@@ -46,7 +46,7 @@ namespace BackOffice.API
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Odds Engine API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "BackOffice API", Version = "v1" });
             });
         }
 
