@@ -2,7 +2,8 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs
-/BackOffice.API/obj
-/BackOffice.Shared/obj
-/BackOffice.API/BackOffice.API.csproj.user
+.vs
+BackOffice.API/obj
+BackOffice.Shared/obj
+BackOffice.API/BackOffice.API.csproj.user
+BackOffice.Shared/bin
