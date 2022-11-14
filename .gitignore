@@ -1,4 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
 
+/.vs
 .vs/backoffice-final/FileContentIndex/21510c1e-603b-4545-893c-f9136a29cd0e.vsidx
 .vs/backoffice-final/FileContentIndex/457e9950-a627-4598-9794-d38b2c6837e2.vsidx
 .vs/backoffice-final/FileContentIndex/b7cd7e9a-5ea6-4cb6-b224-2b081ce67afe.vsidx
