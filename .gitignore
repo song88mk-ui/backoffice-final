@@ -5,3 +5,4 @@
 /.vs
 /BackOffice.API/obj
 /BackOffice.Shared/obj
+/BackOffice.API/BackOffice.API.csproj.user

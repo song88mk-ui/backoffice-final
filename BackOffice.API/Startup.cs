@@ -1,3 +1,4 @@
+using BackOffice.Shared.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackOffice.API
 {
@@ -26,6 +29,25 @@ namespace BackOffice.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            //services.AddDbContext<BackOfficeDbContext>(o => o.UseSqlServer(Configuration["Custom:Trading"]));
+
+            #region DbContext
+
+            #endregion
+
+            #region Controllers
+
+            #endregion
+
+            #region Repository
+
+            #endregion
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Odds Engine API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,7 +59,11 @@ namespace BackOffice.API
             }
 
             app.UseHttpsRedirection();
-
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ctrl API V1");
+            });
             app.UseRouting();
 
             app.UseAuthorization();
