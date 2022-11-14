@@ -62,7 +62,7 @@ namespace BackOffice.API
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ctrl API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "BackOffice API V1");
             });
             app.UseRouting();
 
