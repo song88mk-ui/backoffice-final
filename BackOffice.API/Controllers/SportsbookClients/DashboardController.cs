@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace BackOffice.API.Controllers.SportsbookClients
+namespace Backoffice.API.Controllers.SportsbookClients
 {
+    [ApiController]
+    [Route("sbc/dashboard")]
     public class DashboardController : Controller
     {
         public IActionResult Index()

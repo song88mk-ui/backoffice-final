@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace BackOffice.API.Controllers.SportsbookClients
+namespace Backoffice.API.Controllers.Admin
 {
-    public class RevenueSettlementController : Controller
+    [ApiController]
+    [Route("admin/user")]
+    public class UserController : Controller
     {
         public IActionResult Index()
         {

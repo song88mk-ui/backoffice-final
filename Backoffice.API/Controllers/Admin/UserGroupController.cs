@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace BackOffice.API.Controllers.Administration
+namespace Backoffice.API.Controllers.Admin
 {
+    [ApiController]
+    [Route("admin/usergroup")]
     public class UserGroupController : Controller
     {
         public IActionResult Index()
