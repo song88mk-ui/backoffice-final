@@ -2,7 +2,7 @@
 
 namespace Backoffice.Shared.Models
 {
-    public class BaseResponseDTO<T>
+    public class BaseResponse<T>
     {
         public StatusCode StatusCode { get; set; }
         public string Message { get; set; }

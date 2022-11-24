@@ -1,6 +1,6 @@
-﻿namespace Backoffice.Shared.Models
+﻿namespace Backoffice.Shared.Models.Response
 {
-    public class ClientListResponseDTO
+    public class ClientListResponse
     {
         public long ClientId { get; set; }
         public string BusinessName { get; set; }
