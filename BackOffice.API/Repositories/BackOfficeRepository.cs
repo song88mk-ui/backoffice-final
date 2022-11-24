@@ -27,5 +27,10 @@ namespace Backoffice.API.Repositories
         {
             throw new System.NotImplementedException();
         }
+
+        public List<CurrenciesResponse> GetCurrencies()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
