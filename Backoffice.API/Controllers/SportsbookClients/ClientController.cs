@@ -1,13 +1,16 @@
 ﻿using Backoffice.API.Repositories;
 using Backoffice.Shared.Models.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.SportsbookClients
 {
     [ApiController]
     [Route("client")]
+    [EnableCors("AllowAllOrigins")]
     public class ClientController : Controller
     {
         private readonly IBackofficeRepository _backofficeRepository;
@@ -33,46 +36,88 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
 
+        #region Client Management
+        [Authorize(Policy = "ManageClientsReadOnly")]
+        [HttpGet("clients/{page}/{pageSize}")]
+        public async Task<IActionResult> GetClientListAsync([FromRoute] int page, [FromRoute] int pageSize, string businessName = "", string sortOrder = "BusinessNameAscending")
+        {
+            var result = await _backofficeRepository.GetClients(page, pageSize, businessName, sortOrder);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                case BoStatusCode.Error:
+                default:
+                    return BadRequest(result);
+            }
+        }
+        #endregion
+
         #region Top Fixture
-        [EnableCors("AllowAllOrigins")]
         [HttpGet("topfixtures")]
         public async Task<IActionResult> GetClientTopFixtures([FromQuery] string clientIds)
         {
-            var regionClients = _backofficeRepository.GetClientsByRegion(clientIds).Result;
+            var regionClients = await _backofficeRepository.GetClientsByRegion(clientIds);
             // get client top fixtures
-            var result = await _platformRepository.GetClientTopFixtures(regionClients);
+            var result = await _platformRepository.GetClientTopFixtures(regionClients.Result);
 
-            return Ok(result);
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                case BoStatusCode.Error:
+                default:
+                    return BadRequest(result);
+            }
         }
 
-        [EnableCors("AllowAllOrigins")]
         [HttpGet("topfixtures/sportstree")]
         public async Task<IActionResult> GetSportstreeByClientId([FromQuery] int clientId)
         {
-            var region = _backofficeRepository.GetClientRegion(clientId).Result;
+            var region = await _backofficeRepository.GetClientRegion(clientId);
             // get sportstree w/ fixtures
-            var result = await _platformRepository.GetSportstreeDetails(clientId, region);
+            var result = await _platformRepository.GetSportstreeDetails(clientId, region.Result);
 
-            return Ok(result);
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                case BoStatusCode.Error:
+                default:
+                    return BadRequest(result);
+            }
         }
 
-        [EnableCors("AllowAllOrigins")]
         [HttpPost("topfixtures")]
         public async Task<IActionResult> PostClientTopFixtures([FromBody] PostClientTopFixtureRequest request)
         {
-            var region = _backofficeRepository.GetClientRegion(request.ClientId).Result;
-            var result = await _platformRepository.PostClientTopFixtures(request, region);
+            var region = await _backofficeRepository.GetClientRegion(request.ClientId);
+            var result = await _platformRepository.PostClientTopFixtures(request, region.Result);
 
-            return Ok(result);
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                case BoStatusCode.Error:
+                default:
+                    return BadRequest(result);
+            }
         }
 
-        [EnableCors("AllowAllOrigins")]
         [HttpPost("topfixtures/copy")]
         public async Task<IActionResult> CopyClientTopFixtures([FromBody] CopyClientTopFixtureRequest request)
         {
             var result = await _backofficeRepository.CopyClientTopFixtures(request);
 
-            return Ok(result);
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                case BoStatusCode.Error:
+                default:
+                    return BadRequest(result);
+            }
         }
         #endregion
     }
