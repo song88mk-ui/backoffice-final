@@ -120,5 +120,95 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
         #endregion
+        #region TOP LEAGUES
+
+        [EnableCors("AllowAllOrigins")]
+        [HttpGet("topleagues")]
+        public async Task<IActionResult> GetClientTopLeagues(TopLeaguesRequest request)
+        {
+            var region = _backofficeRepository.GetClientsByRegion(request.ClientIdRefs).Result;
+
+            var result = await _platformRepository.GetClientTopLeagues(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [EnableCors("AllowAllOrigins")]
+        [HttpPost("topleagues")]
+        public async Task<IActionResult> AddOrUpdateTopLeagues(ClientTopLeaguesRequest request)
+        {
+            var region = _backofficeRepository.GetClientRegion(request.ClientIdRef).Result;
+            var result = await _platformRepository.AddOrUpdateTopLeagues(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [EnableCors("AllowAllOrigins")]
+        [HttpPost("topleagues/copy")]
+        public async Task<IActionResult> CopyClientTopLeagues([FromBody] CopyClientTopLeaguesRequest request)
+        {
+            var result = await _platformRepository.CopyClientTopLeagues(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [EnableCors("AllowAllOrigins")]
+        [HttpGet("client/sports")]
+        public async Task<IActionResult> GetClientSports([FromQuery] string LanguageCode)
+        {
+            var result = await _platformRepository.GetClientSports(LanguageCode, "HK");
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [EnableCors("AllowAllOrigins")]
+        [HttpGet("client/allleagues")]
+        public async Task<IActionResult> GetClientAllLeagues([FromQuery] ClientAllLeaguesRequest request)
+        {
+            var region = _backofficeRepository.GetClientRegion(request.ClientIdRef).Result;
+
+            var result = await _platformRepository.GetClientAllLeagues(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("client/currencies")]
+        public async Task<IActionResult> GetCurrencies()
+        {
+            var result = _backofficeRepository.GetCurrencies();
+
+            return Ok(result);
+        }
+        #endregion
     }
 }

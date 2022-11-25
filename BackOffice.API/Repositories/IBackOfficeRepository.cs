@@ -14,5 +14,6 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<string>> GetClientRegion(int clientId);
         Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs);
         Task<BaseResponse<BaseResponse<bool>>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);
+        List<CurrenciesResponse> GetCurrencies();
     }
 }
