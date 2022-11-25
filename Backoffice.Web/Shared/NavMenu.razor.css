@@ -3,14 +3,14 @@
 }
 
 .top-row {
-    height: 3.5rem;
+    height: 7rem;
     border-bottom: solid 1.5px #747474;
 }
 
 .bottom-row {
-    position: absolute;
+    /*position: absolute;
     bottom: 0;
-    width: 100%;
+    width: 100%;*/
 }
 
 .navbar-brand {
@@ -57,6 +57,11 @@
     color: white;
 }
 
+.nav-item ::deep .nav-link.account {
+    border: solid 1px #fff;
+    color: #fff;
+}
+
 @media (min-width: 641px) {
     .navbar-toggler {
         display: none;
@@ -66,4 +71,45 @@
         /* Never collapse the sidebar for wide screens */
         display: block;
     }
+}
+
+.ico {
+    display: block;
+    height: 1.5em;
+    width: 1.5em;
+    background-size: initial;
+    background-repeat: no-repeat;
+    margin-right: 10px;
+}
+
+.ico-dashboard {
+    background-image: url('./icons/svg/dashboard.svg');
+}
+
+.ico-deeplink-generator {
+    background-image: url('./icons/svg/deeplink-generator.svg');
+}
+
+.ico-notification {
+    background-image: url('./icons/svg/notification.svg');
+}
+
+.ico-parlay-bonus {
+    background-image: url('./icons/svg/parlay-bonus.svg');
+}
+
+.ico-reports {
+    background-image: url('./icons/svg/reports.svg');
+}
+
+.ico-top-fixtures {
+    background-image: url('./icons/svg/top-fixtures.svg');
+}
+
+.ico-top-leagues {
+    background-image: url('./icons/svg/top-leagues.svg');
+}
+
+.ico-user {
+    background-image: url('./icons/svg/user.svg');
 }
