@@ -1,6 +1,6 @@
-﻿using Backoffice.API.Repositories;
+﻿using Backoffice.API.ActionFilter;
+using Backoffice.API.Repositories;
 using Backoffice.Shared.Models.Requests;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -9,6 +9,7 @@ using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.SportsbookClients
 {
+    [Authorize]
     [ApiController]
     [Route("client")]
     [EnableCors("AllowAllOrigins")]
@@ -36,23 +37,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-
-        #region Client Management
-        [Authorize(Policy = "ManageClientsReadOnly")]
-        [HttpGet("clients/{page}/{pageSize}")]
-        public async Task<IActionResult> GetClientListAsync([FromRoute] int page, [FromRoute] int pageSize, [FromQuery] string businessName = "", [FromQuery] string sortOrder = "BusinessNameAscending")
-        {
-            var result = await _backofficeRepository.GetClients(page, pageSize, businessName, sortOrder);
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-        #endregion
 
         #region Top Fixture
         [HttpGet("topfixtures")]
