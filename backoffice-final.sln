@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backoffice.API", "Backoffic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backoffice.Shared", "Backoffice.Shared\Backoffice.Shared.csproj", "{C41EB7BC-D011-42FB-B43C-C5D4D500ED00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backoffice.Web", "Backoffice.Web\Backoffice.Web.csproj", "{08731752-A74E-47CF-9B8C-B2437D93A41B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backoffice.Web", "Backoffice.Web\Backoffice.Web.csproj", "{08731752-A74E-47CF-9B8C-B2437D93A41B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

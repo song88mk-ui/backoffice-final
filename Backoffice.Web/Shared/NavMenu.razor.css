@@ -70,15 +70,6 @@
     }
 }
 
-.ico {
-    display: block;
-    height: 1.5em;
-    width: 1.5em;
-    background-size: initial;
-    background-repeat: no-repeat;
-    margin-right: 10px;
-}
-
 .nav-item ::deep a.active .ico, .nav-item ::deep a:hover .ico {
     color: #fff;
 }
@@ -86,36 +77,4 @@
 .sub-menu {
     border-radius: 5px;
     background-color: #404E67;
-}
-
-.ico-dashboard {
-    background-image: url('./icons/svg/dashboard.svg');
-}
-
-.ico-deeplink-generator {
-    background-image: url('./icons/svg/deeplink-generator.svg');
-}
-
-.ico-notification {
-    background-image: url('./icons/svg/notification.svg');
-}
-
-.ico-parlay-bonus {
-    background-image: url('./icons/svg/parlay-bonus.svg');
-}
-
-.ico-reports {
-    background-image: url('./icons/svg/reports.svg');
-}
-
-.ico-top-fixtures {
-    background-image: url('./icons/svg/top-fixtures.svg');
-}
-
-.ico-top-leagues {
-    background-image: url('./icons/svg/top-leagues.svg');
-}
-
-.ico-user {
-    background-image: url('./icons/svg/user.svg');
 }
