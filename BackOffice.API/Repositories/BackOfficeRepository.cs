@@ -33,22 +33,22 @@ namespace Backoffice.API.Repositories
             };
         }
 
-        public Task<BaseResponse<string>> GetClientRegion(int clientId)
+        public async Task<BaseResponse<string>> GetClientRegion(int clientId)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs)
+        public async Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<BaseResponse<BaseResponse<bool>>> CopyClientTopFixtures(CopyClientTopFixtureRequest request)
+        public async Task<BaseResponse<BaseResponse<bool>>> CopyClientTopFixtures(CopyClientTopFixtureRequest request)
         {
             throw new System.NotImplementedException();
         }
 
-        public List<CurrenciesResponse> GetCurrencies()
+        public async Task<BaseResponse<List<CurrenciesResponse>>> GetCurrencies()
         {
             throw new System.NotImplementedException();
         }

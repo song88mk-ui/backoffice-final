@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using static Backoffice.Shared.Models.Response.ClientTopLeaguesResponse;
 using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.SportsbookClients
@@ -39,7 +40,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         #region Client Management
         [Authorize(Policy = "ManageClientsReadOnly")]
         [HttpGet("clients/{page}/{pageSize}")]
-        public async Task<IActionResult> GetClientListAsync([FromRoute] int page, [FromRoute] int pageSize, string businessName = "", string sortOrder = "BusinessNameAscending")
+        public async Task<IActionResult> GetClientListAsync([FromRoute] int page, [FromRoute] int pageSize, [FromQuery] string businessName = "", [FromQuery] string sortOrder = "BusinessNameAscending")
         {
             var result = await _backofficeRepository.GetClients(page, pageSize, businessName, sortOrder);
 
@@ -47,7 +48,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
             {
                 case BoStatusCode.Success:
                     return Ok(result);
-                case BoStatusCode.Error:
                 default:
                     return BadRequest(result);
             }
@@ -66,7 +66,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
             {
                 case BoStatusCode.Success:
                     return Ok(result);
-                case BoStatusCode.Error:
                 default:
                     return BadRequest(result);
             }
@@ -83,7 +82,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
             {
                 case BoStatusCode.Success:
                     return Ok(result);
-                case BoStatusCode.Error:
                 default:
                     return BadRequest(result);
             }
@@ -99,7 +97,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
             {
                 case BoStatusCode.Success:
                     return Ok(result);
-                case BoStatusCode.Error:
                 default:
                     return BadRequest(result);
             }
@@ -114,7 +111,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
             {
                 case BoStatusCode.Success:
                     return Ok(result);
-                case BoStatusCode.Error:
                 default:
                     return BadRequest(result);
             }
@@ -126,13 +122,13 @@ namespace Backoffice.API.Controllers.SportsbookClients
         [HttpGet("topleagues")]
         public async Task<IActionResult> GetClientTopLeagues(TopLeaguesRequest request)
         {
-            var region = _backofficeRepository.GetClientsByRegion(request.ClientIdRefs).Result;
+            var region = await _backofficeRepository.GetClientsByRegion(request.ClientIdRefs);
 
-            var result = await _platformRepository.GetClientTopLeagues(request, region);
+            var result = await _platformRepository.GetClientTopLeagues(request, region.Result);
 
             switch (result.StatusCode)
             {
-                case Shared.Enums.StatusCode.Success:
+                case BoStatusCode.Success:
                     return Ok(result);
                 default:
                     return BadRequest(result);
@@ -143,12 +139,12 @@ namespace Backoffice.API.Controllers.SportsbookClients
         [HttpPost("topleagues")]
         public async Task<IActionResult> AddOrUpdateTopLeagues(ClientTopLeaguesRequest request)
         {
-            var region = _backofficeRepository.GetClientRegion(request.ClientIdRef).Result;
-            var result = await _platformRepository.AddOrUpdateTopLeagues(request, region);
+            var region = await _backofficeRepository.GetClientRegion(request.ClientIdRef);
+            var result = await _platformRepository.AddOrUpdateTopLeagues(request, region.Result);
 
             switch (result.StatusCode)
             {
-                case Shared.Enums.StatusCode.Success:
+                case BoStatusCode.Success:
                     return Ok(result);
                 default:
                     return BadRequest(result);
@@ -163,7 +159,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
 
             switch (result.StatusCode)
             {
-                case Shared.Enums.StatusCode.Success:
+                case BoStatusCode.Success:
                     return Ok(result);
                 default:
                     return BadRequest(result);
@@ -189,13 +185,13 @@ namespace Backoffice.API.Controllers.SportsbookClients
         [HttpGet("client/allleagues")]
         public async Task<IActionResult> GetClientAllLeagues([FromQuery] ClientAllLeaguesRequest request)
         {
-            var region = _backofficeRepository.GetClientRegion(request.ClientIdRef).Result;
+            var region = await _backofficeRepository.GetClientRegion(request.ClientIdRef);
 
-            var result = await _platformRepository.GetClientAllLeagues(request, region);
+            var result = await _platformRepository.GetClientAllLeagues(request, region.Result);
 
             switch (result.StatusCode)
             {
-                case Shared.Enums.StatusCode.Success:
+                case BoStatusCode.Success:
                     return Ok(result);
                 default:
                     return BadRequest(result);
@@ -205,9 +201,15 @@ namespace Backoffice.API.Controllers.SportsbookClients
         [HttpGet("client/currencies")]
         public async Task<IActionResult> GetCurrencies()
         {
-            var result = _backofficeRepository.GetCurrencies();
+            var result = await _backofficeRepository.GetCurrencies();
 
-            return Ok(result);
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
         }
         #endregion
     }
