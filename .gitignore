@@ -8,3 +8,5 @@ BackOffice.Shared/obj
 BackOffice.API/BackOffice.API.csproj.user
 BackOffice.Shared/bin
 /BackOffice.API/bin/Debug/netcoreapp3.1
+BackOffice.Web/bin
+BackOffice.Web/obj
