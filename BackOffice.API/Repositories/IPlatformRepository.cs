@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using System.Collections.Generic;
@@ -17,5 +18,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<CopyClientTopLeagueMessageResponse>> CopyClientTopLeagues(CopyClientTopLeaguesRequest request);
         Task<BaseResponse<SportsLookupResponse>> GetClientSports(string LanguageCode, string region);
         Task<BaseResponse<TopLeaguesResponse>> GetClientAllLeagues(ClientAllLeaguesRequest request, string region);
+        Task<BaseResponse<ClientParlayBonusResponse>> GetClientParlayBonus(GetParlayBonusRequest request, IDictionary<string, string> regionclientIds);
+        Task<BaseResponse<StatusCode>> AddOrUpdateParlayBonus(ParlayBonusRequest request, string region);
     }
 }

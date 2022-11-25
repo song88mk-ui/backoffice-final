@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -14,6 +15,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using static Backoffice.Shared.Models.Requests.TopLeaguesRequest;
+using static Backoffice.Shared.Models.Response.ClientParlayBonusResponse;
 using static Backoffice.Shared.Models.Response.ClientTopFixtureResponse;
 using static Backoffice.Shared.Models.Response.ClientTopLeaguesResponse;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -377,6 +379,96 @@ namespace Backoffice.API.Repositories
             catch (Exception ex)
             {
                 return new BaseResponse<TopLeaguesResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ClientParlayBonusResponse>> GetClientParlayBonus(GetParlayBonusRequest request, IDictionary<string, string> regionclientIds)
+        {
+            try
+            {
+                var bonus = new List<ParlayBonusConfig>();
+                var minOdds = 0m;
+                foreach (var region in regionclientIds)
+                {
+                    var queryStrings = await FormUrlEncoded(request);
+
+                    var requestUri = $"v1/client/parlaybonus{queryStrings}";
+
+                    var result = await GetHttpClient(region.Key).GetAsync(requestUri);
+
+                    if (result.StatusCode == HttpStatusCode.OK)
+                    {
+                        var newresult = JsonConvert.DeserializeObject<BaseResponse<ClientParlayBonusResponse>>(result.Content.ReadAsStringAsync().Result).Result;
+                        if (newresult.ParlayBonusConfigs.Any())
+                        {
+                            bonus.AddRange(newresult.ParlayBonusConfigs);
+                            minOdds = newresult.ParlayBonusMinOdds;
+                        }
+                    }
+                }
+
+                if (bonus.Any())
+                {
+                    return new BaseResponse<ClientParlayBonusResponse>()
+                    {
+                        StatusCode = StatusCode.Success,
+                        Message = StatusCode.Success.ToString(),
+                        Result = new ClientParlayBonusResponse
+                        {
+                            ClientIdRef = request.ClientIdRef,
+                            ParlayBonusConfigs = bonus,
+                            ParlayBonusMinOdds = minOdds
+                        }
+                    };
+                }
+                else
+                {
+                    return new BaseResponse<ClientParlayBonusResponse>()
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')}"
+                    };
+                }                
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ClientParlayBonusResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<StatusCode>> AddOrUpdateParlayBonus(ParlayBonusRequest request, string region)
+        {
+            try
+            {
+                var response = await GetHttpClient(region).PostAsync($"v1/client/parlaybonus", new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<StatusCode>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<StatusCode>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

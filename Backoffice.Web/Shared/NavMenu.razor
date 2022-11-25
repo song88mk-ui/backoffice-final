@@ -1,27 +1,86 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<div class="top-row ps-3 navbar">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Backoffice.Web</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <img src="icons/svg/song-logo.svg" alt="Song88" />
     </div>
 </div>
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+            <NavLink class="nav-link" href="fetchdata">
+                <span class="ico ico-dashboard" aria-hidden="true"></span>
+                <span class="nav-menu-text">Dashboard</span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+                <span class="ico ico-reports" aria-hidden="true"></span>
+                <span class="nav-menu-text">Reports</span>
+                <span class="fa fa-chevron-right"></span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            <NavLink class="nav-link" href="counter">
+                <span class="ico ico-reports" aria-hidden="true"></span>
+                <span class="nav-menu-text">Settings</span>
+                <span class="fa fa-chevron-down"></span>
+            </NavLink>
+            <div class="sub-menu">
+                <nav class="flex-column">
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="fetchdata">
+                            <span class="ico ico-deeplink-generator" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Deeplink Generator</span>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="fetchdata">
+                            <span class="ico ico-top-leagues" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Top Leagues</span>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="fetchdata">
+                            <span class="ico ico-top-fixtures" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Top Fixtures</span>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="fetchdata">
+                            <span class="ico ico-parlay-bonus" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Parlay Bonus</span>
+                        </NavLink>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="ico ico-dashboard" aria-hidden="true"></span>
+                <span class="nav-menu-text">Clients</span>
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="ico ico-parlay-bonus" aria-hidden="true"></span>
+                <span class="nav-menu-text">Revenue Settlement</span>
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+<div class="bottom-row">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="javascript:void(0)">
+                <span class="ico ico-notification" aria-hidden="true"></span>
+                <span class="nav-menu-text">Notifications</span>
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link account" href="javascript:void(0)">
+                <span class="ico ico-user" aria-hidden="true"></span>
+                <span class="nav-menu-text">FCI-Bryan</span>
             </NavLink>
         </div>
     </nav>

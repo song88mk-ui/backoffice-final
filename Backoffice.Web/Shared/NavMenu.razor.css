@@ -3,19 +3,19 @@
 }
 
 .top-row {
-    height: 3.5rem;
-    background-color: rgba(0,0,0,0.4);
+    height: 7rem;
+    border-bottom: solid 1.5px #747474;
+}
+
+.bottom-row {
+    /*position: absolute;
+    bottom: 0;
+    width: 100%;*/
 }
 
 .navbar-brand {
     font-size: 1.1rem;
-}
-
-.oi {
-    width: 2rem;
-    font-size: 1.1rem;
-    vertical-align: text-top;
-    top: -2px;
+    color: #fff;
 }
 
 .nav-item {
@@ -23,31 +23,40 @@
     padding-bottom: 0.5rem;
 }
 
-    .nav-item:first-of-type {
-        padding-top: 1rem;
-    }
+.nav-menu-text {
+    flex: auto;
+}
 
-    .nav-item:last-of-type {
-        padding-bottom: 1rem;
-    }
+.nav-item:first-of-type {
+    padding-top: 1rem;
+}
 
-    .nav-item ::deep a {
-        color: #d7d7d7;
-        border-radius: 4px;
-        height: 3rem;
-        display: flex;
-        align-items: center;
-        line-height: 3rem;
-    }
+.nav-item:last-of-type {
+    padding-bottom: 1rem;
+}
+
+.nav-item ::deep a {
+    color: #9AA0AB;
+    border-radius: 4px;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    line-height: 3rem;
+}
 
 .nav-item ::deep a.active {
-    background-color: rgba(255,255,255,0.25);
+    background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
     color: white;
 }
 
 .nav-item ::deep a:hover {
-    background-color: rgba(255,255,255,0.1);
+    background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
     color: white;
+}
+
+.nav-item ::deep .nav-link.account {
+    border: solid 1px #fff;
+    color: #fff;
 }
 
 @media (min-width: 641px) {
@@ -59,4 +68,54 @@
         /* Never collapse the sidebar for wide screens */
         display: block;
     }
+}
+
+.ico {
+    display: block;
+    height: 1.5em;
+    width: 1.5em;
+    background-size: initial;
+    background-repeat: no-repeat;
+    margin-right: 10px;
+}
+
+.nav-item ::deep a.active .ico, .nav-item ::deep a:hover .ico {
+    color: #fff;
+}
+
+.sub-menu {
+    border-radius: 5px;
+    background-color: #404E67;
+}
+
+.ico-dashboard {
+    background-image: url('./icons/svg/dashboard.svg');
+}
+
+.ico-deeplink-generator {
+    background-image: url('./icons/svg/deeplink-generator.svg');
+}
+
+.ico-notification {
+    background-image: url('./icons/svg/notification.svg');
+}
+
+.ico-parlay-bonus {
+    background-image: url('./icons/svg/parlay-bonus.svg');
+}
+
+.ico-reports {
+    background-image: url('./icons/svg/reports.svg');
+}
+
+.ico-top-fixtures {
+    background-image: url('./icons/svg/top-fixtures.svg');
+}
+
+.ico-top-leagues {
+    background-image: url('./icons/svg/top-leagues.svg');
+}
+
+.ico-user {
+    background-image: url('./icons/svg/user.svg');
 }

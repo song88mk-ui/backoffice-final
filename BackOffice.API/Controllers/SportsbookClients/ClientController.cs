@@ -196,5 +196,41 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
         #endregion
+
+        #region PARLAY BONUS
+        [EnableCors("AllowAllOrigins")]
+        [HttpGet("parlaybonus/list")]
+        public async Task<IActionResult> GetClientParlayBonus([FromQuery] GetParlayBonusRequest request)
+        {
+            var regionClients = await _backofficeRepository.GetClientsByRegion(request.ClientIdRef.ToString());
+
+            var result = await _platformRepository.GetClientParlayBonus(request, regionClients.Result);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [EnableCors("AllowAllOrigins")]
+        [HttpPost("parlaybonus")]
+        public async Task<IActionResult> AddOrUpdateParlayBonus([FromBody] ParlayBonusRequest request)
+        {
+            var region = await _backofficeRepository.GetClientRegion(request.ClientIdRef);
+
+            var result = await _platformRepository.AddOrUpdateParlayBonus(request, region.Result);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        #endregion
     }
 }

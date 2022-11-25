@@ -8,3 +8,9 @@ BackOffice.Shared/obj
 BackOffice.API/BackOffice.API.csproj.user
 BackOffice.Shared/bin
 /BackOffice.API/bin/Debug/netcoreapp3.1
+/Backoffice.Web/bin
+/Backoffice.Web/bin/Debug/net6.0
+/Backoffice.Web/obj
+/Backoffice.Web/obj/Debug/net6.0
+/Backoffice.Web/obj/Debug/net6.0/ref/Backoffice.Web.dll
+/Backoffice.Web/obj/Debug/net6.0/scopedcss
