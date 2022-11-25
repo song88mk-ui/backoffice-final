@@ -18,16 +18,13 @@
     color: #fff;
 }
 
-.oi {
-    width: 2rem;
-    font-size: 1.1rem;
-    vertical-align: text-top;
-    top: -2px;
-}
-
 .nav-item {
     font-size: 0.9rem;
     padding-bottom: 0.5rem;
+}
+
+.nav-menu-text {
+    flex: auto;
 }
 
 .nav-item:first-of-type {
@@ -80,6 +77,15 @@
     background-size: initial;
     background-repeat: no-repeat;
     margin-right: 10px;
+}
+
+.nav-item ::deep a.active .ico, .nav-item ::deep a:hover .ico {
+    color: #fff;
+}
+
+.sub-menu {
+    border-radius: 5px;
+    background-color: #404E67;
 }
 
 .ico-dashboard {
