@@ -7,10 +7,8 @@
     border-bottom: solid 1.5px #747474;
 }
 
-.bottom-row {
-    /*position: absolute;
-    bottom: 0;
-    width: 100%;*/
+.middle-bottom-row {
+    height: 88vh;
 }
 
 .navbar-brand {
