@@ -1,0 +1,29 @@
+﻿.access-items {
+    height: inherit;
+}
+
+.access-item {
+    background-color: #FFFFFF;
+}
+
+.access-item-logo img {
+    width: 75px;
+    height: 75px;
+    margin: 0 auto;
+    display: block;
+}
+
+.top-row h4 {
+    font-size: 20px;
+}
+
+.middle-row p {
+    font-size: 12px;
+}
+
+.bottom-row a {
+    background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
+    color: white;
+    font-size: 12px; 
+    text-align: center;
+}
