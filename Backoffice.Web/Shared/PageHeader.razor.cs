@@ -5,6 +5,7 @@ namespace Backoffice.Web.Shared
     public partial class PageHeader : IDisposable
     {
         [Parameter] public string PageTitle { get; set; }
+        [Parameter] public string IconClass { get; set; }
 
         public void Dispose()
         {
