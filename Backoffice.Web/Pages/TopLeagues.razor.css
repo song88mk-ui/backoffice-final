@@ -2,3 +2,82 @@
     background-color: #FFFFFF;
     border-radius: 3px;
 }
+
+.tbl {
+    width: 100%;
+}
+
+.tbl thead th {
+    background-color: #354156;
+    color: #fff;
+}
+
+.tbl thead th, .tbl tbody td, .tbl tfoot td {
+    font-size: 0.9rem;
+    font-weight: inherit;
+    text-align: center;
+}
+
+.tbl tfoot td {
+    background-color: #232323;
+    color: #fff;
+}
+
+.tbl thead th:first-child {
+    border-top-left-radius: 3px;
+}
+
+.tbl thead th:last-child {
+    border-top-right-radius: 3px;
+}
+
+.tbl tfoot td:first-child {
+    border-bottom-left-radius: 3px;
+}
+
+.tbl tfoot td:last-child {
+    border-bottom-right-radius: 3px;
+}
+
+.th-number {
+    width: 15%;
+}
+
+.th-client {
+    width: 25%;
+}
+
+.th-top-leagues {
+    width: 45%;
+}
+
+.th-action {
+    width: 15%;
+}
+
+.tl-fixture {
+    background-color: #9AA0AB;
+    color: #FFF;
+    width: 30%;
+}
+
+.tl-link-edit {
+    color: #1F1F1F;
+    font-size: 1rem;
+}
+
+.tl-link-copy {
+    color: #1F1F1F;
+    font-size: 1rem;
+}
+
+.tbl-pagination a, .tbl-pagination span {
+    color: #979797;
+}
+
+.tbl-pagination a.active {
+    background-color: #E4422E;
+    color: #FFFFFF;
+    padding: 2px 5px;
+    border-radius: 2px;
+}

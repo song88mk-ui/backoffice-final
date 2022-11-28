@@ -33,3 +33,33 @@ C:\Users\Work\source\repos\BO Revamp\backoffice-final\Backoffice.Web\obj\Debug\n
 C:\Users\Work\source\repos\BO Revamp\backoffice-final\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.pdb
 C:\Users\Work\source\repos\BO Revamp\backoffice-final\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.genruntimeconfig.cache
 C:\Users\Work\source\repos\BO Revamp\backoffice-final\Backoffice.Web\obj\Debug\net6.0\ref\Backoffice.Web.dll
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\bin\Debug\net6.0\appsettings.Development.json
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\bin\Debug\net6.0\appsettings.json
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\bin\Debug\net6.0\Backoffice.Web.staticwebassets.runtime.json
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\bin\Debug\net6.0\Backoffice.Web.exe
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\bin\Debug\net6.0\Backoffice.Web.deps.json
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\bin\Debug\net6.0\Backoffice.Web.runtimeconfig.json
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\bin\Debug\net6.0\Backoffice.Web.dll
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\bin\Debug\net6.0\ref\Backoffice.Web.dll
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\bin\Debug\net6.0\Backoffice.Web.pdb
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.csproj.AssemblyReference.cache
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.AssemblyInfoInputs.cache
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.AssemblyInfo.cs
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.csproj.CoreCompileInputs.cache
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.RazorAssemblyInfo.cache
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.RazorAssemblyInfo.cs
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\staticwebassets.build.json
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\staticwebassets.development.json
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\scopedcss\Components\TopLeagues\Filter.razor.rz.scp.css
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\scopedcss\Pages\TopLeagues.razor.rz.scp.css
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\scopedcss\Shared\MainLayout.razor.rz.scp.css
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\scopedcss\Shared\NavMenu.razor.rz.scp.css
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\scopedcss\Shared\PageHeader.razor.rz.scp.css
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\scopedcss\bundle\Backoffice.Web.styles.css
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\scopedcss\projectbundle\Backoffice.Web.bundle.scp.css
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.dll
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\ref\Backoffice.Web.dll
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.pdb
+C:\Users\BrPo01\source\repos\backoffice-final-2\Backoffice.Web\obj\Debug\net6.0\Backoffice.Web.genruntimeconfig.cache
