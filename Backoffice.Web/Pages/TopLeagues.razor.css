@@ -81,3 +81,18 @@
     padding: 2px 5px;
     border-radius: 2px;
 }
+
+::deep .modal-show {
+    display: block;
+    position: fixed;
+}
+
+::deep .modal-center {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    float: left;
+    height: unset !important;
+    margin-left: unset;
+    margin-top: unset;
+}

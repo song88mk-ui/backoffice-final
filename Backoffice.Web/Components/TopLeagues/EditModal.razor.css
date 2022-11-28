@@ -1,0 +1,26 @@
+﻿.modal-show {
+    display: block;
+    position: fixed;
+}
+
+.modal-center {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    float: left;    
+    height: unset !important;
+    margin-left: unset;
+    margin-top: unset;
+}
+
+.actions {
+    color: black;
+}
+
+.actions a {
+    color: black;
+}
+
+    .actions > span {
+        padding: 0.2rem;
+    }
