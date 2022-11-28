@@ -58,7 +58,7 @@
 .tl-fixture {
     background-color: #9AA0AB;
     color: #FFF;
-    width: 30%;
+    width: fit-content;
 }
 
 .tl-link-edit {
