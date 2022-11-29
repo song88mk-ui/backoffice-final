@@ -25,12 +25,12 @@ namespace Backoffice.API.Repositories
             _platformRepository = platformRepository;
         }
 
-        public async Task<BaseResponse<List<ClientListResponse>>> GetClients()
+        public async Task<BaseResponse<ClientListResponse>> GetClients()
         {
             try
             {
                 var clients = _backofficeContext.ClientInformation
-                    .Select(client => new ClientListResponse
+                    .Select(client => new ClientResponse
                     {
                         ClientId = client.ClientId,
                         BusinessName = client.Name,
@@ -38,16 +38,19 @@ namespace Backoffice.API.Repositories
                         Region = client.Region
                     }).ToList();
 
-                return new BaseResponse<List<ClientListResponse>>
+                return new BaseResponse<ClientListResponse>
                 {
                     StatusCode = StatusCode.Success,
                     Message = StatusCode.Success.ToString(),
-                    Result = clients
+                    Result = new ClientListResponse
+                    {
+                        Clients = clients ?? new List<ClientResponse>()
+                    }
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<ClientListResponse>>
+                return new BaseResponse<ClientListResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",

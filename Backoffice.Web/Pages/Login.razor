@@ -1,6 +1,60 @@
-﻿@page "/login"
+﻿@layout AccessLayout
 
-<div class="d-flex flex-row">
-    <div></div>
-    <div></div>
+@page "/"
+@page "/login"
+
+<div class="banner w-100 d-flex flex-row justify-content-center">
+    <div class="first-banner w-50 d-flex flex-column justify-content-center align-items-center">
+        <div class="first-header-text">
+            Welcome To
+        </div>
+        <div class="second-header-text mb-3">
+            Back Office
+        </div>
+        <div class="banner-icons">
+            <img src="icons/svg/login-banner-icons.svg" alt="login banner icons" />
+        </div>
+    </div>
+    <div class="second-banner w-50 px-4 d-flex flex-column justify-content-center align-items-center">
+        <div class="w-50 mx-4 login-container">
+            <div class="login-header mb-5">
+                <div class="logo">
+                    <img src="icons/svg/song88-login-logo.svg" alt="login logo" />
+                </div>
+                <div class="title text-center mt-4 mb-3">Login</div>
+                <hr class="title-break" />
+            </div>
+            <form>
+                <div class="login-body mb-3">
+                    <div class="mb-4">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" placeholder="Enter your username" />
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control border-end-0" placeholder="Enter your password" />
+                            <span class="input-group-text border-start-0 bg-white">
+                                <i class="fa fa-eye-slash"></i>
+                                @*<i class="fa fa-eye"></i>*@
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <input type="checkbox" class="form-check-input me-1" />
+                            <label class="form-check-label">Remember Information</label>
+                        </div>
+                        <div class="col-md-6">
+                            <a class="form-link text-decoration-none float-end" href="javascript:void(0);">Forgot Password?</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="login-footer">
+                    @*<button type="submit" class="d-block rounded-2 text-decoration-none text-center"></button>*@
+                    <a href="/choose-access" class="d-block rounded-2 text-decoration-none text-center">Submit</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
