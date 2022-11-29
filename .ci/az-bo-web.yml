@@ -1,0 +1,35 @@
+name: $(System.TeamProject)-BackOffice-Web-$(Build.BuildId).$(Rev:r)
+
+pr: none
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - Backoffice.Web
+      - Backoffice.Shared
+    exclude:
+      - README.md
+
+
+resources:
+  repositories:
+    - repository: bt
+      type: github
+      name: FlyingCockatoo/BuildTemplates
+      endpoint: FlyingCockatoo
+      ref: refs/tags/v0.1.4
+    - repository: nuget-helper
+      type: github
+      name: FlyingCockatoo/infra-build-nuget-helper
+      endpoint: FlyingCockatoo
+      ref: refs/heads/main
+
+extends:
+  template: dotnetservice.yml@bt
+  parameters:
+    projects:
+      - Backoffice.Web

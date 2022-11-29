@@ -10,6 +10,7 @@ trigger:
   paths:
     include:
       - BackOffice.API
+      - Backoffice.Shared
     exclude:
       - README.md
 
@@ -20,7 +21,7 @@ resources:
       type: github
       name: FlyingCockatoo/BuildTemplates
       endpoint: FlyingCockatoo
-      ref: refs/tags/v0.1.1
+      ref: refs/tags/v0.1.4
     - repository: nuget-helper
       type: github
       name: FlyingCockatoo/infra-build-nuget-helper
