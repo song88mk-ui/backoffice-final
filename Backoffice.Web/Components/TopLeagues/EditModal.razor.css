@@ -24,3 +24,37 @@
     .actions > span {
         padding: 0.2rem;
     }
+
+.editModalTbl {
+    text-align: center;
+}
+
+.editModalTbl tr:nth-child(2n+2) {
+    background-color: #F5F5F5;
+}
+
+.editModalThead {
+    color: white;
+    background-color: #354156;
+    border-radius: 5px;
+}
+
+.editModalBtn {
+    width: 112px;
+    height: 40px;
+    border-radius: 5px;
+    color: white;
+}
+
+.editModalCancel {
+    background-color: #9AA0AB;
+}
+
+.editModalSave {
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+.leagueDropBtn {
+    border: 1px solid #C7C1C1;
+    border-radius: 3px;
+}
