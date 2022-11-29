@@ -22,10 +22,10 @@ namespace Backoffice.API.Controllers.SportsbookClients
         }
 
         #region Top Fixture
-        [HttpGet("topfixtures")]
-        public async Task<IActionResult> GetClientTopFixtures([FromQuery] string clientIds)
+        [HttpPost("topfixtures")]
+        public async Task<IActionResult> GetClientTopFixtures([FromBody] GetClientTopFixtureRequest request)
         {
-            var regionClients = await _backofficeRepository.GetClientsByRegion(clientIds);
+            var regionClients = await _backofficeRepository.GetClientsByRegion(request.ClientIds);
             // get client top fixtures
             var result = await _platformRepository.GetClientTopFixtures(regionClients.Result);
 
@@ -54,7 +54,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
 
-        [HttpPost("topfixtures")]
+        [HttpPost("topfixtures/post")]
         public async Task<IActionResult> PostClientTopFixtures([FromBody] PostClientTopFixtureRequest request)
         {
             var region = await _backofficeRepository.GetClientRegion(request.ClientId);

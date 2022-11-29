@@ -1,6 +1,8 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using System.Net;
 using System.Text.Json;
 
 namespace Backoffice.Web.Services
@@ -24,20 +26,56 @@ namespace Backoffice.Web.Services
         }
         #endregion
 
-        #region Methods
-        public async Task<BaseResponse<ClientTopFixtureResponse>> GetClientTopFixtures(string clientIds)
+        #region Methods - Client
+        public async Task<BaseResponse<ClientListResponse>> GetClients()
         {
             try
             {
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientTopFixtureResponse>>
-                (await _httpClient.GetStreamAsync($"sportsbook/settings/topfixtures"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientListResponse>>
+                (await _httpClient.GetStreamAsync($"sportsbook/client/list"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-                return result ?? new BaseResponse<ClientTopFixtureResponse>
+                return result ?? new BaseResponse<ClientListResponse>
                 {
                     StatusCode = StatusCode.Success,
-                    Message = $"{StatusCode.Success.ToString()}",
-                    Result = new ClientTopFixtureResponse()
+                    Message = $"{StatusCode.Success}",
+                    Result = new ClientListResponse()
                 };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ClientListResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        #endregion
+
+        #region Methods - Top Fixtures
+
+        public async Task<BaseResponse<ClientTopFixtureResponse>> GetClientTopFixtures(GetClientTopFixtureRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"sportsbook/settings/topfixtures", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<ClientTopFixtureResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<ClientTopFixtureResponse>();
+                    else
+                    {
+                        return new BaseResponse<ClientTopFixtureResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -49,10 +87,98 @@ namespace Backoffice.Web.Services
             }
         }
 
+        public async Task<BaseResponse<SportsTreeResponse>> GetSportstreeByClientId(string clientId)
+        {
+            try
+            {
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsTreeResponse>>
+                (await _httpClient.GetStreamAsync($"sportsbook/settings/topfixtures/sportstree?clientId={clientId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return result ?? new BaseResponse<SportsTreeResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = $"{StatusCode.Success}",
+                    Result = new SportsTreeResponse()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<SportsTreeResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ClientTopFixtureMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"sportsbook/settings/topfixtures/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureMessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<ClientTopFixtureMessageResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureMessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<ClientTopFixtureMessageResponse>();
+                    else
+                    {
+                        return new BaseResponse<ClientTopFixtureMessageResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ClientTopFixtureMessageResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+        public async Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"sportsbook/settings/topfixtures/copy", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<bool>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<bool>();
+                    else
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        #endregion
+
         public void Dispose()
         {
             _httpClient.Dispose();
         }
-        #endregion
     }
 }
