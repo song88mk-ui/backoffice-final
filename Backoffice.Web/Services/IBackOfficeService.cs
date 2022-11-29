@@ -5,6 +5,6 @@ namespace Backoffice.Web.Services
 {
     public interface IBackOfficeService
     {
-        Task<BaseResponse<ClientTopFixtureResponse>> GetClientTopFixtures(string clientIds)
+        Task<BaseResponse<ClientTopFixtureResponse>> GetClientTopFixtures(string clientIds);
     }
 }
