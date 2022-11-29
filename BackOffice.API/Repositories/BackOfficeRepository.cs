@@ -1,6 +1,8 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,9 +11,34 @@ namespace Backoffice.API.Repositories
 {
     public class BackofficeRepository : IBackofficeRepository
     {
-        public Task<BaseResponse<List<ClientListResponse>>> GetClients()
+        private readonly IConfiguration _configuration;
+        public BackofficeRepository()
         {
-            throw new System.NotImplementedException();
+
+        }
+
+        public async Task<BaseResponse<List<ClientListResponse>>> GetClients()
+        {
+            try
+            {
+
+
+                return new BaseResponse<List<ClientListResponse>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')}",
+                    Result = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<ClientListResponse>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = null
+                };
+            }
         }
         public async Task<BaseResponse<string>> GetClientRegion(int clientId)
         {
