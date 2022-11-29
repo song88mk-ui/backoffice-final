@@ -9,7 +9,7 @@ namespace Backoffice.API.Repositories
 {
     public interface IBackofficeRepository
     {
-        Task<BaseResponse<List<ClientListResponse>>> GetClients();
+        Task<BaseResponse<ClientListResponse>> GetClients();
         Task<BaseResponse<string>> GetClientRegion(int clientId);
         Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs);
         Task<BaseResponse<BaseResponse<bool>>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);

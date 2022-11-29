@@ -1,3 +1,4 @@
+using Backoffice.Web.Hubs;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -8,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IModalService, ModalService>();
+builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>();
+
 
 var app = builder.Build();
 
@@ -26,6 +29,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.MapBlazorHub();
+app.MapHub<BoHub>("/bohub");
 app.MapFallbackToPage("/_Host");
 
 app.Run();

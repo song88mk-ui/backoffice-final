@@ -5,9 +5,10 @@ namespace Backoffice.Shared.Models.Response
 {
     public class ClientListResponse
     {
-        public long ClientId { get; set; }
-        public string BusinessName { get; set; }
-        public string Brand { get; set; }
-        public string Region { get; set; }
+        public ClientListResponse()
+        {
+            Clients = new List<ClientResponse>();
+        }
+        public List<ClientResponse> Clients { get; set; }
     }
 }
