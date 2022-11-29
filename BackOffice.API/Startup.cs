@@ -3,12 +3,16 @@ using Backoffice.API.Repositories;
 using Backoffice.Shared.Data.Backoffice;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Backoffice.API
 {
@@ -60,6 +64,11 @@ namespace Backoffice.API
                 option.AddSecurityRequirement(requirement);
             });
 
+            services.AddControllers().AddJsonOptions(opt =>
+            {
+                opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+
             services.AddDbContext<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"]));
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
             services.AddScoped<IPlatformRepository, PlatformRepository>();
@@ -76,10 +85,11 @@ namespace Backoffice.API
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseCors();
-            app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseCors();
             app.UseAuthorization();
+
+            app.UseHttpsRedirection();
 
             app.UseEndpoints(endpoints =>
             {

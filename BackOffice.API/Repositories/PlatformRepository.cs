@@ -101,11 +101,11 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).PostAsync($"v1/client/topfixtures", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureMessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonConvert.DeserializeObject<BaseResponse<ClientTopFixtureMessageResponse>>(await response.Content.ReadAsStringAsync());
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureMessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonConvert.DeserializeObject<BaseResponse<ClientTopFixtureMessageResponse>>(await response.Content.ReadAsStringAsync());
                     else
                     {
                         return new BaseResponse<ClientTopFixtureMessageResponse>
@@ -133,6 +133,7 @@ namespace Backoffice.API.Repositories
                 foreach (var region in regionclientIds)
                 {
                     var response = await GetHttpClient(region.Key).GetAsync($"v1/client/topfixtures?clientRefIds={region.Value}");
+                    var payload = JsonConvert.DeserializeObject<BaseResponse<ClientTopFixtureResponse>>(response.Content.ReadAsStringAsync().Result);
 
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
@@ -142,28 +143,30 @@ namespace Backoffice.API.Repositories
                             topFixture.AddRange(newresult);
                         }
                     }
+                    else
+                    {
+                        if (response.StatusCode == HttpStatusCode.BadRequest)
+                            return JsonConvert.DeserializeObject<BaseResponse<ClientTopFixtureResponse>>(await response.Content.ReadAsStringAsync());
+                        else
+                        {
+                            return new BaseResponse<ClientTopFixtureResponse>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                            };
+                        }
+                    }
                 }
 
-                if (topFixture.Any())
+                return new BaseResponse<ClientTopFixtureResponse>()
                 {
-                    return new BaseResponse<ClientTopFixtureResponse>()
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new ClientTopFixtureResponse
                     {
-                        StatusCode = StatusCode.Success,
-                        Message = StatusCode.Success.ToString(),
-                        Result = new ClientTopFixtureResponse
-                        {
-                            TopFixtures = topFixture
-                        }
-                    };
-                }
-                else
-                {
-                    return new BaseResponse<ClientTopFixtureResponse>
-                    {
-                        StatusCode = StatusCode.Error,
-                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')}"
-                    };
-                }
+                        TopFixtures = topFixture
+                    }
+                };
             }
             catch (Exception ex)
             {
@@ -181,11 +184,11 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).GetAsync($"v1/client/topfixtures/sportstree?clientRefId={clientId}");
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonConvert.DeserializeObject<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync());
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonConvert.DeserializeObject<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync());
                     else
                     {
                         return new BaseResponse<SportsTreeResponse>
@@ -298,11 +301,11 @@ namespace Backoffice.API.Repositories
             var response = await GetHttpClient(region).PostAsync($"v1/client/topleagues", new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"));
 
             if (response.IsSuccessStatusCode)
-                return JsonSerializer.Deserialize<BaseResponse<ClientTopLeagueMessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                return JsonConvert.DeserializeObject<BaseResponse<ClientTopLeagueMessageResponse>>(await response.Content.ReadAsStringAsync());
             else
             {
                 if (response.StatusCode == HttpStatusCode.BadRequest)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientTopLeagueMessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonConvert.DeserializeObject<BaseResponse<ClientTopLeagueMessageResponse>>(await response.Content.ReadAsStringAsync());
                 else
                 {
                     return new BaseResponse<ClientTopLeagueMessageResponse>
@@ -326,11 +329,11 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).GetAsync($"v1/client/sports?LanguageCode={LanguageCode}");
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<SportsLookupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonConvert.DeserializeObject<BaseResponse<SportsLookupResponse>>(await response.Content.ReadAsStringAsync());
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<SportsLookupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonConvert.DeserializeObject<BaseResponse<SportsLookupResponse>>(await response.Content.ReadAsStringAsync());
                     else
                     {
                         return new BaseResponse<SportsLookupResponse>
@@ -359,11 +362,11 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).GetAsync($"v1/client/allleagues{queryStrings}");
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<TopLeaguesResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonConvert.DeserializeObject<BaseResponse<TopLeaguesResponse>>(await response.Content.ReadAsStringAsync());
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<TopLeaguesResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonConvert.DeserializeObject<BaseResponse<TopLeaguesResponse>>(await response.Content.ReadAsStringAsync());
                     else
                     {
                         return new BaseResponse<TopLeaguesResponse>
@@ -430,7 +433,7 @@ namespace Backoffice.API.Repositories
                         StatusCode = StatusCode.Error,
                         Message = $"{StatusCode.Error.ToString().Replace('_', ' ')}"
                     };
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -449,11 +452,11 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).PostAsync($"v1/client/parlaybonus", new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonConvert.DeserializeObject<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync());
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonConvert.DeserializeObject<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync());
                     else
                     {
                         return new BaseResponse<StatusCode>
@@ -473,5 +476,40 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+
+        #region Top Fixtures
+        public async Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request, string region)
+        {
+            var topFixtures = new List<ClientTopFixtureSetup>();
+            var sortOrder = 1;
+
+            foreach (var fixture in request.TopFixtures)
+            {
+                topFixtures.Add(new ClientTopFixtureSetup()
+                {
+                    FixtureId = fixture.FixtureId,
+                    SortOrder = sortOrder
+                });
+
+                sortOrder++;
+            }
+
+            var requestUri = $"v1/client/topfixtures/copy";
+
+            var result = GetHttpClient(region).PostAsync(requestUri, new StringContent(JsonConvert.SerializeObject(new
+            {
+                ClientIds = request.ClientIds,
+                TopFixtures = topFixtures
+            }), Encoding.UTF8, "application/json")).Result;
+            var payload = JsonConvert.DeserializeObject<BaseResponse<bool>>(result.Content.ReadAsStringAsync().Result);
+
+            return new BaseResponse<bool>()
+            { 
+                StatusCode = payload.StatusCode,
+                Message = payload.Message,
+                Result = payload.Result
+            };
+        }
+        #endregion
     }
 }
