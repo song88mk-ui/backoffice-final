@@ -1,0 +1,31 @@
+﻿<tfoot>
+    <tr>
+        <td class="py-2" colspan="2">
+            <span>Showing @FromRow to @ToRow of @MetaData.TotalCount entries</span>
+        </td>
+        <td class="py-2 text-end" colspan="2">
+            <div class="tbl-pagination">
+                @foreach (var link in _links)
+                {
+                    if(link.Text == "Previous")
+                    {
+                        <a class="me-2 text-decoration-none @(link.Enabled ? null : "disabled") @(link.Active ? "active" : null)" @onclick="() => OnSelectedPage(link)">
+                            <i class="fa fa-chevron-left"></i>
+                        </a>
+                    }
+                    else if(link.Text == "Next")
+                    {
+                        <a class="me-2 text-decoration-none @(link.Enabled ? null : "disabled") @(link.Active ? "active" : null)" @onclick="() => OnSelectedPage(link)">
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="me-2 text-decoration-none @(link.Enabled ? null : "disabled") @(link.Active ? "active" : null)" @onclick="() => OnSelectedPage(link)">@link.Text</a>
+                    }
+                }
+                
+            </div>
+        </td>
+    </tr>
+</tfoot>

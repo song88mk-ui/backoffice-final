@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Backoffice.Shared.Models.Response
 {
-    public class ClientTopLeagueMessageResponse
+    public class PlatformMessageResponse
     {
         public StatusCode StatusCode { get; set; }
         public string Message { get; set; }

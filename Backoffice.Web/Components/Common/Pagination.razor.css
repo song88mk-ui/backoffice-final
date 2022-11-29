@@ -1,0 +1,28 @@
+﻿
+.tbl tfoot td {
+    background-color: #232323;
+    color: #fff;
+}
+
+.tbl tfoot td:first-child {
+    border-bottom-left-radius: 3px;
+    text-align: left;
+    padding-left: 15px;
+}
+
+.tbl tfoot td:last-child {
+    border-bottom-right-radius: 3px;
+}
+
+
+.tbl-pagination a, .tbl-pagination span {
+    color: #979797;
+    cursor: pointer;
+}
+
+.tbl-pagination a.active {
+    background-color: #E4422E;
+    color: #FFFFFF;
+    padding: 2px 5px;
+    border-radius: 2px;
+}

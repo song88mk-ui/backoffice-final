@@ -7,11 +7,11 @@ namespace Backoffice.Shared.Models.Requests
     {
         public CopyClientTopLeaguesRequest()
         {
-            ClientIdRefs = new List<int>();
+            ClientIds = new List<int>();
             TopLeagues = new List<ClientTopLeague>();
         }
 
-        public List<int> ClientIdRefs { get; set; }
+        public List<int> ClientIds { get; set; }
         public int SportId { get; set; }
         public List<ClientTopLeague> TopLeagues { get; set; }
     }

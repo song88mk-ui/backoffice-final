@@ -9,6 +9,7 @@ using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.SportsbookClients
 {
+    [Authorize]
     [Route("sportsbook/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class SettingsController : ControllerBase
@@ -123,7 +124,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         [HttpPost("topleagues/copy")]
         public async Task<IActionResult> CopyClientTopLeagues([FromBody] CopyClientTopLeaguesRequest request)
         {
-            var result = await _platformRepository.CopyClientTopLeagues(request);
+            var result = await _backofficeRepository.CopyClientTopLeagues(request);
 
             switch (result.StatusCode)
             {
