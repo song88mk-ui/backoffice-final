@@ -10,18 +10,18 @@ namespace Backoffice.API.Repositories
 {
     public interface IPlatformRepository
     {
-        #region Top Fixtures
+        #region TOP FIXTURE
         Task<BaseResponse<ClientTopFixtureResponse>> GetClientTopFixtures(IDictionary<string, string> regionclientIds);
-        Task<BaseResponse<ClientTopFixtureMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request, string region);
-        Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request, string region);
+        Task<BaseResponse<PlatformMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request, string region);
+        Task<BaseResponse<PlatformMessageResponse>> CopyClientTopFixtures(CopyClientTopFixtureRequest request, string region);
         Task<BaseResponse<SportsTreeResponse>> GetSportstreeDetails(int clientId, string region);
         #endregion
 
-        #region Top Leagues
+        #region TOP LEAGUES
         Task<BaseResponse<TopLeaguesResponse>> GetClientAllLeagues(ClientAllLeaguesRequest request, string region);
         Task<BaseResponse<ClientTopLeaguesResponse>> GetClientTopLeagues(TopLeaguesRequest request, IDictionary<string, string> regionclientIds);
-        Task<BaseResponse<CopyClientTopLeagueMessageResponse>> CopyClientTopLeagues(CopyClientTopLeaguesRequest request);
-        Task<BaseResponse<ClientTopLeagueMessageResponse>> AddOrUpdateTopLeagues(ClientTopLeaguesRequest request, string region);
+        Task<BaseResponse<PlatformMessageResponse>> CopyClientTopLeagues(CopyClientTopLeaguesRequest request, string region);
+        Task<BaseResponse<PlatformMessageResponse>> AddOrUpdateTopLeagues(ClientTopLeaguesRequest request, string region);
         Task<BaseResponse<SportsLookupResponse>> GetClientSports(string LanguageCode, string region);
         #endregion
 

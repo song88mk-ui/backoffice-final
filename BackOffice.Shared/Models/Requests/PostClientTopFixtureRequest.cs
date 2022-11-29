@@ -6,10 +6,10 @@ namespace Backoffice.Shared.Models.Requests
     {
         public PostClientTopFixtureRequest()
         {
-            TopFixtures = new List<ClientTopFixtureSetup>();
+            TopFixtures = new List<ClientTopSetup>();
         }
 
         public int ClientId { get; set; }
-        public List<ClientTopFixtureSetup> TopFixtures { get; set; }
+        public List<ClientTopSetup> TopFixtures { get; set; }
     }
 }

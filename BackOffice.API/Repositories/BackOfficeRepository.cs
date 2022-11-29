@@ -76,7 +76,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs)
         {
             try
@@ -113,11 +112,12 @@ namespace Backoffice.API.Repositories
             }
         }
 
+        #region TOP FIXTURES
         public async Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request)
         {
             try
             {
-                var response = new BaseResponse<CopyClientTopFixtureRequest>();
+                var response = new BaseResponse<PlatformMessageResponse>();
 
                 var hkClientIds = new List<int>();
                 var saClientIds = new List<int>();
@@ -139,28 +139,28 @@ namespace Backoffice.API.Repositories
                     };
                 }
 
-                //if (hkClientIds.Any())
-                //{
-                //    var hkResponse = await _platformRepository.CopyClientTopFixtures(new CopyClientTopFixtureRequest
-                //    {
-                //        ClientIds = hkClientIds,
-                //        TopFixtures = request.TopFixtures
-                //    }, "HK");
+                if (hkClientIds.Any())
+                {
+                    var hkResponse = await _platformRepository.CopyClientTopFixtures(new CopyClientTopFixtureRequest
+                    {
+                        ClientIds = hkClientIds,
+                        TopFixtures = request.TopFixtures
+                    }, "HK");
 
-                //    response = hkResponse;
-                //}
+                    response = hkResponse;
+                }
 
-                //// only proceed to SA if result from HK is null or HK has a result and the status code is success
-                //if (saClientIds.Any() && (response.Result == null || (response.Result != null && response.StatusCode == StatusCode.Success)))
-                //{
-                //    var saResponse = await _platformRepository.CopyClientTopFixtures(new CopyClientTopFixtureRequest
-                //    {
-                //        ClientIds = saClientIds,
-                //        TopFixtures = request.TopFixtures
-                //    }, "SA");
+                // only proceed to SA if result from HK is null or HK has a result and the status code is success
+                if (saClientIds.Any() && (response.Result == null || (response.Result != null && response.StatusCode == StatusCode.Success)))
+                {
+                    var saResponse = await _platformRepository.CopyClientTopFixtures(new CopyClientTopFixtureRequest
+                    {
+                        ClientIds = saClientIds,
+                        TopFixtures = request.TopFixtures
+                    }, "SA");
 
-                //    response = saResponse;
-                //}
+                    response = saResponse;
+                }
 
                 //return response;
                 return new BaseResponse<bool>()
@@ -180,10 +180,125 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        #endregion
+
+        #region TOP LEAGUES
+        public async Task<BaseResponse<bool>> CopyClientTopLeagues(CopyClientTopLeaguesRequest request)
+        {
+            try
+            {
+                var response = new BaseResponse<PlatformMessageResponse>();
+
+                var hkClientIds = new List<int>();
+                var saClientIds = new List<int>();
+
+                foreach (var clientId in request.ClientIds)
+                {
+                    var region = (await GetClientRegion(clientId)).Result;
+
+                    if (region == "HK") hkClientIds.Add(clientId);
+                    else if (region == "SA") saClientIds.Add(clientId);
+                }
+
+                if (!hkClientIds.Any() && !saClientIds.Any())
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = StatusCode.Error.ToString().Replace("_", " "),
+                        Result = false
+                    };
+                }
+
+                if (hkClientIds.Any())
+                {
+                    var hkResponse = await _platformRepository.CopyClientTopLeagues(new CopyClientTopLeaguesRequest
+                    {
+                        ClientIds = hkClientIds,
+                        SportId = request.SportId,
+                        TopLeagues = request.TopLeagues
+                    }, "HK");
+
+                    response = hkResponse;
+                }
+
+                // only proceed to SA if result from HK is null or HK has a result and the status code is success
+                if (saClientIds.Any() && (response.Result == null || (response.Result != null && response.Result.StatusCode == StatusCode.Success)))
+                {
+                    var saResponse = await _platformRepository.CopyClientTopLeagues(new CopyClientTopLeaguesRequest
+                    {
+                        ClientIds = saClientIds,
+                        SportId = request.SportId,
+                        TopLeagues = request.TopLeagues
+                    }, "SA");
+
+                    response = saResponse;
+                }
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = response.StatusCode,
+                    Message = response.Message,
+                    Result = true
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = false
+                };
+            }
+        }
+        #endregion
 
         public async Task<BaseResponse<List<CurrenciesResponse>>> GetCurrencies()
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                var result = Enum.GetValues(typeof(Currency)).Cast<Currency>().Select(s => new CurrenciesResponse()
+                {
+                    Id = (int)s,
+                    Name = s.ToString(),
+                    Value = GetFEDisplayValue(s.ToString())
+                }).ToList();
+
+                return new BaseResponse<List<CurrenciesResponse>>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<CurrenciesResponse>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = null
+                };
+            }
         }
+
+        #region Methods
+        private string GetFEDisplayValue(string currency)
+        {
+            var newCurrency = currency;
+            switch (currency.ToUpper())
+            {
+                case "PHP":
+                    newCurrency = "CRC";
+                    break;
+                default:
+                    break;
+            }
+
+            return newCurrency;
+        }
+        #endregion
     }
 }

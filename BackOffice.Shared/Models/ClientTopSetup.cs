@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Backoffice.Shared.Models
 {
-    public class ClientTopFixtureSetup
+    public class ClientTopSetup
     {
-        public long FixtureId { get; set; } = -1;
+        public long Id { get; set; } = -1;
         public int SortOrder { get; set; } = -1;
     }
 }
