@@ -3,14 +3,14 @@
 @page "/choose-access"
 
 <div class="w-50 m-auto access-items d-flex flex-row align-items-center justify-content-center">
-    <div class="access-item w-25 m-1 d-flex flex-column justify-content-center rounded-2">
+    <div class="access-item w-25 m-1 d-flex flex-column justify-content-between rounded-2">
         <div class="top-row mx-2 pt-5">
             <div class="access-item-logo">
                 <img src="icons/svg/admin.svg" alt="admin" />
             </div>
             <h4 class="text-center mt-3 fw-bold">Admin</h4>
         </div>
-        <div class="middle-row mx-2 mt-3 mb-3">
+        <div class="middle-row mx-2 mt-3 mb-1">
             <p class="text-center mx-1">
                 Create and manage user and user groups, modify, settle, or cancel bets, and view manual bet settlement history
             </p>
@@ -22,14 +22,14 @@
             </a>
         </div>
     </div>
-    <div class="access-item w-25 m-1 d-flex flex-column justify-content-center rounded-2">
+    <div class="access-item w-25 m-1 d-flex flex-column justify-content-between rounded-2">
         <div class="top-row mx-2 pt-5">
             <div class="access-item-logo">
                 <img src="icons/svg/pm.svg" alt="partner management" />
             </div>
             <h4 class="text-center mt-3 fw-bold">Partner Management</h4>
         </div>
-        <div class="middle-row mx-2 mt-3 mb-3">
+        <div class="middle-row mx-2 mt-3 mb-1">
             <p class="text-center mx-1">
                 Create and manage partners, transfer payments, view reports, payment, and settlement history, and more
             </p>
@@ -41,14 +41,14 @@
             </a>
         </div>
     </div>
-    <div class="access-item w-25 m-1 d-flex flex-column justify-content-center rounded-2">
+    <div class="access-item w-25 m-1 d-flex flex-column justify-content-between rounded-2">
         <div class="top-row mx-2 pt-5">
             <div class="access-item-logo">
                 <img src="icons/svg/sbc.svg" alt="sportsbook clients" />
             </div>
             <h4 class="text-center mt-3 fw-bold">Sportsbook Clients</h4>
         </div>
-        <div class="middle-row mx-2 mt-3 mb-3">
+        <div class="middle-row mx-2 mt-3 mb-1">
             <p class="text-center mx-1">
                 Generate deeplink, modify top leagues and fixtures, manage clients, update parlay bonus, and view all bets, reports, and monthly settlements
             </p>
@@ -60,14 +60,14 @@
             </a>
         </div>
     </div>
-    <div class="access-item w-25 m-1 d-flex flex-column justify-content-center rounded-2">
+    <div class="access-item w-25 m-1 d-flex flex-column justify-content-between rounded-2">
         <div class="top-row mx-2 pt-5">
             <div class="access-item-logo">
                 <img src="icons/svg/trading.svg" alt="trading" />
             </div>
             <h4 class="text-center mt-3 fw-bold">Trading</h4>
         </div>
-        <div class="middle-row mx-2 mt-3 mb-3">
+        <div class="middle-row mx-2 mt-3 mb-1">
             <p class="text-center mx-1">
                 Access Odds Engine and manage max liabilities
             </p>
@@ -79,4 +79,81 @@
             </a>
         </div>
     </div>
+
+    @*<div class="access-item w-25 m-1 row rounded-2 justify-content-center">
+        <div class="top-row pt-5 col-md-12">
+            <div class="access-item-logo">
+                <img src="icons/svg/admin.svg" alt="admin" />
+            </div>
+            <h4 class="text-center mt-3 fw-bold">Admin</h4>
+        </div>
+        <div class="middle-row col-md-12">
+            <p class="text-center mx-1">
+                Create and manage user and user groups, modify, settle, or cancel bets, and view manual bet settlement history
+            </p>
+        </div>
+        <div class="bottom-row mb-2 col-md-12">
+            <a href="/" class="d-block py-2 rounded-2 text-decoration-none">
+                <span class="link-text">Go to Admin Page</span>
+                <i class="fa fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    <div class="access-item w-25 m-1 row rounded-2 justify-content-center">
+        <div class="top-row pt-5 col-md-12">
+            <div class="access-item-logo">
+                <img src="icons/svg/pm.svg" alt="partner management" />
+            </div>
+            <h4 class="text-center mt-3 fw-bold">Partner Management</h4>
+        </div>
+        <div class="middle-row col-md-12">
+            <p class="text-center mx-1">
+                Create and manage partners, transfer payments, view reports, payment, and settlement history, and more
+            </p>
+        </div>
+        <div class="bottom-row mb-2 col-md-12">
+            <a href="/" class="d-block py-2 rounded-2 text-decoration-none">
+                <span class="link-text">Go to Partner Management Page</span>
+                <i class="fa fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    <div class="access-item w-25 m-1 row rounded-2 justify-content-center">
+        <div class="top-row pt-5 col-md-12">
+            <div class="access-item-logo">
+                <img src="icons/svg/sbc.svg" alt="sportsbook clients" />
+            </div>
+            <h4 class="text-center mt-3 fw-bold">Sportsbook Clients</h4>
+        </div>
+        <div class="middle-row col-md-12">
+            <p class="text-center mx-1">
+                Generate deeplink, modify top leagues and fixtures, manage clients, update parlay bonus, and view all bets, reports, and monthly settlements
+            </p>
+        </div>
+        <div class="bottom-row mb-2 col-md-12">
+            <a href="/" class="d-block py-2 rounded-2 text-decoration-none">
+                <span class="link-text">Go to Sportsbook Clients Page</span>
+                <i class="fa fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    <div class="access-item w-25 m-1 row rounded-2 justify-content-center">
+        <div class="top-row pt-5 col-md-12">
+            <div class="access-item-logo">
+                <img src="icons/svg/trading.svg" alt="trading" />
+            </div>
+            <h4 class="text-center mt-3 fw-bold">Trading</h4>
+        </div>
+        <div class="middle-row col-md-12">
+            <p class="text-center mx-1">
+                Access Odds Engine and manage max liabilities
+            </p>
+        </div>
+        <div class="bottom-row mb-2 col-md-12">
+            <a href="/" class="d-block py-2 rounded-2 text-decoration-none">
+                <span class="link-text">Go to Trading Page</span>
+                <i class="fa fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>*@
 </div>
