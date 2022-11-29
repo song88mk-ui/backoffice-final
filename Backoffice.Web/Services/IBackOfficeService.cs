@@ -8,7 +8,7 @@ namespace Backoffice.Web.Services
     {
         Task<BaseResponse<ClientListResponse>> GetClients();
         Task<BaseResponse<ClientTopFixtureResponse>> GetClientTopFixtures(GetClientTopFixtureRequest request);
-        Task<BaseResponse<ClientTopFixtureMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request);
+        Task<BaseResponse<PlatformMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request);
         Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);
 
     }

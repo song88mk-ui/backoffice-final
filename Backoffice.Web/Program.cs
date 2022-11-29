@@ -1,6 +1,9 @@
+using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Hubs;
 using Backoffice.Web.Services;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +14,8 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IModalService, ModalService>();
 builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>();
 
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 
 var app = builder.Build();
 

@@ -1,7 +1,10 @@
-﻿@layout AccessLayout
-
-@page "/"
+﻿@model Backoffice.Web.Pages.Authentication.LoginModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @page "/login"
+
+@{
+    var hasError = TempData["HasError"] != null ? bool.Parse(TempData["HasError"].ToString()) : false;
+}
 
 <div class="banner w-100 d-flex flex-row justify-content-center">
     <div class="first-banner w-50 d-flex flex-column justify-content-center align-items-center">

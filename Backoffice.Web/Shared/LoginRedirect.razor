@@ -1,0 +1,20 @@
+﻿@using System.Web
+@attribute [AllowAnonymous]
+@inject NavigationManager UriHelper
+
+@code {
+    protected override void OnInitialized()
+    {
+        try
+        {
+            var returnUrl = UriHelper.ToBaseRelativePath(UriHelper.Uri);
+            if (string.IsNullOrWhiteSpace(returnUrl))
+                UriHelper.NavigateTo("login", true);
+            else
+                UriHelper.NavigateTo($"login?returnUrl={returnUrl}", true);
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+}

@@ -111,21 +111,21 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<ClientTopFixtureMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request)
+        public async Task<BaseResponse<PlatformMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request)
         {
             try
             {
                 var response = await _httpClient.PostAsync($"sportsbook/settings/topfixtures/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureMessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<ClientTopFixtureMessageResponse>();
+                    return JsonSerializer.Deserialize<BaseResponse<PlatformMessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<PlatformMessageResponse>();
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureMessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<ClientTopFixtureMessageResponse>();
+                        return JsonSerializer.Deserialize<BaseResponse<PlatformMessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<PlatformMessageResponse>();
                     else
                     {
-                        return new BaseResponse<ClientTopFixtureMessageResponse>
+                        return new BaseResponse<PlatformMessageResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -135,7 +135,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                return new BaseResponse<ClientTopFixtureMessageResponse>
+                return new BaseResponse<PlatformMessageResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
