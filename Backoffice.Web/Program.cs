@@ -17,6 +17,8 @@ builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 
+builder.Services.AddHttpContextAccessor();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
