@@ -7,14 +7,26 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddSession();
+
+builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>(client =>
+{
+    client.BaseAddress = new Uri(configuration["API:Authentication:Uri"]);
+    client.DefaultRequestHeaders.Clear();
+    client.DefaultRequestHeaders.Add("x-api-key", configuration["API:Authentication:Security:APIKey"]);
+});
+
 builder.Services.AddScoped<IModalService, ModalService>();
 builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>();
-
-builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 
 var app = builder.Build();
@@ -30,6 +42,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+app.UseSession();
 
 app.UseRouting();
 

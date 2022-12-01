@@ -1,63 +1,209 @@
-﻿@model Backoffice.Web.Pages.Authentication.LoginModel
+﻿@page "/login"
+@using Microsoft.AspNetCore.Authorization
+@model Backoffice.Web.Pages.Authentication.LoginModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@page "/login"
+
+@attribute [AllowAnonymous]
 
 @{
     var hasError = TempData["HasError"] != null ? bool.Parse(TempData["HasError"].ToString()) : false;
+    Layout = null;
 }
+<!DOCTYPE html>
 
-<div class="banner w-100 d-flex flex-row justify-content-center">
-    <div class="first-banner w-50 d-flex flex-column justify-content-center align-items-center">
-        <div class="first-header-text">
-            Welcome To
-        </div>
-        <div class="second-header-text mb-3">
-            Back Office
-        </div>
-        <div class="banner-icons">
-            <img src="icons/svg/login-banner-icons.svg" alt="login banner icons" />
-        </div>
-    </div>
-    <div class="second-banner w-50 px-4 d-flex flex-column justify-content-center align-items-center">
-        <div class="w-50 mx-4 login-container">
-            <div class="login-header mb-5">
-                <div class="logo">
-                    <img src="icons/svg/song88-login-logo.svg" alt="login logo" />
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link href="css/site.css" rel="stylesheet" />
+    <link href="POC.Auth.Web.styles.css" rel="stylesheet" />
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.6.2.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.8.1/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+</head>
+<body>
+    <div class="access-layout">
+        @*<PageTitle>Backoffice</PageTitle>*@
+
+        <div class="page">
+            <div class="row h-100">
+                <div class="col-6 first-banner d-flex flex-column justify-content-center align-items-center">
+                    <div class="first-header-text">
+                        Welcome To
+                    </div>
+                    <div class="second-header-text">
+                        Back Office
+                    </div>
+                    <div class="third-header-text text-white mb-3">
+                        <p>Admin, Partner Management, Sportsbook Clients,</p>
+                        <p>And Trading Platform</p>
+                    </div>
+                    <div class="banner-icons">
+                        <img src="icons/svg/login-banner-icons.svg" alt="login banner icons" />
+                    </div>
                 </div>
-                <div class="title text-center mt-4 mb-3">Login</div>
-                <hr class="title-break" />
+                <div class="col-6 second-banner d-flex flex-column justify-content-center align-items-center">
+                    <div class="w-75 mx-4 login-container">
+                        <div class="login-header">
+                            <div class="logo">
+                                <img src="icons/svg/song88-login-logo.svg" alt="login logo" />
+                            </div>
+                            <div class="row d-flex flex-column">
+                                <div class="title text-center mt-4 mb-0">Client Login</div>
+                                <hr class="col-lg-5 col-md-7 col-sm-10 align-self-center title-break" />
+                            </div>
+                            @*@if (hasError)
+                            {
+                            <div asp-validation-summary="All" class="list-unstyled text-center text-danger"></div>
+                            }*@
+                        </div>
+                        <form method="post">
+                            <div class="login-body mb-3">
+                                <div class="mb-4">
+                                    <label class="form-label">Username</label>
+                                    @Html.TextBoxFor(m => m.UserModel.Name, new {@class = "form-control", @placeholder="Enter your username"})
+                                    @Html.ValidationMessageFor(m => m.UserModel.Name)
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Password</label>
+                                    @Html.TextBoxFor(m => m.UserModel.Password, new {@type="password", @class = "form-control", @placeholder="Enter your password"})
+                                    @Html.ValidationMessageFor(m => m.UserModel.Password)
+                                </div>
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <input type="checkbox" class="form-check-input me-1" />
+                                        <label class="form-check-label">Remember Information</label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a class="form-link text-decoration-none float-end" href="javascript:void(0);">Forgot Password?</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="login-footer">
+                                <button type="submit" class="d-block rounded-2 text-decoration-none text-center col-12">Log in</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <form>
-                <div class="login-body mb-3">
-                    <div class="mb-4">
-                        <label class="form-label">Username</label>
-                        <input type="text" class="form-control" placeholder="Enter your username" />
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Password</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control border-end-0" placeholder="Enter your password" />
-                            <span class="input-group-text border-start-0 bg-white">
-                                <i class="fa fa-eye-slash"></i>
-                                @*<i class="fa fa-eye"></i>*@
-                            </span>
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <input type="checkbox" class="form-check-input me-1" />
-                            <label class="form-check-label">Remember Information</label>
-                        </div>
-                        <div class="col-md-6">
-                            <a class="form-link text-decoration-none float-end" href="javascript:void(0);">Forgot Password?</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="login-footer">
-                    @*<button type="submit" class="d-block rounded-2 text-decoration-none text-center"></button>*@
-                    <a href="/choose-access" class="d-block rounded-2 text-decoration-none text-center">Submit</a>
-                </div>
-            </form>
         </div>
     </div>
-</div>
+</body>
+</html>
+
+<style>
+    body {
+        overflow: hidden;
+    }
+
+    .access-layout {
+        height: 100vh;
+        background-color: #404E67;
+    }
+
+    .page {
+        height: inherit;
+    }
+
+    .first-banner {
+        background-image: url('../background/login-background-image.png');
+        background-size: 100% 100%;
+    }
+
+    .second-banner {
+        background-color: #FFFFFF;
+        background-size: 100%;
+    }
+
+    .first-header-text {
+        letter-spacing: 0px;
+        color: #FFFFFF;
+        text-transform: capitalize;
+        opacity: 1;
+        font-size: 25px;
+    }
+
+    .third-header-text {
+        letter-spacing: 0px;
+        color: #FFFFFF;
+        text-transform: capitalize;
+        opacity: 1;
+        text-align: center;
+        font-size: 18px;
+    }
+
+    .second-header-text {
+        font-size: 60px;
+        font-weight: bold;
+        color: #FFFFFF;
+        text-align: center;
+    }
+
+    .banner-icons img {
+        height: 66px;
+    }
+
+    .login-header .title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #404E67;
+    }
+
+    .logo img {
+        margin: 0 auto;
+        display: block;
+    }
+
+    .title-break {
+        background-image: linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%);
+        padding-block: 3px
+    }
+
+    .login-body .form-label, .login-body .form-check-label {
+        color: #1F1F1F;
+    }
+
+    .login-body .form-label {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .login-body .form-check-label {
+        font-size: 13px;
+    }
+
+    .login-body .form-link {
+        font-size: 13px;
+        color: #EA6140;
+    }
+
+    .login-footer a, .login-footer button {
+        background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
+        color: white;
+        font-size: 14px;
+        padding-top: 11px;
+        padding-bottom: 11px;
+    }
+
+    .login-body {
+        padding: 0.575rem 0.75rem;
+        border-color: #E5E5E5;
+    }
+
+    .login-body .input-group .input-group-text {
+        border-color: #E5E5E5;
+    }
+
+    .field-validation-error {
+        color: red;
+        font-size: 12px;
+    }
+
+    input.input-validation-error,
+    textarea.input-validation-error,
+    select.input-validation-error {
+        border: 1px solid #CD0A0A;
+    }
+</style>
