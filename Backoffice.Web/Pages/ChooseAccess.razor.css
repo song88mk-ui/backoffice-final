@@ -1,4 +1,16 @@
-﻿.access-items {
+﻿@media only screen and (max-width: 1280px) {
+    .access-items {
+        max-width: 75% !important;
+    }
+}
+
+@media only screen and (min-width: 1281px) {
+    .access-items {
+        max-width: 50% !important;
+    }
+} 
+
+.access-items {
     height: inherit;
 }
 

@@ -29,6 +29,8 @@ builder.Services.AddScoped<IModalService, ModalService>();
 builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 
+builder.Services.AddHttpContextAccessor();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
