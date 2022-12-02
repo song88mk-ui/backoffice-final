@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Backoffice.Shared.Models
+namespace Backoffice.Shared.Models.Response
 {
     public class PageListResponse<T>
     {
