@@ -11,7 +11,7 @@
                                 <option selected>Choose client...</option>
                                 @foreach (var item in Clients)
                                 {
-                                    if (item.Value == ClientCode)
+                                    if (item.Value == ClientId)
                                     {
                                         <option value="@item.Value" selected>@item.Name</option>
                                     }

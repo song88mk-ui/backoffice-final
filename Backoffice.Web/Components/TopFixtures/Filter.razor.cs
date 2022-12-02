@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Models;
+using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -8,11 +9,12 @@ namespace Backoffice.Web.Components.TopFixtures
     {
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public EventCallback<string> OnInitCallback { get; set; }
         [Parameter] public EventCallback<string> OnSearchCallback { get; set; }
         protected SearchFormModel SearchForm { get; set; }
         public List<SelectListItemModel<string>> Clients { get; set; }
-        public string ClientCode { get; set; }
+        public string ClientId { get; set; }
         #endregion
 
         #region Methods
@@ -31,11 +33,18 @@ namespace Backoffice.Web.Components.TopFixtures
                 var clients = (await BackOfficeService.GetClients()).Result;
                 if(clients != null)
                 {
+
+                    if (UserModel.ClientCodes.Any())
+                    {
+                        clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.Brand.ToUpper())).ToList();
+                    }
+
                     Clients = clients.Clients.Select(s => new SelectListItemModel<string>
                     {
-                        Value = s.Brand,
+                        Value = s.ClientId.ToString(),
                         Name = s.BusinessName
                     }).ToList();
+
                 }
 
                 if (!Clients.Any())
@@ -45,6 +54,7 @@ namespace Backoffice.Web.Components.TopFixtures
                         Name = "No Clients Available"
                     });
 
+                await OnInitCallback.InvokeAsync("");
             }
             catch (Exception)
             {
@@ -53,8 +63,8 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
-            ClientCode = e.Value.ToString();
-            await OnInitCallback.InvokeAsync(ClientCode);
+            ClientId = e.Value.ToString();
+            await OnInitCallback.InvokeAsync(ClientId);
         }
 
         public async Task OnInputSearchEvent()

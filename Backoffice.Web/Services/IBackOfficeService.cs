@@ -8,8 +8,8 @@ namespace Backoffice.Web.Services
     {
         Task<BaseResponse<ClientListResponse>> GetClients();
         Task<BaseResponse<ClientTopFixtureResponse>> GetClientTopFixtures(GetClientTopFixtureRequest request);
+        Task<BaseResponse<SportsTreeResponse>> GetSportstreeByClientId(int clientId);
         Task<BaseResponse<PlatformMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request);
         Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);
-
     }
 }
