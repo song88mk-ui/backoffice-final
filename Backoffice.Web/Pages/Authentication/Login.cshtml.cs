@@ -13,7 +13,7 @@ namespace Backoffice.Web.Pages.Authentication
         public NavigationManager NavigationManager { get; set; }
         [TempData] public string ErrorMessage { get; set; }
 
-        [BindProperty] public UserModel UserModel { get; set; } = new UserModel();
+        [BindProperty] public LogInModel UserModel { get; set; } = new LogInModel();
 
         private readonly IAuthenticationService AuthenticationService;
         private readonly IHttpContextAccessor _httpContextAccessor;

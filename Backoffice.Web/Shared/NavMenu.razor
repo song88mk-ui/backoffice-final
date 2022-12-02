@@ -1,4 +1,5 @@
-﻿<div class="top-row ps-3 navbar">
+﻿@using Backoffice.Web.Models
+<div class="top-row ps-3 navbar">
     <div class="container-fluid">
         <img src="icons/svg/song-logo.svg" alt="Song88" />
     </div>
@@ -87,6 +88,8 @@
 </div>
 
 @code {
+    [CascadingParameter(Name = "UserModel")]
+    public UserModel UserModel { get; set; }
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;

@@ -24,7 +24,7 @@ namespace Backoffice.Web.Services
             _authStateProvider = authStateProvider;
         }
 
-        public async Task<BaseResponse<bool>> Login(UserModel user)
+        public async Task<BaseResponse<bool>> Login(LogInModel user)
         {
             var result = new BaseResponse<bool>
                 {

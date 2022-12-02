@@ -1,12 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.Security.Claims;
 
 namespace Backoffice.Web.Models
 {
     public class UserModel
     {
-        [Required(ErrorMessage = "Username is required to log in, please enter it above.")]
-        public string Name { get; set; }
-        [Required(ErrorMessage = "Password is required to log in, please enter it above.")]
-        public string Password { get; set; }
+        public string Id { get; set; }
+        public string UserName { get; set; }
+        public List<string> ClientCodes { get; set; }
+        public List<Claim> Claims { get; set; }
     }
 }
