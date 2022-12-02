@@ -1,4 +1,4 @@
-using Backoffice.Web.Models;
+using Backoffice.Shared.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;

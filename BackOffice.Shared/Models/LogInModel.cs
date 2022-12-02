@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Backoffice.Web.Models
+namespace Backoffice.Shared.Models
 {
     public class LogInModel
     {

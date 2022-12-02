@@ -1,4 +1,5 @@
-﻿using Backoffice.Web.Models;
+﻿using Backoffice.Shared.Models;
+using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
