@@ -4,7 +4,7 @@
             <span>Showing @FromRow to @ToRow of @MetaData.TotalCount entries</span>
         </td>
         <td class="py-2 text-end" colspan="2">
-            <div class="tbl-pagination">
+            <div class="tbl-pagination noselect">
                 @foreach (var link in _links)
                 {
                     if(link.Text == "Previous")

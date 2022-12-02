@@ -5,12 +5,23 @@
                 <div class="row">
                     <div class="col">
                         <label class="my-1 mr-2">Client</label>
-                        <select class="form-control my-1 mr-sm-2">
-                            <option selected>Choose...</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
-                        </select>
+                        @if (Clients.Any())
+                        {
+                            <select class="form-control my-1 mr-sm-2" @onchange="OnClientChangedEvent">
+                                <option selected>Choose client...</option>
+                                @foreach (var item in Clients)
+                                {
+                                    if (item.Value == ClientCode)
+                                    {
+                                        <option value="@item.Value" selected>@item.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Value">@item.Name</option>
+                                    }
+                                }
+                            </select>
+                        }
                     </div>
                 </div>
             </form>
@@ -18,7 +29,9 @@
         <div class="col-md-9 search-content">
             <form class="pull-right">
                 <div class="right-icon-control">
-                    <input id="search" placeholder="Search" class="form-control search-text valid">
+                    <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                        <InputText id="search" placeholder="Search" class="form-control search-text valid" @bind-Value="SearchForm.SearchText" />
+                    </EditForm>
                 </div>
             </form>
         </div>

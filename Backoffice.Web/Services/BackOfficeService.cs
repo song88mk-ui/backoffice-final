@@ -15,13 +15,15 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Ctor
-        public BackOfficeService(HttpClient httpClient, IConfiguration configuration)
+        public BackOfficeService(HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor _httpContextAccessor)
         {
             _configuration = configuration;
             _httpClient = httpClient;
 
+            var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
             _httpClient.BaseAddress = new Uri(_configuration["API:BoApi:Uri"]);
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:BoApi:Security:APIKey"]);
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken);
 
         }
         #endregion

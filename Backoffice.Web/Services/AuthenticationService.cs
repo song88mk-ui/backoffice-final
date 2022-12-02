@@ -4,7 +4,6 @@ using Backoffice.Web.Models;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -39,7 +38,7 @@ namespace Backoffice.Web.Services
             {
                 var authPayload = await response.Content.ReadAsStringAsync();
                 var token = JsonConvert.DeserializeObject<BaseResponse<TokenModel>>(authPayload);
-                _httpContextAccessor.HttpContext.Session.SetString("UserToken", token.Result.AccessToken);
+                _httpContextAccessor.HttpContext?.Session.SetString("UserToken", token.Result.AccessToken);
                 //await _localStorage.SetItemAsync("authToken", token.Result.Token);
                 ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(user.Name);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token.Result.AccessToken);
