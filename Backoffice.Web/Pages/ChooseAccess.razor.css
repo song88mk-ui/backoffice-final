@@ -8,7 +8,7 @@
     .access-items {
         max-width: 50% !important;
     }
-} 
+}
 
 .access-items {
     height: inherit;
@@ -16,7 +16,8 @@
 
 .access-item {
     background-color: #FFFFFF;
-    height: 320px;
+    width: 45%;
+    height: auto;
 }
 
 .access-item-logo img {
@@ -37,6 +38,16 @@
 .bottom-row a {
     background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
     color: white;
-    font-size: 12px; 
+    font-size: 12px;
     text-align: center;
+}
+
+.btn-logout {
+    width: fit-content;
+    padding: 5px;
+    border-style: solid;
+    border-color: #ffffff;
+    border-radius: 5px;
+    background: none;
+    color: #ffffff;
 }
