@@ -7,3 +7,30 @@
     background-color: #354156;
     color: #fff;
 }
+
+.table thead th, .table tbody td {
+    font-size: 0.9rem;
+    font-weight: inherit;
+    text-align: center;
+}
+
+.td-parlay-bonus {
+    color: #E4422E;
+}
+
+.tl-link-add, .tl-link-minus, .tl-link-edit {
+    color: #1F1F1F;
+    font-size: 1rem;
+}
+
+.th-number {
+    width: 30%;
+}
+
+.th-parlay-bonus {
+    width: 50%;
+}
+
+.th-action {
+    width: 20%;
+}

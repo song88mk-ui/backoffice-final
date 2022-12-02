@@ -1,4 +1,5 @@
-﻿@using Backoffice.Web.Components.ParlayBonus
+﻿@using Backoffice.Web.Components.Common
+@using Backoffice.Web.Components.ParlayBonus
 
 @page "/parlay-bonus"
 
@@ -12,45 +13,95 @@
                 <Filter />
             </div>
             <div class="col-md-12">
-                <table class="table table-hover table-borderless">
+                <table class="table table-hover table-borderless mt-4">
                     <thead class="table-head-pb">
                         <tr>
-                            <th class="th-number">No. of Selections</th>
-                            <th>
+                            <th class="th-number py-3">No. of Selections</th>
+                            <th class="th-parlay-bonus py-3">
                                 <span>Parlay Bonus</span>
-                                <i class="fa fa-info-circle"></i>
+                                <i class="fa fa-info-circle ms-5"></i>
                             </th>
-                            <th>Action</th>
+                            <th class="th-action py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>1</td>
-                            <td>100.00%</td>
-                            <td></td>
+                            <td class="td-parlay-bonus">100.00%</td>
+                            <td>
+                                <a class="tl-link-add me-2" href="javascript:(0)">
+                                    <i class="fa fa-plus-square"></i>
+                                </a>
+                                <a class="tl-link-minus me-2" href="javascript:(0)">
+                                    <i class="fa fa-minus-square"></i>
+                                </a>
+                                <a class="tl-link-edit me-2" href="javascript:(0)">
+                                    <i class="fa fa-bars"></i>
+                                </a>
+                            </td>
                         </tr>
                         <tr>
                             <td>2</td>
-                            <td>100.00%</td>
-                            <td></td>
+                            <td class="td-parlay-bonus">100.00%</td>
+                            <td>
+                                <a class="tl-link-add me-2" href="javascript:(0)">
+                                    <i class="fa fa-plus-square"></i>
+                                </a>
+                                <a class="tl-link-minus me-2" href="javascript:(0)">
+                                    <i class="fa fa-minus-square"></i>
+                                </a>
+                                <a class="tl-link-edit me-2" href="javascript:(0)">
+                                    <i class="fa fa-bars"></i>
+                                </a>
+                            </td>
                         </tr>
                         <tr>
                             <td>3</td>
-                            <td>100.00%</td>
-                            <td></td>
+                            <td class="td-parlay-bonus">100.00%</td>
+                            <td>
+                                <a class="tl-link-add me-2" href="javascript:(0)">
+                                    <i class="fa fa-plus-square"></i>
+                                </a>
+                                <a class="tl-link-minus me-2" href="javascript:(0)">
+                                    <i class="fa fa-minus-square"></i>
+                                </a>
+                                <a class="tl-link-edit me-2" href="javascript:(0)">
+                                    <i class="fa fa-bars"></i>
+                                </a>
+                            </td>
                         </tr>
                         <tr>
                             <td>4</td>
-                            <td>100.00%</td>
-                            <td></td>
+                            <td class="td-parlay-bonus">100.00%</td>
+                            <td>
+                                <a class="tl-link-add me-2" href="javascript:(0)">
+                                    <i class="fa fa-plus-square"></i>
+                                </a>
+                                <a class="tl-link-minus me-2" href="javascript:(0)">
+                                    <i class="fa fa-minus-square"></i>
+                                </a>
+                                <a class="tl-link-edit me-2" href="javascript:(0)">
+                                    <i class="fa fa-bars"></i>
+                                </a>
+                            </td>
                         </tr>
                         <tr>
                             <td>5</td>
-                            <td>100.00%</td>
-                            <td></td>
+                            <td class="td-parlay-bonus">100.00%</td>
+                            <td>
+                                <a class="tl-link-add me-2" href="javascript:(0)">
+                                    <i class="fa fa-plus-square"></i>
+                                </a>
+                                <a class="tl-link-minus me-2" href="javascript:(0)">
+                                    <i class="fa fa-minus-square"></i>
+                                </a>
+                                <a class="tl-link-edit me-2" href="javascript:(0)">
+                                    <i class="fa fa-bars"></i>
+                                </a>
+                            </td>
                         </tr>
                     </tbody>
-                    <tfoot></tfoot>
+                    <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage"/>
                 </table>
             </div>
         </div>
