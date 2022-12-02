@@ -21,8 +21,8 @@ namespace Backoffice.Web.Services
             _httpClient = httpClient;
 
             var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
-            _httpClient.BaseAddress = new Uri(_configuration["API:BoApi:Uri"]);
-            _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:BoApi:Security:APIKey"]);
+            _httpClient.BaseAddress = new Uri(_configuration["API:Backoffice:Uri"]);
+            _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:Backoffice:Security:APIKey"]);
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken);
 
         }
