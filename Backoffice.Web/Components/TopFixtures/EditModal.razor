@@ -1,0 +1,96 @@
+﻿<div class="modal-body">
+    <div class="row">
+        <div class="col-2">
+            <label class="my-1 mr-2">Sport</label>
+            <select class="form-control form-select my-1 mr-sm-2">
+                <option value="Soccer">Soccer</option>
+                <option value="Basketball">Basketball</option>
+                <option value="Baseball">Baseball</option>
+            </select>
+        </div>
+
+        <div class="col-2">
+            <label class="my-1 mr-2">Segment</label>
+            <select class="form-control form-select my-1 mr-sm-2">
+                <option value="England">England</option>
+                <option value="France">France</option>
+                <option value="Germany">Germany</option>
+            </select>
+        </div>
+
+        <div class="col-2">
+            <label class="my-1 mr-2">League</label>
+            <select class="form-control form-select my-1 mr-sm-2">
+                <option value="All">All</option>
+            </select>
+        </div>
+
+        <div class="col-2">
+            <label class="my-1 mr-2">Game</label>
+            <select class="form-control form-select my-1 mr-sm-2">
+                <option value="All">All</option>
+            </select>
+        </div>
+
+        <div class="col-2">
+            <label class="my-1 mr-2">Sort Kickoff Date & Time</label>
+            <select class="form-control form-select my-1 mr-sm-2">
+                <option value="All">Default List</option>
+                <option value="2">Date & Time (Ascending)</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="table editModalTbl">
+        <thead class="editModalThead">
+            <tr>
+                <th scope="1">No</th>
+                <th scope="1">Sport</th>
+                <th scope="1">Segment</th>
+                <th scope="1">League</th>
+                <th scope="1">Game</th>
+                <th scope="1">Kick Off Date & Time</th>
+                <th scope="1">Fixture Status</th>
+                <th scope="1">Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>Basketball</td>
+                <td>USA</td>
+                <td>NBA</td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn dropdown-toggle" data-bs-auto-close="outside" type="button" id="gameDropdown1"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                            Boston Celtics vs. Milwaukee Bucks
+                        </button>
+
+                        <ul class="dropdown-menu" aria-labelledby="gameDropdown1">
+                            <li>
+                                <a class="btn" data-bs-target="" type="button">Soccer</a>
+                            </li>
+                            <li><a class="dropdown-toggle dropdown-item" type="button">England</a></li>
+                            <li><a class="dropdown-toggle dropdown-item" type="button">Basketball</a></li>
+                        </ul>
+                    </div>
+                </td>
+                <td>
+                    12/22/2022 10:00:00 PM
+                </td>
+                <td>
+                    <span class="badge rounded-pill bg-secondary px-3">
+                        Prematch
+                    </span>
+                </td>
+                <td class="actions">
+                    <span><a href="#"><i class="fa fa-plus-square" aria-hidden="true"></i></a></span>
+                    <span><a href="#"><i class="fa fa-minus-square" aria-hidden="true"></i></a></span>
+                    <span><a href="#"><i class="fa fa-bars" aria-hidden="true"></i></a></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,13 +1,15 @@
 ﻿using Backoffice.Shared.Models;
-using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.TopFixtures;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Backoffice.Shared.Models.Requests;
 
 namespace Backoffice.Web.Pages
 {
     public partial class TopFixtures : IDisposable
     {
+        [Inject] public IModalService ModalService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public string PageTitle { get; set; }
@@ -16,6 +18,9 @@ namespace Backoffice.Web.Pages
         public bool IsPreLoader { get; set; }
         public TopFixturesModel TopFixturesModel { get; set; }
 
+        public string ClientName { get; set; }
+
+        #region Methods
         protected override async Task OnInitializedAsync()
         {
             PageTitle = "Top Fixtures";
@@ -53,6 +58,16 @@ namespace Backoffice.Web.Pages
             //    TopFixturesModel.TopFixtures = TopFixturesModel.TopFixtures.Where()
         }
 
+        public async Task OnEdit()
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+
+            var options = new ModalOptions();
+            ModalService.Open<EditModal>($"Set Top Leagues of {ClientName}", parameters, options);
+        }
+
         protected async Task SelectPage(int page)
         {
             MetaData.CurrentPage = page;
@@ -62,5 +77,6 @@ namespace Backoffice.Web.Pages
         public void Dispose()
         {
         }
+        #endregion
     }
 }
