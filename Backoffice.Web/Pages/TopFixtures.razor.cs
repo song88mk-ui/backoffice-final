@@ -68,6 +68,16 @@ namespace Backoffice.Web.Pages
             ModalService.Open<EditModal>($"Set Top Leagues of {ClientName}", parameters, options);
         }
 
+        public async Task OnCopy()
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+
+            var options = new ModalOptions();
+            ModalService.Open<CopyModal>($"Copy {ClientName} Top Fixtures Settings To", parameters, options);
+        }
+
         protected async Task SelectPage(int page)
         {
             MetaData.CurrentPage = page;
