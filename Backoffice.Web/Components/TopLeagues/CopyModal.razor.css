@@ -1,7 +1,7 @@
 ﻿.clientBtn {
     border: 1px solid #C7C1C1;
     text-align: left;
-    width: 10rem;
+    width: 14rem;
 }
 
 .dropdown-toggle::after {
@@ -40,4 +40,8 @@
     min-width: 100px;
     border: 1px solid #C7C1C1;
     border-radius: 3px;
+}
+
+.dropdown-menu.show {
+    width: 14rem;
 }
