@@ -34,13 +34,13 @@ namespace Backoffice.Web.Services
             try
             {
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientListResponse>>
-                (await _httpClient.GetStreamAsync($"sportsbook/client/list"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (await _httpClient.GetStreamAsync($"sportsbook/Client/list"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result ?? new BaseResponse<ClientListResponse>
                 {
                     StatusCode = StatusCode.Success,
                     Message = $"{StatusCode.Success}",
-                    Result = result.Result ?? new ClientListResponse()
+                    Result = new ClientListResponse()
                 };
             }
             catch (Exception ex)

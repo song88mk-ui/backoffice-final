@@ -13,7 +13,7 @@ namespace Backoffice.Web.Shared
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-        [CascadingParameter] public UserModel UserModel { get; set; }
+        public UserModel UserModel { get; set; }
 
         public LogInModel Model { get; set; }
 
