@@ -19,22 +19,18 @@ namespace Backoffice.Web.Shared
 
         protected override async Task OnInitializedAsync()
         {
-            UserModel = new UserModel();
             try
             {
+                UserModel = new UserModel();
+
                 if (HttpContextAccessor.HttpContext.Session.GetString("UserToken") == null)
                 {
-                    NavigationManager.NavigateTo("/login", true);
+                    NavigationManager.NavigateTo("login", true);
                     // remove cascade value
                 }
 
                 var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 var userClaims = authState.User.Claims.ToList();
-                UserModel = new UserModel()
-                {
-                    ClientCodes = new List<string>(),
-                    Claims = new List<System.Security.Claims.Claim>()
-                };
 
                 foreach (var claim in userClaims)
                 {
@@ -62,9 +58,9 @@ namespace Backoffice.Web.Shared
                 // ID
                 // List of clients
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                NavigationManager.NavigateTo("/login", true);
+                NavigationManager.NavigateTo("login", true);
             }
         }
 

@@ -1,4 +1,10 @@
-/*@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');*/
+@font-face {
+    font-family: "s88-icon";
+    src: url('../css/font-bo/bo-icons.woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -68,43 +74,58 @@ a, .btn-link {
 }
 
 .ico {
+    font-family: "s88-icon";
     display: block;
-    height: 1.5em;
-    width: 1.5em;
     background-size: initial;
     background-repeat: no-repeat;
     background-position: center;
-    margin-right: 10px;
+    font-style: normal;
 }
 
-.ico-dashboard {
-    background-image: url('../icons/svg/dashboard.svg');
+.ico-dashboard:before {
+    content: "\1102";
 }
 
-.ico-deeplink-generator {
-    background-image: url('../icons/svg/deeplink-generator.svg');
+.ico-deeplink-generator:before {
+    content: "\1103";
 }
 
-.ico-notification {
-    background-image: url('../icons/svg/notification.svg');
+.ico-notification:before {
+    content: "\1104";
 }
 
-.ico-parlay-bonus {
-    background-image: url('../icons/svg/parlay-bonus.svg');
+.ico-parlay-bonus:before {
+    content: "\1105";
 }
 
-.ico-reports {
-    background-image: url('../icons/svg/reports.svg');
+.ico-reports:before {
+    content: "\1107";
 }
 
-.ico-top-fixtures {
-    background-image: url('../icons/svg/top-fixtures.svg');
+.ico-top-fixtures:before {
+    content: "\1109";
 }
 
-.ico-top-leagues {
-    background-image: url('../icons/svg/top-leagues.svg');
+.ico-top-leagues:before {
+    content: "\110A";
 }
 
-.ico-user {
-    background-image: url('../icons/svg/user.svg');
+.ico-user:before {
+    content: "\110C";
+}
+
+.ico-admin:before {
+    content: "\1101";
+}
+
+.ico-pm:before {
+    content: "\1106";
+}
+
+.ico-sbc:before {
+    content: "\1108";
+}
+
+.ico-trading:before {
+    content: "\110B";
 }
