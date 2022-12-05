@@ -23,8 +23,7 @@ namespace Backoffice.Web.Services
             var userToken = httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
             _httpClient.BaseAddress = new Uri(_configuration["API:Backoffice:Uri"]);
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:Backoffice:Security:APIKey"]);
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer ", userToken);
-
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken);
         }
         #endregion
 

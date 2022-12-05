@@ -4,6 +4,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 
 namespace Backoffice.Web.Pages
 {
@@ -15,7 +16,6 @@ namespace Backoffice.Web.Pages
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
-        public bool IsPreLoader { get; set; }
         public TopFixturesModel TopFixturesModel { get; set; }
 
         public string ClientName { get; set; }
@@ -29,32 +29,44 @@ namespace Backoffice.Web.Pages
             MetaData = new MetaData()
             {
                 CurrentPage = 1,
-                PageSize = 10,
-                TotalCount = 10000,
-                TotalPages = 100,
+                PageSize = 100,
+                TotalCount = 0,
+                TotalPages = 1,
             };
 
             TopFixturesModel = new TopFixturesModel();
-
         }
 
-        public async Task OnInitEvent(string clientId)
+        public async Task OnInitEvent(TopFixtureCallback request)
         {
-            IsPreLoader = true;
-            await InvokeAsync(StateHasChanged);
+            var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = request.ClientIds })).Result;
 
-            TopFixturesModel.TopFixtures = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest
+            if (result != null && result.TopFixtures.Any())
             {
-                ClientIds = clientId
-            })).Result.TopFixtures;
+                TopFixturesModel.TopFixtures = result.TopFixtures;
+            }
+            else
+            {
+                TopFixturesModel.TopFixtures = new List<ClientTopFixtureResponse.OrderedClientTopFixture>();
+                foreach(var clientId in request.ClientIds.Split(","))
+                {
+                    //TODO
+                    //TopFixturesModel.TopFixtures
+                }
+            }
 
-            IsPreLoader = false;
+            await OnSearchEvent(request.SearchText);
         }
 
         public async Task OnSearchEvent(string searchString)
         {
-            //if(!string.IsNullOrEmpty(searchString))
-            //    TopFixturesModel.TopFixtures = TopFixturesModel.TopFixtures.Where()
+            TopFixturesModel.TopFixturesFiltered.Clear();
+            if (!string.IsNullOrEmpty(searchString))
+                TopFixturesModel.TopFixturesFiltered.AddRange(TopFixturesModel.TopFixtures.Where(t => t.ClientName.Contains(searchString) || t.TopFixtures.Any(tf => tf.SportName.Contains(searchString) )));
+            else
+                TopFixturesModel.TopFixturesFiltered.AddRange(TopFixturesModel.TopFixtures);
+
+            MetaData.TotalCount = TopFixturesModel.TopFixturesFiltered.Count();
         }
 
         public async Task OnEdit()

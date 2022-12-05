@@ -7,9 +7,16 @@ namespace Backoffice.Web.Models
         public TopFixturesModel()
         {
             TopFixtures = new List<OrderedClientTopFixture>();
+            TopFixturesFiltered = new List<OrderedClientTopFixture>();
         }
         public List<OrderedClientTopFixture> TopFixtures { get; set; }
-        public string ClientCode { get; set; }
-        public Guid ClientId { get; set; }
+        public List<OrderedClientTopFixture> TopFixturesFiltered { get; set; }
+        
+    }
+
+    public class TopFixtureCallback
+    {
+        public string ClientIds { get; set; }
+        public string SearchText { get; set; }
     }
 }

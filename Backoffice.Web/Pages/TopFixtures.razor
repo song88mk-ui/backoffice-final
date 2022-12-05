@@ -24,98 +24,45 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="py-2">
-                                    <span>1</span>
-                                </td>
-                                <td class="py-2">
-                                    <span>10 Cric India</span>
-                                </td>
-                                <td class="py-2">
-                                    <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
-                                        <div class="tl-fixture m-1 py-1 rounded-2">
-                                            <span class="px-3">Boston Celtics vs Ginebra San Miguel</span>
-                                        </div>
-                                        <div class="tl-fixture m-1 py-1 rounded-2">
-                                            <span class="px-3">Alabang Snatchers vs Muntilupa Walkers</span>
-                                        </div>
-                                        <div class="tl-fixture m-1 py-1 rounded-2">
-                                            <span class="px-3">Atlanta Hawks vs Pale Pilsen</span>
-                                        </div>
-                                        <div class="tl-fixture m-1 py-1 rounded-2">
-                                            <span class="px-3">Boston Celtics vs Ginebra San Miguel</span>
-                                        </div>
-                                        <div class="tl-fixture m-1 py-1 rounded-2">
-                                            <span class="px-3">Boston Celtics vs Ginebra San Miguel</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-2">
-                                    <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="OnEdit">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                    <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="OnCopy">
-                                        <i class="fa fa-copy"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">
-                                    <span>2</span>
-                                </td>
-                                <td class="py-2">
-                                    <span>10 Cric India</span>
-                                </td>
-                                <td class="py-2">
-                                    <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
-                                        <div class="tl-fixture m-1 py-1 rounded-2">
-                                            <span class="px-3">Boston Celtics vs Ginebra San Miguel</span>
-                                        </div>
-                                        <div class="tl-fixture m-1 py-1 rounded-2">
-                                            <span class="px-3">Alabang Snatchers vs Muntilupa Walkers</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-2">
-                                    <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="OnEdit">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                    <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="OnCopy">
-                                        <i class="fa fa-copy"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">
-                                    <span>3</span>
-                                </td>
-                                <td class="py-2">
-                                    <span>10 Cric India</span>
-                                </td>
-                                <td class="py-2">
-                                    <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
-                                        <div class="tl-fixture m-1 py-1 rounded-2">
-                                            <span class="px-3">Boston Celtics vs Ginebra San Miguel</span>
-                                        </div>
-                                        <div class="tl-fixture m-1 py-1 rounded-2">
-                                            <span class="px-3">Alabang Snatchers vs Muntilupa Walkers</span>
-                                        </div>
-                                        <div class="tl-fixture m-1 py-1 rounded-2">
-                                            <span class="px-3">Atlanta Hawks vs Pale Pilsen</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-2">
-                                    <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="OnEdit">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                    <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="OnCopy">
-                                        <i class="fa fa-copy"></i>
-                                    </a>
-                                </td>
-                            </tr>
+                            @if (TopFixturesModel.TopFixturesFiltered.Any())
+                            {
+                                var rowCtr = 0;
+                                foreach (var topFixture in TopFixturesModel.TopFixturesFiltered)
+                                {
+                                    rowCtr = rowCtr + 1;
+                                    <tr>
+                                        <td class="py-2">
+                                            <span>@rowCtr</span>
+                                        </td>
+                                        <td class="py-2">
+                                            <span>@topFixture.ClientName</span>
+                                        </td>
+                                        <td class="py-2">
+                                            <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
+                                                @if(topFixture.TopFixtures.Any())
+                                                {
+                                                    foreach(var fixture in topFixture.TopFixtures)
+                                                    {
+                                                        <div class="tl-fixture m-1 py-1 rounded-2">
+                                                            <span class="px-3">@fixture.FixtureName</span>
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+                                        </td>
+                                        <td class="py-2">
+                                            <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="OnEdit">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="OnCopy">
+                                                <i class="fa fa-copy"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
                         </tbody>
-                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage"/>
+                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" />
                     </table>
                 </div>
             </div>
@@ -124,5 +71,5 @@
 </div>
 
 <div>
-    <CustomModal/>
+    <CustomModal />
 </div>

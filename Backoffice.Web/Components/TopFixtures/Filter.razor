@@ -8,7 +8,6 @@
                         @if (Clients.Any())
                         {
                             <select class="form-control my-1 mr-sm-2" @onchange="OnClientChangedEvent">
-                                <option selected>Choose client...</option>
                                 @foreach (var item in Clients)
                                 {
                                     if (item.Value == ClientId)

@@ -10,7 +10,7 @@ namespace Backoffice.Web.Components.TopFixtures
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [Parameter] public EventCallback<string> OnInitCallback { get; set; }
+        [Parameter] public EventCallback<TopFixtureCallback> OnInitCallback { get; set; }
         [Parameter] public EventCallback<string> OnSearchCallback { get; set; }
         protected SearchFormModel SearchForm { get; set; }
         public List<SelectListItemModel<string>> Clients { get; set; }
@@ -29,6 +29,8 @@ namespace Backoffice.Web.Components.TopFixtures
                 {
                     SearchText = string.Empty
                 };
+                
+                ClientId = string.Empty;
 
                 var clients = (await BackOfficeService.GetClients()).Result;
                 if(clients != null)
@@ -53,9 +55,15 @@ namespace Backoffice.Web.Components.TopFixtures
                         Value = "",
                         Name = "No Clients Available"
                     });
+                else
+                    Clients.Insert(0, new SelectListItemModel<string> { Value = "", Name = "Choose client..." });
 
-                var clientCodes = string.Join(",", Clients.Where(c => !string.IsNullOrEmpty(c.Value)).Select(s => s.Value).ToList());
-                await OnInitCallback.InvokeAsync(clientCodes);
+                var clientIds = string.Join(",", Clients.Where(c => !string.IsNullOrEmpty(c.Value)).Select(s => s.Value).ToList());
+                await OnInitCallback.InvokeAsync(new TopFixtureCallback
+                {
+                    ClientIds = clientIds,
+                    SearchText = SearchForm.SearchText
+                });
             }
             catch (Exception)
             {
@@ -65,7 +73,16 @@ namespace Backoffice.Web.Components.TopFixtures
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
             ClientId = e.Value.ToString();
-            await OnInitCallback.InvokeAsync(ClientId);
+
+            var clientIds = ClientId;
+            if (string.IsNullOrEmpty(ClientId))
+                clientIds = string.Join(",", Clients.Where(c => !string.IsNullOrEmpty(c.Value)).Select(s => s.Value).ToList());
+
+            await OnInitCallback.InvokeAsync(new TopFixtureCallback
+            {
+                ClientIds = clientIds,
+                SearchText = SearchForm.SearchText
+            });
         }
 
         public async Task OnInputSearchEvent()
