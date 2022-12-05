@@ -46,7 +46,7 @@ namespace Backoffice.API.ActionFilter
             }
 
             // Invalid Isuer
-            if (jwtToken.Issuer != _configuration["JWT:Issuer"])
+            if (jwtToken.Issuer != _configuration["API:AuthenticationAPI:JWT:Issuer"])
             {
                 context.Result = new JsonResult(new { title = "Unauthorized", message = "Invalid Issuer." }) { StatusCode = StatusCodes.Status401Unauthorized };
             }
@@ -74,6 +74,8 @@ namespace Backoffice.API.ActionFilter
                         context.Result = new JsonResult(new { title = "Unauthorized", message = validToken.Message }) { StatusCode = StatusCodes.Status401Unauthorized };
                         return;
                     }
+
+                    context.HttpContext.Request.Headers[HeaderNames.Authorization] = validToken.Result.AccessToken;
                 }
                 else
                 {
