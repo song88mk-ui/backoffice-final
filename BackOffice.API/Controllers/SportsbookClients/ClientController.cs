@@ -1,11 +1,8 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
-using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using static Backoffice.Shared.Models.Response.ClientTopLeaguesResponse;
-using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.SportsbookClients
 {
@@ -15,12 +12,10 @@ namespace Backoffice.API.Controllers.SportsbookClients
     public class ClientController : Controller
     {
         private readonly IBackofficeRepository _backofficeRepository;
-        private readonly IPlatformRepository _platformRepository;
 
-        public ClientController(IBackofficeRepository backofficeRepository, IPlatformRepository platformRepository)
+        public ClientController(IBackofficeRepository backofficeRepository)
         {
             _backofficeRepository = backofficeRepository;
-            _platformRepository = platformRepository;
         }
 
         [HttpGet("list")]
