@@ -57,4 +57,16 @@
 .leagueDropBtn {
     border: 1px solid #C7C1C1;
     border-radius: 3px;
+    min-width: 15rem;
+    text-align: left;
+}
+
+.dropdown-toggle::after {
+    float: right;
+    position: relative;
+    top: 10px;
+}
+
+.dropdown-item {
+    min-width: 15rem;
 }
