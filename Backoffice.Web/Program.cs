@@ -20,9 +20,9 @@ builder.Services.AddSession();
 
 builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>(client =>
 {
-    client.BaseAddress = new Uri(configuration["API:Authentication:Uri"]);
+    client.BaseAddress = new Uri(configuration["API:Backoffice:Uri"]);
     client.DefaultRequestHeaders.Clear();
-    client.DefaultRequestHeaders.Add("x-api-key", configuration["API:Authentication:Security:APIKey"]);
+    client.DefaultRequestHeaders.Add("x-api-key", configuration["API:Backoffice:Security:APIKey"]);
 });
 
 builder.Services.AddScoped<IModalService, ModalService>();

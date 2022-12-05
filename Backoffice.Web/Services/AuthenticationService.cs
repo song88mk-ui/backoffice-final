@@ -29,9 +29,11 @@ namespace Backoffice.Web.Services
                     StatusCode = Backoffice.Shared.Enums.StatusCode.Error,
                     Message = Backoffice.Shared.Enums.StatusCode.Error.ToString(),
                     Result = false
-                }; ;
+                };
+            //user.Provider = "BackOfficeWeb";
+            user.Provider = "BoAPI";
             var bodyContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync("/authenticate", bodyContent);
+            var response = await _httpClient.PostAsync("api/authentication/login", bodyContent);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {

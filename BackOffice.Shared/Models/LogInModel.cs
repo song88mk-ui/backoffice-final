@@ -8,5 +8,6 @@ namespace Backoffice.Shared.Models
         public string Name { get; set; }
         [Required(ErrorMessage = "Password is required to log in, please enter it above.")]
         public string Password { get; set; }
+        public string Provider { get; set; }
     }
 }

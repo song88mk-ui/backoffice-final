@@ -69,6 +69,12 @@ namespace Backoffice.API
                 opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
+            services.AddHttpClient<IAuthenticationRepository, AuthenticationRepository>(client =>
+            {
+                client.BaseAddress = new Uri(Configuration["API:AuthenticationAPI:Uri"]);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Add("x-api-key", Configuration["API:AuthenticationAPI:Security:APIKey"]);
+            });
             services.AddDbContext<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"]));
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
             services.AddScoped<IPlatformRepository, PlatformRepository>();

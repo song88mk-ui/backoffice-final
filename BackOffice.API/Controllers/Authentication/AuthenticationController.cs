@@ -1,6 +1,7 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.API.Repositories;
+using Backoffice.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -10,24 +11,24 @@ namespace Backoffice.API.Controllers.Authentication
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        // GET: api/<AuthenticationController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private IAuthenticationRepository _authenticationRepository { get; set; }
+        public AuthenticationController(IAuthenticationRepository authenticationRepository)
         {
-            return new string[] { "value1", "value2" };
+            _authenticationRepository = authenticationRepository;
         }
-
-        // GET api/<AuthenticationController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
         // POST api/<AuthenticationController>
-        [HttpPost]
-        public void Login([FromBody] LogInModel value)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
+            var result = await _authenticationRepository.Login(content);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
         }
     }
 }
