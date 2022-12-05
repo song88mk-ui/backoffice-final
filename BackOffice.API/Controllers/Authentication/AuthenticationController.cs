@@ -20,7 +20,29 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
-            var result = await _authenticationRepository.Login(content);
+            var result = await this._authenticationRepository.Login(content);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var result = new BaseResponse<bool>()
+            {
+                StatusCode = Shared.Enums.StatusCode.Unauthorized,
+                Message = "Missing authorization"
+            };
+            if (HttpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                result = await this._authenticationRepository.Logout(token);
+            }
 
             switch (result.StatusCode)
             {

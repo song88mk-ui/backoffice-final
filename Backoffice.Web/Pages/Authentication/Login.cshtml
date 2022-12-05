@@ -182,6 +182,8 @@
                                 <div class="mb-4">
                                     <label class="form-label">Password</label>
                                     @Html.TextBoxFor(m => m.UserModel.Password, new {@type="password", @class = "form-control", @placeholder="Enter your password"})
+                                    <i class="bi bi-eye-slash"
+                                       id="togglePassword"></i>
                                     @Html.ValidationMessageFor(m => m.UserModel.Password)
                                 </div>
                                 <div class="row mb-4">
