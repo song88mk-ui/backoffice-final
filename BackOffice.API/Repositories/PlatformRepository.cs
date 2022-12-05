@@ -273,7 +273,6 @@ namespace Backoffice.API.Repositories
                 Result = payload.Result
             };
         }
-
         public async Task<BaseResponse<SportsLookupResponse>> GetClientSports(string LanguageCode, string region)
         {
             try
@@ -305,7 +304,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        
         #endregion
 
         #region TOP FIXTURE

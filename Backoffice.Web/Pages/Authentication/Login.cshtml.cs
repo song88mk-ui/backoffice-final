@@ -56,33 +56,31 @@ namespace Backoffice.Web.Pages.Authentication
         {
             if (ModelState.IsValid)
             {
-                //TempData["HasError"] = false;
-                //var result = await AuthenticationService.Login(UserModel);
-                //if (result.Result)
-                //{
-                //    //var cookie = new HttpCookie("Login");
-                //    //cookie.Values.Add("EmailID", LoginUser.EmailID);
-                //    //cookie.Values.Add("Password", LoginUser.Password);
-                //    //cookie.Expires = DateTime.Now.AddDays(15);
-                //    //Response.Cookies.Add(cookie);
+                TempData["HasError"] = false;
+                var result = await AuthenticationService.Login(UserModel);
+                if (result.Result)
+                {
+                    //var cookie = new HttpCookie("Login");
+                    //cookie.Values.Add("EmailID", LoginUser.EmailID);
+                    //cookie.Values.Add("Password", LoginUser.Password);
+                    //cookie.Expires = DateTime.Now.AddDays(15);
+                    //Response.Cookies.Add(cookie);
 
-                //    //NavigationManager.NavigateTo("/");
-                //return LocalRedirect("/choose-access");
-                //}
-                //else
-                //{
-                //    if (UserModel != null)
-                //        UserModel.Password = String.Empty;
+                    //NavigationManager.NavigateTo("/");
+                    return LocalRedirect("/choose-access");
+                }
+                else
+                {
+                    if (UserModel != null)
+                        UserModel.Password = String.Empty;
 
-                //    TempData["HasError"] = true;
-
-                //    if(result.Message.ToLower().Contains("user does not exist"))
-                //        ModelState.AddModelError("UserModel.Name", "Sorry, we couldn't find an account with that username, please try again.");
+                    TempData["HasError"] = true;
 
                     if (result.Message.ToLower().Contains("user does not exist"))
                         ModelState.AddModelError("UserModel.Name", "Sorry, we couldn't find an account with that username, please try again.");
-
-                return LocalRedirect("/top-leagues");
+                    
+                    ModelState.AddModelError("UserModel.Password", "Password is incorrect, please try again or click Forgot Password to reset it.");
+                }
             }
             return Page();
         }

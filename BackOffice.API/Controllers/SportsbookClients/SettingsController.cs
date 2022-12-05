@@ -14,7 +14,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
 {
     [Authorize]
     [Route("sportsbook/[controller]")]
-    [ApiController, EnableCors("AllowAllOrigins")/*, ServiceFilter(typeof(ApiKeyFilter))*/]
+    [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class SettingsController : ControllerBase
     {
         private readonly IBackofficeRepository _backofficeRepository;
@@ -105,21 +105,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-        [EnableCors("AllowAllOrigins")]
-        [HttpGet("topleagues/allleagues")]
-        public async Task<IActionResult> GetClientAllLeagues([FromQuery] ClientAllLeaguesRequest request)
-        {
-            var region = await _backofficeRepository.GetClientRegion(request.ClientIdRef);
-            var result = await _platformRepository.GetClientAllLeagues(request, region.Result);
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
+        
         [EnableCors("AllowAllOrigins")]
         [HttpPost("topleagues")]
         public async Task<IActionResult> GetTopLeagues([FromBody] GetTopLeaguesRequest request)
@@ -151,7 +137,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-        #endregion        
 
         [EnableCors("AllowAllOrigins")]
         [HttpPost("topleagues/copy")]
@@ -177,16 +162,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
 
             return Ok(result);
         }
-        
-
-        [HttpGet("client/currencies")]
-        public async Task<IActionResult> GetCurrencies()
-        {
-            var result = await _platformRepository.GetClientSports(LanguageCode, "HK");
-
-            return Ok(result);
-        }
-        
+        #endregion
 
         #region PARLAY BONUS
 

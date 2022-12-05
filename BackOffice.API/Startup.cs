@@ -43,26 +43,26 @@ namespace Backoffice.API
             services.AddSwaggerGen(option =>
             {
                 option.SwaggerDoc("v1", new OpenApiInfo { Title = "Backoffice API", Version = "v1" });
-                //option.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
-                //{
-                //    Name = "x-api-key",
-                //    In = ParameterLocation.Header,
-                //    Type = SecuritySchemeType.ApiKey,
-                //    Description = "Authorization by x-api-key inside request's header",
-                //    Scheme = "ApiKeyScheme"
-                //});
-                //var key = new OpenApiSecurityScheme()
-                //{
-                //    Reference = new OpenApiReference
-                //    {
-                //        Type = ReferenceType.SecurityScheme,
-                //        Id = "ApiKey"
-                //    },
-                //    In = ParameterLocation.Header
-                //};
+                option.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+                {
+                    Name = "x-api-key",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Description = "Authorization by x-api-key inside request's header",
+                    Scheme = "ApiKeyScheme"
+                });
+                var key = new OpenApiSecurityScheme()
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "ApiKey"
+                    },
+                    In = ParameterLocation.Header
+                };
 
-                //var requirement = new OpenApiSecurityRequirement { { key, new List<string>() } };
-                //option.AddSecurityRequirement(requirement);
+                var requirement = new OpenApiSecurityRequirement { { key, new List<string>() } };
+                option.AddSecurityRequirement(requirement);
             });
 
             services.AddControllers().AddJsonOptions(opt =>

@@ -238,7 +238,7 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        #region Methods
+        #region Utilities
         private string GetFEDisplayValue(string currency)
         {
             var newCurrency = currency;
