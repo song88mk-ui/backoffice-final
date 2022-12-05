@@ -1,14 +1,14 @@
 ﻿h4 {
     color: #1F1F1F;
-    font-size: 26px;
+    font-size: 25px;
     font-weight: bold;
 }
 
 h4 .ico {
     display: inline-flex;
     float: left;
-    background-size: 26px;
-    height: 35px;
+    margin-right: 10px;
+    font-size: 30px;
 }
 
 hr {

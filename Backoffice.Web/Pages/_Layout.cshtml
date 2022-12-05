@@ -7,19 +7,22 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <base href="~/" />
 
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    <script src="js/bootstrap.bundle.min.js"></script>
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
     <link href="css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
 
     <link href="Backoffice.Web.styles.css" rel="stylesheet" />
+
+    <!-- script -->
+    <script src="js/bootstrap.bundle.min.js"></script>
+    
+    <!-- preload icons -->    
+    <link rel="preload" as="font" type="font/woff" crossorigin="anonymous" href="css/font-bo/bo-icons.woff"  />
+
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
-    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.6.2.js"></script>
-    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.8.1/jquery.validate.js">
-    </script>
-    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
 </head>
 <body>
     @RenderBody()
