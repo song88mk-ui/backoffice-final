@@ -31,7 +31,7 @@ namespace Backoffice.Web.Services
                     Result = false
                 };
             //user.Provider = "BackOfficeWeb";
-            user.Provider = "BoAPI";
+            user.Provider = "BoWeb";
             var bodyContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync("api/authentication/login", bodyContent);
 
@@ -70,6 +70,8 @@ namespace Backoffice.Web.Services
             _httpContextAccessor.HttpContext.Session.Remove("UserToken");
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
             _httpClient.DefaultRequestHeaders.Authorization = null;
+
+            var response = await _httpClient.GetAsync("/logout");
 
             return true;
         }

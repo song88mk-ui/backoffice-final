@@ -42,6 +42,7 @@ namespace Backoffice.Web.Pages.Authentication
                 _httpContextAccessor.HttpContext.Session.Remove("ErrorMessage");
             }
 
+
             returnUrl = returnUrl ?? Url.Content("~/");
 
             // auto login

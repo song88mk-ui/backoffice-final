@@ -21,13 +21,9 @@ namespace Backoffice.Web.Shared
         {
             try
             {
-                UserModel = new UserModel();
+                if (HttpContextAccessor.HttpContext.Session.GetString("UserToken") == null) return;
 
-                if (HttpContextAccessor.HttpContext.Session.GetString("UserToken") == null)
-                {
-                    NavigationManager.NavigateTo("login", true);
-                    // remove cascade value
-                }
+                UserModel = new UserModel();
 
                 var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 var userClaims = authState.User.Claims.ToList();
@@ -52,7 +48,6 @@ namespace Backoffice.Web.Shared
 
                 }
 
-
                 // * Create Cascading parameter for user model
                 // ClaimsPrincipal
                 // ID
@@ -61,6 +56,17 @@ namespace Backoffice.Web.Shared
             catch (Exception ex)
             {
                 NavigationManager.NavigateTo("login", true);
+            }
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                if (HttpContextAccessor.HttpContext.Session.GetString("UserToken") == null)
+                {
+                    NavigationManager.NavigateTo("login", true);
+                }
             }
         }
 
