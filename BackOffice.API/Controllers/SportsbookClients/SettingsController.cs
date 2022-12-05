@@ -183,6 +183,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         #endregion
 
         #region PARLAY BONUS
+
         [EnableCors("AllowAllOrigins")]
         [HttpGet("parlaybonus/list")]
         public async Task<IActionResult> GetClientParlayBonus([FromQuery] GetParlayBonusRequest request)
@@ -216,6 +217,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
+
         #endregion
     }
 }

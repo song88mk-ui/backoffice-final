@@ -10,23 +10,132 @@
     Layout = null;
 }
 <!DOCTYPE html>
-
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="~/" />
+
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    <link href="css/site.css" rel="stylesheet" />
-    <link href="POC.Auth.Web.styles.css" rel="stylesheet" />
-    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.6.2.js"></script>
-    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.8.1/jquery.validate.js"></script>
-    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <link rel="stylesheet" href="css/site.css" />
+    
+    <style>
+        body {
+            overflow: hidden;
+        }
+
+        .access-layout {
+            height: 100vh;
+            background-color: #404E67;
+        }
+
+        .page {
+            height: inherit;
+        }
+
+        .first-banner {
+            background-image: url('../background/login-background-image.png');
+            background-size: 100% 100%;
+        }
+
+        .second-banner {
+            background-color: #FFFFFF;
+            background-size: 100%;
+        }
+
+        .first-header-text {
+            letter-spacing: 0px;
+            color: #FFFFFF;
+            text-transform: capitalize;
+            opacity: 1;
+            font-size: 25px;
+        }
+
+        .third-header-text {
+            letter-spacing: 0px;
+            color: #FFFFFF;
+            text-transform: capitalize;
+            opacity: 1;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .second-header-text {
+            font-size: 60px;
+            font-weight: bold;
+            color: #FFFFFF;
+            text-align: center;
+        }
+
+        .banner-icons img {
+            height: 66px;
+        }
+
+        .login-header .title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #404E67;
+        }
+
+        .logo img {
+            margin: 0 auto;
+            display: block;
+        }
+
+        .title-break {
+            background-image: linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%);
+            padding-block: 3px
+        }
+
+        .login-body .form-label, .login-body .form-check-label {
+            color: #1F1F1F;
+        }
+
+        .login-body .form-label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .login-body .form-check-label {
+            font-size: 13px;
+        }
+
+        .login-body .form-link {
+            font-size: 13px;
+            color: #EA6140;
+        }
+
+        .login-footer a, .login-footer button {
+            background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
+            color: white;
+            font-size: 14px;
+            padding-top: 11px;
+            padding-bottom: 11px;
+        }
+
+        .login-body {
+            padding: 0.575rem 0.75rem;
+            border-color: #E5E5E5;
+        }
+
+        .login-body .input-group .input-group-text {
+            border-color: #E5E5E5;
+        }
+
+        .field-validation-error {
+            color: red;
+            font-size: 12px;
+        }
+
+        input.input-validation-error,
+        textarea.input-validation-error,
+        select.input-validation-error {
+            border: 1px solid #CD0A0A;
+        }
+    </style>
 </head>
 <body>
     <div class="access-layout">
-        @*<PageTitle>Backoffice</PageTitle>*@
-
         <div class="page">
             <div class="row h-100">
                 <div class="col-6 first-banner d-flex flex-column justify-content-center align-items-center">
@@ -82,7 +191,7 @@
                                 </div>
                             </div>
                             <div class="login-footer">
-                                <button type="submit" class="d-block rounded-2 text-decoration-none text-center col-12">Log in</button>
+                                <button type="submit" class="d-block rounded-2 text-decoration-none text-center col-12 border-0">Log in</button>
                             </div>
                         </form>
                     </div>
@@ -92,118 +201,3 @@
     </div>
 </body>
 </html>
-
-<style>
-    body {
-        overflow: hidden;
-    }
-
-    .access-layout {
-        height: 100vh;
-        background-color: #404E67;
-    }
-
-    .page {
-        height: inherit;
-    }
-
-    .first-banner {
-        background-image: url('../background/login-background-image.png');
-        background-size: 100% 100%;
-    }
-
-    .second-banner {
-        background-color: #FFFFFF;
-        background-size: 100%;
-    }
-
-    .first-header-text {
-        letter-spacing: 0px;
-        color: #FFFFFF;
-        text-transform: capitalize;
-        opacity: 1;
-        font-size: 25px;
-    }
-
-    .third-header-text {
-        letter-spacing: 0px;
-        color: #FFFFFF;
-        text-transform: capitalize;
-        opacity: 1;
-        text-align: center;
-        font-size: 18px;
-    }
-
-    .second-header-text {
-        font-size: 60px;
-        font-weight: bold;
-        color: #FFFFFF;
-        text-align: center;
-    }
-
-    .banner-icons img {
-        height: 66px;
-    }
-
-    .login-header .title {
-        font-size: 28px;
-        font-weight: bold;
-        color: #404E67;
-    }
-
-    .logo img {
-        margin: 0 auto;
-        display: block;
-    }
-
-    .title-break {
-        background-image: linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%);
-        padding-block: 3px
-    }
-
-    .login-body .form-label, .login-body .form-check-label {
-        color: #1F1F1F;
-    }
-
-    .login-body .form-label {
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    .login-body .form-check-label {
-        font-size: 13px;
-    }
-
-    .login-body .form-link {
-        font-size: 13px;
-        color: #EA6140;
-    }
-
-    .login-footer a, .login-footer button {
-        background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
-        color: white;
-        font-size: 14px;
-        padding-top: 11px;
-        padding-bottom: 11px;
-    }
-
-    .login-body {
-        padding: 0.575rem 0.75rem;
-        border-color: #E5E5E5;
-    }
-
-    .login-body .input-group .input-group-text {
-        border-color: #E5E5E5;
-    }
-
-    .field-validation-error {
-        color: red;
-        font-size: 12px;
-    }
-
-    input.input-validation-error,
-    textarea.input-validation-error,
-    select.input-validation-error {
-        border: 1px solid #CD0A0A;
-    }
-</style>
