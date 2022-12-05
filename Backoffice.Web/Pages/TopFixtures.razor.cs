@@ -48,7 +48,6 @@ namespace Backoffice.Web.Pages
                 ClientIds = clientId
             })).Result.TopFixtures;
 
-
             IsPreLoader = false;
         }
 

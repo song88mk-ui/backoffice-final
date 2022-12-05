@@ -54,7 +54,8 @@ namespace Backoffice.Web.Components.TopFixtures
                         Name = "No Clients Available"
                     });
 
-                await OnInitCallback.InvokeAsync("");
+                var clientCodes = string.Join(",", Clients.Where(c => !string.IsNullOrEmpty(c.Value)).Select(s => s.Value).ToList());
+                await OnInitCallback.InvokeAsync(clientCodes);
             }
             catch (Exception)
             {
