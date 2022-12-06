@@ -9,7 +9,7 @@ namespace Backoffice.Web.Services
     {
         Task<BaseResponse<ClientListResponse>> GetClients();
         Task<BaseResponse<ClientTopFixtureResponse>> GetClientTopFixtures(GetClientTopFixtureRequest request);
-        Task<BaseResponse<SportsTreeResponse>> GetSportstreeByClientId(int clientId);
+        
         Task<BaseResponse<PlatformMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request);
         Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);
         
@@ -17,5 +17,6 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<PlatformMessageResponse>> PostTopLeaguesAsync(PostTopLeaguesRequest request);
         Task<BaseResponse<bool>> CopyTopLeaguesAsync(CopyTopLeaguesRequest request);
         Task<BaseResponse<SportsLookupResponse>> GetSportsAsync(string languageCode);
+        Task<BaseResponse<SportsTreeResponse>> GetSportstreeByClientId(int clientId);
     }
 }

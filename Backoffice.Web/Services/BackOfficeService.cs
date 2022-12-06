@@ -278,7 +278,7 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Methods - Others
-        public async Task<BaseResponse<SportsLookupResponse>> GetSportsAsync(string languageCode, string region)
+        public async Task<BaseResponse<SportsLookupResponse>> GetSportsAsync(string languageCode)
         {
             try
             {
