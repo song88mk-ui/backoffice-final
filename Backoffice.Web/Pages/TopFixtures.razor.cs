@@ -39,7 +39,8 @@ namespace Backoffice.Web.Pages
 
         public async Task OnInitEvent(TopFixtureCallback request)
         {
-            var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = request.ClientIds })).Result;
+            var clientIds = string.Join(",", request.SelectedClients.Select(s => s.ClientId).ToList());
+            var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = clientIds })).Result;
 
             if (result != null && result.TopFixtures.Any())
             {
@@ -48,10 +49,14 @@ namespace Backoffice.Web.Pages
             else
             {
                 TopFixturesModel.TopFixtures = new List<ClientTopFixtureResponse.OrderedClientTopFixture>();
-                foreach(var clientId in request.ClientIds.Split(","))
+                foreach(var client in request.SelectedClients)
                 {
-                    //TODO
-                    //TopFixturesModel.TopFixtures
+                    TopFixturesModel.TopFixtures.Add(new ClientTopFixtureResponse.OrderedClientTopFixture 
+                    { 
+                        ClientIdRef = (int)client.ClientId,  
+                        ClientName = client.ClientName,
+                        TopFixtures = new List<FixtureModel>()
+                    });
                 }
             }
 

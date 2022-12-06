@@ -10,7 +10,7 @@
                             <select class="form-control my-1 mr-sm-2" @onchange="OnClientChangedEvent">
                                 @foreach (var item in Clients)
                                 {
-                                    if (item.Value == ClientId)
+                                    if (item.Value.ClientId.ToString() == ClientId)
                                     {
                                         <option value="@item.Value" selected>@item.Name</option>
                                     }

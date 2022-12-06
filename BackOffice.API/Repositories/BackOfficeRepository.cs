@@ -36,8 +36,8 @@ namespace Backoffice.API.Repositories
                     .Select(client => new ClientResponse
                     {
                         ClientId = client.ClientId,
-                        BusinessName = client.Name,
-                        Brand = client.Brand,
+                        ClientName = client.Name,
+                        ClientCode = client.Brand,
                         Region = client.Region
                     }).ToList();
 

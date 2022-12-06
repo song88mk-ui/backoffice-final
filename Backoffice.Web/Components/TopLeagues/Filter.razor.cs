@@ -35,12 +35,12 @@ namespace Backoffice.Web.Components.TopLeagues
                 if (clients != null)
                 {
                     if (UserModel.ClientCodes.Any())
-                         clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.Brand.ToUpper())).ToList();
+                         clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
                     Clients = clients.Clients.Select(s => new SelectListItemModel<string>
                     {
                         Value = s.ClientId.ToString(),
-                        Name = s.BusinessName
+                        Name = s.ClientName
                     }).ToList();
                 }
 
