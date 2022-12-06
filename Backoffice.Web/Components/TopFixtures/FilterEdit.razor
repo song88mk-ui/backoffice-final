@@ -1,0 +1,100 @@
+﻿@if (SportsTree != null)
+{
+    <div class="row">
+        <div class="col-2">
+            <label class="my-1 mr-2">Sport</label>
+
+            <select class="form-control form-select my-1 mr-sm-2" @onchange="OnSportChangedEvent">
+                <option value="0" selected>ALL</option>
+                @if (SportsTree.Sports.Any())
+                {
+                    foreach (var sport in SportsTree.Sports)
+                    {
+                        if (SelectedSport != null && sport.SportId == SelectedSport.SportId)
+                        {
+                            <option value="@sport.SportId" selected>@sport.SportName</option>
+                        }
+                        else
+                        {
+                            <option value="@sport.SportId">@sport.SportName</option>
+                        }
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-2">
+            <label class="my-1 mr-2">Segment</label>
+
+            <select class="form-control form-select my-1 mr-sm-2" @onchange="OnSegmentChangedEvent">
+                <option value="0" selected>ALL</option>
+                @if (SelectedSport != null && SelectedSport.Segments.Any())
+                {
+                    foreach (var segment in SelectedSport.Segments)
+                    {
+                        if (SelectedSegment != null && segment.SegmentId == SelectedSegment.SegmentId)
+                        {
+                            <option value="@segment.SegmentId" selected>@segment.SegmentName</option>
+                        }
+                        else
+                        {
+                            <option value="@segment.SegmentId">@segment.SegmentName</option>
+                        }
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-2">
+            <label class="my-1 mr-2">League</label>
+
+            <select class="form-control form-select my-1 mr-sm-2" @onchange="OnLeagueChangedEvent">
+                <option value="0" selected>ALL</option>
+                @if (SelectedSegment != null && SelectedSegment.Leagues.Any())
+                {
+                    foreach (var league in SelectedSegment.Leagues)
+                    {
+                        if (SelectedLeague != null && league.LeagueId == SelectedLeague.LeagueId)
+                        {
+                            <option value="@league.LeagueId" selected>@league.LeagueName</option>
+                        }
+                        else
+                        {
+                            <option value="@league.LeagueId">@league.LeagueName</option>
+                        }
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-2">
+            <label class="my-1 mr-2">Game</label>
+
+            <select class="form-control form-select my-1 mr-sm-2" @onchange="OnGameChangedEvent">
+                <option value="0" selected>ALL</option>
+                @if (SelectedLeague != null && SelectedLeague.Fixtures.Any())
+                {
+                    foreach (var fixture in SelectedLeague.Fixtures)
+                    {
+                        if (SelectedGame != null && fixture.FixtureId == SelectedGame.FixtureId)
+                        {
+                            <option value="@fixture.FixtureId" selected>@fixture.FixtureName</option>
+                        }
+                        else
+                        {
+                            <option value="@fixture.FixtureId">@fixture.FixtureName</option>
+                        }
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-2">
+            <label class="my-1 mr-2">Sort Kickoff Date & Time</label>
+            <select class="form-control form-select my-1 mr-sm-2">
+                <option value="All">Default List</option>
+                <option value="2">Date & Time (Ascending)</option>
+            </select>
+        </div>
+    </div>
+}

@@ -98,33 +98,6 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<SportsTreeResponse>> GetSportstreeByClientId(int clientId)
-        {
-            try
-            {
-                var userToken = await _authenticationService.AuthenticateToken();
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
-
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsTreeResponse>>
-                (await _httpClient.GetStreamAsync($"sportsbook/settings/topfixtures/sportstree?clientId={clientId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-
-                return result ?? new BaseResponse<SportsTreeResponse>
-                {
-                    StatusCode = StatusCode.Success,
-                    Message = $"{StatusCode.Success}",
-                    Result = new SportsTreeResponse()
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<SportsTreeResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-
         public async Task<BaseResponse<PlatformMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request)
         {
             try
@@ -198,7 +171,7 @@ namespace Backoffice.Web.Services
         }
         #endregion
 
-        #region Top Leagues
+        #region Methods - Top Leagues
         public async Task<BaseResponse<GetTopLeaguesResponse>> GetTopLeaguesAsync(GetTopLeaguesRequest request)
         {
             try
@@ -301,6 +274,10 @@ namespace Backoffice.Web.Services
                 };
             }
         }
+
+        #endregion
+
+        #region Methods - Others
         public async Task<BaseResponse<SportsLookupResponse>> GetSportsAsync(string languageCode)
         {
             try
@@ -327,8 +304,36 @@ namespace Backoffice.Web.Services
                 };
             }
         }
+
+        public async Task<BaseResponse<SportsTreeResponse>> GetSportstreeByClientId(int clientId)
+        {
+            try
+            {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsTreeResponse>>
+                (await _httpClient.GetStreamAsync($"sportsbook/settings/topfixtures/sportstree?clientId={clientId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return result ?? new BaseResponse<SportsTreeResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = $"{StatusCode.Success}",
+                    Result = new SportsTreeResponse()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<SportsTreeResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         #endregion
-        
+
         public void Dispose()
         {
             _httpClient.Dispose();

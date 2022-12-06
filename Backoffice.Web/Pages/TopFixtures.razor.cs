@@ -18,8 +18,6 @@ namespace Backoffice.Web.Pages
         public MetaData MetaData { get; set; } = new MetaData();
         public TopFixturesModel TopFixturesModel { get; set; }
 
-        public string ClientName { get; set; }
-
         #region Methods
         protected override async Task OnInitializedAsync()
         {
@@ -74,24 +72,25 @@ namespace Backoffice.Web.Pages
             MetaData.TotalCount = TopFixturesModel.TopFixturesFiltered.Count();
         }
 
-        public async Task OnEdit()
+        public async Task OnEdit(ClientTopFixtureResponse.OrderedClientTopFixture topFixture)
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("ClientId", topFixture.ClientIdRef);
 
             var options = new ModalOptions();
-            ModalService.Open<EditModal>($"Set Top Leagues of {ClientName}", parameters, options);
+            ModalService.Open<EditModal>($"Set Top Fixtures of {topFixture.ClientName}", parameters, options);
         }
 
-        public async Task OnCopy()
+        public async Task OnCopy(ClientTopFixtureResponse.OrderedClientTopFixture topFixture)
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
 
             var options = new ModalOptions();
-            ModalService.Open<CopyModal>($"Copy {ClientName} Top Fixtures Settings To", parameters, options);
+            ModalService.Open<CopyModal>($"Copy {topFixture.ClientName} Top Fixtures Settings To", parameters, options);
         }
 
         protected async Task SelectPage(int page)

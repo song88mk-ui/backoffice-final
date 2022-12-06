@@ -9,9 +9,12 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public MetaData MetaData { get; set; }
         [Parameter] public int Spread { get; set; }
         [Parameter] public EventCallback<int> SelectPageEvent { get; set; }
+        [Parameter] public int PaginationColspan { get; set; }
+
         protected List<PagingLink> _links;
         protected int ToRow => GetToRow();
         protected int FromRow => GetFromRow();
+
         #endregion
 
         protected override void OnParametersSet()
@@ -21,6 +24,8 @@ namespace Backoffice.Web.Components.Common
 
         private int GetFromRow()
         {
+            if(MetaData.TotalCount <= 0)
+                return 0;
             return ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1;
         }
 
