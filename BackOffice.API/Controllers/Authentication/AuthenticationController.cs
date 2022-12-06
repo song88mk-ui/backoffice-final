@@ -30,7 +30,29 @@ namespace Backoffice.API.Controllers.Authentication
                     return BadRequest(result);
             }
         }
-        [HttpPost("logout")]
+        [HttpGet("authenticate")]
+        public async Task<IActionResult> Authenticate()
+        {
+            var result = new BaseResponse<TokenModel>()
+            {
+                StatusCode = Shared.Enums.StatusCode.Unauthorized,
+                Message = "Missing authorization"
+            };
+            if (HttpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                result = await this._authenticationRepository.Authenticate(token);
+            }
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpGet("logout")]
         public async Task<IActionResult> Logout()
         {
             var result = new BaseResponse<bool>()

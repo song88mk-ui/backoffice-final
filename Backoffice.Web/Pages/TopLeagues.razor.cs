@@ -27,7 +27,7 @@ namespace Backoffice.Web.Pages
             IconClass = "ico-top-leagues";
 
             ClientInformation = (await BackOfficeService.GetClients()).Result;
-            var userClientCodes = ClientInformation != null ? ClientInformation?.Clients.Where(x => UserModel.ClientCodes.Contains(x.Brand)).Select(x => x.ClientId).ToList() : new List<long>();
+            var userClientCodes = ClientInformation != null ? ClientInformation?.Clients.Where(x => UserModel.ClientCodes.Contains(x.ClientCode)).Select(x => x.ClientId).ToList() : new List<long>();
 
             GetTopLeaguesRequest = new GetTopLeaguesRequest()
             {

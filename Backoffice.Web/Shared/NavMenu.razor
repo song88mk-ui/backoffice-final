@@ -86,16 +86,3 @@
         </nav>
     </div>
 </div>
-
-@code {
-    [CascadingParameter(Name = "UserModel")]
-    public UserModel UserModel { get; set; }
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
