@@ -51,7 +51,7 @@ namespace Backoffice.Web.Components.TopLeagues
                         Name = "No Clients Available"
                     });
 
-                var sports = (await BackOfficeService.GetSportsAsync("en", "hk")).Result;
+                var sports = (await BackOfficeService.GetSportsAsync("en")).Result;
                 if (sports != null)
                 {
                     Sports = sports.Sports.Select(s => new SelectListItemModel<int>
@@ -68,7 +68,7 @@ namespace Backoffice.Web.Components.TopLeagues
                         Name = "No Sports Available"
                     });
 
-                await OnInitCallback.InvokeAsync("");
+                await OnInitCallback.InvokeAsync();
             }
             catch (Exception)
             {

@@ -159,8 +159,13 @@ namespace Backoffice.API.Controllers.SportsbookClients
         public async Task<IActionResult> GetClientSports([FromQuery] string LanguageCode)
         {
             var result = await _platformRepository.GetClientSports(LanguageCode, "HK");
-
-            return Ok(result);
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
         }
         #endregion
 

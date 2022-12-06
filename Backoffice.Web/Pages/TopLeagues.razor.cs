@@ -38,10 +38,8 @@ namespace Backoffice.Web.Pages
 
             TopLeaguesList = (await BackOfficeService.GetTopLeaguesAsync(GetTopLeaguesRequest)).Result;
             if (TopLeaguesList != null)
-                TopLeaguesList.ClientTopLeagues.ToList().ForEach(c => c.ClientName = ClientInformation.Clients.FirstOrDefault(x => x.ClientId == c.ClientIdRef).BusinessName);
+                TopLeaguesList.ClientTopLeagues.ToList().ForEach(c => c.ClientName = ClientInformation?.Clients?.FirstOrDefault(x => x.ClientId == c.ClientIdRef).BusinessName);
         }
-
-
 
         public async Task OnEdit()
         {

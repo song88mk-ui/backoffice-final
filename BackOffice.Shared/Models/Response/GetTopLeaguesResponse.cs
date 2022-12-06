@@ -11,14 +11,11 @@ namespace Backoffice.Shared.Models.Response
         }
         public List<OrderedClientTopLeagues> ClientTopLeagues { get; set; }
 
-        #region Nested Class
         public class OrderedClientTopLeagues
         {
             public int ClientIdRef { get; set; }
             public string ClientName { get; set; }
-            public int SportId { get; set; }
             public List<OrderedClientTopLeague> TopLeagues { get; set; }
         }
-        #endregion
     }
 }

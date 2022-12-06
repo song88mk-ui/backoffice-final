@@ -16,6 +16,6 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<GetTopLeaguesResponse>> GetTopLeaguesAsync(GetTopLeaguesRequest request);
         Task<BaseResponse<PlatformMessageResponse>> PostTopLeaguesAsync(PostTopLeaguesRequest request);
         Task<BaseResponse<bool>> CopyTopLeaguesAsync(CopyTopLeaguesRequest request);
-        Task<BaseResponse<SportsLookupResponse>> GetSportsAsync(string languageCode, string region);
+        Task<BaseResponse<SportsLookupResponse>> GetSportsAsync(string languageCode);
     }
 }

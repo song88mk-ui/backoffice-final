@@ -76,38 +76,27 @@ namespace Backoffice.API.Repositories
                         SportId = request.SportId
                     });
 
-                    var result = await GetHttpClient(region.Key).GetAsync($"v1/client/topleagues{queryStrings}");
+                    var result = GetHttpClient(region.Key).GetAsync($"v1/client/topleagues{queryStrings}").Result;
 
                     if (result.StatusCode == HttpStatusCode.OK)
                     {
-                        var newresult = JsonConvert.DeserializeObject<BaseResponse<GetTopLeaguesResponse>>(await result.Content.ReadAsStringAsync()).Result.ClientTopLeagues;
+                        var newresult = JsonConvert.DeserializeObject<BaseResponse<GetTopLeaguesResponse>>(result.Content.ReadAsStringAsync().Result).Result.ClientTopLeagues;
                         if (newresult.Any())
                         {
                             topLeagues.AddRange(newresult);
                         }
                     }
-                }
 
-                if (topLeagues.Any())
-                {
-                    return new BaseResponse<GetTopLeaguesResponse>()
-                    {
-                        StatusCode = StatusCode.Success,
-                        Message = StatusCode.Success.ToString(),
-                        Result = new GetTopLeaguesResponse()
-                        {
-                            ClientTopLeagues = topLeagues
-                        }
-                    };
                 }
-                else
+                return new BaseResponse<GetTopLeaguesResponse>()
                 {
-                    return new BaseResponse<GetTopLeaguesResponse>()
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new GetTopLeaguesResponse
                     {
-                        StatusCode = StatusCode.Error,
-                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')}"
-                    };
-                }
+                        ClientTopLeagues = topLeagues
+                    }
+                };
             }
             catch (Exception ex)
             {

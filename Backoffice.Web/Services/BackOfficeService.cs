@@ -277,18 +277,18 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<SportsLookupResponse>> GetSportsAsync(string languageCode, string region)
+        public async Task<BaseResponse<SportsLookupResponse>> GetSportsAsync(string languageCode)
         {
             try
             {
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsLookupResponse>>
-                (await _httpClient.GetStreamAsync($"sportsbook/settings/sports?language={languageCode}&region={region}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (await _httpClient.GetStreamAsync($"sportsbook/settings/sports?languageCode={languageCode}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result ?? new BaseResponse<SportsLookupResponse>
                 {
                     StatusCode = StatusCode.Success,
                     Message = $"{StatusCode.Success}",
-                    Result = result?.Result ?? new SportsLookupResponse()
+                    Result = new SportsLookupResponse()
                 };
             }
             catch (Exception ex)

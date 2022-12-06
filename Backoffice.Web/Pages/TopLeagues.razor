@@ -42,7 +42,7 @@
                                                 @foreach (var x in item.TopLeagues)
                                                 {
                                                     <div class="tl-fixture m-1 py-1 rounded-2">
-                                                        <span class="px-3">@x.LeagueName</span>
+                                                        <span class="px-3">@x.SegmentName > @x.LeagueName</span>
                                                     </div>
                                                 }
                                             </div>
@@ -60,28 +60,6 @@
                                 }
                             }
                         </tbody>
-                        <tfoot>
-                            <tr>
-                                <td class="py-2">
-                                    <span>Showing 10 of 100 entries</span>
-                                </td>
-                                <td class="py-2 text-end" colspan="3">
-                                    <div class="tbl-pagination">
-                                        <a class="me-2 text-decoration-none" href="javascript:void(0);">
-                                            <i class="fa fa-chevron-left"></i>
-                                        </a>
-                                        <a class="me-2 text-decoration-none active" href="javascript:void(0);">1</a>
-                                        <a class="me-2 text-decoration-none" href="javascript:void(0);">2</a>
-                                        <a class="me-2 text-decoration-none" href="javascript:void(0);">3</a>
-                                        <span class="me-2">.......</span>
-                                        <a class="me-2 text-decoration-none" href="javascript:void(0);">30</a>
-                                        <a class="me-2 text-decoration-none" href="javascript:void(0);">
-                                            <i class="fa fa-chevron-right"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tfoot>
                         <Pagination MetaData="MetaData" Spread="3" />
 @*                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" />
 *@                    </table>
