@@ -21,6 +21,8 @@ namespace Backoffice.Web.Components.Common
 
         private int GetFromRow()
         {
+            if(MetaData.TotalCount <= 0)
+                return 0;
             return ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1;
         }
 
