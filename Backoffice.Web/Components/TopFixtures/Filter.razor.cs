@@ -73,10 +73,10 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
-            ClientId = ((ClientResponse)e.Value).ClientId.ToString();
+            ClientId = e.Value.ToString();
 
             var selectedClients = Clients.Where(c => !string.IsNullOrEmpty(c.Value.ClientCode)).Select(s => s.Value).ToList();
-            if(ClientId != "0")
+            if(ClientId != "" && ClientId != "0")
                 selectedClients = Clients.Where(c => c.Value.ClientId.ToString() == ClientId).Select(s => s.Value).ToList();
 
             await OnInitCallback.InvokeAsync(new TopFixtureCallback
