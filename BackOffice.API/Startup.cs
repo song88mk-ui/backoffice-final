@@ -1,6 +1,7 @@
 using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Data.Backoffice;
+using Backoffice.Shared.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Data.SqlClient;
@@ -78,6 +79,7 @@ namespace Backoffice.API
             services.AddDbContext<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"]));
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
             services.AddScoped<IPlatformRepository, PlatformRepository>();
+            services.AddSingleton<IMemCache, MemCache>();
             services.AddScoped<ApiKeyFilter>();
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 

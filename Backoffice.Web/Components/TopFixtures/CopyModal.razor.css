@@ -1,0 +1,47 @@
+﻿.clientBtn {
+    border: 1px solid #C7C1C1;
+    text-align: left;
+    width: 14rem;
+}
+
+.dropdown-toggle::after {
+    float: right;
+    position: relative;
+    top: 10px;
+}
+
+.copyModalBtn {
+    width: 112px;
+    height: 40px;
+    border-radius: 5px;
+    color: white;
+}
+
+.copyModalCancel {
+    background-color: #9AA0AB;
+}
+
+.copyModalSave {
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+.clientBorder {
+    background: #404E67 0% 0% no-repeat padding-box;
+    border-radius: 3px;
+    color: white;
+}
+
+.btn-close {
+    font-size: 0.6rem;
+    font-weight: bold;
+}
+
+.leagueContainer {
+    min-width: 100px;
+    border: 1px solid #C7C1C1;
+    border-radius: 3px;
+}
+
+.dropdown-menu.show {
+    width: 14rem;
+}

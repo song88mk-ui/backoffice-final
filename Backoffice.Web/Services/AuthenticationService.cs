@@ -71,7 +71,7 @@ namespace Backoffice.Web.Services
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
             _httpClient.DefaultRequestHeaders.Authorization = null;
 
-            var response = await _httpClient.GetAsync("/logout");
+            await _httpClient.GetAsync("/logout");
 
             return true;
         }

@@ -61,6 +61,10 @@ namespace Backoffice.API.Repositories
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
                 var response = await _httpClient.GetAsync($"logout");
+                if(response.Headers.TryGetValues("Token", out var newToken))
+                {
+
+                }
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
