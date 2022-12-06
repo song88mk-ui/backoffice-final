@@ -1,14 +1,20 @@
-﻿namespace Backoffice.Web.Components.TopFixtures
+﻿using Backoffice.Web.Models;
+using Backoffice.Web.Services;
+using Microsoft.AspNetCore.Components;
+
+namespace Backoffice.Web.Components.TopFixtures
 {
     public partial class CopyModal : IDisposable
     {
-        #region Properties        
+        #region Properties     
+        [Inject] public IModalService ModalService { get; set; }
+        [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         #endregion
         #region Methods
 
         public async Task OnCancelClickEvent()
         {
-
+            ModalService.Cancel();
         }
 
         public async Task OnSaveClickEvent()

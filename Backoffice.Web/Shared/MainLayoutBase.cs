@@ -21,7 +21,10 @@ namespace Backoffice.Web.Shared
         {
             try
             {
-                if (HttpContextAccessor.HttpContext?.Session.GetString("UserToken") == null) return;
+                if (HttpContextAccessor.HttpContext.Session.GetString("UserToken") == null)
+                {
+                    NavigationManager.NavigateTo("login", true);
+                }
 
                 UserModel = new UserModel();
 
@@ -56,17 +59,6 @@ namespace Backoffice.Web.Shared
             catch (Exception ex)
             {
                 NavigationManager.NavigateTo("login", true);
-            }
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                if (HttpContextAccessor.HttpContext.Session.GetString("UserToken") == null)
-                {
-                    NavigationManager.NavigateTo("login", true);
-                }
             }
         }
 

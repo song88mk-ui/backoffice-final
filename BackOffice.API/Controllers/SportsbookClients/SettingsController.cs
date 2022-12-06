@@ -1,10 +1,13 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using static Backoffice.Shared.Models.Response.ClientTopLeaguesResponse;
+using static Backoffice.Shared.Models.Response.GetTopLeaguesResponse;
 using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.SportsbookClients
@@ -85,15 +88,30 @@ namespace Backoffice.API.Controllers.SportsbookClients
         }
         #endregion
 
-        #region TOP LEAGUES
+        #region Top Leagues
 
         [EnableCors("AllowAllOrigins")]
-        [HttpGet("topleagues")]
-        public async Task<IActionResult> GetClientTopLeagues(TopLeaguesRequest request)
+        [HttpGet("topleagues/allleagues")]
+        public async Task<IActionResult> GetClientAllLeagues([FromQuery] ClientAllLeaguesRequest request)
+        {
+            var region = await _backofficeRepository.GetClientRegion(request.ClientIdRef);
+            var result = await _platformRepository.GetClientAllLeagues(request, region.Result);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        
+        [EnableCors("AllowAllOrigins")]
+        [HttpPost("topleagues")]
+        public async Task<IActionResult> GetTopLeagues([FromBody] GetTopLeaguesRequest request)
         {
             var region = await _backofficeRepository.GetClientsByRegion(request.ClientIdRefs);
-
-            var result = await _platformRepository.GetClientTopLeagues(request, region.Result);
+            var result = await _platformRepository.GetTopLeagues(request, region.Result);
 
             switch (result.StatusCode)
             {
@@ -105,11 +123,11 @@ namespace Backoffice.API.Controllers.SportsbookClients
         }
 
         [EnableCors("AllowAllOrigins")]
-        [HttpPost("topleagues")]
-        public async Task<IActionResult> AddOrUpdateTopLeagues(ClientTopLeaguesRequest request)
+        [HttpPost("topleagues/post")]
+        public async Task<IActionResult> PostTopLeagues([FromBody] PostTopLeaguesRequest request)
         {
             var region = await _backofficeRepository.GetClientRegion(request.ClientIdRef);
-            var result = await _platformRepository.AddOrUpdateTopLeagues(request, region.Result);
+            var result = await _platformRepository.PostTopLeagues(request, region.Result);
 
             switch (result.StatusCode)
             {
@@ -122,9 +140,10 @@ namespace Backoffice.API.Controllers.SportsbookClients
 
         [EnableCors("AllowAllOrigins")]
         [HttpPost("topleagues/copy")]
-        public async Task<IActionResult> CopyClientTopLeagues([FromBody] CopyClientTopLeaguesRequest request)
+        public async Task<IActionResult> CopyTopLeagues([FromBody] CopyTopLeaguesRequest request)
         {
-            var result = await _backofficeRepository.CopyClientTopLeagues(request);
+            var region = await _backofficeRepository.GetClientsByRegion(string.Join(",", request.ClientIds));
+            var result = await _platformRepository.CopyTopLeagues(request, region.Result);
 
             switch (result.StatusCode)
             {
@@ -136,49 +155,12 @@ namespace Backoffice.API.Controllers.SportsbookClients
         }
 
         [EnableCors("AllowAllOrigins")]
-        [HttpGet("client/sports")]
+        [HttpGet("sports")]
         public async Task<IActionResult> GetClientSports([FromQuery] string LanguageCode)
         {
             var result = await _platformRepository.GetClientSports(LanguageCode, "HK");
 
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-
-        [EnableCors("AllowAllOrigins")]
-        [HttpGet("client/allleagues")]
-        public async Task<IActionResult> GetClientAllLeagues([FromQuery] ClientAllLeaguesRequest request)
-        {
-            var region = await _backofficeRepository.GetClientRegion(request.ClientIdRef);
-
-            var result = await _platformRepository.GetClientAllLeagues(request, region.Result);
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-
-        [HttpGet("client/currencies")]
-        public async Task<IActionResult> GetCurrencies()
-        {
-            var result = await _backofficeRepository.GetCurrencies();
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
+            return Ok(result);
         }
         #endregion
 

@@ -26,7 +26,7 @@ namespace Backoffice.Web.Pages.Authentication
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<IActionResult> OnGet(string returnUrl = null)
+        public async Task<IActionResult> OnGet(string returnUrl)
         {
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
@@ -76,9 +76,9 @@ namespace Backoffice.Web.Pages.Authentication
 
                     TempData["HasError"] = true;
 
-                    if(result.Message.ToLower().Contains("user does not exist"))
+                    if (result.Message.ToLower().Contains("user does not exist"))
                         ModelState.AddModelError("UserModel.Name", "Sorry, we couldn't find an account with that username, please try again.");
-
+                    
                     ModelState.AddModelError("UserModel.Password", "Password is incorrect, please try again or click Forgot Password to reset it.");
                 }
             }

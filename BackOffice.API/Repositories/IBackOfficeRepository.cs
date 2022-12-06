@@ -16,11 +16,6 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);
         #endregion
 
-        #region TOP LEAGUES
-        Task<BaseResponse<bool>> CopyClientTopLeagues(CopyClientTopLeaguesRequest request);
-
-        #endregion
-
         Task<BaseResponse<List<CurrenciesResponse>>> GetCurrencies();
     }
 }

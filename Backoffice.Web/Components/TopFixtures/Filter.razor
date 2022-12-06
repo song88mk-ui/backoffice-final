@@ -8,16 +8,15 @@
                         @if (Clients.Any())
                         {
                             <select class="form-control my-1 mr-sm-2" @onchange="OnClientChangedEvent">
-                                <option selected>Choose client...</option>
                                 @foreach (var item in Clients)
                                 {
-                                    if (item.Value == ClientId)
+                                    if (item.Value.ClientId.ToString() == ClientId)
                                     {
-                                        <option value="@item.Value" selected>@item.Name</option>
+                                        <option value="@item.Value.ClientId" selected>@item.Name</option>
                                     }
                                     else
                                     {
-                                        <option value="@item.Value">@item.Name</option>
+                                        <option value="@item.Value.ClientId">@item.Name</option>
                                     }
                                 }
                             </select>

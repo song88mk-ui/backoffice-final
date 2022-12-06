@@ -1,4 +1,4 @@
-﻿using static Backoffice.Shared.Models.Response.ClientTopFixtureResponse;
+﻿using Backoffice.Shared.Models.Response;
 
 namespace Backoffice.Web.Models
 {
@@ -6,10 +6,17 @@ namespace Backoffice.Web.Models
     {
         public TopFixturesModel()
         {
-            TopFixtures = new List<OrderedClientTopFixture>();
+            TopFixtures = new List<ClientTopFixtureResponse.OrderedClientTopFixture>();
+            TopFixturesFiltered = new List<ClientTopFixtureResponse.OrderedClientTopFixture>();
         }
-        public List<OrderedClientTopFixture> TopFixtures { get; set; }
-        public string ClientCode { get; set; }
-        public Guid ClientId { get; set; }
+        public List<ClientTopFixtureResponse.OrderedClientTopFixture> TopFixtures { get; set; }
+        public List<ClientTopFixtureResponse.OrderedClientTopFixture> TopFixturesFiltered { get; set; }
+        
+    }
+
+    public class TopFixtureCallback
+    {
+        public List<ClientResponse> SelectedClients { get; set; }
+        public string SearchText { get; set; }
     }
 }

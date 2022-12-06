@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using static Backoffice.Shared.Models.Requests.TopLeaguesRequest;
+using static Backoffice.Shared.Models.Requests.GetTopLeaguesRequest;
 
 namespace Backoffice.Shared.Models.Response
 {
