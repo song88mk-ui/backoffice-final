@@ -21,7 +21,7 @@ namespace Backoffice.Web.Shared
         {
             try
             {
-                if (HttpContextAccessor.HttpContext.Session.GetString("UserToken") == null) return;
+                if (HttpContextAccessor.HttpContext?.Session.GetString("UserToken") == null) return;
 
                 UserModel = new UserModel();
 

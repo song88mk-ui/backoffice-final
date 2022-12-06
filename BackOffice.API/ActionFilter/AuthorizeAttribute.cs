@@ -43,47 +43,21 @@ namespace Backoffice.API.ActionFilter
             if (jwtToken == null)
             {
                 context.Result = new JsonResult(new { title = "Unauthorized", message = "Invalid token." }) { StatusCode = StatusCodes.Status401Unauthorized };
+                return;
             }
 
             // Invalid Isuer
             if (jwtToken.Issuer != _configuration["API:AuthenticationAPI:JWT:Issuer"])
             {
                 context.Result = new JsonResult(new { title = "Unauthorized", message = "Invalid Issuer." }) { StatusCode = StatusCodes.Status401Unauthorized };
+                return;
             }
 
             if (jwtToken.ValidTo < DateTime.UtcNow)
             {
-                // Call Auth validator
-                var client = new HttpClient()
-                {
-                    BaseAddress = new Uri(_configuration["API:AuthenticationAPI:Uri"]),
-                };
-
-                client.DefaultRequestHeaders.Add("x-api-key", _configuration["API:AuthenticationAPI:Security:APIKey"]);
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                var response = (await client.GetAsync($"/authenticate"));
-
-                var payload = await response.Content.ReadAsStringAsync();
-                var validToken = JsonConvert.DeserializeObject<BaseResponse<TokenModel>>(payload);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    if (validToken.Result == null)
-                    {
-                        context.Result = new JsonResult(new { title = "Unauthorized", message = validToken.Message }) { StatusCode = StatusCodes.Status401Unauthorized };
-                        return;
-                    }
-
-                    context.HttpContext.Request.Headers[HeaderNames.Authorization] = validToken.Result.AccessToken;
-                }
-                else
-                {
-                    context.Result = new JsonResult(new { title = "Unauthorized", message = "" }) { StatusCode = StatusCodes.Status401Unauthorized };
-                    return;
-                }
+                context.Result = new JsonResult(new { title = "Unauthorized", message = "" }) { StatusCode = StatusCodes.Status401Unauthorized };
+                return;
             }
-
         }
     }
 }

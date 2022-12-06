@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Text.Json;
 
@@ -12,18 +13,20 @@ namespace Backoffice.Web.Services
         #region Fields
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
+        private readonly IAuthenticationService _authenticationService;
         #endregion
 
         #region Ctor
-        public BackOfficeService(HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public BackOfficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
             _httpClient = httpClient;
+            _authenticationService = authenticationService;
 
             var userToken = httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
             _httpClient.BaseAddress = new Uri(_configuration["API:Backoffice:Uri"]);
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:Backoffice:Security:APIKey"]);
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer ", userToken);
 
         }
         #endregion
@@ -33,6 +36,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientListResponse>>
                 (await _httpClient.GetStreamAsync($"sportsbook/client/list"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
@@ -60,10 +66,13 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var response = await _httpClient.PostAsync($"settings/topfixtures", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) 
+                    return JsonSerializer.Deserialize<BaseResponse<ClientTopFixtureResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
                         ?? new BaseResponse<ClientTopFixtureResponse>();
                 else
                 {
@@ -94,6 +103,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsTreeResponse>>
                 (await _httpClient.GetStreamAsync($"settings/topfixtures/sportstree?clientId={clientId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
@@ -118,6 +130,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var response = await _httpClient.PostAsync($"settings/topfixtures/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -152,6 +167,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var response = await _httpClient.PostAsync($"settings/topfixtures/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)

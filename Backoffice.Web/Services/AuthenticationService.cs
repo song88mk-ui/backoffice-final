@@ -2,10 +2,12 @@
 using Backoffice.Web.ActionFilter;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Backoffice.Web.Services
 {
@@ -52,8 +54,8 @@ namespace Backoffice.Web.Services
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                var authPayload = await response.Content.ReadAsStringAsync();
-                var token = JsonConvert.DeserializeObject<BaseResponse<TokenModel>>(authPayload); 
+                var authPayload = await response.Content.ReadAsStreamAsync();
+                var token = await JsonSerializer.DeserializeAsync<BaseResponse<TokenModel>>(authPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }); 
                 result = new BaseResponse<bool>
                 {
                     StatusCode = token.StatusCode,
@@ -65,9 +67,35 @@ namespace Backoffice.Web.Services
             return result;
         }
 
+        public async Task<TokenModel> AuthenticateToken()
+        {
+            var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+            var response = await _httpClient.GetAsync("api/authentication/authenticate");
+            var token = new TokenModel();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<TokenModel>>(await response.Content.ReadAsStreamAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                token = new TokenModel()
+                {
+                    AccessToken = result.Result.AccessToken
+                };
+
+                _httpContextAccessor.HttpContext?.Session.SetString("UserToken", token.AccessToken ?? "");
+
+                var authState = await ((AuthStateProvider)_authStateProvider).GetAuthenticationStateAsync();
+                var userName = authState.User.Claims.ToList().Where(x => x.Type == "TokenName").Select(x => x.Value).FirstOrDefault() ?? "";
+
+                ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(userName);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            }
+
+            return token;
+        }
         public async Task<bool> Logout()
         {
-            _httpContextAccessor.HttpContext.Session.Remove("UserToken");
+            _httpContextAccessor.HttpContext?.Session.Remove("UserToken");
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
             _httpClient.DefaultRequestHeaders.Authorization = null;
 
