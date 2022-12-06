@@ -33,3 +33,19 @@
 .btn-cancel {
     background-color: #9AA0AB;
 }
+
+.clientBtn {
+    border: 1px solid #C7C1C1;
+    text-align: left;
+    width: 14rem;
+}
+
+.dropdown-toggle::after {
+    float: right;
+    position: relative;
+    top: 10px;
+}
+
+.dropdown-menu.show {
+    width: 14rem;
+}

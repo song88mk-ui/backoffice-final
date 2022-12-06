@@ -2,7 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Microsoft.AspNetCore.Http;
+using Backoffice.Web.Pages;
 using System.Net;
 using System.Text.Json;
 
@@ -298,6 +298,36 @@ namespace Backoffice.Web.Services
             catch (Exception ex)
             {
                 return new BaseResponse<SportsLookupResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<ClientParlayBonusResponse>>> GetClientParlayBonus(GetParlayBonusRequest request)
+        {
+            try
+            {
+                List<ClientParlayBonusResponse> finalResult = new List<ClientParlayBonusResponse>();
+
+                foreach (var clientId in request.ClientIdRef)
+                {
+
+                }
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientParlayBonusResponse>>
+                (await _httpClient.GetStreamAsync($"sportsbook/settings/parlaybonus/list/request"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return finalResult ?? new BaseResponse<List<ClientParlayBonusResponse>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = $"{StatusCode.Success}",
+                    Result = finalResult ?? new List<ClientParlayBonusResponse>()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<ClientParlayBonusResponse>>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
