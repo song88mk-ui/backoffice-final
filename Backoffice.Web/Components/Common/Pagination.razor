@@ -1,9 +1,9 @@
 ﻿<tfoot>
     <tr>
-        <td class="py-2" colspan="2">
+        <td class="py-2">
             <span>Showing @FromRow to @ToRow of @MetaData.TotalCount entries</span>
         </td>
-        <td class="py-2 text-end" colspan="2">
+        <td class="py-2 text-end" colspan="@PaginationColspan">
             <div class="tbl-pagination noselect">
                 @foreach (var link in _links)
                 {
