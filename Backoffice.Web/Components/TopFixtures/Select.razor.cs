@@ -16,10 +16,10 @@ namespace Backoffice.Web.Components.TopFixtures
         #region Methods
         public async void OnGameSelectedEvent(FixtureModel fixture)
         {
+            fixture.SortOrder = RowCount;
             var model = new EditTopFixturesModel
             {
                 SelectedGame = fixture,
-                RowCtr = RowCount
             };
             await OnSelectedGame.InvokeAsync(model);
         }

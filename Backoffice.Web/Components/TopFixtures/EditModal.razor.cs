@@ -36,7 +36,19 @@ namespace Backoffice.Web.Components.TopFixtures
             if (TopFixture.TopFixtures.Any())
             {
                 NewTopFixture.TopFixtures = new List<FixtureModel>();
-                NewTopFixture.TopFixtures.AddRange(TopFixture.TopFixtures);
+                var rowCount = 0;
+                foreach (var topFixture in TopFixture.TopFixtures)
+                {
+                    rowCount = rowCount + 1;
+                    topFixture.SortOrder = rowCount;
+                    NewTopFixture.TopFixtures.Add(topFixture);
+                }
+            }
+
+            if(NewTopFixture.TopFixtures == null || !NewTopFixture.TopFixtures.Any())
+            {
+                NewTopFixture.TopFixtures = new List<FixtureModel>();
+                NewTopFixture.TopFixtures.Add(new FixtureModel() { SortOrder = 1 });
             }
 
             SportsTree = model.Sports;
@@ -44,35 +56,38 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async Task OnSelectedGameEvent(EditTopFixturesModel model)
         {
-            if(model.RowCtr <= 1)
+            var rowCtr = 0;
+            foreach (var fixture in NewTopFixture.TopFixtures)
             {
-                NewTopFixture.TopFixtures = new List<FixtureModel>();
-                NewTopFixture.TopFixtures.Add(model.SelectedGame);
-            }
-            else
-            {
-                var rowCtr = 0;
-                foreach(var fixture in NewTopFixture.TopFixtures)
+                rowCtr = rowCtr + 1;
+                if (rowCtr == fixture.SortOrder)
                 {
-                    rowCtr = rowCtr + 1;
-                    if(rowCtr == model.RowCtr)
-                    {
-                        fixture.SportId = model.SelectedGame.SportId;
-                        fixture.SportName = model.SelectedGame.SportName;
-                        fixture.SegmentId = model.SelectedGame.SegmentId;
-                        fixture.SegmentName = model.SelectedGame.SegmentName;
-                        fixture.LeagueId = model.SelectedGame.LeagueId;
-                        fixture.LeagueName = model.SelectedGame.LeagueName;
-                        fixture.StartDate = model.SelectedGame.StartDate;
-                        fixture.FixtureId = model.SelectedGame.FixtureId;
-                        fixture.FixtureName = model.SelectedGame.FixtureName;
-                        fixture.FixtureStatus = model.SelectedGame.FixtureStatus;
-                        fixture.SortOrder = model.SelectedGame.SortOrder;
-                        break;
-                    }
+                    fixture.SportId = model.SelectedGame.SportId;
+                    fixture.SportName = model.SelectedGame.SportName;
+                    fixture.SegmentId = model.SelectedGame.SegmentId;
+                    fixture.SegmentName = model.SelectedGame.SegmentName;
+                    fixture.LeagueId = model.SelectedGame.LeagueId;
+                    fixture.LeagueName = model.SelectedGame.LeagueName;
+                    fixture.StartDate = model.SelectedGame.StartDate;
+                    fixture.FixtureId = model.SelectedGame.FixtureId;
+                    fixture.FixtureName = model.SelectedGame.FixtureName;
+                    fixture.FixtureStatus = model.SelectedGame.FixtureStatus;
+                    fixture.SortOrder = model.SelectedGame.SortOrder;
+                    break;
                 }
-
             }
+        }
+
+        public async Task OnAddRow(int rowCtr)
+        {
+            NewTopFixture.TopFixtures.Insert(rowCtr, new FixtureModel() { SortOrder = (rowCtr + 1) });
+        }
+        public async Task OnDeleteRow(FixtureModel fixture)
+        {
+            NewTopFixture.TopFixtures.Remove(fixture);
+
+            if (NewTopFixture.TopFixtures.Count == 0)
+                NewTopFixture.TopFixtures.Add(new FixtureModel() { SortOrder = 1 });
         }
 
         public async Task OnCancelClickEvent()

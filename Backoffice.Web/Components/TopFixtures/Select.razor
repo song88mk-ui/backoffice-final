@@ -1,17 +1,16 @@
-﻿<ul class="dropdown-menu" aria-labelledby="@RowCount">
+﻿<ul class="dropdown-menu" aria-labelledby="Row@(RowCount)">
     @if (SportsTree != null && SportsTree.Any())
     {
         //Sports
         foreach (var sport in SportsTree)
         {
             <li>
-                <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" href=".@(sport.SportName)Collapse">@sport.SportName</a>
+                <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" href=".Collapse@(sport.SportId)">@sport.SportName</a>
                 @if (sport.Segments != null && sport.Segments.Any())
                 {
-                    <div class="@($"{sport.SportName}Collapse collapse ms-2")">                        
+                    <div class="@($"Collapse{sport.SportId} collapse ms-2")">                        
                         @foreach (var segment in sport.Segments)
                         {
-
                             <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" aria-controls="Collapse@(segment.SegmentId)" href=".Collapse@(segment.SegmentId)">@segment.SegmentName</a>
 
                             @if (segment.Leagues != null && segment.Leagues.Any())

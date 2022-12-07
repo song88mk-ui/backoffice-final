@@ -18,83 +18,83 @@
         </thead>
 
         <tbody>
-            @if (NewTopFixture != null )
+            @if (NewTopFixture != null)
             {
-                var rowCtr = 0;
                 if (NewTopFixture.TopFixtures != null && NewTopFixture.TopFixtures.Any())
                 {
                     foreach (var topFixture in NewTopFixture.TopFixtures)
                     {
-                        rowCtr = rowCtr + 1;
-                        <tr>
-                            <th scope="row">@rowCtr</th>
-                            <td>@topFixture.SportName</td>
-                            <td>@topFixture.SegmentName</td>
-                            <td>@topFixture.LeagueName</td>
-                            <td>
-                                <div class="dropdown">
-                                    <button class="btn dropdown-toggle" data-bs-auto-close="outside" type="button" id="@rowCtr"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        @topFixture.FixtureName
-                                    </button>
+                        if (!string.IsNullOrEmpty(topFixture.FixtureId))
+                        {
+                            <tr>
+                                <th scope="row">@topFixture.SortOrder</th>
+                                <td>@topFixture.SportName</td>
+                                <td>@topFixture.SegmentName</td>
+                                <td>@topFixture.LeagueName</td>
+                                <td>
+                                    <div class="dropdown">
+                                    <button class="btn dropdown-toggle" data-bs-auto-close="outside" type="button" id="Row@(topFixture.SortOrder)"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            @topFixture.FixtureName
+                                        </button>
 
-                                    <Select SportsTree="SportsTree" RowCount="@rowCtr" OnSelectedGame="OnSelectedGameEvent" />
-                                </div>
-                            </td>
-                            <td>
-                                @topFixture.StartDate.ToString("MM/dd/yyyy HH:mm:ss")
-                            </td>
-                            <td>
-                                @if (@topFixture.FixtureStatus == FixtureStatus.Prematch.ToString())
-                                {
-                                    <span class="badge rounded-pill bg-secondary px-3">
-                                        Prematch
-                                    </span>
-                                }
-                                else if (@topFixture.FixtureStatus == FixtureStatus.Live.ToString())
-                                {
-                                    <span class="badge rounded-pill bg-live px-3">
-                                        Live
-                                    </span>
-                                }
+                                        <Select @key="@($"topFixture{topFixture.SortOrder}")" SportsTree="SportsTree" RowCount="@topFixture.SortOrder" OnSelectedGame="OnSelectedGameEvent" />
+                                    </div>
+                                </td>
+                                <td>
+                                    @topFixture.StartDate.ToString("MM/dd/yyyy HH:mm:ss")
+                                </td>
+                                <td>
+                                    @if (@topFixture.FixtureStatus == FixtureStatus.Prematch.ToString())
+                                    {
+                                        <span class="badge rounded-pill bg-secondary px-3">
+                                            Prematch
+                                        </span>
+                                    }
+                                    else if (@topFixture.FixtureStatus == FixtureStatus.Live.ToString())
+                                    {
+                                        <span class="badge rounded-pill bg-live px-3">
+                                            Live
+                                        </span>
+                                    }
 
-                            </td>
-                            <td class="actions">
-                                <span><a href="#"><i class="fa fa-plus-square" aria-hidden="true"></i></a></span>
-                                <span><a href="#"><i class="fa fa-minus-square" aria-hidden="true"></i></a></span>
-                                <span><a href="#"><i class="fa fa-bars" aria-hidden="true"></i></a></span>
-                            </td>
-                        </tr>
+                                </td>
+                                <td class="actions">
+                                    <span><a @onclick="() => OnAddRow(topFixture.SortOrder)"><i class="fa fa-plus-square" aria-hidden="true"></i></a></span>
+                                    <span><a @onclick="() => OnDeleteRow(topFixture)"><i class="fa fa-minus-square" aria-hidden="true"></i></a></span>
+                                    <span><a href="#"><i class="fa fa-bars" aria-hidden="true"></i></a></span>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <th scope="row">@topFixture.SortOrder</th>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn dropdown-toggle" data-bs-auto-close="outside" type="button" id="Row@(topFixture.SortOrder)"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            No Game
+                                        </button>
+                                        <Select @key="@($"topFixture{topFixture.SortOrder}")" SportsTree="SportsTree" RowCount="@topFixture.SortOrder" OnSelectedGame="OnSelectedGameEvent" />
+                                    </div>
+                                </td>
+                                <td>
+                                </td>
+                                <td>
+                                </td>
+                                <td class="actions">
+                                    <span><a @onclick="() => OnAddRow(topFixture.SortOrder)"><i class="fa fa-plus-square" aria-hidden="true"></i></a></span>
+                                    <span><a @onclick="() => OnDeleteRow(topFixture)"><i class="fa fa-minus-square" aria-hidden="true"></i></a></span>
+                                    <span><a href="#"><i class="fa fa-bars" aria-hidden="true"></i></a></span>
+                                </td>
+                            </tr>
+                        }
                     }
                 }
-                rowCtr = rowCtr + 1;
-                <tr>
-                    <th scope="row">@rowCtr</th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn dropdown-toggle" data-bs-auto-close="outside" type="button" id="gameDropdown1"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                No Game
-                            </button>
-
-                            <Select SportsTree="SportsTree" RowCount="@rowCtr" OnSelectedGame="OnSelectedGameEvent"/>
-                        </div>
-                    </td>
-                    <td>
-                                
-                    </td>
-                    <td>
-                                
-                    </td>
-                    <td class="actions">
-                        <span><a href="#"><i class="fa fa-plus-square" aria-hidden="true"></i></a></span>
-                        <span><a href="#"><i class="fa fa-minus-square" aria-hidden="true"></i></a></span>
-                        <span><a href="#"><i class="fa fa-bars" aria-hidden="true"></i></a></span>
-                    </td>
-                </tr>
             }
 
         </tbody>

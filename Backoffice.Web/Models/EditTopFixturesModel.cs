@@ -15,7 +15,6 @@ namespace Backoffice.Web.Models
         public SportsTreeResponse.LeagueResponse SelectedLeague { get; set; }
         public FixtureModel SelectedGameFilter { get; set; }
         public FixtureModel SelectedGame { get; set; }
-        public int RowCtr { get; set; }
 
     }
 }
