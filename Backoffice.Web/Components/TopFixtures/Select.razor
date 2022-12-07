@@ -1,4 +1,4 @@
-﻿<ul class="dropdown-menu" aria-labelledby="gameDropdown1">
+﻿<ul class="dropdown-menu" aria-labelledby="@RowCount">
     @if (SportsTree != null && SportsTree.Any())
     {
         //Sports
@@ -8,18 +8,18 @@
                 <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" href=".@(sport.SportName)Collapse">@sport.SportName</a>
                 @if (sport.Segments != null && sport.Segments.Any())
                 {
-                    //Segments
-                    foreach (var segment in sport.Segments)
-                    {
-                        <div class="@($"{sport.SportName}Collapse collapse ms-2")" >
-                            <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" aria-controls="@(segment.SegmentName)Collapse" href=".@(segment.SegmentName)Collapse">@segment.SegmentName</a>
+                    <div class="@($"{sport.SportName}Collapse collapse ms-2")">                        
+                        @foreach (var segment in sport.Segments)
+                        {
+
+                            <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" aria-controls="Collapse@(segment.SegmentId)" href=".Collapse@(segment.SegmentId)">@segment.SegmentName</a>
 
                             @if (segment.Leagues != null && segment.Leagues.Any())
                             {
                                 //Leagues
                                 foreach (var league in segment.Leagues)
                                 {
-                                    <div class="collapse @(segment.SegmentName)Collapse">
+                                    <div class="collapse Collapse@(segment.SegmentId)">
                                         @if (league.Fixtures != null && league.Fixtures.Any())
                                         {
                                             //Games
@@ -34,8 +34,8 @@
                                     </div>
                                 }
                             }
-                        </div>
-                    }
+                        }
+                    </div>
                 }
             </li>
         }
