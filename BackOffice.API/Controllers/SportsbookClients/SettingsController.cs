@@ -30,7 +30,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         public async Task<IActionResult> GetClientTopFixtures([FromBody] GetClientTopFixtureRequest request)
         {
             var regionClients = await _backofficeRepository.GetClientsByRegion(request.ClientIds);
-            // get client top fixtures
+
             var result = await _platformRepository.GetClientTopFixtures(regionClients.Result);
 
             switch (result.StatusCode)
@@ -46,7 +46,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         public async Task<IActionResult> GetSportstreeByClientId([FromQuery] int clientId)
         {
             var region = await _backofficeRepository.GetClientRegion(clientId);
-            // get sportstree w/ fixtures
+
             var result = await _platformRepository.GetSportstreeDetails(clientId, region.Result);
 
             switch (result.StatusCode)

@@ -70,7 +70,7 @@ namespace Backoffice.Web.Components.TopFixtures
                     fixture.SegmentName = model.SelectedGame.SegmentName;
                     fixture.LeagueId = model.SelectedGame.LeagueId;
                     fixture.LeagueName = model.SelectedGame.LeagueName;
-                    fixture.StartDate = model.SelectedGame.StartDate;
+                    fixture.FixtureStartDate = model.SelectedGame.FixtureStartDate;
                     fixture.FixtureId = model.SelectedGame.FixtureId;
                     fixture.FixtureName = model.SelectedGame.FixtureName;
                     fixture.FixtureStatus = model.SelectedGame.FixtureStatus;
