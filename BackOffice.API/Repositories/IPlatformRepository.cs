@@ -26,7 +26,7 @@ namespace Backoffice.API.Repositories
 
         #region Parlay Bonus
         Task<BaseResponse<StatusCode>> AddOrUpdateParlayBonus(ParlayBonusRequest request, string region);
-        Task<BaseResponse<ClientParlayBonusResponse>> GetClientParlayBonus(GetParlayBonusRequest request, IDictionary<string, string> regionclientIds);
+        Task<BaseResponse<ClientParlayBonusResponse>> GetClientParlayBonus(GetParlayBonusRequest request, List<IDictionary<string, string>> regionclientIds);
         #endregion
     }
 }

@@ -25,85 +25,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach(var item in ClientParlayBonusResponse)
-                        {
-
-                        }
-                        <tr>
-                            <td>1</td>
-                            <td class="td-parlay-bonus">100.00%</td>
-                            <td>
-                                <a class="tl-link-add me-2" href="javascript:(0)">
-                                    <i class="fa fa-plus-square"></i>
-                                </a>
-                                <a class="tl-link-minus me-2" href="javascript:(0)">
-                                    <i class="fa fa-minus-square"></i>
-                                </a>
-                                <a class="tl-link-edit me-2" href="javascript:(0)">
-                                    <i class="fa fa-bars"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td class="td-parlay-bonus">100.00%</td>
-                            <td>
-                                <a class="tl-link-add me-2" href="javascript:(0)">
-                                    <i class="fa fa-plus-square"></i>
-                                </a>
-                                <a class="tl-link-minus me-2" href="javascript:(0)">
-                                    <i class="fa fa-minus-square"></i>
-                                </a>
-                                <a class="tl-link-edit me-2" href="javascript:(0)">
-                                    <i class="fa fa-bars"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td class="td-parlay-bonus">100.00%</td>
-                            <td>
-                                <a class="tl-link-add me-2" href="javascript:(0)">
-                                    <i class="fa fa-plus-square"></i>
-                                </a>
-                                <a class="tl-link-minus me-2" href="javascript:(0)">
-                                    <i class="fa fa-minus-square"></i>
-                                </a>
-                                <a class="tl-link-edit me-2" href="javascript:(0)">
-                                    <i class="fa fa-bars"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td class="td-parlay-bonus">100.00%</td>
-                            <td>
-                                <a class="tl-link-add me-2" href="javascript:(0)">
-                                    <i class="fa fa-plus-square"></i>
-                                </a>
-                                <a class="tl-link-minus me-2" href="javascript:(0)">
-                                    <i class="fa fa-minus-square"></i>
-                                </a>
-                                <a class="tl-link-edit me-2" href="javascript:(0)">
-                                    <i class="fa fa-bars"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td class="td-parlay-bonus">100.00%</td>
-                            <td>
-                                <a class="tl-link-add me-2" href="javascript:(0)">
-                                    <i class="fa fa-plus-square"></i>
-                                </a>
-                                <a class="tl-link-minus me-2" href="javascript:(0)">
-                                    <i class="fa fa-minus-square"></i>
-                                </a>
-                                <a class="tl-link-edit me-2" href="javascript:(0)">
-                                    <i class="fa fa-bars"></i>
-                                </a>
-                            </td>
-                        </tr>
+                        @foreach (var item in ClientParlayBonusResponse)
+                        {                                                        
+                            <tr>
+                                @foreach(var config in item.ParlayBonusConfigs)
+                                {
+                                    <td>@config.SelectionCount</td>
+                                    <td class="td-parlay-bonus">@(config.ParlayBonus * 100)%</td>
+                                    <td>
+                                        <a class="tl-link-add me-2" href="javascript:(0)">
+                                            <i class="fa fa-plus-square"></i>
+                                        </a>
+                                        <a class="tl-link-minus me-2" href="javascript:(0)">
+                                            <i class="fa fa-minus-square"></i>
+                                        </a>
+                                        <a class="tl-link-edit me-2" href="javascript:(0)">
+                                            <i class="fa fa-bars"></i>
+                                        </a>
+                                    </td>
+                                }
+                            </tr>
+                        }                        
                     </tbody>
                     <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="2" />
                 </table>

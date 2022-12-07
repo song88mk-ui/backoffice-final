@@ -412,7 +412,7 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region PARLAY BONUS
-        public async Task<BaseResponse<ClientParlayBonusResponse>> GetClientParlayBonus(GetParlayBonusRequest request, IDictionary<string, string> regionclientIds)
+        public async Task<BaseResponse<ClientParlayBonusResponse>> GetClientParlayBonus(GetParlayBonusRequest request, List<IDictionary<string, string>> regionclientIds)
         {
             try
             {
@@ -420,19 +420,22 @@ namespace Backoffice.API.Repositories
                 var minOdds = 0m;
                 foreach (var region in regionclientIds)
                 {
-                    var queryStrings = await FormUrlEncoded(request);
-
-                    var requestUri = $"v1/client/parlaybonus{queryStrings}";
-
-                    var result = await GetHttpClient(region.Key).GetAsync(requestUri);
-
-                    if (result.StatusCode == HttpStatusCode.OK)
+                    foreach (var key in region)
                     {
-                        var newresult = JsonConvert.DeserializeObject<BaseResponse<ClientParlayBonusResponse>>(result.Content.ReadAsStringAsync().Result).Result;
-                        if (newresult.ParlayBonusConfigs.Any())
+                        var queryStrings = await FormUrlEncoded(request);
+
+                        var requestUri = $"v1/client/parlaybonus{queryStrings}";
+
+                        var result = await GetHttpClient(key.Key).GetAsync(requestUri);
+
+                        if (result.StatusCode == HttpStatusCode.OK)
                         {
-                            bonus.AddRange(newresult.ParlayBonusConfigs);
-                            minOdds = newresult.ParlayBonusMinOdds;
+                            var newresult = JsonConvert.DeserializeObject<BaseResponse<ClientParlayBonusResponse>>(result.Content.ReadAsStringAsync().Result).Result;
+                            if (newresult.ParlayBonusConfigs.Any())
+                            {
+                                bonus.AddRange(newresult.ParlayBonusConfigs);
+                                minOdds = newresult.ParlayBonusMinOdds;
+                            }
                         }
                     }
                 }
@@ -445,7 +448,7 @@ namespace Backoffice.API.Repositories
                         Message = StatusCode.Success.ToString(),
                         Result = new ClientParlayBonusResponse
                         {
-                            ClientIdRef = request.ClientIdRef,
+                            ClientIdRef = request.ClientIdRef.FirstOrDefault(),
                             ParlayBonusConfigs = bonus,
                             ParlayBonusMinOdds = minOdds
                         }
