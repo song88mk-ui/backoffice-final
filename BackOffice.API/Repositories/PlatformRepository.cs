@@ -381,14 +381,14 @@ namespace Backoffice.API.Repositories
         }
         public async Task<BaseResponse<PlatformMessageResponse>> CopyClientTopFixtures(CopyClientTopFixtureRequest request, string region)
         {
-            var topFixtures = new List<ClientTopSetup>();
+            var topFixtures = new List<ClientTopFixtureSetup>();
             var sortOrder = 1;
 
             foreach (var fixture in request.TopFixtures)
             {
-                topFixtures.Add(new ClientTopSetup()
+                topFixtures.Add(new ClientTopFixtureSetup()
                 {
-                    Id = fixture.Id,
+                    FixtureId = fixture.FixtureId,
                     SortOrder = sortOrder
                 });
 

@@ -92,7 +92,17 @@ namespace Backoffice.Web.Pages
             var options = new ModalOptions();
             ModalService.Open<CopyModal>($"Copy {topFixture.ClientName} Top Fixtures Settings To", parameters, options);
         }
+        public async Task OnSaveClickEvent(object item)
+        {
+            var clientTopFixture = TopFixturesModel.TopFixtures.FirstOrDefault(t => t.ClientIdRef == Convert.ToInt32(item));
+            if (clientTopFixture != null)
+            {
+                var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = item.ToString() })).Result;
 
+                clientTopFixture.TopFixtures = result.TopFixtures.FirstOrDefault()?.TopFixtures;
+            }
+
+        }
         protected async Task SelectPage(int page)
         {
             MetaData.CurrentPage = page;

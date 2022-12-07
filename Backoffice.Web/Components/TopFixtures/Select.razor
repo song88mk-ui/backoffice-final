@@ -1,25 +1,23 @@
 ﻿<ul class="dropdown-menu" aria-labelledby="Row@(RowCount)">
     @if (SportsTree != null && SportsTree.Any())
     {
-        //Sports
         foreach (var sport in SportsTree)
         {
             <li>
-                <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" href=".Collapse@(sport.SportId)">@sport.SportName</a>
+                <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" href="#Collapse@(sport.SportId)">@sport.SportName</a>
                 @if (sport.Segments != null && sport.Segments.Any())
                 {
-                    <div class="@($"Collapse{sport.SportId} collapse ms-2")">                        
+                    <div id="Collapse@(sport.SportId)" class="collapse ms-2">                        
                         @foreach (var segment in sport.Segments)
                         {
-                            <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" aria-controls="Collapse@(segment.SegmentId)" href=".Collapse@(segment.SegmentId)">@segment.SegmentName</a>
+                            <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" aria-controls="SegmentCollapse@(segment.SegmentId)" href="#SegmentCollapse@(segment.SegmentId)">@segment.SegmentName</a>
 
                             @if (segment.Leagues != null && segment.Leagues.Any())
                             {
-                                //Leagues
-                                foreach (var league in segment.Leagues)
+                                <div id="SegmentCollapse@(segment.SegmentId)" class="collapse">
+                                @foreach (var league in segment.Leagues)
                                 {
-                                    <div class="collapse Collapse@(segment.SegmentId)">
-                                        @if (league.Fixtures != null && league.Fixtures.Any())
+                                        if (league.Fixtures != null && league.Fixtures.Any())
                                         {
                                             //Games
                                             foreach (var fixture in league.Fixtures)
@@ -30,8 +28,8 @@
                                                 </div>
                                             }
                                         }
-                                    </div>
                                 }
+                                </div>
                             }
                         }
                     </div>

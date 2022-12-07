@@ -1,5 +1,7 @@
 ﻿using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -9,8 +11,10 @@ namespace Backoffice.Web.Components.TopFixtures
     public partial class EditModal : IDisposable
     {
         #region Properties
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+        [CascadingParameter] public CustomModal Modal { get; set; }
         public ClientTopFixtureResponse.OrderedClientTopFixture TopFixture { get; set; }
 
         public ClientTopFixtureResponse.OrderedClientTopFixture NewTopFixture { get; set; }
@@ -56,11 +60,9 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async Task OnSelectedGameEvent(EditTopFixturesModel model)
         {
-            var rowCtr = 0;
             foreach (var fixture in NewTopFixture.TopFixtures)
             {
-                rowCtr = rowCtr + 1;
-                if (rowCtr == fixture.SortOrder)
+                if (model.SelectedGame.SortOrder == fixture.SortOrder)
                 {
                     fixture.SportId = model.SelectedGame.SportId;
                     fixture.SportName = model.SelectedGame.SportName;
@@ -81,6 +83,7 @@ namespace Backoffice.Web.Components.TopFixtures
         public async Task OnAddRow(int rowCtr)
         {
             NewTopFixture.TopFixtures.Insert(rowCtr, new FixtureModel() { SortOrder = (rowCtr + 1) });
+            SortOrderRow();
         }
         public async Task OnDeleteRow(FixtureModel fixture)
         {
@@ -88,6 +91,22 @@ namespace Backoffice.Web.Components.TopFixtures
 
             if (NewTopFixture.TopFixtures.Count == 0)
                 NewTopFixture.TopFixtures.Add(new FixtureModel() { SortOrder = 1 });
+
+            SortOrderRow();
+
+        }
+
+        private void SortOrderRow()
+        {
+            if(NewTopFixture.TopFixtures != null && NewTopFixture.TopFixtures.Any())
+            {
+                int rowCtr = 0;
+                foreach (var fixture in NewTopFixture.TopFixtures)
+                {
+                    rowCtr = rowCtr + 1;
+                    fixture.SortOrder = rowCtr;
+                }
+            }
         }
 
         public async Task OnCancelClickEvent()
@@ -97,7 +116,38 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async Task OnSaveClickEvent()
         {
+            var topFixtures = new List<ClientTopFixtureSetup>();
 
+            if (NewTopFixture.TopFixtures != null && NewTopFixture.TopFixtures.Any())
+            {
+                int rowCtr = 0;
+                foreach (var fixture in NewTopFixture.TopFixtures)
+                {
+                    if (string.IsNullOrEmpty(fixture.FixtureId))
+                        continue;
+
+                    rowCtr = rowCtr + 1;
+                    topFixtures.Add(new ClientTopFixtureSetup
+                    {
+                        FixtureId = Convert.ToInt64(fixture.FixtureId),
+                        SortOrder = rowCtr
+                    });
+                }
+            }
+
+            if (!topFixtures.Any())
+                return;
+
+            var request = new PostClientTopFixtureRequest()
+            {
+                ClientId = TopFixture.ClientIdRef,
+                TopFixtures = topFixtures
+            };
+            await BackOfficeService.PostClientTopFixtures(request);
+
+            ModalService.Cancel();
+
+            await Modal.OnSaveClickCallback.InvokeAsync(TopFixture.ClientIdRef);
         }
 
         public void Dispose()
