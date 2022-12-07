@@ -172,12 +172,19 @@ namespace Backoffice.API.Controllers.SportsbookClients
         #region PARLAY BONUS
 
         [EnableCors("AllowAllOrigins")]
-        [HttpGet("parlaybonus/list")]
-        public async Task<IActionResult> GetClientParlayBonus([FromQuery] GetParlayBonusRequest request)
+        [HttpPost("parlaybonus/list")]
+        public async Task<IActionResult> GetClientParlayBonus([FromBody] GetParlayBonusRequest request)
         {
-            var regionClients = await _backofficeRepository.GetClientsByRegion(request.ClientIdRef.ToString());
+            List<IDictionary<string,string>> regionClients = new List<IDictionary<string,string>>();
 
-            var result = await _platformRepository.GetClientParlayBonus(request, regionClients.Result);
+            foreach (var clientIdRef in request.ClientIdRef)
+            {
+                var regionClient = await _backofficeRepository.GetClientsByRegion(request.ClientIdRef.ToString());
+
+                regionClients.Add(regionClient.Result);
+            }
+
+            var result = await _platformRepository.GetClientParlayBonus(request, regionClients);
 
             switch (result.StatusCode)
             {

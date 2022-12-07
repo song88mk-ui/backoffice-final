@@ -309,21 +309,27 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                List<ClientParlayBonusResponse> finalResult = new List<ClientParlayBonusResponse>();
+                List<ClientParlayBonusResponse> finalResult = new List<ClientParlayBonusResponse>();                
 
-                foreach (var clientId in request.ClientIdRef)
+                var response =await _httpClient.PostAsync($"sportsbook/settings/parlaybonus/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<List<ClientParlayBonusResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<List<ClientParlayBonusResponse>>();
+                else
                 {
-
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<List<ClientParlayBonusResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<List<ClientParlayBonusResponse>>();
+                    else
+                    {
+                        return new BaseResponse<List<ClientParlayBonusResponse>>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
                 }
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientParlayBonusResponse>>
-                (await _httpClient.GetStreamAsync($"sportsbook/settings/parlaybonus/list/request"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-
-                return new BaseResponse<List<ClientParlayBonusResponse>>
-                {
-                    StatusCode = StatusCode.Success,
-                    Message = $"{StatusCode.Success}",
-                    Result = finalResult ?? new List<ClientParlayBonusResponse>()
-                };
             }
             catch (Exception ex)
             {

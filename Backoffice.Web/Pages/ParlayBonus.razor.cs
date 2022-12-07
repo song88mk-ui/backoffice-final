@@ -11,7 +11,7 @@ namespace Backoffice.Web.Pages
     {
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [CascadingParameter] UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
