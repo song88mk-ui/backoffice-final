@@ -11,7 +11,7 @@ namespace Backoffice.Web.Components.TopFixtures
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Parameter] public int ClientId { get; set; }
-        [Parameter] public EventCallback OnInitCallback { get; set; }
+        [Parameter] public EventCallback<EditTopFixturesModel> OnInitCallback { get; set; }
         public SportsTreeResponse SportsTree { get; set; }
         public SportsTreeResponse.SportReponse SelectedSport { get; set; }
         public SportsTreeResponse.SegmentResponse SelectedSegment { get; set; }
@@ -33,7 +33,15 @@ namespace Backoffice.Web.Components.TopFixtures
 
                 SportsTree = (await BackOfficeService.GetSportstreeByClientId(ClientId)).Result;
 
-                await OnInitCallback.InvokeAsync();
+                var model = new EditTopFixturesModel
+                {
+                    Sports = SportsTree.Sports,
+                    SelectedSport = SelectedSport,
+                    SelectedSegment = SelectedSegment,
+                    SelectedLeague = SelectedLeague,
+                    SelectedGame = SelectedGame
+                };
+                await OnInitCallback.InvokeAsync(model);
             }
             catch (Exception)
             {
@@ -46,7 +54,17 @@ namespace Backoffice.Web.Components.TopFixtures
             SelectedSegment = new SportsTreeResponse.SegmentResponse();
             SelectedLeague = new SportsTreeResponse.LeagueResponse();
             SelectedGame = new FixtureModel();
-            await OnInitCallback.InvokeAsync();
+
+            var model = new EditTopFixturesModel
+            {
+                Sports = SportsTree.Sports,
+                SelectedSport = SelectedSport,
+                SelectedSegment = SelectedSegment,
+                SelectedLeague = SelectedLeague,
+                SelectedGame = SelectedGame
+            };
+
+            await OnInitCallback.InvokeAsync(model);
         }
         public async void OnSegmentChangedEvent(ChangeEventArgs e)
         {
@@ -54,20 +72,47 @@ namespace Backoffice.Web.Components.TopFixtures
             SelectedLeague = new SportsTreeResponse.LeagueResponse();
             SelectedGame = new FixtureModel();
 
-            await OnInitCallback.InvokeAsync();
+            var model = new EditTopFixturesModel
+            {
+                Sports = SportsTree.Sports,
+                SelectedSport = SelectedSport,
+                SelectedSegment = SelectedSegment,
+                SelectedLeague = SelectedLeague,
+                SelectedGame = SelectedGame
+            };
+
+            await OnInitCallback.InvokeAsync(model);
         }
 
         public async void OnLeagueChangedEvent(ChangeEventArgs e)
         {
             SelectedLeague = SelectedSegment.Leagues.FirstOrDefault(s => s.LeagueId == Convert.ToInt32(e.Value));
             SelectedGame = new FixtureModel();
-            await OnInitCallback.InvokeAsync();
+            var model = new EditTopFixturesModel
+            {
+                Sports = SportsTree.Sports,
+                SelectedSport = SelectedSport,
+                SelectedSegment = SelectedSegment,
+                SelectedLeague = SelectedLeague,
+                SelectedGame = SelectedGame
+            };
+
+            await OnInitCallback.InvokeAsync(model);
         }
 
         public async void OnGameChangedEvent(ChangeEventArgs e)
         {
             SelectedGame = SelectedLeague.Fixtures.FirstOrDefault(f => f.FixtureId == e.Value);
-            await OnInitCallback.InvokeAsync();
+            var model = new EditTopFixturesModel
+            {
+                Sports = SportsTree.Sports,
+                SelectedSport = SelectedSport,
+                SelectedSegment = SelectedSegment,
+                SelectedLeague = SelectedLeague,
+                SelectedGame = SelectedGame
+            };
+
+            await OnInitCallback.InvokeAsync(model);
         }
 
         public async ValueTask DisposeAsync()

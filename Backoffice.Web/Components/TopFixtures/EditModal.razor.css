@@ -36,16 +36,6 @@
     border-radius: 3px;
 }
 
-.dropdown-menu.show {
-    width: 300px;
-}
-
-li > a.dropdown-toggle::after, div > a::after {
-    float: right;
-    position: relative;
-    top: 10px;
-}
-
 .bg-live {
     background: transparent linear-gradient(268deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;    
 }

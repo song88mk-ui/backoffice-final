@@ -1,0 +1,10 @@
+﻿
+.dropdown-menu.show {
+    width: 300px;
+}
+
+li > a.dropdown-toggle::after, div > a::after {
+    float: right;
+    position: relative;
+    top: 10px;
+}
