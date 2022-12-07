@@ -318,7 +318,7 @@ namespace Backoffice.Web.Services
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientParlayBonusResponse>>
                 (await _httpClient.GetStreamAsync($"sportsbook/settings/parlaybonus/list/request"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-                return finalResult ?? new BaseResponse<List<ClientParlayBonusResponse>>
+                return new BaseResponse<List<ClientParlayBonusResponse>>
                 {
                     StatusCode = StatusCode.Success,
                     Message = $"{StatusCode.Success}",
