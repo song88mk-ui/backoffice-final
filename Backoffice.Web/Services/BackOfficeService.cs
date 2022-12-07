@@ -305,35 +305,23 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ClientParlayBonusResponse>>> GetClientParlayBonus(GetParlayBonusRequest request)
+        public async Task<BaseResponse<ClientParlayBonusResponse>> GetClientParlayBonus(GetParlayBonusRequest request)
         {
             try
             {
-                List<ClientParlayBonusResponse> finalResult = new List<ClientParlayBonusResponse>();                
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientParlayBonusResponse>>
+                (await _httpClient.GetStreamAsync($"sportsbook/settings/parlaybonus/list/request={request.ClientIdRef}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-                var response =await _httpClient.PostAsync($"sportsbook/settings/parlaybonus/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<ClientParlayBonusResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<List<ClientParlayBonusResponse>>();
-                else
+                return result ?? new BaseResponse<ClientParlayBonusResponse>
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<ClientParlayBonusResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                            ?? new BaseResponse<List<ClientParlayBonusResponse>>();
-                    else
-                    {
-                        return new BaseResponse<List<ClientParlayBonusResponse>>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
+                    StatusCode = StatusCode.Success,
+                    Message = $"{StatusCode.Success}",
+                    Result = result?.Result ?? new ClientParlayBonusResponse()
+                };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<ClientParlayBonusResponse>>
+                return new BaseResponse<ClientParlayBonusResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

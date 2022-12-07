@@ -15,14 +15,15 @@ namespace Backoffice.Web.Pages
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
-        public List<ClientParlayBonusResponse> ClientParlayBonusResponse { get; set; }
+        public ClientParlayBonusResponse ClientParlayBonusResponse { get; set; }
+        public long ClientId { get; set; }
         #endregion
 
         protected override async Task OnInitializedAsync()
         {
             PageTitle = "Parlay Bonus";
             IconClass = "ico-parlay-bonus";
-            ClientParlayBonusResponse = new List<ClientParlayBonusResponse>();
+            ClientParlayBonusResponse = new ClientParlayBonusResponse();
 
             MetaData = new MetaData()
             {
@@ -30,13 +31,14 @@ namespace Backoffice.Web.Pages
                 PageSize = 10,
                 TotalCount = 10000,
                 TotalPages = 100,
-            };
+            };            
+        }
 
-            var clientList = await BackOfficeService.GetClients();
-
+        public async Task OnClientChangedEvent(long ClientId)        
+        {
             var result = (await BackOfficeService.GetClientParlayBonus(new GetParlayBonusRequest()
             {
-                ClientIdRef = clientList.Result.Clients.Select(x => x.ClientId).ToList()
+                ClientIdRef = ClientId
             })).Result;
 
             if (result != null)

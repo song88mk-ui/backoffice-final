@@ -3,28 +3,22 @@
         <div class="input-container d-flex">
             <div class="me-4">
                 <label class="form-label d-block">Client</label>
-                <div class="dropdown">
-                    <button class="btn clientBtn dropdown-toggle" type="button" id="clientDropdown" data-bs-auto-close="outside" data- data-bs-toggle="dropdown" aria-expanded="false">@selectedClientsCount</button>
-
-                    <ul class="dropdown-menu" aria-labelledby="clientDropdown">
-                        <li class="dropdown-item">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="All" id="ClientAll" />
-                                <label class="form-check-label" for="ClientAll">Select All</label>
-                            </div>
-                        </li>
-
-                        @foreach (var client in UserModel.ClientCodes)
+                @if (Clients.Any())
+                {
+                    <select class="form-control form-select my-1 mr-sm-2" @onchange="OnClientChangedEvent">
+                        @foreach (var item in Clients)
                         {
-                            <li class="dropdown-item">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="@client" id="@client" />
-                                    <label class="form-check-label" for="@client">@client</label>
-                                </div>
-                            </li>
+                            if (item.Value.ClientId.ToString() == ClientId)
+                            {
+                                <option value="@item.Value.ClientId" selected>@item.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Value.ClientId">@item.Name</option>
+                            }
                         }
-                    </ul>
-                </div>
+                    </select>
+                }
             </div>
             <div class="odds-container d-flex justify-content-center align-self-end">
                 <div class="min-odds-text border-end-0 px-4 rounded-start">Minimum Odds Per Selection</div>

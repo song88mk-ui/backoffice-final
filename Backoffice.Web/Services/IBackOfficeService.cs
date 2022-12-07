@@ -17,7 +17,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<bool>> CopyTopLeaguesAsync(CopyTopLeaguesRequest request);        
         Task<BaseResponse<SportsTreeResponse>> GetSportstreeByClientId(int clientId);
         Task<BaseResponse<SportsLookupResponse>> GetSportsAsync(string languageCode);
-        Task<BaseResponse<List<ClientParlayBonusResponse>>> GetClientParlayBonus(GetParlayBonusRequest request);
+        Task<BaseResponse<ClientParlayBonusResponse>> GetClientParlayBonus(GetParlayBonusRequest request);
         void Dispose();
     }
 }
