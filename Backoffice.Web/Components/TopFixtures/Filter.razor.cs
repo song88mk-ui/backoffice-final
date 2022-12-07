@@ -93,7 +93,6 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async ValueTask DisposeAsync()
         {
-            
             GC.SuppressFinalize(this);
         }
         public void Dispose()

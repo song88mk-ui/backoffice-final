@@ -10,13 +10,12 @@ namespace Backoffice.Web.Components.TopLeagues
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [Parameter] public EventCallback<string> OnInitCallback { get; set; }
-        [Parameter] public EventCallback<string> OnSearchCallback { get; set; }
+        [Parameter] public EventCallback<TopLeaguesFilterModel> OnInitCallback { get; set; }
+        [Parameter] public EventCallback<TopLeaguesFilterModel> OnFilterCallback { get; set; }
         protected SearchFormModel SearchForm { get; set; }
         public List<SelectListItemModel<string>> Clients { get; set; }
-        public List<SelectListItemModel<int>> Sports { get; set; }
-        public string ClientId { get; set; }
-        public int SportId { get; set; }
+        public List<SelectListItemModel<string>> Sports { get; set; }
+        public TopLeaguesFilterModel TopLeaguesFilterModel { get; set; }
         #endregion
 
         protected override async Task OnInitializedAsync()
@@ -24,7 +23,14 @@ namespace Backoffice.Web.Components.TopLeagues
             try
             {
                 Clients = new List<SelectListItemModel<string>>();
-                Sports = new List<SelectListItemModel<int>>();
+                Sports = new List<SelectListItemModel<string>>();
+
+                TopLeaguesFilterModel = new TopLeaguesFilterModel()
+                {
+                    ClientId = string.Empty,
+                    SportId = string.Empty,
+                    Search = string.Empty
+                };
 
                 SearchForm = new SearchFormModel()
                 {
@@ -54,17 +60,17 @@ namespace Backoffice.Web.Components.TopLeagues
                 var sports = (await BackOfficeService.GetSportsAsync("en")).Result;
                 if (sports != null)
                 {
-                    Sports = sports.Sports.Select(s => new SelectListItemModel<int>
+                    Sports = sports.Sports.Select(s => new SelectListItemModel<string>
                     {
-                        Value = s.SportId,
+                        Value = s.SportId.ToString(),
                         Name = s.SportName
                     }).ToList();
                 }
 
                 if (!Sports.Any())
-                    Sports.Add(new SelectListItemModel<int>
+                    Sports.Add(new SelectListItemModel<string>
                     {
-                        Value = 0,
+                        Value = "0",
                         Name = "No Sports Available"
                     });
 
@@ -77,28 +83,31 @@ namespace Backoffice.Web.Components.TopLeagues
         
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
-            ClientId = e.Value.ToString();
-            await OnInitCallback.InvokeAsync(ClientId);
+            TopLeaguesFilterModel.ClientId = e.Value.ToString();
+            await OnFilterCallback.InvokeAsync(TopLeaguesFilterModel);
         }
         
         public async void OnSportsChangedEvent(ChangeEventArgs e)
         {
-            SportId = (int)e.Value;
-            await OnInitCallback.InvokeAsync(SportId.ToString());
+            TopLeaguesFilterModel.SportId = e.Value.ToString();
+            await OnFilterCallback.InvokeAsync(TopLeaguesFilterModel);
         }
         
         public async Task OnInputSearchEvent()
         {
-            await OnSearchCallback.InvokeAsync(SearchForm.SearchText);
+            TopLeaguesFilterModel.Search = SearchForm.SearchText;
+            await OnFilterCallback.InvokeAsync(TopLeaguesFilterModel);
         }
         
         public async ValueTask DisposeAsync()
         {
+            BackOfficeService.Dispose();
             GC.SuppressFinalize(this);
         }
         
         public void Dispose()
         {
+            BackOfficeService.Dispose();
             GC.SuppressFinalize(this);
         }
     }

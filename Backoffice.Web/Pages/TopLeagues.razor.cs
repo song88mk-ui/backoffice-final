@@ -10,6 +10,7 @@ namespace Backoffice.Web.Pages
 {
     public partial class TopLeagues : IDisposable
     {
+        #region Properties
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter(Name = "UserModel")] protected UserModel UserModel { get; set; }
@@ -19,26 +20,55 @@ namespace Backoffice.Web.Pages
         public GetTopLeaguesRequest GetTopLeaguesRequest { get; set; }
         public GetTopLeaguesResponse TopLeaguesList { get; set; }
         public ClientListResponse ClientInformation { get; set; }
+        public List<long> UserClientCodes { get; set; }
+        public TopLeaguesFilterModel TopLeaguesFilter { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
+        #endregion
 
+
+        #region Methods
         protected override async Task OnInitializedAsync()
         {
             PageTitle = "Top Leagues";
             IconClass = "ico-top-leagues";
 
             ClientInformation = (await BackOfficeService.GetClients()).Result;
-            var userClientCodes = ClientInformation != null ? ClientInformation?.Clients.Where(x => UserModel.ClientCodes.Contains(x.ClientCode)).Select(x => x.ClientId).ToList() : new List<long>();
+            UserClientCodes = ClientInformation != null ? ClientInformation?.Clients?.Where(x => UserModel.ClientCodes.Contains(x.ClientCode)).Select(x => x.ClientId).ToList() : new List<long>();
 
+            GetTopLeaguesRequest = new GetTopLeaguesRequest();
+            TopLeaguesFilter = new TopLeaguesFilterModel();
+            MetaData = new MetaData()
+            {
+                PageSize = 10,
+                CurrentPage = 1
+            };
+        }
+
+        public async Task OnInitEvent(TopLeaguesFilterModel topLeaguesFilterModel)
+        {
             GetTopLeaguesRequest = new GetTopLeaguesRequest()
             {
-                ClientIdRefs = string.Join(",", userClientCodes),
-                SportId = 0,
+                ClientIdRefs = string.IsNullOrWhiteSpace(topLeaguesFilterModel?.ClientId) ? string.Join(",", UserClientCodes) : topLeaguesFilterModel?.ClientId,
+                SportId = string.IsNullOrWhiteSpace(topLeaguesFilterModel?.SportId) ? 0 : int.Parse(topLeaguesFilterModel?.SportId),
                 LanguageCode = "en"
             };
+
+            TopLeaguesFilter = topLeaguesFilterModel ?? new TopLeaguesFilterModel();
 
             TopLeaguesList = (await BackOfficeService.GetTopLeaguesAsync(GetTopLeaguesRequest)).Result;
             if (TopLeaguesList != null)
                 TopLeaguesList.ClientTopLeagues.ToList().ForEach(c => c.ClientName = ClientInformation?.Clients?.FirstOrDefault(x => x.ClientId == c.ClientIdRef).ClientName);
+
+            MetaData.TotalCount = TopLeaguesList.ClientTopLeagues.Count();
+            MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
+            var skip = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+            if (MetaData.CurrentPage > 0)
+                TopLeaguesList.ClientTopLeagues = TopLeaguesList.ClientTopLeagues.Skip(skip).Take(MetaData.PageSize).ToList();
+        }
+
+        public async Task OnFilterEvent(TopLeaguesFilterModel topLeaguesFilterModel)
+        {
+            await OnInitEvent(topLeaguesFilterModel);
         }
 
         public async Task OnEdit()
@@ -61,8 +91,17 @@ namespace Backoffice.Web.Pages
             ModalService.Open<CopyModal>($"Copy {ClientName} Top League Settings To", parameters, options);
         }
 
+        protected async Task SelectPage(int page)
+        {
+            MetaData.CurrentPage = page;
+            await OnInitEvent(TopLeaguesFilter);
+        }
+
         public void Dispose()
         {
+            BackOfficeService.Dispose();
         }
+
+        #endregion
     }
 }

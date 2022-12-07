@@ -8,10 +8,10 @@
                         @if (Clients.Any())
                         {
                             <select class="form-select my-1 mr-sm-2" @onchange="OnClientChangedEvent">
-                                <option selected>Choose client...</option>
+                                <option value="" selected>Choose client...</option>
                                 @foreach (var item in Clients)
                                 {
-                                    if (item.Value == ClientId)
+                                    if (item.Value == TopLeaguesFilterModel.ClientId)
                                     {
                                         <option value="@item.Value" selected>@item.Name</option>
                                     }
@@ -28,10 +28,10 @@
                         @if (Sports.Any())
                         {
                             <select class="form-select my-1 mr-sm-2" @onchange="OnSportsChangedEvent">
-                                <option selected>Choose sport...</option>
+                                <option value="" selected>Choose sport...</option>
                                 @foreach (var item in Sports)
                                 {
-                                    if (item.Value == SportId)
+                                    if (item.Value == TopLeaguesFilterModel.SportId)
                                     {
                                         <option value="@item.Value" selected>@item.Name</option>
                                     }
