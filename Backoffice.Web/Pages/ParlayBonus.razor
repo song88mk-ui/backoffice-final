@@ -10,28 +10,32 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter UserModel="@UserModel" />
+                <Filter ClientParlayBonusResponse="@ClientParlayBonusResponse" OnClientChangedCallback="OnClientChangedEvent" />
             </div>
             <div class="col-md-12">
-                <table class="table table-hover table-borderless mt-4">
-                    <thead class="table-head-pb">
-                        <tr>
-                            <th class="th-number py-3">No. of Selections</th>
-                            <th class="th-parlay-bonus py-3">
-                                <span>Parlay Bonus</span>
-                                <i class="fa fa-info-circle ms-5"></i>
-                            </th>
-                            <th class="th-action py-3">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in ClientParlayBonusResponse)
-                        {                                                        
+                @if (ClientParlayBonusResponse == null || ClientParlayBonusResponse.ParlayBonusConfigs.Count == 0)
+                {
+                    <NoRecordFound/>
+                }
+                else
+                {
+                    <table class="table table-hover table-borderless mt-4">
+                        <thead class="table-head-pb">
                             <tr>
-                                @foreach(var config in item.ParlayBonusConfigs)
-                                {
-                                    <td>@config.SelectionCount</td>
-                                    <td class="td-parlay-bonus">@(config.ParlayBonus * 100)%</td>
+                                <th class="th-number py-3">No. of Selections</th>
+                                <th class="th-parlay-bonus py-3">
+                                    <span>Parlay Bonus</span>
+                                    <i class="fa fa-info-circle ms-5"></i>
+                                </th>
+                                <th class="th-action py-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in ClientParlayBonusResponse.ParlayBonusConfigs)
+                            {
+                                <tr>
+                                    <td>@item.SelectionCount</td>
+                                    <td class="td-parlay-bonus">@(item.ParlayBonus * 100)%</td>
                                     <td>
                                         <a class="tl-link-add me-2" href="javascript:(0)">
                                             <i class="fa fa-plus-square"></i>
@@ -43,12 +47,12 @@
                                             <i class="fa fa-bars"></i>
                                         </a>
                                     </td>
-                                }
-                            </tr>
-                        }                        
-                    </tbody>
-                    <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="2" />
-                </table>
+                                </tr>
+                            }
+                        </tbody>
+                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="2" />
+                    </table>
+                }
             </div>
         </div>
     </div>

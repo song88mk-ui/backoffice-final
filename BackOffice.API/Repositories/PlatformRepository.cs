@@ -381,14 +381,14 @@ namespace Backoffice.API.Repositories
         }
         public async Task<BaseResponse<PlatformMessageResponse>> CopyClientTopFixtures(CopyClientTopFixtureRequest request, string region)
         {
-            var topFixtures = new List<ClientTopSetup>();
+            var topFixtures = new List<ClientTopFixtureSetup>();
             var sortOrder = 1;
 
             foreach (var fixture in request.TopFixtures)
             {
-                topFixtures.Add(new ClientTopSetup()
+                topFixtures.Add(new ClientTopFixtureSetup()
                 {
-                    Id = fixture.Id,
+                    FixtureId = fixture.FixtureId,
                     SortOrder = sortOrder
                 });
 
@@ -412,7 +412,7 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region PARLAY BONUS
-        public async Task<BaseResponse<ClientParlayBonusResponse>> GetClientParlayBonus(GetParlayBonusRequest request, List<IDictionary<string, string>> regionclientIds)
+        public async Task<BaseResponse<ClientParlayBonusResponse>> GetClientParlayBonus(GetParlayBonusRequest request, IDictionary<string, string> regionclientIds)
         {
             try
             {
@@ -420,22 +420,19 @@ namespace Backoffice.API.Repositories
                 var minOdds = 0m;
                 foreach (var region in regionclientIds)
                 {
-                    foreach (var key in region)
+                    var queryStrings = await FormUrlEncoded(request);
+
+                    var requestUri = $"v1/client/parlaybonus{queryStrings}";
+
+                    var result = await GetHttpClient(region.Key).GetAsync(requestUri);
+
+                    if (result.StatusCode == HttpStatusCode.OK)
                     {
-                        var queryStrings = await FormUrlEncoded(request);
-
-                        var requestUri = $"v1/client/parlaybonus{queryStrings}";
-
-                        var result = await GetHttpClient(key.Key).GetAsync(requestUri);
-
-                        if (result.StatusCode == HttpStatusCode.OK)
+                        var newresult = JsonConvert.DeserializeObject<BaseResponse<ClientParlayBonusResponse>>(result.Content.ReadAsStringAsync().Result).Result;
+                        if (newresult.ParlayBonusConfigs.Any())
                         {
-                            var newresult = JsonConvert.DeserializeObject<BaseResponse<ClientParlayBonusResponse>>(result.Content.ReadAsStringAsync().Result).Result;
-                            if (newresult.ParlayBonusConfigs.Any())
-                            {
-                                bonus.AddRange(newresult.ParlayBonusConfigs);
-                                minOdds = newresult.ParlayBonusMinOdds;
-                            }
+                            bonus.AddRange(newresult.ParlayBonusConfigs);
+                            minOdds = newresult.ParlayBonusMinOdds;
                         }
                     }
                 }
@@ -448,7 +445,7 @@ namespace Backoffice.API.Repositories
                         Message = StatusCode.Success.ToString(),
                         Result = new ClientParlayBonusResponse
                         {
-                            ClientIdRef = request.ClientIdRef.FirstOrDefault(),
+                            ClientIdRef = request.ClientIdRef,
                             ParlayBonusConfigs = bonus,
                             ParlayBonusMinOdds = minOdds
                         }

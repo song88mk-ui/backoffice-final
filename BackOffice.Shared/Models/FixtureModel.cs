@@ -14,7 +14,7 @@ namespace Backoffice.Shared.Models
         public string LeagueName { get; set; }
         public string FixtureId { get; set; }
         public string FixtureName { get; set; }
-        public DateTime StartDate { get; set; }
+        public DateTime FixtureStartDate { get; set; }
         public string FixtureStatus { get; set; }
         public int SortOrder { get; set; }
     }

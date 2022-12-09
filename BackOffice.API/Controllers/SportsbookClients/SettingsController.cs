@@ -30,7 +30,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         public async Task<IActionResult> GetClientTopFixtures([FromBody] GetClientTopFixtureRequest request)
         {
             var regionClients = await _backofficeRepository.GetClientsByRegion(request.ClientIds);
-            // get client top fixtures
+
             var result = await _platformRepository.GetClientTopFixtures(regionClients.Result);
 
             switch (result.StatusCode)
@@ -46,7 +46,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         public async Task<IActionResult> GetSportstreeByClientId([FromQuery] int clientId)
         {
             var region = await _backofficeRepository.GetClientRegion(clientId);
-            // get sportstree w/ fixtures
+
             var result = await _platformRepository.GetSportstreeDetails(clientId, region.Result);
 
             switch (result.StatusCode)
@@ -172,19 +172,12 @@ namespace Backoffice.API.Controllers.SportsbookClients
         #region PARLAY BONUS
 
         [EnableCors("AllowAllOrigins")]
-        [HttpPost("parlaybonus/list")]
-        public async Task<IActionResult> GetClientParlayBonus([FromBody] GetParlayBonusRequest request)
+        [HttpGet("parlaybonus/list")]
+        public async Task<IActionResult> GetClientParlayBonus([FromQuery] GetParlayBonusRequest request)
         {
-            List<IDictionary<string,string>> regionClients = new List<IDictionary<string,string>>();
+            var regionClients = await _backofficeRepository.GetClientsByRegion(request.ClientIdRef.ToString());
 
-            foreach (var clientIdRef in request.ClientIdRef)
-            {
-                var regionClient = await _backofficeRepository.GetClientsByRegion(request.ClientIdRef.ToString());
-
-                regionClients.Add(regionClient.Result);
-            }
-
-            var result = await _platformRepository.GetClientParlayBonus(request, regionClients);
+            var result = await _platformRepository.GetClientParlayBonus(request, regionClients.Result);
 
             switch (result.StatusCode)
             {
