@@ -47,12 +47,15 @@
                                             </div>
                                         </td>
                                         <td class="py-2">
-                                            <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="OnEdit">
+                                            <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="_ => OnEdit(item)">
                                                 <i class="fa fa-edit"></i>
                                             </a>
-                                            <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="OnCopy">
-                                                <i class="fa fa-copy"></i>
-                                            </a>
+                                            @if (item.TopLeagues.Any())
+                                            {
+                                                <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="_ => OnCopy(item)">
+                                                    <i class="fa fa-copy"></i>
+                                                </a>
+                                            }
                                         </td>
                                     </tr>
                                     i++;
@@ -60,7 +63,7 @@
                             }
                         </tbody>
                         <Pagination MetaData="MetaData" Spread="3" PaginationColspan="3" SelectPageEvent="SelectPage" />
-                   </table>
+                    </table>
                 </div>
             </div>
         </div>

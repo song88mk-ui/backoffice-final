@@ -177,54 +177,26 @@ namespace Backoffice.API.Repositories
                 if (regionclientIds.ContainsKey("HK"))
                     hkClientIds.AddRange(regionclientIds["HK"].Split(",").Select(int.Parse).ToList());
                 else if (regionclientIds.ContainsKey("SA"))
-                    saClientIds.AddRange(regionclientIds["HK"].Split(",").Select(int.Parse).ToList());
+                    saClientIds.AddRange(regionclientIds["SA"].Split(",").Select(int.Parse).ToList());
 
                 if (hkClientIds.Any())
                 {
-                    var topLeagues = new List<ClientTopSetup>();
-                    var sortOrder = 1;
-
-                    foreach (var league in request.TopLeagues)
-                    {
-                        topLeagues.Add(new ClientTopSetup()
-                        {
-                            Id = league.Id,
-                            SortOrder = sortOrder
-                        });
-
-                        sortOrder++;
-                    }
-
                     response = await CopyTopLeagesPerRegion(new CopyTopLeaguesRequest
                     {
-                        ClientIds = hkClientIds,
+                        ClientIdRefs = hkClientIds,
                         SportId = request.SportId,
-                        TopLeagues = topLeagues
+                        TopLeagues = request.TopLeagues
                     }, "HK");
                 }
 
                 // only proceed to SA if result from HK is null or HK has a result and the status code is success
                 if (saClientIds.Any() && (response.Result == null || (response.Result != null && response.Result.StatusCode == StatusCode.Success)))
                 {
-                    var topLeagues = new List<ClientTopSetup>();
-                    var sortOrder = 1;
-
-                    foreach (var league in request.TopLeagues)
-                    {
-                        topLeagues.Add(new ClientTopSetup()
-                        {
-                            Id = league.Id,
-                            SortOrder = sortOrder
-                        });
-
-                        sortOrder++;
-                    }
-
                     response = await CopyTopLeagesPerRegion(new CopyTopLeaguesRequest
                     {
-                        ClientIds = saClientIds,
+                        ClientIdRefs = saClientIds,
                         SportId = request.SportId,
-                        TopLeagues = topLeagues
+                        TopLeagues = request.TopLeagues
                     }, "SA");
                 }
 
@@ -247,9 +219,10 @@ namespace Backoffice.API.Repositories
         }
         private async Task<BaseResponse<PlatformMessageResponse>> CopyTopLeagesPerRegion(CopyTopLeaguesRequest request, string region)
         {
-            var result = await GetHttpClient(region).PostAsync($"v1/client/topleauges/copy", new StringContent(JsonConvert.SerializeObject(new
+            var result = await GetHttpClient(region).PostAsync($"v1/client/topleagues/copy", new StringContent(JsonConvert.SerializeObject(new
             {
-                ClientIds = request.ClientIds,
+                ClientIdRefs = request.ClientIdRefs,
+                SportId = request?.SportId,
                 TopLeague = request.TopLeagues
             }), Encoding.UTF8, "application/json"));
 

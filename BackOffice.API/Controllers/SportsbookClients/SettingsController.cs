@@ -142,7 +142,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         [HttpPost("topleagues/copy")]
         public async Task<IActionResult> CopyTopLeagues([FromBody] CopyTopLeaguesRequest request)
         {
-            var region = await _backofficeRepository.GetClientsByRegion(string.Join(",", request.ClientIds));
+            var region = await _backofficeRepository.GetClientsByRegion(string.Join(",", request.ClientIdRefs));
             var result = await _platformRepository.CopyTopLeagues(request, region.Result);
 
             switch (result.StatusCode)
