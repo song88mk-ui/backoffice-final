@@ -8,7 +8,7 @@ namespace Backoffice.API.Repositories
 {
     public interface IBackofficeRepository
     {
-        Task<BaseResponse<ClientListResponse>> GetClients();
+        Task<BaseResponse<ClientResponse>> GetClients();
         Task<BaseResponse<string>> GetClientRegion(int clientId);
         Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs);
 
@@ -17,5 +17,6 @@ namespace Backoffice.API.Repositories
         #endregion
 
         Task<BaseResponse<List<CurrenciesResponse>>> GetCurrencies();
+        Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);
     }
 }

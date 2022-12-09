@@ -19,7 +19,7 @@ namespace Backoffice.Web.Pages
         public string IconClass { get; set; }
         public GetTopLeaguesRequest GetTopLeaguesRequest { get; set; }
         public GetTopLeaguesResponse TopLeaguesList { get; set; }
-        public ClientListResponse ClientInformation { get; set; }
+        public ClientResponse ClientInformation { get; set; }
         public List<long> UserClientCodes { get; set; }
         public TopLeaguesFilterModel TopLeaguesFilter { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();

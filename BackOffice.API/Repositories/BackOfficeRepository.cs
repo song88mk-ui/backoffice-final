@@ -16,10 +16,17 @@ namespace Backoffice.API.Repositories
 {
     public class BackofficeRepository : IBackofficeRepository
     {
+        #region Fields
+
         private readonly IConfiguration _configuration;
         private readonly BackofficeContext _backofficeContext;
         private readonly IPlatformRepository _platformRepository;
         private readonly IMemCache _memCache;
+
+        #endregion
+
+        #region Ctor
+
         public BackofficeRepository(IConfiguration configuration, BackofficeContext backofficeContext, IPlatformRepository platformRepository, IMemCache memCache)
         {
             _configuration = configuration;
@@ -28,17 +35,85 @@ namespace Backoffice.API.Repositories
             _memCache = memCache;
         }
 
-        public async Task<BaseResponse<ClientListResponse>> GetClients()
+        #endregion
+
+        #region Methods - Client
+
+        public async Task<BaseResponse<ClientResponse>> GetClients()
         {
             try
             {
                 var clients = GetClientInformation()
-                    .Select(client => new ClientResponse
+                    .Select(client => new ClientResponse.Client
                     {
                         ClientId = client.ClientId,
                         ClientName = client.Name,
                         ClientCode = client.Brand,
                         Region = client.Region
+                    }).ToList();
+
+                return new BaseResponse<ClientResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new ClientResponse
+                    {
+                        Clients = clients ?? new List<ClientResponse.Client>()
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ClientResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request)
+        {
+            try
+            {
+                var query = _backofficeContext.ClientInformation.AsNoTracking();
+
+                if (!string.IsNullOrEmpty(request.Search))
+                    query = query.Where(c => c.Name.Contains(request.Search));
+
+                // sort order
+                if (request.SortBy == ClientSorting.SortByBusinessNameAsc)
+                {
+                    query = query.OrderBy(c => c.Name);
+                }
+                else if (request.SortBy == ClientSorting.SortByBusinessNameDesc)
+                {
+                    query = query.OrderByDescending(c => c.Name);
+                }
+                else if (request.SortBy == ClientSorting.SortByCreatedDateAsc)
+                {
+                    query = query.OrderBy(c => c.CreatedDate);
+                }
+                else if (request.SortBy == ClientSorting.SortByCreatedDateDesc)
+                {
+                    query = query.OrderByDescending(c => c.CreatedDate);
+                }
+
+                var totalClientCount = query.Count();
+
+                var skip = (request.Page - 1) * request.PageSize;
+                var totalPage = ((totalClientCount - 1) / request.PageSize) + 1;
+
+                var clients = query.Skip(skip).Take(request.PageSize)
+                    .Select(s => new ClientListResponse.Client
+                    {
+                        ClientId = s.ClientId,
+                        Name = s.Name,
+                        Website = s.Website,
+                        StatusId = s.StatusId,
+                        StatusName = ((ClientStatus)s.StatusId).ToString(),
+                        Region = s.Region
                     }).ToList();
 
                 return new BaseResponse<ClientListResponse>
@@ -47,7 +122,11 @@ namespace Backoffice.API.Repositories
                     Message = StatusCode.Success.ToString(),
                     Result = new ClientListResponse
                     {
-                        Clients = clients ?? new List<ClientResponse>()
+                        Page = request.Page,
+                        PageSize = request.PageSize,
+                        Total = totalClientCount,
+                        TotalPage = totalPage,
+                        Clients = clients ?? new List<ClientListResponse.Client>()
                     }
                 };
             }
@@ -61,6 +140,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+
         public async Task<BaseResponse<string>> GetClientRegion(int clientId)
         {
             try
@@ -82,6 +162,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        
         public async Task<BaseResponse<string>> GetClientRegionByClientCode(string clientCode)
         {
             try
@@ -103,6 +184,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        
         public async Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs)
         {
             try
@@ -139,7 +221,10 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        #region TOP FIXTURES
+        #endregion
+
+        #region Methods - Top Fixtures
+
         public async Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request)
         {
             try
@@ -239,6 +324,7 @@ namespace Backoffice.API.Repositories
         }
 
         #region Utilities
+
         private string GetFEDisplayValue(string currency)
         {
             var newCurrency = currency;
@@ -258,6 +344,7 @@ namespace Backoffice.API.Repositories
         {
             return _memCache.GetCache("boci", () => _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24) ?? new List<ClientInformation>();
         }
+
         #endregion
     }
 }

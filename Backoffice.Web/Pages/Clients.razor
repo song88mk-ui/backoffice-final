@@ -1,4 +1,5 @@
-﻿@using Backoffice.Web.Components.Common
+﻿@using Backoffice.Shared.Enums
+@using Backoffice.Web.Components.Common
 @using Backoffice.Web.Components.Clients
 
 @page "/clients"
@@ -10,7 +11,7 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter />
+                <Filter OnInitCallback="OnInitEvent" />
             </div>
             <div class="col-md-12">
                 <table class="table table-hover table-borderless mt-4">
@@ -26,44 +27,35 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>
-                                <span class="fw-bold">10 Bet Brazil</span>
-                            </td>
-                            <td>https://10betbrazil.com</td>
-                            <td>
-                                <span class="status-normal py-1 px-4 rounded-pill">Normal</span>
-                            </td>
-                            <td>Hongkong</td>
-                            <td>
-                                <a class="btn btn-bet-settings" href="javascript:(0)">View Bet Settings</a>
-                            </td>
-                            <td>
-                                <a class="link-edit me-2" href="javascript:(0)">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>
-                                <span class="fw-bold">10 Bet Brazil</span>
-                            </td>
-                            <td>https://10betbrazil.com</td>
-                            <td>
-                                <span class="status-locked py-1 px-4 rounded-pill">Locked</span>
-                            </td>
-                            <td>Hongkong</td>
-                            <td>
-                                <a class="btn btn-bet-settings" href="javascript:(0)">View Bet Settings</a>
-                            </td>
-                            <td>
-                                <a class="link-edit me-2" href="javascript:(0)">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                            </td>
-                        </tr>
+                        @foreach (var client in ClientListModel.Clients)
+                        {
+                            <tr>
+                                <td>@client.Num</td>
+                                <td>
+                                    <span class="fw-bold">@client.Name</span>
+                                </td>
+                                <td>@client.Website</td>
+                                <td>
+                                    @if (client.StatusId == (int)ClientStatus.Normal)
+                                    {
+                                        <span class="status-normal py-1 px-4 rounded-pill">@client.StatusName</span>
+                                    }
+                                    else if (client.StatusId == (int)ClientStatus.Locked)
+                                    {
+                                        <span class="status-locked py-1 px-4 rounded-pill">@client.StatusName</span>
+                                    }
+                                </td>
+                                <td>@client.Region</td>
+                                <td>
+                                    <a class="btn btn-bet-settings" href="javascript:(0)">View Bet Settings</a>
+                                </td>
+                                <td>
+                                    <a class="link-edit me-2" href="javascript:(0)">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>                        
+                        }
                     </tbody>
                     <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
                 </table>

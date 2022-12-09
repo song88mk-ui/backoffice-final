@@ -16,7 +16,7 @@ namespace Backoffice.Web.Models
 
     public class TopFixtureCallback
     {
-        public List<ClientResponse> SelectedClients { get; set; }
+        public List<ClientResponse.Client> SelectedClients { get; set; }
         public string SearchText { get; set; }
     }
 }

@@ -2,16 +2,25 @@
     <div class="w-100 d-flex flex-row justify-content-between">
         <div class="input-container d-flex">
             <div class="me-4">
-                <label class="form-label d-block">Business Name</label>
-                <input type="text" class="form-control" placeholder="Search" />
+                <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                    <label class="form-label d-block">Business Name</label>
+                    <InputText id="search" placeholder="Search" class="form-control search-text valid" @bind-Value="SearchForm.SearchText" />
+                </EditForm>
             </div>
             <div class="me-4">
                 <label class="form-label d-block">Sort By</label>
-                <select class="form-select d-block">
-                    <option selected>Sort by Business Name (Ascending)</option>
-                    <option value="1">Sort by Business Name (Descending)</option>
-                    <option value="2">Sort by Create Date (Ascending)</option>
-                    <option value="3">Sort by Create Date (Descending)</option>
+                <select class="form-select d-block" @onchange="OnSortByChangedEvent">
+                    @foreach (var item in SelectSortByList)
+                    {
+                        if (SortBy == item.Value)
+                        {
+                            <option value="@item.Value" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Name</option>
+                        }
+                    }
                 </select>
             </div>
         </div>

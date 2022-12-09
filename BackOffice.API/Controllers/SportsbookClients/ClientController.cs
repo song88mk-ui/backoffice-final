@@ -1,5 +1,6 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
+using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -22,6 +23,21 @@ namespace Backoffice.API.Controllers.SportsbookClients
         public async Task<IActionResult> GetClients()
         {
             var result = await _backofficeRepository.GetClients();
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+
+        [HttpPost("information/list")]
+        public async Task<IActionResult> GetClientList([FromBody] GetClientListRequest request)
+        {
+            var result = await _backofficeRepository.GetClientList(request);
 
             switch (result.StatusCode)
             {

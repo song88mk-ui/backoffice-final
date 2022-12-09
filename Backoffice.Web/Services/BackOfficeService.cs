@@ -24,30 +24,69 @@ namespace Backoffice.Web.Services
             _httpClient = httpClient;
             _authenticationService = authenticationService;
 
-            var userToken = httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+            //var userToken = httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+
             _httpClient.BaseAddress = new Uri(_configuration["API:Backoffice:Uri"]);
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:Backoffice:Security:APIKey"]);
-
         }
         #endregion
 
         #region Methods - Client
-        public async Task<BaseResponse<ClientListResponse>> GetClients()
+
+        public async Task<BaseResponse<ClientResponse>> GetClients()
         {
             try
             {
                 var userToken = await _authenticationService.AuthenticateToken();
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
 
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientListResponse>>
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientResponse>>
                 (await _httpClient.GetStreamAsync($"sportsbook/Client/list"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-                return result ?? new BaseResponse<ClientListResponse>
+                return result ?? new BaseResponse<ClientResponse>
                 {
                     StatusCode = StatusCode.Success,
                     Message = $"{StatusCode.Success}",
-                    Result = new ClientListResponse()
+                    Result = new ClientResponse()
                 };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ClientResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request)
+        {
+            try
+            {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
+                var response = await _httpClient.PostAsync($"sportsbook/client/information/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ClientListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<ClientListResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ClientListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<ClientListResponse>();
+                    else
+                    {
+                        return new BaseResponse<ClientListResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+
             }
             catch (Exception ex)
             {

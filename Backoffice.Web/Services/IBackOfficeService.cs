@@ -7,7 +7,8 @@ namespace Backoffice.Web.Services
 {
     public interface IBackOfficeService
     {
-        Task<BaseResponse<ClientListResponse>> GetClients();
+        Task<BaseResponse<ClientResponse>> GetClients();
+        Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);
         Task<BaseResponse<ClientTopFixtureResponse>> GetClientTopFixtures(GetClientTopFixtureRequest request);
         Task<BaseResponse<PlatformMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request);
         Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);
