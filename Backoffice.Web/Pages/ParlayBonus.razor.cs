@@ -1,9 +1,11 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.ParlayBonus;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using static Backoffice.Shared.Models.Response.ClientParlayBonusResponse;
 
 namespace Backoffice.Web.Pages
 {
@@ -11,6 +13,7 @@ namespace Backoffice.Web.Pages
     {
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -45,6 +48,22 @@ namespace Backoffice.Web.Pages
             {
                 ClientParlayBonusResponse = result;
             }
+        }
+
+        public async Task OnDeleteConfig(ParlayBonusConfig parlayBonusConfig)
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("ParlayBonusConfig", parlayBonusConfig);
+
+            var options = new ModalOptions();
+            ModalService.Open<DeleteModal>($"Delete Parlay Bonus", parameters, options);
+        }
+
+        public async Task OnViewConfigLog(ParlayBonusConfig parlayBonusConfig)
+        {
+
         }
 
         protected async Task SelectPage(int page)

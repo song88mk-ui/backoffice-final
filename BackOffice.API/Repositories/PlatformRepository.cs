@@ -410,28 +410,17 @@ namespace Backoffice.API.Repositories
                     }
                 }
 
-                if (bonus.Any())
+                return new BaseResponse<ClientParlayBonusResponse>()
                 {
-                    return new BaseResponse<ClientParlayBonusResponse>()
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new ClientParlayBonusResponse
                     {
-                        StatusCode = StatusCode.Success,
-                        Message = StatusCode.Success.ToString(),
-                        Result = new ClientParlayBonusResponse
-                        {
-                            ClientIdRef = request.ClientIdRef,
-                            ParlayBonusConfigs = bonus,
-                            ParlayBonusMinOdds = minOdds
-                        }
-                    };
-                }
-                else
-                {
-                    return new BaseResponse<ClientParlayBonusResponse>()
-                    {
-                        StatusCode = StatusCode.Error,
-                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')}"
-                    };
-                }
+                        ClientIdRef = request.ClientIdRef,
+                        ParlayBonusConfigs = bonus,
+                        ParlayBonusMinOdds = minOdds
+                    }
+                };
             }
             catch (Exception ex)
             {

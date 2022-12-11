@@ -37,15 +37,12 @@
                                     <td>@item.SelectionCount</td>
                                     <td class="td-parlay-bonus">@(item.ParlayBonus * 100)%</td>
                                     <td>
-                                        <a class="tl-link-add me-2" href="javascript:(0)">
-                                            <i class="fa fa-plus-square"></i>
+                                        <a class="tl-link-add me-2" @onclick="_ => OnDeleteConfig(item)">
+                                            <i class="fa fa-trash"></i>
                                         </a>
-                                        <a class="tl-link-minus me-2" href="javascript:(0)">
-                                            <i class="fa fa-minus-square"></i>
-                                        </a>
-                                        <a class="tl-link-edit me-2" href="javascript:(0)">
-                                            <i class="fa fa-bars"></i>
-                                        </a>
+                                        <a class="tl-link-minus me-2" @onclick="_ => OnViewConfigLog(item)">
+                                            <i class="fa fa-list-alt"></i>
+                                        </a>                                       
                                     </td>
                                 </tr>
                             }
