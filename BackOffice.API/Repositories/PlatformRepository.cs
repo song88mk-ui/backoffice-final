@@ -163,7 +163,7 @@ namespace Backoffice.API.Repositories
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
                 };
             }
-            
+
         }
         public async Task<BaseResponse<bool>> CopyTopLeagues(CopyTopLeaguesRequest request, IDictionary<string, string> regionclientIds)
         {
@@ -189,8 +189,7 @@ namespace Backoffice.API.Repositories
                     }, "HK");
                 }
 
-                // only proceed to SA if result from HK is null or HK has a result and the status code is success
-                if (saClientIds.Any() && (response.Result == null || (response.Result != null && response.Result.StatusCode == StatusCode.Success)))
+                if (saClientIds.Any())
                 {
                     response = await CopyTopLeagesPerRegion(new CopyTopLeaguesRequest
                     {
@@ -204,7 +203,7 @@ namespace Backoffice.API.Repositories
                 {
                     StatusCode = response.StatusCode,
                     Message = response.Message,
-                    Result = true
+                    Result = response.StatusCode == StatusCode.Success ? true : false
                 };
             }
             catch (Exception ex)
@@ -223,7 +222,7 @@ namespace Backoffice.API.Repositories
             {
                 ClientIdRefs = request.ClientIdRefs,
                 SportId = request?.SportId,
-                TopLeague = request.TopLeagues
+                TopLeagues = request.TopLeagues
             }), Encoding.UTF8, "application/json"));
 
             var payload = JsonConvert.DeserializeObject<BaseResponse<PlatformMessageResponse>>(await result.Content.ReadAsStringAsync());

@@ -72,7 +72,7 @@ namespace Backoffice.Web.Pages
                 TopLeaguesList.ClientTopLeagues = new List<OrderedClientTopLeagues>();
             }
 
-            MetaData.TotalCount = TopLeaguesList.ClientTopLeagues.Count();
+            MetaData.TotalCount = TopLeaguesList.ClientTopLeagues.Count;
             MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
             var skip = (MetaData.CurrentPage - 1) * MetaData.PageSize;
             if (MetaData.CurrentPage > 0)

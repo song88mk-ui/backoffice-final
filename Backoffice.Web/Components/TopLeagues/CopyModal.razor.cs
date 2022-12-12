@@ -74,11 +74,11 @@ namespace Backoffice.Web.Components.TopLeagues
             {
                 ClientIdErrorMsg = string.Empty;
 
-                var topSetUp = new List<CopyTopLeaguesRequest.OrderedClientTopLeague>();
+                var topSetUp = new List<CopyTopLeaguesRequest.SportLeague>();
                 var i = 0;
                 foreach (var item in CopyTopLeaguesModel.CopyFromClientTopLeagues)
                 {
-                    topSetUp.Add(new CopyTopLeaguesRequest.OrderedClientTopLeague()
+                    topSetUp.Add(new CopyTopLeaguesRequest.SportLeague()
                     {
                         SportId = item.SportId,
                         SportName = item.SportName,
@@ -86,6 +86,8 @@ namespace Backoffice.Web.Components.TopLeagues
                         SegmentName = item.SegmentName,
                         LeagueId = item.LeagueId,
                         LeagueName = item.LeagueName,
+                        Status = item.Status,
+                        LiveCount= item.LiveCount,
                         SortOrder = i++
                     });
                 }
