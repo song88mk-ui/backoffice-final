@@ -418,7 +418,11 @@ namespace Backoffice.API.Repositories
                     {
                         ClientIdRef = request.ClientIdRef,
                         ParlayBonusConfig = bonus,
-                        ParlayBonusMinOdds = minOdds
+                        ParlayBonusMinOdds = minOdds,
+                        Page = request.Page,
+                        PageSize = request.PageSize,
+                        Total = bonus.Count,
+                        TotalPage = ((bonus.Count - 1) / request.PageSize) + 1
                     }
                 };
             }
