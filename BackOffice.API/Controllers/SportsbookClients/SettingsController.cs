@@ -1,13 +1,9 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
-using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using static Backoffice.Shared.Models.Response.GetTopLeaguesResponse;
 using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.SportsbookClients
@@ -91,11 +87,11 @@ namespace Backoffice.API.Controllers.SportsbookClients
         #region Top Leagues
 
         [EnableCors("AllowAllOrigins")]
-        [HttpGet("topleagues/allleagues")]
-        public async Task<IActionResult> GetClientAllLeagues([FromQuery] ClientAllLeaguesRequest request)
+        [HttpGet("allleagues")]
+        public async Task<IActionResult> GetAllLeagues([FromQuery] GetAllLeaguesRequest request)
         {
             var region = await _backofficeRepository.GetClientRegion(request.ClientIdRef);
-            var result = await _platformRepository.GetClientAllLeagues(request, region.Result);
+            var result = await _platformRepository.GetAllLeagues(request, region.Result);
 
             switch (result.StatusCode)
             {

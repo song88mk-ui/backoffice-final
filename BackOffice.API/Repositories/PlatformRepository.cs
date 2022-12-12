@@ -28,7 +28,7 @@ namespace Backoffice.API.Repositories
         }
 
         #region TOP LEAGUES
-        public async Task<BaseResponse<TopLeaguesResponse>> GetClientAllLeagues(ClientAllLeaguesRequest request, string region)
+        public async Task<BaseResponse<GetAllLeaguesResponse>> GetAllLeagues(GetAllLeaguesRequest request, string region)
         {
             try
             {
@@ -36,14 +36,14 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).GetAsync($"v1/client/allleagues{queryStrings}");
 
                 if (response.IsSuccessStatusCode)
-                    return JsonConvert.DeserializeObject<BaseResponse<TopLeaguesResponse>>(await response.Content.ReadAsStringAsync());
+                    return JsonConvert.DeserializeObject<BaseResponse<GetAllLeaguesResponse>>(await response.Content.ReadAsStringAsync());
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonConvert.DeserializeObject<BaseResponse<TopLeaguesResponse>>(await response.Content.ReadAsStringAsync());
+                        return JsonConvert.DeserializeObject<BaseResponse<GetAllLeaguesResponse>>(await response.Content.ReadAsStringAsync());
                     else
                     {
-                        return new BaseResponse<TopLeaguesResponse>
+                        return new BaseResponse<GetAllLeaguesResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -53,7 +53,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                return new BaseResponse<TopLeaguesResponse>
+                return new BaseResponse<GetAllLeaguesResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

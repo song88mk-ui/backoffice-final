@@ -53,17 +53,25 @@ namespace Backoffice.Web.Pages
             };
 
             TopLeaguesFilter = topLeaguesFilterModel ?? new TopLeaguesFilterModel();
-            
 
             TopLeaguesList = (await BackOfficeService.GetTopLeaguesAsync(GetTopLeaguesRequest)).Result;
             if (TopLeaguesList != null)
+            {
                 TopLeaguesList.ClientTopLeagues.ToList().ForEach(c => c.ClientName = ClientInformation?.Clients?.FirstOrDefault(x => x.ClientId == c.ClientIdRef).ClientName);
+
+                if (!string.IsNullOrWhiteSpace(topLeaguesFilterModel.Search))
+                {
+                    var result = TopLeaguesList.ClientTopLeagues.Where(t => t.ClientName.Contains(topLeaguesFilterModel.Search) || t.TopLeagues.Any(tf => tf.SportName.Contains(topLeaguesFilterModel.Search)) || t.TopLeagues.Any(tf => tf.SegmentName.Contains(topLeaguesFilterModel.Search)) || t.TopLeagues.Any(tf => tf.LeagueName.Contains(topLeaguesFilterModel.Search)));
+                    TopLeaguesList.ClientTopLeagues.Clear();
+                    TopLeaguesList.ClientTopLeagues.AddRange(result);
+                }
+            }
             else
             {
                 TopLeaguesList = new GetTopLeaguesResponse();
                 TopLeaguesList.ClientTopLeagues = new List<OrderedClientTopLeagues>();
             }
-                
+
             MetaData.TotalCount = TopLeaguesList.ClientTopLeagues.Count();
             MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
             var skip = (MetaData.CurrentPage - 1) * MetaData.PageSize;
@@ -82,9 +90,11 @@ namespace Backoffice.Web.Pages
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("ClientId", orderedClientTopLeagues.ClientIdRef);
+            parameters.Add("CurrentTopLeagues", orderedClientTopLeagues.TopLeagues);
+            parameters.Add("SportId", TopLeaguesFilter.SportId);
 
             var options = new ModalOptions();
-            ModalService.Open<EditModal>($"Set Top Leagues of {orderedClientTopLeagues.ClientName}", parameters, options);
+            ModalService.Open<EditModal>($"Set the Top Leagues of {orderedClientTopLeagues.ClientName}", parameters, options);
         }
 
         public async Task OnCopy(OrderedClientTopLeagues orderedClientTopLeagues)
@@ -106,9 +116,13 @@ namespace Backoffice.Web.Pages
             await OnInitEvent(TopLeaguesFilter);
         }
 
+        public async ValueTask DisposeAsync()
+        {
+            GC.SuppressFinalize(this);
+        }
         public void Dispose()
         {
-            BackOfficeService.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         #endregion

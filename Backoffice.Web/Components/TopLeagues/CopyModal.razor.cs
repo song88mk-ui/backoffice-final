@@ -139,9 +139,13 @@ namespace Backoffice.Web.Components.TopLeagues
             ClientIdErrorMsg = string.IsNullOrWhiteSpace(ClientIdErrorMsg) ? "Select client to proceed" : string.Empty;
         }
 
+        public async ValueTask DisposeAsync()
+        {
+            GC.SuppressFinalize(this);
+        }
         public void Dispose()
         {
-            BackOfficeService.Dispose();
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

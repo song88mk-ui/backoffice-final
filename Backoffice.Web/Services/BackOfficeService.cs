@@ -9,7 +9,7 @@ using System.Text.Json;
 
 namespace Backoffice.Web.Services
 {
-    public class BackOfficeService : IBackOfficeService, IDisposable
+    public class BackOfficeService : IBackOfficeService
     {
         #region Fields
         private readonly HttpClient _httpClient;
@@ -212,6 +212,41 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Methods - Top Leagues
+
+        public async Task<BaseResponse<GetAllLeaguesResponse>> GetAllLeaguesAsync(GetAllLeaguesRequest request)
+        {
+            try
+            {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
+                var response = await _httpClient.PostAsync($"sportsbook/settings/allleagues", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<GetAllLeaguesResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<GetAllLeaguesResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<GetAllLeaguesResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<GetAllLeaguesResponse>();
+                    else
+                    {
+                        return new BaseResponse<GetAllLeaguesResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<GetAllLeaguesResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
         public async Task<BaseResponse<GetTopLeaguesResponse>> GetTopLeaguesAsync(GetTopLeaguesRequest request)
         {
             try
@@ -422,10 +457,5 @@ namespace Backoffice.Web.Services
         }
 
         #endregion
-
-        public void Dispose()
-        {
-            _httpClient.Dispose();
-        }
     }
 }

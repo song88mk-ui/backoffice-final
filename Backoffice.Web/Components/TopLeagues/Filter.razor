@@ -1,7 +1,7 @@
 ﻿<div class="content-filter mx-3">
-    <div class="row">
-        <div class="col-md-3">
-            <form>
+    <form>
+        <div class="row">
+            <div class="col-md-3">
                 <div class="row">
                     <div class="col">
                         <label class="my-1 mr-2">Client</label>
@@ -44,16 +44,16 @@
                         }
                     </div>
                 </div>
-            </form>
-        </div>
-        <div class="col-md-9 search-content">
-            <form class="pull-right">
-                <div class="right-icon-control">
-                    <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
-                        <InputText id="search" placeholder="Search" class="form-control search-text valid" @bind-Value="SearchForm.SearchText" />
-                    </EditForm>
+            </div>
+            <div class="col-md-9 search-content">
+                <div class="pull-right">
+                    <div class="right-icon-control">
+                        <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                            <InputText id="search" placeholder="Search" class="form-control search-text valid" @bind-Value="SearchForm.SearchText" />
+                        </EditForm>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
+    </form>
 </div>

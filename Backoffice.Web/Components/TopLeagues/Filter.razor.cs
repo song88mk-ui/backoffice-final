@@ -101,13 +101,11 @@ namespace Backoffice.Web.Components.TopLeagues
         
         public async ValueTask DisposeAsync()
         {
-            BackOfficeService.Dispose();
             GC.SuppressFinalize(this);
         }
         
         public void Dispose()
         {
-            BackOfficeService.Dispose();
             GC.SuppressFinalize(this);
         }
     }
