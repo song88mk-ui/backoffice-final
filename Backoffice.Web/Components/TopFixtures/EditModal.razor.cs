@@ -19,6 +19,7 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public ClientTopFixtureResponse.OrderedClientTopFixture NewTopFixture { get; set; }
         public List<SportsTreeResponse.SportReponse> SportsTree { get; set; }
+        public int SelectedRowIndex { get; set; }
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
@@ -27,6 +28,7 @@ namespace Backoffice.Web.Components.TopFixtures
             {
                 TopFixture = ModalParameters.TryGet<ClientTopFixtureResponse.OrderedClientTopFixture>("TopFixture");
                 SportsTree = new List<SportsTreeResponse.SportReponse>();
+                SelectedRowIndex = -1;
             }
             catch (Exception)
             {
@@ -43,9 +45,23 @@ namespace Backoffice.Web.Components.TopFixtures
                 var rowCount = 0;
                 foreach (var topFixture in TopFixture.TopFixtures)
                 {
-                    rowCount = rowCount + 1;
-                    topFixture.SortOrder = rowCount;
-                    NewTopFixture.TopFixtures.Add(topFixture);
+                    if(model.SelectedSport.SportId == 0 || model.SelectedSport.SportId == topFixture.SportId)
+                    {
+                        if(model.SelectedSegment.SegmentId == 0 || model.SelectedSegment.SegmentId == topFixture.SegmentId)
+                        {
+                            if (model.SelectedLeague.LeagueId == 0 || model.SelectedLeague.LeagueId == topFixture.LeagueId)
+                            {
+                                if(model.SelectedGameFilter.FixtureId == "0" || model.SelectedGameFilter.FixtureId == topFixture.FixtureId)
+                                {
+                                    rowCount = rowCount + 1;
+                                    topFixture.SortOrder = rowCount;
+                                    NewTopFixture.TopFixtures.Add(topFixture);
+                                }
+
+                            }
+                        }
+                    }
+
                 }
             }
 
@@ -55,7 +71,18 @@ namespace Backoffice.Web.Components.TopFixtures
                 NewTopFixture.TopFixtures.Add(new FixtureModel() { SortOrder = 1 });
             }
 
+            NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.OrderByDescending(t => t.FixtureStartDate).ToList();
+            if (model.SortFilter == "2")
+            {
+                NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.OrderBy(t => t.FixtureStartDate).ToList();
+            }
+
             SportsTree = model.Sports;
+        }
+
+        public async Task OnDropdownSelect(int index)
+        {
+            SelectedRowIndex = index;
         }
 
         public async Task OnSelectedGameEvent(EditTopFixturesModel model)
@@ -83,7 +110,7 @@ namespace Backoffice.Web.Components.TopFixtures
         public async Task OnAddRow(int rowCtr)
         {
             NewTopFixture.TopFixtures.Insert(rowCtr, new FixtureModel() { SortOrder = (rowCtr + 1) });
-            SortOrderRow();
+            await SortOrderRow();
         }
         public async Task OnDeleteRow(FixtureModel fixture)
         {
@@ -92,11 +119,11 @@ namespace Backoffice.Web.Components.TopFixtures
             if (NewTopFixture.TopFixtures.Count == 0)
                 NewTopFixture.TopFixtures.Add(new FixtureModel() { SortOrder = 1 });
 
-            SortOrderRow();
+            await SortOrderRow();
 
         }
 
-        private void SortOrderRow()
+        private async Task SortOrderRow()
         {
             if(NewTopFixture.TopFixtures != null && NewTopFixture.TopFixtures.Any())
             {
@@ -107,6 +134,8 @@ namespace Backoffice.Web.Components.TopFixtures
                     fixture.SortOrder = rowCtr;
                 }
             }
+
+            await InvokeAsync(StateHasChanged);
         }
 
         public async Task OnCancelClickEvent()

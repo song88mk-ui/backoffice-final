@@ -16,7 +16,8 @@ namespace Backoffice.Web.Components.TopFixtures
         public SportsTreeResponse.SportReponse SelectedSport { get; set; }
         public SportsTreeResponse.SegmentResponse SelectedSegment { get; set; }
         public SportsTreeResponse.LeagueResponse SelectedLeague { get; set; }
-        public FixtureModel SelectedGame { get; set; }
+        public FixtureModel SelectedGameFilter { get; set; }
+        public string SortFilter { get; set; }
         #endregion
 
         #region Methods
@@ -28,8 +29,9 @@ namespace Backoffice.Web.Components.TopFixtures
                 SelectedSport = new SportsTreeResponse.SportReponse();
                 SelectedSegment = new SportsTreeResponse.SegmentResponse();
                 SelectedLeague = new SportsTreeResponse.LeagueResponse();
-                SelectedGame = new FixtureModel();
+                SelectedGameFilter = new FixtureModel();
                 SportsTree = new SportsTreeResponse();
+                SortFilter = "1";
 
                 SportsTree = (await BackOfficeService.GetSportstreeByClientId(ClientId)).Result;
 
@@ -39,7 +41,7 @@ namespace Backoffice.Web.Components.TopFixtures
                     SelectedSport = SelectedSport,
                     SelectedSegment = SelectedSegment,
                     SelectedLeague = SelectedLeague,
-                    SelectedGame = SelectedGame
+                    SelectedGameFilter = SelectedGameFilter
                 };
                 await OnInitCallback.InvokeAsync(model);
             }
@@ -53,7 +55,7 @@ namespace Backoffice.Web.Components.TopFixtures
             SelectedSport = SportsTree.Sports.FirstOrDefault(s => s.SportId == Convert.ToInt32(e.Value));
             SelectedSegment = new SportsTreeResponse.SegmentResponse();
             SelectedLeague = new SportsTreeResponse.LeagueResponse();
-            SelectedGame = new FixtureModel();
+            SelectedGameFilter = new FixtureModel();
 
             var model = new EditTopFixturesModel
             {
@@ -61,7 +63,7 @@ namespace Backoffice.Web.Components.TopFixtures
                 SelectedSport = SelectedSport,
                 SelectedSegment = SelectedSegment,
                 SelectedLeague = SelectedLeague,
-                SelectedGame = SelectedGame
+                SelectedGameFilter = SelectedGameFilter
             };
 
             await OnInitCallback.InvokeAsync(model);
@@ -70,7 +72,7 @@ namespace Backoffice.Web.Components.TopFixtures
         {
             SelectedSegment = SelectedSport.Segments.FirstOrDefault(s => s.SegmentId == Convert.ToInt32(e.Value));
             SelectedLeague = new SportsTreeResponse.LeagueResponse();
-            SelectedGame = new FixtureModel();
+            SelectedGameFilter = new FixtureModel();
 
             var model = new EditTopFixturesModel
             {
@@ -78,7 +80,7 @@ namespace Backoffice.Web.Components.TopFixtures
                 SelectedSport = SelectedSport,
                 SelectedSegment = SelectedSegment,
                 SelectedLeague = SelectedLeague,
-                SelectedGame = SelectedGame
+                SelectedGameFilter = SelectedGameFilter
             };
 
             await OnInitCallback.InvokeAsync(model);
@@ -87,14 +89,14 @@ namespace Backoffice.Web.Components.TopFixtures
         public async void OnLeagueChangedEvent(ChangeEventArgs e)
         {
             SelectedLeague = SelectedSegment.Leagues.FirstOrDefault(s => s.LeagueId == Convert.ToInt32(e.Value));
-            SelectedGame = new FixtureModel();
+            SelectedGameFilter = new FixtureModel();
             var model = new EditTopFixturesModel
             {
                 Sports = SportsTree.Sports,
                 SelectedSport = SelectedSport,
                 SelectedSegment = SelectedSegment,
                 SelectedLeague = SelectedLeague,
-                SelectedGame = SelectedGame
+                SelectedGameFilter = SelectedGameFilter
             };
 
             await OnInitCallback.InvokeAsync(model);
@@ -102,14 +104,33 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async void OnGameChangedEvent(ChangeEventArgs e)
         {
-            SelectedGame = SelectedLeague.Fixtures.FirstOrDefault(f => f.FixtureId == e.Value);
+            SelectedGameFilter = SelectedLeague.Fixtures.FirstOrDefault(f => f.FixtureId == e.Value);
             var model = new EditTopFixturesModel
             {
                 Sports = SportsTree.Sports,
                 SelectedSport = SelectedSport,
                 SelectedSegment = SelectedSegment,
                 SelectedLeague = SelectedLeague,
-                SelectedGame = SelectedGame
+                SelectedGameFilter = SelectedGameFilter
+            };
+
+            await OnInitCallback.InvokeAsync(model);
+        }
+
+        public async void OnSortChangedEvent(ChangeEventArgs e)
+        {
+            if (string.IsNullOrEmpty(e.Value?.ToString()))
+                SortFilter = "1";
+            SortFilter = e.Value.ToString();
+
+            var model = new EditTopFixturesModel
+            {
+                Sports = SportsTree.Sports,
+                SelectedSport = SelectedSport,
+                SelectedSegment = SelectedSegment,
+                SelectedLeague = SelectedLeague,
+                SelectedGameFilter = SelectedGameFilter,
+                SortFilter = SortFilter ?? "1"
             };
 
             await OnInitCallback.InvokeAsync(model);
