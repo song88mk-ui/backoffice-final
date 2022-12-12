@@ -387,7 +387,7 @@ namespace Backoffice.Web.Services
                 var userToken = await _authenticationService.AuthenticateToken();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
 
-                var requestUri = $"sportsbook/settings/parlaybonus/list?ClientIdRef={request.ClientIdRef}";
+                var requestUri = $"sportsbook/settings/parlaybonus/list?ClientIdRef={request.ClientIdRef}&Page={request.Page}&PageSize={request.PageSize}";
 
                 var response = await _httpClient.GetAsync(requestUri);
 

@@ -8,5 +8,7 @@ namespace Backoffice.Shared.Models.Requests
     {
         public long ClientIdRef { get; set; }
         public int SelectionCount { get; set; }
+        public int Page { get; set; }
+        public int PageSize { get; set; }        
     }
 }
