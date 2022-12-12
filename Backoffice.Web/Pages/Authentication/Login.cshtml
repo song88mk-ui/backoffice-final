@@ -22,9 +22,6 @@
 
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/site.css" />
-
-    <link href="Backoffice.Web.styles.css" rel="stylesheet" />
-
     <!-- script -->
     <script src="js/bootstrap.bundle.min.js"></script>
 
@@ -137,11 +134,11 @@
                 border-color: #E5E5E5;
             }
 
-        .passwordEye:hover {
+        .password-eye:hover {
             cursor: pointer;
         }
 
-        .passwordEye {
+        .password-eye {
             z-index: 9999;
         }
 
@@ -175,23 +172,6 @@
             border: 1px solid #CD0A0A;
         }
     </style>
-    <script>
-        function password_show_hide() {
-            var x = document.getElementById("password");
-            var show_eye = document.getElementById("show_eye");
-            var hide_eye = document.getElementById("hide_eye");
-            hide_eye.classList.remove("d-none");
-            if (x.type === "password") {
-                x.type = "text";
-                show_eye.style.display = "none";
-                hide_eye.style.display = "block";
-            } else {
-                x.type = "password";
-                show_eye.style.display = "block";
-                hide_eye.style.display = "none";
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="access-layout">
@@ -241,7 +221,7 @@
                                         <li>The Password field is required.</li>
                                         </ul>
                                         </div>*@
-                                        <button type="button" class="d-flex align-items-center position-absolute end-0 h-100 bg-transparent border-0 passwordEye" onclick="password_show_hide();">
+                                        <button type="button" class="d-flex align-items-center position-absolute end-0 h-100 bg-transparent border-0 password-eye" onclick="password_show_hide();">
                                             <i class="fa fa-eye-slash text-center eye-icon" id="show_eye"></i>
                                             <i class="fa fa-eye d-none text-center eye-icon" id="hide_eye"></i>
                                         </button>
@@ -267,5 +247,22 @@
             </div>
         </div>
     </div>
+    <script>
+        function password_show_hide() {
+            var x = document.getElementById("password");
+            var show_eye = document.getElementById("show_eye");
+            var hide_eye = document.getElementById("hide_eye");
+            hide_eye.classList.remove("d-none");
+            if (x.type === "password") {
+                x.type = "text";
+                show_eye.style.display = "none";
+                hide_eye.style.display = "block";
+            } else {
+                x.type = "password";
+                show_eye.style.display = "block";
+                hide_eye.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>

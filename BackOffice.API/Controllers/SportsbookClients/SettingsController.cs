@@ -202,5 +202,9 @@ namespace Backoffice.API.Controllers.SportsbookClients
         }
 
         #endregion
+
+        #region Subuser
+
+        #endregion
     }
 }

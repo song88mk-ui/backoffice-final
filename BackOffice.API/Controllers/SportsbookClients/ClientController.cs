@@ -18,7 +18,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
         {
             _backofficeRepository = backofficeRepository;
         }
-
         [HttpGet("list")]
         public async Task<IActionResult> GetClients()
         {
@@ -32,7 +31,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-
 
         [HttpPost("information/list")]
         public async Task<IActionResult> GetClientList([FromBody] GetClientListRequest request)
