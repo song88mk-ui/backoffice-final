@@ -402,9 +402,9 @@ namespace Backoffice.API.Repositories
                     if (result.StatusCode == HttpStatusCode.OK)
                     {
                         var newresult = JsonConvert.DeserializeObject<BaseResponse<ClientParlayBonusResponse>>(result.Content.ReadAsStringAsync().Result).Result;
-                        if (newresult.ParlayBonusConfigs.Any())
+                        if (newresult.ParlayBonusConfig.Any())
                         {
-                            bonus.AddRange(newresult.ParlayBonusConfigs);
+                            bonus.AddRange(newresult.ParlayBonusConfig);
                             minOdds = newresult.ParlayBonusMinOdds;
                         }
                     }
@@ -417,7 +417,7 @@ namespace Backoffice.API.Repositories
                     Result = new ClientParlayBonusResponse
                     {
                         ClientIdRef = request.ClientIdRef,
-                        ParlayBonusConfigs = bonus,
+                        ParlayBonusConfig = bonus,
                         ParlayBonusMinOdds = minOdds
                     }
                 };

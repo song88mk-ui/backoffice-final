@@ -8,30 +8,28 @@ namespace Backoffice.Shared.Models.Response
     {
         public ClientParlayBonusResponse()
         {
-            ParlayBonusConfigs = new List<ParlayBonusConfig>();
+            ParlayBonusConfig = new List<ParlayBonusConfig>();
         }
         public long ClientIdRef { get; set; }
         public decimal ParlayBonusMinOdds { get; set; }
-        public List<ParlayBonusConfig> ParlayBonusConfigs { get; set; }
+        public List<ParlayBonusConfig> ParlayBonusConfig { get; set; }
+    }
 
-        #region Nested class
-        public class ParlayBonusConfig
+    public class ParlayBonusConfig
+    {
+        public ParlayBonusConfig()
         {
-            public ParlayBonusConfig()
-            {
-                ParlayBonusHistory = new List<ParlayBonusHistory>();
-            }
-            public int SelectionCount { get; set; }
-            public decimal ParlayBonus { get; set; }
-            public List<ParlayBonusHistory> ParlayBonusHistory { get; set; }
-
+            ParlayBonusHistory = new List<ParlayBonusHistory>();
         }
+        public int SelectionCount { get; set; }
+        public decimal ParlayBonus { get; set; }
+        public List<ParlayBonusHistory> ParlayBonusHistory { get; set; }
 
-        public class ParlayBonusHistory
-        {
-            public string LastUpdate { get; set; }
-            public decimal ParlayBonus { get; set; }
-        }
-        #endregion
+    }
+
+    public class ParlayBonusHistory
+    {
+        public string LastUpdate { get; set; }
+        public decimal ParlayBonus { get; set; }
     }
 }

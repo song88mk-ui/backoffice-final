@@ -45,6 +45,8 @@ namespace Backoffice.Web.Pages
 
         public async Task OnInitEvent(TopLeaguesFilterModel topLeaguesFilterModel)
         {
+            TopLeaguesFilter = topLeaguesFilterModel ?? new TopLeaguesFilterModel();
+
             GetTopLeaguesRequest = new GetTopLeaguesRequest()
             {
                 ClientIdRefs = string.IsNullOrWhiteSpace(topLeaguesFilterModel?.ClientId) ? string.Join(",", UserClientCodes) : topLeaguesFilterModel?.ClientId,
@@ -52,14 +54,12 @@ namespace Backoffice.Web.Pages
                 LanguageCode = "en"
             };
 
-            TopLeaguesFilter = topLeaguesFilterModel ?? new TopLeaguesFilterModel();
-
             TopLeaguesList = (await BackOfficeService.GetTopLeaguesAsync(GetTopLeaguesRequest)).Result;
             if (TopLeaguesList != null)
             {
                 TopLeaguesList.ClientTopLeagues.ToList().ForEach(c => c.ClientName = ClientInformation?.Clients?.FirstOrDefault(x => x.ClientId == c.ClientIdRef).ClientName);
 
-                if (!string.IsNullOrWhiteSpace(topLeaguesFilterModel.Search))
+                if (topLeaguesFilterModel != null && !string.IsNullOrWhiteSpace(topLeaguesFilterModel.Search))
                 {
                     var result = TopLeaguesList.ClientTopLeagues.Where(t => t.ClientName.Contains(topLeaguesFilterModel.Search) || t.TopLeagues.Any(tf => tf.SportName.Contains(topLeaguesFilterModel.Search)) || t.TopLeagues.Any(tf => tf.SegmentName.Contains(topLeaguesFilterModel.Search)) || t.TopLeagues.Any(tf => tf.LeagueName.Contains(topLeaguesFilterModel.Search)));
                     TopLeaguesList.ClientTopLeagues.Clear();
@@ -77,6 +77,7 @@ namespace Backoffice.Web.Pages
             var skip = (MetaData.CurrentPage - 1) * MetaData.PageSize;
             if (MetaData.CurrentPage > 0)
                 TopLeaguesList.ClientTopLeagues = TopLeaguesList.ClientTopLeagues.Skip(skip).Take(MetaData.PageSize).ToList();
+
         }
 
         public async Task OnFilterEvent(TopLeaguesFilterModel topLeaguesFilterModel)
