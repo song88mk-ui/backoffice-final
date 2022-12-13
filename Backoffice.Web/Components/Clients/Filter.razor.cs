@@ -10,6 +10,7 @@ namespace Backoffice.Web.Components.Clients
         #region Properties
 
         [Parameter] public EventCallback<ClientListCallbackModel> OnInitCallback { get; set; }
+        [Parameter] public EventCallback<bool> OnCreateClientCallback { get; set; }
 
         public SearchFormModel SearchForm { get; set; }
         public int SortBy { get; set; }
@@ -75,6 +76,11 @@ namespace Backoffice.Web.Components.Clients
                 SearchText = SearchForm.SearchText,
                 SortBy = SortBy
             });
+        }
+
+        public async Task OnCreateClientClickEvent()
+        {
+            await OnCreateClientCallback.InvokeAsync();
         }
 
         public void Dispose()

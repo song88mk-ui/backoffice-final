@@ -11,7 +11,7 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter OnInitCallback="OnInitEvent" />
+                <Filter OnInitCallback="OnInitEvent" OnCreateClientCallback="OnCreateClientClickEvent" />
             </div>
             <div class="col-md-12">
                 <table class="table table-hover table-borderless mt-4">
@@ -62,4 +62,7 @@
             </div>
         </div>
     </div>
+</div>
+<div>
+    <CustomModal />
 </div>

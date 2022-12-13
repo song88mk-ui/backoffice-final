@@ -17,16 +17,18 @@
                 }
                 else
                 {
-                     <Tooltip Text="@ToolTip"><h5 class="modal-title">
-                        @if(HasHeaderBackButton)
-                        {
-                            <button type="button" class="btn-close" @onclick="_ => Close()"></button> <span style="top: -5px; position: relative">@_modalTitle</span>
-                        }
-                        else
-                        {
-                            @_modalTitle
-                        }
-                     </h5></Tooltip>
+                     <Tooltip Text="@ToolTip">
+                         <h5 class="modal-title">
+                            @if(HasHeaderBackButton)
+                            {
+                                <button type="button" class="btn-close" @onclick="_ => Close()"></button> <span style="top: -5px; position: relative">@_modalTitle</span>
+                            }
+                            else
+                            {
+                                @_modalTitle
+                            }
+                        </h5>
+                     </Tooltip>
                 }
                
                 @if(!HideCloseButton)

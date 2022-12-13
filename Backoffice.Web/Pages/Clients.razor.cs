@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.Clients;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -12,6 +13,7 @@ namespace Backoffice.Web.Pages
         #region Properties
 
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IModalService ModalService { get; set; }
 
         public MetaData MetaData { get; set; }
         public ClientListModel ClientListModel { get; set; }
@@ -51,6 +53,17 @@ namespace Backoffice.Web.Pages
         {
             MetaData.CurrentPage = page;
             ClientListModel = await GetClientList(ClientListCallbackModel.SearchText, ClientListCallbackModel.SortBy, MetaData.CurrentPage);
+        }
+
+        public async Task OnCreateClientClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+
+            var options = new ModalOptions();
+            ModalService.Open<CreateModal>("Create Client", parameters, options);
         }
 
         public void Dispose()
