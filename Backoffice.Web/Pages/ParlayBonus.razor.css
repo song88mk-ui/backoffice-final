@@ -35,3 +35,37 @@
 .th-action {
     width: 20%;
 }
+
+.tooltip2 {
+    position: relative;
+    display: inline-block;
+}
+
+    .tooltip2 .tooltiptext {
+        visibility: hidden;
+        width: 10rem;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        top: -0.8rem;
+        left: 2rem;
+    }
+
+        .tooltip2 .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: 100%;
+            margin-top: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent black transparent transparent;
+        }
+
+    .tooltip2:hover .tooltiptext {
+        visibility: visible;
+    }
