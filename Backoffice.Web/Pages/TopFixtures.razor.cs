@@ -53,7 +53,7 @@ namespace Backoffice.Web.Pages
                     { 
                         ClientIdRef = (int)client.ClientId,  
                         ClientName = client.ClientName,
-                        TopFixtures = new List<FixtureModel>()
+                        TopFixtures = new List<ClientTopFixtureResponse.TopFixture>()
                     });
                 }
             }

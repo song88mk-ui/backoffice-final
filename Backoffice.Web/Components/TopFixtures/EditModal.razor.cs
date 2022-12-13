@@ -41,7 +41,7 @@ namespace Backoffice.Web.Components.TopFixtures
             NewTopFixture = new ClientTopFixtureResponse.OrderedClientTopFixture();
             if (TopFixture.TopFixtures.Any())
             {
-                NewTopFixture.TopFixtures = new List<FixtureModel>();
+                NewTopFixture.TopFixtures = new List<ClientTopFixtureResponse.TopFixture>();
                 var rowCount = 0;
                 foreach (var topFixture in TopFixture.TopFixtures)
                 {
@@ -66,14 +66,14 @@ namespace Backoffice.Web.Components.TopFixtures
 
             if(NewTopFixture.TopFixtures == null || !NewTopFixture.TopFixtures.Any())
             {
-                NewTopFixture.TopFixtures = new List<FixtureModel>();
-                NewTopFixture.TopFixtures.Add(new FixtureModel() { SortOrder = 1 });
+                NewTopFixture.TopFixtures = new List<ClientTopFixtureResponse.TopFixture>();
+                NewTopFixture.TopFixtures.Add(new ClientTopFixtureResponse.TopFixture() { SortOrder = 1 });
             }
 
-            NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.OrderByDescending(t => t.StartDate).ToList();
+            NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.OrderByDescending(t => t.FixtureStartDate).ToList();
             if (model.SortFilter == "2")
             {
-                NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.OrderBy(t => t.StartDate).ToList();
+                NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.OrderBy(t => t.FixtureStartDate).ToList();
             }
 
             SportsTree = model.Sports;
@@ -98,7 +98,7 @@ namespace Backoffice.Web.Components.TopFixtures
                     fixture.SegmentName = model.SelectedGame.SegmentName;
                     fixture.LeagueId = model.SelectedGame.LeagueId;
                     fixture.LeagueName = model.SelectedGame.LeagueName;
-                    fixture.StartDate = model.SelectedGame.StartDate;
+                    fixture.FixtureStartDate = model.SelectedGame.StartDate;
                     fixture.FixtureId = model.SelectedGame.FixtureId;
                     fixture.FixtureName = model.SelectedGame.FixtureName;
                     fixture.FixtureStatus = model.SelectedGame.FixtureStatus;
@@ -110,15 +110,15 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async Task OnAddRow(int rowCtr)
         {
-            NewTopFixture.TopFixtures.Insert(rowCtr, new FixtureModel() { SortOrder = (rowCtr + 1) });
+            NewTopFixture.TopFixtures.Insert(rowCtr, new ClientTopFixtureResponse.TopFixture() { SortOrder = (rowCtr + 1) });
             await SortOrderRow();
         }
-        public async Task OnDeleteRow(FixtureModel fixture)
+        public async Task OnDeleteRow(ClientTopFixtureResponse.TopFixture fixture)
         {
             NewTopFixture.TopFixtures.Remove(fixture);
 
             if (NewTopFixture.TopFixtures.Count == 0)
-                NewTopFixture.TopFixtures.Add(new FixtureModel() { SortOrder = 1 });
+                NewTopFixture.TopFixtures.Add(new ClientTopFixtureResponse.TopFixture() { SortOrder = 1 });
 
             await SortOrderRow();
 

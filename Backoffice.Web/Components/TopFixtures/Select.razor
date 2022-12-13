@@ -30,7 +30,7 @@
 
                                                 <div class="form-check ms-4">
                                                     <input class="form-check-input" type="radio" name="@RowCount" value="@fixture.FixtureId" id="@fixture.FixtureId" @onclick="() => OnGameSelectedEvent(fixture)" />
-                                                    <label class="form-check-label" for="@fixture.FixtureId">@fixture.FixtureName</label>
+                                                    <label class="form-check-label" for="@fixture.FixtureId" @onclick="() => OnGameSelectedEvent(fixture)">@fixture.FixtureName</label>
                                                 </div>
                                             }
                                         }

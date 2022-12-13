@@ -40,7 +40,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
 
         [HttpGet("topfixtures/sportstree")]
         public async Task<IActionResult> GetSportstreeByClientId([FromQuery] int clientId)
-        {//
+        {
             var region = await _backofficeRepository.GetClientRegion(clientId);
 
             var result = await _platformRepository.GetSportstreeDetails(clientId, region.Result);
