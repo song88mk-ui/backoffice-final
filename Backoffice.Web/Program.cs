@@ -1,3 +1,4 @@
+using Backoffice.Shared.Enums;
 using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Hubs;
 using Backoffice.Web.Services;
@@ -15,6 +16,18 @@ builder.Services.AddServerSideBlazor();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorizationCore();
+
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("sbc-menu-topleagues", policy => policy.RequireClaim("SportsbookClient.TopLeagues.Access",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("sbc-menu-topfixtures", policy => policy.RequireClaim("SportsbookClient.TopFixtures.Access",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim("SportsbookClient.ParlayBonus.Access",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+});
+
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddSession();
 
