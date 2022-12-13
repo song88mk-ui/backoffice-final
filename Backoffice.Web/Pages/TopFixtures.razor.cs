@@ -88,19 +88,29 @@ namespace Backoffice.Web.Pages
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("TopFixture", topFixture);
 
             var options = new ModalOptions();
             ModalService.Open<CopyModal>($"Copy {topFixture.ClientName} Top Fixtures Settings To", parameters, options);
         }
         public async Task OnSaveClickEvent(object item)
         {
-            var clientTopFixture = TopFixturesModel.TopFixtures.FirstOrDefault(t => t.ClientIdRef == Convert.ToInt32(item));
-            if (clientTopFixture != null)
+            var clientIdRefs = string.IsNullOrEmpty(item.ToString()) ? new List<string>() : item.ToString().Split(",").ToList();
+            foreach(var clientIdRef in clientIdRefs)
             {
-                var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = item.ToString() })).Result;
+                if (string.IsNullOrEmpty(clientIdRef))
+                    continue;
 
-                clientTopFixture.TopFixtures = result.TopFixtures.FirstOrDefault()?.TopFixtures;
+                var clientTopFixture = TopFixturesModel.TopFixtures.FirstOrDefault(t => t.ClientIdRef == Convert.ToInt32(clientIdRef));
+                if (clientTopFixture != null)
+                {
+                    var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = item.ToString() })).Result;
+
+                    clientTopFixture.TopFixtures = result.TopFixtures.FirstOrDefault()?.TopFixtures ?? new List<ClientTopFixtureResponse.TopFixture>();
+
+                }
             }
+
 
         }
         protected async Task SelectPage(int page)

@@ -9,6 +9,8 @@ namespace Backoffice.Web.Components.TopFixtures
     {
         #region Properties
         [Parameter] public List<SportsTreeResponse.SportReponse> SportsTree { get; set; }
+        [Parameter] public List<string> CurrentTopFixtures { get; set; }
+        [Parameter] public string SelectedTopFixture { get; set; }
         [Parameter] public int RowCount { get; set; }
         [Parameter] public EventCallback<EditTopFixturesModel> OnSelectedGame { get; set; }
         #endregion

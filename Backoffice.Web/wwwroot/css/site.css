@@ -132,3 +132,7 @@ a, .btn-link {
 .ico-trading:before {
     content: "\110B";
 }
+
+iframe {
+    width: 100% !important;
+}

@@ -38,7 +38,7 @@
                                             data-bs-toggle="dropdown" aria-expanded="false" @onclick="async () => await OnDropdownSelect(index)">
                                             @NewTopFixture.TopFixtures[index].FixtureName
                                         </button>
-                                        <Select @key="@($"Key{index}")" SportsTree="SportsTree" RowCount="@(index+1)" OnSelectedGame="OnSelectedGameEvent" />     
+                                        <Select @key="@($"Key{index}")" SportsTree="SportsTree" CurrentTopFixtures="@CurrentTopFixtures" SelectedTopFixture="@NewTopFixture.TopFixtures[index].FixtureId" RowCount="@(index+1)" OnSelectedGame="OnSelectedGameEvent" />     
                                     </div>
                                 </td>
                                 <td>
@@ -79,7 +79,7 @@
                                             data-bs-toggle="dropdown" aria-expanded="false" @onclick="async () => await OnDropdownSelect(index)">
                                             No Game
                                         </button>
-                                        <Select @key="@($"Key{index}")" SportsTree="SportsTree" RowCount="@(index+1)" OnSelectedGame="OnSelectedGameEvent" />
+                                        <Select @key="@($"Key{index}")" SportsTree="SportsTree" CurrentTopFixtures="@CurrentTopFixtures" SelectedTopFixture="@NewTopFixture.TopFixtures[index].FixtureId" RowCount="@(index+1)" OnSelectedGame="OnSelectedGameEvent" />
                                     </div>
                                 </td>
                                 <td>

@@ -1,4 +1,3 @@
-using Backoffice.Shared.Enums;
 using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Hubs;
 using Backoffice.Web.Services;

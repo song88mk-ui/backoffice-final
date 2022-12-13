@@ -149,7 +149,7 @@ namespace Backoffice.API.Repositories
                 {
                     StatusCode = StatusCode.Error,
                     Message = StatusCode.Success.ToString(),
-                    Result = GetClientInformation().Where(s => s.ClientId == clientId).Select(s => s.ClientId).FirstOrDefault().ToString()
+                    Result = GetClientInformation().Where(s => s.ClientId == clientId).Select(s => s.Region).FirstOrDefault().ToString()
                 };
             }
             catch (Exception ex)

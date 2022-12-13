@@ -3,27 +3,39 @@
     border-radius: 3px;
 }
 
-.tbl {
-    width: 100%;
+.table > tbody > tr:nth-child(2n) > td, .table > tbody > tr:nth-child(2n) > th {
+    background-color: #F5F5F5;
 }
 
-.tbl thead th {
+.table-head {
     background-color: #354156;
     color: #fff;
 }
 
-.tbl thead th, .tbl tbody td, ::deep .tbl tfoot td {
+.table thead th, .table tbody td, ::deep .table tfoot td {
     font-size: 0.9rem;
     font-weight: inherit;
+    vertical-align: middle;
+}
+
+table thead th, .table tbody td {
     text-align: center;
 }
 
-.tbl thead th:first-child {
+table thead th:first-child {
     border-top-left-radius: 3px;
 }
 
-.tbl thead th:last-child {
+table thead th:last-child {
     border-top-right-radius: 3px;
+}
+
+table tfoot td:first-child {
+    border-bottom-left-radius: 3px;
+}
+
+table tfoot td:last-child {
+    border-bottom-right-radius: 3px;
 }
 
 .th-number {
@@ -60,4 +72,9 @@
 
 ::deep .modal-dialog {
     max-width: 1500px;
+}
+
+a.disabled {
+    color: gray;
+    pointer-events: none;
 }
