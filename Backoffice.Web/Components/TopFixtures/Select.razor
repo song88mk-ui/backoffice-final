@@ -4,37 +4,55 @@
         foreach (var sport in SportsTree)
         {
             <li>
-                <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" href="#Collapse@(sport.SportId)">@sport.SportName</a>
+                <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" href="#Row@(RowCount)Collapse@(sport.SportId)">@sport.SportName</a>
                 @if (sport.Segments != null && sport.Segments.Any())
                 {
-                    <div id="Collapse@(sport.SportId)" class="collapse ms-2">                        
+                    <div id="Row@(RowCount)Collapse@(sport.SportId)" class="collapse ms-2">
                         @for (int x = 0; x < sport.Segments.Count; x++)
                         {
                             var segment = sport.Segments[x];
 
-                            <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" aria-controls="SegmentCollapse@(segment.SegmentId)" href="#SegmentCollapse@(segment.SegmentId)">@segment.SegmentName</a>
+                            <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" aria-controls="Row@(RowCount)SegmentCollapse@(segment.SegmentId)" href="#Row@(RowCount)SegmentCollapse@(segment.SegmentId)">@segment.SegmentName</a>
 
                             @if (segment.Leagues != null && segment.Leagues.Any())
                             {
-                                <div id="SegmentCollapse@(segment.SegmentId)" class="collapse">
-                                @for (int y = 0; y < segment.Leagues.Count; y++)
-                                {
-                                    var league = segment.Leagues[y];
+                                <div id="Row@(RowCount)SegmentCollapse@(segment.SegmentId)" class="collapse ms-3">
+                                    @for (int y = 0; y < segment.Leagues.Count; y++)
+                                    {
+                                        var league = segment.Leagues[y];
+
+                                        <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" aria-controls="Row@(RowCount)LeagueCollapse@(league.LeagueId)" href="#Row@(RowCount)LeagueCollapse@(league.LeagueId)">@league.LeagueName</a>
 
                                         if (league.Fixtures != null && league.Fixtures.Any())
                                         {
-                                            //Games
-                                            for (int z = 0; z < league.Fixtures.Count; z++)
-                                            {
-                                                var fixture = league.Fixtures[z];
+                                            <div id="Row@(RowCount)LeagueCollapse@(league.LeagueId)" class="collapse">
 
-                                                <div class="form-check ms-4">
-                                                    <input class="form-check-input" type="radio" name="@RowCount" value="@fixture.FixtureId" id="@fixture.FixtureId" @onclick="() => OnGameSelectedEvent(fixture)" />
-                                                    <label class="form-check-label" for="@fixture.FixtureId" @onclick="() => OnGameSelectedEvent(fixture)">@fixture.FixtureName</label>
-                                                </div>
-                                            }
+                                                @for (int z = 0; z < league.Fixtures.Count; z++)
+                                                {
+                                                    var fixture = league.Fixtures[z];
+                                                    if (!CurrentTopFixtures.Contains(fixture.FixtureId) || fixture.FixtureId == SelectedTopFixture)
+                                                    {
+                                                        if (fixture.FixtureId == SelectedTopFixture)
+                                                        {
+                                                            <div class="form-check ms-4" id="Row@(RowCount)Fixture@(fixture.FixtureId)" @onclick="() => OnGameSelectedEvent(fixture)">
+                                                                <input class="form-check-input" type="radio" name="@RowCount" value="@fixture.FixtureId" id="@fixture.FixtureId" checked />
+                                                                <label class="form-check-label" id="@fixture.FixtureId" for="@fixture.FixtureId">@fixture.FixtureName</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="form-check ms-4" id="Row@(RowCount)Fixture@(fixture.FixtureId)" @onclick="() => OnGameSelectedEvent(fixture)">
+                                                                <input class="form-check-input" type="radio" name="@RowCount" value="@fixture.FixtureId" id="@fixture.FixtureId" />
+                                                                <label class="form-check-label" id="@fixture.FixtureId" for="@fixture.FixtureId">@fixture.FixtureName</label>
+                                                            </div>
+                                                        }
+                                                    }
+
+                                                }
+
+                                            </div>
                                         }
-                                }
+                                    }
                                 </div>
                             }
                         }

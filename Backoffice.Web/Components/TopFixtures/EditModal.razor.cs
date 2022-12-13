@@ -19,6 +19,7 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public ClientTopFixtureResponse.OrderedClientTopFixture NewTopFixture { get; set; }
         public List<SportsTreeResponse.SportReponse> SportsTree { get; set; }
+        public List<string> CurrentTopFixtures { get; set; }
         public int SelectedRowIndex { get; set; }
         #endregion
         #region Methods
@@ -28,6 +29,7 @@ namespace Backoffice.Web.Components.TopFixtures
             {
                 TopFixture = ModalParameters.TryGet<ClientTopFixtureResponse.OrderedClientTopFixture>("TopFixture");
                 SportsTree = new List<SportsTreeResponse.SportReponse>();
+                CurrentTopFixtures = TopFixture.TopFixtures.Any() ? TopFixture.TopFixtures.Select(s => s.FixtureId).ToList() : new List<string>();
                 SelectedRowIndex = -1;
             }
             catch (Exception)
@@ -106,6 +108,8 @@ namespace Backoffice.Web.Components.TopFixtures
                     break;
                 }
             }
+
+            CurrentTopFixtures = NewTopFixture.TopFixtures.Any() ? NewTopFixture.TopFixtures.Select(s => s.FixtureId).ToList() : new List<string>();
         }
 
         public async Task OnAddRow(int rowCtr)
