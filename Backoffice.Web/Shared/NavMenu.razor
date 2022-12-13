@@ -51,24 +51,33 @@
                                 <span class="nav-menu-text">Deeplink Generator</span>
                             </NavLink>
                         </div>
-                        <div class="nav-item">
-                            <NavLink class="nav-link" href="/top-leagues">
-                                <span class="ico ico-top-leagues" aria-hidden="true"></span>
-                                <span class="nav-menu-text">Top Leagues</span>
-                            </NavLink>
-                        </div>
-                        <div class="nav-item">
-                            <NavLink class="nav-link" href="/top-fixtures">
-                                <span class="ico ico-top-fixtures" aria-hidden="true"></span>
-                                <span class="nav-menu-text">Top Fixtures</span>
-                            </NavLink>
-                        </div>
-                        <div class="nav-item">
-                            <NavLink class="nav-link" href="/parlay-bonus">
-                                <span class="ico ico-parlay-bonus" aria-hidden="true"></span>
-                                <span class="nav-menu-text">Parlay Bonus</span>
-                            </NavLink>
-                        </div>
+                        @if (UserModel?.Claims.Where(c => c.Type.Contains("SportsbookClient.TopLeagues") && c.Value != "0").ToList().Count > 0)
+                        {
+                            <div class="nav-item">
+                                <NavLink class="nav-link" href="/top-leagues">
+                                    <span class="ico ico-top-leagues" aria-hidden="true"></span>
+                                    <span class="nav-menu-text">Top Leagues</span>
+                                </NavLink>
+                            </div>
+                        }
+                        @if (UserModel?.Claims.Where(c => c.Type.Contains("SportsbookClient.TopFixtures") && c.Value != "0").ToList().Count > 0)
+                        {
+                            <div class="nav-item">
+                                <NavLink class="nav-link" href="/top-fixtures">
+                                    <span class="ico ico-top-fixtures" aria-hidden="true"></span>
+                                    <span class="nav-menu-text">Top Fixtures</span>
+                                </NavLink>
+                            </div>
+                        }
+                        @if (UserModel?.Claims.Where(c => c.Type.Contains("SportsbookClient.ParlayBonus") && c.Value != "0").ToList().Count > 0)
+                        {
+                            <div class="nav-item">
+                                <NavLink class="nav-link" href="/parlay-bonus">
+                                    <span class="ico ico-parlay-bonus" aria-hidden="true"></span>
+                                    <span class="nav-menu-text">Parlay Bonus</span>
+                                </NavLink>
+                            </div>
+                        }
                     </nav>
                 </div>
             </div>
@@ -79,10 +88,10 @@
                 </NavLink>
             </div>
             @*<div class="nav-item px-3">
-                <NavLink class="nav-link" href="">
-                    <span class="ico ico-revenue-settlement" aria-hidden="true"></span>
-                    <span class="nav-menu-text">Revenue Settlement</span>
-                </NavLink>
+            <NavLink class="nav-link" href="">
+            <span class="ico ico-revenue-settlement" aria-hidden="true"></span>
+            <span class="nav-menu-text">Revenue Settlement</span>
+            </NavLink>
             </div>*@
         </nav>
     </div>
