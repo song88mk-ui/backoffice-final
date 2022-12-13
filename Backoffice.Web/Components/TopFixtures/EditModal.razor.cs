@@ -51,7 +51,7 @@ namespace Backoffice.Web.Components.TopFixtures
                         {
                             if (model.SelectedLeague.LeagueId == 0 || model.SelectedLeague.LeagueId == topFixture.LeagueId)
                             {
-                                if(model.SelectedGameFilter.FixtureId == "0" || model.SelectedGameFilter.FixtureId == topFixture.FixtureId)
+                                if(string.IsNullOrEmpty(model.SelectedGameFilter.FixtureId) || model.SelectedGameFilter.FixtureId == "0" || model.SelectedGameFilter.FixtureId == topFixture.FixtureId)
                                 {
                                     rowCount = rowCount + 1;
                                     topFixture.SortOrder = rowCount;
@@ -61,7 +61,6 @@ namespace Backoffice.Web.Components.TopFixtures
                             }
                         }
                     }
-
                 }
             }
 
@@ -71,13 +70,15 @@ namespace Backoffice.Web.Components.TopFixtures
                 NewTopFixture.TopFixtures.Add(new FixtureModel() { SortOrder = 1 });
             }
 
-            NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.OrderByDescending(t => t.FixtureStartDate).ToList();
+            NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.OrderByDescending(t => t.StartDate).ToList();
             if (model.SortFilter == "2")
             {
-                NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.OrderBy(t => t.FixtureStartDate).ToList();
+                NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.OrderBy(t => t.StartDate).ToList();
             }
 
             SportsTree = model.Sports;
+
+            await SortOrderRow();
         }
 
         public async Task OnDropdownSelect(int index)
@@ -97,7 +98,7 @@ namespace Backoffice.Web.Components.TopFixtures
                     fixture.SegmentName = model.SelectedGame.SegmentName;
                     fixture.LeagueId = model.SelectedGame.LeagueId;
                     fixture.LeagueName = model.SelectedGame.LeagueName;
-                    fixture.FixtureStartDate = model.SelectedGame.FixtureStartDate;
+                    fixture.StartDate = model.SelectedGame.StartDate;
                     fixture.FixtureId = model.SelectedGame.FixtureId;
                     fixture.FixtureName = model.SelectedGame.FixtureName;
                     fixture.FixtureStatus = model.SelectedGame.FixtureStatus;

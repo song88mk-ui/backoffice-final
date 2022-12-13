@@ -52,7 +52,11 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async void OnSportChangedEvent(ChangeEventArgs e)
         {
+
             SelectedSport = SportsTree.Sports.FirstOrDefault(s => s.SportId == Convert.ToInt32(e.Value));
+            if (SelectedSport == null)
+                SelectedSport = new SportsTreeResponse.SportReponse();
+
             SelectedSegment = new SportsTreeResponse.SegmentResponse();
             SelectedLeague = new SportsTreeResponse.LeagueResponse();
             SelectedGameFilter = new FixtureModel();
@@ -71,6 +75,9 @@ namespace Backoffice.Web.Components.TopFixtures
         public async void OnSegmentChangedEvent(ChangeEventArgs e)
         {
             SelectedSegment = SelectedSport.Segments.FirstOrDefault(s => s.SegmentId == Convert.ToInt32(e.Value));
+            if (SelectedSegment == null)
+                SelectedSegment = new SportsTreeResponse.SegmentResponse();
+
             SelectedLeague = new SportsTreeResponse.LeagueResponse();
             SelectedGameFilter = new FixtureModel();
 
@@ -89,6 +96,8 @@ namespace Backoffice.Web.Components.TopFixtures
         public async void OnLeagueChangedEvent(ChangeEventArgs e)
         {
             SelectedLeague = SelectedSegment.Leagues.FirstOrDefault(s => s.LeagueId == Convert.ToInt32(e.Value));
+            if (SelectedLeague == null)
+                SelectedLeague = new SportsTreeResponse.LeagueResponse();
             SelectedGameFilter = new FixtureModel();
             var model = new EditTopFixturesModel
             {
@@ -105,6 +114,9 @@ namespace Backoffice.Web.Components.TopFixtures
         public async void OnGameChangedEvent(ChangeEventArgs e)
         {
             SelectedGameFilter = SelectedLeague.Fixtures.FirstOrDefault(f => f.FixtureId == e.Value);
+            if (SelectedGameFilter == null)
+                SelectedGameFilter = new FixtureModel();
+
             var model = new EditTopFixturesModel
             {
                 Sports = SportsTree.Sports,
