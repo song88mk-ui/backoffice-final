@@ -20,6 +20,7 @@ namespace Backoffice.Web.Pages
         public MetaData MetaData { get; set; } = new MetaData();
         public ClientParlayBonusResponse ClientParlayBonusResponse { get; set; }
         public long ClientId { get; set; }
+        public bool IsUpdating { get; set; } = false;
         #endregion
 
         protected override async Task OnInitializedAsync()
@@ -93,6 +94,11 @@ namespace Backoffice.Web.Pages
             MetaData.CurrentPage = page;
 
             await LoadClientParlayBonus(ClientId);
+        }
+
+        public async Task OnUpdateClick()
+        {
+            IsUpdating = !IsUpdating;
         }
 
         public void Dispose()

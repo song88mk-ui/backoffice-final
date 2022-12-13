@@ -12,6 +12,7 @@ namespace Backoffice.Web.Components.ParlayBonus
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Parameter] public ClientParlayBonusResponse ClientParlayBonusResponse { get; set; }
         [Parameter] public EventCallback<long> OnClientChangedCallback { get; set; }
+        [Parameter] public EventCallback<bool> OnUpdateClickCallback { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public List<SelectListItemModel<ClientResponse.Client>> Clients { get; set; }
         public string ClientId { get; set; }
@@ -68,6 +69,8 @@ namespace Backoffice.Web.Components.ParlayBonus
         public async Task OnUpdateClickEvent()
         {
             IsUpdating = !IsUpdating;
+
+            await OnUpdateClickCallback.InvokeAsync(IsUpdating);
 
             await InvokeAsync(StateHasChanged);
         }

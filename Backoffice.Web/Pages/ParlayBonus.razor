@@ -12,7 +12,7 @@
                         <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
                     </div>
                     <div class="col-md-12">
-                        <Filter ClientParlayBonusResponse="@ClientParlayBonusResponse" OnClientChangedCallback="OnClientChangedEvent" />
+                        <Filter ClientParlayBonusResponse="@ClientParlayBonusResponse" OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClick" />
                     </div>
                     <div class="col-md-12">
                         @if (ClientParlayBonusResponse == null || ClientParlayBonusResponse.ParlayBonusConfig.Count == 0)
@@ -41,12 +41,22 @@
                                             <td>@item.SelectionCount</td>
                                             <td class="td-parlay-bonus">@(item.ParlayBonus * 100)%</td>
                                             <td>
-                                                <a class="tl-link-add me-2" title="Delete" @onclick="_ => OnDeleteConfig(item)">
-                                                    <i class="fa fa-trash"></i>
-                                                </a>
-                                                <a class="tl-link-minus me-2" title="View History" @onclick="_ => OnViewConfigLog(item)">
+                                                @if (IsUpdating)
+                                                {
+
+                                                    <button type="button" class="btn tl-link-add me-2" title="Delete" @onclick="_ => OnDeleteConfig(item)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                }            
+                                                else
+                                                {
+                                                    <button type="button" class="btn tl-link-add me-2" title="Delete" @onclick="_ => OnDeleteConfig(item)" disabled>
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                }
+                                                <button type="button" class="btn tl-link-minus me-2" title="View History" @onclick="_ => OnViewConfigLog(item)">
                                                     <i class="fa fa-list-alt"></i>
-                                                </a>
+                                                </button>
                                             </td>
                                         </tr>
                                     }
