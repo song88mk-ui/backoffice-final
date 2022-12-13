@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col">
             <table class="table">
-                <thead>
+                <thead class="">
                     <tr>
                         <th scope="col">Last Updated</th>
                         <th scope="col">Bonus</th>
@@ -15,8 +15,8 @@
                             <td>
                                 @history.LastUpdate
                             </td>
-                            <td>
-                                @history.ParlayBonus
+                            <td class="fw-bold">
+                                @($"{(history.ParlayBonus * 100).ToString("#.00")}%")
                             </td>
                         </tr>
                     }
@@ -26,5 +26,5 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn copyModalBtn copyModalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCloseClickEvent">Close</button>
+    <button type="button" class="btn closeModalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCloseClickEvent">Close</button>
 </div>

@@ -26,6 +26,7 @@ namespace Backoffice.Web.Components.Common
         public bool _showBackdrop = false;
         public string _modalTitle = "";
         public string _modalDialogStyle = "";
+        public string _modalIcon = "";
 
         #endregion
 
@@ -47,11 +48,13 @@ namespace Backoffice.Web.Components.Common
             var style = parameters.TryGet<string>("DialogStyle");
             var modalClass = parameters.TryGet<string>("ModalClass");
             var modalDialogClass = parameters.TryGet<string>("ModalDialogClass");
+            var modalIcon = parameters.TryGet<string>("ModalIcon");
 
             _modalDisplay = "block";
             _modalClass = string.IsNullOrEmpty(modalClass) ? "show" : modalClass;
             _modalDialogClass = string.IsNullOrEmpty(modalDialogClass) ? "" : modalDialogClass;
             _modalDialogStyle = !string.IsNullOrEmpty(style) ? style : "";
+            _modalIcon = !string.IsNullOrEmpty(modalIcon) ? modalIcon : "";
 
             ToolTip = options.Tooltip;
             HideCloseButton = options.HideCloseButton == null ? false : (bool)options.HideCloseButton;

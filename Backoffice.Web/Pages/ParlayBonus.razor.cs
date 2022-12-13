@@ -39,6 +39,11 @@ namespace Backoffice.Web.Pages
 
         public async Task OnClientChangedEvent(long ClientId)        
         {
+            await LoadClientParlayBonus(ClientId);
+        }
+
+        public async Task LoadClientParlayBonus(long ClientId)
+        {
             var result = (await BackOfficeService.GetClientParlayBonus(new GetParlayBonusRequest()
             {
                 ClientIdRef = ClientId,
@@ -77,15 +82,17 @@ namespace Backoffice.Web.Pages
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("ParlayBonusConfig", parlayBonusConfig);
+            parameters.Add("ModalIcon", "<i class=\"fa fa-list-alt m-2\"></i>");
 
-            var options = new ModalOptions();
-            options.Tooltip = "<i class=\"fa fa-list-alt\"></i>";
+            var options = new ModalOptions();            
             ModalService.Open<ViewLogModal>($"Logs", parameters, options);
         }
 
         protected async Task SelectPage(int page)
         {
-            MetaData.CurrentPage = page;            
+            MetaData.CurrentPage = page;
+
+            await LoadClientParlayBonus(ClientId);
         }
 
         public void Dispose()

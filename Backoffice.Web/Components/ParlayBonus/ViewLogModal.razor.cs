@@ -27,7 +27,7 @@ namespace Backoffice.Web.Components.ParlayBonus
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            
         }
         #endregion
     }
