@@ -17,15 +17,13 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorizationCore();
 
-
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("sbc-menu-topleagues", policy => policy.RequireClaim("SportsbookClient.TopLeagues.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("sbc-menu-topfixtures", policy => policy.RequireClaim("SportsbookClient.TopFixtures.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
-    options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim("SportsbookClient.ParlayBonus.Access",
-        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim("SportsbookClient.ParlayBonus.Access"));
 });
 
 builder.Services.AddBlazoredLocalStorage();

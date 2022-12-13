@@ -42,7 +42,6 @@ namespace Backoffice.Web.Services
                 var authPayload = await response.Content.ReadAsStringAsync();
                 var token = JsonConvert.DeserializeObject<BaseResponse<TokenModel>>(authPayload);
                 _httpContextAccessor.HttpContext?.Session.SetString("UserToken", token.Result.AccessToken);
-                //await _localStorage.SetItemAsync("authToken", token.Result.Token);
                 ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(user.Name);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token.Result.AccessToken);
                 result = new BaseResponse<bool>
