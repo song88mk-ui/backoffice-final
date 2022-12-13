@@ -181,7 +181,7 @@ namespace Backoffice.Web.Components.TopFixtures
 
             ModalService.Cancel();
 
-            await Modal.OnSaveClickCallback.InvokeAsync(TopFixture.ClientIdRef);
+            await Modal.OnSaveClickCallback.InvokeAsync(TopFixture.ClientIdRef.ToString());
         }
 
         public void Dispose()
