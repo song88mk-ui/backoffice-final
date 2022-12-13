@@ -30,9 +30,18 @@
                 </div>
             </div>
         </div>
-        <div class="button-container d-flex flex-row-reverse align-items-end">
+        <div class="button-container d-flex align-items-end">
             <!-- Update -->
-            <a href="javascript:void(0)" class="btn btn-update px-4">Update</a>
+            @if (IsUpdating)
+            {
+                <a href="javascript:void(0)" class="btn btn-cancel px-4 me-2" @onclick="OnUpdateClickEvent">Cancel</a>
+                <a href="javascript:void(0)" class="btn btn-save px-4">Save Changes</a>
+                <a href="javascript:void(0)" class="btn btn-add px-4 me-2">Add</a>
+            }
+            else
+            {
+                <a href="javascript:void(0)" class="btn btn-update px-4" @onclick="OnUpdateClickEvent">Update</a>
+            }
             <!-- Update and Save-->
             @*<a href="javascript:void(0)" class="btn btn-save px-4">Save</a>
             <a href="javascript:void(0)" class="btn btn-cancel px-4 me-2">Cancel</a>*@

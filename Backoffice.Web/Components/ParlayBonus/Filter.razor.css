@@ -21,7 +21,7 @@
     font-size: 16px;
 }
 
-.btn-update, .btn-save, .btn-cancel {
+.btn-update, .btn-save, .btn-cancel, .btn-add {
     color: #FFFFFF;
     font-size: 15px;
 }
@@ -32,6 +32,11 @@
 
 .btn-cancel {
     background-color: #9AA0AB;
+}
+
+.btn-add {
+    background: #232323 0% 0% no-repeat padding-box;
+    border-radius: 5px;
 }
 
 .clientBtn {

@@ -8,13 +8,16 @@ namespace Backoffice.Web.Components.ParlayBonus
 {
     public partial class Filter : IDisposable
     {
+        #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Parameter] public ClientParlayBonusResponse ClientParlayBonusResponse { get; set; }
         [Parameter] public EventCallback<long> OnClientChangedCallback { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public List<SelectListItemModel<ClientResponse.Client>> Clients { get; set; }
-        public string ClientId { get; set; }   
-        
+        public string ClientId { get; set; }
+        public bool IsUpdating { get; set; } = false;
+        #endregion
+
         #region Methods
 
         protected override async Task OnInitializedAsync()
@@ -60,6 +63,13 @@ namespace Backoffice.Web.Components.ParlayBonus
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
             await OnClientChangedCallback.InvokeAsync(long.Parse(e.Value.ToString()));
+        }
+
+        public async Task OnUpdateClickEvent()
+        {
+            IsUpdating = !IsUpdating;
+
+            await InvokeAsync(StateHasChanged);
         }
         #endregion
     }
