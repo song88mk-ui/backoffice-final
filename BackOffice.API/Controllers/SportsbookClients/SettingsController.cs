@@ -87,8 +87,8 @@ namespace Backoffice.API.Controllers.SportsbookClients
         #region Top Leagues
 
         [EnableCors("AllowAllOrigins")]
-        [HttpGet("allleagues")]
-        public async Task<IActionResult> GetAllLeagues([FromQuery] GetAllLeaguesRequest request)
+        [HttpPost("allleagues")]
+        public async Task<IActionResult> GetAllLeagues([FromBody] GetAllLeaguesRequest request)
         {
             var region = await _backofficeRepository.GetClientRegion(request.ClientIdRef);
             var result = await _platformRepository.GetAllLeagues(request, region.Result);

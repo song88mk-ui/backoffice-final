@@ -28,7 +28,7 @@ namespace Backoffice.Web.Components.TopLeagues
                 TopLeaguesFilterModel = new TopLeaguesFilterModel()
                 {
                     ClientId = string.Empty,
-                    SportId = string.Empty,
+                    SportId = "1",
                     Search = string.Empty
                 };
 

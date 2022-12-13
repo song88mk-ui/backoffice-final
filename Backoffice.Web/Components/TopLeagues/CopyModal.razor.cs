@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -11,19 +12,22 @@ namespace Backoffice.Web.Components.TopLeagues
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+        [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public CopyTopLeaguesModel CopyTopLeaguesModel { get; set; }
         public CopyTopLeaguesRequest CopyTopLeaguesRequest { get; set; }
         public bool IsSelectAll { get; set; }
-        public string ClientIdErrorMsg { get; set; }
+        public string ClientIdErrorMessage { get; set; }
+        public string AlertMessage { get; set; }
+        public string AlertStatus { get; set; }
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            ClientIdErrorMsg = string.Empty;
+            ClientIdErrorMessage = string.Empty;
 
             CopyTopLeaguesModel = new CopyTopLeaguesModel
             {
@@ -68,11 +72,11 @@ namespace Backoffice.Web.Components.TopLeagues
         {
             if (!CopyTopLeaguesModel.ClientIdSelectedModel.Where(x => x.IsSelected).Any())
             {
-                ClientIdErrorMsg = "Select client to proceed";
+                ClientIdErrorMessage = "Select client to proceed";
             }
             else
             {
-                ClientIdErrorMsg = string.Empty;
+                ClientIdErrorMessage = string.Empty;
 
                 var topSetUp = new List<CopyTopLeaguesRequest.SportLeague>();
                 var i = 0;
@@ -87,7 +91,7 @@ namespace Backoffice.Web.Components.TopLeagues
                         LeagueId = item.LeagueId,
                         LeagueName = item.LeagueName,
                         Status = item.Status,
-                        LiveCount= item.LiveCount,
+                        LiveCount = item.LiveCount,
                         SortOrder = i++
                     });
                 }
@@ -99,9 +103,20 @@ namespace Backoffice.Web.Components.TopLeagues
                     TopLeagues = topSetUp
                 };
 
-               var result = await BackOfficeService.CopyTopLeaguesAsync(CopyTopLeaguesRequest);
-               if(result.Result)
+                var result = await BackOfficeService.CopyTopLeaguesAsync(CopyTopLeaguesRequest);
+                if (result.Result)
+                {
+                    AlertMessage = "Copy top leagues successful";
+                    AlertStatus = "alert-success";
+                    await Modal.OnSaveClickCallback.InvokeAsync();
+                    await Task.Delay(3500);
                     ModalService.Cancel();
+                }
+                else
+                {
+                    AlertStatus = "alert-danger";
+                    AlertMessage = "Copy top leagues failed";
+                }
             }
         }
 
@@ -112,6 +127,9 @@ namespace Backoffice.Web.Components.TopLeagues
                 if (item.ClientId == clientId)
                     item.IsSelected = !item.IsSelected;
             }
+
+            var count = CopyTopLeaguesModel.ClientIdSelectedModel.Where(_ => _.IsSelected).Count();
+            ClientIdErrorMessage = count == 0 ? "Select client to proceed" : string.Empty;
         }
 
         public void RemoveClient(string clientId)
@@ -138,7 +156,7 @@ namespace Backoffice.Web.Components.TopLeagues
         public void SelectAllToggleCheckbox(bool isSelectAll)
         {
             CopyTopLeaguesModel.ClientIdSelectedModel.ForEach(x => x.IsSelected = isSelectAll);
-            ClientIdErrorMsg = string.IsNullOrWhiteSpace(ClientIdErrorMsg) ? "Select client to proceed" : string.Empty;
+            ClientIdErrorMessage = string.IsNullOrWhiteSpace(ClientIdErrorMessage) ? "Select client to proceed" : string.Empty;
         }
 
         public async ValueTask DisposeAsync()

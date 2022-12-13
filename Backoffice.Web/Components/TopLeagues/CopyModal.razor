@@ -39,7 +39,10 @@
                         </div>
                     }
                 </div>
-                <span class="field-validation-error" data-valmsg-replace="true">@ClientIdErrorMsg</span>
+                <br/>
+                <div class="alert @(string.IsNullOrWhiteSpace(ClientIdErrorMessage) ? "" : "alert-danger")" role="alert">
+                    @ClientIdErrorMessage
+                </div>
             </div>
         </div>
 
@@ -51,11 +54,15 @@
                     {
                         <div class="mx-2 mb-2 p-2 clientBorder">
                             @item.SegmentName > @item.LeagueName
-                            <span><button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="_ => RemoveLeague(item.LeagueId)"></button></span>
+                            @*<span><button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="_ => RemoveLeague(item.LeagueId)"></button></span>*@                        
                         </div>
                     }
                 </div>
             </div>
+        </div>
+        <br/>
+        <div class="alert @AlertStatus" role="alert">
+            @AlertMessage
         </div>
     </div>
     <div class="modal-footer">

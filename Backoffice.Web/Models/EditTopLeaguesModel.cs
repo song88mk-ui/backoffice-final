@@ -1,16 +1,11 @@
-﻿using Backoffice.Shared.Models.Response;
+﻿using static Backoffice.Shared.Models.Requests.GetTopLeaguesRequest;
 
 namespace Backoffice.Web.Models
 {
     public class EditTopLeaguesModel
     {
-        public EditTopLeaguesModel()
-        {
-            Sports = new List<SportsTreeResponse.SportReponse>();
-        }
-        public List<SportsTreeResponse.SportReponse> Sports { get; set; }
-        public SportsTreeResponse.SportReponse SelectedSport { get; set; }
-        public SportsTreeResponse.SegmentResponse SelectedSegment { get; set; }
-        public SportsTreeResponse.LeagueResponse SelectedLeague { get; set; }
+        public int ClientId { get; set; }
+        public string SportId { get; set; }
+        public List<OrderedClientTopLeague> CurrentTopLeagues { get; set; }
     }
 }

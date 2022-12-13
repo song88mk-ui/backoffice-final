@@ -41,16 +41,23 @@ namespace Backoffice.Web.Pages
                 PageSize = 10,
                 CurrentPage = 1
             };
+
+            await InvokeAsync(StateHasChanged);
         }
 
         public async Task OnInitEvent(TopLeaguesFilterModel topLeaguesFilterModel)
         {
-            TopLeaguesFilter = topLeaguesFilterModel ?? new TopLeaguesFilterModel();
+            TopLeaguesFilter = topLeaguesFilterModel ?? new TopLeaguesFilterModel()
+            {
+                ClientId = string.Join(",", UserClientCodes),
+                SportId = "1",
+                Search = string.Empty
+            };
 
             GetTopLeaguesRequest = new GetTopLeaguesRequest()
             {
                 ClientIdRefs = string.IsNullOrWhiteSpace(topLeaguesFilterModel?.ClientId) ? string.Join(",", UserClientCodes) : topLeaguesFilterModel?.ClientId,
-                SportId = string.IsNullOrWhiteSpace(topLeaguesFilterModel?.SportId) ? 0 : int.Parse(topLeaguesFilterModel?.SportId),
+                SportId = string.IsNullOrWhiteSpace(topLeaguesFilterModel?.SportId) ? 1 : int.Parse(topLeaguesFilterModel?.SportId),
                 LanguageCode = "en"
             };
 
@@ -115,6 +122,18 @@ namespace Backoffice.Web.Pages
         {
             MetaData.CurrentPage = page;
             await OnInitEvent(TopLeaguesFilter);
+        }
+
+        public async Task OnSaveClickEvent()
+        {
+            var filter = new TopLeaguesFilterModel()
+            {
+                Search = TopLeaguesFilter.Search,
+                SportId = TopLeaguesFilter.SportId,
+                ClientId = TopLeaguesFilter.ClientId
+            };
+                 
+            await OnInitEvent(filter);
         }
 
         public async ValueTask DisposeAsync()
