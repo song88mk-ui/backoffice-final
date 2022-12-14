@@ -13,5 +13,6 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<bool>> Register(UserRegisterRequest request, string token);
         Task<BaseResponse<UserResponse>> GetCurrentUser(string userId, string token);
         Task<BaseResponse<UserListResponse>> GetSubAccounts(SubAccountListRequest request, string token);
+        Task<BaseResponse<PermissionResponse>> GetPermissionList(bool isSubUserOnly, string token);
     }
 }

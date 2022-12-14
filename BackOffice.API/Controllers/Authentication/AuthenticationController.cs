@@ -150,5 +150,28 @@ namespace Backoffice.API.Controllers.Authentication
             }
         }
 
+        [HttpGet("permission/list")]
+        public async Task<IActionResult> GetPermissionList(bool isSubUser)
+        {
+            var result = new BaseResponse<PermissionResponse>()
+            {
+                StatusCode = Shared.Enums.StatusCode.Unauthorized,
+                Message = "Missing authorization"
+            };
+            if (HttpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+                result = await _authenticationRepository.GetPermissionList(isSubUser, token);
+            }
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
     }
 }
