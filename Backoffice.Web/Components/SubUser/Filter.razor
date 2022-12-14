@@ -1,0 +1,14 @@
+﻿<div class="content-filter mx-3">
+    <div class="w-100 d-flex flex-row justify-content-between">
+        <div class="input-container d-flex">
+            <div class="me-4">
+                <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                    <InputText id="search" placeholder="Search" class="form-control search-text valid" @bind-Value="SearchForm.SearchText" />
+                </EditForm>
+            </div>
+        </div>
+        <div class="button-container d-flex flex-row-reverse align-items-end">
+            <a href="javascript:void(0)" class="btn btn-create px-4">Create Sub User</a>
+        </div>
+    </div>
+</div>
