@@ -1,5 +1,7 @@
 ﻿using Backoffice.API.Repositories;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -20,7 +22,7 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
-            var result = await this._authenticationRepository.Login(content);
+            var result = await _authenticationRepository.Login(content);
 
             switch (result.StatusCode)
             {
@@ -41,7 +43,7 @@ namespace Backoffice.API.Controllers.Authentication
             if (HttpContext.Request.Headers.ContainsKey("Authorization"))
             {
                 var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-                result = await this._authenticationRepository.Authenticate(token);
+                result = await _authenticationRepository.Authenticate(token);
             }
 
             switch (result.StatusCode)
@@ -52,6 +54,7 @@ namespace Backoffice.API.Controllers.Authentication
                     return BadRequest(result);
             }
         }
+
         [HttpGet("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -63,7 +66,7 @@ namespace Backoffice.API.Controllers.Authentication
             if (HttpContext.Request.Headers.ContainsKey("Authorization"))
             {
                 var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-                result = await this._authenticationRepository.Logout(token);
+                result = await _authenticationRepository.Logout(token);
             }
 
             switch (result.StatusCode)
@@ -74,5 +77,78 @@ namespace Backoffice.API.Controllers.Authentication
                     return BadRequest(result);
             }
         }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Create([FromBody] UserRegisterRequest request)
+        {
+            var result = new BaseResponse<bool>()
+            {
+                StatusCode = Shared.Enums.StatusCode.Unauthorized,
+                Message = "Missing authorization"
+            };
+            if (HttpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                
+                result = await _authenticationRepository.Register(request, token);
+
+            }
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetCurrentUser(string userId)
+        {
+            var result = new BaseResponse<UserModel>()
+            {
+                StatusCode = Shared.Enums.StatusCode.Unauthorized,
+                Message = "Missing authorization"
+            };
+            if (HttpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                result = await _authenticationRepository.GetCurrentUser(userId, token);
+            }
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("subaccount/list")]
+        public async Task<IActionResult> GetSubAccounts([FromBody] SubAccountListRequest request)
+        {
+            var result = new BaseResponse<UserListResponse>()
+            {
+                StatusCode = Shared.Enums.StatusCode.Unauthorized,
+                Message = "Missing authorization"
+            };
+            if (HttpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+                result = await _authenticationRepository.GetSubAccounts(request, token);
+            }
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
     }
 }
