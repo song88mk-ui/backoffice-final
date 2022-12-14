@@ -7,9 +7,9 @@ namespace Backoffice.Shared.Models.Response
     {
         public UserListResponse()
         {
-            Users = new List<UserModel>();
+            Users = new List<UserResponse>();
         }
 
-        public List<UserModel> Users { get; set; }
+        public List<UserResponse> Users { get; set; }
     }
 }

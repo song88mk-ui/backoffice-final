@@ -156,7 +156,7 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<UserModel>> GetCurrentUser(string userId, string token)
+        public async Task<BaseResponse<UserResponse>> GetCurrentUser(string userId, string token)
         {
             try
             {
@@ -164,16 +164,16 @@ namespace Backoffice.API.Repositories
                 var response = await _httpClient.GetAsync($"api/user/{userId}");
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<UserModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<UserModel>();
+                    return JsonSerializer.Deserialize<BaseResponse<UserResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<UserResponse>();
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
-                        return JsonSerializer.Deserialize<BaseResponse<UserModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                            ?? new BaseResponse<UserModel>();
+                        return JsonSerializer.Deserialize<BaseResponse<UserResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<UserResponse>();
                     else
                     {
-                        return new BaseResponse<UserModel>
+                        return new BaseResponse<UserResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -183,7 +183,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                return new BaseResponse<UserModel>
+                return new BaseResponse<UserResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

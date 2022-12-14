@@ -106,7 +106,7 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetCurrentUser(string userId)
         {
-            var result = new BaseResponse<UserModel>()
+            var result = new BaseResponse<UserResponse>()
             {
                 StatusCode = Shared.Enums.StatusCode.Unauthorized,
                 Message = "Missing authorization"
