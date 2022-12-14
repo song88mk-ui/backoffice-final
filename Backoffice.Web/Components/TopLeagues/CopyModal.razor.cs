@@ -156,7 +156,7 @@ namespace Backoffice.Web.Components.TopLeagues
         public void SelectAllToggleCheckbox(bool isSelectAll)
         {
             CopyTopLeaguesModel.ClientIdSelectedModel.ForEach(x => x.IsSelected = isSelectAll);
-            ClientIdErrorMessage = string.IsNullOrWhiteSpace(ClientIdErrorMessage) ? "Select client to proceed" : string.Empty;
+            ClientIdErrorMessage = !isSelectAll ? "Select client to proceed" : string.Empty;
         }
 
         public async ValueTask DisposeAsync()
