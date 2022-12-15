@@ -10,5 +10,6 @@ namespace Backoffice.Web.Services
         Task<TokenModel> AuthenticateToken();
         Task<bool> Logout();
         Task<BaseResponse<UserListResponse>> GetSubAccounts(SubAccountListRequest request);
+        Task<BaseResponse<PermissionResponse>> GetPermissionList(bool isSubUser);
     }
 }

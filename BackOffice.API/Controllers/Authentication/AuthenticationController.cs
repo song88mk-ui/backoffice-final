@@ -151,7 +151,7 @@ namespace Backoffice.API.Controllers.Authentication
         }
 
         [HttpGet("permission/list")]
-        public async Task<IActionResult> GetPermissionList(bool isSubUser)
+        public async Task<IActionResult> GetPermissionList([FromQuery] bool isSubUser)
         {
             var result = new BaseResponse<PermissionResponse>()
             {

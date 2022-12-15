@@ -13,9 +13,12 @@ namespace Backoffice.Web.Pages
         #region Properties
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
 
+        public PermissionResponse Permissions { get; set; }
         public UserListResponse SubUsers { get; set; }
         public MetaData MetaData { get; set; }
 
@@ -25,6 +28,9 @@ namespace Backoffice.Web.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            Permissions = new PermissionResponse();
+            SubUsers = new UserListResponse();
+
             MetaData = new MetaData
             {
                 CurrentPage = 1,
@@ -40,6 +46,8 @@ namespace Backoffice.Web.Pages
         public async Task OnInitEvent()
         {
             SubUsers = await GetSubUsers(1);
+
+            Permissions = await GetPermissionList();
         }
 
         public async Task SelectPage(int page)
@@ -74,7 +82,7 @@ namespace Backoffice.Web.Pages
         {
             var request = new SubAccountListRequest
             {
-                MainUserId = "1001",
+                MainUserId = UserModel.Id,
                 Page = page,
                 PageSize = 25
             };
@@ -94,11 +102,26 @@ namespace Backoffice.Web.Pages
                 return new UserListResponse
                 {
                     MetaData = MetaData,
-                    Users = response.Result.Users.ToList()
+                    Users = response.Result.Users ?? new List<UserResponse>()
                 };
             }
 
             return new UserListResponse();
+        }
+
+        private async Task<PermissionResponse> GetPermissionList()
+        {
+            var response = await AuthenticationService.GetPermissionList(true);
+
+            if (response.StatusCode == StatusCode.Success)
+            {
+                return new PermissionResponse
+                {
+                    Permissions = response.Result.Permissions ?? new List<PermissionModel>(),
+                };
+            }
+
+            return new PermissionResponse();
         }
         #endregion
     }
