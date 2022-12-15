@@ -20,14 +20,13 @@ namespace Backoffice.Web.Components.ParlayBonus
         [Parameter] public List<SelectListItemModel<ClientResponse.Client>> Clients { get; set; }        
         public string ClientId { get; set; }
         public bool IsUpdating { get; set; } = false;        
+        public decimal OriginalMinOdds { get; set; }
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {
-            
-            
+        {                   
         }
 
         public void Dispose()
@@ -43,6 +42,7 @@ namespace Backoffice.Web.Components.ParlayBonus
 
         public async Task OnUpdateClickEvent()
         {
+            OriginalMinOdds = ClientParlayBonusResponse.ParlayBonusMinOdds;
             IsUpdating = !IsUpdating;
 
             await OnUpdateClickCallback.InvokeAsync(IsUpdating);
@@ -58,6 +58,7 @@ namespace Backoffice.Web.Components.ParlayBonus
 
         public async Task OnCancelClickEvent()
         {
+            ClientParlayBonusResponse.ParlayBonusMinOdds = OriginalMinOdds;
             IsUpdating = !IsUpdating;
             await InvokeAsync(StateHasChanged);
             await OnCancelClickCallback.InvokeAsync();            
