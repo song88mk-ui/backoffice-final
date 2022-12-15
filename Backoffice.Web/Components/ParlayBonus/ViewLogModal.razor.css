@@ -17,3 +17,8 @@
     .table tr:nth-child(2n+2) {
         background-color: #F5F5F5;
     }
+
+.logModal {
+    overflow-y: scroll;
+    max-height: 30rem;
+}

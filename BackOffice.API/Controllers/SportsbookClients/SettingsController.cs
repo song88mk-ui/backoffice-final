@@ -188,7 +188,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         [HttpPost("parlaybonus")]
         public async Task<IActionResult> AddOrUpdateParlayBonus([FromBody] ParlayBonusRequest request)
         {
-            var region = await _backofficeRepository.GetClientRegion(request.ClientIdRef);
+            var region = await _backofficeRepository.GetClientRegion((int)request.ClientIdRef);
 
             var result = await _platformRepository.AddOrUpdateParlayBonus(request, region.Result);
 

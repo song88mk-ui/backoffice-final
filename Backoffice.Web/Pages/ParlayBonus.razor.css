@@ -18,6 +18,11 @@
     color: #E4422E;
 }
 
+    .td-parlay-bonus input[type=number] {
+        text-align: center;
+        color: red;
+    }
+
 .tl-link-add, .tl-link-minus, .tl-link-edit {
     color: #1F1F1F;
     font-size: 1rem;
@@ -69,3 +74,16 @@
     .tooltip2:hover .tooltiptext {
         visibility: visible;
     }
+
+/*remove arrows for input[type=number]*/
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}

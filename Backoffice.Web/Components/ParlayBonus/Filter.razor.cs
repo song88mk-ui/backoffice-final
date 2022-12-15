@@ -10,50 +10,24 @@ namespace Backoffice.Web.Components.ParlayBonus
     {
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [Parameter] public ClientParlayBonusResponse ClientParlayBonusResponse { get; set; }
-        [Parameter] public EventCallback<long> OnClientChangedCallback { get; set; }
+        [Parameter] public ClientParlayBonusResponse ClientParlayBonusResponse { get; set; }        
         [Parameter] public EventCallback<bool> OnUpdateClickCallback { get; set; }
+        [Parameter] public EventCallback<ParlayBonusConfig> OnAddClickCallback { get; set; }
+        [Parameter] public EventCallback<long> OnClientChangedCallback { get; set; }
+        [Parameter] public EventCallback OnSaveClickCallback { get; set; }
+        [Parameter] public EventCallback OnCancelClickCallback { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        public List<SelectListItemModel<ClientResponse.Client>> Clients { get; set; }
+        [Parameter] public List<SelectListItemModel<ClientResponse.Client>> Clients { get; set; }        
         public string ClientId { get; set; }
-        public bool IsUpdating { get; set; } = false;
+        public bool IsUpdating { get; set; } = false;        
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            Clients = new List<SelectListItemModel<ClientResponse.Client>>();
-
-            ClientId = string.Empty;
-
-            var clients = (await BackOfficeService.GetClients()).Result;
-            if (clients != null)
-            {
-
-                if (UserModel.ClientCodes.Any())
-                {
-                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-                }
-
-                Clients = clients.Clients.Select(s => new SelectListItemModel<ClientResponse.Client>
-                {
-                    Value = s,
-                    Name = s.ClientName
-                }).ToList();
-
-            }
-
-            if (!Clients.Any())
-                Clients.Add(new SelectListItemModel<ClientResponse.Client>
-                {
-                    Value = new ClientResponse.Client(),
-                    Name = "No Clients Available"
-                });
-            else
-                Clients.Insert(0, new SelectListItemModel<ClientResponse.Client> { Value = new ClientResponse.Client(), Name = "Choose client..." });
-
-            var selectedClients = Clients.Where(c => !string.IsNullOrEmpty(c.Value.ClientCode)).Select(s => s.Value).ToList();
+            
+            
         }
 
         public void Dispose()
@@ -63,6 +37,7 @@ namespace Backoffice.Web.Components.ParlayBonus
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
+            IsUpdating = false;
             await OnClientChangedCallback.InvokeAsync(long.Parse(e.Value.ToString()));
         }
 
@@ -73,6 +48,26 @@ namespace Backoffice.Web.Components.ParlayBonus
             await OnUpdateClickCallback.InvokeAsync(IsUpdating);
 
             await InvokeAsync(StateHasChanged);
+        }
+
+        public async Task OnSaveClickEvent()
+        {
+            IsUpdating = false;
+            await OnSaveClickCallback.InvokeAsync();
+        }
+
+        public async Task OnCancelClickEvent()
+        {
+            IsUpdating = !IsUpdating;
+            await InvokeAsync(StateHasChanged);
+            await OnCancelClickCallback.InvokeAsync();            
+        }
+
+        public async Task OnAddClickEvent()
+        {            
+            await OnAddClickCallback.InvokeAsync(new ParlayBonusConfig() {
+                SelectionCount = ClientParlayBonusResponse.ParlayBonusConfig.Last().SelectionCount + 1
+            });
         }
         #endregion
     }

@@ -394,7 +394,7 @@ namespace Backoffice.Web.Services
                 if (response.IsSuccessStatusCode)
                 {
                     return JsonSerializer.Deserialize<BaseResponse<ClientParlayBonusResponse>>
-                        (await response.Content.ReadAsStringAsync(), 
+                        (await response.Content.ReadAsStringAsync(),
                         new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ??
                         new BaseResponse<ClientParlayBonusResponse>();
                 }
@@ -408,7 +408,7 @@ namespace Backoffice.Web.Services
                             new BaseResponse<ClientParlayBonusResponse>();
 
                         return result;
-                    }                    
+                    }
                     else
                     {
                         return new BaseResponse<ClientParlayBonusResponse>()
@@ -422,6 +422,44 @@ namespace Backoffice.Web.Services
             catch (Exception ex)
             {
                 return new BaseResponse<ClientParlayBonusResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<StatusCode>> AddOrUpdateParlayBonus(ParlayBonusRequest request)
+        {
+            try
+            {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
+                var response = await _httpClient.PostAsync($"sportsbook/settings/parlaybonus", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<StatusCode>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<StatusCode>();
+                    else
+                    {
+                        return new BaseResponse<StatusCode>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<StatusCode>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
