@@ -6,7 +6,7 @@ namespace Backoffice.Web.Components.SubUser
     public partial class Filter : IDisposable
     {
         #region Properties
-        [Parameter] public EventCallback OnInitCallback { get; set; }
+        [Parameter] public EventCallback<bool> OnInitCallback { get; set; }
         [Parameter] public EventCallback OnCreateSubUserCallback { get; set; }
         public SearchFormModel SearchForm { get; set; }
 
@@ -19,12 +19,12 @@ namespace Backoffice.Web.Components.SubUser
         {
             SearchForm = new SearchFormModel();
 
-            await OnInitCallback.InvokeAsync();
+            await OnInitCallback.InvokeAsync(true);
         }
 
         public async Task OnInputSearchEvent()
         {
-            await OnInitCallback.InvokeAsync();
+            await OnInitCallback.InvokeAsync(false);
         }
 
         public async Task OnCreateSubUserClickEvent()

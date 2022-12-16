@@ -2,9 +2,11 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.SubUser;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Security.Claims;
 
 namespace Backoffice.Web.Pages
 {
@@ -19,6 +21,7 @@ namespace Backoffice.Web.Pages
         public string IconClass { get; set; }
 
         public PermissionResponse Permissions { get; set; }
+        public SubUserClaimsModel SubUserClaims { get; set; }
         public UserListResponse SubUsers { get; set; }
         public MetaData MetaData { get; set; }
 
@@ -29,6 +32,7 @@ namespace Backoffice.Web.Pages
         protected override async Task OnInitializedAsync()
         {
             Permissions = new PermissionResponse();
+            SubUserClaims = new SubUserClaimsModel();
             SubUsers = new UserListResponse();
 
             MetaData = new MetaData
@@ -43,11 +47,41 @@ namespace Backoffice.Web.Pages
             IconClass = "ico-sub-user";
         }
 
-        public async Task OnInitEvent()
+        public async Task OnInitEvent(bool isFirstTime)
         {
             SubUsers = await GetSubUsers(1);
 
-            Permissions = await GetPermissionList();
+            if(isFirstTime)
+            {
+                Permissions = await GetPermissionList();
+                if(Permissions != null && Permissions.Permissions.Any())
+                {
+                    foreach(var permission in Permissions.Permissions)
+                    {
+                        if(permission.IsSubUser)
+                        {
+                            var subUserClaim = new SubUserClaim
+                            {
+                                Name = permission.Name,
+                                ClaimType = permission.ClaimType,
+                                HasReadOnly = permission.HasReadOnly,
+                                ClaimValue = "0",
+                            };
+
+                            var claim = UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType);
+                            if(claim != null && Convert.ToInt32(claim.Value) > 0)
+                            {
+                                subUserClaim.ClaimValue = claim.Value;
+                            }
+
+                            if (string.IsNullOrEmpty(subUserClaim.ClaimValue) || subUserClaim.ClaimValue == "0")
+                                subUserClaim.IsEnabled = false;
+
+                            SubUserClaims.SubUserClaims.Add(subUserClaim);
+                        }
+                    }
+                }
+            }
         }
 
         public async Task SelectPage(int page)
@@ -63,9 +97,29 @@ namespace Backoffice.Web.Pages
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("SubUserClaims", SubUserClaims);
 
             var options = new ModalOptions();
-            //ModalService.Open<CreateModal>("Create Client", parameters, options);
+            ModalService.Open<CreateOrUpdateModal>("Create Sub-Users", parameters, options);
+        }
+
+        public async Task OnSaveClickEvent(object item)
+        {
+            //var clientIdRefs = string.IsNullOrEmpty(item.ToString()) ? new List<string>() : item.ToString().Split(",").ToList();
+            //foreach (var clientIdRef in clientIdRefs)
+            //{
+            //    if (string.IsNullOrEmpty(clientIdRef))
+            //        continue;
+
+            //    var clientTopFixture = TopFixturesModel.TopFixtures.FirstOrDefault(t => t.ClientIdRef == Convert.ToInt32(clientIdRef));
+            //    if (clientTopFixture != null)
+            //    {
+            //        var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = item.ToString() })).Result;
+
+            //        clientTopFixture.TopFixtures = result.TopFixtures.FirstOrDefault()?.TopFixtures ?? new List<ClientTopFixtureResponse.TopFixture>();
+
+            //    }
+            //}
         }
 
         public void Dispose()
