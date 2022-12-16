@@ -11,5 +11,6 @@ namespace Backoffice.Shared.Models.Response
         }
 
         public List<UserResponse> Users { get; set; }
+        public MetaData MetaData { get; set; }
     }
 }

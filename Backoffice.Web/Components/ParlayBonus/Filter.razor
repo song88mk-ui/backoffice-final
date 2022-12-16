@@ -20,13 +20,20 @@
                     </select>
                 }
             </div>
-            <div class="odds-container d-flex justify-content-center align-self-end">
-                <div class="min-odds-text border-end-0 px-4 rounded-start">Minimum Odds Per Selection</div>
-                <div class="border-start-0 rounded-end">
-                    <span class="min-odds ms-5 me-4">@ClientParlayBonusResponse.ParlayBonusMinOdds</span>
-                    <i class="tooltip2 fa fa-info-circle me-2">
+            <div class="odds-container d-flex justify-content-center align-self-end">                
+                <div class="input-group border-0">
+                    <span class="input-group-text min-odds-text">Minimum Odds Per Selection</span>
+                    @if (IsUpdating)
+                    {
+                        <input type="number" @bind="@ClientParlayBonusResponse.ParlayBonusMinOdds" @bind:event="oninput" class="min-odds-input text-center" />
+                    }
+                    else
+                    {
+                        <input type="number" @bind="@ClientParlayBonusResponse.ParlayBonusMinOdds" @bind:event="oninput" class="min-odds-input text-center" disabled/>
+                    }
+                    <span class="tooltip2 fa fa-info-circle me-2">
                         <span class="tooltiptext">Minimum Value: 1.20</span>
-                    </i>
+                    </span>
                 </div>
             </div>
         </div>
@@ -34,17 +41,21 @@
             <!-- Update -->
             @if (IsUpdating)
             {
-                <a href="javascript:void(0)" class="btn btn-cancel px-4 me-2" @onclick="OnUpdateClickEvent">Cancel</a>
-                <a href="javascript:void(0)" class="btn btn-save px-4">Save Changes</a>
-                <a href="javascript:void(0)" class="btn btn-add px-4 me-2">Add</a>
+                <button type="button" class="btn btn-cancel px-4 me-2" @onclick="OnCancelClickEvent">Cancel</button>
+                <button type="button" class="btn btn-save px-4 me-2" @onclick="OnSaveClickEvent">Save Changes</button>
+                <button type="button" class="btn btn-add px-4 me-2" @onclick="OnAddClickEvent">Add</button>
             }
             else
             {
-                <a href="javascript:void(0)" class="btn btn-update px-4" @onclick="OnUpdateClickEvent">Update</a>
+                if (ClientParlayBonusResponse?.ParlayBonusConfig.Count > 0)
+                {
+                    <button type="button" class="btn btn-update px-4" @onclick="OnUpdateClickEvent">Update</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-update px-4" @onclick="OnUpdateClickEvent" disabled>Update</button>
+                }
             }
-            <!-- Update and Save-->
-            @*<a href="javascript:void(0)" class="btn btn-save px-4">Save</a>
-            <a href="javascript:void(0)" class="btn btn-cancel px-4 me-2">Cancel</a>*@
         </div>
     </div>
 </div>

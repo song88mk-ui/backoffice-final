@@ -12,6 +12,11 @@
     font-size: 14px;
 }
 
+.min-odds-input {
+
+    border-radius: 0px 3px 3px 0px;
+}
+
 .form-label {
     font-size: 13px;
 }
@@ -58,6 +63,8 @@
 .tooltip2 {
     position: relative;
     display: inline-block;
+    left: -1.5rem;
+    top: 0.6rem;
 }
 
     .tooltip2 .tooltiptext {

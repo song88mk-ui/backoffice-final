@@ -10,7 +10,7 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter />
+                <Filter OnInitCallback="OnInitEvent" OnCreateSubUserCallback="OnCreateSubUserClickEvent" />
             </div>
             <div class="col-md-12">
                 <table class="table table-hover table-borderless mt-4">
@@ -25,38 +25,29 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <span class="fw-bold">User 1</span>
-                            </td>
-                            <td>US1</td>
-                            <td>02/12/2022</td>
-                            <td>
-                                <span class="status-normal py-1 px-4 rounded-pill">Normal</span>
-                            </td>
-                            <td>Dashboard</td>
-                            <td>
-                                <a class="link-edit me-2" href="javascript:(0)">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="fw-bold">User 2</span>
-                            </td>
-                            <td>US2</td>
-                            <td>03/12/2022</td>
-                            <td>
-                                <span class="status-locked py-1 px-4 rounded-pill">Locked</span>
-                            </td>
-                            <td>Dashboard</td>
-                            <td>
-                                <a class="link-edit me-2" href="javascript:(0)">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                            </td>
-                        </tr>
+                        @if (SubUsers != null && SubUsers.Users.Any())
+                        {
+                            foreach (var user in SubUsers.Users)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold">@user.UserName</span>
+                                    </td>
+                                    <td>@user.NickName</td>
+                                    <td>@user.CreatedDate.ToString("MM/dd/yyyy")</td>
+                                    <td>
+                                        <span class="@(user.Status == "Normal" ? "status-normal" : "status-locked") py-1 px-4 rounded-pill">Normal</span>
+                                    </td>
+                                    <td>Dashboard</td>
+                                    <td>
+                                        <a class="link-edit me-2" href="javascript:(0)">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+
                     </tbody>
                     <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="4" />
                 </table>
