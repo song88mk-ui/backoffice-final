@@ -7,6 +7,6 @@ namespace Backoffice.Shared.Models.Requests
     {
         public int ClientIdRef { get; set; }
         public int SportId { get; set; }
-        public List<ClientTopLeague> TopLeagues { get; set; }
+        public List<OrderedClientTopLeague> TopLeagues { get; set; }
     }
 }

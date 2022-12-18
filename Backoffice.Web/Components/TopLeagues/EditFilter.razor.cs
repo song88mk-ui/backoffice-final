@@ -10,7 +10,8 @@ namespace Backoffice.Web.Components.TopLeagues
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Parameter] public int ClientId { get; set; }
-        [Parameter] public EventCallback<EditFilterTopLeaguesModel> OnInitCallback { get; set; }
+        [Parameter] public int SportId { get; set; }
+        [Parameter] public EventCallback<EditTopLeaguesModel> OnInitCallback { get; set; }
         public SportsTreeResponse SportsTree { get; set; }
         public SportsTreeResponse.SportReponse SelectedSport { get; set; }
         public SportsTreeResponse.SegmentResponse SelectedSegment { get; set; }
@@ -23,18 +24,18 @@ namespace Backoffice.Web.Components.TopLeagues
         {
             try
             {
-
-
                 SelectedSport = new SportsTreeResponse.SportReponse();
                 SelectedSegment = new SportsTreeResponse.SegmentResponse();
                 SelectedLeague = new SportsTreeResponse.LeagueResponse();
                 SportsTree = new SportsTreeResponse();
 
                 SportsTree = (await BackOfficeService.GetSportstreeByClientId(ClientId)).Result;
+                if (SportsTree != null)
+                    SelectedSport = SportsTree.Sports.FirstOrDefault(s => s.SportId == SportId);
 
-                var model = new EditFilterTopLeaguesModel
+                var model = new EditTopLeaguesModel
                 {
-                    Sports = SportsTree.Sports,
+                    Sports = SportsTree.Sports ?? new List<SportsTreeResponse.SportReponse>(),
                     SelectedSport = SelectedSport,
                     SelectedSegment = SelectedSegment,
                     SelectedLeague = SelectedLeague
@@ -46,28 +47,12 @@ namespace Backoffice.Web.Components.TopLeagues
             }
         }
 
-        public async void OnSportChangedEvent(ChangeEventArgs e)
-        {
-            SelectedSport = SportsTree.Sports.FirstOrDefault(s => s.SportId == Convert.ToInt32(e.Value));
-            //SelectedSegment = new SportsTreeResponse.SegmentResponse();
-            //SelectedLeague = new SportsTreeResponse.LeagueResponse();
-
-            var model = new EditFilterTopLeaguesModel
-            {
-                Sports = SportsTree.Sports,
-                SelectedSport = SelectedSport,
-                SelectedSegment = SelectedSegment,
-                SelectedLeague = SelectedLeague
-            };
-
-            await OnInitCallback.InvokeAsync(model);
-        }
         public async void OnSegmentChangedEvent(ChangeEventArgs e)
         {
             SelectedSegment = SelectedSport.Segments.FirstOrDefault(s => s.SegmentId == Convert.ToInt32(e.Value));
-            //SelectedLeague = new SportsTreeResponse.LeagueResponse();
+            SelectedLeague = new SportsTreeResponse.LeagueResponse();
 
-            var model = new EditFilterTopLeaguesModel
+            var model = new EditTopLeaguesModel
             {
                 Sports = SportsTree.Sports,
                 SelectedSport = SelectedSport,
@@ -81,7 +66,7 @@ namespace Backoffice.Web.Components.TopLeagues
         public async void OnLeagueChangedEvent(ChangeEventArgs e)
         {
             SelectedLeague = SelectedSegment.Leagues.FirstOrDefault(s => s.LeagueId == Convert.ToInt32(e.Value));
-            var model = new EditFilterTopLeaguesModel
+            var model = new EditTopLeaguesModel
             {
                 Sports = SportsTree.Sports,
                 SelectedSport = SelectedSport,

@@ -109,7 +109,7 @@ namespace Backoffice.Web.Components.TopLeagues
                     AlertMessage = "Copy top leagues successful";
                     AlertStatus = "alert-success";
                     await Modal.OnSaveClickCallback.InvokeAsync();
-                    await Task.Delay(3500);
+                    await Task.Delay(1000);
                     ModalService.Cancel();
                 }
                 else

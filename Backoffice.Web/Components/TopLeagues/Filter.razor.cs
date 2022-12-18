@@ -24,13 +24,7 @@ namespace Backoffice.Web.Components.TopLeagues
             {
                 Clients = new List<SelectListItemModel<string>>();
                 Sports = new List<SelectListItemModel<string>>();
-
-                TopLeaguesFilterModel = new TopLeaguesFilterModel()
-                {
-                    ClientId = string.Empty,
-                    SportId = "1",
-                    Search = string.Empty
-                };
+                TopLeaguesFilterModel = new TopLeaguesFilterModel();
 
                 SearchForm = new SearchFormModel()
                 {
@@ -90,6 +84,7 @@ namespace Backoffice.Web.Components.TopLeagues
         public async void OnSportsChangedEvent(ChangeEventArgs e)
         {
             TopLeaguesFilterModel.SportId = e.Value.ToString();
+            TopLeaguesFilterModel.SportName = Sports.FirstOrDefault(x => x.Value == TopLeaguesFilterModel.SportId).Name;
             await OnFilterCallback.InvokeAsync(TopLeaguesFilterModel);
         }
         
