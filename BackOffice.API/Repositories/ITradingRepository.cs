@@ -12,9 +12,18 @@ namespace Backoffice.API.Repositories
     {
 
         #region Client
+        Task<BaseResponse<List<ClientInformationModel>>> GetClientList(string region);
+        Task<BaseResponse<ConfigModel>> GetClientConfig(ClientConfigRequest request, string region);
+        Task<BaseResponse<ClientConfigResponse>> AddOrUpdateConfig(ConfigSettingsModel request, string region);
+        Task<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>> GetConfigLogs(ConfigLogsRequest request, string region);
+        Task<BaseResponse<List<ClientLeagueConfig>>> GetClientLeagueConfig(string clientCode, string region);
+        Task<BaseResponse<List<ClientMarketConfig>>> GetClientMarketConfig(string clientCode, string region);
+        Task<BaseResponse<List<ClientMarketConfig>>> GetClientMarketConfig(int pageSize, int page, string clientCode, string region);
         #endregion
 
         #region Sportsbook
+        Task<BaseResponse<MarketFixtureResponse>> GetFixtures(MarketFixtureRequest request);
+        Task<BaseResponse<MarketFixtureResponse>> GetOutrightFixtures(MarketFixtureRequest request);
         #endregion
 
         #region Priceboost

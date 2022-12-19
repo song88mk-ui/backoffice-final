@@ -19,7 +19,7 @@
         {
             public string ClientCode { get; set; }
             public int Num { get; set; }
-            public string ClientId { get; set; }
+            public int ClientId { get; set; }
             public string Name { get; set; }
             public string Website { get; set; }
             public int StatusId { get; set; }
