@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Folder Include="Controllers\Admin\" />
+    <Folder Include="Controllers\Trading\" />
   </ItemGroup>
 
 
