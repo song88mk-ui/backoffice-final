@@ -23,8 +23,8 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Sportsbook
-        Task<BaseResponse<MarketFixtureResponse>> GetFixtures(MarketFixtureRequest request);
-        Task<BaseResponse<MarketFixtureResponse>> GetOutrightFixtures(MarketFixtureRequest request);
+        Task<BaseResponse<MarketFixtureResponse>> GetFixtures(MarketFixtureRequest request, string region);
+        Task<BaseResponse<MarketFixtureResponse>> GetOutrightFixtures(MarketFixtureRequest request, string region);
         #endregion
 
         #region Priceboost

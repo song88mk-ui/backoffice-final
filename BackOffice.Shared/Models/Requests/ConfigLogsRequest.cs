@@ -25,3 +25,4 @@ namespace Backoffice.Shared.Models.Requests
         public int Id { get; set; }
         public string CursorDirection { get; set; }
     }
+}
