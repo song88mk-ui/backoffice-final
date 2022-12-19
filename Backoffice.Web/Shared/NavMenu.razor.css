@@ -81,3 +81,15 @@ span.ico {
     font-size: 18px;
     margin-right: 10px;
 }
+
+.collapse:not(.show) {
+    display: none !important;
+}
+
+[data-bs-toggle="collapse"] .fa:before {
+    content: "\f078" !important;
+}
+
+[data-bs-toggle="collapse"].collapsed .fa:before {
+    content: "\f054" !important;
+}

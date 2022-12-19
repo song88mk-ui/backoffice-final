@@ -133,6 +133,22 @@ a, .btn-link {
     content: "\110B";
 }
 
+.ico-settings:before {
+    content: "\1110";
+}
+
+.ico-odds-engine:before {
+    content: "\110F";
+}
+
+.ico-clients:before {
+    content: "\110E";
+}
+
+.ico-sub-user:before {
+    content: "\110D";
+}
+
 iframe {
     width: 100% !important;
 }
