@@ -1,4 +1,5 @@
 ﻿using Backoffice.API.Repositories;
+using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -34,6 +35,31 @@ namespace Backoffice.API.Controllers.Trading
 
             return Ok();
         }
+        #endregion
+
+        #region Client
+        [HttpPost("activitylog/list")]
+        public async Task<IActionResult> GetActivityLogs([FromBody] ActivityLogRequest request)
+        {
+            var result = await _tradingRepository.GetActivityLogs(request, "HK");
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        #endregion
+
+        #region Sportsbook
+        #endregion
+
+        #region Priceboost
+        #endregion
+
+        #region Activity Log
         #endregion
     }
 }

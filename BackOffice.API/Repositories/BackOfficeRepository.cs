@@ -108,7 +108,8 @@ namespace Backoffice.API.Repositories
                 var clients = query.Skip(skip).Take(request.PageSize)
                     .Select(s => new ClientListResponse.Client
                     {
-                        ClientId = s.ClientId,
+                        ClientId = s.ClientId.ToString(),
+                        ClientCode = s.Brand,
                         Name = s.Name,
                         Website = s.Website,
                         StatusId = s.StatusId,

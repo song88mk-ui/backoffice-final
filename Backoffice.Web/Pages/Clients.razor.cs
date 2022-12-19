@@ -106,6 +106,7 @@ namespace Backoffice.Web.Pages
                     {
                         Num = index + 1,
                         ClientId = s.ClientId,
+                        ClientCode = s.ClientCode,
                         Name = s.Name,
                         StatusId = s.StatusId,
                         StatusName = s.StatusName,
