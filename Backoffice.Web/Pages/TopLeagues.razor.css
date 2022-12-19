@@ -75,17 +75,6 @@ table tfoot td:last-child {
     font-size: 1rem;
 }
 
-.tbl-pagination a, .tbl-pagination span {
-    color: #979797;
-}
-
-.tbl-pagination a.active {
-    background-color: #E4422E;
-    color: #FFFFFF;
-    padding: 2px 5px;
-    border-radius: 2px;
-}
-
 ::deep .modal-dialog {
     max-width: 1500px;
 }
