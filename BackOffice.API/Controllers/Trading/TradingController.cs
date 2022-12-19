@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Backoffice.API.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -8,6 +9,16 @@ namespace Backoffice.API.Controllers.Trading
     [ApiController]
     public class TradingController : ControllerBase
     {
+        private ITradingRepository _tradingRepository { get; set; }
+
+        #region Ctor
+        public TradingController(ITradingRepository tradingRepository)
+        {
+            _tradingRepository = tradingRepository;
+        }
+        #endregion
+
+        #region Methods
         [HttpGet("sports/{fixtureTypeId}")]
         public async Task<IActionResult> GetSports(int fixtureTypeId)
         {
@@ -23,5 +34,6 @@ namespace Backoffice.API.Controllers.Trading
 
             return Ok();
         }
+        #endregion
     }
 }
