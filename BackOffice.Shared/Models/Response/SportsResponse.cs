@@ -11,13 +11,19 @@ namespace Backoffice.Shared.Models.Response
             Sports = new List<SportReponse>();
         }
         public List<SportReponse> Sports { get; set; }
+
         #region Nested Class
-        public class SportReponse : SportModel
+
+        public class SportReponse
         {
             public SportReponse()
             {
                 Segments = new List<SegmentResponse>();
             }
+
+            public int SportId { get; set; }
+            public string SportName { get; set; }
+            public int? SortOrder { get; set; }
             public List<SegmentResponse> Segments { get; set; }
         }
         public class SegmentResponse
@@ -42,6 +48,7 @@ namespace Backoffice.Shared.Models.Response
             public int SortOrder { get; set; }
             public List<FixtureModel> Fixtures { get; set; }
         }
+
         #endregion
     }
 }
