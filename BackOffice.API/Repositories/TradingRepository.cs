@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using System.Configuration;
 using static Backoffice.Shared.Models.Response.GetAllLeaguesResponse;
+using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
 
 namespace Backoffice.API.Repositories
 {
@@ -218,6 +219,38 @@ namespace Backoffice.API.Repositories
             catch (Exception ex)
             {
                 return new BaseResponse<LeagueLookupResponse>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<TierLeagueOrderResponse>>> GetTierLeagueOrderList(string region)
+        {
+            try
+            {
+                var response = await GetHttpClient(region).GetAsync($"tier/leagueorder/list");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<List<TierLeagueOrderResponse>>>(await response.Content.ReadAsStringAsync());
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<List<TierLeagueOrderResponse>>>(await response.Content.ReadAsStringAsync());
+                    else
+                    {
+                        return new BaseResponse<List<TierLeagueOrderResponse>>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<TierLeagueOrderResponse>>()
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
@@ -1466,7 +1499,7 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<ManualMessageSettlementAuditResponse>> GetMessageSettlementAudit(List<MessageSettlementRequest> request, string region)
+        public async Task<BaseResponse<ManualMessageSettlementAuditResponse>> GetMessageSettlementAudit(ManualMessageSettlementRequest request, string region)
         {
             try
             {
