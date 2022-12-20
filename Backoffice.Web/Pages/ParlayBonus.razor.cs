@@ -29,7 +29,7 @@ namespace Backoffice.Web.Pages
         protected override async Task OnInitializedAsync()
         {            
             PageTitle = "Parlay Bonus";
-            IconClass = "ico-parlay-bonus";
+            IconClass = "ico ico-parlay-bonus";
             ClientParlayBonusResponse = new ClientParlayBonusResponse();
             Clients = new List<SelectListItemModel<ClientResponse.Client>>();
 

@@ -1,12 +1,13 @@
-﻿@inherits MainLayoutBase
+﻿@using Backoffice.Shared.Enums
+
+@inherits MainLayoutBase
 
 <CascadingValue Value="UserModel" Name="UserModel">
     <PageTitle>Backoffice</PageTitle>
     <div class="page">
         <div class="sidebar">
-            <NavMenu />
+            <NavMenu NavMenuAccess="NavMenuAccess.SBC" />
         </div>
-
         <main>
             <article class="content px-4">
                 @Body

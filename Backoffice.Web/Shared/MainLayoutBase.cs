@@ -2,20 +2,25 @@
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Backoffice.Web.Shared
 {
     public class MainLayoutBase : LayoutComponentBase, IDisposable
     {
+        #region Properties
+
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
+
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-        public UserModel UserModel { get; set; }
 
+        public UserModel UserModel { get; set; }
         public LogInModel Model { get; set; }
+
+        #endregion
+
+        #region Methods
 
         protected override async Task OnInitializedAsync()
         {
@@ -65,5 +70,7 @@ namespace Backoffice.Web.Shared
         public async void Dispose()
         {
         }
+
+        #endregion
     }
 }

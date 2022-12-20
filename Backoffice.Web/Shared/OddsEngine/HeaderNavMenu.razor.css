@@ -1,0 +1,8 @@
+﻿.header-link {
+    color: #FFF;
+}
+
+.active {
+    border-image: linear-gradient(241deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 1;
+    border-bottom: 4px solid;
+}
