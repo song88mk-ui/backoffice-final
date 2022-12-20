@@ -1,0 +1,317 @@
+﻿@font-face {
+    font-family: 'iconsports';
+    src: url('../fonts/iconsports.eot?f7fu7d');
+    src: url('../fonts/iconsports.eot?f7fu7d#iefix') format('embedded-opentype'), url('../fonts/iconsports.ttf?f7fu7d') format('truetype'), url('../fonts/iconsports.woff?f7fu7d') format('woff'), url('../fonts/iconsports.svg?f7fu7d#iconsports') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+[class^="iconfont-"], [class*=" iconfont-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'iconsports' !important;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.iconfont-soccer:before {
+    content: "\e942";
+}
+
+.iconfont-bandy:before {
+    content: "\e93d";
+}
+
+.iconfont-esport-league-of-legends:before {
+    content: "\e936";
+}
+
+.iconfont-esport-dota:before {
+    content: "\e937";
+}
+
+.iconfont-esport-counter-strike:before {
+    content: "\e930";
+}
+
+.iconfont-badminton:before {
+    content: "\e931";
+}
+
+.iconfont-esports-soccer:before {
+    content: "\e900";
+}
+
+.iconfont-bobsleigh:before {
+    content: "\e901";
+}
+
+.iconfont-bowls:before {
+    content: "\e902";
+}
+
+.iconfont-squash:before {
+    content: "\e903";
+}
+
+.iconfont-waterpolo:before {
+    content: "\e904";
+}
+
+.iconfont-beach-volley:before {
+    content: "\e905";
+}
+
+.iconfont-ballrun:before {
+    content: "\e906";
+}
+
+.iconfont-air-racing:before {
+    content: "\e907";
+}
+
+.iconfont-alpine-skiing:before {
+    content: "\e908";
+}
+
+.iconfont-archery:before {
+    content: "\e909";
+}
+
+.iconfont-artistic-swimming:before {
+    content: "\e90a";
+}
+
+.iconfont-athletics:before {
+    content: "\e90b";
+}
+
+.iconfont-aussie-rules:before {
+    content: "\e90c";
+}
+
+.iconfont-basketball-3x3:before {
+    content: "\e90d";
+}
+
+.iconfont-beach-soccer:before {
+    content: "\e90e";
+}
+
+.iconfont-biathlon:before {
+    content: "\e90f";
+}
+
+.iconfont-cross-country:before {
+    content: "\e910";
+}
+
+.iconfont-curling:before {
+    content: "\e911";
+}
+
+.iconfont-cycling:before {
+    content: "\e912";
+}
+
+.iconfont-darts:before {
+    content: "\e913";
+}
+
+.iconfont-elce-hockey:before {
+    content: "\e914";
+}
+
+.iconfont-esport-call-of-duty:before {
+    content: "\e915";
+}
+
+.iconfont-esport-hearthstone:before {
+    content: "\e916";
+}
+
+.iconfont-esport-overwatch:before {
+    content: "\e917";
+}
+
+.iconfont-esport-rainbow-six:before {
+    content: "\e918";
+}
+
+.iconfont-rocket-league:before {
+    content: "\e919";
+}
+
+.iconfont-field-hockey:before {
+    content: "\e91a";
+}
+
+.iconfont-figure-skating:before {
+    content: "\e91b";
+}
+
+.iconfont-freestyle-skiing:before {
+    content: "\e91c";
+}
+
+.iconfont-futsal:before {
+    content: "\e91d";
+}
+
+.iconfont-gaelic-football:before {
+    content: "\e91e";
+}
+
+.iconfont-gaelic-hurling:before {
+    content: "\e91f";
+}
+
+.iconfont-golf:before {
+    content: "\e920";
+}
+
+.iconfont-luge:before {
+    content: "\e922";
+}
+
+.iconfont-motor-sport:before {
+    content: "\e923";
+}
+
+.iconfont-nordic-combined:before {
+    content: "\e924";
+}
+
+.iconfont-pesapallo:before {
+    content: "\e925";
+}
+
+.iconfont-sailing:before {
+    content: "\e926";
+}
+
+.iconfont-short-track-speed-skating:before {
+    content: "\e927";
+}
+
+.iconfont-skeleton:before {
+    content: "\e928";
+}
+
+.iconfont-ski-jumping:before {
+    content: "\e929";
+}
+
+.iconfont-snowboard:before {
+    content: "\e92a";
+}
+
+.iconfont-soccer-mythical:before {
+    content: "\e92b";
+}
+
+.iconfont-speed-skating:before {
+    content: "\e92c";
+}
+
+.iconfont-water-polo:before {
+    content: "\e92d";
+}
+
+.iconfont-rugby:before {
+    content: "\e93b";
+}
+
+.iconfont-snooker:before {
+    content: "\e93a";
+}
+
+.iconfont-ice-hockey:before {
+    content: "\e941";
+}
+
+.iconfont-boxing:before {
+    content: "\e93e";
+}
+
+.iconfont-american-football:before {
+    content: "\e93c";
+}
+
+.iconfont-table-tennis:before {
+    content: "\e939";
+}
+
+.iconfont-volleyball:before {
+    content: "\e938";
+}
+
+.iconfont-ebasketball:before {
+    content: "\e935";
+}
+
+.iconfont-basketball:before {
+    content: "\e934";
+}
+
+.iconfont-baseball:before {
+    content: "\e933";
+}
+
+.iconfont-esoccer:before {
+    content: "\e932";
+}
+
+.iconfont-tennis:before {
+    content: "\e921";
+}
+
+.iconfont-mma:before {
+    content: "\e940";
+}
+
+.iconfont-handball:before {
+    content: "\e93f";
+}
+
+.iconfont-kabaddi:before {
+    content: "\e92f";
+}
+
+.iconfont-cricket:before {
+    content: "\e92e";
+}
+
+.iconfont-trophy:before {
+    content: "\e99e";
+}
+
+.iconfont-esport-king-of-glory:before {
+    content: "\e948";
+}
+
+.iconfont-floorball:before {
+    content: "\e944";
+}
+
+.iconfont-esport-starcraft:before {
+    content: "\e943";
+}
+
+.iconfont-virtual-soccer:before {
+    content: "\e946";
+}
+
+.iconfont-virtual-basketball:before {
+    content: "\e947";
+}
+
+.iconfont-virtual-tennis:before {
+    content: "\e945";
+}

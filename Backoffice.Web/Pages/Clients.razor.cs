@@ -40,7 +40,7 @@ namespace Backoffice.Web.Pages
             };
 
             PageTitle = "Manage Clients";
-            IconClass = "ico-clients";
+            IconClass = "ico ico-clients";
         }
 
         public async Task OnInitEvent(ClientListCallbackModel request)

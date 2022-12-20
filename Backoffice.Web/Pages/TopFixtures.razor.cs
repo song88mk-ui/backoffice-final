@@ -22,7 +22,7 @@ namespace Backoffice.Web.Pages
         protected override async Task OnInitializedAsync()
         {
             PageTitle = "Top Fixtures";
-            IconClass = "ico-top-fixtures";
+            IconClass = "ico ico-top-fixtures";
 
             MetaData = new MetaData()
             {

@@ -1,4 +1,5 @@
-﻿using Backoffice.Web.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Shared
@@ -7,8 +8,9 @@ namespace Backoffice.Web.Shared
     {
         #region Properties
 
-        [CascadingParameter(Name = "UserModel")]
-        public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
+        [Parameter] public NavMenuAccess NavMenuAccess { get; set; }
 
         #endregion
 

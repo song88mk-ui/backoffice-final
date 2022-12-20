@@ -44,7 +44,7 @@ namespace Backoffice.Web.Pages
             };
 
             PageTitle = "Sub Users";
-            IconClass = "ico-sub-user";
+            IconClass = "ico ico-sub-user";
         }
 
         public async Task OnInitEvent(bool isFirstTime)

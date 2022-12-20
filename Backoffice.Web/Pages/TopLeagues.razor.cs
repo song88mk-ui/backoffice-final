@@ -31,7 +31,7 @@ namespace Backoffice.Web.Pages
             try
             {
                 PageTitle = "Top Leagues";
-                IconClass = "ico-top-leagues";
+                IconClass = "ico ico-top-leagues";
 
                 ClientInformation = (await BackOfficeService.GetClients()).Result;
                 UserClientCodes = ClientInformation != null ? ClientInformation?.Clients?.Where(x => UserModel.ClientCodes.Contains(x.ClientCode)).Select(x => x.ClientId).ToList() : new List<long>();

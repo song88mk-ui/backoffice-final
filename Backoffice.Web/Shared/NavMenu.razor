@@ -1,4 +1,5 @@
 ﻿@using Backoffice.Web.Models
+@using Backoffice.Shared.Enums
 
 <div class="top-row ps-3 navbar">
     <div class="container-fluid">
@@ -7,86 +8,148 @@
 </div>
 <div class="middle-bottom-row d-flex flex-column justify-content-between">
     <div class="middle-row" @onclick="ToggleNavMenu">
-        <nav class="flex-column">
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/dashboard">
-                    <span class="ico ico-dashboard" aria-hidden="true"></span>
-                    <span class="nav-menu-text">Dashboard</span>
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-report" role="button" aria-expanded="false" aria-controls="sub-menu-report">
-                    <span class="ico ico-reports" aria-hidden="true"></span>
-                    <span class="nav-menu-text">Reports</span>
-                    <span class="fa fa-chevron-right"></span>
-                </NavLink>
-                <div class="sub-menu collapse" id="sub-menu-report">
+        @if (NavMenuAccess == NavMenuAccess.SBC)
+        {
+            <nav class="flex-column">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/dashboard">
+                        <span class="ico ico-dashboard" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Dashboard</span>
+                    </NavLink>
                 </div>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-setting" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
-                    <span class="ico ico-settings" aria-hidden="true"></span>
-                    <span class="nav-menu-text">Settings</span>
-                    <span class="fa fa-chevron-down"></span>
-                </NavLink>
-                <div class="sub-menu collapse show" id="sub-menu-setting">
-                    <nav class="flex-column">
-                        <div class="nav-item">
-                            <NavLink class="nav-link" href="/deeplink/generator">
-                                <span class="ico ico-deeplink-generator" aria-hidden="true"></span>
-                                <span class="nav-menu-text">Deeplink Generator</span>
-                            </NavLink>
-                        </div>
-                        @if (UserModel?.Claims.Where(c => c.Type.Contains("SportsbookClient.TopLeagues") && c.Value != "0").ToList().Count > 0)
-                        {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-report" role="button" aria-expanded="false" aria-controls="sub-menu-report">
+                        <span class="ico ico-reports" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Reports</span>
+                        <span class="fa fa-chevron-right"></span>
+                    </NavLink>
+                    <div class="sub-menu collapse" id="sub-menu-report">
+                    </div>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-setting" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
+                        <span class="ico ico-settings" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Settings</span>
+                        <span class="fa fa-chevron-down"></span>
+                    </NavLink>
+                    <div class="sub-menu collapse show" id="sub-menu-setting">
+                        <nav class="flex-column">
                             <div class="nav-item">
-                                <NavLink class="nav-link" href="/top-leagues">
-                                    <span class="ico ico-top-leagues" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">Top Leagues</span>
+                                <NavLink class="nav-link" href="/deeplink/generator">
+                                    <span class="ico ico-deeplink-generator" aria-hidden="true"></span>
+                                    <span class="nav-menu-text">Deeplink Generator</span>
                                 </NavLink>
                             </div>
-                        }
-                        @if (UserModel?.Claims.Where(c => c.Type.Contains("SportsbookClient.TopFixtures") && c.Value != "0").ToList().Count > 0)
-                        {
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="/top-fixtures">
-                                    <span class="ico ico-top-fixtures" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">Top Fixtures</span>
-                                </NavLink>
-                            </div>
-                        }
-                        @if (UserModel?.Claims.Where(c => c.Type.Contains("SportsbookClient.ParlayBonus") && c.Value != "0").ToList().Count > 0)
-                        {
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="/parlay-bonus">
-                                    <span class="ico ico-parlay-bonus" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">Parlay Bonus</span>
-                                </NavLink>
-                            </div>
-                        }
+                            @if (UserModel?.Claims.Where(c => c.Type.Contains("SportsbookClient.TopLeagues") && c.Value != "0").ToList().Count > 0)
+                            {
+                                <div class="nav-item">
+                                    <NavLink class="nav-link" href="/top-leagues">
+                                        <span class="ico ico-top-leagues" aria-hidden="true"></span>
+                                        <span class="nav-menu-text">Top Leagues</span>
+                                    </NavLink>
+                                </div>
+                            }
+                            @if (UserModel?.Claims.Where(c => c.Type.Contains("SportsbookClient.TopFixtures") && c.Value != "0").ToList().Count > 0)
+                            {
+                                <div class="nav-item">
+                                    <NavLink class="nav-link" href="/top-fixtures">
+                                        <span class="ico ico-top-fixtures" aria-hidden="true"></span>
+                                        <span class="nav-menu-text">Top Fixtures</span>
+                                    </NavLink>
+                                </div>
+                            }
+                            @if (UserModel?.Claims.Where(c => c.Type.Contains("SportsbookClient.ParlayBonus") && c.Value != "0").ToList().Count > 0)
+                            {
+                                <div class="nav-item">
+                                    <NavLink class="nav-link" href="/parlay-bonus">
+                                        <span class="ico ico-parlay-bonus" aria-hidden="true"></span>
+                                        <span class="nav-menu-text">Parlay Bonus</span>
+                                    </NavLink>
+                                </div>
+                            }
                         
-                        <div class="nav-item">
-                            <NavLink class="nav-link" href="/sub-user">
-                                <span class="ico ico-sub-user" aria-hidden="true"></span>
-                                <span class="nav-menu-text">Sub User</span>
-                            </NavLink>
-                        </div>
-                    </nav>
+                            <div class="nav-item">
+                                <NavLink class="nav-link" href="/sub-user">
+                                    <span class="ico ico-sub-user" aria-hidden="true"></span>
+                                    <span class="nav-menu-text">Sub User</span>
+                                </NavLink>
+                            </div>
+                        </nav>
+                    </div>
                 </div>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="clients">
-                    <span class="ico ico-clients" aria-hidden="true"></span>
-                    <span class="nav-menu-text">Clients</span>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="clients">
+                        <span class="ico ico-clients" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Clients</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="odds-engine">
+                        <span class="ico ico-odds-engine" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Odds Engine</span>
+                    </NavLink>
+                </div>
+                @*<div class="nav-item px-3">
+                <NavLink class="nav-link" href="">
+                <span class="ico ico-revenue-settlement" aria-hidden="true"></span>
+                <span class="nav-menu-text">Revenue Settlement</span>
                 </NavLink>
-            </div>
-            @*<div class="nav-item px-3">
-            <NavLink class="nav-link" href="">
-            <span class="ico ico-revenue-settlement" aria-hidden="true"></span>
-            <span class="nav-menu-text">Revenue Settlement</span>
-            </NavLink>
-            </div>*@
-        </nav>
+                </div>*@
+            </nav>
+        }
+        else if (NavMenuAccess == NavMenuAccess.OE)
+        {
+            <nav class="flex-column">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link header" href="javascript:void(0);">
+                        <span class="fa fa-trophy all-sports" aria-hidden="true"></span>
+                        <span class="nav-menu-text">All Sports</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="odds-engine/monitoring">
+                        <span class="iconfont iconfont-american-football" aria-hidden="true"></span>
+                        <span class="nav-menu-text">American Football</span>
+                        <span class="fa fa-chevron-right"></span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="odds-engine/monitoring">
+                        <span class="iconfont iconfont-aussie-rules" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Aussie Rules</span>
+                        <span class="fa fa-chevron-right"></span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="odds-engine/monitoring">
+                        <span class="iconfont iconfont-baseball" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Baseball</span>
+                        <span class="fa fa-chevron-right"></span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="odds-engine/monitoring">
+                        <span class="iconfont iconfont-basketball" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Basketball</span>
+                        <span class="fa fa-chevron-right"></span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="odds-engine/monitoring">
+                        <span class="iconfont iconfont-beach-volley" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Beach Volley</span>
+                        <span class="fa fa-chevron-right"></span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="odds-engine/monitoring">
+                        <span class="iconfont iconfont-boxing" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Boxing</span>
+                        <span class="fa fa-chevron-right"></span>
+                    </NavLink>
+                </div>
+            </nav>
+        }
     </div>
     <div class="bottom-row">
         <nav class="flex-column">

@@ -21,7 +21,7 @@ namespace Backoffice.Web.Pages
         protected override async Task OnInitializedAsync()
         {
             PageTitle = "Dashboard";
-            IconClass = "ico-dashboard";
+            IconClass = "ico ico-dashboard";
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
