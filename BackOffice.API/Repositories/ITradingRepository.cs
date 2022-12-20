@@ -56,6 +56,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<SportsTreeResponse>> GetSports(int fixtureTypeId, string region);
         Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId, string region);
         Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region);
+        Task<BaseResponse<SportSelectorMarketTemplateResponse>> GetSelectorMarketTemplates(string region);
         #endregion
 
         #region Segment
@@ -64,6 +65,7 @@ namespace Backoffice.API.Repositories
 
         #region League
         Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string region);
+        Task<BaseResponse<List<TierLeagueOrderResponse>>> GetTierLeagueOrderList(string region);
         #endregion
 
         #region Fixtures
@@ -72,5 +74,27 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<FixtureOddsHistoryResponse>> GetFixtureMarketSelections(int fixtureTypeId, string providerFixtureId, string providerMarketId, string providerSelectionId, string region);
         Task<BaseResponse<MarketFixtureDetailResponse>> GetFixtureMarketDetails(string providerFixtureId, string region);
         #endregion
+
+        #region BET
+        Task<BaseResponse<BetSelectionDetailsResponse>> GetBetSelections(BetSelectionDetailsRequest request, string region);
+        Task<BaseResponse<ManualBetDetailsResponse>> GetManualBetDetails(ManualBetDetailsRequest request, string region);
+        #endregion
+
+        #region FASTODDS
+        Task<BaseResponse<FastOddsSportsResponse>> GetFastOddsSports(int fixtureTypeId, string region);
+        Task<BaseResponse<FastOddsFixturesResponse>> GetFixtures(FastOddsFixturesRequest request, string region);
+        #endregion
+
+        #region MANUAL
+        Task<BaseResponse<ManualMarketSettlementResponse>> AddOrUpdateManualMarketSettlement(List<ManualMarketSettlementRequest> request, string userId, string region);
+        Task<BaseResponse<ManualMarketSettlementDetailsResponse>> GetManualMarketSettlementDetails(ManualMarketSettlementDetailsRequest request, string region);
+        Task<BaseResponse<string>> AddManualMessageSettlement(List<MessageSettlementRequest> request, string region);
+        Task<BaseResponse<ManualMessageSettlementAuditResponse>> GetMessageSettlementAudit(ManualMessageSettlementRequest request, string region);
+        #endregion
+
+        Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region);
+        Task<BaseResponse<BookmakerConfigurationResponse>> GetBookmakers(string region);
+        Task<BaseResponse<Tuple<List<NotificationResponse>, MetaData>>> GetNotifications(NotificationsRequest request, string region);
+        Task<BaseResponse<List<MarketTemplatePlayerPropsResponse>>> GetMarketTemplatePlayerProps(MarketTemplatePlayerPropsRequest request, string region);
     }
 }

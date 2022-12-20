@@ -76,6 +76,24 @@ namespace Backoffice.API.Controllers.Trading
                     return BadRequest(result);
             }
         }
+
+        [HttpGet("sports/selectormarkettemplates")]
+        public async Task<IActionResult> GetSelectorMarketTemplates()
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetSelectorMarketTemplates(region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         #endregion
 
         #region Segment
@@ -107,6 +125,24 @@ namespace Backoffice.API.Controllers.Trading
                 region = HttpContext.Request.Headers["x-region"].ToString();
 
             var result = await _tradingRepository.GetLeagueLookup(sportId, segmentId, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("tier/leagueorder/list")]
+        public async Task<IActionResult> GetTierLeagueOrderList()
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetTierLeagueOrderList(region);
 
             switch (result.StatusCode)
             {
@@ -493,5 +529,227 @@ namespace Backoffice.API.Controllers.Trading
             }
         }
         #endregion
+
+        #region BET
+        [HttpPost("bet/selections")]
+        public async Task<IActionResult> GetBetSelections([FromBody] BetSelectionDetailsRequest request)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetBetSelections(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("bet/details")]
+        public async Task<IActionResult> GetManualBetDetails([FromBody] ManualBetDetailsRequest request)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetManualBetDetails(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        #endregion
+
+        #region FASTODDS
+        [HttpGet("fastodds/sports/{fixtureTypeId}")]
+        public async Task<IActionResult> GetFastOddsSports(int fixtureTypeId)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetSports(fixtureTypeId, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("fastodds/fixtures")]
+        public async Task<IActionResult> GetFixtures([FromBody] FastOddsFixturesRequest request)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetFixtures(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        #endregion
+
+        #region MANUAL
+        [HttpPost("manual/marketsettlement")]
+        public async Task<IActionResult> AddOrUpdateManualMarketSettlement([FromBody] List<ManualMarketSettlementRequest> request, [FromQuery] string userId)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.AddOrUpdateManualMarketSettlement(request, userId, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("manual/marketsettlement/details")]
+        public async Task<IActionResult> GetManualMarketSettlementDetails([FromBody] ManualMarketSettlementDetailsRequest request)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetManualMarketSettlementDetails(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("manual/messagesettlement")]
+        public async Task<IActionResult> AddManualMessageSettlement([FromBody] List<MessageSettlementRequest> request)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.AddManualMessageSettlement(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("manual/messagesettlement/list")]
+        public async Task<IActionResult> GetMessageSettlementAudit([FromBody] ManualMessageSettlementRequest request)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetMessageSettlementAudit(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        #endregion
+
+        [HttpPost("publish")]
+        public async Task<IActionResult> Publish([FromBody] MessageRequest request)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.Publish(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("bookmakers")]
+        public async Task<IActionResult> GetBookmakers()
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetBookmakers(region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("notifications")]
+        public async Task<IActionResult> GetNotifications([FromBody] NotificationsRequest request)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetNotifications(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("markettemplateplayerprops")]
+        public async Task<IActionResult> GetMarketTemplatePlayerProps([FromBody] MarketTemplatePlayerPropsRequest request)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetMarketTemplatePlayerProps(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
     }
 }
