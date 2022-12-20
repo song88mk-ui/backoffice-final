@@ -489,7 +489,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var response = await GetHttpClient(region).GetAsync($"client/marketconfig?userId={clientCode}");
+                var response = await GetHttpClient(region).GetAsync($"client/marketconfig?clientCode={clientCode}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<List<ClientMarketConfig>>>(await response.Content.ReadAsStringAsync());
