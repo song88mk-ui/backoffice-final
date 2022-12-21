@@ -27,6 +27,24 @@ namespace Backoffice.Web.Components.SubUser
 
             }
         }
+        public async Task OnSubUserPreferenceClicked(ChangeEventArgs e, SubUserClaim claim, bool isReadOnly)
+        {
+            if(Convert.ToBoolean(e.Value) == true)
+            {
+                if(isReadOnly == true)
+                {
+                    claim.ClaimValue = "2";
+                }
+                else
+                {
+                    claim.ClaimValue = "1";
+                }
+            }
+            else
+            {
+                claim.ClaimValue = "0";
+            }
+        }
         public async Task OnCancelClickEvent()
         {
             ModalService.Cancel();

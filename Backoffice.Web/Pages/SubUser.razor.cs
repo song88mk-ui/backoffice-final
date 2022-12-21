@@ -66,6 +66,7 @@ namespace Backoffice.Web.Pages
                                 ClaimType = permission.ClaimType,
                                 HasReadOnly = permission.HasReadOnly,
                                 ClaimValue = "0",
+                                IsEnabled = true
                             };
 
                             var claim = UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType);
@@ -78,6 +79,7 @@ namespace Backoffice.Web.Pages
                                 subUserClaim.IsEnabled = false;
 
                             SubUserClaims.SubUserClaims.Add(subUserClaim);
+
                         }
                     }
                 }

@@ -35,25 +35,75 @@
                                 <h6 class="title fw-bold ps-2 py-1">Sub-User Preference</h6>
                             </div>
 
-                            @if(SubUserClaims != null && SubUserClaims.SubUserClaims.Any())
+                            @if (SubUserClaims != null && SubUserClaims.SubUserClaims.Any())
                             {
-                                foreach(var claim in SubUserClaims.SubUserClaims)
+                                for (int i = 0; i < SubUserClaims.SubUserClaims.Count; i++)
                                 {
-                                    <div class="col-md-12">
+                                    var x = i;
+
+                                    <div class="col-md-12 noselect">
                                         <div class="form-check">
-                                            @if(claim.IsEnabled)
-                                            {
-                                                <input class="form-check-input" type="checkbox" value="" id="permisionTopLeagues">
-                                            }
-                                            else
-                                            {
-                                                <input class="form-check-input" type="checkbox" value="" id="permisionTopLeagues" disabled>
-                                            }
-                                            <label class="form-check-label" for="permisionTopLeagues">
-                                                @claim.Name
+                                            <label class="form-check-label" for="permisionTopLeagues@(x)">
+                                                @if (SubUserClaims.SubUserClaims[x].IsEnabled)
+                                                {
+                                                    if (SubUserClaims.SubUserClaims[x].ClaimValue == "1")
+                                                    {
+                                                        <input class="form-check-input" type="checkbox" id="permisionTopLeagues@(x)" @onchange="(e) => OnSubUserPreferenceClicked(e, SubUserClaims.SubUserClaims[x], false)" checked>
+                                                    }
+                                                    else
+                                                    {
+                                                        <input class="form-check-input" type="checkbox" id="permisionTopLeagues@(x)" @onchange="(e) => OnSubUserPreferenceClicked(e, SubUserClaims.SubUserClaims[x], false)">
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    if (SubUserClaims.SubUserClaims[x].ClaimValue == "1")
+                                                    {
+                                                        <input class="form-check-input" type="checkbox" value="" id="permisionTopLeagues@(x)" checked disabled>
+                                                    }
+                                                    else
+                                                    {
+                                                        <input class="form-check-input" type="checkbox" value="" id="permisionTopLeagues@(x)" disabled>
+                                                    }
+                                                }
+                                                @SubUserClaims.SubUserClaims[x].Name
                                             </label>
                                         </div>
                                     </div>
+
+                                    @if (SubUserClaims.SubUserClaims[x].HasReadOnly)
+                                    {
+                                        <div class="col-md-12 noselect">
+                                            <div class="form-check">
+                                                <label class="form-check-label" for="permisionTopLeagues@(x)-readonly">
+                                                    @if (SubUserClaims.SubUserClaims[x].IsEnabled)
+                                                    {
+                                                        if (SubUserClaims.SubUserClaims[x].ClaimValue == "2")
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" value="" id="permisionTopLeagues@(x)-readonly" @onchange="(e) => OnSubUserPreferenceClicked(e, SubUserClaims.SubUserClaims[x], true)" checked>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" value="" id="permisionTopLeagues@(x)-readonly" @onchange="(e) => OnSubUserPreferenceClicked(e, SubUserClaims.SubUserClaims[x], true)">
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (SubUserClaims.SubUserClaims[x].ClaimValue == "2")
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" value="" id="permisionTopLeagues@(x)-readonly" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" value="" id="permisionTopLeagues@(x)-readonly" disabled>                                                            
+                                                        }
+                                                    }
+                                                    @SubUserClaims.SubUserClaims[x].Name (Readonly)
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
                                 }
                             }
                         </div>
