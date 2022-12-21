@@ -232,7 +232,7 @@ namespace Backoffice.API.Repositories
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
-                var response = await _httpClient.GetAsync($"api/user/subaccount/list?isSubUserOnly={isSubUserOnly}");
+                var response = await _httpClient.GetAsync($"api/user/permission/list?isSubUserOnly={isSubUserOnly}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<PermissionResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
