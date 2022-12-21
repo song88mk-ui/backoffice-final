@@ -267,7 +267,7 @@ namespace Backoffice.API.Controllers.Trading
         #endregion
 
         #region Priceboost
-        [HttpPost("sportsbook/outrightfixtures")]
+        [HttpPost("priceboost")]
         public async Task<IActionResult> AddOrUpdatePriceBoost([FromBody] List<PriceBoostConfigModel> request)
         {
             var region = "";
