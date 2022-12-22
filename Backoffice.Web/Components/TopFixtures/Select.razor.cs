@@ -8,7 +8,7 @@ namespace Backoffice.Web.Components.TopFixtures
     public partial class Select : ComponentBase, IDisposable
     {
         #region Properties
-        [Parameter] public List<SportsTreeResponse.SportReponse> SportsTree { get; set; }
+        [Parameter] public List<SportsTreeModel.SportModel> SportsTree { get; set; }
         [Parameter] public List<string> CurrentTopFixtures { get; set; }
         [Parameter] public string SelectedTopFixture { get; set; }
         [Parameter] public int RowCount { get; set; }
