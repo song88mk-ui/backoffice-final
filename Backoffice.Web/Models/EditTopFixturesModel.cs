@@ -1,5 +1,4 @@
 ﻿using Backoffice.Shared.Models;
-using Backoffice.Shared.Models.Response;
 
 namespace Backoffice.Web.Models
 {
@@ -7,12 +6,12 @@ namespace Backoffice.Web.Models
     {
         public EditTopFixturesModel()
         {
-            Sports = new List<SportsTreeResponse.SportReponse>();
+            Sports = new List<SportsTreeModel.SportModel>();
         }
-        public List<SportsTreeResponse.SportReponse> Sports { get; set; }
-        public SportsTreeResponse.SportReponse SelectedSport { get; set; }
-        public SportsTreeResponse.SegmentResponse SelectedSegment { get; set; }
-        public SportsTreeResponse.LeagueResponse SelectedLeague { get; set; }
+        public List<SportsTreeModel.SportModel> Sports { get; set; }
+        public SportsTreeModel.SportModel SelectedSport { get; set; }
+        public SportsTreeModel.SegmentModel SelectedSegment { get; set; }
+        public SportsTreeModel.LeagueModel SelectedLeague { get; set; }
         public FixtureModel SelectedGameFilter { get; set; }
         public FixtureModel SelectedGame { get; set; }
         public string SortFilter { get; set; }

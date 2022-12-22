@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.Clients
 
         public SearchFormModel SearchForm { get; set; }
         public int SortBy { get; set; }
-        public List<SelectListItemModel<int>> SelectSortByList { get; set; }
+        public List<Models.SelectListItemModel<int>> SelectSortByList { get; set; }
 
         #endregion
 
@@ -23,27 +23,27 @@ namespace Backoffice.Web.Components.Clients
         protected override async Task OnInitializedAsync()
         {
             SearchForm = new SearchFormModel();
-            SelectSortByList = new List<SelectListItemModel<int>>();
+            SelectSortByList = new List<Models.SelectListItemModel<int>>();
 
-            SelectSortByList.Add(new SelectListItemModel<int>
+            SelectSortByList.Add(new Models.SelectListItemModel<int>
             {
                 Name = "Sort by Business Name (Ascending)",
                 Value = (int)ClientSorting.SortByBusinessNameAsc
             });
 
-            SelectSortByList.Add(new SelectListItemModel<int>
+            SelectSortByList.Add(new Models.SelectListItemModel<int>
             {
                 Name = "Sort by Business Name (Descending)",
                 Value = (int)ClientSorting.SortByBusinessNameDesc
             });
 
-            SelectSortByList.Add(new SelectListItemModel<int>
+            SelectSortByList.Add(new Models.SelectListItemModel<int>
             {
                 Name = "Sort by Create Date (Ascending)",
                 Value = (int)ClientSorting.SortByCreatedDateAsc
             });
 
-            SelectSortByList.Add(new SelectListItemModel<int>
+            SelectSortByList.Add(new Models.SelectListItemModel<int>
             {
                 Name = "Sort by Create Date (Descending)",
                 Value = (int)ClientSorting.SortByCreatedDateDesc

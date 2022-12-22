@@ -1,5 +1,4 @@
 ﻿using Backoffice.Shared.Models;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -15,7 +14,7 @@ namespace Backoffice.Web.Components.TopFixtures
         [Parameter] public EventCallback<TopFixtureCallback> OnInitCallback { get; set; }
         [Parameter] public EventCallback<string> OnSearchCallback { get; set; }
         protected SearchFormModel SearchForm { get; set; }
-        public List<SelectListItemModel<ClientResponse.Client>> Clients { get; set; }
+        public List<Models.SelectListItemModel<ClientModel.Client>> Clients { get; set; }
         public string ClientId { get; set; }
 
         #endregion
@@ -26,7 +25,7 @@ namespace Backoffice.Web.Components.TopFixtures
         {
             try
             {
-                Clients = new List<SelectListItemModel<ClientResponse.Client>>();
+                Clients = new List<Models.SelectListItemModel<ClientModel.Client>>();
 
                 SearchForm = new SearchFormModel()
                 {
@@ -44,7 +43,7 @@ namespace Backoffice.Web.Components.TopFixtures
                         clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                     }
 
-                    Clients = clients.Clients.Select(s => new SelectListItemModel<ClientResponse.Client>
+                    Clients = clients.Clients.Select(s => new Models.SelectListItemModel<ClientModel.Client>
                     {
                         Value = s,
                         Name = s.ClientName
@@ -53,13 +52,13 @@ namespace Backoffice.Web.Components.TopFixtures
                 }
 
                 if (!Clients.Any())
-                    Clients.Add(new SelectListItemModel<ClientResponse.Client>
+                    Clients.Add(new Models.SelectListItemModel<ClientModel.Client>
                     {
-                        Value = new ClientResponse.Client(),
+                        Value = new ClientModel.Client(),
                         Name = "No Clients Available"
                     });
                 else
-                    Clients.Insert(0, new SelectListItemModel<ClientResponse.Client> { Value = new ClientResponse.Client(), Name = "Choose client..." });
+                    Clients.Insert(0, new Models.SelectListItemModel<ClientModel.Client> { Value = new ClientModel.Client(), Name = "Choose client..." });
 
                 var selectedClients = Clients.Where(c => !string.IsNullOrEmpty(c.Value.ClientCode)).Select(s => s.Value).ToList();
                 await OnInitCallback.InvokeAsync(new TopFixtureCallback

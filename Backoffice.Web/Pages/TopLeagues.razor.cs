@@ -1,11 +1,10 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.TopLeagues;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using static Backoffice.Shared.Models.Response.GetTopLeaguesResponse;
+using static Backoffice.Web.Models.TopLeaguesModel;
 
 namespace Backoffice.Web.Pages
 {
@@ -18,8 +17,8 @@ namespace Backoffice.Web.Pages
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public GetTopLeaguesRequest GetTopLeaguesRequest { get; set; }
-        public GetTopLeaguesResponse TopLeaguesList { get; set; }
-        public ClientResponse ClientInformation { get; set; }
+        public TopLeaguesModel TopLeaguesList { get; set; }
+        public ClientModel ClientInformation { get; set; }
         public List<long> UserClientCodes { get; set; }
         public TopLeaguesFilterModel TopLeaguesFilter { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
@@ -89,7 +88,7 @@ namespace Backoffice.Web.Pages
                 }
                 else
                 {
-                    TopLeaguesList = new GetTopLeaguesResponse();
+                    TopLeaguesList = new TopLeaguesModel();
                     TopLeaguesList.ClientTopLeagues = new List<OrderedClientTopLeagues>();
                 }
 

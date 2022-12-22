@@ -1,5 +1,4 @@
-﻿using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Models;
+﻿using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -12,10 +11,10 @@ namespace Backoffice.Web.Components.TopLeagues
         [Parameter] public int ClientId { get; set; }
         [Parameter] public int SportId { get; set; }
         [Parameter] public EventCallback<EditTopLeaguesModel> OnInitCallback { get; set; }
-        public SportsTreeResponse SportsTree { get; set; }
-        public SportsTreeResponse.SportReponse SelectedSport { get; set; }
-        public SportsTreeResponse.SegmentResponse SelectedSegment { get; set; }
-        public SportsTreeResponse.LeagueResponse SelectedLeague { get; set; }
+        public SportsTreeModel SportsTree { get; set; }
+        public SportsTreeModel.SportModel SelectedSport { get; set; }
+        public SportsTreeModel.SegmentModel SelectedSegment { get; set; }
+        public SportsTreeModel.LeagueModel SelectedLeague { get; set; }
         #endregion
 
         #region Methods
@@ -24,10 +23,10 @@ namespace Backoffice.Web.Components.TopLeagues
         {
             try
             {
-                SelectedSport = new SportsTreeResponse.SportReponse();
-                SelectedSegment = new SportsTreeResponse.SegmentResponse();
-                SelectedLeague = new SportsTreeResponse.LeagueResponse();
-                SportsTree = new SportsTreeResponse();
+                SelectedSport = new SportsTreeModel.SportModel();
+                SelectedSegment = new SportsTreeModel.SegmentModel();
+                SelectedLeague = new SportsTreeModel.LeagueModel();
+                SportsTree = new SportsTreeModel();
 
                 SportsTree = (await BackOfficeService.GetSportstreeByClientId(ClientId)).Result;
                 if (SportsTree != null)
@@ -35,7 +34,7 @@ namespace Backoffice.Web.Components.TopLeagues
 
                 var model = new EditTopLeaguesModel
                 {
-                    Sports = SportsTree.Sports ?? new List<SportsTreeResponse.SportReponse>(),
+                    Sports = SportsTree.Sports ?? new List<SportsTreeModel.SportModel>(),
                     SelectedSport = SelectedSport,
                     SelectedSegment = SelectedSegment,
                     SelectedLeague = SelectedLeague
@@ -50,7 +49,7 @@ namespace Backoffice.Web.Components.TopLeagues
         public async void OnSegmentChangedEvent(ChangeEventArgs e)
         {
             SelectedSegment = SelectedSport.Segments.FirstOrDefault(s => s.SegmentId == Convert.ToInt32(e.Value));
-            SelectedLeague = new SportsTreeResponse.LeagueResponse();
+            SelectedLeague = new SportsTreeModel.LeagueModel();
 
             var model = new EditTopLeaguesModel
             {

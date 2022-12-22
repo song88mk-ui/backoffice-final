@@ -1,11 +1,9 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.ParlayBonus;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using static Backoffice.Shared.Models.Response.ClientParlayBonusResponse;
 
 namespace Backoffice.Web.Pages
 {
@@ -18,20 +16,20 @@ namespace Backoffice.Web.Pages
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
-        public ClientParlayBonusResponse ClientParlayBonusResponse { get; set; }
+        public ClientParlayBonusModel ClientParlayBonusResponse { get; set; }
         public long ClientId { get; set; }
         public bool IsUpdating { get; set; } = false;
         public List<ParlayBonusConfig> TempConfig { get; set; }
         public bool IsPreloading { get; set; }
-        public List<SelectListItemModel<ClientResponse.Client>> Clients { get; set; }
+        public List<Models.SelectListItemModel<ClientModel.Client>> Clients { get; set; }
         #endregion
 
         protected override async Task OnInitializedAsync()
         {            
             PageTitle = "Parlay Bonus";
             IconClass = "ico ico-parlay-bonus";
-            ClientParlayBonusResponse = new ClientParlayBonusResponse();
-            Clients = new List<SelectListItemModel<ClientResponse.Client>>();
+            ClientParlayBonusResponse = new ClientParlayBonusModel();
+            Clients = new List<Models.SelectListItemModel<ClientModel.Client>>();
 
             TempConfig = new List<ParlayBonusConfig>();
 
@@ -57,7 +55,7 @@ namespace Backoffice.Web.Pages
                     clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                 }
 
-                Clients = clients.Clients.Select(s => new SelectListItemModel<ClientResponse.Client>
+                Clients = clients.Clients.Select(s => new Models.SelectListItemModel<ClientModel.Client>
                 {
                     Value = s,
                     Name = s.ClientName
@@ -66,13 +64,13 @@ namespace Backoffice.Web.Pages
             }
 
             if (!Clients.Any())
-                Clients.Add(new SelectListItemModel<ClientResponse.Client>
+                Clients.Add(new Models.SelectListItemModel<ClientModel.Client>
                 {
-                    Value = new ClientResponse.Client(),
+                    Value = new ClientModel.Client(),
                     Name = "No Clients Available"
                 });
             else
-                Clients.Insert(0, new SelectListItemModel<ClientResponse.Client> { Value = new ClientResponse.Client(), Name = "Choose client..." });
+                Clients.Insert(0, new Models.SelectListItemModel<ClientModel.Client> { Value = new ClientModel.Client(), Name = "Choose client..." });
 
             //var selectedClients = Clients.Where(c => !string.IsNullOrEmpty(c.Value.ClientCode)).Select(s => s.Value).ToList();            
         }

@@ -1,5 +1,4 @@
 ﻿using Backoffice.Shared.Models;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -10,14 +9,14 @@ namespace Backoffice.Web.Components.ParlayBonus
     {
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [Parameter] public ClientParlayBonusResponse ClientParlayBonusResponse { get; set; }        
+        [Parameter] public ClientParlayBonusModel ClientParlayBonusResponse { get; set; }        
         [Parameter] public EventCallback<bool> OnUpdateClickCallback { get; set; }
         [Parameter] public EventCallback<ParlayBonusConfig> OnAddClickCallback { get; set; }
         [Parameter] public EventCallback<long> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [Parameter] public List<SelectListItemModel<ClientResponse.Client>> Clients { get; set; }        
+        [Parameter] public List<Models.SelectListItemModel<ClientModel.Client>> Clients { get; set; }        
         public string ClientId { get; set; }
         public bool IsUpdating { get; set; } = false;        
         public decimal OriginalMinOdds { get; set; }

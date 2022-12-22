@@ -1,6 +1,5 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -15,10 +14,10 @@ namespace Backoffice.Web.Components.TopFixtures
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
-        public ClientTopFixtureResponse.OrderedClientTopFixture TopFixture { get; set; }
+        public ClientTopFixtureModel.OrderedClientTopFixture TopFixture { get; set; }
 
-        public ClientTopFixtureResponse.OrderedClientTopFixture NewTopFixture { get; set; }
-        public List<SportsTreeResponse.SportReponse> SportsTree { get; set; }
+        public ClientTopFixtureModel.OrderedClientTopFixture NewTopFixture { get; set; }
+        public List<SportsTreeModel.SportModel> SportsTree { get; set; }
         public List<string> CurrentTopFixtures { get; set; }
         public int SelectedRowIndex { get; set; }
         #endregion
@@ -27,8 +26,8 @@ namespace Backoffice.Web.Components.TopFixtures
         {
             try
             {
-                TopFixture = ModalParameters.TryGet<ClientTopFixtureResponse.OrderedClientTopFixture>("TopFixture");
-                SportsTree = new List<SportsTreeResponse.SportReponse>();
+                TopFixture = ModalParameters.TryGet<ClientTopFixtureModel.OrderedClientTopFixture>("TopFixture");
+                SportsTree = new List<SportsTreeModel.SportModel>();
                 CurrentTopFixtures = TopFixture.TopFixtures.Any() ? TopFixture.TopFixtures.Select(s => s.FixtureId).ToList() : new List<string>();
                 SelectedRowIndex = -1;
             }
@@ -40,10 +39,10 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async Task OnInitEvent(EditTopFixturesModel model)
         {
-            NewTopFixture = new ClientTopFixtureResponse.OrderedClientTopFixture();
+            NewTopFixture = new ClientTopFixtureModel.OrderedClientTopFixture();
             if (TopFixture.TopFixtures.Any())
             {
-                NewTopFixture.TopFixtures = new List<ClientTopFixtureResponse.TopFixture>();
+                NewTopFixture.TopFixtures = new List<ClientTopFixtureModel.TopFixture>();
                 var rowCount = 0;
                 foreach (var topFixture in TopFixture.TopFixtures)
                 {
@@ -68,8 +67,8 @@ namespace Backoffice.Web.Components.TopFixtures
 
             if(NewTopFixture.TopFixtures == null || !NewTopFixture.TopFixtures.Any())
             {
-                NewTopFixture.TopFixtures = new List<ClientTopFixtureResponse.TopFixture>();
-                NewTopFixture.TopFixtures.Add(new ClientTopFixtureResponse.TopFixture() { SortOrder = 1 });
+                NewTopFixture.TopFixtures = new List<ClientTopFixtureModel.TopFixture>();
+                NewTopFixture.TopFixtures.Add(new ClientTopFixtureModel.TopFixture() { SortOrder = 1 });
             }
 
             NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.OrderByDescending(t => t.FixtureStartDate).ToList();
@@ -114,15 +113,15 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async Task OnAddRow(int rowCtr)
         {
-            NewTopFixture.TopFixtures.Insert(rowCtr, new ClientTopFixtureResponse.TopFixture() { SortOrder = (rowCtr + 1) });
+            NewTopFixture.TopFixtures.Insert(rowCtr, new ClientTopFixtureModel.TopFixture() { SortOrder = (rowCtr + 1) });
             await SortOrderRow();
         }
-        public async Task OnDeleteRow(ClientTopFixtureResponse.TopFixture fixture)
+        public async Task OnDeleteRow(ClientTopFixtureModel.TopFixture fixture)
         {
             NewTopFixture.TopFixtures.Remove(fixture);
 
             if (NewTopFixture.TopFixtures.Count == 0)
-                NewTopFixture.TopFixtures.Add(new ClientTopFixtureResponse.TopFixture() { SortOrder = 1 });
+                NewTopFixture.TopFixtures.Add(new ClientTopFixtureModel.TopFixture() { SortOrder = 1 });
 
             await SortOrderRow();
 

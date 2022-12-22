@@ -1,5 +1,4 @@
 ﻿using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -18,7 +17,7 @@ namespace Backoffice.Web.Components.TopLeagues
         [Parameter] public int ClientId { get; set; }
         [Parameter] public int SportId { get; set; }
         [Parameter] public string SportName { get; set; }
-        public List<SportsTreeResponse.SportReponse> SportsTree { get; set; }
+        public List<SportsTreeModel.SportModel> SportsTree { get; set; }
 
         public GetAllLeaguesRequest GetAllLeaguesRequest { get; set; }
         public List<OrderedClientTopLeague> CurrentTopLeagues { get; set; }

@@ -6,17 +6,17 @@ namespace Backoffice.Web.Models
     {
         public TopFixturesModel()
         {
-            TopFixtures = new List<ClientTopFixtureResponse.OrderedClientTopFixture>();
-            TopFixturesFiltered = new List<ClientTopFixtureResponse.OrderedClientTopFixture>();
+            TopFixtures = new List<ClientTopFixtureModel.OrderedClientTopFixture>();
+            TopFixturesFiltered = new List<ClientTopFixtureModel.OrderedClientTopFixture>();
         }
-        public List<ClientTopFixtureResponse.OrderedClientTopFixture> TopFixtures { get; set; }
-        public List<ClientTopFixtureResponse.OrderedClientTopFixture> TopFixturesFiltered { get; set; }
+        public List<ClientTopFixtureModel.OrderedClientTopFixture> TopFixtures { get; set; }
+        public List<ClientTopFixtureModel.OrderedClientTopFixture> TopFixturesFiltered { get; set; }
         
     }
 
     public class TopFixtureCallback
     {
-        public List<ClientResponse.Client> SelectedClients { get; set; }
+        public List<ClientModel.Client> SelectedClients { get; set; }
         public string SearchText { get; set; }
     }
 }

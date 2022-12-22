@@ -4,7 +4,6 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
 
 namespace Backoffice.Web.Pages
 {
@@ -46,14 +45,14 @@ namespace Backoffice.Web.Pages
             }
             else
             {
-                TopFixturesModel.TopFixtures = new List<ClientTopFixtureResponse.OrderedClientTopFixture>();
+                TopFixturesModel.TopFixtures = new List<ClientTopFixtureModel.OrderedClientTopFixture>();
                 foreach(var client in request.SelectedClients)
                 {
-                    TopFixturesModel.TopFixtures.Add(new ClientTopFixtureResponse.OrderedClientTopFixture 
+                    TopFixturesModel.TopFixtures.Add(new ClientTopFixtureModel.OrderedClientTopFixture 
                     { 
                         ClientIdRef = (int)client.ClientId,  
                         ClientName = client.ClientName,
-                        TopFixtures = new List<ClientTopFixtureResponse.TopFixture>()
+                        TopFixtures = new List<ClientTopFixtureModel.TopFixture>()
                     });
                 }
             }
@@ -72,7 +71,7 @@ namespace Backoffice.Web.Pages
             MetaData.TotalCount = TopFixturesModel.TopFixturesFiltered.Count();
         }
 
-        public async Task OnEdit(ClientTopFixtureResponse.OrderedClientTopFixture topFixture)
+        public async Task OnEdit(ClientTopFixtureModel.OrderedClientTopFixture topFixture)
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
@@ -83,7 +82,7 @@ namespace Backoffice.Web.Pages
             ModalService.Open<EditModal>($"Set Top Fixtures of {topFixture.ClientName}", parameters, options);
         }
 
-        public async Task OnCopy(ClientTopFixtureResponse.OrderedClientTopFixture topFixture)
+        public async Task OnCopy(ClientTopFixtureModel.OrderedClientTopFixture topFixture)
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
@@ -106,7 +105,7 @@ namespace Backoffice.Web.Pages
                 {
                     var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = item.ToString() })).Result;
 
-                    clientTopFixture.TopFixtures = result.TopFixtures.FirstOrDefault()?.TopFixtures ?? new List<ClientTopFixtureResponse.TopFixture>();
+                    clientTopFixture.TopFixtures = result.TopFixtures.FirstOrDefault()?.TopFixtures ?? new List<ClientTopFixtureModel.TopFixture>();
 
                 }
             }

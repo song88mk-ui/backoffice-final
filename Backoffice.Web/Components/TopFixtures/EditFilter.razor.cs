@@ -1,5 +1,4 @@
 ﻿using Backoffice.Shared.Models;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -12,10 +11,10 @@ namespace Backoffice.Web.Components.TopFixtures
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Parameter] public int ClientId { get; set; }
         [Parameter] public EventCallback<EditTopFixturesModel> OnInitCallback { get; set; }
-        public SportsTreeResponse SportsTree { get; set; }
-        public SportsTreeResponse.SportReponse SelectedSport { get; set; }
-        public SportsTreeResponse.SegmentResponse SelectedSegment { get; set; }
-        public SportsTreeResponse.LeagueResponse SelectedLeague { get; set; }
+        public SportsTreeModel SportsTree { get; set; }
+        public SportsTreeModel.SportModel SelectedSport { get; set; }
+        public SportsTreeModel.SegmentModel SelectedSegment { get; set; }
+        public SportsTreeModel.LeagueModel SelectedLeague { get; set; }
         public FixtureModel SelectedGameFilter { get; set; }
         public string SortFilter { get; set; }
         #endregion
@@ -26,16 +25,16 @@ namespace Backoffice.Web.Components.TopFixtures
         {
             try
             {
-                SelectedSport = new SportsTreeResponse.SportReponse();
-                SelectedSegment = new SportsTreeResponse.SegmentResponse();
-                SelectedLeague = new SportsTreeResponse.LeagueResponse();
+                SelectedSport = new SportsTreeModel.SportModel();
+                SelectedSegment = new SportsTreeModel.SegmentModel();
+                SelectedLeague = new SportsTreeModel.LeagueModel();
                 SelectedGameFilter = new FixtureModel();
-                SportsTree = new SportsTreeResponse();
+                SportsTree = new SportsTreeModel();
                 SortFilter = "1";
 
                 SportsTree = (await BackOfficeService.GetSportstreeByClientId(ClientId)).Result;
 
-                var model = new EditTopFixturesModel
+                var model = new Models.EditTopFixturesModel
                 {
                     Sports = SportsTree.Sports,
                     SelectedSport = SelectedSport,
@@ -55,10 +54,10 @@ namespace Backoffice.Web.Components.TopFixtures
 
             SelectedSport = SportsTree.Sports.FirstOrDefault(s => s.SportId == Convert.ToInt32(e.Value));
             if (SelectedSport == null)
-                SelectedSport = new SportsTreeResponse.SportReponse();
+                SelectedSport = new SportsTreeModel.SportModel();
 
-            SelectedSegment = new SportsTreeResponse.SegmentResponse();
-            SelectedLeague = new SportsTreeResponse.LeagueResponse();
+            SelectedSegment = new SportsTreeModel.SegmentModel();
+            SelectedLeague = new SportsTreeModel.LeagueModel();
             SelectedGameFilter = new FixtureModel();
 
             var model = new EditTopFixturesModel
@@ -76,9 +75,9 @@ namespace Backoffice.Web.Components.TopFixtures
         {
             SelectedSegment = SelectedSport.Segments.FirstOrDefault(s => s.SegmentId == Convert.ToInt32(e.Value));
             if (SelectedSegment == null)
-                SelectedSegment = new SportsTreeResponse.SegmentResponse();
+                SelectedSegment = new SportsTreeModel.SegmentModel();
 
-            SelectedLeague = new SportsTreeResponse.LeagueResponse();
+            SelectedLeague = new SportsTreeModel.LeagueModel();
             SelectedGameFilter = new FixtureModel();
 
             var model = new EditTopFixturesModel
@@ -97,7 +96,7 @@ namespace Backoffice.Web.Components.TopFixtures
         {
             SelectedLeague = SelectedSegment.Leagues.FirstOrDefault(s => s.LeagueId == Convert.ToInt32(e.Value));
             if (SelectedLeague == null)
-                SelectedLeague = new SportsTreeResponse.LeagueResponse();
+                SelectedLeague = new SportsTreeModel.LeagueModel();
             SelectedGameFilter = new FixtureModel();
             var model = new EditTopFixturesModel
             {
