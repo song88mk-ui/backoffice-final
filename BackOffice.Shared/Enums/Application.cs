@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Backoffice.Shared.Enums
 {
-    public enum App
+    public enum Application
     {
         Admin = 1001,
         PartnerManagement = 1002,

@@ -1,4 +1,6 @@
-﻿using Backoffice.Shared.Models.Response;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -9,18 +11,25 @@ namespace Backoffice.Web.Components.SubUser
     public partial class CreateOrUpdateModal : IDisposable
     {
         #region Properties
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
+        public UserResponse SubUser { get; set; }
+        public string ConfirmPassword { get; set; }
         public SubUserClaimsModel SubUserClaims { get; set; }
+        public List<AlertModel> Alerts { get; set; }
+
         #endregion
         protected override async Task OnInitializedAsync()
         {
             try
             {
                 SubUserClaims = ModalParameters.TryGet<SubUserClaimsModel>("SubUserClaims");
-
+                Alerts = new List<AlertModel>();
+                SubUser = new UserResponse();
+                SubUser.Status = "Normal";
+                ConfirmPassword = string.Empty;
             }
             catch (Exception)
             {
@@ -51,34 +60,86 @@ namespace Backoffice.Web.Components.SubUser
         }
         public async Task OnSaveClickEvent()
         {
-            //var topFixtures = new List<ClientTopFixtureSetup>();
+            Alerts.Clear();
 
-            //if (NewTopFixture.TopFixtures != null && NewTopFixture.TopFixtures.Any())
-            //{
-            //    int rowCtr = 0;
-            //    foreach (var fixture in NewTopFixture.TopFixtures)
-            //    {
-            //        if (string.IsNullOrEmpty(fixture.FixtureId))
-            //            continue;
+            if (string.IsNullOrEmpty(SubUser.UserName))
+            {
+                Alerts.Add(new AlertModel
+                {
+                    AlertStatus = "Error",
+                    AltertMessage ="Sub Username is required",
+                    Opacity = 1.0m
+                });
+            }
 
-            //        rowCtr = rowCtr + 1;
-            //        topFixtures.Add(new ClientTopFixtureSetup
-            //        {
-            //            FixtureId = Convert.ToInt64(fixture.FixtureId),
-            //            SortOrder = rowCtr
-            //        });
-            //    }
-            //}
+            if (string.IsNullOrEmpty(SubUser.NickName))
+            {
+                Alerts.Add(new AlertModel
+                {
+                    AlertStatus = "Error",
+                    AltertMessage = "Nickname is required",
+                    Opacity = 1.0m
+                });
+            }
 
-            //if (!topFixtures.Any())
-            //    return;
+            if (string.IsNullOrEmpty(SubUser.Password))
+            {
+                Alerts.Add(new AlertModel
+                {
+                    AlertStatus = "Error",
+                    AltertMessage = "Password is required",
+                    Opacity = 1.0m
+                });
+            }
+            else if (string.IsNullOrEmpty(ConfirmPassword))
+            {
+                Alerts.Add(new AlertModel
+                {
+                    AlertStatus = "Error",
+                    AltertMessage = "Please confirm password",
+                    Opacity = 1.0m
 
-            //var request = new PostClientTopFixtureRequest()
-            //{
-            //    ClientId = TopFixture.ClientIdRef,
-            //    TopFixtures = topFixtures
-            //};
-            //await BackOfficeService.PostClientTopFixtures(request);
+                });
+            }
+            else if (SubUser.Password != ConfirmPassword)
+            {
+                Alerts.Add(new AlertModel
+                {
+                    AlertStatus = "Error",
+                    AltertMessage = "Password does not match",
+                    Opacity = 1.0m
+                });
+            }
+
+            if (Alerts.Any())
+                return;
+
+            var request = new UserRegisterRequest()
+            {
+                AppId = (int)Application.SportsBookClient,
+                AppName = Application.SportsBookClient.ToString(),
+                Email = "sbsubaccount@fci.com",
+                MainUserId = SubUserClaims.MainUserId,
+                NickName = SubUser.NickName,
+                Password = SubUser.Password,
+                Status = SubUser.Status,
+                UserName = $"{SubUserClaims.MainUserName}{SubUser.UserName}",
+                UserId = Guid.NewGuid().ToString(),
+                RoleName = "Default",
+                CreatedDate = DateTime.UtcNow,
+            };
+
+            request.UserClaims = new List<System.Security.Claims.Claim>();
+
+            if (SubUserClaims.SubUserClaims.Any())
+            {
+                foreach(var subClaim in SubUserClaims.SubUserClaims)
+                {
+                    request.UserClaims.Add(new System.Security.Claims.Claim(subClaim.ClaimType, subClaim.ClaimValue));
+                }
+            }
+
+            await AuthenticationService.Register(request);
 
             ModalService.Cancel();
 

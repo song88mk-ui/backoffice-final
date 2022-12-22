@@ -53,6 +53,9 @@ namespace Backoffice.Web.Pages
 
             if(isFirstTime)
             {
+                SubUserClaims.MainUserId = UserModel.Id;
+                SubUserClaims.MainUserName = UserModel.UserName;
+
                 Permissions = await GetPermissionList();
                 if(Permissions != null && Permissions.Permissions.Any())
                 {
@@ -100,7 +103,7 @@ namespace Backoffice.Web.Pages
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("SubUserClaims", SubUserClaims);
-
+            
             var options = new ModalOptions();
             ModalService.Open<CreateOrUpdateModal>("Create Sub-Users", parameters, options);
         }

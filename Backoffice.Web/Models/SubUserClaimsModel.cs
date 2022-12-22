@@ -9,6 +9,8 @@ namespace Backoffice.Web.Models
         {
             SubUserClaims = new List<SubUserClaim>();
         }
+        public string MainUserId { get; set; }
+        public string MainUserName { get; set; }
         public List<SubUserClaim> SubUserClaims { get; set; }
     }
 

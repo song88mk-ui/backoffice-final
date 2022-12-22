@@ -46,7 +46,7 @@ namespace Backoffice.Web.Shared
                         case "USERID":
                             UserModel.Id = claim.Value;
                             break;
-                        case "USERNAME":
+                        case "TOKENNAME":
                             UserModel.UserName = claim.Value;
                             break;
                         default:
