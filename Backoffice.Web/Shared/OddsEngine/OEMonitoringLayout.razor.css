@@ -4,6 +4,10 @@
     flex-direction: column;
 }
 
+article {
+    height: 100vh;
+}
+
 main {
     flex: 1;
     padding-left: 250px;

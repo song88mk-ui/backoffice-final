@@ -1,0 +1,21 @@
+﻿<div class="content-filter mx-3">
+    <div class="w-100 d-flex justify-content-between">
+        <div class="select-container">
+            <select class="form-select d-block">
+                <option value="market-1" selected>Market 1</option>
+                <option value="market-2">Market 2</option>
+                <option value="market-3">Market 3</option>
+            </select>
+        </div>
+        <div>
+            <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                <div class="input-group">
+                    <InputText id="search" placeholder="Search" class="form-control search-text valid border-end-0" @bind-Value="SearchForm.SearchText" />
+                    <span class="input-group-text border-start-0">
+                        <i class="fa fa-search"></i>
+                    </span>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>

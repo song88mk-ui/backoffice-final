@@ -1,4 +1,6 @@
-﻿@layout OEMonitoringLayout
+﻿@using Backoffice.Web.Components.OddsEngine.Monitoring
+
+@layout OEMonitoringLayout
 
 @page "/odds-engine"
 @page "/odds-engine/monitoring"
@@ -7,5 +9,330 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-
+    <Filter />
+</div>
+<div class="col-md-12">
+    <table class="table table-hover table-bordered mt-4">
+        <thead class="table-head">
+            <tr>
+                <th class="th-start-date py-3"></th>
+                <th class="th-fixture-name py-3"></th>
+                <th>BTR CTRL</th>
+                <th>10 BET CRYPTO</th>
+                <th>10 BET DRC</th>
+                <th>10 BET GHANA</th>
+                <th>10 CRIC INDIA</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <span>23/06/22</span>
+                    <br />
+                    <span class="fw-bold">23:30</span>
+                </td>
+                <td>
+                    <span>MONTREAL ALOUETTES</span>
+                    <br />
+                    <span class="fw-bold">SASKATCHEWAN ROUGHRIDERS</span>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span>23/06/22</span>
+                    <br />
+                    <span class="fw-bold">23:30</span>
+                </td>
+                <td>
+                    <span>MONTREAL ALOUETTES</span>
+                    <br />
+                    <span class="fw-bold">SASKATCHEWAN ROUGHRIDERS</span>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span>23/06/22</span>
+                    <br />
+                    <span class="fw-bold">23:30</span>
+                </td>
+                <td>
+                    <span>MONTREAL ALOUETTES</span>
+                    <br />
+                    <span class="fw-bold">SASKATCHEWAN ROUGHRIDERS</span>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span>23/06/22</span>
+                    <br />
+                    <span class="fw-bold">23:30</span>
+                </td>
+                <td>
+                    <span>MONTREAL ALOUETTES</span>
+                    <br />
+                    <span class="fw-bold">SASKATCHEWAN ROUGHRIDERS</span>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>2.56</span>
+                        </div>
+                        <div class="odds-container me-2 py-1 px-3">
+                            <span>1.62</span> 
+                        </div>
+                        <div class="py-1 px-2">
+                            <span>101</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
