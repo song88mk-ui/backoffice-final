@@ -2,3 +2,217 @@
     border-image: linear-gradient(241deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 1;
     border-left: 3px solid;
 }
+
+.modal-body {
+    overflow-y: scroll;
+    max-height: 30rem;
+}
+
+.form-label {
+    font-size: 0.8rem;
+}
+
+.input-group-text {
+    background-color: initial;
+    padding: 0rem 1rem;
+}
+
+.monthly-fee-lbl {
+    font-size: 0.7rem;
+    vertical-align: middle;
+}
+
+.form-check-input:checked {
+    background-color: #E43F2C;
+}
+
+#telephoneField {
+    font-size: 0.78rem;
+}
+
+.tax-settings {
+    border: solid 1px #C7C1C1;
+    border-radius: 3px 3px 0px 0px;
+}
+
+.tax-settings-head {
+    background-color: #F5F5F5;
+}
+
+.list-group-item {
+    border: none;
+}
+
+.list-group-item:hover, .list-group-item input, .list-group-item label {
+    cursor: pointer;
+}
+
+#allSports, #allVirtualSports, #allSportsWinnings, #allVirtualSportsWinnings {
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    z-index: 1;
+}
+
+.dropdown-menu li {
+    position: relative;
+}
+
+.tax-settings-btn {
+    border: 1px solid #C7C1C1;
+    font-size: 0.8rem;
+}
+
+.dropdown-menu {
+    font-size: 0.8rem;
+}
+
+#stakeField, #winningsField {
+    border-top-left-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;    
+}
+
+.btn-check:checked+.btn-radio {
+    box-shadow:none;
+    color: white;
+    background: transparent linear-gradient(269deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+.switchCompany {
+    position: relative;
+    display: inline-block;
+    width: 6rem;
+    height: 1.5rem;
+}
+
+.switchCompany #companyRevenueShareSwitch {
+    display: none;
+}
+
+.sliderCompany {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent linear-gradient(269deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+    .sliderCompany:before {
+        position: absolute;
+        content: "";
+        height: 1rem;
+        width: 1rem;
+        left: 0.2rem;
+        bottom: 0.3rem;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+#companyRevenueShareSwitch:focus + .sliderCompany {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+#companyRevenueShareSwitch:checked + .sliderCompany:before {
+    -webkit-transform: translateX(4.7rem);
+    -ms-transform: translateX(4.7rem);
+    transform: translateX(4.7rem);
+}
+
+/*------ ADDED CSS ---------*/
+.sliderCompany:after {
+    content: 'Fixed % GGR';
+    color: white;
+    display: block;
+    position: absolute;
+    transform: translate(-50%,-50%);
+    top: 50%;
+    left: 63%;
+    font-size: 0.6rem;    
+    width: 5rem;
+}
+
+#companyRevenueShareSwitch:checked + .sliderCompany:after {
+    content: 'Tier % GGR';
+    width: 4rem;
+    left: 55%;
+}
+
+/*--------- END --------*/
+
+/* Rounded sliders */
+.sliderCompany.round {
+    border-radius: 34px;
+}
+
+    .sliderCompany.round:before {
+        border-radius: 50%;
+    }
+
+.modalTab {
+    box-shadow: none !important;
+    color: black;    
+    border-radius: 0;
+}
+
+.addBtn {
+    color: white;
+    background: transparent linear-gradient(269deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, -10%);
+    font-size: 0.8rem;
+}
+
+.noPadding {
+    padding:0;
+}
+
+.btn-check:checked + label {
+    border-bottom: solid 3px #E12E22;
+    color: black;
+}
+
+.btn-check:not(:checked) + label {
+    color: #959595
+}
+
+.tier-lbl {
+    width: 30rem;
+}
+
+.modalBtn {
+    width: 112px;
+    height: 40px;
+    border-radius: 5px;
+    color: white;
+}
+
+.modalCancel {
+    background-color: #9AA0AB;
+}
+
+.modalSave {
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+.p-desc {
+    font-size: 0.54rem;
+    color: #959595;
+    margin-bottom: 0;
+}
+
+thead {
+    background-color: rgb(64, 78,103);
+    color: white;
+}
+
+.padRight {
+    padding-right: 12rem;
+}

@@ -6,27 +6,467 @@
                 <h6 class="title fw-bold ps-2 py-1">Business Information</h6>
             </div>
             <div class="col-md-12">
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-md-4">
-
+                        <label for="businessNameField" class="form-label">Business Name</label>
+                        <input type="text" class="form-control" id="businessNameField" placeholder="Enter Business Name" />
                     </div>
-                    <div class="col-md-4"></div>
-                    <div class="col-md-4"></div>
+                    <div class="col-md-4">
+                        <label for="websiteField" class="form-label">Website</label>
+                        <input type="text" class="form-control" id="websiteField" placeholder="https://www.song88.com" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="emailField" class="form-label">Email Address</label>
+                        <div class="input-group">
+                            <input type="email" class="form-control" id="emailField" placeholder="Enter Email Address" aria-label="Email" />
+                            <div class="input-group-text">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="emailNotifSwitch" aria-label="Notify email switch" />
+                                </div>
+                            </div>
+                        </div>
+                        <p class="fst-italic p-desc">Add Email Address and enable toggle to be notified via email.</p>
+                    </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6"></div>
-                    <div class="col-md-3"></div>
-                    <div class="col-md-3"></div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="monthlyFeeInputGroup" class="form-label">Monthly Fee</label>
+                        <div class="input-group" id="monthlyFeeInputGroup">
+                            <div class="input-group-text">
+                                <div class="form-check form-switch">
+                                    <input id="monthlyFeeSwitch" class="form-check-input" role="switch" type="checkbox" aria-label="Checkbox for Monthly Fee" />
+                                    <label class="form-check-label monthly-fee-lbl" for="monthlyFeeSwitch">Monthly Fee</label>
+                                </div>
+                            </div>
+
+                            <input type="text" class="form-control" placeholder="Enter Monthly Fee" id="monthlyFeeField" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="telephoneField" class="form-label">Telephone</label>
+                        <input type="text" class="form-control" id="telephoneField" placeholder="Enter Telephone Number" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="brandField" class="form-label">Brand</label>
+                        <input type="text" class="form-control" id="brandField" placeholder="Enter Brand" />
+                    </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6"></div>
-                    <div class="col-md-6"></div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6"></div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column tax-settings mb-3">
+                            <div class="p-2 mb-2 tax-settings-head">
+                                Tax Settings
+                            </div>
+                            <div class="ps-2 pb-3 border-bottom">
+                                <label for="stakeField" class="form-label stake-lbl">Stake</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">%</span>
+                                    <input type="text" id="stakeField" class="form-control rounded border-start-0" />
+                                    <div class="dropdown mx-2">
+                                        <button class="btn tax-settings-btn dropdown-toggle ps-4" type="button" id="sportTypesDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                            Exclude Sport Types
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sportTypesDropdown">
+                                            <li>
+                                                <input class="form-check-input" type="checkbox" id="allSports" aria-label="..." />
+                                                <button class="dropdown-item dropdown-toggle ps-4" id="sportsItemDropdown" data-bs-target="#sportCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sportCollapse">
+                                                    Sports
+                                                </button>
+
+                                                <div class="collapse" id="sportCollapse">
+                                                    <ul class="list-group">
+                                                        <li class="list-group-item">
+                                                            <input class="form-check-input" type="checkbox" id="soccerCheck" />
+                                                            <label class="form-check-label" for="soccerCheck">Soccer</label>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <input class="form-check-input" type="checkbox" id="basketBallCheck" />
+                                                            <label class="form-check-label" for="basketBallCheck">Basketball</label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li>
+                                                <input class="form-check-input" type="checkbox" id="allVirtualSports" aria-label="..." />
+                                                <button class="dropdown-item dropdown-toggle ps-4" id="virtualSportsItemDropdown" data-bs-target="#virtualSportCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="virtualSportCollapse">
+                                                    Virtual Sports
+                                                </button>
+
+                                                <div class="collapse" id="virtualSportCollapse">
+                                                    <ul class="list-group">
+                                                        <li class="list-group-item">
+                                                            <input class="form-check-input" type="checkbox" id="virtualSoccerCheck" />
+                                                            <label class="form-check-label" for="virtualSoccerCheck">Virtual Soccer</label>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <input class="form-check-input" type="checkbox" id="virtualBasketballCheck" />
+                                                            <label class="form-check-label" for="virtualBasketballCheck">Basketball</label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ps-2 pb-3 pt-2">
+                                <label for="winningsField" class="form-label stake-lbl">Winnings</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">%</span>
+                                    <input type="text" id="winningsField" class="form-control rounded border-start-0" />
+                                    <div class="dropdown mx-2">
+                                        <button class="btn tax-settings-btn dropdown-toggle ps-4" type="button" id="sportTypesWinningsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                            Exclude Sport Types
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sportTypesWinningsDropdown">
+                                            <li>
+                                                <input class="form-check-input" type="checkbox" id="allSportsWinnings" aria-lab el="..." />
+                                                <button class="dropdown-item dropdown-toggle ps-4" id="sportsItemWinningsDropdown" data-bs-target="#sportWinningsCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sportWinningsCollapse">
+                                                    Sports
+                                                </button>
+
+                                                <div class="collapse" id="sportWinningsCollapse">
+                                                    <ul class="list-group">
+                                                        <li class="list-group-item">
+                                                            <input class="form-check-input" type="checkbox" id="soccerWinningsCheck" />
+                                                            <label class="form-check-label" for="soccerWinningsCheck">Soccer</label>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <input class="form-check-input" type="checkbox" id="basketBallWinningsCheck" />
+                                                            <label class="form-check-label" for="basketBallWinningsCheck">Basketball</label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li>
+                                                <input class="form-check-input" type="checkbox" id="allVirtualSportsWinnings" aria-label="..." />
+                                                <button class="dropdown-item dropdown-toggle ps-4" id="virtualSportsItemWinningsDropdown" data-bs-target="#virtualSportWinningsCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="virtualSportWinningsCollapse">
+                                                    Virtual Sports
+                                                </button>
+
+                                                <div class="collapse" id="virtualSportWinningsCollapse">
+                                                    <ul class="list-group">
+                                                        <li class="list-group-item">
+                                                            <input class="form-check-input" type="checkbox" id="virtualSoccerWinningsCheck" />
+                                                            <label class="form-check-label" for="virtualSoccerWinningsCheck">Virtual Soccer</label>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <input class="form-check-input" type="checkbox" id="virtualBasketballWinningsCheck" />
+                                                            <label class="form-check-label" for="virtualBasketballWinningsCheck">Basketball</label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column tax-settings">
+                            <div class="p-2 mb-2 tax-settings-head">
+                                Bet Slip Settings
+                            </div>
+                            <div class="p-2">
+                                <label class="form-label" for="betSlipSettingsField">
+                                    Maximum No. of Selections
+                                </label>
+                                <input type="text" id="betSlipSettingsField" placeholder="20" />
+                                <p class="fst-italic p-desc">This will limit the number of bets a user can place in the bet slip.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column">
+                            <div class="p-2">
+                                Region
+                            </div>
+                            <div class="btn-group border rounded p-2" role="group" aria-label="Region Toggle Button Group">
+                                <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" checked />
+                                <label class="btn btn-radio" for="hongkongRadio">Hongkong</label>
+
+                                <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" />
+                                <label class="btn btn-radio" for="africaRadio">Africa</label>
+                            </div>
+
+                            <div class="d-flex flex-column mt-3 tax-settings">
+                                <div class="d-flex justify-content-between tax-settings-head">
+                                    <div class="p-2">
+                                        Company Revenue Share
+                                    </div>
+
+                                    <label class="switchCompany m-2">
+                                        <input type="checkbox" id="companyRevenueShareSwitch" @onclick="ToggleCompanyRevenueSwitch" />
+                                        <div class="sliderCompany round"></div>
+                                    </label>
+                                </div>
+
+                                @if (!companyRevenueToggle)
+                                {
+                                //fixed
+                                    <div class="d-flex justify-content-around">
+                                        <div class="p-2">
+                                            <label class="form-label" for="sportsBookDropdown">Sportsbook</label>
+                                            <select class="form-control form-select" aria-label="Sportsbook Dropdown" id="sportsBookDropdown">
+                                                <option value="50">50%</option>
+                                                <option value="60">60%</option>
+                                                <option value="70">70%</option>
+                                                <option value="80">80%</option>
+                                                <option value="90">90%</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="p-2">
+                                            <label class="form-label" for="jackpotDropdown">Jackpot</label>
+                                            <select class="form-control form-select" aria-label="Jackpot Dropdown" id="jackpotDropdown">
+                                                <option value="50">50%</option>
+                                                <option value="60">60%</option>
+                                                <option value="70">70%</option>
+                                                <option value="80">80%</option>
+                                                <option value="90">90%</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                //tier
+                                    <div class="d-flex flex-column p-3">
+                                        <div class="d-flex justify-content-evenly">
+                                            <div>
+                                                <input type="radio" class="btn-check" name="tierOptions" id="sportsBookOption" checked />
+                                                <label class="btn modalTab" for="sportsBookOption">Sportsbook</label>
+                                            </div>
+                                            <div>
+                                                <input type="radio" class="btn-check" name="tierOptions" id="jackpotOption" />
+                                                <label class="btn modalTab" for="jackpotOption">Jackpot</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="p-2 border rounded">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr class="border rounded">
+                                                        <th scope="col">No.</th>
+                                                        <th scope="col">From</th>
+                                                        <th scope="col">To</th>
+                                                        <th scope="col">%GGR</th>
+                                                        <th scope="col" class="noPadding"><button class="btn addBtn" type="button">Add</button></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td scope="row" colspan="5" class="text-center">No Tiers Yet</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div class="d-flex align-items-center">
+                                                <label class="tier-lbl">Above Tier Settings</label>
+                                                <select class="form-select" aria-label="Above Tier Select" id="aboveTierSelect">
+                                                    <option value="50">50%</option>
+                                                    <option value="60">60%</option>
+                                                    <option value="70">70%</option>
+                                                    <option value="80">80%</option>
+                                                    <option value="90">90%</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="bet-container"></div>
+    <div class="bet-container">
+        <div class="row">
+            <div class="col-md-12">
+                <h6 class="title fw-bold ps-2 py-1">Bet Setting</h6>
+            </div>
+            <div class="col-md-12">
+                <div class="row">
+                    @foreach (var currency in Currenycies)
+                    {
+                        <div class="col">
+                            <input type="radio" class="btn-check" name="currencyOptions" id="@currency" />
+                            <label class="btn modalTab" for="@currency">@currency</label>
+                        </div>
+                    }
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column tax-settings">
+                            <div class="p-2 mb-2 tax-settings-head">
+                                Soccer
+                            </div>
+                            <div class="p-2 d-flex">
+                                <div class="d-flex flex-column me-4">
+                                    <label class="form-label" for="soccerMinTicketField">
+                                        Min Per Ticket
+                                    </label>
+                                    <input type="text" class="form-control" id="soccerMinTicketField" />
+                                    <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                </div>
+
+                                <div class="d-flex flex-column">
+                                    <label class="form-label" for="soccerMaxTicketField">
+                                        Max Per Ticket
+                                    </label>
+                                    <input type="text" class="form-control" id="soccerMaxTicketField" />
+                                </div>
+                            </div>
+                            <div class="ps-2 pb-2 padRight">
+                                <label class="form-label" for="soccerMaxGameField">Max Per Game</label>
+                                <input type="text" class="form-control" id="soccerMaxGameField" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column tax-settings">
+                            <div class="p-2 mb-2 tax-settings-head">
+                                Cricket
+                            </div>
+                            <div class="p-2 d-flex">
+                                <div class="d-flex flex-column me-4">
+                                    <label class="form-label" for="cricketMinTicketField">
+                                        Min Per Ticket
+                                    </label>
+                                    <input type="text" class="form-control" id="cricketMinTicketField" />
+                                    <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                </div>
+
+                                <div class="d-flex flex-column">
+                                    <label class="form-label" for="cricketMaxTicketField">
+                                        Max Per Ticket
+                                    </label>
+                                    <input type="text" class="form-control" id="cricketMaxTicketField" />
+                                </div>
+                            </div>
+                            <div class="ps-2 pb-2 padRight">
+                                <label class="form-label" for="cricketMaxGameField">Max Per Game</label>
+                                <input type="text" class="form-control" id="cricketMaxGameField" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column tax-settings">
+                            <div class="p-2 mb-2 tax-settings-head">
+                                Other Sports
+                            </div>
+                            <div class="p-2 d-flex">
+                                <div class="d-flex flex-column me-4">
+                                    <label class="form-label" for="othersMinTicketField">
+                                        Min Per Ticket
+                                    </label>
+                                    <input type="text" class="form-control" id="othersMinTicketField" />
+                                    <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                </div>
+
+                                <div class="d-flex flex-column">
+                                    <label class="form-label" for="othersMaxTicketField">
+                                        Max Per Ticket
+                                    </label>
+                                    <input type="text" class="form-control" id="othersMaxTicketField" />
+                                </div>
+                            </div>
+                            <div class="ps-2 pb-2 padRight">
+                                <label class="form-label" for="othersMaxGameField">Max Per Game</label>
+                                <input type="text" class="form-control" id="othersMaxGameField" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column tax-settings">
+                            <div class="p-2 mb-2 tax-settings-head">
+                                Parlay
+                            </div>
+                            <div class="p-2 d-flex">
+                                <div class="d-flex flex-column me-4">
+                                    <label class="form-label" for="parlayMinTicketField">
+                                        Min Per Ticket
+                                    </label>
+                                    <input type="text" class="form-control" id="parlayMinTicketField" />
+                                    <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                </div>
+
+                                <div class="d-flex flex-column">
+                                    <label class="form-label" for="parlayMaxTicketField">
+                                        Max Per Ticket
+                                    </label>
+                                    <input type="text" class="form-control" id="parlayMaxTicketField" />
+                                </div>
+                            </div>
+                            <div class="ps-2 pb-2">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="parlayMaxPayoutField">Max Payout Per Ticket</label>
+                                        <input type="text" class="form-control" id="parlayMaxPayoutField" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="parlayMaxBonusWinnings">Max Bonus Winnings</label>
+                                        <input type="text" class="form-control" id="parlayMaxBonusWinnings" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column tax-settings">
+                            <div class="p-2 mb-2 tax-settings-head">
+                                Price Boost
+                            </div>
+
+                            <div class="p-2">
+                                <label class="form-label" for="priceboostMaxStake">Max Stake</label>
+                                <input type="text" class="form-control" id="priceboostMaxStake" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column tax-settings">
+                            <div class="p-2 mb-2 tax-settings-head">
+                                Bet Builder
+                            </div>
+
+                            <div class="p-2">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="betBuilderMinTicket">Min Per Ticket</label>
+                                        <input type="text" id="betBuilderMinTicket" class="form-control" />
+                                        <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="betBuilderMaxTicket">Max Per Ticket</label>
+                                        <input type="text" id="betBuilderMaxTicket" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                                        
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal">Cancel</button>
+    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal">Save</button>
 </div>
