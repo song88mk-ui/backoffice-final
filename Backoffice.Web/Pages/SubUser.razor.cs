@@ -55,36 +55,13 @@ namespace Backoffice.Web.Pages
             {
                 SubUserClaims.MainUserId = UserModel.Id;
                 SubUserClaims.MainUserName = UserModel.UserName;
+                SubUserClaims.SubUserClaims = new List<SubUserClaim>();
 
                 Permissions = await GetPermissionList();
+
                 if (Permissions != null && Permissions.Permissions.Any())
                 {
-                    foreach (var permission in Permissions.Permissions)
-                    {
-                        if (permission.IsSubUser)
-                        {
-                            var subUserClaim = new SubUserClaim
-                            {
-                                Name = permission.Name,
-                                ClaimType = permission.ClaimType,
-                                HasReadOnly = permission.HasReadOnly,
-                                ClaimValue = "0",
-                                IsEnabled = true
-                            };
-
-                            var claim = UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType);
-                            if (claim != null && Convert.ToInt32(claim.Value) > 0)
-                            {
-                                subUserClaim.ClaimValue = claim.Value;
-                            }
-
-                            if (string.IsNullOrEmpty(subUserClaim.ClaimValue) || subUserClaim.ClaimValue == "0")
-                                subUserClaim.IsEnabled = false;
-
-                            SubUserClaims.SubUserClaims.Add(subUserClaim);
-
-                        }
-                    }
+                    SubUserClaims.SubUserClaims = GetSubUserClaims(null);
                 }
             }
         }
@@ -98,14 +75,34 @@ namespace Backoffice.Web.Pages
 
         public async Task OnCreateSubUserClickEvent()
         {
+            SubUserClaims.SubUserClaims.Clear();
+            SubUserClaims.SubUserClaims = GetSubUserClaims(null);
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("SubUserClaims", SubUserClaims);
+            parameters.Add("SubUser", new UserResponse());
+            parameters.Add("IsEdit", false);
 
             var options = new ModalOptions();
             ModalService.Open<CreateOrUpdateModal>("Create Sub-Users", parameters, options);
+        }
+
+        public async Task OnEditSubUserClickEvent(UserResponse user)
+        {
+            SubUserClaims.SubUserClaims.Clear();
+            SubUserClaims.SubUserClaims = GetSubUserClaims(user.Claims);
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("SubUserClaims", SubUserClaims);
+            parameters.Add("SubUser", user);
+            parameters.Add("IsEdit", true);
+
+            var options = new ModalOptions();
+            ModalService.Open<CreateOrUpdateModal>("Edit Sub-Users", parameters, options);
         }
 
         public async Task OnSaveClickEvent(object item)
@@ -169,6 +166,48 @@ namespace Backoffice.Web.Pages
             return new PermissionResponse();
         }
 
+        private List<SubUserClaim> GetSubUserClaims(List<ClaimModel> claims)
+        {
+            var subUserClaims = new List<SubUserClaim>();
+
+            foreach (var permission in Permissions.Permissions)
+            {
+                if (permission.IsSubUser)
+                {
+                    var subUserClaim = new SubUserClaim
+                    {
+                        Name = permission.Name,
+                        ClaimType = permission.ClaimType,
+                        HasReadOnly = permission.HasReadOnly,
+                        ClaimValue = "0",
+                        IsEnabled = true
+                    };
+
+                    var claim = UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType);
+                    if (claim != null && Convert.ToInt32(claim.Value) > 0)
+                    {
+                        subUserClaim.ClaimValue = claim.Value;
+                    }
+
+                    if (string.IsNullOrEmpty(subUserClaim.ClaimValue) || subUserClaim.ClaimValue == "0")
+                        subUserClaim.IsEnabled = false;
+
+                    if (claims != null)
+                    {
+                        var userClaim = claims.FirstOrDefault(c => c.ClaimType == subUserClaim.ClaimType);
+                        if (userClaim != null)
+                            subUserClaim.ClaimValue = userClaim.ClaimValue;
+                        else
+                            subUserClaim.ClaimValue = "0";
+                    }
+
+                    subUserClaims.Add(subUserClaim);
+
+                }
+            }
+            return subUserClaims;
+        }
+
         private string GetClaimsList(List<ClaimModel> claims)
         {
             if(claims != null && claims.Any())
@@ -176,10 +215,13 @@ namespace Backoffice.Web.Pages
                 var claimsList = string.Empty;
                 foreach(var claim in claims)
                 {
-                    var permission = Permissions.Permissions.FirstOrDefault(p => p.ClaimType == claim.ClaimType);
-                    if(permission != null)
+                    if(claim.ClaimValue != "0")
                     {
-                        claimsList = claimsList + (string.IsNullOrEmpty(claimsList) ? string.Empty : ", ") + $"{permission.Name}";
+                        var permission = Permissions.Permissions.FirstOrDefault(p => p.ClaimType == claim.ClaimType);
+                        if (permission != null)
+                        {
+                            claimsList = claimsList + (string.IsNullOrEmpty(claimsList) ? string.Empty : ", ") + $"{permission.Name}" + (claim.ClaimValue == "2" ? " (ReadOnly)" : string.Empty);
+                        }
                     }
                 }
                 return claimsList;

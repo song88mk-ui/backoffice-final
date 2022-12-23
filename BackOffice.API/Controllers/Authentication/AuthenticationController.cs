@@ -103,6 +103,31 @@ namespace Backoffice.API.Controllers.Authentication
             }
         }
 
+        [HttpPost("user/modify")]
+        public async Task<IActionResult> UpdateUser([FromBody] UserRegisterRequest request)
+        {
+            var result = new BaseResponse<bool>()
+            {
+                StatusCode = Shared.Enums.StatusCode.Unauthorized,
+                Message = "Missing authorization"
+            };
+            if (HttpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+                result = await _authenticationRepository.UpdateUser(request, token);
+
+            }
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetCurrentUser(string userId)
         {

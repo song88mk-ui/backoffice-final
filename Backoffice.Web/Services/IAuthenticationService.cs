@@ -10,6 +10,7 @@ namespace Backoffice.Web.Services
         Task<TokenModel> AuthenticateToken();
         Task<bool> Logout();
         Task<BaseResponse<bool>> Register(UserRegisterRequest request);
+        Task<BaseResponse<bool>> UpdateUser(UserRegisterRequest request);
         Task<BaseResponse<UserListResponse>> GetSubAccounts(SubAccountListRequest request);
         Task<BaseResponse<PermissionResponse>> GetPermissionList(bool isSubUser);
     }

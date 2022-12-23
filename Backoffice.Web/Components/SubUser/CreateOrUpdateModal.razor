@@ -18,19 +18,46 @@
                     </div>
                     <div class="col-md-12">
                         <label for="selectStatus" class="form-label">Status</label>
-                        <select id="selectStatus" class="form-select" disabled>
-                            <option value="Normal" selected>Normal</option>
-                            <option value="Locked">Locked</option>
-                        </select>
+                        @if(IsEdit == true)
+                        {
+                            <select id="selectStatus" class="form-select" @onchange="OnStatusChangedEvent">
+                                @if(SubUser.Status == "Normal")
+                                {
+                                    <option value="Normal" selected>Normal</option>
+                                    <option value="Locked">Locked</option>
+                                }
+                                else if(SubUser.Status == "Locked")
+                                {
+                                    <option value="Normal">Normal</option>
+                                    <option value="Locked" selected>Locked</option>
+                                }
+                                else
+                                {
+                                    <option value="Normal">Normal</option>
+                                    <option value="Locked">Locked</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <select id="selectStatus" class="form-select" disabled>
+                                <option value="Normal" selected>Normal</option>
+                                <option value="Locked">Locked</option>
+                            </select>
+                        }
                     </div>
-                    <div class="col-md-6">
-                        <label for="inputPassword" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="inputPassword" placeholder="Password" @bind-value="SubUser.Password">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="inputPassword2" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="inputPassword2" placeholder="Confirm Password" @bind-value="ConfirmPassword">
-                    </div>
+                    @if(IsEdit == false)
+                    {
+                        <div class="col-md-6">
+                            <label for="inputPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="inputPassword" placeholder="Password" @bind-value="SubUser.Password">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="inputPassword2" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="inputPassword2" placeholder="Confirm Password" @bind-value="ConfirmPassword">
+                        </div>
+                    }
+
                     <div class="col-md-12">
                         <div class="row">
                             <div class="col-md-12">

@@ -16,6 +16,7 @@ namespace Backoffice.Web.Components.SubUser
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         public UserResponse SubUser { get; set; }
+        public bool IsEdit { get; set; }
         public string ConfirmPassword { get; set; }
         public SubUserClaimsModel SubUserClaims { get; set; }
         public List<AlertModel> Alerts { get; set; }
@@ -27,8 +28,13 @@ namespace Backoffice.Web.Components.SubUser
             {
                 SubUserClaims = ModalParameters.TryGet<SubUserClaimsModel>("SubUserClaims");
                 Alerts = new List<AlertModel>();
-                SubUser = new UserResponse();
-                SubUser.Status = "Normal";
+                SubUser = ModalParameters.TryGet<UserResponse>("SubUser");
+                IsEdit = ModalParameters.TryGet<bool>("IsEdit");
+                SubUser.Status = IsEdit ? SubUser.Status : "Normal";
+
+                if (SubUser.UserName.IndexOf(SubUserClaims.MainUserName) == 0)
+                    SubUser.UserName = SubUser.UserName.Replace(SubUserClaims.MainUserName, "");
+
                 ConfirmPassword = string.Empty;
             }
             catch (Exception)
@@ -38,9 +44,9 @@ namespace Backoffice.Web.Components.SubUser
         }
         public async Task OnSubUserPreferenceClicked(ChangeEventArgs e, SubUserClaim claim, bool isReadOnly)
         {
-            if(Convert.ToBoolean(e.Value) == true)
+            if (Convert.ToBoolean(e.Value) == true)
             {
-                if(isReadOnly == true)
+                if (isReadOnly == true)
                 {
                     claim.ClaimValue = "2";
                 }
@@ -53,6 +59,10 @@ namespace Backoffice.Web.Components.SubUser
             {
                 claim.ClaimValue = "0";
             }
+        }
+        public async Task OnStatusChangedEvent(ChangeEventArgs e)
+        {
+            SubUser.Status = e.Value.ToString();
         }
         public async Task OnCancelClickEvent()
         {
@@ -67,7 +77,7 @@ namespace Backoffice.Web.Components.SubUser
                 Alerts.Add(new AlertModel
                 {
                     AlertStatus = "Error",
-                    AltertMessage ="Sub Username is required",
+                    AltertMessage = "Sub Username is required",
                     Opacity = 1.0m
                 });
             }
@@ -82,7 +92,7 @@ namespace Backoffice.Web.Components.SubUser
                 });
             }
 
-            if (string.IsNullOrEmpty(SubUser.Password))
+            if (!IsEdit && string.IsNullOrEmpty(SubUser.Password))
             {
                 Alerts.Add(new AlertModel
                 {
@@ -91,7 +101,7 @@ namespace Backoffice.Web.Components.SubUser
                     Opacity = 1.0m
                 });
             }
-            else if (string.IsNullOrEmpty(ConfirmPassword))
+            else if (!IsEdit && string.IsNullOrEmpty(ConfirmPassword))
             {
                 Alerts.Add(new AlertModel
                 {
@@ -101,7 +111,7 @@ namespace Backoffice.Web.Components.SubUser
 
                 });
             }
-            else if (SubUser.Password != ConfirmPassword)
+            else if (!IsEdit && SubUser.Password != ConfirmPassword)
             {
                 Alerts.Add(new AlertModel
                 {
@@ -124,38 +134,62 @@ namespace Backoffice.Web.Components.SubUser
                 Password = SubUser.Password,
                 Status = SubUser.Status,
                 UserName = $"{SubUserClaims.MainUserName}{SubUser.UserName}",
-                UserId = Guid.NewGuid().ToString(),
+                UserId = IsEdit ? SubUser.UserId : Guid.NewGuid().ToString(),
                 RoleName = "Default",
-                CreatedDate = DateTime.UtcNow,
+                CreatedDate = IsEdit ? SubUser.CreatedDate : DateTime.UtcNow,
             };
 
             request.Claims = new List<ClaimModel>();
 
             if (SubUserClaims.SubUserClaims.Any())
             {
-                foreach(var subClaim in SubUserClaims.SubUserClaims)
+                foreach (var subClaim in SubUserClaims.SubUserClaims)
                 {
                     request.Claims.Add(new ClaimModel { ClaimType = subClaim.ClaimType, ClaimValue = subClaim.ClaimValue });
                 }
             }
 
-            var result = (await AuthenticationService.Register(request)).Result;
-
-            if(result)
+            if(IsEdit == true)
             {
-                ModalService.Cancel();
+                var result = (await AuthenticationService.UpdateUser(request)).Result;
 
-                await Modal.OnSaveClickCallback.InvokeAsync();
+                if (result)
+                {
+                    ModalService.Cancel();
+
+                    await Modal.OnSaveClickCallback.InvokeAsync();
+                }
+                else
+                {
+                    Alerts.Add(new AlertModel
+                    {
+                        AlertStatus = "Error",
+                        AltertMessage = $"Failed to insert {SubUserClaims.MainUserName}{SubUser.UserName}",
+                        Opacity = 1.0m
+                    });
+                }
             }
             else
             {
-                Alerts.Add(new AlertModel
+                var result = (await AuthenticationService.Register(request)).Result;
+
+                if (result)
                 {
-                    AlertStatus = "Error",
-                    AltertMessage = $"Failed to insert {SubUserClaims.MainUserName}{SubUser.UserName}",
-                    Opacity = 1.0m
-                });
+                    ModalService.Cancel();
+
+                    await Modal.OnSaveClickCallback.InvokeAsync();
+                }
+                else
+                {
+                    Alerts.Add(new AlertModel
+                    {
+                        AlertStatus = "Error",
+                        AltertMessage = $"Failed to insert {SubUserClaims.MainUserName}{SubUser.UserName}",
+                        Opacity = 1.0m
+                    });
+                }
             }
+            
         }
         public void Dispose()
         {
