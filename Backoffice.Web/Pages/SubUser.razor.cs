@@ -110,21 +110,7 @@ namespace Backoffice.Web.Pages
 
         public async Task OnSaveClickEvent(object item)
         {
-            //var clientIdRefs = string.IsNullOrEmpty(item.ToString()) ? new List<string>() : item.ToString().Split(",").ToList();
-            //foreach (var clientIdRef in clientIdRefs)
-            //{
-            //    if (string.IsNullOrEmpty(clientIdRef))
-            //        continue;
-
-            //    var clientTopFixture = TopFixturesModel.TopFixtures.FirstOrDefault(t => t.ClientIdRef == Convert.ToInt32(clientIdRef));
-            //    if (clientTopFixture != null)
-            //    {
-            //        var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = item.ToString() })).Result;
-
-            //        clientTopFixture.TopFixtures = result.TopFixtures.FirstOrDefault()?.TopFixtures ?? new List<ClientTopFixtureResponse.TopFixture>();
-
-            //    }
-            //}
+            SubUsers = await GetSubUsers(1);
         }
 
         public void Dispose()

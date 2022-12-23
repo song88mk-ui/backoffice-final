@@ -139,11 +139,23 @@ namespace Backoffice.Web.Components.SubUser
                 }
             }
 
-            await AuthenticationService.Register(request);
+            var result = (await AuthenticationService.Register(request)).Result;
 
-            ModalService.Cancel();
+            if(result)
+            {
+                ModalService.Cancel();
 
-            //await Modal.OnSaveClickCallback.InvokeAsync(TopFixture.ClientIdRef.ToString());
+                await Modal.OnSaveClickCallback.InvokeAsync();
+            }
+            else
+            {
+                Alerts.Add(new AlertModel
+                {
+                    AlertStatus = "Error",
+                    AltertMessage = $"Failed to insert {SubUserClaims.MainUserName}{SubUser.UserName}",
+                    Opacity = 1.0m
+                });
+            }
         }
         public void Dispose()
         {
