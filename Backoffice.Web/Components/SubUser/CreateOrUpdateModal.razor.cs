@@ -129,13 +129,13 @@ namespace Backoffice.Web.Components.SubUser
                 CreatedDate = DateTime.UtcNow,
             };
 
-            request.UserClaims = new List<ClaimModel>();
+            request.Claims = new List<ClaimModel>();
 
             if (SubUserClaims.SubUserClaims.Any())
             {
                 foreach(var subClaim in SubUserClaims.SubUserClaims)
                 {
-                    request.UserClaims.Add(new ClaimModel { ClaimType = subClaim.ClaimType, ClaimValue = subClaim.ClaimValue });
+                    request.Claims.Add(new ClaimModel { ClaimType = subClaim.ClaimType, ClaimValue = subClaim.ClaimValue });
                 }
             }
 

@@ -38,7 +38,12 @@
                                     <td>
                                         <span class="@(user.Status == "Normal" ? "status-normal" : "status-locked") py-1 px-4 rounded-pill">Normal</span>
                                     </td>
-                                    <td>Dashboard</td>
+                                    <td>
+                                        @if(user.Claims != null && user.Claims.Any())
+                                        {
+                                            @($"{GetClaimsList(user.Claims)}")
+                                        }
+                                    </td>
                                     <td>
                                         <a class="link-edit me-2" href="javascript:(0)">
                                             <i class="fa fa-edit"></i>

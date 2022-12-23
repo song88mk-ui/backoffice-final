@@ -51,17 +51,17 @@ namespace Backoffice.Web.Pages
         {
             SubUsers = await GetSubUsers(1);
 
-            if(isFirstTime)
+            if (isFirstTime)
             {
                 SubUserClaims.MainUserId = UserModel.Id;
                 SubUserClaims.MainUserName = UserModel.UserName;
 
                 Permissions = await GetPermissionList();
-                if(Permissions != null && Permissions.Permissions.Any())
+                if (Permissions != null && Permissions.Permissions.Any())
                 {
-                    foreach(var permission in Permissions.Permissions)
+                    foreach (var permission in Permissions.Permissions)
                     {
-                        if(permission.IsSubUser)
+                        if (permission.IsSubUser)
                         {
                             var subUserClaim = new SubUserClaim
                             {
@@ -73,7 +73,7 @@ namespace Backoffice.Web.Pages
                             };
 
                             var claim = UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType);
-                            if(claim != null && Convert.ToInt32(claim.Value) > 0)
+                            if (claim != null && Convert.ToInt32(claim.Value) > 0)
                             {
                                 subUserClaim.ClaimValue = claim.Value;
                             }
@@ -103,7 +103,7 @@ namespace Backoffice.Web.Pages
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("SubUserClaims", SubUserClaims);
-            
+
             var options = new ModalOptions();
             ModalService.Open<CreateOrUpdateModal>("Create Sub-Users", parameters, options);
         }
@@ -167,6 +167,24 @@ namespace Backoffice.Web.Pages
             }
 
             return new PermissionResponse();
+        }
+
+        private string GetClaimsList(List<ClaimModel> claims)
+        {
+            if(claims != null && claims.Any())
+            {
+                var claimsList = string.Empty;
+                foreach(var claim in claims)
+                {
+                    var permission = Permissions.Permissions.FirstOrDefault(p => p.ClaimType == claim.ClaimType);
+                    if(permission != null)
+                    {
+                        claimsList = claimsList + (string.IsNullOrEmpty(claimsList) ? string.Empty : ", ") + $"{permission.Name}";
+                    }
+                }
+                return claimsList;
+            }
+            return string.Empty;
         }
         #endregion
     }
