@@ -18,7 +18,7 @@ namespace Backoffice.API.Controllers.Authentication
         {
             _authenticationRepository = authenticationRepository;
         }
-        // POST api/<AuthenticationController>
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {

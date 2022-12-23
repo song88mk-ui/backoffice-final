@@ -1,4 +1,5 @@
 ﻿
+using Backoffice.Shared.Models;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Models
@@ -14,11 +15,9 @@ namespace Backoffice.Web.Models
         public List<SubUserClaim> SubUserClaims { get; set; }
     }
 
-    public class SubUserClaim
+    public class SubUserClaim : ClaimModel
     {
         public string Name { get; set; }
-        public string ClaimType { get; set; }
-        public string ClaimValue { get; set; }
         public bool HasReadOnly { get; set; }
         public bool IsEnabled { get; set; }
     }
