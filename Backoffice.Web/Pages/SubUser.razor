@@ -36,7 +36,14 @@
                                     <td>@user.NickName</td>
                                     <td>@user.CreatedDate.ToString("MM/dd/yyyy")</td>
                                     <td>
-                                        <span class="@(user.Status == "Normal" ? "status-normal" : "status-locked") py-1 px-4 rounded-pill">Normal</span>
+                                        @if(user.Status == "Normal")
+                                        {
+                                            <span class="status-normal py-1 px-4 rounded-pill">Normal</span>                                        
+                                        }
+                                        else
+                                        {
+                                            <span class="status-locked py-1 px-4 rounded-pill">Locked</span>
+                                        }
                                     </td>
                                     <td>
                                         @if(user.Claims != null && user.Claims.Any())

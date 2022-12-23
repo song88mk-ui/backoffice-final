@@ -153,7 +153,7 @@ namespace Backoffice.API.Controllers.Authentication
 
         [HttpPost("subaccount/list")]
         public async Task<IActionResult> GetSubAccounts([FromBody] SubAccountListRequest request)
-        {
+        {//
             var result = new BaseResponse<UserListResponse>()
             {
                 StatusCode = Shared.Enums.StatusCode.Unauthorized,

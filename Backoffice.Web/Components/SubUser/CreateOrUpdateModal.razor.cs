@@ -131,7 +131,7 @@ namespace Backoffice.Web.Components.SubUser
                 Email = "sbsubaccount@fci.com",
                 MainUserId = SubUserClaims.MainUserId,
                 NickName = SubUser.NickName,
-                Password = SubUser.Password,
+                Password = IsEdit ? "" : SubUser.Password,
                 Status = SubUser.Status,
                 UserName = $"{SubUserClaims.MainUserName}{SubUser.UserName}",
                 UserId = IsEdit ? SubUser.UserId : Guid.NewGuid().ToString(),

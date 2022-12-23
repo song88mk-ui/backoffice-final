@@ -19,6 +19,7 @@ namespace Backoffice.Web.Pages
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
+        public SubUserCallbackModel CallbackModel { get; set; }
 
         public PermissionResponse Permissions { get; set; }
         public SubUserClaimsModel SubUserClaims { get; set; }
@@ -34,7 +35,7 @@ namespace Backoffice.Web.Pages
             Permissions = new PermissionResponse();
             SubUserClaims = new SubUserClaimsModel();
             SubUsers = new UserListResponse();
-
+            CallbackModel = new SubUserCallbackModel();
             MetaData = new MetaData
             {
                 CurrentPage = 1,
@@ -47,11 +48,12 @@ namespace Backoffice.Web.Pages
             IconClass = "ico ico-sub-user";
         }
 
-        public async Task OnInitEvent(bool isFirstTime)
+        public async Task OnInitEvent(SubUserCallbackModel model)
         {
-            SubUsers = await GetSubUsers(1);
+            CallbackModel = model;
+            SubUsers = await GetSubUsers(1, model.SearchText);
 
-            if (isFirstTime)
+            if (model.IsFirstTime)
             {
                 SubUserClaims.MainUserId = UserModel.Id;
                 SubUserClaims.MainUserName = UserModel.UserName;
@@ -70,7 +72,7 @@ namespace Backoffice.Web.Pages
         {
             MetaData.CurrentPage = page;
 
-            SubUsers = await GetSubUsers(page);
+            SubUsers = await GetSubUsers(page, CallbackModel.SearchText);
         }
 
         public async Task OnCreateSubUserClickEvent()
@@ -107,7 +109,7 @@ namespace Backoffice.Web.Pages
 
         public async Task OnSaveClickEvent(object item)
         {
-            SubUsers = await GetSubUsers(1);
+            SubUsers = await GetSubUsers(1, CallbackModel.SearchText);
         }
 
         public void Dispose()
@@ -120,11 +122,12 @@ namespace Backoffice.Web.Pages
 
         #region Utilities
 
-        private async Task<UserListResponse> GetSubUsers(int page)
+        private async Task<UserListResponse> GetSubUsers(int page, string searchText)
         {
             var request = new SubAccountListRequest
             {
                 MainUserId = UserModel.Id,
+                SearchText = searchText,
                 Page = page,
                 PageSize = 25
             };
