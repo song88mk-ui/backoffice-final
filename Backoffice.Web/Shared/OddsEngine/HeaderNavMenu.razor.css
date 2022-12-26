@@ -1,8 +1,33 @@
-﻿.header-link {
+﻿ul {
+    padding-left: 0;
+    list-style-type: none;
+    margin-bottom: 0;
+}
+
+.header-link {
     color: #FFF;
 }
 
 .active {
     border-image: linear-gradient(241deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 1;
     border-bottom: 4px solid;
+}
+
+.sub-menu-container {
+    display: block;
+    position: absolute;
+    background-color: #FFF;
+    box-shadow: 0 2px 30px 6px rgb(0 0 0 / 10%);
+}
+
+.sub-header-link {
+    color: #505050;
+}
+
+.sub-menu-container li:hover {
+    background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
+}
+
+.sub-menu-container li:hover .sub-header-link {
+    color: #FFF;
 }

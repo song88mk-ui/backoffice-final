@@ -1,0 +1,68 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        <div class="content-filter mx-3 d-flex justify-content-between">
+            <div class="select-container d-flex">
+                <div class="me-4">
+                    <label class="form-label d-block">Clients</label>
+                    <select class="form-select d-block">
+                        <option value="Client_1" selected>Client 1</option>
+                        <option value="Client_2">Client 2</option>
+                        <option value="Client_3">Client 3</option>
+                    </select>
+                </div>
+                <div class="me-4">
+                    <label class="form-label d-block">Sport</label>
+                    <select class="form-select d-block">
+                        <option value="Sport_1" selected>Sport 1</option>
+                        <option value="Sport_2">Sport 2</option>
+                        <option value="Sport_3">Sport 3</option>
+                    </select>
+                </div>
+                <div class="me-4">
+                    <label class="form-label d-block">Segment</label>
+                    <select class="form-select d-block">
+                        <option value="Client_1" selected>Segment 1</option>
+                        <option value="Client_2">Segment 2</option>
+                        <option value="Client_3">Segment 3</option>
+                    </select>
+                </div>
+                <div class="me-4">
+                    <label class="form-label d-block">League</label>
+                    <select class="form-select d-block">
+                        <option value="League_1" selected>League 1</option>
+                        <option value="League_2">League 2</option>
+                        <option value="League_3">League 3</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-container d-flex flex-row-reverse align-items-end">
+                <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                    <div class="input-group">
+                        <InputText id="search" placeholder="Search" class="form-control search-text valid border-end-0" @bind-Value="SearchForm.SearchText" />
+                        <span class="input-group-text border-start-0">
+                            <i class="fa fa-search"></i>
+                        </span>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="mx-3 d-flex justify-content-between mt-3">
+            <div>
+                <a href="javascript:void(0)" class="btn btn-boosted-odds px-3">
+                    <i class="fa fa-rocket"></i>
+                    Add Boosted Odds
+                </a>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="btn btn-logs px-3">
+                    <i class="fa fa-list"></i>
+                    Logs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
