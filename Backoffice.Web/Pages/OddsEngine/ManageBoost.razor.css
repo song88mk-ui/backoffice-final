@@ -3,6 +3,10 @@
     color: #fff;
 }
 
+.table > tbody > tr:nth-child(2n) > td, .table > tbody > tr:nth-child(2n) > th {
+    background-color: #F5F5F5;
+}
+
 .table thead th, .table tbody td, ::deep .table tfoot td {
     font-size: 0.8rem;
     font-weight: inherit;

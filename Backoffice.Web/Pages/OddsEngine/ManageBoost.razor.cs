@@ -13,7 +13,7 @@
 
         protected override async Task OnInitializedAsync()
         {
-            PageTitle = "Boosted Settings";
+            PageTitle = "Manage Boost";
             IconClass = string.Empty;
         }
 
