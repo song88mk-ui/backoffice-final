@@ -18,6 +18,7 @@
     position: absolute;
     background-color: #FFF;
     box-shadow: 0 2px 30px 6px rgb(0 0 0 / 10%);
+    z-index: 1;
 }
 
 .sub-header-link {
