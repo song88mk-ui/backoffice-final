@@ -1,6 +1,6 @@
 ﻿using Backoffice.Shared.Models;
 
-namespace Backoffice.Web.Components.OddsEngine.ManageUsers
+namespace Backoffice.Web.Components.OddsEngine.ManageUserGroups
 {
     public partial class Filter : IDisposable
     {

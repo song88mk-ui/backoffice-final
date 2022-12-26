@@ -1,6 +1,6 @@
 ﻿namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class ManageUsers : IDisposable
+    public partial class ManageUsergroups : IDisposable
     {
         #region Properties
 
@@ -13,7 +13,7 @@
 
         protected override async Task OnInitializedAsync()
         {
-            PageTitle = "Manage Users";
+            PageTitle = "Manage User Group";
             IconClass = string.Empty;
         }
 
