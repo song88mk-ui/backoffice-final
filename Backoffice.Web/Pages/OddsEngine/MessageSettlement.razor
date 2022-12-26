@@ -1,0 +1,63 @@
+﻿@using Backoffice.Web.Components.OddsEngine.MessageSettlement
+
+@layout OEMonitoringLayout
+
+@page "/odds-engine/message-settlement"
+
+<div class="col-md-12">
+    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+</div>
+<div class="col-md-12">
+    <Filter />
+</div>
+<div class="col-md-12">
+    <div class="mx-3 mt-4">
+        <table class="table table-hover table-bordered">
+            <thead class="table-head">
+                <tr>
+                    <th>#</th>
+                    <th>Date and Time</th>
+                    <th>Bet ID</th>
+                    <th>Sports</th>
+                    <th>Message Settled</th>
+                    <th>Settled By</th>
+                    <th>Date Settled</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        1
+                    </td>
+                    <td>
+                        <span class="date d-block">02/08/2022</span>
+                        <span class="time d-block">07:16:50 AM</span>
+                    </td>
+                    <td>
+                        AD850EFD-ED00-4A75-A99D-08DA7789336
+                    </td>
+                    <td>
+                        Soccer
+                    </td>
+                    <td>
+                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
+                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
+                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
+                    </td>
+                    <td>
+                        FCI-Bryan
+                    </td>
+                    <td>
+                        <span class="date d-block">02/08/2022</span>
+                        <span class="time d-block">07:16:50 AM</span>
+                    </td>
+                    <td>
+                        Lorem ipsum is simply dummy text of the printing and type industry
+                    </td>
+                </tr>
+            </tbody>
+            <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
+        </table>
+    </div>
+</div>

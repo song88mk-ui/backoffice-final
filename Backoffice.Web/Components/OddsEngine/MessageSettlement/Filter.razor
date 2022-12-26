@@ -1,0 +1,29 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        <div class="content-filter mx-3 d-flex justify-content-between">
+            <div class="button-container d-flex">
+                <a href="javascript:void(0)" class="btn btn-message-settlement px-3">
+                    <i class="fa fa-plus me-1"></i>
+                    Add Message Settlement
+                </a>
+            </div>
+            <div class="button-container d-flex flex-row-reverse align-items-end">
+                <a href="javascript:void(0)" class="btn btn-export px-3 ms-2">
+                    <i class="fa fa-file-excel-o me-1"></i>
+                    Export to Excel
+                </a>
+                <a href="javascript:void(0)" class="btn btn-filter px-3" @onclick="OnFilterClickEvent">
+                    <i class="fa fa-filter me-1"></i>
+                    Filters
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (ShowFilter)
+{
+    <div class="row">
+        <div class="col-md-12"></div>
+    </div>
+}

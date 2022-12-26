@@ -1,0 +1,12 @@
+﻿.btn-message-settlement, .btn-export, .btn-filter {
+    color: #FFFFFF;
+    font-size: 15px;
+}
+
+.btn-message-settlement, .btn-export {
+    background-image: linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%);
+}
+
+.btn-filter {
+    background-color: #232323;
+}
