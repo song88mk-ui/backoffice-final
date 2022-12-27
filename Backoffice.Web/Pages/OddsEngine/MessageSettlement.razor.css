@@ -33,6 +33,6 @@ table tfoot td:last-child {
     border-bottom-right-radius: 3px;
 }
 
-.table-head th {
+.table-head th, ::deep .table tfoot td {
     border-width: 1px 0;
 }
