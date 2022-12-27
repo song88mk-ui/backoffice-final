@@ -27,7 +27,26 @@ builder.Services.AddAuthorization(options =>
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim("SportsbookClient.ParlayBonus.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
-    options.AddPolicy("main-user", policy => policy.RequireClaim("MainUser.Access",
+    options.AddPolicy("sbc-main-user", policy => policy.RequireClaim("MainUser.Access",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    #endregion
+
+    #region Trading
+    options.AddPolicy("trading-menu-monitoring-match", policy => policy.RequireClaim("Trading.Monitoring.Match.Access",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("trading-menu-monitoring-outrights", policy => policy.RequireClaim("Trading.Monitoring.Outrights.Access",
+            $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("trading-menu-config-match", policy => policy.RequireClaim("Trading.Config.Match.Access",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("trading-menu-config-outrights", policy => policy.RequireClaim("Trading.Config.Outrights.Access",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("trading-menu-administration-managemanualmessagesettlement", policy => policy.RequireClaim("Trading.Administration.ManageManualMessageSettlement.Access",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("trading-menu-administration-usergroup", policy => policy.RequireClaim("Trading.Administration.ManageUserGroup.Access",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("trading-menu-priceboost-manageboost", policy => policy.RequireClaim("Trading.PriceBoost.ManageBoost.Access",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("trading-menu-priceboost-managesettings", policy => policy.RequireClaim("Trading.PriceBoost.BoostedSettings.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     #endregion
 });
