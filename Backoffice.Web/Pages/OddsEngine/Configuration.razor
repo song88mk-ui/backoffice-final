@@ -1,0 +1,43 @@
+﻿@using Backoffice.Web.Components.OddsEngine.Configuration
+
+@layout OEMonitoringLayout
+
+@page "/odds-engine/config"
+
+<div class="col-md-12">
+    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+    <HeaderConfigTopMenu/>
+</div>
+
+<div class="col-md-12">
+    <Filter/>
+</div>
+
+<div class="col-md-12 mb-2">
+    <button type="button" class="btn float-end">Deactivate All</button>
+</div>
+
+<div class="col-md-12">
+    <div class="accordion">
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <button class="accordion-button ps-5" type="button" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#accordion1">
+                    Free Text Market
+                </button>
+
+                <div class="d-flex justify-content-around market-toggle">
+                    <span>Market Active</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="market1Toggle"  role="switch" aria-label="Market 1 Toggle Switch"/>
+                    </div>
+                </div>
+            </div>
+
+            <div id="accordion1" class="accordion-collapse collapse show">
+                <div class="accordion-body">
+                    <PrematchConfig />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

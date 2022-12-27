@@ -1,0 +1,115 @@
+﻿.sr-timeline .keys {
+    height: 75px;
+    position: relative;
+    width: calc(100% - 54px);
+}
+
+.sr-timeline .line {
+    height: 2px;
+    background: #d1d3d5;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+}
+
+.sr-timeline .keys .keys-container {
+    height: 100%;
+    position: relative;
+    width: calc(100% - 80px);    
+}
+
+    .sr-timeline .keys .keys-container .timeline-key {
+        width: 80px;
+        text-align: center;
+    }
+
+.timeline-axis-label {
+    color: #666c78;
+    position: absolute;
+    text-transform: uppercase;
+    top: 0;
+}
+
+.timeline-axis-label.label-prematch {
+    left: 20px;
+}
+
+.timeline-key .key {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+    line-height: 36px;
+    margin-top: -18px;
+    margin-left: -18px;
+    background-color: #31bbd9;
+    border: 1px solid #31bbd9;
+    border-radius: 40px;
+    box-sizing: border-box;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-content: center;
+    align-content: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+}
+
+.timeline-key .label {
+    top: 64px;
+    width: 100%;
+    position: absolute;
+    font-size: 12px;
+    background-color: #fff;
+    text-transform: uppercase;
+    color: #79808b !important;
+}
+.sr-timeline .end {
+    border-left: 2px solid #d1d3d5;
+    color: #79808b;
+    position: relative;
+    width: 54px;
+    height: 75px;
+}
+
+.timeline-key {
+    color: #79808b;
+    font-size: 12px;
+    width: 70px;
+    height: 75px;
+    position: relative;
+}
+
+    .timeline-key .key {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 36px;
+        height: 36px;
+        font-size: 12px;
+        line-height: 36px;
+        margin-top: -18px;
+        margin-left: -18px;
+        background-color: #31bbd9;
+        border: 1px solid #31bbd9;
+        border-radius: 40px;
+        box-sizing: border-box;
+        color: #fff;
+        text-transform: uppercase;
+        text-align: center;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-align-content: center;
+        align-content: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+    }
+
+.key a {
+    color: white;
+    text-decoration: none;
+}

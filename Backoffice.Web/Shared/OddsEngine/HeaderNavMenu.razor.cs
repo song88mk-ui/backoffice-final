@@ -7,6 +7,7 @@
         public bool ShowPriceBoostMenu { get; set; }
         public bool ShowAdministrationMenu { get; set; }
         public bool ShowSettlementMenu { get; set; }
+        public bool ShowMarketSettingsMenu { get; set; }
 
         #endregion
 
@@ -56,6 +57,18 @@
                 ShowSettlementMenu = false;
         }
 
+        public async Task OnMarketSettingsClickEvent()
+        {
+            if (!ShowMarketSettingsMenu)
+            {
+                HideAllSubmenu();
+
+                ShowMarketSettingsMenu = true;
+            }
+            else
+                ShowMarketSettingsMenu = false;
+        }
+
         public void Dispose()
         {
         }
@@ -74,6 +87,7 @@
         private void HideAllSubmenu()
         {
             ShowSettlementMenu = false;
+            ShowMarketSettingsMenu = false;
         }
 
         #endregion

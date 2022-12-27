@@ -29,6 +29,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
         }
 
+        public async Task SelectPage(int page)
+        {
+        }
+
         public void Dispose()
         {
         }

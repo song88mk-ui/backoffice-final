@@ -13,22 +13,38 @@
     border-bottom: 4px solid;
 }
 
-.sub-menu-container {
-    display: block;
+.sub-menu-container, .settlement-container, .market-settings-container {
     position: absolute;
     background-color: #FFF;
     box-shadow: 0 2px 30px 6px rgb(0 0 0 / 10%);
     z-index: 1;
 }
 
+.sub-menu-container {
+    display: block;
+}
+
+.settlement-container, .market-settings-container {
+    display: block;
+    left: 100%;
+}
+
+.settlement-container {
+    top: 30%;
+}
+
+.market-settings-container {
+    top: 70%;
+}
+
 .sub-header-link {
     color: #505050;
 }
 
-.sub-menu-container li:hover {
+.sub-menu-container li:hover, .settlement-container li:hover, .market-settings-container li:hover {
     background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
 }
 
-.sub-menu-container li:hover .sub-header-link {
+.sub-menu-container li:hover > .sub-header-link, .settlement-container li:hover > .sub-header-link, .market-settings-container li:hover > .sub-header-link {
     color: #FFF;
 }
