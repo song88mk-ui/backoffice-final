@@ -1670,7 +1670,7 @@ namespace Backoffice.API.Repositories
 
             var client = new HttpClient()
             {
-                BaseAddress = new Uri(Path.Combine(GetBaseUrl(region), "api/v1/trading/"))
+                BaseAddress = new Uri($"{uri}api/v1/trading/")
             };
             client.DefaultRequestHeaders.Add("x-api-key", GetApikey(region));
 

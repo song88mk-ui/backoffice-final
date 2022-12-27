@@ -44,7 +44,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("sports/topmarkets/{sportId}")]
         public async Task<IActionResult> GetTopMarkets(int sportId)
         {
-            var region = "";
+            var region = "HK";
             if (HttpContext.Request.Headers.ContainsKey("x-region"))
                 region = HttpContext.Request.Headers["x-region"].ToString();
 

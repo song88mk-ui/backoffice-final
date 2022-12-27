@@ -79,6 +79,7 @@ namespace Backoffice.API
             services.AddDbContext<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"]));
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
             services.AddScoped<IPlatformRepository, PlatformRepository>();
+            services.AddScoped<ITradingRepository, TradingRepository>();
             services.AddSingleton<IMemCache, MemCache>();
             services.AddScoped<ApiKeyFilter>();
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
