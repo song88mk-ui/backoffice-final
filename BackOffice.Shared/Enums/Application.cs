@@ -5,7 +5,7 @@ namespace Backoffice.Shared.Enums
     {
         Admin = 1001,
         PartnerManagement = 1002,
-        SportsBookClient = 1003,
+        SportsbookClient = 1003,
         Trading = 1004
     }
 }

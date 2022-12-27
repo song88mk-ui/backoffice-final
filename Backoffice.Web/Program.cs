@@ -6,6 +6,7 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
+using System.Drawing;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
@@ -19,12 +20,16 @@ builder.Services.AddAuthorizationCore();
 
 builder.Services.AddAuthorization(options =>
 {
+    #region SBC
     options.AddPolicy("sbc-menu-topleagues", policy => policy.RequireClaim("SportsbookClient.TopLeagues.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("sbc-menu-topfixtures", policy => policy.RequireClaim("SportsbookClient.TopFixtures.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim("SportsbookClient.ParlayBonus.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("main-user", policy => policy.RequireClaim("MainUser.Access",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    #endregion
 });
 
 builder.Services.AddBlazoredLocalStorage();

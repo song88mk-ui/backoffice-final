@@ -6,7 +6,7 @@ namespace Backoffice.Web.Services
 {
     public interface IAuthenticationService
     {
-        Task<BaseResponse<bool>> Login(LogInModel user);
+        Task<BaseResponse<Tuple<bool, List<string>>>> Login(LogInModel user);
         Task<TokenModel> AuthenticateToken();
         Task<bool> Logout();
         Task<BaseResponse<bool>> Register(UserRegisterRequest request);

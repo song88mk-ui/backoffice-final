@@ -67,13 +67,15 @@
                                     </NavLink>
                                 </div>
                             }
-                        
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="/sub-user">
-                                    <span class="ico ico-sub-user" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">Sub User</span>
-                                </NavLink>
-                            </div>
+                            @if (string.IsNullOrWhiteSpace(UserModel?.MainUserId))
+                            {
+                                <div class="nav-item">
+                                    <NavLink class="nav-link" href="/sub-user">
+                                        <span class="ico ico-sub-user" aria-hidden="true"></span>
+                                        <span class="nav-menu-text">Sub User</span>
+                                    </NavLink>
+                                </div>
+                            }
                         </nav>
                     </div>
                 </div>
@@ -90,11 +92,11 @@
                     </NavLink>
                 </div>
                 @*<div class="nav-item px-3">
-                <NavLink class="nav-link" href="">
-                <span class="ico ico-revenue-settlement" aria-hidden="true"></span>
-                <span class="nav-menu-text">Revenue Settlement</span>
-                </NavLink>
-                </div>*@
+            <NavLink class="nav-link" href="">
+            <span class="ico ico-revenue-settlement" aria-hidden="true"></span>
+            <span class="nav-menu-text">Revenue Settlement</span>
+            </NavLink>
+            </div>*@
             </nav>
         }
         else if (NavMenuAccess == NavMenuAccess.OE)

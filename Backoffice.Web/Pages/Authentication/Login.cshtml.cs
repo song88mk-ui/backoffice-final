@@ -1,3 +1,4 @@
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
@@ -56,10 +57,29 @@ namespace Backoffice.Web.Pages.Authentication
         {
             if (ModelState.IsValid)
             {
+                var policies = new List<string>();
                 TempData["HasError"] = false;
                 var result = await AuthenticationService.Login(UserModel);
-                if (result.Result)
+                if (result.Result.Item1)
                 {
+                    policies = result.Result.Item2;
+
+                    if (policies.Count > 1)
+                    {
+                        return LocalRedirect("/choose-access");
+                    }
+
+                    if (policies.Count == 1)
+                    {
+                        switch (policies.FirstOrDefault().ToString())
+                        {
+                            case nameof(Application.SportsbookClient):
+                                return LocalRedirect("/dashboard");
+                            case nameof(Application.Trading):
+                                return LocalRedirect("/trading");
+                        }
+                    }
+
                     //var cookie = new HttpCookie("Login");
                     //cookie.Values.Add("EmailID", LoginUser.EmailID);
                     //cookie.Values.Add("Password", LoginUser.Password);
@@ -67,22 +87,19 @@ namespace Backoffice.Web.Pages.Authentication
                     //Response.Cookies.Add(cookie);
 
                     //NavigationManager.NavigateTo("/");
-                    return LocalRedirect("/choose-access");
                 }
-                else
+
+                if (UserModel != null)
+                    UserModel.Password = String.Empty;
+
+                TempData["HasError"] = true;
+
+                if (result.Message.ToLower().Contains("user does not exist"))
                 {
-                    if (UserModel != null)
-                        UserModel.Password = String.Empty;
-
-                    TempData["HasError"] = true;
-
-                    if (result.Message.ToLower().Contains("user does not exist"))
-                    {
-                        ModelState.AddModelError("UserModel.Name", "Sorry, we couldn't find an account with that username, please try again.");
-                    }
-
-                    ModelState.AddModelError("UserModel.Password", "Password is incorrect, please try again or click Forgot Password to reset it.");
+                    ModelState.AddModelError("UserModel.Name", "Sorry, we couldn't find an account with that username, please try again.");
                 }
+
+                ModelState.AddModelError("UserModel.Password", "Password is incorrect, please try again or click Forgot Password to reset it.");
             }
             return Page();
         }

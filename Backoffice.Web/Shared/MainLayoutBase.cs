@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
 
 namespace Backoffice.Web.Shared
 {
@@ -36,7 +37,7 @@ namespace Backoffice.Web.Shared
                 var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 var userClaims = authState.User.Claims.ToList();
 
-                foreach (var claim in userClaims)
+                Parallel.ForEach(userClaims, (claim) =>
                 {
                     switch (claim.Type.ToUpper())
                     {
@@ -49,17 +50,15 @@ namespace Backoffice.Web.Shared
                         case "TOKENNAME":
                             UserModel.UserName = claim.Value;
                             break;
+                        case "MAINUSERID":
+                            UserModel.MainUserId = claim.Value;
+                            UserModel.Claims.Add(new Claim("MainUser.Access", string.IsNullOrWhiteSpace(UserModel.MainUserId) ? "1" : "0"));
+                            break;
                         default:
                             UserModel.Claims.Add(claim);
                             break;
                     }
-
-                }
-
-                // * Create Cascading parameter for user model
-                // ClaimsPrincipal
-                // ID
-                // List of clients
+                });
             }
             catch (Exception ex)
             {
