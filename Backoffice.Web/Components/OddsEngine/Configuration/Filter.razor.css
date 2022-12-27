@@ -1,0 +1,34 @@
+﻿.col {
+    padding: 0;
+    margin: 0 0.5rem;
+}
+
+.searchDiv {
+    position: relative;
+}
+
+    .searchDiv i {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translate(-50%, -50%)
+    }
+
+    .searchDiv input {
+        padding-right: 2.5rem;
+    }
+
+.btn {
+    color: white;
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+    font-size: 0.8rem;
+}
+
+.fa-info-circle {
+    font-size: 1.2rem;
+    vertical-align: middle;
+}
+
+.fa-info-circle:hover {
+    cursor: help;
+}

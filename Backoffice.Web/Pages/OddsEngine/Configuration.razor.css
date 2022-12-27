@@ -1,0 +1,33 @@
+﻿.accordion-button {
+    background-color: #F1F1F1;
+}
+
+    .accordion-button::after {
+        position: absolute;
+        left: 1%;
+    }
+
+.accordion-button {
+    color: black;
+}
+
+    .accordion-button:not(.collapsed)::after {
+        filter: grayscale(100%);
+    }
+
+.accordion-header {
+    position: relative;
+}
+
+.market-toggle {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 10rem;
+    transform: translateY(-50%);
+    z-index: 9999;
+}
+
+.form-check-input:checked {
+    background-color: #E43F2C;
+}
