@@ -1,0 +1,86 @@
+﻿<div class="modal-body">
+    <div class="d-flex flex-row">
+        <div>
+            <input type="radio" class="btn-check" name="matchTabOptions" id="matchType" checked/>
+            <label class="btn match-tab-lbl" for="matchType">Match Type</label>
+        </div>
+
+        <div>
+            <input type="radio" class="btn-check" name="matchTabOptions" id="outrights" />
+            <label class="btn match-tab-lbl" for="outrights">Outrights</label>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-6">
+            <label for="sportSelect" class="form-label">Sports</label>
+            <select class="form-select" id="sportSelect">
+                <option value="1">Sport 1</option>
+                <option value="2">Sport 2</option>
+                <option value="3">Sport 3</option>
+                <option value="4">Sport 4</option>
+                <option value="5">Sport 5</option>
+            </select>
+        </div>
+        <div class="col-6">
+            <label for="segmentSelect" class="form-label">Segment</label>
+            <select class="form-select" id="segmentSelect">
+                <option value="1">Segment 1</option>
+                <option value="2">Segment 2</option>
+                <option value="3">Segment 3</option>
+                <option value="4">Segment 4</option>
+                <option value="5">Segment 5</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-6">
+            <label for="leagueSelect" class="form-label">League</label>
+            <select class="form-select" id="LeagueSelect">
+                <option value="1">League 1</option>
+                <option value="2">League 2</option>
+                <option value="3">League 3</option>
+                <option value="4">League 4</option>
+                <option value="5">League 5</option>
+            </select>
+        </div>
+        <div class="col-6">
+            <label for="fixtureSelect" class="form-label">Fixture</label>
+            <select class="form-select" id="fixtureSelect">
+                <option value="1">Fixture 1</option>
+                <option value="2">Fixture 2</option>
+                <option value="3">Fixture 3</option>
+                <option value="4">Fixture 4</option>
+                <option value="5">Fixture 5</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-6">
+            <label for="marketSelect" class="form-label">Market</label>
+            <select class="form-select" id="marketSelect">
+                <option value="1">Market 1</option>
+                <option value="2">Market 2</option>
+                <option value="3">Market 3</option>
+                <option value="4">Market 4</option>
+                <option value="5">Market 5</option>
+            </select>
+        </div>
+        <div class="col-6">
+            <label for="selectionSelect" class="form-label">Selection</label>
+            <select class="form-select" id="selectionSelect">
+                <option value="1">Selection 1</option>
+                <option value="2">Selection 2</option>
+                <option value="3">Selection 3</option>
+                <option value="4">Selection 4</option>
+                <option value="5">Selection 5</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Cancel</button>
+    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnNextModalClick">Next</button>
+</div>
