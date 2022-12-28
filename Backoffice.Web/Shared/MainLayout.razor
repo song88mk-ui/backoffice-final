@@ -1,4 +1,5 @@
 ﻿@using Backoffice.Shared.Enums
+@inject NavigationManager NavigationManager
 
 @inherits MainLayoutBase
 
@@ -6,7 +7,14 @@
     <PageTitle>Backoffice</PageTitle>
     <div class="page">
         <div class="sidebar">
-            <NavMenu NavMenuAccess="NavMenuAccess.SBC" />
+            @if (NavigationManager.Uri.Contains("/odds-engine"))
+            {
+                <NavMenu NavMenuAccess="NavMenuAccess.OE" />
+            }
+            else
+            {
+                <NavMenu NavMenuAccess="NavMenuAccess.SBC" />
+            }
         </div>
         <main>
             <article class="content px-4">

@@ -10,10 +10,9 @@ namespace Backoffice.Web.Shared
     {
         #region Properties
 
+        [Inject] public NavigationManager NavigationManager { get; set; } = default!;
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
-
-        [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
         public UserModel UserModel { get; set; }
@@ -52,7 +51,6 @@ namespace Backoffice.Web.Shared
                             break;
                         case "MAINUSERID":
                             UserModel.MainUserId = claim.Value;
-                            UserModel.Claims.Add(new Claim("SportsbookClient.MainUser.Access", string.IsNullOrWhiteSpace(UserModel.MainUserId) ? "1" : "0"));
                             break;
                         default:
                             UserModel.Claims.Add(claim);

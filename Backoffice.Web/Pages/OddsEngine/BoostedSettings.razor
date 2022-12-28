@@ -1,5 +1,4 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.BoostedSettings
-
 @layout OEMonitoringLayout
 
 @page "/odds-engine/boosted-settings"
@@ -12,6 +11,21 @@
 </div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">
+
+        @*<TableContent>
+            <TableHeaderContent @THeadClass="">
+                <th valign="middle" align="left" width="30%"><strong>Client Name</strong></th>
+                <th valign="middle" align="left" width="30%"><strong>% Cap of Current Odds from Boosted Odds</strong></th>
+                <th valign="middle" align="left" width="20%"><strong>Manage</strong></th>
+            </TableHeaderContent>
+            <TableBodyContent>
+                @foreach (var client in ClientsView)
+                {
+                    <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" />
+                }
+            </TableBodyContent>
+        </TableContent>*@
+
         <table class="table table-hover table-bordered">
             <thead class="table-head">
                 <tr>
@@ -26,7 +40,7 @@
                     <td>
                         <div class="d-flex justify-content-center">
                             <div class="odds-container py-1 px-3">
-                                <span>76.00 %</span> 
+                                <span>76.00 %</span>
                             </div>
                         </div>
                     </td>
@@ -46,7 +60,7 @@
                     <td>
                         <div class="d-flex justify-content-center">
                             <div class="odds-container py-1 px-3">
-                                <span>51.00 %</span> 
+                                <span>51.00 %</span>
                             </div>
                         </div>
                     </td>
@@ -66,7 +80,7 @@
                     <td>
                         <div class="d-flex justify-content-center">
                             <div class="odds-container py-1 px-3">
-                                <span>5.00 %</span> 
+                                <span>5.00 %</span>
                             </div>
                         </div>
                     </td>

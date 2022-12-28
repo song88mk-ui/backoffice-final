@@ -1,0 +1,28 @@
+﻿<tr id="@BoostedSettings.ClientId">
+    <td align="left" valign="middle" class="text-left py-3"><span class="text-center"><strong>@BoostedSettings.ClientName</strong></span></td>
+    <td align="center" valign="middle">
+        <div class="py-2">
+            <span class="m-rl-xs cap-bg-default">@BoostedSettings.Cap.ToString("P", CultureInfo.InvariantCulture)</span>
+        </div>
+    </td>
+    <td align="center" valign="middle">
+        @*<AuthorizeView Policy="priceboost-managesettings-canedit">
+            <Authorized Context="ActivateAll">*@
+                <button class="btn btn-primary btn-sm" @onclick="async () => await OnEditSetting(BoostedSettings.ClientId)">
+                    <span data-toggle="tooltip" data-placement="top" title="Click to Edit" data-original-title="Click To Edit">
+                        <i class="fa fa-edit"></i> Edit
+                    </span>
+                </button>
+            @*</Authorized>
+        </AuthorizeView>
+        <AuthorizeView Policy="priceboost-managesettings">
+            <Authorized Context="ActivateAll">
+                <button class="btn btn-info btn-sm" @onclick="async () => await OnViewLogs(BoostedSettings.ClientId)">
+                    <span data-toggle="tooltip" data-placement="top" title="Click to View Logs" data-original-title="Click To View Logs">
+                        <i class="fa fa-list-alt"></i> Logs
+                    </span>
+                </button>
+            </Authorized>
+        </AuthorizeView>*@
+    </td>
+</tr>

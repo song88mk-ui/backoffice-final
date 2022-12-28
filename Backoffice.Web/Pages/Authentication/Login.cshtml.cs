@@ -76,7 +76,7 @@ namespace Backoffice.Web.Pages.Authentication
                             case nameof(Application.SportsbookClient):
                                 return LocalRedirect("/dashboard");
                             case nameof(Application.Trading):
-                                return LocalRedirect("/trading");
+                                return LocalRedirect("/odds-engine");
                         }
                     }
 
