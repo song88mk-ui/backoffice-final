@@ -52,7 +52,7 @@ namespace Backoffice.Web.Shared
                             break;
                         case "MAINUSERID":
                             UserModel.MainUserId = claim.Value;
-                            UserModel.Claims.Add(new Claim("MainUser.Access", string.IsNullOrWhiteSpace(UserModel.MainUserId) ? "1" : "0"));
+                            UserModel.Claims.Add(new Claim("SportsbookClient.MainUser.Access", string.IsNullOrWhiteSpace(UserModel.MainUserId) ? "1" : "0"));
                             break;
                         default:
                             UserModel.Claims.Add(claim);

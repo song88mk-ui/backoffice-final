@@ -27,7 +27,7 @@ builder.Services.AddAuthorization(options =>
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim("SportsbookClient.ParlayBonus.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
-    options.AddPolicy("sbc-main-user", policy => policy.RequireClaim("MainUser.Access",
+    options.AddPolicy("sbc-menu-subuser", policy => policy.RequireClaim("SportsbookClient.MainUser.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     #endregion
 
