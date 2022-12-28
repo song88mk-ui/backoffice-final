@@ -12,5 +12,6 @@ namespace Backoffice.Shared.Models.Requests
         public int LeagueId { get; set; }
         public string MarketTemplateId { get; set; }
         public bool AllFixtureStatus { get; set; } = false;
+        public string SearchText { get; set; }
     }
 }

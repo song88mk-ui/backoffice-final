@@ -1,0 +1,107 @@
+﻿<div class="modal-body">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Client Name</th>
+                <th scope="col">Sports</th>
+                <th scope="col">Details</th>
+                <th scope="col">BR Ctrl</th>
+                <th scope="col">Current Odds</th>
+                <th scope="col">Update Selection</th>        
+                <th scope="col">Boosted Odds</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">10 Cric</th>
+                <td>Cricket</td>
+                <td class="d-flex flex-column">
+                    <span><b>Western Bulldogs</b></span>
+                    <span>Winner (incl. Super Over) - Warwickshire</span>
+                    <span>Shpageeza League, Playoffs</span>
+                    <span>Western Bulldogs vs. Essendon Bombers</span>
+                    <span>First innings home team</span>
+                </td>
+                <td class="text-center">8.10</td>
+                <td class="text-center">10.12</td>
+                <td>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex flex-row">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle" type="button" id="dropdown1" data-bs-toggle="dropdown" aria-expanded="false" disabled>
+                                    <i class="icofont icofont-lang-en"></i>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdown1">
+                                    <li>
+                                        <a class="dropdown-item" href="#"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <input type="text" class="form-control" id="textInput1" value="test lang en"/>
+                            </div>
+                            <div>
+                                <button type="button" class="btn">
+                                    <i class="fa fa-plus-circle"></i>
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="btn">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle" type="button" id="dropdown2" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="icofont icofont-lang-en" aria-hidden="true"></i>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdown2">                                    
+                                        <button class="dropdown-item" href="#">
+                                            <i class="fa fa-flag" aria-hidden="true"></i><span>Flag1</span>
+                                        </button>
+
+                                        <button class="dropdown-item" href="#">
+                                            <i class="fa fa-flag" aria-hidden="true"></i><span>Flag2</span>
+                                        </button>
+
+                                        <button class="dropdown-item" href="#">
+                                            <i class="fa fa-flag" aria-hidden="true"></i><span>Flag3</span>
+                                        </button>
+
+                                        <button class="dropdown-item" href="#">
+                                            <i class="fa fa-flag" aria-hidden="true"></i><span>Flag4</span>
+                                        </button>
+
+                                        <button class="dropdown-item" href="#">
+                                            <i class="fa fa-flag" aria-hidden="true"></i><span>Flag5</span>
+                                        </button>                                    
+                                </div>
+                            </div>
+                            <div>
+                                <input type="text" class="form-control" id="textInput2" value="test lang FR"/>
+                            </div>
+                            <div>
+                                <button type="button" class="btn">
+                                    <i class="fa fa-plus-circle"></i>
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="btn">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <input type="number" class="form-control text-center" value="8.10" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Cancel</button>
+    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveModalClick">Save</button>
+</div>

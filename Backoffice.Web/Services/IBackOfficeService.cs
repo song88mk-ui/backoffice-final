@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 
 namespace Backoffice.Web.Services
@@ -21,5 +22,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<SportsLookupModel>> GetSportsAsync(string languageCode);
         Task<BaseResponse<ClientParlayBonusModel>> GetClientParlayBonus(GetParlayBonusRequest request);
         Task<BaseResponse<StatusCode>> AddOrUpdateParlayBonus(ParlayBonusRequest request);
+        Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId);
+        Task<BaseResponse<MarketFixtureResponse>> GetMarketFixtures(MarketFixtureRequest request);
     }
 }

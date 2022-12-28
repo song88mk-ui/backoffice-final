@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using System.Net;
 using System.Net.Http.Headers;
@@ -471,7 +472,7 @@ namespace Backoffice.Web.Services
             try
             {
                 var userToken = await _authenticationService.AuthenticateToken();
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
 
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsTreeModel>>
                 (await _httpClient.GetStreamAsync($"sportsbook/settings/topfixtures/sportstree?clientId={clientId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -494,5 +495,66 @@ namespace Backoffice.Web.Services
         }
 
         #endregion
+
+        #region Methods - Trading
+        public async Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId)
+        {
+            try
+            {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<List<MainMarketTemplateResponse>>>
+                (await _httpClient.GetStreamAsync($"api/trading/sports/topmarkets/{sportId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return result ?? new BaseResponse<List<MainMarketTemplateResponse>>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = $"{StatusCode.Success}",
+                    Result = new List<MainMarketTemplateResponse>()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<MainMarketTemplateResponse>>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<MarketFixtureResponse>> GetMarketFixtures(MarketFixtureRequest request)
+        {
+            try
+            {
+                var stringUri = string.IsNullOrEmpty(request.MarketTemplateId) ?
+                    $"api/trading/fixtures/market/{request.FixtureTypeId}/{request.SportId}/{request.SegmentId}/{request.LeagueId}" :
+                    $"api/trading/fixtures/market/{request.FixtureTypeId}/{request.SportId}/{request.SegmentId}/{request.LeagueId}/{request.MarketTemplateId}";
+
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<MarketFixtureResponse>>
+                (await _httpClient.GetStreamAsync(stringUri), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return result ?? new BaseResponse<MarketFixtureResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = $"{StatusCode.Success}",
+                    Result = new MarketFixtureResponse()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<MarketFixtureResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = new MarketFixtureResponse()
+                };
+            }
+        }
+
+
+        #endregion
+
     }
 }
