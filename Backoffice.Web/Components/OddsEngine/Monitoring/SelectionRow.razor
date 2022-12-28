@@ -1,0 +1,18 @@
+﻿@if (HasClientConfig)
+{
+    <div class="odds-container me-2 py-1 px-3">
+        <CallbackOnCssAnimationEnd OnCssAnimationCompleted="OnCompleted">
+            <span class="@GetClientColor()" @attributes="SpanAttributes">
+                @(GetClientOdds())
+            </span>
+        </CallbackOnCssAnimationEnd>
+    </div>
+}
+else
+{
+    <div class="odds-container me-2 py-1 px-3">
+        <CallbackOnCssAnimationEnd OnCssAnimationCompleted="OnCompleted">
+            <span class="odds-bg-default">-.-</span>
+        </CallbackOnCssAnimationEnd>
+    </div>
+}

@@ -1,11 +1,22 @@
 ﻿<div class="content-filter mx-3">
     <div class="w-100 d-flex justify-content-between">
         <div class="select-container">
-            <select class="form-select d-block">
-                <option value="market-1" selected>Market 1</option>
-                <option value="market-2">Market 2</option>
-                <option value="market-3">Market 3</option>
-            </select>
+            @if (TopMarketTemplates.Any())
+            {
+                <select class="form-select d-block" @onchange="OnMarketChangedEvent">
+                    @foreach (var item in TopMarketTemplates)
+                    {
+                        if (item.MainMarketTemplateId.ToString() == MarketTemplateId)
+                        {
+                            <option value="@item.MainMarketTemplateId" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.MainMarketTemplateId">@item.Name</option>
+                        }
+                    }
+                </select>
+            }
         </div>
         <div>
             <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">

@@ -3,7 +3,7 @@
     color: #fff;
 }
 
-.table thead th, .table tbody td, ::deep .table tfoot td {
+.table thead th, ::deep .table tbody td, ::deep .table tfoot td {
     font-size: 0.8rem;
     font-weight: inherit;
     vertical-align: middle;
@@ -21,18 +21,6 @@ table thead th:last-child {
     border-top-right-radius: 3px;
 }
 
-table tfoot td:first-child {
-    border-bottom-left-radius: 3px;
-}
-
-table tfoot td:last-child {
-    border-bottom-right-radius: 3px;
-}
-
 .table-head th {
     border-width: 1px 0;
-}
-
-.odds-container {
-    border: 2px solid #707070;
 }

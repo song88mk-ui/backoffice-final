@@ -1,0 +1,121 @@
+﻿<tr>
+    <td>
+        @if (Market.FixtureStatusId == 1)
+        {
+            <span>@Market.CurrentPeriod</span>
+            @if (!string.IsNullOrEmpty(Market.CurrentMinute) && int.Parse(Market.CurrentMinute) > 0)
+            {
+                <br />
+                <span class="fw-bold">@Market.CurrentMinute</span>
+            }
+        }
+        else
+        {
+            <span>
+                @Market.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")
+                <br>
+                <strong>@Market.FixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
+            </span>
+        }
+
+    </td>
+    <td>
+        <span class="fw-bold">@Market.HomeName.ToUpper()</span>
+        <br />
+        <span>@Market.AwayName.ToUpper()</span>
+
+        @if (Market.FixtureStatusId == 1)
+        {
+            <span>@Market.Score</span>
+        }
+    </td>
+
+    <!-- BR CTRL -->
+    <td>
+        <div class="d-flex justify-content-center">
+            @if (Market != null && Market.Selections.Any())
+            {
+                foreach (var selection in Market?.Selections)
+                {
+                    var selectionKey = $"br-{selection.ProviderSelectionId}";
+
+                    <SelectionRow @key="selectionKey" Selection="selection" ColumnSize="@ColumnSize" IsBetStop="IsBetStop" CurrentMarketStatus="@Market.MarketStatusId" HasClientConfig="true" />
+
+                    if (HasLine)
+                    {
+                        <div>
+                            <span class="margin-value odds-bg-grey m-rl-xs">@MarketLine</span>
+                        </div>
+
+                        HasLine = false;
+                    }
+                }
+
+                if (Market != null && Market.Selections.Any())
+                {
+                    <div class="py-1 px-2">
+                        <span>@GetClientMargin(string.Empty, string.Empty, Market.Selections)</span>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="odds-container me-2 py-1 px-3">
+                    <span>-.-</span>
+                </div>
+                <div class="odds-container me-2 py-1 px-3">
+                    <span>-.-</span>
+                </div>
+                <div class="py-1 px-2">
+                    <span>-.-</span>
+                </div>
+            }
+
+        </div>
+    </td>
+
+    <!-- Client Odds -->
+    @if (Clients != null)
+    {
+        foreach (var client in Clients)
+        {
+            var hasLine = HasLine;
+            <td>
+                <div class="d-flex justify-content-center">
+                    @if (Market != null && Market.Selections.Any())
+                    {
+                        foreach (var selection in Market?.Selections)
+                        {
+                            var selectionKey = $"{client.ClientCode.ToLower()}-{selection.ProviderSelectionId}";
+                            var hasClientConfig = HasClientConfig(client.ClientCode, Market.ClientCode, Market.ClientCodeMargin);
+
+                            <SelectionRow @key="selection.ProviderSelectionId" CurrentClientCode="@client.ClientCode"
+                              Selection="selection" ColumnSize="@ColumnSize" IsBetStop="IsBetStop"
+                              CurrentMarketStatus="@GetMarketStatusId(client, Market.ClientCode, Market.MarketStatusId)"
+                              HasClientConfig="hasClientConfig" />
+
+                            if (hasLine)
+                            {
+                                if (hasClientConfig)
+                                {
+                                    <div>
+                                        <span class="margin-value odds-bg-grey m-rl-xs">@MarketLine</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div>
+                                        <span class="margin-value odds-bg-grey m-rl-xs">-.-</span>
+                                    </div>
+                                }
+
+                                hasLine = false;
+                            }
+                        }
+                    }
+                </div>
+            </td>
+        }
+    }
+
+</tr>
