@@ -122,48 +122,20 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         <span class="nav-menu-text">All Sports</span>
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="odds-engine/monitoring">
-                        <span class="iconfont iconfont-american-football" aria-hidden="true"></span>
-                        <span class="nav-menu-text">American Football</span>
-                        <span class="fa fa-chevron-right"></span>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="odds-engine/monitoring">
-                        <span class="iconfont iconfont-aussie-rules" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Aussie Rules</span>
-                        <span class="fa fa-chevron-right"></span>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="odds-engine/monitoring">
-                        <span class="iconfont iconfont-baseball" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Baseball</span>
-                        <span class="fa fa-chevron-right"></span>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="odds-engine/monitoring">
-                        <span class="iconfont iconfont-basketball" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Basketball</span>
-                        <span class="fa fa-chevron-right"></span>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="odds-engine/monitoring">
-                        <span class="iconfont iconfont-beach-volley" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Beach Volley</span>
-                        <span class="fa fa-chevron-right"></span>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="odds-engine/monitoring">
-                        <span class="iconfont iconfont-boxing" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Boxing</span>
-                        <span class="fa fa-chevron-right"></span>
-                    </NavLink>
-                </div>
+                @if (Menu != null && Menu.Sports.Count > 0)
+                {
+                    @foreach (var sport in Menu.Sports)
+                    {
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="@($"odds-engine/monitoring/{sport.SportId}")">
+                                <span class="@($"iconfont iconfont-{sport.SportName.ToLower().Replace(' ', '-')}")" aria-hidden="true"></span>
+                                <span class="nav-menu-text">@sport.SportName</span>
+                                <span class="fa fa-chevron-right"></span>
+                            </NavLink>
+                        </div>
+                    }
+                }
+
             </nav>
         }
     </div>
