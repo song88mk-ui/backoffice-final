@@ -13,17 +13,17 @@
     <div class="mx-3 mt-4">
 
         @*<TableContent>
-            <TableHeaderContent @THeadClass="">
-                <th valign="middle" align="left" width="30%"><strong>Client Name</strong></th>
-                <th valign="middle" align="left" width="30%"><strong>% Cap of Current Odds from Boosted Odds</strong></th>
-                <th valign="middle" align="left" width="20%"><strong>Manage</strong></th>
-            </TableHeaderContent>
-            <TableBodyContent>
-                @foreach (var client in ClientsView)
-                {
-                    <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" />
-                }
-            </TableBodyContent>
+        <TableHeaderContent>
+        <th valign="middle" align="left" width="30%"><strong>Client Name</strong></th>
+        <th valign="middle" align="left" width="30%"><strong>% Cap of Current Odds from Boosted Odds</strong></th>
+        <th valign="middle" align="left" width="20%"><strong>Manage</strong></th>
+        </TableHeaderContent>
+        <TableBodyContent>
+        @foreach (var client in ClientsView)
+        {
+        <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" />
+        }
+        </TableBodyContent>
         </TableContent>*@
 
         <table class="table table-hover table-bordered">
@@ -35,67 +35,31 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>10 BET CRYPTO</td>
-                    <td>
-                        <div class="d-flex justify-content-center">
-                            <div class="odds-container py-1 px-3">
-                                <span>76.00 %</span>
+                @foreach (var client in ClientsView)
+                {
+                    <tr>
+                        <td>@client.ClientName</td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="odds-container py-1 px-1">
+                                    <span>@client.Cap.ToString("P", CultureInfo.InvariantCulture)</span>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex justify-content-center">
-                            <a class="link-edit me-2" href="javascript:(0)">
-                                <i class="fa fa-edit"></i>
-                            </a>
-                            <a class="link-logs me-2" href="javascript:(0)">
-                                <i class="fa fa-list"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>10 BET GHANA</td>
-                    <td>
-                        <div class="d-flex justify-content-center">
-                            <div class="odds-container py-1 px-3">
-                                <span>51.00 %</span>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <a class="link-edit me-2" @onclick="async () => await OnEditSetting(client)" href="javascript:(0)">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a class="link-logs me-2" href="javascript:(0)">
+                                    <i class="fa fa-list"></i>
+                                </a>
                             </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex justify-content-center">
-                            <a class="link-edit me-2" href="javascript:(0)">
-                                <i class="fa fa-edit"></i>
-                            </a>
-                            <a class="link-logs me-2" href="javascript:(0)">
-                                <i class="fa fa-list"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>10 BET DRC</td>
-                    <td>
-                        <div class="d-flex justify-content-center">
-                            <div class="odds-container py-1 px-3">
-                                <span>5.00 %</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex justify-content-center">
-                            <a class="link-edit me-2" href="javascript:(0)">
-                                <i class="fa fa-edit"></i>
-                            </a>
-                            <a class="link-logs me-2" href="javascript:(0)">
-                                <i class="fa fa-list"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
 </div>
+<Backoffice.Web.Components.Common.CustomModal />

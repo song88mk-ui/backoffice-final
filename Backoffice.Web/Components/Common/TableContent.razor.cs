@@ -2,7 +2,7 @@
 
 namespace Backoffice.Web.Components.Common
 {
-    public partial class TableContent
+    public partial class TableContent : ComponentBase, IDisposable
     {
         #region Properties
 

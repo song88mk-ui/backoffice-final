@@ -1,0 +1,41 @@
+﻿<div class="modal-body">
+    @if (IsPreLoader)
+    {
+        <Preloader Classes="@("container-loader popup")" AlwaysLoad="true" />
+    }
+    <form>
+        <table class="table table-bordered table-dark">
+            <thead>
+                <tr>
+                    <th class="col-md-3">Client Name</th>
+                    <th class="col"><center>% Cap of Current Odds from Boosted Odds</center></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@ClientName</td>
+                    <td class="text-center">
+                        <center>
+                            <div class="col-md-4 input-icon input-icon-right">
+                                <input class="cap-bg-default" type="number" placeholder='0.00' @bind-value="CapEdit" data-decimal="2" oninput="enforceNumberValidation(this)" />
+                                <i>%</i>
+                            </div>
+                        </center>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+<div class="modal-footer">
+    @if (IsPreLoader)
+    {
+        <button type="button" class="btn btn-default waves-effect" disabled>Cancel</button>
+        <button type="button" class="btn btn-primary" data-type="inverse" data-from="top" data-align="right" @ref="SaveButton" disabled>Save</button>
+    }
+    else
+    {
+        <button type="button" class="btn btn-default waves-effect" @onclick="_ => OnCancelClickEvent()">Cancel</button>
+        <button type="button" class="btn btn-primary" data-type="inverse" data-from="top" data-align="right" @onclick="_ => OnSaveClickEvent()" @ref="SaveButton">Save</button>
+    }
+</div>

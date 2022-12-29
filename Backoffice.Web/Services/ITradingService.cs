@@ -7,5 +7,6 @@ namespace Backoffice.Web.Services
     public interface ITradingService
     {
         Task<BaseResponse<List<BoostedSettingsModel>>> GetBoostedSettings(BoostedSettingsRequest request);
+        Task<BaseResponse<bool>> AddOrUpdateBoostedSetting(BoostedSettingsModel request, string userId);
     }
 }

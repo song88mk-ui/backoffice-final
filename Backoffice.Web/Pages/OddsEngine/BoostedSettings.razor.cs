@@ -1,5 +1,6 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.OddsEngine.BoostedSettings;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -14,10 +15,12 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string IconClass { get; set; }
 
 
+        [Parameter] public string THeadClass { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
         protected List<BoostedSettingsModel> ClientsView { get; set; }
         protected SearchFormModel SearchForm { get; set; }
+        [Inject] IModalService ModalService { get; set; }
 
         #endregion
 
@@ -25,6 +28,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            THeadClass = "table-head";
             PageTitle = "Boosted Settings";
             IconClass = string.Empty;
 
@@ -52,6 +56,25 @@ namespace Backoffice.Web.Pages.OddsEngine
             finally
             {
                 await InvokeAsync(StateHasChanged);
+            }
+        }
+        public async Task OnEditSetting(BoostedSettingsModel client)
+        {
+            try
+            {
+                var parameters = new ModalParameters();
+
+                parameters.Add("Client", client);
+                //parameters.Add("ClientCode", BoostedSettings.ClientCode);
+                //parameters.Add("ClientName", BoostedSettings.ClientName);
+                //parameters.Add("Cap", BoostedSettings.Cap);
+
+                var options = new ModalOptions();
+                ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
+            }
+            catch (Exception ex)
+            {
+
             }
         }
         public void Dispose()

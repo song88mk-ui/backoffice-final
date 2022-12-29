@@ -10,6 +10,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
     {
         [Parameter] public BoostedSettingsModel BoostedSettings { get; set; }
         [Parameter] public Guid ClientId { get; set; }
+        [Inject] IModalService ModalService { get; set; }
 
         public async Task OnEditSetting(Guid marketTemplateGroupId)
         {
@@ -23,7 +24,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                 parameters.Add("Cap", BoostedSettings.Cap);
 
                 var options = new ModalOptions();
-                //ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
+                ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
             }
             catch (Exception ex)
             {
