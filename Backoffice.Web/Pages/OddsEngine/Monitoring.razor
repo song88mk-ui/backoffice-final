@@ -1,9 +1,12 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.Monitoring
+@using Backoffice.Web.Components.Common
 
 @layout OEMonitoringLayout
 
 @page "/odds-engine"
 @page "/odds-engine/monitoring"
+@page "/odds-engine/monitoring/{SportId}/{SegmentId}"
+@page "/odds-engine/monitoring/{SportId}/{SegmentId}/{LeagueId}"
 
 <div class="col-md-12">
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
@@ -28,7 +31,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (FixtureMarkets.Any())
+            @if (FixtureMarkets != null && FixtureMarkets.Any())
             {
                 foreach (var market in FixtureMarkets)
                 {
@@ -37,4 +40,9 @@
             }
         </tbody>
     </table>
+
+    @if (FixtureMarkets != null && !FixtureMarkets.Any())
+    {
+        <NoRecordFound />
+    }
 </div>

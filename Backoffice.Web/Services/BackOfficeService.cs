@@ -353,6 +353,33 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Methods - Others
+        public async Task<BaseResponse<SportsTreeResponse>> GetSportsTreeAsync(int fixtureTypeId)
+        {
+            try
+            {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsTreeResponse>>
+                (await _httpClient.GetStreamAsync($"api/trading/sports/{fixtureTypeId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return result ?? new BaseResponse<SportsTreeResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = $"{StatusCode.Success}",
+                    Result = new SportsTreeResponse()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<SportsTreeResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<SportsLookupModel>> GetSportsAsync(string languageCode)
         {
             try

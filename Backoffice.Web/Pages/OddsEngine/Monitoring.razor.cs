@@ -11,18 +11,46 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Parameter] public string SportId { get; set; }
+        [Parameter] public string SegmentId { get; set; }
+        [Parameter] public string LeagueId { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public MonitoringCallbackModel CallbackModel { get; set; }
         public List<FixtureMarketModel> FixtureMarkets { get; set; }
+        public SportsTreeModel.SportModel DefaultSport { get; set; }
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            FixtureMarkets = new List<FixtureMarketModel>();
+            FixtureMarkets = null;
             CallbackModel = new MonitoringCallbackModel();
+
+            DefaultSport = new SportsTreeModel.SportModel();
+            
+            if (!string.IsNullOrEmpty(SportId))
+            {
+                DefaultSport.SportId = Convert.ToInt32(SportId);
+
+                if (!string.IsNullOrEmpty(SegmentId))
+                {
+                    DefaultSport.Segments = new List<SportsTreeModel.SegmentModel>();
+
+                    var leagues = new List<SportsTreeModel.LeagueModel>();
+                    leagues.Add(new SportsTreeModel.LeagueModel
+                    {
+                        LeagueId = string.IsNullOrEmpty(LeagueId) ? 0 : Convert.ToInt32(LeagueId)
+                    });
+
+                    DefaultSport.Segments.Add(new SportsTreeModel.SegmentModel
+                    {
+                        SegmentId = Convert.ToInt32(SegmentId),
+                        Leagues = leagues
+                    });
+                }
+            }
 
             PageTitle = "American Football - USA - NCAA, Regular Season";
             IconClass = "iconfon iconfont-american-football";
