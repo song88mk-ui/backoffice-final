@@ -26,11 +26,11 @@
 }
 
 .nav-item:first-of-type {
-    padding-top: 1rem;
+    padding-top: 0.2rem;
 }
 
 .nav-item:last-of-type {
-    padding-bottom: 1rem;
+    padding-bottom: 0.2rem;
 }
 
 .nav-item ::deep a {
@@ -82,8 +82,11 @@ nav-item ::deep .nav-link.header.active, .nav-item ::deep .nav-link.header:hover
     color: #fff;
 }
 
-.sub-menu {
+.sub-menu, .sub-menu-oddsengine {
     border-radius: 5px;
+}
+
+.sub-menu {
     background-color: #404E67;
 }
 

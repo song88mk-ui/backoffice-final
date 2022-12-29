@@ -16,6 +16,7 @@ namespace Backoffice.Web.Shared
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
         public SportsTreeModel Menu { get; set; }
         public SportsTreeModel.SportModel DefaultSport { get; set; }
+
         #endregion
 
         #region Fields
@@ -30,9 +31,9 @@ namespace Backoffice.Web.Shared
         #endregion
 
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
-
             Menu = new SportsTreeModel();
 
             await GetSportsTreeMenu();
@@ -74,11 +75,13 @@ namespace Backoffice.Web.Shared
         #endregion
 
         #region Utilities
+
         private async Task GetSportsTreeMenu()
         {
             var result = new SportsTreeModel();
 
             var response = await BackOfficeService.GetSportsTreeAsync((int)FixtureType.Match);
+
             foreach (var sport in response.Result.Sports)
             {
                 result.Sports.Add(new SportsTreeModel.SportModel
@@ -106,6 +109,7 @@ namespace Backoffice.Web.Shared
 
             Menu = result;
         }
+
         #endregion
     }
 }
