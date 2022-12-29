@@ -8,7 +8,11 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
     public partial class Filter : IDisposable
     {
         #region Properties
-        [Inject] IModalService ModalService { get; set; }
+        [Inject] private IModalService ModalService { get; set; }
+        [Inject] private ITradingService TradingService { get; set; }
+        [Parameter] public PriceboostFilterModel PriceboostFilterModel { get; set; }
+        //[Parameter] public EventCallback<PriceboostFilterModel> PriceboostFilterModelChanged { get; set; }
+        //[Parameter] public EventCallback OnFilterChangedCallback { get; set; }
 
         public SearchFormModel SearchForm { get; set; }
 
@@ -19,10 +23,64 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         protected override async Task OnInitializedAsync()
         {
             SearchForm = new SearchFormModel();
+
+            //PriceboostFilterModel = new PriceboostFilterModel();
+
+            //PriceboostFilterModel.Sports =  await LoadSports();
+            //PriceboostFilterModel.Segments = await LoadSegments(PriceboostFilterModel.SportId);
+            //PriceboostFilterModel.Leagues = await LoadLeagues(PriceboostFilterModel.SportId, PriceboostFilterModel.SegmentId);
         }
 
         public async Task OnInputSearchEvent()
         {
+        }
+
+        public async Task<List<Models.SelectListItemModel<int>>> LoadSports()
+        {
+            var result = (await TradingService.GetSportLookup()).Result;
+
+            if (result == null)
+                return new List<Models.SelectListItemModel<int>>();
+
+            var sports = result.SportLookup.Select(s => new Models.SelectListItemModel<int>()
+            {
+                Value = s.SportId,
+                Name = s.SportName
+            }).ToList();
+
+            return sports;      
+        }
+
+        public async Task<List<Models.SelectListItemModel<int>>> LoadSegments(int sportId)
+        {
+            var result = (await TradingService.GetSegmentLookup(sportId)).Result;
+
+            if (result == null)
+                return new List<Models.SelectListItemModel<int>>();
+
+            var segments = result.SegmentLookup.Select(s => new Models.SelectListItemModel<int>()
+            {
+                Value = s.SegmentId,
+                Name = s.SegmentName
+            }).ToList();
+
+            return segments;
+        }
+
+        public async Task<List<Models.SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
+        {
+            var result = (await TradingService.GetLeagueLookup(sportId, segmentId)).Result;
+
+            if (result == null)
+                return new List<Models.SelectListItemModel<int>>();
+
+            var leagues = result.LeagueLookup.Select(s => new Models.SelectListItemModel<int>()
+            {
+                Value = s.LeagueId,
+                Name = s.LeagueName
+            }).ToList();
+
+            return leagues;
         }
 
         public async Task OnAddBoostedOdds()
@@ -44,6 +102,51 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             var options = new ModalOptions();
             ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);
+        }
+
+        public async Task OnClientChangedEvent(ChangeEventArgs e)
+        {
+            PriceboostFilterModel.ClientCode = e.Value.ToString();
+
+            //await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
+            //await OnFilterChangedCallback.InvokeAsync();
+        }
+
+        public async Task OnSportChangedEvent(ChangeEventArgs e)
+        {
+            PriceboostFilterModel.SportId = int.Parse(e.Value.ToString());
+
+            //PriceboostFilterModel.Segments = new List<Models.SelectListItemModel<int>>();
+            //PriceboostFilterModel.Leagues = new List<Models.SelectListItemModel<int>>();
+            //PriceboostFilterModel.Segments = await LoadSegments(PriceboostFilterModel.SportId);
+            //PriceboostFilterModel.Leagues = await LoadLeagues(PriceboostFilterModel.SportId, PriceboostFilterModel.SegmentId);
+
+            //if (PriceboostFilterModel.SportId != 0)
+            //{
+            //    PriceboostFilterModel.SegmentId = 0;
+            //    PriceboostFilterModel.LeagueId = 0;
+            //}
+
+            //await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
+            //await OnFilterChangedCallback.InvokeAsync();
+        }
+
+        public async Task OnSegmentChangedEvent(ChangeEventArgs e)
+        {
+            //PriceboostFilterModel.SegmentId = int.Parse(e.Value.ToString());
+            //PriceboostFilterModel.LeagueId = 0;
+            //PriceboostFilterModel.Leagues = await LoadLeagues(PriceboostFilterModel.SportId, PriceboostFilterModel.SegmentId);
+
+            //await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
+            //await OnFilterChangedCallback.InvokeAsync();
+        }
+
+        public async Task OnLeagueChangedEvent(ChangeEventArgs e)
+        {
+            //PriceboostFilterModel.LeagueId = int.Parse(e.Value.ToString());
+
+            //await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
+            //await OnFilterChangedCallback.InvokeAsync();
         }
 
         public void Dispose()

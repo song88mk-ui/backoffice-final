@@ -8,16 +8,14 @@ namespace Backoffice.Shared.Models.Response
     {
         public SportsLookupResponse()
         {
-            Sports = new List<SportLookup>();
+            SportLookup = new List<SportLookup>();
         }
-        public List<SportLookup> Sports { get; set; }
+        public List<SportLookup> SportLookup { get; set; }        
+    }
 
-        #region Nested Class
-        public class SportLookup
-        {
-            public int SportId { get; set; }
-            public string SportName { get; set; }
-        }
-        #endregion
+    public class SportLookup
+    {
+        public int SportId { get; set; }
+        public string SportName { get; set; }
     }
 }
