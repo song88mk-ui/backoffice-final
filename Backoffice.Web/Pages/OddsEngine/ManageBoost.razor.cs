@@ -44,11 +44,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             //await InvokeAsync(StateHasChanged);
         }        
 
-        public async Task OnFilterChangedEvent()
-        {
-
-        }
-
         public async Task OnEdit()
         {
             var parameters = new ModalParameters();
@@ -79,6 +74,41 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
             ModalService.Open<DeleteBoostedOddsModal>($"Delete Boosted Odds", parameters, options);
+        }
+
+        public async Task GetContents()
+        {
+
+        }
+
+        public async Task OnClientChangedEvent(string clientCode)
+        {
+
+        }
+
+        public async Task OnSportChangedEvent(int sportId)
+        {
+            PriceboostFilterModel.SegmentId = 0;
+            PriceboostFilterModel.LeagueId = 0;
+
+            PriceboostFilterModel.Segments = await LoadSegments(sportId);
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        public async Task OnSegmentChangedEvent(Tuple<int,int> param)
+        {
+            PriceboostFilterModel.LeagueId = 0;
+            
+            PriceboostFilterModel.Leagues = await LoadLeagues(param.Item1, param.Item2);
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        public async Task OnLeagueChangedEvent()
+        {
+            await GetContents();
+            await InvokeAsync(StateHasChanged);
         }
 
         public void Dispose()
@@ -151,7 +181,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 Value = s.LeagueId,
                 Name = s.LeagueName
-            }).ToList();
+            }).Take(100).ToList();
 
             return leagues;
         }

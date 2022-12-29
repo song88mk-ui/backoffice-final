@@ -8,7 +8,9 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter PriceboostFilterModel="@PriceboostFilterModel"/>
+    <Filter PriceboostFilterModel="@PriceboostFilterModel" 
+        OnClientChangedCallback="OnClientChangedEvent" OnSportChangedCallback="OnSportChangedEvent" OnSegmentChangedCallback="OnSegmentChangedEvent"
+        OnLeagueChangedCallback="OnLeagueChangedEvent"/>
 </div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">
