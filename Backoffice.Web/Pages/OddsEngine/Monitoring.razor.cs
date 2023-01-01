@@ -11,6 +11,8 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [CascadingParameter(Name = "NavigateSportEvent")] public EventCallback<SportClickCallbackModel> NavigateSportEvent { get; set; }
+        [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
         [Parameter] public string SportId { get; set; }
         [Parameter] public string SegmentId { get; set; }
         [Parameter] public string LeagueId { get; set; }
@@ -51,6 +53,13 @@ namespace Backoffice.Web.Pages.OddsEngine
                     });
                 }
             }
+
+            await NavigateSportEvent.InvokeAsync(new SportClickCallbackModel
+            {
+                SportId = string.IsNullOrEmpty(SportId) ? 0 : Convert.ToInt32(SportId),
+                SegmentId = string.IsNullOrEmpty(SegmentId) ? 0 : Convert.ToInt32(SegmentId),
+                LeagueId = string.IsNullOrEmpty(LeagueId) ? 0 : Convert.ToInt32(LeagueId)
+            });
 
             PageTitle = "American Football - USA - NCAA, Regular Season";
             IconClass = "iconfon iconfont-american-football";

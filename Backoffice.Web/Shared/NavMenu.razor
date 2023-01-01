@@ -122,51 +122,45 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         <span class="nav-menu-text">All Sports</span>
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="@($"odds-engine/monitoring/16")">
-                        <span class="@($"iconfont iconfont-american-football")"></span>
-                        <span class="nav-menu-text">American Football</span>
-                        <span class="fa fa-chevron-down"></span>
-                    </NavLink>
-                    <div class="sub-menu-oddsengine ms-3 show">
-                        <nav class="flex-column">
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="javascript:void(0);">
-                                    <span class="fa fa-chevron-right me-2"></span>
-                                    <span class="nav-menu-text">USA</span>
-                                    <span class="fa fa-chevron-down"></span>
-                                </NavLink>
-                                <div class="sub-menu-oddsengine ms-3 show">
-                                    <NavLink class="nav-link" href="javascript:void(0);">
-                                        <span class="fa fa-chevron-right me-2"></span>
-                                        <span class="nav-menu-text">League 1</span>
-                                    </NavLink>
-                                    <NavLink class="nav-link" href="javascript:void(0);">
-                                        <span class="fa fa-chevron-right me-2"></span>
-                                        <span class="nav-menu-text">League 2</span>
-                                    </NavLink>
-                                </div>
-                            </div>
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="javascript:void(0);">
-                                    <span class="fa fa-chevron-right me-2"></span>
-                                    <span class="nav-menu-text">Canada</span>
-                                    <span class="fa fa-chevron-right"></span>
-                                </NavLink>
-                            </div>
-                        </nav>
-                    </div>
-                </div>
                 @if (Menu != null && Menu.Sports.Count > 0)
                 {
                     @foreach (var sport in Menu.Sports)
                     {
                         <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="@($"odds-engine/monitoring/{sport.SportId}")">
+                            <NavLink class="nav-link" @onclick="_ => OnSportClickEvent(sport.SportId)">
                                 <span class="@($"iconfont iconfont-{sport.SportName.ToLower().Replace(' ', '-')}")" aria-hidden="true"></span>
                                 <span class="nav-menu-text">@sport.SportName</span>
-                                <span class="fa fa-chevron-right"></span>
+                                <span class="@(sport.SportId == DefaultSport.SportId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
                             </NavLink>
+                            @if (sport.SportId == DefaultSport.SportId)
+                            {
+                                <div class="sub-menu-oddsengine ms-3 show">
+                                    <nav class="flex-column">
+                                        <div class="nav-item">
+                                            @foreach (var segment in sport.Segments)
+                                            {
+                                                <NavLink class="nav-link" @onclick="_ => OnSegmentClickEvent(segment.SegmentId)">
+                                                    <span class="fa fa-chevron-right me-2"></span>
+                                                    <span class="nav-menu-text">@segment.SegmentName</span>
+                                                    <span class="@(sport.SportId == DefaultSport.SportId && segment.SegmentId == DefaultSport.SegmentId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
+                                                </NavLink>
+                                                @if (sport.SportId == DefaultSport.SportId && segment.SegmentId == DefaultSport.SegmentId)
+                                                {
+                                                    <div class="sub-menu-oddsengine ms-3 show">
+                                                        @foreach (var league in segment.Leagues)
+                                                        {
+                                                            <NavLink class="nav-link" @onclick="_ => OnLeagueClickEvent(league.LeagueId)">
+                                                                <span class="fa fa-chevron-right me-2"></span>
+                                                                <span class="nav-menu-text">@league.LeagueName</span>
+                                                            </NavLink>
+                                                        }
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    </nav>
+                                </div>
+                            }
                         </div>
                     }
                 }

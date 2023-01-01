@@ -1,4 +1,5 @@
 ﻿@using Backoffice.Shared.Enums
+@using Backoffice.Web.Models
 
 @inherits MainLayoutBase
 
@@ -6,7 +7,7 @@
     <PageTitle>Backoffice</PageTitle>
     <div class="page">
         <div class="sidebar">
-            <NavMenu NavMenuAccess="NavMenuAccess.OE" />
+            <NavMenu NavMenuAccess="NavMenuAccess.OE" DefaultSport="DefaultSport" OnSportClickCallback="OnSportClickEvent" />
         </div>
         <main>
             <article class="content px-4">
@@ -16,11 +17,15 @@
                             <div class="header-container col-md-12">
                                 <HeaderNavMenu />
                             </div>
-                            @Body
+                            <CascadingValue Value="NavigateSportEvent" Name="NavigateSportEvent">
+                                <CascadingValue Value="DefaultSport" Name="DefaultSport">
+                                    @Body
+                                </CascadingValue>
+                            </CascadingValue>
                         </div>
                     </div>
                 </div>
             </article>
         </main>
     </div>
-</CascadingValue> 
+</CascadingValue>

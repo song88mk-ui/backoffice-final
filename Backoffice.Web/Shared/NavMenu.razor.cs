@@ -14,9 +14,8 @@ namespace Backoffice.Web.Shared
 
         [Parameter] public NavMenuAccess NavMenuAccess { get; set; }
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
+        [Parameter] public SportClickCallbackModel DefaultSport { get; set; }
         public SportsTreeModel Menu { get; set; }
-        public SportsTreeModel.SportModel DefaultSport { get; set; }
-
         #endregion
 
         #region Fields
@@ -24,9 +23,6 @@ namespace Backoffice.Web.Shared
         private bool collapseNavMenu = true;
         private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-        public string _sportId;
-        public string _segmentId;
-        public string _leagueId;
 
         #endregion
 
@@ -36,36 +32,59 @@ namespace Backoffice.Web.Shared
         {
             Menu = new SportsTreeModel();
 
+            if (DefaultSport == null)
+                DefaultSport = new SportClickCallbackModel();
+
             await GetSportsTreeMenu();
 
-            DefaultSport = new SportsTreeModel.SportModel();
-
-            if (!string.IsNullOrEmpty(_sportId))
-            {
-                DefaultSport.SportId = Convert.ToInt32(_sportId);
-
-                if (!string.IsNullOrEmpty(_segmentId))
-                {
-                    DefaultSport.Segments = new List<SportsTreeModel.SegmentModel>();
-
-                    var leagues = new List<SportsTreeModel.LeagueModel>();
-                    leagues.Add(new SportsTreeModel.LeagueModel
-                    {
-                        LeagueId = string.IsNullOrEmpty(_leagueId) ? 0 : Convert.ToInt32(_leagueId)
-                    });
-
-                    DefaultSport.Segments.Add(new SportsTreeModel.SegmentModel
-                    {
-                        SegmentId = Convert.ToInt32(_segmentId),
-                        Leagues = leagues
-                    });
-                }
-            }
         }
 
         public void ToggleNavMenu()
         {
             collapseNavMenu = !collapseNavMenu;
+        }
+
+        public async Task OnSportClickEvent(int sportId)
+        {
+            DefaultSport.SegmentId = DefaultSport.SportId == sportId ? 0 : DefaultSport.SportId != sportId ? 0 : DefaultSport.SegmentId;
+            DefaultSport.SportId = DefaultSport.SportId == sportId ? 0 : sportId;
+        }
+
+        public async Task OnSegmentClickEvent(int segmentId)
+        {
+            if (DefaultSport.SegmentId == segmentId)
+            {
+                DefaultSport.SegmentId = 0;
+                DefaultSport.LeagueId = 0;
+                return;
+            }
+
+            DefaultSport.SegmentId = segmentId;
+
+            var sport = Menu.Sports.FirstOrDefault(c => c.SportId == DefaultSport.SportId);
+            var segment = sport.Segments.FirstOrDefault(c => c.SegmentId == DefaultSport.SegmentId);
+            var league = segment.Leagues.FirstOrDefault();
+
+            DefaultSport.LeagueId = league.LeagueId;
+
+            await OnSportClickCallback.InvokeAsync(new SportClickCallbackModel
+            {
+                SportId = DefaultSport.SportId,
+                SegmentId = DefaultSport.SegmentId,
+                LeagueId = DefaultSport.LeagueId
+            });
+        }
+
+        public async Task OnLeagueClickEvent(int leagueId)
+        {
+            DefaultSport.LeagueId = leagueId;
+
+            await OnSportClickCallback.InvokeAsync(new SportClickCallbackModel
+            {
+                SportId = DefaultSport.SportId,
+                SegmentId = DefaultSport.SegmentId,
+                LeagueId = DefaultSport.LeagueId
+            });
         }
 
         public void Dispose()
