@@ -13,8 +13,8 @@ namespace Backoffice.Web.Shared
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public NavMenuAccess NavMenuAccess { get; set; }
-        [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
-        [Parameter] public SportClickCallbackModel DefaultSport { get; set; }
+        [CascadingParameter(Name = "OnSportClickCallback")] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
+        [CascadingParameter(Name = "DefaultSport")] public SportClickCallbackModel DefaultSport { get; set; }
         public SportsTreeModel Menu { get; set; }
         #endregion
 

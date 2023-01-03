@@ -18,6 +18,9 @@ namespace Backoffice.Web.Shared
         public UserModel UserModel { get; set; }
         public LogInModel Model { get; set; }
 
+        public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
+        public SportClickCallbackModel DefaultSport { get; set; }
+
         #endregion
 
         #region Methods
@@ -41,6 +44,14 @@ namespace Backoffice.Web.Shared
 
                     var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                     var userClaims = authState.User.Claims.ToList();
+                UserModel = new UserModel();
+
+                DefaultSport = new SportClickCallbackModel();
+
+                OnSportClickCallback = EventCallback.Factory.Create<SportClickCallbackModel>(this, OnNavigateSportEvent);
+
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var userClaims = authState.User.Claims.ToList();
 
                     Parallel.ForEach(userClaims, (claim) =>
                     {
@@ -69,6 +80,11 @@ namespace Backoffice.Web.Shared
                     NavigationManager.NavigateTo("login", true);
                 }
             }
+        }
+
+        private async Task OnNavigateSportEvent(SportClickCallbackModel model)
+        {
+            DefaultSport = model;
         }
 
         public async void Dispose()
