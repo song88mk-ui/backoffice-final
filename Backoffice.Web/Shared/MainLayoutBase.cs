@@ -31,7 +31,7 @@ namespace Backoffice.Web.Shared
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if(firstRender)
+            if (firstRender)
             {
                 try
                 {
@@ -42,16 +42,12 @@ namespace Backoffice.Web.Shared
                         return;
                     }
 
+                    DefaultSport = new SportClickCallbackModel();
+
+                    OnSportClickCallback = EventCallback.Factory.Create<SportClickCallbackModel>(this, OnNavigateSportEvent);
+
                     var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                     var userClaims = authState.User.Claims.ToList();
-                UserModel = new UserModel();
-
-                DefaultSport = new SportClickCallbackModel();
-
-                OnSportClickCallback = EventCallback.Factory.Create<SportClickCallbackModel>(this, OnNavigateSportEvent);
-
-                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-                var userClaims = authState.User.Claims.ToList();
 
                     Parallel.ForEach(userClaims, (claim) =>
                     {
