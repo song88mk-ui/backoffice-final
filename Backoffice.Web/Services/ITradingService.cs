@@ -12,6 +12,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId);
 
         #region Priceboost
+        Task<BaseResponse<List<PriceBoostConfigModel>>> GetPriceBoostConfig(PriceBoostConfigRequest request);
         Task<BaseResponse<List<BoostedSettingsModel>>> GetBoostedSettings(BoostedSettingsRequest request);
         Task<BaseResponse<bool>> AddOrUpdateBoostedSetting(BoostedSettingsModel request, string userId);
         #endregion

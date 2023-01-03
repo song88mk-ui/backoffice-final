@@ -1,4 +1,9 @@
-﻿.table-head {
+﻿.boost-expired {
+    background: rgba(0, 0, 0, .05);
+    color: #aaa !important;
+}
+
+.table-head {
     background-color: #354156;
     color: #fff;
 }

@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Models;
@@ -15,9 +16,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }        
         public MetaData MetaData { get; set; }
-        public PriceboostFilterModel PriceboostFilterModel { get; set; }
+        public PriceboostFilterModel PriceBoostFilterModel { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }        
+        public List<PriceBoostConfigModel> PriceBoostList { get; set; }
         #endregion
 
         #region Methods
@@ -26,8 +28,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             PageTitle = "Manage Boost";
             IconClass = string.Empty;
-            
-            PriceboostFilterModel= new PriceboostFilterModel();
+
+            PriceBoostFilterModel = new PriceboostFilterModel();
 
             MetaData = new MetaData()
             {
@@ -36,15 +38,16 @@ namespace Backoffice.Web.Pages.OddsEngine
                 TotalCount = 10000,
                 TotalPages = 100
             };
-
-            PriceboostFilterModel.Clients = await LoadClients();
-            PriceboostFilterModel.Sports = await LoadSports();
-            PriceboostFilterModel.Segments = await LoadSegments(PriceboostFilterModel.SportId);
-            PriceboostFilterModel.Leagues = await LoadLeagues(PriceboostFilterModel.SportId, PriceboostFilterModel.SegmentId);
-            //await InvokeAsync(StateHasChanged);
+            
+            PriceBoostFilterModel.Clients = await LoadClients();
+            PriceBoostFilterModel.Sports = await LoadSports();
+            PriceBoostFilterModel.Segments = await LoadSegments(PriceBoostFilterModel.SportId);
+            PriceBoostFilterModel.Leagues = await LoadLeagues(PriceBoostFilterModel.SportId, PriceBoostFilterModel.SegmentId);
+            await GetContents();
+            await InvokeAsync(StateHasChanged);
         }        
 
-        public async Task OnEdit()
+        public async Task OnEdit(PriceBoostConfigModel priceboost)
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
@@ -55,7 +58,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             ModalService.Open<EditBoostedOddsModal>($"Edit Boosted Odds", parameters, options);
         }
 
-        public async Task OnViewLog()
+        public async Task OnViewLog(PriceBoostConfigModel priceboost)
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
@@ -65,7 +68,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             ModalService.Open<ViewLogsBoostedModal>($"View Logs", parameters, options);
         }
 
-        public async Task OnDelete()
+        public async Task OnDelete(PriceBoostConfigModel priceboost)
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
@@ -78,30 +81,51 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task GetContents()
         {
+            var priceBoostList = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest 
+            {
+                ClientCode = !string.IsNullOrEmpty(PriceBoostFilterModel.ClientCode) ? PriceBoostFilterModel.ClientCode : "",
+                SportId = PriceBoostFilterModel.SportId > 0 ? PriceBoostFilterModel.SportId.ToString() : "",
+                SegmentId = PriceBoostFilterModel.SegmentId > 0 ? PriceBoostFilterModel.SegmentId.ToString() : "",
+                LeagueId = PriceBoostFilterModel.LeagueId > 0 ? PriceBoostFilterModel.LeagueId.ToString() : "",
+                ProviderFixtureId = "",
+                MarketTemplateId = "",
+                SelectionTemplateId = "",
+                SelectionSpecifier = "",
+                MarketSpecifier = ""
+            })).Result;
 
+            if (priceBoostList != null && priceBoostList.Any())
+            {
+                priceBoostList = priceBoostList.Where(x => UserModel.ClientCodes.Contains(x.ClientCode)).ToList();
+            }
+
+            PriceBoostList = priceBoostList;
         }
 
         public async Task OnClientChangedEvent(string clientCode)
         {
-
+            await GetContents();
         }
 
         public async Task OnSportChangedEvent(int sportId)
         {
-            PriceboostFilterModel.SegmentId = 0;
-            PriceboostFilterModel.LeagueId = 0;
+            PriceBoostFilterModel.SegmentId = 0;
+            PriceBoostFilterModel.LeagueId = 0;
 
-            PriceboostFilterModel.Segments = await LoadSegments(sportId);
+            PriceBoostFilterModel.Segments = await LoadSegments(sportId);
+            PriceBoostFilterModel.Leagues = await LoadLeagues(sportId, PriceBoostFilterModel.SegmentId);
 
+            await GetContents();
             await InvokeAsync(StateHasChanged);
         }
 
         public async Task OnSegmentChangedEvent(Tuple<int,int> param)
         {
-            PriceboostFilterModel.LeagueId = 0;
-            
-            PriceboostFilterModel.Leagues = await LoadLeagues(param.Item1, param.Item2);
+            PriceBoostFilterModel.LeagueId = 0;
 
+            PriceBoostFilterModel.Leagues = await LoadLeagues(param.Item1, param.Item2);
+
+            await GetContents();
             await InvokeAsync(StateHasChanged);
         }
 
@@ -134,7 +158,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             return clients.Clients.Select(x => new Models.SelectListItemModel<string>()
             {
                 Name = x.ClientName,
-                Value = x.ClientId.ToString()
+                Value = x.ClientCode
             }).ToList();
         }
 

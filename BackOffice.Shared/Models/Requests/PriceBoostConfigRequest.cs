@@ -15,5 +15,6 @@ namespace Backoffice.Shared.Models.Requests
         public string MarketTemplateId { get; set; }
         public string SelectionTemplateId { get; set; }
         public string SelectionSpecifier { get; set; }
+        public string MarketSpecifier { get; set; }
     }
 }

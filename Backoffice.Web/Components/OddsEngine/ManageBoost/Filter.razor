@@ -7,7 +7,7 @@
                     @if (PriceboostFilterModel.Clients.Any())
                     {
                         <select class="form-select d-block" @onchange="OnClientChangedEvent">
-                            <option value="0">All Clients</option>
+                            <option value="">All Clients</option>
                             @foreach (var item in PriceboostFilterModel.Clients)
                             {
                                 if (item.Name == PriceboostFilterModel.ClientCode)
