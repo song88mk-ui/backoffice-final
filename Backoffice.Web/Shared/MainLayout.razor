@@ -18,7 +18,11 @@
         </div>
         <main>
             <article class="content px-4">
-                @Body
+                <CascadingValue Value="OnSportClickCallback" Name="OnSportClickCallback">
+                    <CascadingValue Value="DefaultSport" Name="DefaultSport">
+                        @Body
+                    </CascadingValue>
+                </CascadingValue>
             </article>
         </main>
     </div>

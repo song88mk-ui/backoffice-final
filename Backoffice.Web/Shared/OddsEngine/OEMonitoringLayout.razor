@@ -7,7 +7,7 @@
     <PageTitle>Backoffice</PageTitle>
     <div class="page">
         <div class="sidebar">
-            <NavMenu NavMenuAccess="NavMenuAccess.OE" DefaultSport="DefaultSport" OnSportClickCallback="OnSportClickEvent" />
+            <NavMenu NavMenuAccess="NavMenuAccess.OE"/>
         </div>
         <main>
             <article class="content px-4">
@@ -17,11 +17,7 @@
                             <div class="header-container col-md-12">
                                 <HeaderNavMenu />
                             </div>
-                            <CascadingValue Value="NavigateSportEvent" Name="NavigateSportEvent">
-                                <CascadingValue Value="DefaultSport" Name="DefaultSport">
-                                    @Body
-                                </CascadingValue>
-                            </CascadingValue>
+                            @Body
                         </div>
                     </div>
                 </div>
