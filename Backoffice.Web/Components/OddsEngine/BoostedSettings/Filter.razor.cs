@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Models;
+using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -50,7 +51,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             parameters.Add("DialogStyle", "max-width: 80%; overflow-y: initial !important");
             parameters.Add("Page", CurrentPage);
             var options = new ModalOptions();
-            //ModalService.Open<ViewLogsPriceBoostModalBody>("View Logs", parameters, options);
+
+            ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);
         }
         public void Dispose()
         {
