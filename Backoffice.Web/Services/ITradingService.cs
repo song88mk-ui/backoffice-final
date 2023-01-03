@@ -7,10 +7,17 @@ namespace Backoffice.Web.Services
 {
     public interface ITradingService
     {
-        Task<BaseResponse<List<BoostedSettingsModel>>> GetBoostedSettings(BoostedSettingsRequest request);
         Task<BaseResponse<SportsLookupResponse>> GetSportLookup();
         Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId);
         Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId);
+
+        #region Priceboost
+        Task<BaseResponse<List<BoostedSettingsModel>>> GetBoostedSettings(BoostedSettingsRequest request);
         Task<BaseResponse<bool>> AddOrUpdateBoostedSetting(BoostedSettingsModel request, string userId);
+        #endregion
+
+
+        Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
+        Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);
     }
 }

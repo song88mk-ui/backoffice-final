@@ -25,7 +25,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         public string ClientName { get; set; }
         public decimal Cap { get; set; }
         public decimal CapEdit { get; set; }
-        public BoostedSettingsModel BoostedSettings { get; set; }
+        public BoostedSettingsModel Client { get; set; }
 
         protected bool IsPreLoader { get; set; } = false;
         public bool ShowAlertMessage { get; set; }
@@ -41,12 +41,13 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         {
             try
             {
-                BoostedSettings = new BoostedSettingsModel();
-                BoostedSettings = ModalParameters?.TryGet<BoostedSettingsModel>("Client");
-                //ClientCode = ModalParameters.TryGet<string>("ClientCode");
-                //ClientName = ModalParameters.TryGet<string>("ClientName");
-                //Cap = ModalParameters.TryGet<decimal>("Cap") * 100;
-                //CapEdit = decimal.Parse(Cap.ToString("G4"));
+                Client = new BoostedSettingsModel();
+                Client = ModalParameters?.TryGet<BoostedSettingsModel>("Client");
+                ClientId = Client.ClientId;
+                ClientCode = Client.ClientCode;
+                ClientName = Client.ClientName;
+                Cap = Client.Cap * 100;
+                CapEdit = decimal.Parse(Cap.ToString("G4"));
             }
             catch (Exception)
             {
@@ -77,9 +78,6 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                     AlertMessage = "% Cap has been successfully updated!";
                     AlertStatus = "Success!";
                     Opacity = 1.0m;
-
-                    await Modal.OnSaveClickCallback.InvokeAsync(true);
-                    await Task.Delay(3500);
                 }
                 else
                 {

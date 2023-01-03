@@ -1,0 +1,68 @@
+﻿@using BlazorDateRangePicker;
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-lg-8 col-md-6 col-sm-4">
+            <div class="form-group">
+                <DateRangePicker DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="StartDate" EndDate="EndDate" MaxDate="@DateTime.Today" OnRangeSelect="OnRangeSelect" />
+            </div>
+        </div>
+        <div class="col align-self-end pr-1">
+            <div class="form-group">
+                <EditForm class="f-right form-group" Model="SearchForm" OnValidSubmit="OnSubmitClickEvent" Context="FormContext">
+                    <div class="right-icon-control">
+                        <InputText id="search" class="form-control search-text" placeholder="Search Here..." @bind-Value="SearchForm.SearchText" />
+                        <div class="form-icon"> <i class="feather icon-search"></i> </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (!IsPreLoader)
+            {
+                @if (ActivityLogs != null && ActivityLogs.Any())
+                {
+                    <TableContent>
+                        <TableHeaderContent>
+                            <th valign="middle" align="left"><strong>#</strong></th>
+                            <th valign="middle" align="left"><strong>Date</strong></th>
+                            <th valign="middle" align="left"><strong>Client Name</strong></th>
+                            <th valign="middle" align="left"><strong>Activity</strong></th>
+                            <th valign="middle" align="left"><strong>Changed From</strong></th>
+                            <th valign="middle" align="left"><strong>Changed To</strong></th>
+                            <th valign="middle" align="left"><strong>Updated By</strong></th>
+                        </TableHeaderContent>
+
+                        <TableBodyContent>
+                            @foreach (var log in ActivityLogs)
+                            {
+                                int RowCount = (ActivityLogs.IndexOf(log) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                                <tr>
+                                    <td>@RowCount</td>
+                                    <td>@log.TimeStamp.ToLocalTime().ToString("dd/MM/yy HH:mm")</td>
+                                    <td>@ClientName</td>
+                                    <td><strong>@log.Activity</strong></td>
+                                    <td>@((MarkupString)EvaluateActivity(log.From))</td>
+                                    <td>@((MarkupString)EvaluateActivity(log.To))</td>
+                                    <td>@log.UserId</td>
+                                </tr>
+                            }
+                        </TableBodyContent>
+                    </TableContent>
+
+                    <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+                }
+                else
+                {
+                    <NoRecordFound />
+                }
+            }
+        </div>
+    </div>
+</div>
+<div class="modal-footer notifications">
+    <button type="button" @onclick="OnCancelClickEvent" class="btn btn-danger waves-effect " data-dismiss="modal">Close</button>
+</div>

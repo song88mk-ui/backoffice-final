@@ -24,43 +24,50 @@ namespace Backoffice.Web.Shared
 
         protected override async Task OnInitializedAsync()
         {
-            try
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if(firstRender)
             {
-                if (HttpContextAccessor.HttpContext.Session.GetString("UserToken") == null)
+                try
+                {
+                    UserModel = new UserModel();
+                    if (HttpContextAccessor.HttpContext.Session.GetString("UserToken") == null)
+                    {
+                        NavigationManager.NavigateTo("login", true);
+                        return;
+                    }
+
+                    var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                    var userClaims = authState.User.Claims.ToList();
+
+                    Parallel.ForEach(userClaims, (claim) =>
+                    {
+                        switch (claim.Type.ToUpper())
+                        {
+                            case "CLIENTCODES":
+                                UserModel.ClientCodes.AddRange(claim.Value.Split(',').ToList());
+                                break;
+                            case "USERID":
+                                UserModel.Id = claim.Value;
+                                break;
+                            case "TOKENNAME":
+                                UserModel.UserName = claim.Value;
+                                break;
+                            case "MAINUSERID":
+                                UserModel.MainUserId = claim.Value;
+                                break;
+                            default:
+                                UserModel.Claims.Add(claim);
+                                break;
+                        }
+                    });
+                }
+                catch (Exception ex)
                 {
                     NavigationManager.NavigateTo("login", true);
                 }
-
-                UserModel = new UserModel();
-
-                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-                var userClaims = authState.User.Claims.ToList();
-
-                Parallel.ForEach(userClaims, (claim) =>
-                {
-                    switch (claim.Type.ToUpper())
-                    {
-                        case "CLIENTCODES":
-                            UserModel.ClientCodes.AddRange(claim.Value.Split(',').ToList());
-                            break;
-                        case "USERID":
-                            UserModel.Id = claim.Value;
-                            break;
-                        case "TOKENNAME":
-                            UserModel.UserName = claim.Value;
-                            break;
-                        case "MAINUSERID":
-                            UserModel.MainUserId = claim.Value;
-                            break;
-                        default:
-                            UserModel.Claims.Add(claim);
-                            break;
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                NavigationManager.NavigateTo("login", true);
             }
         }
 
