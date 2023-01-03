@@ -12,54 +12,19 @@
 <div class="col-md-12">
     <div class="mx-3 mt-4">
 
-        @*<TableContent>
-        <TableHeaderContent>
-        <th valign="middle" align="left" width="30%"><strong>Client Name</strong></th>
-        <th valign="middle" align="left" width="30%"><strong>% Cap of Current Odds from Boosted Odds</strong></th>
-        <th valign="middle" align="left" width="20%"><strong>Manage</strong></th>
-        </TableHeaderContent>
-        <TableBodyContent>
-        @foreach (var client in ClientsView)
-        {
-        <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" />
-        }
-        </TableBodyContent>
-        </TableContent>*@
-
-        <table class="table table-hover table-bordered">
-            <thead class="table-head">
-                <tr>
-                    <th>Client Name</th>
-                    <th>% Cap of Current Odds from Boosted Odds</th>
-                    <th>Manage</th>
-                </tr>
-            </thead>
-            <tbody>
+        <TableContent>
+            <TableHeaderContent>
+                <th><strong>Client Name</strong></th>
+                <th><strong>% Cap of Current Odds from Boosted Odds</strong></th>
+                <th><strong>Manage</strong></th>
+            </TableHeaderContent>
+            <TableBodyContent>
                 @foreach (var client in ClientsView)
                 {
-                    <tr>
-                        <td>@client.ClientName</td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="odds-container py-1 px-1">
-                                    <span>@client.Cap.ToString("P", CultureInfo.InvariantCulture)</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <a class="link-edit me-2" @onclick="async () => await OnEditSetting(client)" href="javascript:(0)">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <a class="link-logs me-2" href="javascript:(0)">
-                                    <i class="fa fa-list"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
+                    <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" />
                 }
-            </tbody>
-        </table>
+            </TableBodyContent>
+        </TableContent>
     </div>
 </div>
-<Backoffice.Web.Components.Common.CustomModal />
+<Backoffice.Web.Components.Common.CustomModal OnSaveClickCallback="OnSaveSettingClickEvent" />

@@ -34,9 +34,13 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             SearchForm = new SearchFormModel();
             ClientsView = new List<BoostedSettingsModel>();
-            GetContent();
+            await GetContent();
         }
 
+        public async Task OnSaveSettingClickEvent(object item)
+        {
+            await GetContent();
+        }
         private async Task GetContent()
         {
             await InvokeAsync(StateHasChanged);
@@ -71,6 +75,23 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 var options = new ModalOptions();
                 ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        public async Task OnViewLogs(BoostedSettingsModel client)
+        {
+            try
+            {
+                var parameters = new ModalParameters();
+
+                parameters.Add("Client", client);
+                parameters.Add("DialogStyle", "max-width: 80%; overflow-y: initial !important");
+
+                var options = new ModalOptions();
+                ModalService.Open<ViewLogsBoostedSettingModalBody>($"View Logs for {client.ClientName}", parameters, options);
             }
             catch (Exception ex)
             {

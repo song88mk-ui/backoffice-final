@@ -1,6 +1,6 @@
 ﻿<div class="modal-body">
     <form>
-        <table class="table table-bordered table-dark">
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th class="col-md-3">Client Name</th>
@@ -13,7 +13,7 @@
                     <td class="text-center">
                         <center>
                             <div class="col-md-4 input-icon input-icon-right">
-                                <input class="cap-bg-default" type="number" placeholder='0.00' @bind-value="CapEdit" data-decimal="2" oninput="enforceNumberValidation(this)" />
+                                <input class="cap-bg-default col-4 col-sm-2 col-md-4 col-lg-8" type="number" placeholder='0.00' @bind-value="CapEdit" data-decimal="2" oninput="enforceNumberValidation(this)" />
                                 <i>%</i>
                             </div>
                         </center>

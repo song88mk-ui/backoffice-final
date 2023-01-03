@@ -12,19 +12,33 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         [Parameter] public Guid ClientId { get; set; }
         [Inject] IModalService ModalService { get; set; }
 
-        public async Task OnEditSetting(Guid marketTemplateGroupId)
+        public async Task OnEditSetting(BoostedSettingsModel client)
         {
             try
             {
                 var parameters = new ModalParameters();
 
-                parameters.Add("ClientId", ClientId);
-                parameters.Add("ClientCode", BoostedSettings.ClientCode);
-                parameters.Add("ClientName", BoostedSettings.ClientName);
-                parameters.Add("Cap", BoostedSettings.Cap);
+                parameters.Add("Client", client);
 
                 var options = new ModalOptions();
                 ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        public async Task OnViewLogs(BoostedSettingsModel client)
+        {
+            try
+            {
+                var parameters = new ModalParameters();
+
+                parameters.Add("Client", client);
+                parameters.Add("DialogStyle", "max-width: 80%; overflow-y: initial !important");
+
+                var options = new ModalOptions();
+                ModalService.Open<ViewLogsBoostedSettingModalBody>($"View Logs for {client.ClientName}", parameters, options);
             }
             catch (Exception ex)
             {
