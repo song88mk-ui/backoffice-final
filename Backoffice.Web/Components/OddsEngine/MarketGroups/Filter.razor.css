@@ -1,0 +1,23 @@
+﻿.btn-edit, .btn-logs, .btn-copy, .btn-cancel, .btn-save, .btn-market-group {
+    color: #FFF;
+}
+
+.btn-edit {
+    background-color: #F08154;
+}
+
+.btn-logs, .btn-market-group {
+    background-color: #E4422E;
+}
+
+.btn-copy {
+    background-color: #404E67;
+}
+
+.btn-cancel {
+    background-color: #1F1F1F;
+}
+
+.btn-save {
+    background-color: #0AC282;
+}
