@@ -1,0 +1,78 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        <div class="content-filter mx-3 d-flex justify-content-between">
+            <div class="select-container d-flex">
+                <div class="me-2">
+                    <select class="form-select d-block">
+                        <option value="1" selected>Client 1</option>
+                        <option value="2">Client 2</option>
+                        <option value="2">Client 3</option>
+                    </select>
+                </div>
+                <div class="me-2">
+                    <select class="form-select d-block">
+                        <option value="1" selected>Sport 1</option>
+                        <option value="2">Sport 2</option>
+                        <option value="2">Sport 3</option>
+                    </select>
+                </div>
+                <div class="me-2">
+                    <select class="form-select d-block">
+                        <option value="1" selected>Fixture Status 1</option>
+                        <option value="2">Fixture Status 2</option>
+                        <option value="2">Fixture Status 3</option>
+                    </select>
+                </div>
+            </div>
+            <div class="button-container d-flex flex-row-reverse align-items-end">
+                <div class="me-2">
+                    <a href="javascript:void(0)" class="btn btn-logs px-3">
+                        <i class="fa fa-list"></i>
+                        Logs
+                    </a>
+                </div>
+                <div class="me-2">
+                    <a href="javascript:void(0)" class="btn btn-copy px-3">
+                        <i class="fa fa-copy"></i>
+                        Copy
+                    </a>
+                </div>
+                @if (!IsUpdate)
+                {
+                    <div class="me-2">
+                        <a href="javascript:void(0)" class="btn btn-edit px-3" @onclick="OnUpdateClickEvent">
+                            <i class="fa fa-edit"></i>
+                            Update
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="me-2">
+                        <a href="javascript:void(0)" class="btn btn-save px-3">
+                            <i class="fa fa-check"></i>
+                            Save
+                        </a>
+                    </div>
+                    <div class="me-2">
+                        <a href="javascript:void(0)" class="btn btn-cancel px-3" @onclick="OnCancelClickEvent">
+                            Cancel
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex">
+            <div class="mx-3 mt-2">
+                <a href="javascript:void(0)" class="btn btn-market-group px-3">
+                    <i class="fa fa-plus"></i>
+                    Add Market Group
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

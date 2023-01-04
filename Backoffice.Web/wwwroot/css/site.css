@@ -72,7 +72,7 @@ a, .btn-link {
     content: "An error has occurred."
 }
 
-.form-control, .form-select {
+.form-control, .form-select, .btn {
     font-size: 13px;
 }
 
