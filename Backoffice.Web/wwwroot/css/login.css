@@ -1,0 +1,140 @@
+﻿
+body {
+    overflow: hidden;
+}
+
+.access-layout {
+    height: 100vh;
+    background-color: #404E67;
+}
+
+.page {
+    height: inherit;
+}
+
+.first-banner {
+    background-image: url('../background/login-background-image.png');
+    background-size: 100% 100%;
+}
+
+.second-banner {
+    background-color: #FFFFFF;
+    background-size: 100%;
+}
+
+.first-header-text {
+    letter-spacing: 0px;
+    color: #FFFFFF;
+    text-transform: capitalize;
+    opacity: 1;
+    font-size: 25px;
+}
+
+.third-header-text {
+    letter-spacing: 0px;
+    color: #FFFFFF;
+    text-transform: capitalize;
+    opacity: 1;
+    text-align: center;
+    font-size: 18px;
+}
+
+.second-header-text {
+    font-size: 60px;
+    font-weight: bold;
+    color: #FFFFFF;
+    text-align: center;
+}
+
+.banner-icons img {
+    height: 66px;
+}
+
+.login-header .title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #404E67;
+}
+
+.logo img {
+    margin: 0 auto;
+    display: block;
+}
+
+.title-break {
+    background-image: linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%);
+    padding-block: 3px
+}
+
+.login-body .form-label, .login-body .form-check-label {
+    color: #1F1F1F;
+}
+
+.login-body .form-label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.login-body .form-check-label {
+    font-size: 13px;
+}
+
+.login-body .form-link {
+    font-size: 13px;
+    color: #EA6140;
+}
+
+.login-footer a, .login-footer button {
+    background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
+    color: white;
+    font-size: 14px;
+    padding-top: 11px;
+    padding-bottom: 11px;
+}
+
+.login-body {
+    padding: 0.575rem 0.75rem;
+    border-color: #E5E5E5;
+}
+
+    .login-body .input-group .input-group-text {
+        border-color: #E5E5E5;
+    }
+
+.password-eye:hover {
+    cursor: pointer;
+}
+
+.password-eye {
+    z-index: 9999;
+}
+
+.form-control {
+    font-size: 14px;
+}
+
+.field-validation-error {
+    color: red;
+    font-size: 14px;
+}
+
+.eye-icon {
+    width: 3rem;
+    display: block;
+}
+
+input[type="password"] {
+    z-index: 0;
+}
+
+input[type=password]::-ms-reveal,
+input[type=password]::-ms-clear {
+    display: none;
+}
+
+input.input-validation-error,
+textarea.input-validation-error,
+select.input-validation-error
+span.input-validation-error {
+    border: 1px solid #CD0A0A;
+}

@@ -49,7 +49,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         {
             var parameters = new ModalParameters();
             parameters.Add("DialogStyle", "max-width: 80%; overflow-y: initial !important");
-            parameters.Add("Page", CurrentPage);
+            parameters.Add("SelectedPage", CurrentPage);
             var options = new ModalOptions();
 
             ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);

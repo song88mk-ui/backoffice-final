@@ -14,136 +14,148 @@
     <div class="col-12">
         <div class="row collapse" id="filterCollapse">
             <div class="col-2">
-                <select class="form-select">
+                @*<InputSelect @bind-Value="CurrentPage" class="form-select">
                     <optgroup label="Logs Type">
-                        <option value="0">
-                            Manage Boost
-                        </option>
-                        <option value="1">
-                            Boosted Settings
-                        </option>
+                        @foreach (var item in Pages)
+                        {
+                            <option value=@item.Key>@item.Value</option>
+                        }
+                    </optgroup>
+                </InputSelect>*@
+                <select class="form-select" @onchange="OnPageSelectionChangedEvent">
+                    <optgroup label="Logs Type">
+                        @foreach (var item in Pages)
+                        {
+                            @if(SelectedPage == item.Key)
+                            {
+                                <option value="@item.Key" selected>@item.Value</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Key">@item.Value</option>
+                            }
+                        }
                     </optgroup>
                 </select>
             </div>
+            @if (SelectedPage == Backoffice.Shared.Enums.Page.OE_PriceBoost_Manage)
+            {
+                <div class="col-2">
+                    <select class="form-select">
+                        <optgroup label="Clients">
+                            <option value="0">
+                                All Clients
+                            </option>
+                            <option value="1">
+                                10 BET CRYPTO
+                            </option>
+
+                            <option value="2">
+                                10 BET DRC
+                            </option>
+
+                            <option value="3">
+                                10 BET GHANA
+                            </option>
+
+                            <option value="4">
+                                10 BET INDIA
+                            </option>
+
+                            <option value="5">
+                                10 BET JAPAN
+                            </option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="col-2">
+                    <select class="form-select">
+                        <optgroup label="Sports">
+                            <option value="0">
+                                Select Sports
+                            </option>
+                            <option value="1">
+                                Alpine Skiing
+                            </option>
+
+                            <option value="2">
+                                American Football
+                            </option>
+
+                            <option value="3">
+                                Athletics
+                            </option>
+
+                            <option value="4">
+                                Aussie Rules
+                            </option>
+
+                            <option value="5">
+                                Badminton
+                            </option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="col-2">
+                    <select class="form-select">
+                        <optgroup label="Segment">
+                            <option value="0">
+                                Select Segment
+                            </option>
+                            <option value="1">
+                                Segment 1
+                            </option>
+
+                            <option value="2">
+                                Segment 2
+                            </option>
+
+                            <option value="3">
+                                Segment 3
+                            </option>
+
+                            <option value="4">
+                                Segment 4
+                            </option>
+
+                            <option value="5">
+                                Segment 5
+                            </option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="col-2">
+                    <select class="form-select">
+                        <optgroup label="League">
+                            <option value="0">
+                                Select League
+                            </option>
+                            <option value="1">
+                                League 1
+                            </option>
+
+                            <option value="2">
+                                League 2
+                            </option>
+
+                            <option value="3">
+                                League 3
+                            </option>
+
+                            <option value="4">
+                                League 4
+                            </option>
+
+                            <option value="5">
+                                League 5
+                            </option>
+                        </optgroup>
+                    </select>
+                </div>
+            }
 
             <div class="col-2">
-                <select class="form-select">
-                    <optgroup label="Clients">
-                        <option value="0">
-                            All Clients
-                        </option>
-                        <option value="1">
-                            10 BET CRYPTO
-                        </option>
-
-                        <option value="2">
-                            10 BET DRC
-                        </option>
-
-                        <option value="3">
-                            10 BET GHANA
-                        </option>
-
-                        <option value="4">
-                            10 BET INDIA
-                        </option>
-
-                        <option value="5">
-                            10 BET JAPAN
-                        </option>
-                    </optgroup>
-                </select>
-            </div>
-
-            <div class="col-2">
-                <select class="form-select">
-                    <optgroup label="Sports">
-                        <option value="0">
-                            Select Sports
-                        </option>
-                        <option value="1">
-                            Alpine Skiing
-                        </option>
-
-                        <option value="2">
-                            American Football
-                        </option>
-
-                        <option value="3">
-                            Athletics
-                        </option>
-
-                        <option value="4">
-                            Aussie Rules
-                        </option>
-
-                        <option value="5">
-                            Badminton
-                        </option>
-                    </optgroup>
-                </select>
-            </div>
-
-            <div class="col-2">
-                <select class="form-select">
-                    <optgroup label="Segment">
-                        <option value="0">
-                            Select Segment
-                        </option>
-                        <option value="1">
-                            Segment 1
-                        </option>
-
-                        <option value="2">
-                            Segment 2
-                        </option>
-
-                        <option value="3">
-                            Segment 3
-                        </option>
-
-                        <option value="4">
-                            Segment 4
-                        </option>
-
-                        <option value="5">
-                            Segment 5
-                        </option>
-                    </optgroup>
-                </select>
-            </div>
-
-            <div class="col-2">
-                <select class="form-select">
-                    <optgroup label="League">
-                        <option value="0">
-                            Select League
-                        </option>
-                        <option value="1">
-                            League 1
-                        </option>
-
-                        <option value="2">
-                            League 2
-                        </option>
-
-                        <option value="3">
-                            League 3
-                        </option>
-
-                        <option value="4">
-                            League 4
-                        </option>
-
-                        <option value="5">
-                            League 5
-                        </option>
-                    </optgroup>
-                </select>
-            </div>
-
-            <div class="col-2">
-                <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" MaxDate="DateTime.Today"></DateRangePicker>
+                <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="StartDate" EndDate="EndDate" MaxDate="DateTime.Today"></DateRangePicker>
             </div>
 
         </div>

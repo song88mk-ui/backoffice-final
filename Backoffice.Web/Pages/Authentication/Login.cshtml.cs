@@ -62,29 +62,23 @@ namespace Backoffice.Web.Pages.Authentication
                 var result = await AuthenticationService.Login(UserModel);
                 if (result.Result.Item1)
                 {
-                    policies = result.Result.Item2;
+                    return LocalRedirect("/dashboard");
 
-                    if (policies.Count > 1)
-                    {
-                        return LocalRedirect("/choose-access");
-                    }
-
-                    if (policies.Count == 1)
-                    {
-                        switch (policies.FirstOrDefault().ToString())
-                        {
-                            case nameof(Application.SportsbookClient):
-                                return LocalRedirect("/dashboard");
-                            case nameof(Application.Trading):
-                                return LocalRedirect("/odds-engine");
-                        }
-                    }
-
-                    //var cookie = new HttpCookie("Login");
-                    //cookie.Values.Add("EmailID", LoginUser.EmailID);
-                    //cookie.Values.Add("Password", LoginUser.Password);
-                    //cookie.Expires = DateTime.Now.AddDays(15);
-                    //Response.Cookies.Add(cookie);
+                    //policies = result.Result.Item2;
+                    //if (policies.Count > 1)
+                    //{
+                    //    return LocalRedirect("/choose-access");
+                    //}
+                    //if (policies.Count == 1)
+                    //{
+                    //    switch (policies.FirstOrDefault().ToString())
+                    //    {
+                    //        case nameof(Application.SportsbookClient):
+                    //            return LocalRedirect("/dashboard");
+                    //        case nameof(Application.Trading):
+                    //            return LocalRedirect("/odds-engine");
+                    //    }
+                    //}
 
                     //NavigationManager.NavigateTo("/");
                 }
