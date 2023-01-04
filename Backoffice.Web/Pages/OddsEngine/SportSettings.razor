@@ -1,0 +1,89 @@
+﻿@using Backoffice.Web.Components.OddsEngine.SportSettings
+
+@layout OEMonitoringLayout
+
+@page "/odds-engine/sport-settings"
+
+<div class="col-md-12">
+    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+</div>
+<div class="col-md-12">
+    <Filter />
+</div>
+<div class="col-md-12">
+    <div class="mx-3 mt-4">
+        <table class="table table-hover table-bordered">
+            <thead class="table-head">
+                <tr>
+                    <th>
+                        <input type="checkbox" class="form-check-input" />
+                    </th>
+                    <th>Sports</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <input type="checkbox" class="form-check-input" />
+                        </div>
+                    </td>
+                    <td>Soccer</td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <a class="link-bars me-2" href="javascript:(0)">
+                                <i class="fa fa-bars"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <input type="checkbox" class="form-check-input" />
+                        </div>
+                    </td>
+                    <td>American Football</td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <a class="link-bars me-2" href="javascript:(0)">
+                                <i class="fa fa-bars"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <input type="checkbox" class="form-check-input" />
+                        </div>
+                    </td>
+                    <td>Bring Me</td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <a class="link-bars me-2" href="javascript:(0)">
+                                <i class="fa fa-bars"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <input type="checkbox" class="form-check-input" />
+                        </div>
+                    </td>
+                    <td>Basketball</td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <a class="link-bars me-2" href="javascript:(0)">
+                                <i class="fa fa-bars"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
