@@ -23,7 +23,6 @@ namespace Backoffice.Web.Services
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:Backoffice:Security:APIKey"]);
         }
 
-
         public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup()
         {
             try
@@ -67,7 +66,6 @@ namespace Backoffice.Web.Services
                 };
             }
         }        
-
         public async Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId)
         {
             try
@@ -111,7 +109,6 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-
         public async Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId)
         {
             try
@@ -149,6 +146,25 @@ namespace Backoffice.Web.Services
             catch (Exception ex)
             {
                 return new BaseResponse<LeagueLookupResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<ClientInformationModel>>> GetClientList()
+        {
+            try
+            {
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<List<ClientInformationModel>>>
+                (await _httpClient.GetStreamAsync($"api/trading/client"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<ClientInformationModel>>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

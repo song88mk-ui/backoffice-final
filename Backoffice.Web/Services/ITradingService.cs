@@ -11,6 +11,8 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId);
         Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId);
 
+        Task<BaseResponse<List<ClientInformationModel>>> GetClientList();
+
         #region Priceboost
         Task<BaseResponse<List<PriceBoostConfigModel>>> GetPriceBoostConfig(PriceBoostConfigRequest request);
         Task<BaseResponse<List<BoostedSettingsModel>>> GetBoostedSettings(BoostedSettingsRequest request);

@@ -1,5 +1,40 @@
 ﻿<div class="modal-body @DialogStyle">
-    <ViewAllLogsFilter SelectedPage="CurrentPage" />
+    <ViewAllLogsFilter SelectedPage="CurrentPage" OnSaveClickCallback="OnFilterClickEvent" />
+</div>
+<div class="modal-body">
+    <table class="table table-bordered">
+        @if (CurrentPage == Backoffice.Shared.Enums.Page.OE_PriceBoost_Settings)
+        {
+            <thead>
+                <tr>
+                    <th valign="middle" align="left"><strong>#</strong></th>
+                    <th valign="middle" align="left"><strong>Date</strong></th>
+                    <th valign="middle" align="left"><strong>Activity</strong></th>
+                    <th valign="middle" align="left"><strong>From</strong></th>
+                    <th valign="middle" align="left"><strong>To</strong></th>
+                    <th valign="middle" align="left"><strong>Updated By</strong></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (BoostedSettingsActivityLogs != null)
+                {
+                    @foreach (var item in BoostedSettingsActivityLogs)
+                    {
+                        int RowCount = (BoostedSettingsActivityLogs.IndexOf(item) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                        <tr>
+                            <td>@RowCount</td>
+                            <td>@item.TimeStamp.ToLocalTime().ToString("dd/MM/yy") @item.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
+                            <td>@GetClientName(item.Payload)</td>
+                            <td>@item.Activity</td>
+                            <td>@((MarkupString)EvaluateBoostedSettingsActivity(item.From))</td>
+                            <td>@((MarkupString)EvaluateBoostedSettingsActivity(item.To))</td>
+                            <td>@item.UserId</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        }
+    </table>
 </div>
 <div class="modal-footer">
     <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Close</button>
