@@ -1,0 +1,216 @@
+﻿@using Backoffice.Web.Components.OddsEngine.MonitoringDetails
+
+@layout OEMonitoringLayout
+
+@page "/odds-engine/monitoring-details"
+
+<div class="col-md-12">
+    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+</div>
+<div class="col-md-12">
+    <Filter />
+</div>
+<div class="col-md-12">
+    <div class="mx-3 mt-4">
+        <table class="table table-hover table-bordered">
+            <thead class="table-head">
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>BR CTRL</th>
+                    <th>10 BET CRYPTO</th>
+                    <th>10 BET INDIA</th>
+                    <th>10 BET JAPAN</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <span>
+                            05/01/2023
+                            <br>
+                            <strong>00:00</strong>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="fw-bold">Muntinlupa Snatchers</span>
+                        <br />
+                        <span>Alabang Walkers</span>
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <div class="odds-container me-2 py-1 px-3">
+                                <span>2.56</span>
+                            </div>
+                            <div class="odds-container me-2 py-1 px-3">
+                                <span>1.62</span>
+                            </div>
+                            <div class="py-1 px-2">
+                                <span>101</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <div class="odds-container me-2 py-1 px-3">
+                                <span>2.56</span>
+                            </div>
+                            <div class="odds-container me-2 py-1 px-3">
+                                <span>1.62</span>
+                            </div>
+                            <div class="py-1 px-2">
+                                <span>101</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <div class="odds-container me-2 py-1 px-3">
+                                <span>2.56</span>
+                            </div>
+                            <div class="odds-container me-2 py-1 px-3">
+                                <span>1.62</span>
+                            </div>
+                            <div class="py-1 px-2">
+                                <span>101</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <div class="odds-container me-2 py-1 px-3">
+                                <span>2.56</span>
+                            </div>
+                            <div class="odds-container me-2 py-1 px-3">
+                                <span>1.62</span>
+                            </div>
+                            <div class="py-1 px-2">
+                                <span>101</span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="col-md-12">
+    <MarketGroupFilter />
+</div>
+<div class="col-md-12">
+    <div class="d-flex mx-3 mt-4">
+        <div class="w-25">
+            <MarketFilter />
+        </div>
+        <div class="w-75">
+            <table class="table table-hover table-bordered">
+                <thead class="table-head">
+                    <th></th>
+                    <th>BR CTRL</th>
+                    <th>10 BET CRYPTO</th>
+                    <th>10 BET INDIA</th>
+                    <th>10 BET JAPAN</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="py-1 px-2">
+                                    <span class="fw-bold">101</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="py-1 px-2">
+                                    <span class="fw-bold">102</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="py-1 px-2">
+                                    <span class="fw-bold">103</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="py-1 px-2">
+                                    <span class="fw-bold">104</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="fw-bold">Over 2.5</span>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="odds-container me-2 py-1 px-3">
+                                    <span>2.56</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="odds-container me-2 py-1 px-3">
+                                    <span>2.56</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="odds-container me-2 py-1 px-3">
+                                    <span>2.56</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="odds-container me-2 py-1 px-3">
+                                    <span>2.56</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="fw-bold">Under 2.5</span>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="odds-container betstop me-2 py-1 px-3">
+                                    <span>2.56</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="odds-container betstop me-2 py-1 px-3">
+                                    <span>2.56</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="odds-container betstop me-2 py-1 px-3">
+                                    <span>2.56</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <div class="odds-container betstop me-2 py-1 px-3">
+                                    <span>2.56</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
