@@ -1,4 +1,8 @@
-﻿<div class="modal-body">
+﻿@if (IsPreLoader)
+{
+    <Preloader InlineCss="@InlineCss" />
+}
+<div class="modal-body">    
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -12,81 +16,40 @@
         </thead>
         <tbody>
             <tr>
-                <th scope="row" rowspan="8">
+                <th scope="row" rowspan="@(AddPriceBoostFilterModel.PriceBoostConfigList.Count+1)">
                     <div class="d-flex flex-column">
-                        <span><b>Aguilas De Mexicalli</b></span>
-                        <span>1x2</span>
-                        <span>Mexico</span>
-                        <span>Liga Mexicana del Pacifico</span>
-                        <span>Aguilas de Mexicali vs. Venados de Mazatlan</span>
-                        <span>01/12/22</span>
-                        <span>03:30</span>
+                        <span><b>@AddPriceBoostFilterModel.SelectionName</b></span>
+                        <span>@AddPriceBoostFilterModel.MarketName</span>
+                        <span>@AddPriceBoostFilterModel.SegmentName</span>
+                        <span>@AddPriceBoostFilterModel.LeagueName</span>
+                        <span>@AddPriceBoostFilterModel.FixtureName</span>
+                        <span>@(AddPriceBoostFilterModel.PriceBoostConfigList.FirstOrDefault()?.TimeStamp.ToString("dd/MM/yy"))</span>
+                        <span>@(AddPriceBoostFilterModel.PriceBoostConfigList.FirstOrDefault()?.TimeStamp.ToString("HH:mm"))</span>
                     </div>
                 </th>
-                <td rowspan="8">Baseball</td>
-                <td>10 BET CRYPTO</td>
-                <td>2.08</td>
-                <td>2.00</td>
-                <td>
-                    <input type="number" class="form-control"/>
-                </td>
+                <td rowspan="@(AddPriceBoostFilterModel.PriceBoostConfigList.Count+1)">@AddPriceBoostFilterModel.SportName</td>                
             </tr>
-            <tr scope="row">
-                <td>10 BET DRC</td>
-                <td>2.08</td>
-                <td>2.00</td>
-                <td>
-                    <input type="number" class="form-control" />
-                </td>
-            </tr>
-            <tr scope="row">
-                <td>10 BET GHANA</td>
-                <td>2.08</td>
-                <td>2.00</td>
-                <td>
-                    <input type="number" class="form-control" />
-                </td>
-            </tr>
-            <tr scope="row">
-                <td>10 CRIC INDIA</td>
-                <td>2.08</td>
-                <td>2.00</td>
-                <td>
-                    <input type="number" class="form-control" />
-                </td>
-            </tr>
-            <tr scope="row">
-                <td>10 BET JAPAN</td>
-                <td>2.08</td>
-                <td>2.00</td>
-                <td>
-                    <input type="number" class="form-control" />
-                </td>
-            </tr>
-            <tr scope="row">
-                <td>10 BET KENYA</td>
-                <td>2.08</td>
-                <td>2.00</td>
-                <td>
-                    <input type="number" class="form-control" />
-                </td>
-            </tr>
-            <tr scope="row">
-                <td>10 BET MALAWI</td>
-                <td>2.08</td>
-                <td>2.00</td>
-                <td>
-                    <input type="number" class="form-control" />
-                </td>
-            </tr>
-            <tr scope="row">
-                <td>10 BET NIGERIA</td>
-                <td>2.08</td>
-                <td>2.00</td>
-                <td>
-                    <input type="number" class="form-control" />
-                </td>
-            </tr>
+            @foreach(var config in AddPriceBoostFilterModel.PriceBoostConfigList)
+            {
+                <tr scope="row">
+                    <td>@config.ClientCode</td>
+                    <td>@config.BROdds.ToString("0.00")</td>
+                    <td>@config.ClientOdds.ToString("0.00")</td>
+                    <td>                        
+                        @{
+                            placeholder = config.BoostedOdds == 0 ? "-.-" : config.BoostedOdds.ToString("0.00");
+                        }
+                        @if (config.ClientOdds == 0)
+                        {
+                            <input type="number" class="form-control" @bind-value="@config.BoostedOddsStr" placeholder="@placeholder" disabled/>
+                        }
+                        else
+                        {
+                            <input type="number" class="form-control" @bind-value="@config.BoostedOddsStr" placeholder="@placeholder"/>
+                        }
+                    </td>
+                </tr>
+            }           
         </tbody>
     </table>
 </div>

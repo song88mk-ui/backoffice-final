@@ -135,6 +135,28 @@ namespace Backoffice.Web.Pages.OddsEngine
             await InvokeAsync(StateHasChanged);
         }
 
+        public async Task OnModalSave()
+        {
+            PriceBoostList = new List<PriceBoostConfigModel>();
+            PriceBoostFilterModel.ClientCode = string.Empty;
+            PriceBoostFilterModel.SportId = 0;
+            PriceBoostFilterModel.SegmentId = 0;
+            PriceBoostFilterModel.LeagueId = 0;
+
+            await GetContents();
+        }
+
+        public async Task OnModalBack(object addPriceBoostFilterModel)
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("AddPriceBoostFilterModel", (AddPriceBoostFilterModel)addPriceBoostFilterModel);
+
+            var options = new ModalOptions();
+            ModalService.Open<AddBoostedOddsModal>($"Add Boosted Odds", parameters, options);
+        }
+
         public void Dispose()
         {
         }
