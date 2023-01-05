@@ -1,0 +1,35 @@
+﻿.table-head {
+    background-color: #354156;
+    color: #fff;
+}
+
+.table thead th, ::deep .table tbody td, ::deep .table tfoot td {
+    font-size: 0.8rem;
+    font-weight: inherit;
+    vertical-align: middle;
+}
+
+table thead th {
+    text-align: center;
+}
+
+table thead th:first-child {
+    border-top-left-radius: 3px;
+}
+
+table thead th:last-child {
+    border-top-right-radius: 3px;
+}
+
+.table-head th {
+    border-width: 1px 0;
+}
+
+.odds-container {
+    border: 2px solid #707070;
+}
+
+.odds-container.betstop {
+    border-color: #EB3422;
+    background-color: #E2E2E2;
+}

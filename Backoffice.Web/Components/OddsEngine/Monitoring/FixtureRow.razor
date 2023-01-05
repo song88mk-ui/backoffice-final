@@ -20,14 +20,16 @@
 
     </td>
     <td>
-        <span class="fw-bold">@Market.HomeName.ToUpper()</span>
-        <br />
-        <span>@Market.AwayName.ToUpper()</span>
+        <a href="odds-engine/monitoring-details" class="fixture-details text-decoration-none">
+            <span class="fw-bold">@Market.HomeName.ToUpper()</span>
+            <br />
+            <span>@Market.AwayName.ToUpper()</span>
 
-        @if (Market.FixtureStatusId == 1)
-        {
-            <span>@Market.Score</span>
-        }
+            @if (Market.FixtureStatusId == 1)
+            {
+                <span>@Market.Score</span>
+            }
+        </a>
     </td>
 
     <!-- BR CTRL -->

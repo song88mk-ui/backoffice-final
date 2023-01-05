@@ -1,0 +1,14 @@
+﻿.input-group-text {
+    background-color: #fff;
+}
+
+
+.btn-market-group {
+    background-color: #EEEEEE;
+    color: #232323;
+}
+
+.btn-market-group.active {
+    background-color: #FF1A00;
+    color: #FFFFFF;
+}

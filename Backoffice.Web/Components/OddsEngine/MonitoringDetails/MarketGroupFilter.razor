@@ -1,0 +1,39 @@
+﻿<div class="content-filter mx-3 d-flex justify-content-between mt-3">
+    <div class="button-cotainer d-flex">
+        <div class="me-2">
+            <a href="javascript:void(0)" class="btn btn-market-group active px-3">
+                All Markets
+            </a>
+        </div>
+        <div class="me-2">
+            <a href="javascript:void(0)" class="btn btn-market-group px-3">
+                Main Market
+            </a>
+        </div>
+        <div class="me-2">
+            <a href="javascript:void(0)" class="btn btn-market-group px-3">
+                Match
+            </a>
+        </div>
+        <div class="me-2">
+            <a href="javascript:void(0)" class="btn btn-market-group px-3">
+                Points
+            </a>
+        </div>
+        <div class="me-2">
+            <a href="javascript:void(0)" class="btn btn-market-group px-3">
+                1st Half
+            </a>
+        </div>
+    </div>
+    <div class="input-container d-flex flex-row-reverse align-items-end">
+        <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+            <div class="input-group">
+                <InputText id="search" placeholder="Find" class="form-control search-text valid border-end-0" @bind-Value="SearchForm.SearchText" />
+                <span class="input-group-text border-start-0">
+                    <i class="fa fa-search"></i>
+                </span>
+            </div>
+        </EditForm>
+    </div>
+</div>
