@@ -21,7 +21,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
     </div>
 }
 <div class="middle-bottom-row d-flex flex-column justify-content-between">
-    <div class="middle-row" @onclick="ToggleNavMenu">
+    <div class="middle-row mt-3" @onclick="ToggleNavMenu">
         @if (NavMenuAccess == NavMenuAccess.SBC)
         {
             <nav class="flex-column">
@@ -130,9 +130,9 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                             <NavLink class="nav-link" @onclick="_ => OnSportClickEvent(sport.SportId)">
                                 <span class="@($"iconfont iconfont-{sport.SportName.ToLower().Replace(' ', '-')}")" aria-hidden="true"></span>
                                 <span class="nav-menu-text">@sport.SportName</span>
-                                <span class="@(sport.SportId == DefaultSport.SportId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
+                                <span class="@(sport.SportId == SelectedSport.SportId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
                             </NavLink>
-                            @if (sport.SportId == DefaultSport.SportId)
+                            @if (sport.SportId == SelectedSport.SportId)
                             {
                                 <div class="sub-menu-oddsengine ms-3 show">
                                     <nav class="flex-column">
@@ -142,9 +142,9 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                                                 <NavLink class="nav-link" @onclick="_ => OnSegmentClickEvent(segment.SegmentId)">
                                                     <span class="fa fa-chevron-right me-2"></span>
                                                     <span class="nav-menu-text">@segment.SegmentName</span>
-                                                    <span class="@(sport.SportId == DefaultSport.SportId && segment.SegmentId == DefaultSport.SegmentId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
+                                                    <span class="@(sport.SportId == SelectedSport.SportId && segment.SegmentId == SelectedSport.SegmentId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
                                                 </NavLink>
-                                                @if (sport.SportId == DefaultSport.SportId && segment.SegmentId == DefaultSport.SegmentId)
+                                                @if (sport.SportId == SelectedSport.SportId && segment.SegmentId == SelectedSport.SegmentId)
                                                 {
                                                     <div class="sub-menu-oddsengine ms-3 show">
                                                         @foreach (var league in segment.Leagues)

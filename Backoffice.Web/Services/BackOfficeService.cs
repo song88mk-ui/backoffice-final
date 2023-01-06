@@ -39,10 +39,10 @@ namespace Backoffice.Web.Services
             try
             {
                 var userToken = await _authenticationService.AuthenticateToken();
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
 
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientModel>>
-                (await _httpClient.GetStreamAsync($"sportsbook/Client/list"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (await _httpClient.GetStreamAsync($"sportsbook/client/list"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result ?? new BaseResponse<ClientModel>
                 {
@@ -107,7 +107,7 @@ namespace Backoffice.Web.Services
             try
             {
                 var userToken = await _authenticationService.AuthenticateToken();
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
                 var Model = await _httpClient.PostAsync($"sportsbook/settings/topfixtures", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (Model.IsSuccessStatusCode)

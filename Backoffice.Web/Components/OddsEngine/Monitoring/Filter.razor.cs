@@ -9,82 +9,52 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
     public partial class Filter : IDisposable
     {
         #region Properties
+
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         [Parameter] public EventCallback<MonitoringCallbackModel> OnInitCallback { get; set; }
         [Parameter] public int SportId { get; set; }
+
         public SearchFormModel SearchForm { get; set; }
         public List<MainMarketTemplateResponse> TopMarketTemplates { get; set; }
-        public ClientModel Clients { get; set; }
+
         public string MarketTemplateId { get; set; } = string.Empty;
+
         #endregion
 
         #region Fields
+
         protected int sportId;
+
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                TopMarketTemplates = new List<MainMarketTemplateResponse>();
-                Clients = new ClientModel();
+            TopMarketTemplates = new List<MainMarketTemplateResponse>();
+            SearchForm = new SearchFormModel();
+        }
 
-                SearchForm = new SearchFormModel();
+        protected override async Task OnParametersSetAsync()
+        {
+            if (sportId != SportId)
+            {
+                sportId = SportId;
 
                 TopMarketTemplates = (await BackOfficeService.GetTopMarkets(SportId)).Result;
-
-                var clients = (await BackOfficeService.GetClients()).Result;
-                if (clients != null)
-                {
-
-                    if (UserModel.ClientCodes.Any())
-                    {
-                        clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-                    }
-
-                    Clients = clients;
-                }
 
                 if (TopMarketTemplates != null && TopMarketTemplates.Any())
                     MarketTemplateId = TopMarketTemplates.FirstOrDefault().MainMarketTemplateId;
 
                 await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
                 {
+                    SportId = SportId,
                     SearchText = string.Empty,
-                    TopMarketTemplates = TopMarketTemplates,
-                    SelectedMarketTemplateId = MarketTemplateId,
-                    Clients = Clients
+                    SelectedMarketTemplateId = MarketTemplateId
                 });
-
-            }
-            catch (Exception)
-            {
             }
         }
-
-        //protected override async Task OnParametersSetAsync()
-        //{
-        //    if(SportId > 0 &&  sportId != SportId)
-        //    {
-        //        TopMarketTemplates = (await BackOfficeService.GetTopMarkets(SportId)).Result;
-
-        //        TopMarketTemplates = (await BackOfficeService.GetTopMarkets(SportId)).Result;
-
-        //        if (TopMarketTemplates != null && TopMarketTemplates.Any())
-        //            MarketTemplateId = TopMarketTemplates.FirstOrDefault().MainMarketTemplateId;
-
-        //        await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
-        //        {
-        //            SearchText = string.Empty,
-        //            TopMarketTemplates = TopMarketTemplates,
-        //            SelectedMarketTemplateId = MarketTemplateId,
-        //            Clients = Clients
-        //        });
-        //    }
-        //}
 
         public async void OnMarketChangedEvent(ChangeEventArgs e)
         {
@@ -92,16 +62,20 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
             await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
             {
+                SportId = SportId,
                 SelectedMarketTemplateId = MarketTemplateId,
-                Clients = Clients,
-                TopMarketTemplates = TopMarketTemplates,
                 SearchText = SearchForm.SearchText
             });
         }
 
         public async Task OnInputSearchEvent()
         {
-            await OnInitCallback.InvokeAsync(new MonitoringCallbackModel { SearchText = SearchForm.SearchText, TopMarketTemplates = TopMarketTemplates, Clients = Clients, SelectedMarketTemplateId = MarketTemplateId });
+            await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
+            {
+                SportId = SportId,
+                SearchText = SearchForm.SearchText,
+                SelectedMarketTemplateId = MarketTemplateId 
+            });
         }
 
         public void Dispose()
