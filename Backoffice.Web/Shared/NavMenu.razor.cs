@@ -101,7 +101,7 @@ namespace Backoffice.Web.Shared
 
             var response = await BackOfficeService.GetSportsTreeAsync((int)FixtureType.Match);
 
-            foreach (var sport in response.Result.Sports)
+            foreach (var sport in response.Result?.Sports)
             {
                 result.Sports.Add(new SportsTreeModel.SportModel
                 {

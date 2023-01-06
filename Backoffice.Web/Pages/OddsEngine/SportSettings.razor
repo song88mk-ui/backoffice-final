@@ -8,7 +8,7 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter @bind-ClientSportOrderFilter="ClientSportOrderFilter" OnClientChangedCallback="OnClientChangedEvent" OnSaveClickCallback="OnSaveClickEvent"/>
+    <Filter @bind-ClientSportOrderFilter="ClientSportOrderFilter" UserModel="UserModel" OnClientChangedCallback="OnClientChangedEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyCallback="OnCopyClickEvent"/>
 </div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">

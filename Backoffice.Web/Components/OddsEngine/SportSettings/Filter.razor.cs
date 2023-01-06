@@ -14,10 +14,11 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
     {
         #region Properties
         [Inject] public ITradingService TradingService { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [Parameter] public UserModel UserModel { get; set; }
         [Parameter] public ClientSportOrderFilterModel ClientSportOrderFilter { get; set; }
         [Parameter] public EventCallback<ClientSportOrderFilterModel> ClientSportOrderFilterChanged { get; set; }
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
+        [Parameter] public EventCallback OnCopyCallback { get; set; }
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback<string> OnUpdateCallback { get; set; }
 
@@ -32,7 +33,9 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             IsUpdate = false;
 
             Clients = await GetClients();
-            SelectedClient = Clients.FirstOrDefault().Key;
+            ClientSportOrderFilter.ClientCode = Clients.FirstOrDefault().Key;
+            ClientSportOrderFilter.ClientName = Clients.FirstOrDefault().Value;
+            ClientSportOrderFilter.Clients = Clients.Select(x => new SelectListItemModel<string> { Value = x.Key, Name = x.Value }).ToList();
 
             await OnClientChangedCallback.InvokeAsync(SelectedClient);
         }
@@ -40,8 +43,9 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         {
             SelectedClient = e.Value.ToString();
 
-            await InvokeAsync(StateHasChanged);
+            await ClientSportOrderFilterChanged.InvokeAsync(ClientSportOrderFilter);
             await OnClientChangedCallback.InvokeAsync(SelectedClient);
+            await InvokeAsync(StateHasChanged);
         }
         public async Task OnEditClickEvent()
         {
@@ -56,6 +60,17 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             await ClientSportOrderFilterChanged.InvokeAsync(ClientSportOrderFilter);
             await OnSaveClickCallback.InvokeAsync();
+        }
+        public async Task OnViewLogsClickEvent()
+        {
+
+        }
+        public async Task OnCopyClickEvent()
+        {
+            if (string.IsNullOrEmpty(ClientSportOrderFilter.ClientCode))
+                return;
+
+            await OnCopyCallback.InvokeAsync();
         }
         public async Task OnCancelClickEvent()
         {

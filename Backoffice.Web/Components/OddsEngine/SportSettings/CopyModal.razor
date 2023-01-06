@@ -1,0 +1,58 @@
+﻿<div class="modal-body">
+    @if (IsPreLoader)
+    {
+        <Preloader Classes="@("container-loader popup")" AlwaysLoad="true" />
+    }
+    <div class="row">
+        <div class="col-12">
+            <form>
+                <div class="form-group row">
+                    <label class="col-sm-1 col-form-label">To</label>
+                    <div class="col-sm-11">
+                        <select class="js-example-basic-single col-sm-12 form-control" placeholder="Select Client" @onchange="OnClientChangedEvent">
+                            @if (ClientSportOrderFilter != null)
+                            {
+                                <option value="" selected>Select Client</option>
+
+                                foreach (var client in ClientSportOrderFilter.Clients)
+                                {
+                                    if (client.Value == CopyClientCode)
+                                        continue;
+
+                                    if (client.Value == CopyToClientCode)
+                                    {
+                                        <option value="@client.Value" selected>@client.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@client.Value">@client.Name</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    @if (IsPreLoader)
+    {
+        <button type="button" class="btn btn-default waves-effect " data-dismiss="modal" disabled>Cancel</button>
+        <button type="button" class="btn btn-success waves-effect waves-light" data-type="inverse" data-from="top" data-align="right" data-dismiss="modal" disabled>Copy</button>
+    }
+    else
+    {
+        <button type="button" @onclick="OnCancelClickEvent" class="btn btn-default waves-effect " data-dismiss="modal">Cancel</button>
+        if (string.IsNullOrEmpty(CopyToClientCode))
+        {
+            <button type="button" @onclick="OnCopyConfirmation" class="btn btn-success waves-effect waves-light" data-type="inverse" data-from="top" data-align="right" data-dismiss="modal" disabled>Copy</button>
+        }
+        else
+        {
+            <button type="button" @onclick="OnCopyConfirmation" class="btn btn-success waves-effect waves-light" data-type="inverse" data-from="top" data-align="right" data-dismiss="modal">Copy</button>
+        }
+    }
+</div>
