@@ -10,9 +10,8 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class Monitoring : IDisposable
     {
         #region Properties
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [CascadingParameter(Name = "NavigateSportEvent")] public EventCallback<SportClickCallbackModel> NavigateSportEvent { get; set; }
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Parameter] public string SportId { get; set; }
         [Parameter] public string SegmentId { get; set; }
         [Parameter] public string LeagueId { get; set; }
@@ -20,7 +19,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string IconClass { get; set; }
         public MonitoringCallbackModel CallbackModel { get; set; }
         public List<FixtureMarketModel> FixtureMarkets { get; set; }
-        public SportsTreeModel.SportModel DefaultSport { get; set; }
+
+        #endregion
+
+        #region Fields
+        public SportClickCallbackModel defaultSport;
         #endregion
 
         #region Methods
@@ -30,54 +33,62 @@ namespace Backoffice.Web.Pages.OddsEngine
             FixtureMarkets = null;
             CallbackModel = new MonitoringCallbackModel();
 
-            DefaultSport = new SportsTreeModel.SportModel();
-            
+            defaultSport = new SportClickCallbackModel();
+
             if (!string.IsNullOrEmpty(SportId))
             {
-                DefaultSport.SportId = Convert.ToInt32(SportId);
-
+                defaultSport.SportId = Convert.ToInt32(SportId);
                 if (!string.IsNullOrEmpty(SegmentId))
                 {
-                    DefaultSport.Segments = new List<SportsTreeModel.SegmentModel>();
-
-                    var leagues = new List<SportsTreeModel.LeagueModel>();
-                    leagues.Add(new SportsTreeModel.LeagueModel
-                    {
-                        LeagueId = string.IsNullOrEmpty(LeagueId) ? 0 : Convert.ToInt32(LeagueId)
-                    });
-
-                    DefaultSport.Segments.Add(new SportsTreeModel.SegmentModel
-                    {
-                        SegmentId = Convert.ToInt32(SegmentId),
-                        Leagues = leagues
-                    });
+                    defaultSport.SegmentId = Convert.ToInt32(SegmentId);
+                    defaultSport.LeagueId = Convert.ToInt32(LeagueId);
                 }
             }
 
-            await NavigateSportEvent.InvokeAsync(new SportClickCallbackModel
-            {
-                SportId = string.IsNullOrEmpty(SportId) ? 0 : Convert.ToInt32(SportId),
-                SegmentId = string.IsNullOrEmpty(SegmentId) ? 0 : Convert.ToInt32(SegmentId),
-                LeagueId = string.IsNullOrEmpty(LeagueId) ? 0 : Convert.ToInt32(LeagueId)
-            });
-
             PageTitle = "American Football - USA - NCAA, Regular Season";
             IconClass = "iconfon iconfont-american-football";
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            if (SelectedSport != null && defaultSport != SelectedSport)
+            {
+                if (SelectedSport.SportId > 0)
+                {
+                    defaultSport.SportId = SelectedSport.SportId;
+
+                    if (SelectedSport.SegmentId > 0)
+                    {
+                        var isNewSegmentOrLeague = defaultSport.SegmentId != SelectedSport.SegmentId || defaultSport.LeagueId != SelectedSport.LeagueId;
+                        defaultSport.SegmentId = SelectedSport.SegmentId;
+                        defaultSport.LeagueId = SelectedSport.LeagueId;
+
+                        if(isNewSegmentOrLeague)
+                            await OnInitEvent(CallbackModel);
+                    }
+                }
+
+            }
         }
 
         public async Task OnInitEvent(MonitoringCallbackModel model)
         {
             CallbackModel = model;
 
-            FixtureMarkets = await GetFixtures(new MarketFixtureRequest
+            if(model.SelectedMarketTemplateId != null)
             {
-                FixtureTypeId = (int)FixtureType.Match,
-                SportId = 16,
-                SegmentId = 43,
-                LeagueId = 27625,
-                MarketTemplateId = model.SelectedMarketTemplateId,
-                SearchText = model.SearchText,
-            });
+
+                FixtureMarkets = await GetFixtures(new MarketFixtureRequest
+                {
+                    FixtureTypeId = (int)FixtureType.Match,
+                    SportId = defaultSport.SportId,
+                    SegmentId = defaultSport.SegmentId,
+                    LeagueId = defaultSport.LeagueId,
+                    MarketTemplateId = model.SelectedMarketTemplateId,
+                    SearchText = model.SearchText,
+                });
+            }
+
 
         }
 

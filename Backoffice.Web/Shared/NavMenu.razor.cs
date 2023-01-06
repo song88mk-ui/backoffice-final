@@ -13,8 +13,8 @@ namespace Backoffice.Web.Shared
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public NavMenuAccess NavMenuAccess { get; set; }
-        [CascadingParameter(Name = "OnSportClickCallback")] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
-        [CascadingParameter(Name = "DefaultSport")] public SportClickCallbackModel DefaultSport { get; set; }
+        [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
+        [Parameter] public SportClickCallbackModel DefaultSport { get; set; }
         public SportsTreeModel Menu { get; set; }
         #endregion
 
@@ -35,8 +35,35 @@ namespace Backoffice.Web.Shared
             if (DefaultSport == null)
                 DefaultSport = new SportClickCallbackModel();
 
-            await GetSportsTreeMenu();
+            if(NavMenuAccess == NavMenuAccess.OE)
+            {
+                await GetSportsTreeMenu();
 
+                var sport = Menu.Sports.FirstOrDefault();
+                if (sport != null)
+                {
+                    DefaultSport.SportId = sport.SportId;
+
+                    var segment = sport.Segments.FirstOrDefault();
+                    if (segment != null)
+                    {
+                        DefaultSport.SegmentId = segment.SegmentId;
+
+                        var league = segment.Leagues.FirstOrDefault();
+
+                        if(league != null)
+                            DefaultSport.LeagueId = league.LeagueId;
+
+                    }
+                }
+
+                await OnSportClickCallback.InvokeAsync(new SportClickCallbackModel
+                {
+                    SportId = DefaultSport.SportId,
+                    SegmentId = DefaultSport.SegmentId,
+                    LeagueId = DefaultSport.LeagueId
+                });
+            }
         }
 
         public void ToggleNavMenu()
