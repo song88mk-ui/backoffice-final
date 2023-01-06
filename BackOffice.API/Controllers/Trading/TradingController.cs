@@ -276,7 +276,7 @@ namespace Backoffice.API.Controllers.Trading
 
             var result = await _tradingRepository.AddOrUpdatePriceBoost(request, region);
 
-            switch (result.Item1.StatusCode)
+            switch (result.StatusCode)
             {
                 case Shared.Enums.StatusCode.Success:
                     return Ok(result);

@@ -18,25 +18,25 @@
 <div class="row mt-3">
     <div class="col-12">
         <div class="row collapse" id="filterCollapse">
-            <div class="col-2">
-                <select class="form-select" @onchange="OnPageSelectionChangedEvent">
-                    <optgroup label="Logs Type">
-                        @foreach (var item in Pages)
-                        {
-                            @if (SelectedPage == item.Key)
-                            {
-                                <option value="@item.Key" selected>@item.Value</option>
-                            }
-                            else
-                            {
-                                <option value="@item.Key">@item.Value</option>
-                            }
-                        }
-                    </optgroup>
-                </select>
-            </div>
             @if (SelectedPage == Backoffice.Shared.Enums.Page.OE_PriceBoost_Manage)
             {
+                <div class="col-2">
+                    <select class="form-select" @onchange="OnPageSelectionChangedEvent">
+                        <optgroup label="Logs Type">
+                            @foreach (var item in Pages)
+                            {
+                                @if (SelectedPage == item.Key)
+                                {
+                                    <option value="@item.Key" selected>@item.Value</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Key">@item.Value</option>
+                                }
+                            }
+                        </optgroup>
+                    </select>
+                </div>
                 <div class="col-2">
                     <select class="form-select">
                         <optgroup label="Clients">
@@ -149,11 +149,35 @@
                         </optgroup>
                     </select>
                 </div>
-            }
 
-            <div class="col-2">
-                <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="FilterModel.DateFrom" EndDate="FilterModel.DateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDateRangeChangedEvent"></DateRangePicker>
-            </div>
+                <div class="col-2">
+                    <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="FilterModel.DateFrom" EndDate="FilterModel.DateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDateRangeChangedEvent"></DateRangePicker>
+                </div>
+            }
+            else
+            {
+                <div class="col-3">
+                    <select class="form-select" @onchange="OnPageSelectionChangedEvent">
+                        <optgroup label="Logs Type">
+                            @foreach (var item in Pages)
+                            {
+                                @if (SelectedPage == item.Key)
+                                {
+                                    <option value="@item.Key" selected>@item.Value</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Key">@item.Value</option>
+                                }
+                            }
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="col-3">
+                    <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="FilterModel.DateFrom" EndDate="FilterModel.DateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDateRangeChangedEvent"></DateRangePicker>
+                </div>
+            }
 
         </div>
     </div>

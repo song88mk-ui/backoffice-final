@@ -1013,35 +1013,35 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Priceboost
-        public async Task<Tuple<BaseResponse<PriceBoostConfigResponse>, OnActivityLogListMessage>> AddOrUpdatePriceBoost(List<PriceBoostConfigModel> request, string region)
+        public async Task<BaseResponse<PriceBoostConfigResponse>> AddOrUpdatePriceBoost(List<PriceBoostConfigModel> request, string region)
         {
             try
             {
                 var response = await GetHttpClient(region).PostAsync($"priceboost", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<Tuple<BaseResponse<PriceBoostConfigResponse>, OnActivityLogListMessage>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<Tuple<BaseResponse<PriceBoostConfigResponse>, OnActivityLogListMessage>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<PriceBoostConfigResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
                     {
-                        return new Tuple<BaseResponse<PriceBoostConfigResponse>, OnActivityLogListMessage>(new BaseResponse<PriceBoostConfigResponse>()
+                        return new BaseResponse<PriceBoostConfigResponse>()
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        }, null);
+                        };
                     }
                 }
             }
             catch (Exception ex)
             {
-                return new Tuple<BaseResponse<PriceBoostConfigResponse>, OnActivityLogListMessage>(new BaseResponse<PriceBoostConfigResponse>()
+                return new BaseResponse<PriceBoostConfigResponse>()
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                }, null);
+                };
             }
         }
         public async Task<BaseResponse<List<PriceBoostConfigModel>>> GetPriceBoostConfig(PriceBoostConfigRequest request, string region)

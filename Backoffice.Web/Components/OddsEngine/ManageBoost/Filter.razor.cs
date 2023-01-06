@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback<int> OnSportChangedCallback { get; set; }
         [Parameter] public EventCallback<Tuple<int,int>> OnSegmentChangedCallback { get; set; }
-        [Parameter] public EventCallback OnLeagueChangedCallback { get; set; }
+        [Parameter] public EventCallback OnLeagueChangedCallback { get; set; }        
         //[Parameter] public EventCallback OnFilterChangedCallback { get; set; }
 
         public SearchFormModel SearchForm { get; set; }
@@ -91,6 +91,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);            
 
             var options = new ModalOptions();
             ModalService.Open<AddBoostedOddsModal>($"Add Boosted Odds", parameters, options);
@@ -101,7 +102,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("DialogStyle","max-width: 65rem;");
+            parameters.Add("DialogStyle","max-width: 85rem;");
 
             var options = new ModalOptions();
             ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);

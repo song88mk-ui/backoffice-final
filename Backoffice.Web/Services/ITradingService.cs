@@ -1,12 +1,14 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Models;
 using Backoffice.Web.Pages.OddsEngine;
 
 namespace Backoffice.Web.Services
 {
     public interface ITradingService
     {
+        Task<BaseResponse<Models.SportsTreeModel>> GetSports(int fixtureTypeId);
         Task<BaseResponse<SportsLookupResponse>> GetSportLookup();
         Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId);
         Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId);
@@ -18,6 +20,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<List<BoostedSettingsModel>>> GetBoostedSettings(BoostedSettingsRequest request);
         Task<BaseResponse<bool>> AddOrUpdateBoostedSetting(BoostedSettingsModel request, string userId);
         Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request);
+        Task<BaseResponse<PriceBoostConfigResponse>> AddOrUpdatePriceBoost(AddPriceBoostFilterModel request);
         #endregion
 
         #region Admin
@@ -27,6 +30,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<List<TierLeagueOrderModel>>> GetTierLeagueOrder();
         #endregion
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
-        Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);
+        Task<BaseResponse<bool>> AddActivityLog(Backoffice.Shared.Models.ActivityLogModel request);
+        Task<BaseResponse<MessageResponse>> Publish(MessageRequest request);
     }
 }
