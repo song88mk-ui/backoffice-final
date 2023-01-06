@@ -1,11 +1,11 @@
-﻿<tr>
+﻿
+<tr>
     <td>
         @if (Market.FixtureStatusId == 1)
         {
             <span>@Market.CurrentPeriod</span>
             @if (!string.IsNullOrEmpty(Market.CurrentMinute) && int.Parse(Market.CurrentMinute) > 0)
             {
-                <br />
                 <span class="fw-bold">@Market.CurrentMinute</span>
             }
         }
@@ -20,7 +20,7 @@
 
     </td>
     <td>
-        <a href="odds-engine/monitoring-details" class="fixture-details text-decoration-none">
+        <a href="@($"odds-engine/monitoring-details/{Market.ProviderFixtureId}")" class="fixture-details text-decoration-none">
             <span class="fw-bold">@Market.HomeName.ToUpper()</span>
             <br />
             <span>@Market.AwayName.ToUpper()</span>

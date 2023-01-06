@@ -1,14 +1,18 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.MonitoringDetails
+@using Backoffice.Web.Components.Common
 
 @layout OEMonitoringLayout
 
-@page "/odds-engine/monitoring-details"
+@page "/odds-engine/monitoring-details/{Id}"
 
 <div class="col-md-12">
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter />
+    @if (!string.IsNullOrEmpty(Id))
+    {
+        <Filter OnInitCallback="MonitoringDetailsCallback" ProviderFixtureId="@Id" />
+    }
 </div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">
@@ -18,78 +22,20 @@
                     <th></th>
                     <th></th>
                     <th>BR CTRL</th>
-                    <th>10 BET CRYPTO</th>
-                    <th>10 BET INDIA</th>
-                    <th>10 BET JAPAN</th>
+                    @foreach (var client in ClientModel.Clients)
+                    {
+                        <th>@client.ClientName</th>
+                    }
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>
-                        <span>
-                            05/01/2023
-                            <br>
-                            <strong>00:00</strong>
-                        </span>
-                    </td>
-                    <td>
-                        <span class="fw-bold">Muntinlupa Snatchers</span>
-                        <br />
-                        <span>Alabang Walkers</span>
-                    </td>
-                    <td>
-                        <div class="d-flex justify-content-center">
-                            <div class="odds-container me-2 py-1 px-3">
-                                <span>2.56</span>
-                            </div>
-                            <div class="odds-container me-2 py-1 px-3">
-                                <span>1.62</span>
-                            </div>
-                            <div class="py-1 px-2">
-                                <span>101</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex justify-content-center">
-                            <div class="odds-container me-2 py-1 px-3">
-                                <span>2.56</span>
-                            </div>
-                            <div class="odds-container me-2 py-1 px-3">
-                                <span>1.62</span>
-                            </div>
-                            <div class="py-1 px-2">
-                                <span>101</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex justify-content-center">
-                            <div class="odds-container me-2 py-1 px-3">
-                                <span>2.56</span>
-                            </div>
-                            <div class="odds-container me-2 py-1 px-3">
-                                <span>1.62</span>
-                            </div>
-                            <div class="py-1 px-2">
-                                <span>101</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex justify-content-center">
-                            <div class="odds-container me-2 py-1 px-3">
-                                <span>2.56</span>
-                            </div>
-                            <div class="odds-container me-2 py-1 px-3">
-                                <span>1.62</span>
-                            </div>
-                            <div class="py-1 px-2">
-                                <span>101</span>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
+                @if (FilteredMarkets != null)
+                {
+                    @foreach (var market in FilteredMarkets)
+                    {
+                        <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@CallbackModel.SelectedMarketTemplateId" Market="market" />
+                    }
+                }
             </tbody>
         </table>
     </div>
@@ -105,11 +51,11 @@
         <div class="w-75">
             <table class="table table-hover table-bordered">
                 <thead class="table-head">
-                    <th></th>
-                    <th>BR CTRL</th>
-                    <th>10 BET CRYPTO</th>
-                    <th>10 BET INDIA</th>
-                    <th>10 BET JAPAN</th>
+                <th></th>
+                <th>BR CTRL</th>
+                <th>10 BET CRYPTO</th>
+                <th>10 BET INDIA</th>
+                <th>10 BET JAPAN</th>
                 </thead>
                 <tbody>
                     <tr>

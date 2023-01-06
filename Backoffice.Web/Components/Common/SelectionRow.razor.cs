@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
-namespace Backoffice.Web.Components.OddsEngine.Monitoring
+namespace Backoffice.Web.Components.Common
 {
     public partial class SelectionRow : IDisposable
     {

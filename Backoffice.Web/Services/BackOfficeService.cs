@@ -580,6 +580,32 @@ namespace Backoffice.Web.Services
             }
         }
 
+        public async Task<BaseResponse<MarketFixtureDetailResponse>> GetMarketFixtureDetails(string providerFixtureId)
+        {
+            try
+            {
+                var stringUri = $"api/trading/fixtures2/market/details/{providerFixtureId}";
+
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<MarketFixtureDetailResponse>>
+                (await _httpClient.GetStreamAsync(stringUri), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return result ?? new BaseResponse<MarketFixtureDetailResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = $"{StatusCode.Success}",
+                    Result = new MarketFixtureDetailResponse()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<MarketFixtureDetailResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = new MarketFixtureDetailResponse()
+                };
+            }
+        }
 
         #endregion
 
