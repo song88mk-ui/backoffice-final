@@ -24,8 +24,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
-        protected bool IsPreLoader { get; set; } = false;
-        public string DialogStyle { get; set; }
+        protected bool IsPreLoader { get; set; } = false;        
         public Page CurrentPage { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
         public List<string> UserClients { get; set; }
@@ -36,8 +35,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #endregion
 
         protected override async Task OnInitializedAsync()
-        {
-            DialogStyle = ModalParameters.TryGet<string>("DialogStyle");
+        {            
             CurrentPage = ModalParameters.TryGet<Page>("SelectedPage");
             UserClients = await GetUserClients();
             var clients = await GetClients();

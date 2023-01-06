@@ -1,4 +1,9 @@
-﻿.modalBtn {
+﻿.modal-body {
+    overflow-y: scroll;
+    max-height: 20rem;
+}
+
+.modalBtn {
     color: white;
 }
 
