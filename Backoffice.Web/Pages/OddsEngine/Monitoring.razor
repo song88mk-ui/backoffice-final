@@ -12,7 +12,10 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter OnInitCallback="OnInitEvent" SportId="1" />
+    @if (defaultSport != null && defaultSport.SportId > 0)
+    {
+        <Filter OnInitCallback="OnInitEvent" SportId="@defaultSport.SportId" />
+    }
 </div>
 <div class="col-md-12">
     <table class="table table-hover table-bordered mt-4">
@@ -31,7 +34,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (FixtureMarkets != null && FixtureMarkets.Any())
+            @if (FixtureMarkets != null && FixtureMarkets.Any() && defaultSport != null && defaultSport.SportId > 0)
             {
                 foreach (var market in FixtureMarkets)
                 {

@@ -16,7 +16,11 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         public SearchFormModel SearchForm { get; set; }
         public List<MainMarketTemplateResponse> TopMarketTemplates { get; set; }
         public ClientModel Clients { get; set; }
-        public string MarketTemplateId { get; set; }
+        public string MarketTemplateId { get; set; } = string.Empty;
+        #endregion
+
+        #region Fields
+        protected int sportId;
         #endregion
 
         #region Methods
@@ -54,11 +58,33 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                     SelectedMarketTemplateId = MarketTemplateId,
                     Clients = Clients
                 });
+
             }
             catch (Exception)
             {
             }
         }
+
+        //protected override async Task OnParametersSetAsync()
+        //{
+        //    if(SportId > 0 &&  sportId != SportId)
+        //    {
+        //        TopMarketTemplates = (await BackOfficeService.GetTopMarkets(SportId)).Result;
+
+        //        TopMarketTemplates = (await BackOfficeService.GetTopMarkets(SportId)).Result;
+
+        //        if (TopMarketTemplates != null && TopMarketTemplates.Any())
+        //            MarketTemplateId = TopMarketTemplates.FirstOrDefault().MainMarketTemplateId;
+
+        //        await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
+        //        {
+        //            SearchText = string.Empty,
+        //            TopMarketTemplates = TopMarketTemplates,
+        //            SelectedMarketTemplateId = MarketTemplateId,
+        //            Clients = Clients
+        //        });
+        //    }
+        //}
 
         public async void OnMarketChangedEvent(ChangeEventArgs e)
         {
@@ -75,7 +101,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         public async Task OnInputSearchEvent()
         {
-            await OnInitCallback.InvokeAsync(new MonitoringCallbackModel { SearchText = SearchForm.SearchText, TopMarketTemplates = TopMarketTemplates, Clients = Clients });
+            await OnInitCallback.InvokeAsync(new MonitoringCallbackModel { SearchText = SearchForm.SearchText, TopMarketTemplates = TopMarketTemplates, Clients = Clients, SelectedMarketTemplateId = MarketTemplateId });
         }
 
         public void Dispose()

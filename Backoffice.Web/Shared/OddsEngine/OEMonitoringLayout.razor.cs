@@ -1,4 +1,5 @@
 ﻿using Backoffice.Web.Models;
+using Backoffice.Web.Pages.OddsEngine;
 using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Shared.OddsEngine
@@ -7,12 +8,14 @@ namespace Backoffice.Web.Shared.OddsEngine
     {
         #region Properties        
 
+        [Parameter] public SportClickCallbackModel SelectedSport { get; set; }
         #endregion
 
         #region Methods        
 
         public async Task OnSportClickEvent(SportClickCallbackModel model)
         {
+            SelectedSport = model;
 
         }
 
