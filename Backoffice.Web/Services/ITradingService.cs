@@ -8,7 +8,7 @@ namespace Backoffice.Web.Services
 {
     public interface ITradingService
     {
-        Task<BaseResponse<Models.SportsTreeModel>> GetSports(int fixtureTypeId);
+        Task<BaseResponse<SportsTreeModel>> GetSports(int fixtureTypeId);
         Task<BaseResponse<SportsLookupResponse>> GetSportLookup();
         Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId);
         Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId);
@@ -24,6 +24,8 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Admin
+        Task<BaseResponse<MarketFixtureResponse>> GetSportsBookFixtures(MarketFixtureRequest request);
+        Task<BaseResponse<MarketFixtureResponse>> GetSportsBookOutrightFixtures(MarketFixtureRequest request);
         Task<BaseResponse<List<ClientSportOrderListResponse>>> GetClientSportOrderList(ClientSportOrderListRequest request);
         Task<BaseResponse<List<ClientSegmentOrderListResponse>>> GetClientSegmentOrderList(ClientSegmentOrderListRequest request);
         Task<BaseResponse<List<ClientLeagueOrderListResponse>>> GetClientLeagueOrderList(ClientLeagueOrderListRequest request);

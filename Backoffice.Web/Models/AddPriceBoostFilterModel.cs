@@ -1,4 +1,6 @@
-﻿namespace Backoffice.Web.Models
+﻿using Backoffice.Shared.Models;
+
+namespace Backoffice.Web.Models
 {
     public class AddPriceBoostFilterModel
     {
