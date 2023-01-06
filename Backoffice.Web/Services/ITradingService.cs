@@ -20,7 +20,12 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request);
         #endregion
 
-
+        #region Admin
+        Task<BaseResponse<List<ClientSportOrderListResponse>>> GetClientSportOrderList(ClientSportOrderListRequest request);
+        Task<BaseResponse<List<ClientSegmentOrderListResponse>>> GetClientSegmentOrderList(ClientSegmentOrderListRequest request);
+        Task<BaseResponse<List<ClientLeagueOrderListResponse>>> GetClientLeagueOrderList(ClientLeagueOrderListRequest request);
+        Task<BaseResponse<List<TierLeagueOrderModel>>> GetTierLeagueOrder();
+        #endregion
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);
     }

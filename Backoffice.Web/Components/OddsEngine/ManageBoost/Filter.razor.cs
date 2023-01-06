@@ -38,14 +38,14 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
         }
 
-        public async Task<List<Models.SelectListItemModel<int>>> LoadSports()
+        public async Task<List<SelectListItemModel<int>>> LoadSports()
         {
             var result = (await TradingService.GetSportLookup()).Result;
 
             if (result == null)
-                return new List<Models.SelectListItemModel<int>>();
+                return new List<SelectListItemModel<int>>();
 
-            var sports = result.SportLookup.Select(s => new Models.SelectListItemModel<int>()
+            var sports = result.SportLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.SportId,
                 Name = s.SportName
@@ -54,14 +54,14 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             return sports;      
         }
 
-        public async Task<List<Models.SelectListItemModel<int>>> LoadSegments(int sportId)
+        public async Task<List<SelectListItemModel<int>>> LoadSegments(int sportId)
         {
             var result = (await TradingService.GetSegmentLookup(sportId)).Result;
 
             if (result == null)
-                return new List<Models.SelectListItemModel<int>>();
+                return new List<SelectListItemModel<int>>();
 
-            var segments = result.SegmentLookup.Select(s => new Models.SelectListItemModel<int>()
+            var segments = result.SegmentLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.SegmentId,
                 Name = s.SegmentName
@@ -70,14 +70,14 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             return segments;
         }
 
-        public async Task<List<Models.SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
+        public async Task<List<SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
         {
             var result = (await TradingService.GetLeagueLookup(sportId, segmentId)).Result;
 
             if (result == null)
-                return new List<Models.SelectListItemModel<int>>();
+                return new List<SelectListItemModel<int>>();
 
-            var leagues = result.LeagueLookup.Select(s => new Models.SelectListItemModel<int>()
+            var leagues = result.LeagueLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.LeagueId,
                 Name = s.LeagueName

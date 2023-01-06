@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.ParlayBonus
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [Parameter] public List<Models.SelectListItemModel<ClientModel.Client>> Clients { get; set; }        
+        [Parameter] public List<SelectListItemModel<ClientModel.Client>> Clients { get; set; }        
         public string ClientId { get; set; }
         public bool IsUpdating { get; set; } = false;        
         public decimal OriginalMinOdds { get; set; }

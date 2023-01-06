@@ -142,7 +142,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-        private async Task<List<Models.SelectListItemModel<string>>> LoadClients()
+        private async Task<List<SelectListItemModel<string>>> LoadClients()
         {
             ClientModel clients = new ClientModel();
             clients = (await BackOfficeService.GetClients()).Result;
@@ -155,21 +155,21 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             }
 
-            return clients.Clients.Select(x => new Models.SelectListItemModel<string>()
+            return clients.Clients.Select(x => new SelectListItemModel<string>()
             {
                 Name = x.ClientName,
                 Value = x.ClientCode
             }).ToList();
         }
 
-        private async Task<List<Models.SelectListItemModel<int>>> LoadSports()
+        private async Task<List<SelectListItemModel<int>>> LoadSports()
         {
             var result = (await TradingService.GetSportLookup()).Result;
 
             if (result == null)
-                return new List<Models.SelectListItemModel<int>>();
+                return new List<SelectListItemModel<int>>();
 
-            var sports = result.SportLookup.Select(s => new Models.SelectListItemModel<int>()
+            var sports = result.SportLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.SportId,
                 Name = s.SportName
@@ -178,14 +178,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             return sports;
         }
 
-        private async Task<List<Models.SelectListItemModel<int>>> LoadSegments(int sportId)
+        private async Task<List<SelectListItemModel<int>>> LoadSegments(int sportId)
         {
             var result = (await TradingService.GetSegmentLookup(sportId)).Result;
 
             if (result == null)
-                return new List<Models.SelectListItemModel<int>>();
+                return new List<SelectListItemModel<int>>();
 
-            var segments = result.SegmentLookup.Select(s => new Models.SelectListItemModel<int>()
+            var segments = result.SegmentLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.SegmentId,
                 Name = s.SegmentName
@@ -194,14 +194,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             return segments;
         }
 
-        private async Task<List<Models.SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
+        private async Task<List<SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
         {
             var result = (await TradingService.GetLeagueLookup(sportId, segmentId)).Result;
 
             if (result == null)
-                return new List<Models.SelectListItemModel<int>>();
+                return new List<SelectListItemModel<int>>();
 
-            var leagues = result.LeagueLookup.Select(s => new Models.SelectListItemModel<int>()
+            var leagues = result.LeagueLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.LeagueId,
                 Name = s.LeagueName

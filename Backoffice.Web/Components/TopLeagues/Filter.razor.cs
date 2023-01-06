@@ -13,8 +13,8 @@ namespace Backoffice.Web.Components.TopLeagues
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnFilterCallback { get; set; }
         protected SearchFormModel SearchForm { get; set; }
-        public List<Models.SelectListItemModel<string>> Clients { get; set; }
-        public List<Models.SelectListItemModel<string>> Sports { get; set; }
+        public List<SelectListItemModel<string>> Clients { get; set; }
+        public List<SelectListItemModel<string>> Sports { get; set; }
         public TopLeaguesFilterModel TopLeaguesFilterModel { get; set; }
         #endregion
 
@@ -22,8 +22,8 @@ namespace Backoffice.Web.Components.TopLeagues
         {
             try
             {
-                Clients = new List<Models.SelectListItemModel<string>>();
-                Sports = new List<Models.SelectListItemModel<string>>();
+                Clients = new List<SelectListItemModel<string>>();
+                Sports = new List<SelectListItemModel<string>>();
                 TopLeaguesFilterModel = new TopLeaguesFilterModel();
 
                 SearchForm = new SearchFormModel()
@@ -37,7 +37,7 @@ namespace Backoffice.Web.Components.TopLeagues
                     if (UserModel.ClientCodes.Any())
                          clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
-                    Clients = clients.Clients.Select(s => new Models.SelectListItemModel<string>
+                    Clients = clients.Clients.Select(s => new SelectListItemModel<string>
                     {
                         Value = s.ClientId.ToString(),
                         Name = s.ClientName
@@ -45,7 +45,7 @@ namespace Backoffice.Web.Components.TopLeagues
                 }
 
                 if (!Clients.Any())
-                    Clients.Add(new Models.SelectListItemModel<string>
+                    Clients.Add(new SelectListItemModel<string>
                     {
                         Value = "",
                         Name = "No Clients Available"
@@ -54,7 +54,7 @@ namespace Backoffice.Web.Components.TopLeagues
                 var sports = (await BackOfficeService.GetSportsAsync("en")).Result;
                 if (sports != null)
                 {
-                    Sports = sports.Sports.Select(s => new Models.SelectListItemModel<string>
+                    Sports = sports.Sports.Select(s => new SelectListItemModel<string>
                     {
                         Value = s.SportId.ToString(),
                         Name = s.SportName
@@ -62,7 +62,7 @@ namespace Backoffice.Web.Components.TopLeagues
                 }
 
                 if (!Sports.Any())
-                    Sports.Add(new Models.SelectListItemModel<string>
+                    Sports.Add(new SelectListItemModel<string>
                     {
                         Value = "0",
                         Name = "No Sports Available"

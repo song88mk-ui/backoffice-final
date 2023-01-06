@@ -1,11 +1,18 @@
-﻿
-<div class="content-filter mx-3 d-flex justify-content-between">
+﻿<div class="content-filter mx-3 d-flex justify-content-between">
     <div class="select-container d-flex">
         <div class="me-2">
-            <select class="form-select d-block">
-                <option value="1" selected>Client 1</option>
-                <option value="2">Client 2</option>
-                <option value="2">Client 3</option>
+            <select class="form-select d-block" @onchange="OnClientSelectionChangedEvent">
+                @foreach (var item in Clients)
+                {
+                    if (SelectedClient == item.Key)
+                    {
+                        <option value="@item.Key" selected>@item.Value</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Key">@item.Value</option>
+                    }
+                }
             </select>
         </div>
     </div>
@@ -25,7 +32,7 @@
         @if (!IsUpdate)
         {
             <div class="me-2">
-                <a href="javascript:void(0)" class="btn btn-edit px-3" @onclick="OnUpdateClickEvent">
+                <a href="javascript:void(0)" class="btn btn-edit px-3" @onclick="OnEditClickEvent">
                     <i class="fa fa-edit"></i>
                     Update
                 </a>
