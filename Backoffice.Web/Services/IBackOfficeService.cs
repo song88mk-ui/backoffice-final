@@ -13,7 +13,6 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ClientTopFixtureModel>> GetClientTopFixtures(GetClientTopFixtureRequest request);
         Task<BaseResponse<PlatformMessageModel>> PostClientTopFixtures(PostClientTopFixtureRequest request);
         Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);
-        
         Task<BaseResponse<GetAllLeaguesModel>> GetAllLeaguesAsync(GetAllLeaguesRequest request);
         Task<BaseResponse<TopLeaguesModel>> GetTopLeaguesAsync(GetTopLeaguesRequest request);
         Task<BaseResponse<PlatformMessageModel>> PostTopLeaguesAsync(PostTopLeaguesRequest request);
@@ -25,5 +24,6 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<StatusCode>> AddOrUpdateParlayBonus(ParlayBonusRequest request);
         Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId);
         Task<BaseResponse<MarketFixtureResponse>> GetMarketFixtures(MarketFixtureRequest request);
+        Task<BaseResponse<MarketFixtureDetailResponse>> GetMarketFixtureDetails(string providerFixtureId);
     }
 }

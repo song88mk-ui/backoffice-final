@@ -18,6 +18,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         {
             _backofficeRepository = backofficeRepository;
         }
+
         [HttpGet("list")]
         public async Task<IActionResult> GetClients()
         {

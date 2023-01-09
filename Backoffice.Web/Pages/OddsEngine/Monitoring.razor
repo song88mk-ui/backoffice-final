@@ -12,9 +12,9 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    @if (defaultSport != null && defaultSport.SportId > 0)
+    @if (SelectedSport != null)
     {
-        <Filter OnInitCallback="OnInitEvent" SportId="@defaultSport.SportId" />
+        <Filter OnInitCallback="MonitoringCallback" SportId="@SelectedSport.SportId" />
     }
 </div>
 <div class="col-md-12">
@@ -24,21 +24,18 @@
                 <th class="th-start-date py-3"></th>
                 <th class="th-fixture-name py-3"></th>
                 <th>BTR CTRL</th>
-                @if (CallbackModel.Clients.Clients.Any())
+                @foreach (var client in ClientModel.Clients)
                 {
-                    foreach (var client in CallbackModel.Clients.Clients)
-                    {
-                        <th>@client.ClientName</th>
-                    }
+                    <th>@client.ClientName</th>
                 }
             </tr>
         </thead>
         <tbody>
-            @if (FixtureMarkets != null && FixtureMarkets.Any() && defaultSport != null && defaultSport.SportId > 0)
+            @if (FixtureMarkets != null && FixtureMarkets.Any())
             {
                 foreach (var market in FixtureMarkets)
                 {
-                    <FixtureRow @key="@market.ProviderMarketId" Clients="@CallbackModel.Clients.Clients" MainMarketName="@CallbackModel.SelectedMarketTemplateId" Market="market" />
+                    <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@MonitoringCallbackModel.SelectedMarketTemplateId" Market="market" />
                 }
             }
         </tbody>

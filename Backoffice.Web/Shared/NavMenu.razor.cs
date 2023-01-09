@@ -14,15 +14,16 @@ namespace Backoffice.Web.Shared
 
         [Parameter] public NavMenuAccess NavMenuAccess { get; set; }
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
-        [Parameter] public SportClickCallbackModel DefaultSport { get; set; }
+        
+        public SportClickCallbackModel SelectedSport { get; set; }
+
         public SportsTreeModel Menu { get; set; }
+
         #endregion
 
         #region Fields
 
         private bool collapseNavMenu = true;
-        private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
 
         #endregion
 
@@ -31,38 +32,37 @@ namespace Backoffice.Web.Shared
         protected override async Task OnInitializedAsync()
         {
             Menu = new SportsTreeModel();
+            SelectedSport = new SportClickCallbackModel();
 
-            if (DefaultSport == null)
-                DefaultSport = new SportClickCallbackModel();
-
-            if(NavMenuAccess == NavMenuAccess.OE)
+            if (NavMenuAccess == NavMenuAccess.OE)
             {
                 await GetSportsTreeMenu();
 
                 var sport = Menu.Sports.FirstOrDefault();
+
                 if (sport != null)
                 {
-                    DefaultSport.SportId = sport.SportId;
+                    SelectedSport.SportId = sport.SportId;
+                    SelectedSport.SportName = sport.SportName;
 
                     var segment = sport.Segments.FirstOrDefault();
+
                     if (segment != null)
                     {
-                        DefaultSport.SegmentId = segment.SegmentId;
+                        SelectedSport.SegmentId = segment.SegmentId;
+                        SelectedSport.SegmentName = segment.SegmentName;
 
                         var league = segment.Leagues.FirstOrDefault();
 
-                        if(league != null)
-                            DefaultSport.LeagueId = league.LeagueId;
-
+                        if (league != null)
+                        {
+                            SelectedSport.LeagueId = league.LeagueId;
+                            SelectedSport.LeagueName = league.LeagueName;
+                        }
                     }
                 }
 
-                await OnSportClickCallback.InvokeAsync(new SportClickCallbackModel
-                {
-                    SportId = DefaultSport.SportId,
-                    SegmentId = DefaultSport.SegmentId,
-                    LeagueId = DefaultSport.LeagueId
-                });
+                await OnSportClickCallback.InvokeAsync(SelectedSport);
             }
         }
 
@@ -73,45 +73,54 @@ namespace Backoffice.Web.Shared
 
         public async Task OnSportClickEvent(int sportId)
         {
-            DefaultSport.SegmentId = DefaultSport.SportId == sportId ? 0 : DefaultSport.SportId != sportId ? 0 : DefaultSport.SegmentId;
-            DefaultSport.SportId = DefaultSport.SportId == sportId ? 0 : sportId;
+            if (SelectedSport.SportId != sportId)
+            {
+                var sport = Menu.Sports.FirstOrDefault(c => c.SportId == sportId);
+
+                SelectedSport.SportId = sport.SportId;
+                SelectedSport.SportName = sport.SportName;
+
+                // reset selected segment and league if new sport has been selected. 
+                SelectedSport.SegmentId = 0;
+                SelectedSport.SegmentName = string.Empty;
+
+                SelectedSport.LeagueId = 0;
+                SelectedSport.LeagueName = string.Empty;
+            }
         }
 
         public async Task OnSegmentClickEvent(int segmentId)
         {
-            if (DefaultSport.SegmentId == segmentId)
+            if (SelectedSport.SegmentId != segmentId)
             {
-                DefaultSport.SegmentId = 0;
-                DefaultSport.LeagueId = 0;
-                return;
+                var sport = Menu.Sports.FirstOrDefault(c => c.SportId == SelectedSport.SportId);
+                var segment = sport.Segments.FirstOrDefault(c => c.SegmentId == segmentId);
+
+                SelectedSport.SegmentId = segment.SegmentId;
+                SelectedSport.SegmentName = segment.SegmentName;
+
+                var league = segment.Leagues.FirstOrDefault();
+
+                SelectedSport.LeagueId = league.LeagueId;
+                SelectedSport.LeagueName = league.LeagueName;
+
+                await OnSportClickCallback.InvokeAsync(SelectedSport);
             }
-
-            DefaultSport.SegmentId = segmentId;
-
-            var sport = Menu.Sports.FirstOrDefault(c => c.SportId == DefaultSport.SportId);
-            var segment = sport.Segments.FirstOrDefault(c => c.SegmentId == DefaultSport.SegmentId);
-            var league = segment.Leagues.FirstOrDefault();
-
-            DefaultSport.LeagueId = league.LeagueId;
-
-            await OnSportClickCallback.InvokeAsync(new SportClickCallbackModel
-            {
-                SportId = DefaultSport.SportId,
-                SegmentId = DefaultSport.SegmentId,
-                LeagueId = DefaultSport.LeagueId
-            });
         }
 
         public async Task OnLeagueClickEvent(int leagueId)
         {
-            DefaultSport.LeagueId = leagueId;
-
-            await OnSportClickCallback.InvokeAsync(new SportClickCallbackModel
+            if (SelectedSport.LeagueId != leagueId)
             {
-                SportId = DefaultSport.SportId,
-                SegmentId = DefaultSport.SegmentId,
-                LeagueId = DefaultSport.LeagueId
-            });
+                var sport = Menu.Sports.FirstOrDefault(c => c.SportId == SelectedSport.SportId);
+                var segment = sport.Segments.FirstOrDefault(c => c.SegmentId == SelectedSport.SegmentId);
+                var league = segment.Leagues.FirstOrDefault(c => c.LeagueId == leagueId);
+
+                SelectedSport.LeagueId = league.LeagueId;
+                SelectedSport.LeagueName = league.LeagueName;
+
+                await OnSportClickCallback.InvokeAsync(SelectedSport);
+            }
         }
 
         public void Dispose()
@@ -124,36 +133,34 @@ namespace Backoffice.Web.Shared
 
         private async Task GetSportsTreeMenu()
         {
-            var result = new SportsTreeModel();
-
             var response = await BackOfficeService.GetSportsTreeAsync((int)FixtureType.Match);
 
-            foreach (var sport in response.Result?.Sports)
+            if (response.StatusCode == StatusCode.Success)
             {
-                result.Sports.Add(new SportsTreeModel.SportModel
-                {
-                    SportId = sport.SportId,
-                    SportName = sport.SportName,
-                    SortOrder = sport.SortOrder,
-                    Segments = sport.Segments.Select(se => new SportsTreeModel.SegmentModel
+                Menu.Sports = response.Result.Sports
+                    .Select(sp => new SportsTreeModel.SportModel
                     {
-                        SegmentId = se.SegmentId,
-                        SegmentName = se.SegmentName,
-                        SortOrder = se.SortOrder,
-                        Leagues = se.Leagues.Select(le => new SportsTreeModel.LeagueModel
+                        SportId = sp.SportId,
+                        SportName = sp.SportName,
+                        SortOrder = sp.SortOrder,
+                        Segments = sp.Segments.Select(se => new SportsTreeModel.SegmentModel
                         {
-                            LeagueId = le.LeagueId,
-                            LeagueName = le.LeagueName,
-                            SortOrder = le.SortOrder,
-                        }).OrderBy(o => o.SortOrder).ToList()
-                    }).OrderBy(o => o.SortOrder).ToList()
-                });
+                            SegmentId = se.SegmentId,
+                            SegmentName = se.SegmentName,
+                            SortOrder = se.SortOrder,
+                            Leagues = se.Leagues.Select(le => new SportsTreeModel.LeagueModel
+                            {
+                                LeagueId = le.LeagueId,
+                                LeagueName = le.LeagueName,
+                                SortOrder = le.SortOrder,
+                            }).OrderBy(o => o.LeagueName)
+                            .ToList()
+                        }).OrderBy(o => o.SegmentName)
+                        .ToList()
+                    })
+                    .OrderBy(o => o.SportName)
+                    .ToList();
             }
-
-            if (result.Sports.Any())
-                result.Sports = result.Sports.OrderBy(o => o.SportName).ToList();
-
-            Menu = result;
         }
 
         #endregion

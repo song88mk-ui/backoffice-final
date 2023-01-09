@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using static Backoffice.Web.Models.ClientModel;
 
-namespace Backoffice.Web.Components.OddsEngine.Monitoring
+namespace Backoffice.Web.Components.Common
 {
     public partial class FixtureRow : IDisposable
     {

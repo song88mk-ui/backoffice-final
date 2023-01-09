@@ -1,10 +1,12 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -20,6 +22,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string PageTitle { get; set; }
         public string IconClass { get; set; }        
         public List<PriceBoostConfigModel> PriceBoostList { get; set; }
+        public LanguagesModel Languages { get; set; }
+        private PriceBoostConfigModel TempConfig { get; set; }
         #endregion
 
         #region Methods
@@ -48,11 +52,20 @@ namespace Backoffice.Web.Pages.OddsEngine
         }        
 
         public async Task OnEdit(PriceBoostConfigModel priceboost)
-        {
+        {            
+            Languages = new LanguagesModel();
+
+            Languages.Languages = Languages.Languages.Where(x => !priceboost.BoostedSelectionTranslations
+            .Select(y => y.Language.LanguageCode).ToList().Contains(x.LanguageCode)).ToList();
+
+            string obj = JsonSerializer.Serialize(priceboost);
+
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "max-width: 80rem;top:50%;transform:translateY(-50%)");
+            parameters.Add("PriceBoostConfigModel", JsonSerializer.Deserialize<PriceBoostConfigModel>(obj));
+            parameters.Add("Languages", Languages);            
 
             var options = new ModalOptions();            
             ModalService.Open<EditBoostedOddsModal>($"Edit Boosted Odds", parameters, options);
@@ -63,6 +76,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("PriceBoostConfigModel", priceboost);
 
             var options = new ModalOptions();
             ModalService.Open<ViewLogsBoostedModal>($"View Logs", parameters, options);
@@ -74,6 +88,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "max-width: 80rem;top:50%;transform:translateY(-50%)");
+            parameters.Add("PriceBoostConfigModel", priceboost);
 
             var options = new ModalOptions();
             ModalService.Open<DeleteBoostedOddsModal>($"Delete Boosted Odds", parameters, options);

@@ -10,20 +10,29 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class Monitoring : IDisposable
     {
         #region Properties
-        [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
+
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
+
         [Parameter] public string SportId { get; set; }
         [Parameter] public string SegmentId { get; set; }
         [Parameter] public string LeagueId { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-        public MonitoringCallbackModel CallbackModel { get; set; }
+
+        public MonitoringCallbackModel MonitoringCallbackModel { get; set; }
+        public ClientModel ClientModel { get; set; }
         public List<FixtureMarketModel> FixtureMarkets { get; set; }
 
         #endregion
 
         #region Fields
-        public SportClickCallbackModel defaultSport;
+
+        public SportClickCallbackModel selectedSport = new SportClickCallbackModel();
+
         #endregion
 
         #region Methods
@@ -31,65 +40,88 @@ namespace Backoffice.Web.Pages.OddsEngine
         protected override async Task OnInitializedAsync()
         {
             FixtureMarkets = null;
-            CallbackModel = new MonitoringCallbackModel();
+            MonitoringCallbackModel = new MonitoringCallbackModel();
+            ClientModel = new ClientModel();
 
-            defaultSport = new SportClickCallbackModel();
+            //selectedSport = new SportClickCallbackModel();
 
-            if (!string.IsNullOrEmpty(SportId))
+            //// Check url if it contains the ids for the ff: Sport ID, Segment ID, League ID
+            //if (!string.IsNullOrEmpty(SportId))
+            //{
+            //    selectedSport.SportId = Convert.ToInt32(SportId);
+
+            //    if (!string.IsNullOrEmpty(SegmentId))
+            //    {
+            //        selectedSport.SegmentId = Convert.ToInt32(SegmentId);
+            //        selectedSport.LeagueId = Convert.ToInt32(LeagueId);
+            //    }
+            //}
+
+            var clients = (await BackOfficeService.GetClients()).Result;
+
+            if (clients != null)
             {
-                defaultSport.SportId = Convert.ToInt32(SportId);
-                if (!string.IsNullOrEmpty(SegmentId))
+                ClientModel = new ClientModel
                 {
-                    defaultSport.SegmentId = Convert.ToInt32(SegmentId);
-                    defaultSport.LeagueId = Convert.ToInt32(LeagueId);
-                }
+                    Clients = UserModel.ClientCodes.Any() ?
+                        clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientModel.Client>()
+                };
             }
-
-            PageTitle = "American Football - USA - NCAA, Regular Season";
-            IconClass = "iconfon iconfont-american-football";
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            if (SelectedSport != null && defaultSport != SelectedSport)
+            if (SelectedSport != null && selectedSport != SelectedSport)
             {
-                if (SelectedSport.SportId > 0)
+                if (selectedSport.SportId != SelectedSport.SportId)
                 {
-                    defaultSport.SportId = SelectedSport.SportId;
-
-                    if (SelectedSport.SegmentId > 0)
-                    {
-                        var isNewSegmentOrLeague = defaultSport.SegmentId != SelectedSport.SegmentId || defaultSport.LeagueId != SelectedSport.LeagueId;
-                        defaultSport.SegmentId = SelectedSport.SegmentId;
-                        defaultSport.LeagueId = SelectedSport.LeagueId;
-
-                        if(isNewSegmentOrLeague)
-                            await OnInitEvent(CallbackModel);
-                    }
+                    selectedSport.SportId = SelectedSport.SportId;
+                    selectedSport.SportName = SelectedSport.SportName;
                 }
 
+                if (selectedSport.SegmentId != SelectedSport.SegmentId)
+                {
+                    selectedSport.SegmentId = SelectedSport.SegmentId;
+                    selectedSport.SegmentName = SelectedSport.SegmentName;
+                }
+
+                if (selectedSport.LeagueId != SelectedSport.LeagueId)
+                {
+                    selectedSport.LeagueId = SelectedSport.LeagueId;
+                    selectedSport.LeagueName = SelectedSport.LeagueName;
+                }
+
+                PageTitle = $"{SelectedSport.SportName} - {SelectedSport.SegmentName} - {selectedSport.LeagueName}";
+                IconClass = $"iconfont iconfont-{SelectedSport.SportName.ToLower().Replace(" ", "-")}";
+
+                await OnInitEvent();
             }
         }
 
-        public async Task OnInitEvent(MonitoringCallbackModel model)
+        public async Task OnInitEvent()
         {
-            CallbackModel = model;
-
-            if(model.SelectedMarketTemplateId != null)
+            // if user selected a new sport OnInitEvent will be triggered by MonitoringCallback
+            if (SelectedSport.SportId != MonitoringCallbackModel.SportId)
             {
-
-                FixtureMarkets = await GetFixtures(new MarketFixtureRequest
-                {
-                    FixtureTypeId = (int)FixtureType.Match,
-                    SportId = defaultSport.SportId,
-                    SegmentId = defaultSport.SegmentId,
-                    LeagueId = defaultSport.LeagueId,
-                    MarketTemplateId = model.SelectedMarketTemplateId,
-                    SearchText = model.SearchText,
-                });
+                FixtureMarkets = new List<FixtureMarketModel>();
+                return;
             }
 
+            FixtureMarkets = await GetFixtures(new MarketFixtureRequest
+            {
+                FixtureTypeId = (int)FixtureType.Match,
+                SportId = SelectedSport.SportId,
+                SegmentId = SelectedSport.SegmentId,
+                LeagueId = SelectedSport.LeagueId,
+                MarketTemplateId = MonitoringCallbackModel.SelectedMarketTemplateId,
+                SearchText = MonitoringCallbackModel.SearchText,
+            });
+        }
 
+        public async Task MonitoringCallback(MonitoringCallbackModel model)
+        {
+            MonitoringCallbackModel = model;
+            await OnInitEvent();
         }
 
         public void Dispose()

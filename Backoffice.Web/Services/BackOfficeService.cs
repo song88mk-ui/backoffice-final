@@ -39,10 +39,10 @@ namespace Backoffice.Web.Services
             try
             {
                 var userToken = await _authenticationService.AuthenticateToken();
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
 
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientModel>>
-                (await _httpClient.GetStreamAsync($"sportsbook/Client/list"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (await _httpClient.GetStreamAsync($"sportsbook/client/list"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result ?? new BaseResponse<ClientModel>
                 {
@@ -107,7 +107,7 @@ namespace Backoffice.Web.Services
             try
             {
                 var userToken = await _authenticationService.AuthenticateToken();
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
                 var Model = await _httpClient.PostAsync($"sportsbook/settings/topfixtures", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (Model.IsSuccessStatusCode)
@@ -580,6 +580,32 @@ namespace Backoffice.Web.Services
             }
         }
 
+        public async Task<BaseResponse<MarketFixtureDetailResponse>> GetMarketFixtureDetails(string providerFixtureId)
+        {
+            try
+            {
+                var stringUri = $"api/trading/fixtures2/market/details/{providerFixtureId}";
+
+                var result = await JsonSerializer.DeserializeAsync<BaseResponse<MarketFixtureDetailResponse>>
+                (await _httpClient.GetStreamAsync(stringUri), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return result ?? new BaseResponse<MarketFixtureDetailResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = $"{StatusCode.Success}",
+                    Result = new MarketFixtureDetailResponse()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<MarketFixtureDetailResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = new MarketFixtureDetailResponse()
+                };
+            }
+        }
 
         #endregion
 
