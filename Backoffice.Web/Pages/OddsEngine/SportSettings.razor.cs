@@ -247,7 +247,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("DialogStyle", "max-width: 600px;");
 
             var options = new ModalOptions();
-            ModalService.Open<CopyModal>($"Copy {ClientSportOrderFilter.ClientName} Sports Settings", parameters, options);
+            ModalService.Open<SportSettingsCopyModal>($"Copy {ClientSportOrderFilter.ClientName} Sports Settings", parameters, options);
+            await InvokeAsync(StateHasChanged);
         }
         public async Task OnSaveClickEvent()
         {

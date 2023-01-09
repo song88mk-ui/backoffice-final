@@ -300,6 +300,11 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         }
         #endregion
         #region Utilities
+        public async Task SelectPage(int page)
+        {
+            MetaData.CurrentPage = page;
+            await GetContent();
+        }
         public string GetClientName(string payload)
         {
             var payloadSplit = payload.Split(".");

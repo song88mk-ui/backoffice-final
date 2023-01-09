@@ -36,6 +36,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             ClientSportOrderFilter.ClientCode = Clients.FirstOrDefault().Key;
             ClientSportOrderFilter.ClientName = Clients.FirstOrDefault().Value;
             ClientSportOrderFilter.Clients = Clients.Select(x => new SelectListItemModel<string> { Value = x.Key, Name = x.Value }).ToList();
+            SelectedClient = ClientSportOrderFilter.ClientCode;
 
             await OnClientChangedCallback.InvokeAsync(SelectedClient);
         }

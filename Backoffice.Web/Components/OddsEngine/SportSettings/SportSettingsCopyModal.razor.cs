@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Components.OddsEngine.SportSettings
 {
-    public partial class CopyModal : IDisposable
+    public partial class SportSettingsCopyModal : IDisposable
     {
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
@@ -20,12 +20,14 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = false;
-            ClientSportOrderFilter = ModalParameters.TryGet<ClientSportOrderFilterModel>("ClientSportOrderFilter");
-
-            CopyClientCode = ClientSportOrderFilter.ClientCode;
-            CopyClientName = ClientSportOrderFilter.ClientName;
-            CopyToClientCode = string.Empty;
-            CopyToClientName = string.Empty;
+            ClientSportOrderFilter = ModalParameters?.TryGet<ClientSportOrderFilterModel>("ClientSportOrderFilter");
+            if (ClientSportOrderFilter != null)
+            {
+                CopyClientCode = ClientSportOrderFilter.ClientCode;
+                CopyClientName = ClientSportOrderFilter.ClientName;
+                CopyToClientCode = string.Empty;
+                CopyToClientName = string.Empty;
+            }
         }
         public async Task OnCancelClickEvent()
         {
@@ -58,7 +60,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             parameters.Add("DialogStyle", "max-width: 600px;");
 
             var options = new ModalOptions();
-            //ModalService.Open<CopyConfirmationModalBody>("Copy Setting", parameters, options);
+            ModalService.Open<CopyConfirmationModalBody>("Copy Setting", parameters, options);
         }
 
         public void Dispose()
