@@ -8,82 +8,93 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter @bind-ClientSportOrderFilter="ClientSportOrderFilter" UserModel="UserModel" OnClientChangedCallback="OnClientChangedEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyCallback="OnCopyClickEvent" />
+    <Filter @bind-ClientSportOrderFilter="ClientSportOrderFilter" IsPreLoader="IsPreLoader" UserModel="UserModel" OnClientChangedCallback="OnClientChangedEvent" OnInitializeCallback="InitializeCallback" OnSaveClickCallback="OnSaveClickEvent" OnViewLogsCallback="OnViewLogsEvent" OnCopyCallback="OnCopyClickEvent" />
 </div>
 <div class="col-md-12">
-    <div class="mx-3 mt-4">
-        @if (ClientSportOrderList != null && IsPreLoader == false)
-        {
-            if (ClientSportOrderList.Any())
-            {
-                <table class="table table-hover table-bordered">
-                    <thead class="table-head">
-                        <tr>
-                            <th width="5%" valign="middle" align="center">
-                                <Tooltip CssClass="bottom" Text="Select/Unselect all sports<br>To Enable/Disable in Client Site.">
-                                    <Checkbox HasOnChange="ClientSportOrderFilter.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxClicked" />
-                                </Tooltip>
-                            </th>
-                            <th width="85%" valign="middle" align="left"><strong>Sports</strong></th>
-                            <th width="5%" valign="middle" align="center">&nbsp;</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (int i = 0; i < ClientSportOrderList.Count; i++)
+    @if (!IsPreLoader)
+    {
+        <div class="mx-3 mt-4">
+            <table class="table table-hover table-bordered">
+                <thead class="table-head">
+                    <tr>
+                        <th width="5%" valign="middle" align="center">
+                            <Tooltip CssClass="bottom" Text="Select/Unselect all sports<br>To Enable/Disable in Client Site.">
+                                <Checkbox HasOnChange="ClientSportOrderFilter.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxClicked" />
+                            </Tooltip>
+                        </th>
+                        <th width="85%" valign="middle" align="left"><strong>Sports</strong></th>
+                        <th width="5%" valign="middle" align="center">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ClientSportOrderList != null)
+                    {
+                        @if (ClientSportOrderList.Any())
                         {
-                            var sport = ClientSportOrderList[i];
-                            <tr draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="middle"
+                            @for (int i = 0; i < ClientSportOrderList.Count; i++)
+                            {
+                                var sport = ClientSportOrderList[i];
+                                <tr draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="middle"
                     @ondrop="@(()=> Drop(sport))"
                     @ondrag="@(()=> StartDrag(sport))">
-                                <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
-                                    <Checkbox HasOnChange="ClientSportOrderFilter.IsUpdate" Checked="sport.IsActive" OnChangeCallback="CheckboxSportClicked" Param1="sport" />
-                                </th>
-                                <th class="d-flex justify-content-between" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top"
+                                    <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
+                                        <Checkbox HasOnChange="ClientSportOrderFilter.IsUpdate" Checked="sport.IsActive" OnChangeCallback="CheckboxSportClicked" Param1="sport" />
+                                    </th>
+                                    <th class="d-flex justify-content-between" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top"
                         @onclick="()=>sport.IsOpen=!sport.IsOpen">
-                                    @sport.SportName <i class="f-right fa @(sport.IsOpen ? "fa-chevron-up" : "fa-chevron-down" )"></i>
-                                </th>
-                                <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></th>
-                            </tr>
-                            @if (sport.IsOpen && sport.SegmentsSortOrder != null && sport.SegmentsSortOrder.Any())
-                            {
-                                for (int j = 0; j < sport.SegmentsSortOrder.Count; j++)
+                                        @sport.SportName <i class="f-right fa @(sport.IsOpen ? "fa-chevron-up" : "fa-chevron-down" )"></i>
+                                    </th>
+                                    <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></th>
+                                </tr>
+                                @if (sport.IsOpen && sport.SegmentsSortOrder != null && sport.SegmentsSortOrder.Any())
                                 {
-                                    var segment = sport.SegmentsSortOrder[j];
-                                    <tr draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")"
+                                    for (int j = 0; j < sport.SegmentsSortOrder.Count; j++)
+                                    {
+                                        var segment = sport.SegmentsSortOrder[j];
+                                        <tr draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")"
                     @ondrop="@(()=> Drop(segment))"
                     @ondrag="@(()=> StartDrag(segment))">
-                                        <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
-                                        </th>
-                                        <th class="d-flex justify-content-between ps-4" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top"
+                                            <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
+                                            </th>
+                                            <th class="d-flex justify-content-between ps-4" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top"
                         @onclick="()=>segment.IsOpen=!segment.IsOpen">
-                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@segment.SegmentName<i class="f-right fa @(segment.IsOpen ? "fa-chevron-up" : "fa-chevron-down" )"></i>
-                                        </th>
-                                        <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></th>
-                                    </tr>
-                                    @if (segment.IsOpen && segment.LeagueSortOrder != null && segment.LeagueSortOrder.Any())
-                                    {
-                                        for (int k = 0; k < segment.LeagueSortOrder.Count; k++)
+                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@segment.SegmentName<i class="f-right fa @(segment.IsOpen ? "fa-chevron-up" : "fa-chevron-down" )"></i>
+                                            </th>
+                                            <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></th>
+                                        </tr>
+                                        @if (segment.IsOpen && segment.LeagueSortOrder != null && segment.LeagueSortOrder.Any())
                                         {
-                                            var league = segment.LeagueSortOrder[k];
-                                            <tr draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")"
+                                            for (int k = 0; k < segment.LeagueSortOrder.Count; k++)
+                                            {
+                                                var league = segment.LeagueSortOrder[k];
+                                                <tr draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")"
                     @ondrop="@(()=> Drop(league))"
                     @ondrag="@(()=> StartDrag(league))">
-                                                <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
-                                                </th>
-                                                <th class="d-flex justify-content-between ps-5" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top">
-                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@league.LeagueName
-                                                </th>
-                                                <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></th>
-                                            </tr>
+                                                    <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
+                                                    </th>
+                                                    <th class="d-flex justify-content-between ps-5" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top">
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@league.LeagueName
+                                                    </th>
+                                                    <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></th>
+                                                </tr>
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    </tbody>
-                </table>
-            }
-        }
-    </div>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    @if (IsPreLoader)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    }
 </div>
 <CustomModal />

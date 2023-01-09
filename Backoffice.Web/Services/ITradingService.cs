@@ -32,6 +32,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<List<ClientLeagueOrderListResponse>>> GetClientLeagueOrderList(ClientLeagueOrderListRequest request);
         Task<BaseResponse<List<TierLeagueOrderModel>>> GetTierLeagueOrder();
         Task<BaseResponse<ClientSportSettingResponse>> AddOrUpdateClientSportSettings(ClientSportSettingRequest request);
+        Task<BaseResponse<List<ClientSportOrderAuditResponse>>> GetClientSportOrderAuditList(ClientSportOrderAuditRequest request);
         #endregion
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<bool>> AddActivityLog(Backoffice.Shared.Models.ActivityLogModel request);

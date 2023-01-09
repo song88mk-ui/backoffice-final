@@ -16,41 +16,40 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         [Inject] public ITradingService TradingService { get; set; }
         [Parameter] public UserModel UserModel { get; set; }
         [Parameter] public ClientSportOrderFilterModel ClientSportOrderFilter { get; set; }
+        [Parameter] public bool IsPreLoader { get; set; }
         [Parameter] public EventCallback<ClientSportOrderFilterModel> ClientSportOrderFilterChanged { get; set; }
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCopyCallback { get; set; }
+        [Parameter] public EventCallback OnViewLogsCallback { get; set; }
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback<string> OnUpdateCallback { get; set; }
-
-        private bool IsUpdate { get; set; }
+        [Parameter] public EventCallback<string> OnInitializeCallback { get; set; }
         private List<KeyValuePair<string, string>> Clients { get; set; } = new List<KeyValuePair<string, string>>();
-        private string SelectedClient { get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            IsUpdate = false;
-
             Clients = await GetClients();
             ClientSportOrderFilter.ClientCode = Clients.FirstOrDefault().Key;
             ClientSportOrderFilter.ClientName = Clients.FirstOrDefault().Value;
             ClientSportOrderFilter.Clients = Clients.Select(x => new SelectListItemModel<string> { Value = x.Key, Name = x.Value }).ToList();
-            SelectedClient = ClientSportOrderFilter.ClientCode;
+            ClientSportOrderFilter.IsUpdate = false;
 
-            await OnClientChangedCallback.InvokeAsync(SelectedClient);
+            await OnClientChangedCallback.InvokeAsync();
         }
         public async void OnClientSelectionChangedEvent(ChangeEventArgs e)
         {
-            SelectedClient = e.Value.ToString();
+            ClientSportOrderFilter.IsUpdate = false;
+            ClientSportOrderFilter.ClientCode = e.Value.ToString();
+            ClientSportOrderFilter.ClientName = Clients.Where(x => x.Key == e.Value.ToString()).Select(x => x.Value)?.FirstOrDefault();
 
             await ClientSportOrderFilterChanged.InvokeAsync(ClientSportOrderFilter);
-            await OnClientChangedCallback.InvokeAsync(SelectedClient);
+            await OnClientChangedCallback.InvokeAsync();
             await InvokeAsync(StateHasChanged);
         }
         public async Task OnEditClickEvent()
         {
-            IsUpdate = true;
             ClientSportOrderFilter.IsUpdate = true;
 
             await ClientSportOrderFilterChanged.InvokeAsync(ClientSportOrderFilter);
@@ -59,12 +58,14 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         {
             ClientSportOrderFilter.IsUpdate = false;
 
-            await ClientSportOrderFilterChanged.InvokeAsync(ClientSportOrderFilter);
             await OnSaveClickCallback.InvokeAsync();
         }
         public async Task OnViewLogsClickEvent()
         {
+            if (string.IsNullOrEmpty(ClientSportOrderFilter.ClientCode))
+                return;
 
+            await OnViewLogsCallback.InvokeAsync();
         }
         public async Task OnCopyClickEvent()
         {
@@ -75,7 +76,9 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         }
         public async Task OnCancelClickEvent()
         {
-            IsUpdate = false;
+            ClientSportOrderFilter.IsUpdate = false;
+
+            await OnInitializeCallback.InvokeAsync(ClientSportOrderFilter.ClientCode);
         }
         public void Dispose()
         {

@@ -7,6 +7,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Runtime.Caching;
 using System.Security.Claims;
 using static Backoffice.Shared.Models.Response.LeagueLookupResponse;
 
@@ -24,6 +25,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public ClientSportOrderFilterModel ClientSportOrderFilter { get; set; }
         private List<SportsSortOrder> ClientSportOrderList { get; set; }
+        private SportsSortOrder[] Cache { get; set; }
         private bool IsSelectAll { get; set; } = false;
         private int currentIndex { get; set; }
         private int currentSportId { get; set; }
@@ -40,13 +42,16 @@ namespace Backoffice.Web.Pages.OddsEngine
             ClientSportOrderList = new List<SportsSortOrder>();
             ClientSportOrderFilter = new ClientSportOrderFilterModel();
         }
+        public async Task InitializeCallback(string clientCode)
+        {
+            ClientSportOrderFilter.IsUpdate = false;
+            await GetContent(clientCode);
+        }
 
-        public async Task OnClientChangedEvent(string clientCode)
+        public async Task OnClientChangedEvent()
         {
             IsPreLoader = true;
-            await GetContent(clientCode);
-            IsPreLoader = false;
-            await InvokeAsync(StateHasChanged);
+            await GetContent(ClientSportOrderFilter.ClientCode);
         }
 
         public void Dispose()
@@ -56,6 +61,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task GetContent(string clientCode)
         {
+            Console.WriteLine("Get Content");
             if (string.IsNullOrEmpty(clientCode))
             {
                 ClientSportOrderList = new List<SportsSortOrder>();
@@ -64,6 +70,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             IsPreLoader = true;
             ClientSportOrderList = null;
+            Cache = null;
             await InvokeAsync(StateHasChanged);
 
             var clientSports = new List<SportsSortOrder>();
@@ -217,6 +224,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             IsSelectAll = !clientSports.Any(s => s.IsActive == false);
             ClientSportOrderList = clientSports.OrderBy(o => o.SortOrder).ToList();
+            IsPreLoader = false;
+
+            await InvokeAsync(StateHasChanged);
         }
 
         #region Events
@@ -252,71 +262,72 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public async Task OnSaveClickEvent()
         {
+            ClientSportOrderFilter.IsUpdate = false;
             IsPreLoader = true;
             await InvokeAsync(StateHasChanged);
 
-            int sortOrder = 0;
-            var newSportOrder = new List<SportsSortOrder>();
-            foreach (var sport in ClientSportOrderList)
-            {
-                sortOrder++;
-                var sportOrder = new SportsSortOrder()
-                {
-                    SportId = sport.SportId,
-                    SportName = sport.SportName,
-                    SortOrder = sortOrder,
-                    IsActive = sport.IsActive,
-                    SegmentsSortOrder = new List<SportsSegmentSortOrder>()
-                };
+            //int sortOrder = 0;
+            //var newSportOrder = new List<SportsSortOrder>();
+            //foreach (var sport in ClientSportOrderList)
+            //{
+            //    sortOrder++;
+            //    var sportOrder = new SportsSortOrder()
+            //    {
+            //        SportId = sport.SportId,
+            //        SportName = sport.SportName,
+            //        SortOrder = sortOrder,
+            //        IsActive = sport.IsActive,
+            //        SegmentsSortOrder = new List<SportsSegmentSortOrder>()
+            //    };
 
-                int segmentOrderCtr = 0;
-                var segmentOrders = new List<SportsSegmentSortOrder>();
-                var segments = sport.SegmentsSortOrder.ToList();
-                if (segments.Any())
-                {
-                    foreach (var segment in segments)
-                    {
-                        segmentOrderCtr++;
-                        var segmentOrder = new SportsSegmentSortOrder
-                        {
-                            SportId = segment.SportId,
-                            SportName = segment.SportName,
-                            SegmentId = segment.SegmentId,
-                            SegmentName = segment.SegmentName,
-                            SortOrder = segmentOrderCtr,
-                            IsActive = segment.IsActive,
-                        };
+            //    int segmentOrderCtr = 0;
+            //    var segmentOrders = new List<SportsSegmentSortOrder>();
+            //    var segments = sport.SegmentsSortOrder.ToList();
+            //    if (segments.Any())
+            //    {
+            //        foreach (var segment in segments)
+            //        {
+            //            segmentOrderCtr++;
+            //            var segmentOrder = new SportsSegmentSortOrder
+            //            {
+            //                SportId = segment.SportId,
+            //                SportName = segment.SportName,
+            //                SegmentId = segment.SegmentId,
+            //                SegmentName = segment.SegmentName,
+            //                SortOrder = segmentOrderCtr,
+            //                IsActive = segment.IsActive,
+            //            };
 
-                        int leagueOrderCtr = 0;
-                        var leagueOrders = new List<SportSegmentLeagueSortOrder>();
-                        var leagues = segment.LeagueSortOrder.ToList();
-                        if (leagues.Any())
-                        {
-                            foreach (var league in leagues)
-                            {
-                                leagueOrderCtr++;
-                                leagueOrders.Add(new SportSegmentLeagueSortOrder
-                                {
-                                    SportId = league.SportId,
-                                    SportName = league.SportName,
-                                    SegmentId = league.SegmentId,
-                                    SegmentName = league.SegmentName,
-                                    LeagueId = league.LeagueId,
-                                    LeagueName = league.LeagueName,
-                                    SortOrder = leagueOrderCtr,
-                                    IsActive = league.IsActive,
-                                });
-                            }
-                        }
-                        segmentOrder.LeagueSortOrder = leagueOrders;
+            //            int leagueOrderCtr = 0;
+            //            var leagueOrders = new List<SportSegmentLeagueSortOrder>();
+            //            var leagues = segment.LeagueSortOrder.ToList();
+            //            if (leagues.Any())
+            //            {
+            //                foreach (var league in leagues)
+            //                {
+            //                    leagueOrderCtr++;
+            //                    leagueOrders.Add(new SportSegmentLeagueSortOrder
+            //                    {
+            //                        SportId = league.SportId,
+            //                        SportName = league.SportName,
+            //                        SegmentId = league.SegmentId,
+            //                        SegmentName = league.SegmentName,
+            //                        LeagueId = league.LeagueId,
+            //                        LeagueName = league.LeagueName,
+            //                        SortOrder = leagueOrderCtr,
+            //                        IsActive = league.IsActive,
+            //                    });
+            //                }
+            //            }
+            //            segmentOrder.LeagueSortOrder = leagueOrders;
 
-                        segmentOrders.Add(segmentOrder);
-                    }
-                    sportOrder.SegmentsSortOrder = segmentOrders;
-                }
+            //            segmentOrders.Add(segmentOrder);
+            //        }
+            //        sportOrder.SegmentsSortOrder = segmentOrders;
+            //    }
 
-                newSportOrder.Add(sportOrder);
-            }
+            //    newSportOrder.Add(sportOrder);
+            //}
 
             var request = new ClientSportSettingRequest
             {
@@ -324,14 +335,25 @@ namespace Backoffice.Web.Pages.OddsEngine
                 UserId = UserModel.Id,
                 UserName = UserModel.UserName,
                 TimeStamp = DateTime.UtcNow,
-                SportsSortOrder = newSportOrder,
+                SportsSortOrder = ClientSportOrderList,
             };
 
-            var response = (await TradingService.AddOrUpdateClientSportSettings(request)).Result;
-
-            var AlertMessages = response?.StatusCode == StatusCode.Success ? $"Sport Settings of {ClientSportOrderFilter.ClientCode} has been successfully updated." : $"Update Sport Settings for {ClientSportOrderFilter.ClientCode} Failed!";
-           
+            var response = await TradingService.AddOrUpdateClientSportSettings(request);
             IsPreLoader = false;
+            await InvokeAsync(StateHasChanged);
+
+            var AlertMessages = response?.Result.StatusCode == StatusCode.Success ? $"Sport Settings of {ClientSportOrderFilter.ClientCode} has been successfully updated." : $"Update Sport Settings for {ClientSportOrderFilter.ClientCode} Failed!";
+
+        }
+        protected async Task OnViewLogsEvent()
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("ClientCode", ClientSportOrderFilter.ClientCode);
+            parameters.Add("DialogStyle", "max-width: 1300px !important;");
+            parameters.Add("ModalClass", "show logs-modal");
+
+            var options = new ModalOptions();
+            ModalService.Open<ViewLogsModalBody>("View Logs", parameters, options);
         }
         public void Drop(SportsSortOrder item)
         {
