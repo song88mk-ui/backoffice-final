@@ -842,5 +842,23 @@ namespace Backoffice.API.Controllers.Trading
                     return BadRequest(result);
             }
         }
+
+        [HttpGet("markettemplategroups/{fixtureTypeId}")]
+        public async Task<IActionResult> GetMarketTemplateGroups(int fixtureTypeId)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetMarketTemplateGroups(fixtureTypeId, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
     }
 }

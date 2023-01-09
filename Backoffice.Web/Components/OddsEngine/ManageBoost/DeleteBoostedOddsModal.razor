@@ -1,10 +1,11 @@
-﻿<div class="modal-body">
+﻿<Preloader @InlineCss="@InlineCss"/>
+<div class="modal-body">
     <div class="d-flex flex-column justify-content-center p-5">
         <div class="text-center">
             <img src="icons/svg/warning-icon.svg" />
         </div>
         <div class="text-center">
-            You are about to delete "<span class="fw-bold">Boosted Odds for TSO > Tennis > ATP > Wimbledon Men Singles > Wimbledon Men Singles 2023 > ATP - Wimbledon - Winner - Alcaraz, Carlos</span>".
+            You are about to delete "<span class="fw-bold">Boosted Odds for @(DisplayMessage())</span>".
             <br />
             Please be certain as this cannot be undone
         </div>

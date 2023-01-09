@@ -1655,6 +1655,38 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        public async Task<BaseResponse<MarketTemplateGroupResponse>> GetMarketTemplateGroups(int fixtureTypeId, string region)
+        {
+            try
+            {
+
+                var response = await GetHttpClient(region).GetAsync($"markettemplategroups/{fixtureTypeId}");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<MarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<MarketTemplateGroupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<MarketTemplateGroupResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<MarketTemplateGroupResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
 
 
         #region Utilities

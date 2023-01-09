@@ -97,5 +97,6 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<BookmakerConfigurationResponse>> GetBookmakers(string region);
         Task<BaseResponse<Tuple<List<NotificationResponse>, MetaData>>> GetNotifications(NotificationsRequest request, string region);
         Task<BaseResponse<List<MarketTemplatePlayerPropsResponse>>> GetMarketTemplatePlayerProps(MarketTemplatePlayerPropsRequest request, string region);
+        Task<BaseResponse<MarketTemplateGroupResponse>> GetMarketTemplateGroups(int fixtureTypeId, string region);
     }
 }

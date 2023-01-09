@@ -8,7 +8,10 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter />
+    <Filter OnAddMarketGroupCallback="OnMarketGroupAdd" 
+        OnCopyMarketGroupCallback="OnCopyMarketGroup" 
+        OnViewLogsCallback="OnViewLogs"
+        />
 </div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">
@@ -34,7 +37,7 @@
                     <td>All Markets</td>
                     <td>
                         <div class="d-flex justify-content-center">
-                            <a class="link-view me-2" href="javascript:(0)">
+                            <a class="link-view me-2" href="javascript:(0)" @onclick="OnViewMarketGroup">
                                 <i class="fa fa-eye"></i>
                                 11
                             </a>
@@ -42,11 +45,11 @@
                     </td>
                     <td>
                         <div class="d-flex justify-content-center">
-                            <a class="link-edit me-2" href="javascript:(0)">
+                            <a class="link-edit me-2" href="javascript:(0)" @onclick="OnEditMarketGroup">
                                 <i class="fa fa-edit"></i>
                             </a>
                             <a class="link-delete me-2" href="javascript:(0)">
-                                <i class="fa fa-trash"></i>
+                                <i class="fa fa-trash" @onclick="OnDeleteMarketGroup"></i>
                             </a>
                         </div>
                     </td>
@@ -108,7 +111,7 @@
                     </td>
                     <td>
                         <div class="d-flex justify-content-center">
-                            <a class="link-edit me-2" href="javascript:(0)">
+                            <a class="link-edit me-2" href="javascript:(0)" @onclick="OnEditMarketGroup">
                                 <i class="fa fa-edit"></i>
                             </a>
                             <a class="link-delete me-2" href="javascript:(0)">
@@ -161,3 +164,4 @@
         </table>
     </div>
 </div>
+<CustomModal/>
