@@ -19,6 +19,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         public LanguagesModel Languages { get; set; }
         public PriceBoostConfigModel PriceBoostConfigModel { get; set; }        
         public bool IsPreloader { get; set; }
+        public const string InlineCss = "";
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
