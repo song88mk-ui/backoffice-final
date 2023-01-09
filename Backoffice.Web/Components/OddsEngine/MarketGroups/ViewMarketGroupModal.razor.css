@@ -1,0 +1,22 @@
+﻿.modal-btn {
+    color: white;
+    border-radius: 2px;
+    opacity: 1;
+}
+
+    .modal-btn.modal-cancel {
+        background: #9AA0AB;
+    }
+
+.form-control:disabled {
+    background-color: white;
+}
+
+thead {
+    background: #354156 0% 0% no-repeat padding-box;
+    color: white;
+}
+
+tr th:first-of-type {
+    text-align: center;
+}
