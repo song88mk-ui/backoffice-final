@@ -173,6 +173,7 @@ namespace Backoffice.Web.Pages
         {
             var subUserClaims = new List<SubUserClaim>();
 
+            bool hasDashboard = false;
             foreach (var permission in Permissions.Permissions)
             {
                 if (permission.IsSubUser)
@@ -186,39 +187,63 @@ namespace Backoffice.Web.Pages
                         IsEnabled = true
                     };
 
-                    var claim = UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType);
-                    if (claim != null && Convert.ToInt32(claim.Value) > 0)
+                    if (permission.Name.ToLower() == "dashboard")
                     {
-                        subUserClaim.ClaimValue = claim.Value;
-                    }
-
-                    if (string.IsNullOrEmpty(subUserClaim.ClaimValue) || subUserClaim.ClaimValue == "0")
+                        hasDashboard = true;
+                        subUserClaim.ClaimValue = "1";
                         subUserClaim.IsEnabled = false;
-
-                    if (claims != null)
+                    }
+                    else
                     {
-                        var userClaim = claims.FirstOrDefault(c => c.ClaimType == subUserClaim.ClaimType);
-                        if (userClaim != null)
-                            subUserClaim.ClaimValue = userClaim.ClaimValue;
-                        else
-                            subUserClaim.ClaimValue = "0";
+
+                        var claim = UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType);
+                        if (claim != null && Convert.ToInt32(claim.Value) > 0)
+                        {
+                            subUserClaim.ClaimValue = claim.Value;
+                        }
+
+                        if (string.IsNullOrEmpty(subUserClaim.ClaimValue) || subUserClaim.ClaimValue == "0")
+                            subUserClaim.IsEnabled = false;
+
+                        if (claims != null)
+                        {
+                            var userClaim = claims.FirstOrDefault(c => c.ClaimType == subUserClaim.ClaimType);
+                            if (userClaim != null)
+                                subUserClaim.ClaimValue = userClaim.ClaimValue;
+                            else
+                                subUserClaim.ClaimValue = "0";
+                        }
+
                     }
 
                     subUserClaims.Add(subUserClaim);
 
                 }
             }
+
+            if(!hasDashboard)
+            {
+                subUserClaims.Insert(0, new SubUserClaim
+                {
+                    Name = "Dashboard",
+                    ClaimType = "SportsbookClient.Dashboard.Access",
+                    HasReadOnly = false,
+                    ClaimValue = "1",
+                    IsEnabled = false
+                });
+            }
+
             return subUserClaims;
         }
 
         private string GetClaimsList(List<ClaimModel> claims)
         {
-            if(claims != null && claims.Any())
+            if (claims != null && claims.Any())
             {
                 var claimsList = string.Empty;
-                foreach(var claim in claims)
+                foreach (var claim in claims)
                 {
-                    if(claim.ClaimValue != "0")
+                    if (claim.ClaimValue != "0")
                     {
                         var permission = Permissions.Permissions.FirstOrDefault(p => p.ClaimType == claim.ClaimType);
                         if (permission != null)
