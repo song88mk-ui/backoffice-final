@@ -665,8 +665,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var respond = await _httpClient.GetStreamAsync($"api/trading/client/markettemplate/{clientCode}/{sportId}/{fixtureStatusId}");
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<ClientMarketTemplateResponse>>
-                (await _httpClient.GetStreamAsync($"api/trading/client/markettemplate/{clientCode}/{sportId}/{fixtureStatusId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (respond, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result;
             }
