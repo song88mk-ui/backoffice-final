@@ -1,0 +1,84 @@
+﻿@using Backoffice.Web.Components.OddsEngine.MarketSortOrder
+
+@layout OEMonitoringLayout
+
+@page "/odds-engine/market-sort-order"
+
+<div class="col-md-12">    
+    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+</div>
+<div class="col-md-12">
+    <Filter />
+</div>
+<div class="col-md-12">
+    <div class="mx-3 mt-4">
+        <table class="table table-hover table-bordered">
+            <thead class="table-head">
+                <tr>
+                    <th>Market</th>
+                    <th>Market Group</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Market 1</td>
+                    <td>
+                        <div class="d-flex justify-content-center">                            
+                            <select class="form-select d-block">
+                                <option value="1" selected>Market Group 1</option>
+                                <option value="2">Market Group 2</option>
+                                <option value="3">Market Group 3</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <a class="link-bars me-2" href="javascript:(0)">
+                                <i class="fa fa-bars"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Market 2</td>
+                    <td>
+                        <div class="d-flex justify-content-center">                            
+                            <select class="form-select d-block">
+                                <option value="1" selected>Market Group 1</option>
+                                <option value="2">Market Group 2</option>
+                                <option value="3">Market Group 3</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <a class="link-bars me-2" href="javascript:(0)">
+                                <i class="fa fa-bars"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Market 3</td>
+                    <td>
+                        <div class="d-flex justify-content-center">                            
+                            <select class="form-select d-block">
+                                <option value="1" selected>Market Group 1</option>
+                                <option value="2">Market Group 2</option>
+                                <option value="3">Market Group 3</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <a class="link-bars me-2" href="javascript:(0)">
+                                <i class="fa fa-bars"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

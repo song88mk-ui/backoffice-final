@@ -1,0 +1,103 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        <div class="content-filter mx-3 d-flex justify-content-between">
+            <div class="button-container d-flex">
+                <a href="javascript:void(0)" class="btn btn-market-settlement px-3" @onclick="OnAddMarketSettlementClickEvent">
+                    <i class="fa fa-plus me-1"></i>
+                    Add Market Settlement
+                </a>
+            </div>
+            <div class="button-container d-flex flex-row-reverse align-items-end">
+                <a href="javascript:void(0)" class="btn btn-export px-3 ms-2">
+                    <i class="fa fa-file-excel-o me-1"></i>
+                    Export to Excel
+                </a>
+                <a href="javascript:void(0)" class="btn btn-filter px-3" @onclick="OnFilterClickEvent">
+                    <i class="fa fa-filter me-1"></i>
+                    Filters
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (ShowFilter)
+{
+    <div class="row">
+        <div class="col-md-12 mx-3 mt-4">
+            <div class="d-flex">
+                <div class="me-4 select-container">
+                    <select class="form-select d-block">
+                        <option value="0" selected>All Sports</option>
+                        <option value="1">Sport 1</option>
+                        <option value="2">Sport 2</option>
+                        <option value="3">Sport 3</option>
+                    </select>
+                </div>
+                <div class="me-4 select-container">
+                    <select class="form-select d-block">
+                        <option value="0" selected>All Segments</option>
+                        <option value="1">Segment 1</option>
+                        <option value="2">Segment 2</option>
+                        <option value="3">Segment 3</option>
+                    </select>
+                </div>
+                <div class="me-4 select-container">
+                    <select class="form-select d-block">
+                        <option value="0" selected>All Leagues</option>
+                        <option value="1">League 1</option>
+                        <option value="2">League 2</option>
+                        <option value="3">League 3</option>
+                    </select>
+                </div>
+                <div class="me-4 select-container">
+                    <select class="form-select d-block">
+                        <option value="0" selected>All Fixtures</option>
+                        <option value="1">Fixture 1</option>
+                        <option value="2">Fixture 2</option>
+                        <option value="3">Fixture 3</option>
+                    </select>
+                </div>
+                <div class="me-4 select-container">
+                    <select class="form-select d-block">
+                        <option value="0" selected>All Status</option>
+                        <option value="1">Status 1</option>
+                        <option value="2">Status 2</option>
+                        <option value="3">Status 3</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 mx-3 mt-2">
+            <div class="d-flex">
+                <div class="me-4 select-container">
+                    <select class="form-select d-block">
+                        <option value="0" selected>All Markets</option>
+                        <option value="1">Market 1</option>
+                        <option value="2">Market 2</option>
+                        <option value="3">Market 3</option>
+                    </select>
+                </div>
+                <div class="me-4 select-container">
+                    <select class="form-select d-block">
+                        <option value="0" selected>All Selections</option>
+                        <option value="1">Selection 1</option>
+                        <option value="2">Selection 2</option>
+                        <option value="3">Selection 3</option>
+                    </select>
+                </div>
+                <div class="me-4 input-container">
+                    <input type="text" class="form-control" placeholder="06/16/2022 - 06/16/2022" />
+                </div>
+                <div class="me-4 input-container">
+                    <input type="text" class="form-control" placeholder="Settled By" />
+                </div>
+                <div class="me-4 input-container">
+                    <a href="javascript:void(0)" class="btn btn-search px-3">
+                        Search
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

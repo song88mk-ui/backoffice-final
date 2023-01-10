@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Enums;
+﻿
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Response;
 using System.Text.Json;
 
@@ -592,12 +593,14 @@ namespace Backoffice.Web.Services
                 }
             }
             else if (obj.GetType().Name == typeof(ClientMarketTemplateGroupDTO).Name)
-            {
+        public decimal GetFinalOdds(decimal originalValue)
+        {
                 var another = new object();
                 if (data2 != "-")
                 {
                     another = string.IsNullOrEmpty(data2) ? new ClientMarketTemplateGroupDTO() : JsonSerializer.Deserialize(data2, type);
-                }
+            return Math.Round(originalValue, 2);
+        }
 
                 if (string.IsNullOrEmpty(data2))
                     result = result + GetProperties(obj, another) + "|";
@@ -606,7 +609,8 @@ namespace Backoffice.Web.Services
 
             }
             else
-            {
+        public string GetHomeName(string name, FixtureType fixtureType)
+        {
                 var another = string.IsNullOrEmpty(data2) ? new object() : JsonSerializer.Deserialize(data2, type);
 
                 if (string.IsNullOrEmpty(data2))
@@ -617,6 +621,7 @@ namespace Backoffice.Web.Services
             }
 
             return result.TrimEnd('|').Replace("|", "<br>");
+            return fixtureType == FixtureType.Match ? name.Split(" vs. ").First().Trim() : string.Empty;
         }
 
         private static string GetProperties(object obj, object another)
@@ -649,10 +654,12 @@ namespace Backoffice.Web.Services
                     //}
                 }
                 else if (!objValue.Equals(anotherValue))
-                {
+        public string GetAwayName(string name, FixtureType fixtureType)
+        {
                     result = result + $"{objName}: {objValue}|";
                 }
-            }
+            return fixtureType == FixtureType.Match ? name.Split(" vs. ").Last().Trim() : string.Empty;
+        }
 
             return result.TrimEnd('|').Replace("|", "<br>");
         }

@@ -1,0 +1,118 @@
+﻿@using Backoffice.Web.Components.OddsEngine.MarketSettlement
+@layout OEMonitoringLayout
+@page "/odds-engine/market-settlement"
+
+<div class="col-md-12">
+    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+</div>
+<div class="col-md-12">
+    <Filter />
+</div>
+<div class="col-md-12 mt-3 ms-3">
+    <span class="fs-6">Manual Market Settlement History</span>
+</div>
+<div class="col-md-12">
+    <!--PUT CONTROL STATEMENT HERE FOR NO RECORDS-->
+    @*<NoRecordFound />*@
+    <div class="mx-3 mt-4">
+        <table class="table table-hover table-bordered">
+            <thead class="table-head">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Fixture</th>
+                    <th scope="col">Market Name</th>
+                    <th scope="col">Sport</th>
+                    <th scope="col">Event Details</th>
+                    <th scope="col">Selection</th>
+                    <th scope="col">Date Settled</th>
+                    <th scope="col">Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">
+                        1
+                    </th>
+                    <td>
+                        <span>Fixture 1</span>
+                    </td>
+                    <td>
+                        <span>Market 1</span>
+                    </td>
+                    <td>
+                        <span>Sport 1</span>
+                    </td>
+                    <td>
+                        <span>Event Details 1</span>
+                    </td>
+                    <td>
+                        <span>Selection 1</span>
+                    </td>
+                    <td>
+                        <span class="date d-block">02/08/2022</span>
+                        <span class="time d-block">07:16:50 AM</span>
+                    </td>
+                    <td>
+                        Lorem ipsum is simply dummy text of the printing and type industry
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        2
+                    </th>
+                    <td>
+                        <span>Fixture 2</span>
+                    </td>
+                    <td>
+                        <span>Market 2</span>
+                    </td>
+                    <td>
+                        <span>Sport 2</span>
+                    </td>
+                    <td>
+                        <span>Event Details 2</span>
+                    </td>
+                    <td>
+                        <span>Selection 2</span>
+                    </td>
+                    <td>
+                        <span class="date d-block">02/08/2022</span>
+                        <span class="time d-block">07:16:50 AM</span>
+                    </td>
+                    <td>
+                        Lorem ipsum is simply dummy text of the printing and type industry
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        3
+                    </th>
+                    <td>
+                        <span>Fixture 3</span>
+                    </td>
+                    <td>
+                        <span>Market 3</span>
+                    </td>
+                    <td>
+                        <span>Sport 3</span>
+                    </td>
+                    <td>
+                        <span>Event Details 3</span>
+                    </td>
+                    <td>
+                        <span>Selection 3</span>
+                    </td>
+                    <td>
+                        <span class="date d-block">02/08/2022</span>
+                        <span class="time d-block">07:16:50 AM</span>
+                    </td>
+                    <td>
+                        Lorem ipsum is simply dummy text of the printing and type industry
+                    </td>
+                </tr>
+            </tbody>
+            <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
+        </table>
+    </div>
+</div>
+<CustomModal/>
