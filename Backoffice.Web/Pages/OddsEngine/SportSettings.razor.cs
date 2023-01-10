@@ -25,7 +25,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public ClientSportOrderFilterModel ClientSportOrderFilter { get; set; }
         private List<SportsSortOrder> ClientSportOrderList { get; set; }
-        private SportsSortOrder[] Cache { get; set; }
         private bool IsSelectAll { get; set; } = false;
         private int currentIndex { get; set; }
         private int currentSportId { get; set; }
@@ -70,7 +69,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             IsPreLoader = true;
             ClientSportOrderList = null;
-            Cache = null;
             await InvokeAsync(StateHasChanged);
 
             var clientSports = new List<SportsSortOrder>();
@@ -253,7 +251,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             var parameters = new ModalParameters();
             parameters.Add("ClientSportOrderFilter", ClientSportOrderFilter);
-            parameters.Add("ClientSportOrderList", ClientSportOrderList);
             parameters.Add("DialogStyle", "max-width: 600px;");
 
             var options = new ModalOptions();

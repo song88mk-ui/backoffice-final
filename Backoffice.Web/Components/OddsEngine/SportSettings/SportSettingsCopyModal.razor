@@ -7,16 +7,16 @@
         <div class="col-12">
             <form>
                 <div class="form-group row">
-                    <label class="col-sm-1 col-form-label">To</label>
+                    <label class="col-sm-1 col-form-label">From</label>
                     <div class="col-sm-11">
                         <select class="js-example-basic-single col-sm-12 form-control" placeholder="Select Client" @onchange="OnClientChangedEvent">
-                            @if (ClientSportOrderFilter != null)
+                            @if (!string.IsNullOrWhiteSpace(CopyToClientCode))
                             {
                                 <option value="" selected>Select Client</option>
 
                                 foreach (var client in ClientSportOrderFilter.Clients)
                                 {
-                                    if (client.Value == CopyClientCode)
+                                    if (client.Value == CopyToClientCode)
                                         continue;
 
                                     if (client.Value == CopyToClientCode)

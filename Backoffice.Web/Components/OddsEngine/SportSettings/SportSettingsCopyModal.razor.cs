@@ -11,8 +11,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         public ClientSportOrderFilterModel ClientSportOrderFilter { get; set; }
         public bool IsPreLoader { get; set; }
-        public string CopyClientName { get; set; }
-        public string CopyClientCode { get; set; }
+        public string CopyFromClientName { get; set; }
+        public string CopyFromClientCode { get; set; }
         public string CopyToClientCode { get; set; }
         public string CopyToClientName { get; set; }
 
@@ -23,10 +23,10 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             ClientSportOrderFilter = ModalParameters?.TryGet<ClientSportOrderFilterModel>("ClientSportOrderFilter");
             if (ClientSportOrderFilter != null)
             {
-                CopyClientCode = ClientSportOrderFilter.ClientCode;
-                CopyClientName = ClientSportOrderFilter.ClientName;
-                CopyToClientCode = string.Empty;
-                CopyToClientName = string.Empty;
+                CopyToClientCode = ClientSportOrderFilter.ClientCode;
+                CopyToClientName = ClientSportOrderFilter.ClientName;
+                CopyFromClientCode = string.Empty;
+                CopyFromClientName = string.Empty;
             }
         }
         public async Task OnCancelClickEvent()
@@ -36,13 +36,13 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
-            CopyToClientCode = e.Value.ToString();
-            CopyToClientName = string.Empty;
-            if (!string.IsNullOrEmpty(CopyToClientCode))
+            CopyFromClientCode = e.Value.ToString();
+            CopyFromClientName = string.Empty;
+            if (!string.IsNullOrEmpty(CopyFromClientCode))
             {
-                var client = ClientSportOrderFilter?.Clients?.FirstOrDefault(c => c.Value == CopyToClientCode);
+                var client = ClientSportOrderFilter?.Clients?.FirstOrDefault(c => c.Value == CopyFromClientCode);
                 if (client != null)
-                    CopyToClientName = client.Name;
+                    CopyFromClientName = client.Name;
             }
         }
         protected async Task OnCopyConfirmation()
@@ -51,11 +51,10 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 return;
 
             var parameters = new ModalParameters();
-            parameters.Add("CopyClientCode", CopyClientCode);
-            parameters.Add("CopyClientName", CopyClientName);
+            parameters.Add("CopyClientCode", CopyFromClientCode);
+            parameters.Add("CopyClientName", CopyFromClientName);
             parameters.Add("CopyToClientCode", CopyToClientCode);
             parameters.Add("CopyToClientName", CopyToClientName);
-            parameters.Add("ClientSportOrderList", ModalParameters.TryGet<List<SportsSortOrder>>("ClientSportOrderList"));
 
             parameters.Add("DialogStyle", "max-width: 600px;");
 
