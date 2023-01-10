@@ -1,14 +1,33 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
+using Backoffice.Web.Models;
+using Backoffice.Web.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
 
 namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 {
     public partial class Filter : IDisposable
     {
         #region Properties
+        [Inject] public IModalService ModalService { get; set; }
+        [Inject] public ITradingService TradingService { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public EventCallback OnAddMarketGroupCallback { get; set; }
         [Parameter] public EventCallback OnCopyMarketGroupCallback { get; set; }
         [Parameter] public EventCallback OnViewLogsCallback { get; set; }
+        [Parameter] public MarketGroupModel MarketGroupModel { get; set; }
+        [Parameter] public EventCallback<MarketGroupModel> MarketGroupModelChanged { get; set; }
+        [Parameter] public EventCallback OnInitCallback { get; set; }
+
         public bool IsUpdate { get; set; }
+        public List<SelectListItemModel<string>> Clients { get; set; }
+        public string SelectedClientCode { get; set; }
+        public List<SelectListItemModel<int>> Sports { get; set; }
+        public int SelectedSportId { get; set; }
+        public List<SelectListItemModel<int>> FixtureStatuses { get; set; }
+        public int SelectedFixtureStatusId { get; set; }
 
         #endregion
 
@@ -16,7 +35,84 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         protected override async Task OnInitializedAsync()
         {
-            IsUpdate = false;
+            try
+            {
+                IsUpdate = false;
+                Clients = new List<SelectListItemModel<string>>();
+                Sports = new List<SelectListItemModel<int>>();
+                FixtureStatuses = new List<SelectListItemModel<int>>();
+                MarketGroupModel = new MarketGroupModel();
+
+                if (UserModel.ClientCodes != null)
+                {
+                    var clients = (await TradingService.GetClientList()).Result;
+
+                    var roleName = UserModel.RoleName;
+                    if (roleName != "Super Admin")
+                    {
+                        var clientCodes = UserModel.ClientCodes;
+                        clients = clients.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
+                    }
+                    Clients = clients.Select(s => new SelectListItemModel<string>
+                    {
+                        Value = s.ClientCode,
+                        Name = s.ClientName
+                    }).ToList();
+                }
+                else
+                {
+                    Clients.Add(new SelectListItemModel<string>
+                    {
+                        Value = "",
+                        Name = "No Clients Available"
+                    });
+                }
+
+                var client =
+                SelectedClientCode = Clients.FirstOrDefault().Value;
+
+                var sports = (await TradingService.GetSportLookup()).Result;
+
+                if (sports != null)
+                {
+                    Sports = sports.SportLookup.Select(s => new SelectListItemModel<int>
+                    {
+                        Value = s.SportId,
+                        Name = s.SportName
+                    }).ToList();
+                }
+                else
+                {
+                    Sports.Add(new SelectListItemModel<int>
+                    {
+                        Value = 0,
+                        Name = "No Sports Available"
+                    });
+                }
+
+                SelectedSportId = Sports.FirstOrDefault().Value;
+
+                FixtureStatuses.Add(new SelectListItemModel<int>
+                {
+                    Value = (int)FixtureStatus.Prematch,
+                    Name = FixtureStatus.Prematch.ToString()
+                });
+
+                FixtureStatuses.Add(new SelectListItemModel<int>
+                {
+                    Value = (int)FixtureStatus.Live,
+                    Name = FixtureStatus.Live.ToString()
+                });
+
+                SelectedFixtureStatusId = FixtureStatuses.FirstOrDefault().Value;
+
+                await PrepareMarketGroupModel();
+            }
+            catch (Exception)
+            {
+            }
+
+
         }
 
         public async Task OnUpdateClickEvent()
@@ -43,11 +139,50 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             await OnViewLogsCallback.InvokeAsync();
         }
+        public async void OnClientChangedEvent(ChangeEventArgs e)
+        {
+            SelectedClientCode = e.Value.ToString();
 
+            await PrepareMarketGroupModel();
+        }
+        public async void OnSportChangedEvent(ChangeEventArgs e)
+        {
+            SelectedSportId = int.Parse(e.Value.ToString());
+
+            await PrepareMarketGroupModel();
+        }
+
+        public async void OnFixtureStatusChangedEvent(ChangeEventArgs e)
+        {
+            SelectedFixtureStatusId = int.Parse(e.Value.ToString());
+
+            await PrepareMarketGroupModel();
+        }
         public void Dispose()
         {
         }
 
+        #endregion
+
+        #region Utilities
+        private async Task PrepareMarketGroupModel()
+        {
+            if (!string.IsNullOrEmpty(SelectedClientCode) && SelectedSportId != 0)
+            {
+                var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId)).Result;
+
+                if(marketTemplateResponse != null)
+                {
+                    MarketGroupModel.ClientCode = SelectedClientCode;
+                    MarketGroupModel.SportId = marketTemplateResponse.SportId;
+                    MarketGroupModel.ClientId = marketTemplateResponse.ClientId;
+                    MarketGroupModel.FixtureStatusId = marketTemplateResponse.FixtureStatusId;
+                }
+
+                await MarketGroupModelChanged.InvokeAsync(MarketGroupModel);
+            }
+            await OnInitCallback.InvokeAsync();
+        }
         #endregion
     }
 }

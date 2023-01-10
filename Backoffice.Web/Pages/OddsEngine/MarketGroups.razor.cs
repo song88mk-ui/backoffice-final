@@ -1,4 +1,6 @@
-﻿using Backoffice.Web.Components.OddsEngine.ManageBoost;
+﻿using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.Common;
+using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Components.OddsEngine.MarketGroups;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -10,19 +12,16 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
         [Inject] IModalService ModalService { get; set; }
+        [Inject] public ITradingService TradingService { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
+        public bool IsPreLoader { get; set; }
+        public bool IsSelectAll { get; set; }
 
+        public MarketGroupModel MarketGroupModel { get; set; }
         #endregion
 
         #region Methods
-
-        protected override async Task OnInitializedAsync()
-        {
-            PageTitle = "Market Groups";
-            IconClass = string.Empty;
-        }
-
         public async Task OnMarketGroupAdd()
         {
             var parameters = new ModalParameters();
@@ -94,6 +93,47 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
         }
 
+        #endregion
+
+        #region Utilities
+        public async Task OnInit()
+        {
+            PageTitle = "Market Groups";
+            IconClass = string.Empty;
+            IsPreLoader = true;
+            await InvokeAsync(StateHasChanged);
+
+            if (!string.IsNullOrEmpty(MarketGroupModel.ClientCode) && MarketGroupModel.SportId != 0)
+            {
+                var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(MarketGroupModel.ClientCode, MarketGroupModel.SportId, MarketGroupModel.FixtureStatusId)).Result;
+
+                MarketGroupModel.MarketTemplateGroups = marketTemplateGroupResponse.ClientMarketTemplateGroups
+                    .Select(s => new ClientMarketTemplateGroupDTO
+                    {
+                        MarketTemplateGroupId = s.MarketTemplateGroupId,
+                        Name = s.Name,
+                        MarketTemplateIds = s.MarketTemplateIds,
+                        SortOrder = s.SortOrder,
+                        IsActive = s.IsActive,
+                        FixtureStatusId = MarketGroupModel.FixtureStatusId
+                    }).ToList();
+
+                MarketGroupModel.OldMarketTemplateGroups = marketTemplateGroupResponse.ClientMarketTemplateGroups
+                    .Select(s => new ClientMarketTemplateGroupDTO
+                    {
+                        MarketTemplateGroupId = s.MarketTemplateGroupId,
+                        Name = s.Name,
+                        MarketTemplateIds = s.MarketTemplateIds,
+                        SortOrder = s.SortOrder,
+                        IsActive = s.IsActive,
+                        FixtureStatusId = MarketGroupModel.FixtureStatusId
+                    }).ToList();
+            }
+
+            IsSelectAll = MarketGroupModel != null && !MarketGroupModel.MarketTemplateGroups.Any(s => s.IsActive == false);
+
+            IsPreLoader = false;
+        }
         #endregion
     }
 }

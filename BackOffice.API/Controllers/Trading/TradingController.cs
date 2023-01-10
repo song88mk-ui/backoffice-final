@@ -554,8 +554,24 @@ namespace Backoffice.API.Controllers.Trading
             if (HttpContext.Request.Headers.ContainsKey("x-region"))
                 region = HttpContext.Request.Headers["x-region"].ToString();
 
-
             var result = await _tradingRepository.GetClientLeagueOrderList(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpGet("client/marketgroup/{clientCode}/{sportId}/{fixtureStatusId}")]
+        public async Task<IActionResult> GetClientMarketTemplateGroups(string clientCode, int sportId, int fixtureStatusId)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetClientMarketTemplateGroups(clientCode, sportId, fixtureStatusId, region);
 
             switch (result.StatusCode)
             {

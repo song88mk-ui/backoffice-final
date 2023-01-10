@@ -8,10 +8,11 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter OnAddMarketGroupCallback="OnMarketGroupAdd" 
+    <Filter @bind-MarketGroupModel="MarketGroupModel"
+        OnAddMarketGroupCallback="OnMarketGroupAdd" 
         OnCopyMarketGroupCallback="OnCopyMarketGroup" 
         OnViewLogsCallback="OnViewLogs"
-        />
+            OnInitCallback="OnInit" />
 </div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">
