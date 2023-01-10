@@ -1,0 +1,54 @@
+﻿<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12">
+            <MarketSettlementModalFilter />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Event Details</th>
+                        <th scope="col">Selection</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">
+                            <span class="d-block fw-bold">CPBL</span>
+                            <span class="d-block">CTBC BROTHERS VS. SISTERS</span>
+                            <span class="d-block">19/04/22 10:35</span>
+                            <span class="d-block">1X2</span>
+                        </th>
+                        <td>
+                            <span class="d-block">CTBC Brothers</span>
+                        </td>
+                        <td>
+                            <select class="form-select">
+                                <optgroup label="Status">
+                                    <option value="0">Select Status</option>
+                                    <option value="1">Won</option>
+                                    <option value="2">Lose</option>
+                                    <option value="3">Half-Won</option>
+                                    <option value="4">Half-Lose</option>
+                                    <option value="5">Void</option>
+                                </optgroup>
+                            </select>
+                        </td>
+                        <td>
+                            <textarea class="form-control"></textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn btn-cancel">Cancel</button>
+    <button type="button" class="btn modal-btn btn-settle">Settle Market</button>
+</div>
