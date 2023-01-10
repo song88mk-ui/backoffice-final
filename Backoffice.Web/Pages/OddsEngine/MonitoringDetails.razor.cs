@@ -5,6 +5,9 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
+using Backoffice.Web.Components.OddsEngine.MonitoringDetails;
+using static Backoffice.Shared.Models.Response.MarketTemplateGroupResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -21,6 +24,18 @@ namespace Backoffice.Web.Pages.OddsEngine
         public MonitoringDetailsCallbackModel CallbackModel { get; set; }
         public ClientModel ClientModel { get; set; }
         public List<FixtureMarketModel> FilteredMarkets { get; set; }
+        public List<MarketNavigationModel> MarketTemplates { get; set; }
+        public List<MarketTemplatePlayerPropsResponse> PlayerPropsMarketTemplates { get; set; }
+
+        #endregion
+
+        #region Fields
+        public List<MarketTemplateGroupResponse.MarketTemplateGroup> fullMarketTemplateGroup;
+        public MarketGroupFilter _marketGroupFilter = default!;
+        public MarketFilter _marketFilter = default!;
+        public MarketFixtureResponse.FixtureModel fixture;
+        public MarketModel marginMarket;
+        public bool isPlayerProps;
 
         #endregion
 
@@ -28,6 +43,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            //MarketTemplateGroups = new List<MarketGroupNavigationModel>();
+            MarketTemplates = new List<MarketNavigationModel>();
+            PlayerPropsMarketTemplates = new List<MarketTemplatePlayerPropsResponse>();
+
             CallbackModel = new MonitoringDetailsCallbackModel();
             ClientModel = new ClientModel();
 
@@ -50,11 +69,25 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnInitEvent()
         {
-            var fixture = CallbackModel.Fixture.Fixture;
+            fixture = CallbackModel.Fixture.Fixture;
             if (fixture != null)
             {
                 FilteredMarkets = GetFixtureMarkets(fixture.Markets.Where(c => c.MarketTemplateId == CallbackModel.SelectedMarketTemplateId).ToList());
+
+                PlayerPropsMarketTemplates = (await BackOfficeService.GetMarketTemplatePlayerProps(new MarketTemplatePlayerPropsRequest
+                {
+                    SportId = fixture.SportId
+                })).Result;
+
+                #region Market Template Group Nagivation
+                //MarketTemplateGroups = new List<MarketGroupNavigationModel>();
+                await _marketGroupFilter.OnInitMarketTemplateGroup(fixture);
+
+                #endregion
+
+
             }
+
         }
 
         public async Task MonitoringDetailsCallback(MonitoringDetailsCallbackModel model)
@@ -66,6 +99,95 @@ namespace Backoffice.Web.Pages.OddsEngine
             PageTitle = $"{model.Fixture.Fixture.SportName} - {model.Fixture.Fixture.SegmentName} - {model.Fixture.Fixture.LeagueName}";
             IconClass = $"iconfont iconfont-{model.Fixture.Fixture.SportName.ToLower().Replace(" ", "-")}";
 
+        }
+
+        public async Task OnInitMarketTemplate(MarketFilterCallbackModel callback)
+        {
+            if (fixture != null)
+            {
+                #region Market Template Navigation
+
+                MarketTemplates = new List<MarketNavigationModel>();
+
+                foreach (var MarketTemplateGroup in callback.MarketTemplateGroups)
+                {
+                    var groupId = MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId;
+
+                    foreach (var market in fixture.Markets)
+                    {
+                        if (MarketTemplateGroup.MarketTemplateGroup.MarketTemplateIds.Contains(market.MarketTemplateId))
+                        {
+                            var marketTemplate = MarketTemplates.FirstOrDefault(c => c.MarketTemplateId == market.MarketTemplateId && c.MarketTemplateGroupId == groupId && c.MarketName == market.MarketName);
+
+                            // check if market templates is already existing in the list
+                            if (marketTemplate == null)
+                            {
+                                // add market template if not existing
+                                MarketTemplates.Add(new MarketNavigationModel()
+                                {
+                                    Id = $"{market.MarketTemplateId}-{groupId}-{market.MarketName.ToLower().Replace(' ', '-')}",
+                                    IsSelected = !MarketTemplates.Any(m => m.MarketTemplateGroupId == groupId && m.IsSelected),
+                                    MarketTemplateGroupId = groupId,
+                                    MarketTemplateId = market.MarketTemplateId,
+                                    MarketName = market.MarketName,
+                                    Fixture = new MarketFixtureResponse.FixtureModel()
+                                    {
+                                        SportId = fixture.SportId,
+                                        SportName = fixture.SportName,
+                                        SegmentId = fixture.SegmentId,
+                                        SegmentName = fixture.SegmentName,
+                                        LeagueId = fixture.LeagueId,
+                                        LeagueName = fixture.LeagueName,
+                                        ProviderFixtureId = fixture.ProviderFixtureId,
+                                        FixtureName = fixture.FixtureName,
+                                        HomeName = fixture.HomeName,
+                                        AwayName = fixture.AwayName,
+                                        FixtureStartDate = fixture.FixtureStartDate,
+                                        IsLive = fixture.IsLive,
+                                        IsLiveStream = fixture.IsLiveStream,
+                                        IsSuspended = fixture.IsSuspended,
+                                        FixtureStatusId = fixture.FixtureStatusId,
+                                        FixtureStatusName = fixture.FixtureStatusName,
+                                        SMSCode = fixture.SMSCode,
+                                        Score = fixture.Score,
+                                        CurrentPeriod = fixture.CurrentPeriod,
+                                        CurrentMinute = fixture.CurrentMinute,
+                                        BetStop = fixture.BetStop,
+                                        IsBetStopGlobal = fixture.IsBetStopGlobal,
+                                        Markets = new List<MarketModel>() { market }
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                // only add the market in the existing markert template
+                                marketTemplate.Fixture.Markets.Add(market);
+                            }
+                        }
+                    }
+                }
+
+                var marketTemplateGroupId = callback.MarketTemplateGroups?.FirstOrDefault(c => c.IsSelected)?.MarketTemplateGroup.MarketTemplateGroupId ?? 0;
+
+                await _marketFilter.OnInitMarketTemplates(MarketTemplates, marketTemplateGroupId, callback.SearchForm);
+
+
+                #endregion
+            }
+        }
+
+        public async Task OnMarketTemplateClicked(List<MarketNavigationModel> marketTemplates)
+        {
+            MarketTemplates = marketTemplates;
+
+            var marketTemplate = marketTemplates.FirstOrDefault(c => c.IsSelected);
+
+            marginMarket = marketTemplate == null ? new MarketModel() : fixture.Markets.FirstOrDefault(c => c.MarketTemplateId == marketTemplate.MarketTemplateId && c.MarketName == marketTemplate.MarketName) ?? new MarketModel();
+
+            var playerPropMarketTemplates = PlayerPropsMarketTemplates.FirstOrDefault(c => c.FixtureStatusId == 0)?.MarketTemplates ?? string.Empty;
+            var marketTemplateIds = playerPropMarketTemplates.Split(",").ToList();
+
+            isPlayerProps = marketTemplateIds.Contains(marginMarket.MarketTemplateId);
         }
 
         public void Dispose()
@@ -111,6 +233,106 @@ namespace Backoffice.Web.Pages.OddsEngine
             return fixtureMarkets;
         }
 
+        protected string GetClientMargin(string clientCode, string clientCodeMargin, List<SelectionModel> selections, bool isPlayerProps)
+        {
+            var clients = string.IsNullOrEmpty(clientCodeMargin) ? new List<Tuple<string, decimal>>() : clientCodeMargin.Split('|').Select(s => new Tuple<string, decimal>(s.Split(':').First(), Convert.ToDecimal(s.Split(':').Last()))).ToList();
+            var client = clients.FirstOrDefault(c => c.Item1 == clientCode);
+
+            if (client == null)
+            {
+                var activeSelections = new List<SelectionModel>();
+
+                if (isPlayerProps)
+                {
+                    if (selections.Any(c => c.SelectionTemplateId != "12" && c.SelectionTemplateId != "13"))
+                    {
+                        return "100";
+                    }
+                }
+                else
+                {
+                    activeSelections = selections.Where(c => c.IsActive == true && Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
+                }
+
+                var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(GetClientOdds(s, clientCode)))) - 100) / 100;
+
+                return ((int)((margin * 100) + 100)).ToString();
+            }
+
+            var newMargin = ((int)((client.Item2 * 100) + 100)).ToString();
+
+            var newactiveSelections = new List<SelectionModel>();
+
+            if (isPlayerProps && selections.Count() != 2)
+            {
+                var newactiveSelection = selections.FirstOrDefault(c => c.IsActive == true);
+
+                if (newactiveSelection != null)
+                {
+                    newactiveSelections.Add(newactiveSelection);
+
+                    var underOdds = 1 / (1 - (1 / Convert.ToDecimal(newactiveSelection.DecimalOdds)));
+
+                    newactiveSelections.Add(new SelectionModel
+                    {
+                        DecimalOdds = underOdds.ToString(),
+                        ClientOdds = new List<ClientOddsModel>() { GetPlayerPropClientOdds(underOdds, client) },
+                    });
+                }
+            }
+            else
+            {
+                newactiveSelections = selections.Where(c => c.IsActive == true).ToList();
+            }
+
+            var computedMargin = $"{(Math.Round(newactiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId).Odds)) - 100) + 100}";
+
+            if (newMargin != computedMargin)
+                newMargin = $"{newMargin} ({computedMargin})";
+
+            return newMargin;
+        }
+
+        protected string GetClientOdds(SelectionModel selection, string clientCode)
+        {
+            if (selection.ClientOdds != null && selection.ClientOdds.Any(c => c.ClientCode == clientCode))
+            {
+                return selection.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == selection.SelectionTemplateId).Odds.ToString();
+            }
+
+            return selection.DecimalOdds;
+        }
+
+        protected bool HasClientConfig(string clientCode, string marketClientCode, string marketClientMargin)
+        {
+            if (string.IsNullOrEmpty(marketClientCode))
+                marketClientCode = string.Empty;
+
+            if (string.IsNullOrEmpty(marketClientMargin))
+                marketClientMargin = string.Empty;
+
+            if (marketClientCode.Split("|").Contains(clientCode) || marketClientMargin.Contains(clientCode))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private ClientOddsModel GetPlayerPropClientOdds(decimal underOdds, Tuple<string, decimal> client)
+        {
+            var fairOdds = underOdds;
+            var finalOddsInitialDivideBy = ((fairOdds * client.Item2) / 2) + 1;
+
+            var clientUnderOdds = fairOdds / finalOddsInitialDivideBy;
+
+            return new ClientOddsModel
+            {
+                ClientCode = client.Item1,
+                Odds = clientUnderOdds,
+                OldOdds = clientUnderOdds,
+            };
+        }
         #endregion
 
     }

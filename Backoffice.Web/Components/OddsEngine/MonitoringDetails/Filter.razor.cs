@@ -16,8 +16,11 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         [Parameter] public EventCallback<MonitoringDetailsCallbackModel> OnInitCallback { get; set; }
         [Parameter] public string ProviderFixtureId { get; set; }
         public List<MainMarketTemplateResponse> TopMarketTemplates { get; set; }
-        public string MarketTemplateId { get; set; } = string.Empty;
         public MarketFixtureDetailResponse Fixture { get; set; }
+        #endregion
+
+        #region Fields
+        protected string MarketTemplateId = string.Empty;
         #endregion
 
         #region Methods

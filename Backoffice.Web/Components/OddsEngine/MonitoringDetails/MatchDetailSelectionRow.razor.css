@@ -1,0 +1,11 @@
+﻿.btn-market {
+    background-color: #FFFFFF;
+    color: #232323;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+}
+
+.btn-market.active {
+    background-color: #FF1A00;
+    color: #FFFFFF;
+}
