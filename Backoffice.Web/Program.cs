@@ -1,6 +1,8 @@
 using Backoffice.Shared.Enums;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Hubs;
+using Backoffice.Web.Middleware;
 using Backoffice.Web.Services;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
@@ -65,6 +67,8 @@ builder.Services.AddScoped<IModalService, ModalService>();
 builder.Services.AddHttpClient<ITradingService, TradingService>();
 builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
+builder.Services.AddScoped<ICommonService, CommonService>();
 
 builder.Services.AddHttpContextAccessor();
 
@@ -77,6 +81,8 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseMiddleware<RabbitMQMiddleware>();
 
 app.UseHttpsRedirection();
 
