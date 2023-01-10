@@ -64,6 +64,7 @@ builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>(cl
 builder.Services.AddScoped<IModalService, ModalService>();
 builder.Services.AddHttpClient<ITradingService, TradingService>();
 builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>();
+builder.Services.AddScoped<ICommonService, CommonService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 
 builder.Services.AddHttpContextAccessor();

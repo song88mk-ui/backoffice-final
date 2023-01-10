@@ -2,7 +2,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages.OddsEngine;
+using ActivityLogModel = Backoffice.Shared.Models.ActivityLogModel;
 
 namespace Backoffice.Web.Services
 {
@@ -35,10 +35,11 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<List<ClientSportOrderAuditResponse>>> GetClientSportOrderAuditList(ClientSportOrderAuditRequest request);
         Task<BaseResponse<ClientMarketTemplateResponse>> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId);
         Task<BaseResponse<ClientMarketTemplateGroupResponse>> GetClientMarketTemplateGroups(string clientCode, int sportId, int fixtureStatusId);
+        Task<BaseResponse<ClientPostMarketTemplateGroupResponse>> AddOrUpdateClientMarketTemplateGroup(ClientPostMarketTemplateGroupRequest request);
         #endregion
 
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
-        Task<BaseResponse<bool>> AddActivityLog(Backoffice.Shared.Models.ActivityLogModel request);
+        Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);
         Task<BaseResponse<MessageResponse>> Publish(MessageRequest request);
     }
 }

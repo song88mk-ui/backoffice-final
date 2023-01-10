@@ -245,7 +245,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             ((SportsSortOrder)model.Param1).IsActive = model.Checked;
 
             IsSelectAll = !ClientSportOrderList.Any(s => s.IsActive == false);
-
         }
         protected async Task OnCopyClickEvent()
         {

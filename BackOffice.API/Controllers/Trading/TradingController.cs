@@ -599,6 +599,23 @@ namespace Backoffice.API.Controllers.Trading
                     return BadRequest(result);
             }
         }
+        [HttpPost("client/markettemplategroup/post")]
+        public async Task<IActionResult> AddOrUpdateClientMarketTemplateGroup([FromBody] ClientPostMarketTemplateGroupRequest request)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.AddOrUpdateClientMarketTemplateGroup(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         #endregion
 
         #region Activity Log

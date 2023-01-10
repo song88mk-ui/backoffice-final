@@ -179,3 +179,7 @@ iframe {
 .disable-link {
     pointer-events: none;
 }
+
+input .disable {
+    pointer-events: none;
+}

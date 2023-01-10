@@ -1,10 +1,15 @@
-﻿using Backoffice.Shared.Models.Response;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Components.OddsEngine.MarketGroups;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -24,7 +29,14 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
         public async Task OnMarketGroupAdd()
         {
+            var marketTemplateGroup = new ClientMarketTemplateGroupDTO
+            {
+                FixtureStatusId = MarketGroupModel.FixtureStatusId
+            };
+
             var parameters = new ModalParameters();
+            parameters.Add("MarketGroupModel", MarketGroupModel);
+            parameters.Add("MarketTemplateGroup", marketTemplateGroup);
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
@@ -32,7 +44,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
             ModalService.Open<AddOrEditMarketGroupModal>($"Add Market Group", parameters, options);
         }
-
+        public async Task OnUpdateMarketGroup()
+        {
+            MarketGroupModel.IsUpdate = true;
+            await InvokeAsync(StateHasChanged);
+        }
         public async Task OnEditMarketGroup()
         {
             var parameters = new ModalParameters();
@@ -55,6 +71,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
             ModalService.Open<DeleteMarketGroupModal>($"Delete Market Group", parameters, options);
         }
+        public async Task OnCanceUpdateClickedEvent()
+        {
+            MarketGroupModel.IsUpdate = false;
+            await InvokeAsync(StateHasChanged);
+        }
 
         public async Task OnCopyMarketGroup()
         {
@@ -66,10 +87,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
             ModalService.Open<CopyMarketGroupModal>($"Edit Market Group", parameters, options);
         }
-
         public async Task OnViewLogs()
         {
             var parameters = new ModalParameters();
+            parameters.Add("MarketGroupModel", MarketGroupModel);
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
@@ -77,17 +98,43 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
             ModalService.Open<MarketGroupViewLogsModal>($"View Logs Market Group", parameters, options);
         }
-
-        public async Task OnViewMarketGroup()
+        public async Task OnViewMarketGroup(string MarketTemplateGroupName, string marketTemplateIds)
         {
             var parameters = new ModalParameters();
+            parameters.Add("ClientCode", MarketGroupModel.ClientCode);
+            parameters.Add("SportId", MarketGroupModel.SportId);
+            parameters.Add("FixtureStatusId", MarketGroupModel.FixtureStatusId);
+            parameters.Add("MarketTemplateGroupName", MarketTemplateGroupName);
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
 
             var options = new ModalOptions();
             ModalService.Open<ViewMarketGroupModal>($"View Market Group", parameters, options);
-        }        
+        }
+        protected async Task CheckboxSelectAllClicked(CheckBoxModel model)
+        {
+            IsSelectAll = model.Checked;
+            if (MarketGroupModel != null && MarketGroupModel.MarketTemplateGroups.Any())
+            {
+                foreach (var marketTemplateGroup in MarketGroupModel.MarketTemplateGroups)
+                {
+                    marketTemplateGroup.IsActive = model.Checked;
+                }
+            }
+        }
+        protected async Task CheckboxMarketGroupClicked(CheckBoxModel model)
+        {
+            ((ClientMarketTemplateGroupDTO)model.Param1).IsActive = model.Checked;
+
+            IsSelectAll = MarketGroupModel != null && !MarketGroupModel.MarketTemplateGroups.Any(s => s.IsActive == false);
+        }
+        public async Task OnSaveMarketGroupClickEvent(object item)
+        {
+            MarketGroupModel.IsUpdate = false;
+
+            await OnInit();
+        }
 
         public void Dispose()
         {
@@ -101,6 +148,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             PageTitle = "Market Groups";
             IconClass = string.Empty;
             IsPreLoader = true;
+            MarketGroupModel.IsUpdate = false;
+
             await InvokeAsync(StateHasChanged);
 
             if (!string.IsNullOrEmpty(MarketGroupModel.ClientCode) && MarketGroupModel.SportId != 0)

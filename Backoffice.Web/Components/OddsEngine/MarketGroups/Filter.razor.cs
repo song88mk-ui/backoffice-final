@@ -15,13 +15,14 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         [Inject] public ITradingService TradingService { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public EventCallback OnAddMarketGroupCallback { get; set; }
+        [Parameter] public EventCallback OnUpdateyMarketGroupCallback { get; set; }
         [Parameter] public EventCallback OnCopyMarketGroupCallback { get; set; }
         [Parameter] public EventCallback OnViewLogsCallback { get; set; }
         [Parameter] public MarketGroupModel MarketGroupModel { get; set; }
-        [Parameter] public EventCallback<MarketGroupModel> MarketGroupModelChanged { get; set; }
         [Parameter] public EventCallback OnInitCallback { get; set; }
+        [Parameter] public EventCallback OnCancelCallback { get; set; }
+        [Parameter] public EventCallback<MarketGroupModel> MarketGroupModelChanged { get; set; }
 
-        public bool IsUpdate { get; set; }
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
         public List<SelectListItemModel<int>> Sports { get; set; }
@@ -37,11 +38,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             try
             {
-                IsUpdate = false;
                 Clients = new List<SelectListItemModel<string>>();
                 Sports = new List<SelectListItemModel<int>>();
                 FixtureStatuses = new List<SelectListItemModel<int>>();
                 MarketGroupModel = new MarketGroupModel();
+                MarketGroupModel.IsUpdate = false;
 
                 if (UserModel.ClientCodes != null)
                 {
@@ -111,18 +112,20 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             catch (Exception)
             {
             }
-
-
         }
 
         public async Task OnUpdateClickEvent()
         {
-            IsUpdate = true;
+            MarketGroupModel.IsUpdate = true;
+
+            await OnUpdateyMarketGroupCallback.InvokeAsync();
         }
 
         public async Task OnCancelClickEvent()
         {
-            IsUpdate = false;
+            MarketGroupModel.IsUpdate = false;
+
+            await OnCancelCallback.InvokeAsync();
         }
 
         public async Task OnAddMarketGroupClickEvent()
