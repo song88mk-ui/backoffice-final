@@ -1,5 +1,4 @@
-﻿
-using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Enums;
 
 namespace Backoffice.Web.Services
 {

@@ -5,10 +5,7 @@ using Backoffice.Web.Hubs;
 using Backoffice.Web.Middleware;
 using Backoffice.Web.Services;
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Web;
-using System.Drawing;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
@@ -69,7 +66,6 @@ builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>();
 builder.Services.AddScoped<ICommonService, CommonService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
-builder.Services.AddScoped<ICommonService, CommonService>();
 
 builder.Services.AddHttpContextAccessor();
 
