@@ -1,0 +1,29 @@
+﻿<tr>
+    <td>
+        <span class="fw-bold">@Selection.SelectionName</span>
+    </td>
+    <td>
+        <div class="d-flex justify-content-center">
+            <div class="odds-container me-2 py-1 px-3">
+                <span>@GetClientOdds(null)</span>
+            </div>
+        </div>
+    </td>
+    @foreach (var client in ClientModel.Clients)
+    {
+        <td>
+            <div class="d-flex justify-content-center">
+                <div class="odds-container me-2 py-1 px-3">
+                    @if (HasClientConfig(client.ClientCode, Market.ClientCode, Market.ClientCodeMargin))
+                    {
+                        <span>@GetClientOdds(client.ClientCode)</span>
+                    }
+                    else
+                    {
+                        <span>-.-</span>
+                    }
+                </div>
+            </div>
+        </td>
+    }
+</tr>

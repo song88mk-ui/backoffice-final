@@ -25,5 +25,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId);
         Task<BaseResponse<MarketFixtureResponse>> GetMarketFixtures(MarketFixtureRequest request);
         Task<BaseResponse<MarketFixtureDetailResponse>> GetMarketFixtureDetails(string providerFixtureId);
+        Task<BaseResponse<MarketTemplateGroupResponse>> GetMarketTemplateGroups(int fixtureTypeId);
+        Task<BaseResponse<List<MarketTemplatePlayerPropsResponse>>> GetMarketTemplatePlayerProps(MarketTemplatePlayerPropsRequest request);
     }
 }

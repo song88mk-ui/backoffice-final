@@ -41,122 +41,85 @@
     </div>
 </div>
 <div class="col-md-12">
-    <MarketGroupFilter />
+    <MarketGroupFilter @ref="_marketGroupFilter" OnInitMarketTemplates="OnInitMarketTemplate" />
 </div>
 <div class="col-md-12">
     <div class="d-flex mx-3 mt-4">
         <div class="w-25">
-            <MarketFilter />
+            <MarketFilter @ref="_marketFilter" OnMarketTemplateClicked="OnMarketTemplateClicked" />
         </div>
         <div class="w-75">
-            <table class="table table-hover table-bordered">
-                <thead class="table-head">
-                <th></th>
-                <th>BR CTRL</th>
-                <th>10 BET CRYPTO</th>
-                <th>10 BET INDIA</th>
-                <th>10 BET JAPAN</th>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="py-1 px-2">
-                                    <span class="fw-bold">101</span>
+
+            @if (MarketTemplates != null && MarketTemplates.Any() && marginMarket != null)
+            {
+
+                <table class="table table-hover table-bordered">
+                    <thead class="table-head">
+                    <th></th>
+                    <th>BR CTRL</th>
+                        @foreach (var client in ClientModel.Clients)
+                        {
+                        <th>@client.ClientName</th>
+                        }
+                    </thead>
+                    <tbody>
+                        <!-- Table Row Margin -->
+                        <tr>
+                            <td></td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <div class="py-1 px-2">
+                                        <span class="fw-bold">@GetClientMargin(string.Empty, string.Empty, marginMarket.Selections, isPlayerProps)</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="py-1 px-2">
-                                    <span class="fw-bold">102</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="py-1 px-2">
-                                    <span class="fw-bold">103</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="py-1 px-2">
-                                    <span class="fw-bold">104</span>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span class="fw-bold">Over 2.5</span>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="odds-container me-2 py-1 px-3">
-                                    <span>2.56</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="odds-container me-2 py-1 px-3">
-                                    <span>2.56</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="odds-container me-2 py-1 px-3">
-                                    <span>2.56</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="odds-container me-2 py-1 px-3">
-                                    <span>2.56</span>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span class="fw-bold">Under 2.5</span>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="odds-container betstop me-2 py-1 px-3">
-                                    <span>2.56</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="odds-container betstop me-2 py-1 px-3">
-                                    <span>2.56</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="odds-container betstop me-2 py-1 px-3">
-                                    <span>2.56</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <div class="odds-container betstop me-2 py-1 px-3">
-                                    <span>2.56</span>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                            </td>
+                            @foreach (var client in ClientModel.Clients)
+                            {
+                                <td>
+                                    <div class="d-flex justify-content-center">
+                                        <div class="py-1 px-2">
+                                            @if (HasClientConfig(client.ClientCode, marginMarket.ClientCode, marginMarket.ClientCodeMargin))
+                                            {
+                                                string margin = GetClientMargin(client.ClientCode, marginMarket.ClientCodeMargin, marginMarket.Selections, isPlayerProps);
+                                                <span class="fw-bold">@margin</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="fw-bold">-.-</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                        <!-- End Table Row Margin -->
+                        <!-- Table Row Odds-->
+                        @foreach (var marketTemplate in MarketTemplates)
+                        {
+                            if (marketTemplate.IsSelected)
+                            {
+                                var isBetStop = fixture.IsBetStopGlobal;
+
+                                if (fixture.BetStop != null)
+                                {
+                                    isBetStop = fixture.BetStop.Count > 0 && fixture.BetStop.FirstOrDefault() == 1 ? true : false;
+                                }
+
+                                foreach (var market in marketTemplate.Fixture.Markets)
+                                {
+                                    foreach (var selection in market.Selections)
+                                    {
+                                        <MatchDetailSelectionRow Selection="@selection" Market="@market" ClientModel="@ClientModel" />
+                                    }
+                                }
+                            }
+                        }
+                        <!-- End Table Row Odds -->
+                        
+                    </tbody>
+                </table>
+
+            }
         </div>
     </div>
 </div>
