@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Backoffice.Shared.Models
 {
@@ -31,7 +30,7 @@ namespace Backoffice.Shared.Models
         public decimal BROdds { get; set; }
         public decimal ClientOdds { get; set; }
         public decimal BoostedOdds { get; set; }
-        [MaxLength(5, ErrorMessage = "Odds is too long.")]
+        //[MaxLength(5, ErrorMessage = "Odds is too long.")]
         //[Range(1, 99999, ErrorMessage = "Boosted Odds min value cannot be lower than 1.00!")]
         public string BoostedOddsStr { get; set; }
         public string BoostedSelectionName { get; set; }
@@ -47,4 +46,5 @@ namespace Backoffice.Shared.Models
         public DateTime TimeStamp { get; set; }
         public string MarketSpecifier { get; set; }
     }
+
 }

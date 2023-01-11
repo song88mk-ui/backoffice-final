@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Backoffice.Shared.Models.Requests
 {
@@ -17,6 +16,7 @@ namespace Backoffice.Shared.Models.Requests
         public DateTime TimeStamp { get; set; }
         public MetaData MetaData { get; set; }
     }
+
     public class PriceboostActivityLogRequest : ActivityLogRequest
     {
         public PriceboostActivityLogRequest()
