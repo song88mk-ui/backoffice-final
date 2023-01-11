@@ -38,114 +38,86 @@
                     </select>
                 </div>
                 <div class="col-2">
-                    <select class="form-select">
+                    <select class="form-select" @onchange="OnClientChangedEvent">
                         <optgroup label="Clients">
-                            <option value="0">
-                                All Clients
-                            </option>
-                            <option value="1">
-                                10 BET CRYPTO
-                            </option>
-
-                            <option value="2">
-                                10 BET DRC
-                            </option>
-
-                            <option value="3">
-                                10 BET GHANA
-                            </option>
-
-                            <option value="4">
-                                10 BET INDIA
-                            </option>
-
-                            <option value="5">
-                                10 BET JAPAN
-                            </option>
+                            <option value="ALL">All Clients</option>
+                            @if (FilterModel != null && FilterModel.Clients != null)
+                            {
+                                @foreach (var client in FilterModel.Clients)
+                                {
+                                    @if (client.Value == FilterModel.ClientCode)
+                                    {
+                                        <option value="@client.Key" selected>@client.Value</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@client.Key">@client.Value</option>
+                                    }
+                                }
+                            }
                         </optgroup>
                     </select>
                 </div>
                 <div class="col-2">
-                    <select class="form-select">
+                    <select class="form-select" @onchange="OnSportChangedEvent">
                         <optgroup label="Sports">
-                            <option value="0">
-                                Select Sports
-                            </option>
-                            <option value="1">
-                                Alpine Skiing
-                            </option>
-
-                            <option value="2">
-                                American Football
-                            </option>
-
-                            <option value="3">
-                                Athletics
-                            </option>
-
-                            <option value="4">
-                                Aussie Rules
-                            </option>
-
-                            <option value="5">
-                                Badminton
-                            </option>
+                            <option value="0">Select Sports</option>
+                            @if (FilterModel != null && FilterModel.Sports != null)
+                            {
+                                @foreach (var sport in FilterModel.Sports.SportLookup)
+                                {
+                                    @if (sport.SportId == FilterModel.SportId)
+                                    {
+                                        <option value="@sport.SportId" selected>@sport.SportName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@sport.SportId">@sport.SportName</option>
+                                    }
+                                }
+                            }
                         </optgroup>
                     </select>
                 </div>
                 <div class="col-2">
-                    <select class="form-select">
+                    <select class="form-select" @onchange="OnSegmentChangedEvent">
                         <optgroup label="Segment">
-                            <option value="0">
-                                Select Segment
-                            </option>
-                            <option value="1">
-                                Segment 1
-                            </option>
-
-                            <option value="2">
-                                Segment 2
-                            </option>
-
-                            <option value="3">
-                                Segment 3
-                            </option>
-
-                            <option value="4">
-                                Segment 4
-                            </option>
-
-                            <option value="5">
-                                Segment 5
-                            </option>
+                            <option value="0">Select Segment</option>
+                            @if (FilterModel != null && FilterModel.Segments != null)
+                            {
+                                @foreach (var segment in FilterModel.Segments.SegmentLookup)
+                                {
+                                    @if (segment.SegmentId == FilterModel.SegmentId)
+                                    {
+                                        <option value="@segment.SegmentId" selected>@segment.SegmentName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@segment.SegmentId">@segment.SegmentName</option>
+                                    }
+                                }
+                            }
                         </optgroup>
                     </select>
                 </div>
                 <div class="col-2">
-                    <select class="form-select">
+                    <select class="form-select" @onchange="OnLeagueChangedEvent">
                         <optgroup label="League">
-                            <option value="0">
-                                Select League
-                            </option>
-                            <option value="1">
-                                League 1
-                            </option>
-
-                            <option value="2">
-                                League 2
-                            </option>
-
-                            <option value="3">
-                                League 3
-                            </option>
-
-                            <option value="4">
-                                League 4
-                            </option>
-
-                            <option value="5">
-                                League 5
-                            </option>
+                            <option value="0">Select League</option>
+                            @if (FilterModel != null && FilterModel.Leagues != null)
+                            {
+                                @foreach (var league in FilterModel.Leagues.LeagueLookup)
+                                {
+                                    @if (league.LeagueId == FilterModel.LeagueId)
+                                    {
+                                        <option value="@league.LeagueId" selected>@league.LeagueName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@league.LeagueId">@league.LeagueName</option>
+                                    }
+                                }
+                            }
                         </optgroup>
                     </select>
                 </div>

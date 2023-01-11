@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -103,6 +104,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle","max-width: 85rem;");
+            parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);
+            parameters.Add("SelectedPage", Page.OE_PriceBoost_Manage);
 
             var options = new ModalOptions();
             ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);
