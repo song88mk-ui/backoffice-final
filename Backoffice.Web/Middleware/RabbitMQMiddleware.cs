@@ -65,7 +65,6 @@ namespace Backoffice.Web.Middleware
                             break;
                     }
                 }
-                
             }
             catch (Exception ex)
             {

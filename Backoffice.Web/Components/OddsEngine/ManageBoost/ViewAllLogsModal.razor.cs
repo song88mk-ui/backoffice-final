@@ -47,13 +47,13 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 Clients = clients,
                 Tab = CurrentPage,
                 ClientCode = "ALL",
-                Sports = new SportsLookupResponse(),
+                Sports = await GetSports(),
                 SportId = 0,
-                Segments = new SegmentLookupResponse(),
+                Segments = null,
                 SegmentId = 0,
-                Leagues = new LeagueLookupResponse(),
+                Leagues = null,
                 LeagueId = 0,
-                SearchText = "%",
+                SearchText = string.Empty,
                 DateFrom = DateTime.Now.AddDays(-7).Date,
                 DateTo = DateTime.Now
             };
@@ -148,6 +148,52 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                         }
                     }
                 }
+
+                //filter
+                //if (!string.IsNullOrEmpty(PriceBoostLogFilterModel.SearchText) && CurrentPage == Page.OE_PriceBoost_Manage &&
+                //    PriceBoostActivityLogs != null && PriceBoostActivityLogs.Any())
+                //{
+                //    PriceBoostActivityLogs = PriceBoostActivityLogs.Where(x => x.Payload.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.Activity.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.From.SelectionName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.From.SportName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.From.SegmentName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.From.LeagueName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.TimeStamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm").Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.From.MarketName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.From.FixtureName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.To.SelectionName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.To.MarketName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.To.SportName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.To.SegmentName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.To.LeagueName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.To.FixtureName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.From.ClientCode.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.To.ClientCode.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.From.ClientName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.To.ClientName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.From.Summary.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.To.Summary.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase))
+                //        .ToList();
+
+                //    response.MetaData.TotalCount = PriceBoostActivityLogs.Count();
+                //}
+                //else if (!string.IsNullOrEmpty(PriceBoostLogFilterModel.SearchText) && CurrentPage == Page.OE_PriceBoost_Settings)
+                //{
+                //    BoostedSettingsActivityLogs = BoostedSettingsActivityLogs.Where(x =>
+                //    x.Payload.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.Activity.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.From.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.To.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.UserId.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                //    x.TimeStamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm").Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase))
+                //        .ToList();
+
+                //    response.MetaData.TotalCount = BoostedSettingsActivityLogs.Count();
+                //}
+
+                MetaData = response.MetaData;
+
             }
 
             await InvokeAsync(StateHasChanged);
@@ -276,7 +322,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             }
         }
 
-        public async Task OnFilterClickEvent(PriceBoostLogFilterModel item)
+        public async Task OnFilterChanged(PriceBoostLogFilterModel item)
         {
             PriceBoostLogFilterModel = item;
             CurrentPage = item.Tab;
@@ -305,6 +351,47 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             MetaData.CurrentPage = page;
             await GetContent();
         }
+
+        public string GetSportName(PriceBoostActivityLog activityLog)
+        {
+            var splitPayload = activityLog.Payload.Split(".");
+
+            return activityLog.Activity == Activity.Create.ToString() || activityLog.Activity == Activity.Update.ToString() ?
+                activityLog.To.SportName : activityLog.From.SportName;
+        }
+
+        public string GetDetails(PriceBoostActivityLog activityLog)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.Append("<div>");
+
+            if (activityLog.Activity == Activity.Create.ToString() || activityLog.Activity == Activity.Update.ToString())
+            {
+                stringBuilder.Append($"<strong><b>{activityLog.To.SelectionName}</b></strong><br>");
+                stringBuilder.Append($"{activityLog.To.MarketName}<br>");
+                stringBuilder.Append($"<span>{activityLog.To.SegmentName}</span><br>");
+                stringBuilder.Append($"<span>{activityLog.To.LeagueName}</span><br>");
+                stringBuilder.Append($"{activityLog.To.FixtureName}<br>");
+                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy")}</span><br>");
+                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("HH:mm")}</span>");
+            }
+            else
+            {
+                stringBuilder.Append($"<strong><b>{activityLog.From.SelectionName}</b></strong><br>");
+                stringBuilder.Append($"{activityLog.From.MarketName}<br>");
+                stringBuilder.Append($"<span>{activityLog.From.SegmentName}</span><br>");
+                stringBuilder.Append($"<span>{activityLog.From.LeagueName}</span><br>");
+                stringBuilder.Append($"{activityLog.From.FixtureName}<br>");
+                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy")}</span><br>");
+                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("HH:mm")}</span>");
+            }
+
+            stringBuilder.Append("</div>");
+
+            return stringBuilder.ToString();
+        }
+
         public string GetClientName(string payload)
         {
             var payloadSplit = payload.Split(".");
@@ -317,6 +404,22 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             return UserModel.ClientCodes;
         }
+
+        private async Task<SportsLookupResponse> GetSports()
+        {
+            return (await TradingService.GetSportLookup()).Result;
+        }
+
+        private async Task<SegmentLookupResponse> GetSegments(int sportId)
+        {
+            return sportId != 0 ? (await TradingService.GetSegmentLookup(sportId)).Result : null;
+        }
+
+        private async Task<LeagueLookupResponse> GetLeagues(int sportId, int segmentId)
+        {
+            return sportId != 0 && segmentId != 0 ? (await TradingService.GetLeagueLookup(sportId, segmentId)).Result : null;
+        }
+
         private string EvaluateBoostedSettingsActivity(string changeData)
         {
             if (!(changeData == null || changeData == string.Empty))

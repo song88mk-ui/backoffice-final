@@ -1,21 +1,21 @@
 ﻿<div class="modal-body">
-    <ViewAllLogsFilter SelectedPage="CurrentPage" OnSaveClickCallback="OnFilterClickEvent" />
-    <table class="table table-bordered">
-        @if (CurrentPage == Backoffice.Shared.Enums.Page.OE_PriceBoost_Settings)
+    <ViewAllLogsFilter @bind-FilterModel="PriceBoostLogFilterModel" SelectedPage="CurrentPage" OnFilterChangedEventCallback="OnFilterChanged" />
+    @if (CurrentPage == Backoffice.Shared.Enums.Page.OE_PriceBoost_Settings)
+    {
+        @if (BoostedSettingsActivityLogs != null)
         {
-            <thead>
-                <tr>
-                    <th valign="middle" align="left"><strong>#</strong></th>
-                    <th valign="middle" align="left"><strong>Date</strong></th>
-                    <th valign="middle" align="left"><strong>Activity</strong></th>
-                    <th valign="middle" align="left"><strong>From</strong></th>
-                    <th valign="middle" align="left"><strong>To</strong></th>
-                    <th valign="middle" align="left"><strong>Updated By</strong></th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (BoostedSettingsActivityLogs != null)
-                {
+            <table class="table table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th valign="middle" align="left"><strong>#</strong></th>
+                        <th valign="middle" align="left"><strong>Date</strong></th>
+                        <th valign="middle" align="left"><strong>Activity</strong></th>
+                        <th valign="middle" align="left"><strong>From</strong></th>
+                        <th valign="middle" align="left"><strong>To</strong></th>
+                        <th valign="middle" align="left"><strong>Updated By</strong></th>
+                    </tr>
+                </thead>
+                <tbody>
                     @foreach (var item in BoostedSettingsActivityLogs)
                     {
                         int RowCount = (BoostedSettingsActivityLogs.IndexOf(item) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
@@ -29,12 +29,72 @@
                             <td>@item.UserId</td>
                         </tr>
                     }
-                }
-            </tbody>
-            <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
+                </tbody>
+                <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
+            </table>
         }
-    </table>
+        else
+        {
+            <NoRecordFound />
+        }
+    }
+    @if (CurrentPage == Backoffice.Shared.Enums.Page.OE_PriceBoost_Manage)
+    {
+        @if (PriceBoostActivityLogs != null)
+        {
+            @if (PriceBoostActivityLogs.Any())
+            {
+                <table class="table table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Client Name</th>
+                            <th scope="col">Sports</th>
+                            <th scope="col">Details</th>
+                            <th scope="col">Activity</th>
+                            <th scope="col">From</th>
+                            <th scope="col">To</th>
+                            <th scope="col">Updated By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var log in PriceBoostActivityLogs)
+                        {
+                            int RowCount = (PriceBoostActivityLogs.IndexOf(log) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                            <tr>
+                                <td>@RowCount</td>
+                                <td>@log.TimeStamp.ToLocalTime().ToString("dd/MM/yy") @log.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
+                                <td>@GetClientName(log.Payload)</td>
+                                <td>@GetSportName(log)</td>
+                                <td>@(
+                        (MarkupString)GetDetails(log)
+                        )</td>
+                                <td>@log.Activity</td>
+                                <td>@(
+                        (MarkupString)log.From.HtmlDetail
+                        )</td>
+                                <td>@(
+                        (MarkupString)log.To.HtmlDetail
+                        )</td>
+                                <td>@log.UserId</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="7" />
+                </table>
+            }
+            else
+            {
+                <NoRecordFound/>
+            }
+        }
+        else
+        {
+            <NoRecordFound />
+        }
+    }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Close</button>
+    <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Close</button>
 </div>

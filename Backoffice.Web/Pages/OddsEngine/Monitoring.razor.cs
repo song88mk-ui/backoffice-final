@@ -292,7 +292,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                                     //}
                                 }
                             }
-
+                            await InvokeAsync(StateHasChanged);
                             // remove markets
                             //if (!currentMarket.Selections.Any())
                             //    currentFixture.Markets.Remove(currentMarket);
