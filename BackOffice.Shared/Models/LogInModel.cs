@@ -4,9 +4,11 @@ namespace Backoffice.Shared.Models
 {
     public class LogInModel
     {
-        [Required(ErrorMessage = "Username is required to log in, please enter it above.")]
+        [Required(ErrorMessage = "Username is required")]
         public string Name { get; set; }
-        [Required(ErrorMessage = "Password is required to log in, please enter it above.")]
+        [MaxLength(15, ErrorMessage = "Password must not be over 15 characters")]
+        [MinLength(8, ErrorMessage = "Password must be atleast 8 characters")]
+        [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
         public string Provider { get; set; }
     }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
 
 namespace Backoffice.Web.Pages.Authentication
@@ -19,6 +20,7 @@ namespace Backoffice.Web.Pages.Authentication
         private readonly IAuthenticationService AuthenticationService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
+        public bool IsValidLogin { get; set; }
         public string ReturnUrl { get; set; }
         public string Error { get; set; }
         public LoginModel(IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor)
@@ -27,7 +29,7 @@ namespace Backoffice.Web.Pages.Authentication
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<IActionResult> OnGet(string returnUrl)
+        public async Task<IActionResult> OnGet(string? returnUrl = null)
         {
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
@@ -81,17 +83,11 @@ namespace Backoffice.Web.Pages.Authentication
                     NavigationManager.NavigateTo("/");
                 }
 
-                if (UserModel != null)
-                    UserModel.Password = String.Empty;
-
                 TempData["HasError"] = true;
 
-                if (result.Message.ToLower().Contains("user does not exist"))
-                {
-                    ModelState.AddModelError("UserModel.Name", "Sorry, we couldn't find an account with that username, please try again.");
-                }
-
-                ModelState.AddModelError("UserModel.Password", "Password is incorrect, please try again or click Forgot Password to reset it.");
+                //ModelState.AddFormError("Username or Password is incorrect");
+                //ModelState.AddModelError("UserModel.Password", "Username or Password is incorrect");
+                ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
             }
             return Page();
         }

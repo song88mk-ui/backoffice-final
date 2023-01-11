@@ -84,6 +84,12 @@ body {
     color: #EA6140;
 }
 
+.validation-summary-errors ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 .login-footer a, .login-footer button {
     background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
     color: white;
