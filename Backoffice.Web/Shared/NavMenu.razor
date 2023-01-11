@@ -31,15 +31,15 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         <span class="nav-menu-text">Dashboard</span>
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-report" role="button" aria-expanded="false" aria-controls="sub-menu-report">
-                        <span class="ico ico-reports" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Reports</span>
-                        <span class="fa fa-chevron-right"></span>
-                    </NavLink>
-                    <div class="sub-menu collapse" id="sub-menu-report">
-                    </div>
-                </div>
+                @*<div class="nav-item px-3">
+            <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-report" role="button" aria-expanded="false" aria-controls="sub-menu-report">
+            <span class="ico ico-reports" aria-hidden="true"></span>
+            <span class="nav-menu-text">Reports</span>
+            <span class="fa fa-chevron-right"></span>
+            </NavLink>
+            <div class="sub-menu collapse" id="sub-menu-report">
+            </div>
+            </div>*@
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-setting" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
                         <span class="ico ico-settings" aria-hidden="true"></span>
@@ -48,12 +48,12 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                     </NavLink>
                     <div class="sub-menu collapse show" id="sub-menu-setting">
                         <nav class="flex-column">
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="/deeplink/generator">
-                                    <span class="ico ico-deeplink-generator" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">Deeplink Generator</span>
-                                </NavLink>
-                            </div>
+                            @*<div class="nav-item">
+                        <NavLink class="nav-link" href="/deeplink/generator">
+                        <span class="ico ico-deeplink-generator" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Deeplink Generator</span>
+                        </NavLink>
+                        </div>*@
                             @if (UserModel?.Claims.Where(c => c.Type.Contains("SportsbookClient.TopLeagues") && c.Value != "0").ToList().Count > 0)
                             {
                                 <div class="nav-item">
@@ -170,16 +170,16 @@ else if (NavMenuAccess == NavMenuAccess.OE)
     </div>
     <div class="bottom-row">
         <nav class="flex-column">
-            <div class="nav-item px-3">
+            @*<div class="nav-item px-3">
                 <NavLink class="nav-link" href="javascript:void(0)">
                     <span class="ico ico-notification" aria-hidden="true"></span>
                     <span class="nav-menu-text">Notifications</span>
                 </NavLink>
-            </div>
+            </div>*@
             <div class="nav-item px-3">
                 <NavLink class="nav-link account" href="javascript:void(0)">
                     <span class="ico ico-user" aria-hidden="true"></span>
-                    <span class="nav-menu-text">FCI-Bryan</span>
+                        <span class="nav-menu-text">@UserModel?.UserName?.ToUpper()</span>
                 </NavLink>
             </div>
         </nav>
