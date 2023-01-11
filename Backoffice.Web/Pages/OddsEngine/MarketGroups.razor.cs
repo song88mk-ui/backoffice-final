@@ -49,9 +49,17 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarketGroupModel.IsUpdate = true;
             await InvokeAsync(StateHasChanged);
         }
-        public async Task OnEditMarketGroup()
+        public async Task OnEditMarketGroup(int marketTemplateGroupId)
         {
+            var marketTemplateGroup = new ClientMarketTemplateGroupDTO
+            {
+                FixtureStatusId = MarketGroupModel.FixtureStatusId,
+                MarketTemplateGroupId = marketTemplateGroupId
+            };
+
             var parameters = new ModalParameters();
+            parameters.Add("MarketGroupModel", MarketGroupModel);
+            parameters.Add("MarketTemplateGroup", marketTemplateGroup);
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
@@ -61,9 +69,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             ModalService.Open<AddOrEditMarketGroupModal>($"Edit Market Group", parameters, options);
         }
 
-        public async Task OnDeleteMarketGroup()
+        public async Task OnDeleteMarketGroup(ClientMarketTemplateGroupDTO marketTemplateGroup)
         {
             var parameters = new ModalParameters();
+            parameters.Add("MarketGroupModel", MarketGroupModel);
+            parameters.Add("MarketTemplateGroup", marketTemplateGroup);
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");

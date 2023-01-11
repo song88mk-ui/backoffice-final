@@ -2,7 +2,11 @@
     <form>
         <div class="row">
             <div class="col-md-12">
-                @if (!IsPreLoader)
+                @if (IsPreLoader)
+                {
+                    <Preloader />
+                }
+                else
                 {
                     <table class="table table-bordered table-hover no-margin">
                         <thead>
@@ -43,14 +47,6 @@
                             }
                         }
                     </table>
-                }
-                else
-                {
-                    <div class="text-center">
-                        <div class="spinner-border" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                    </div>
                 }
             </div>
         </div>

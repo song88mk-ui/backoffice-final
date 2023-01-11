@@ -35,7 +35,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #endregion
 
         protected override async Task OnInitializedAsync()
-        {            
+        {
+            IsPreLoader = true;
             CurrentPage = ModalParameters.TryGet<Page>("SelectedPage");
             UserClients = await GetUserClients();
             var clients = await GetClients();
@@ -142,7 +143,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                                 Activity = activity,
                                 From = activityLog.From,
                                 To = activityLog.To,
-                                UserId = WithAdministrationPagesAccess ? activityLog.UserId : "Administrator",
+                                UserId = WithAdministrationPagesAccess ? "Administrator" : activityLog.UserId ,
                                 TimeStamp = activityLog.TimeStamp
                             });
                         }
@@ -192,8 +193,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 //    response.MetaData.TotalCount = BoostedSettingsActivityLogs.Count();
                 //}
 
+                IsPreLoader = false;
                 MetaData = response.MetaData;
-
             }
 
             await InvokeAsync(StateHasChanged);

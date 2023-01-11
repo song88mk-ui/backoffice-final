@@ -18,7 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        public bool IsEdit { get; set; }
+
         public ClientMarketTemplateGroupDTO MarketTemplateGroup { get; set; }
         public ClientMarketTemplateGroupDTO OldMarketTemplateGroup { get; set; }
         public MarketGroupModel MarketGroupModel { get; set; }
@@ -28,7 +28,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            IsEdit = ModalParameters.TryGet<bool>("IsEdit");
             MarketGroupModel = ModalParameters.TryGet<MarketGroupModel>("MarketGroupModel");
             MarketTemplateGroup = ModalParameters.TryGet<ClientMarketTemplateGroupDTO>("MarketTemplateGroup");
             OldMarketTemplateGroup = new ClientMarketTemplateGroupDTO()

@@ -2,19 +2,39 @@
     <div class="row mb-2">
         <div class="col text-center">
             <img src="icons/svg/warning-icon.svg" />
-        </div>        
-    </div>
-    <div class="row">
-        <div class="col text-center">
-            <p>
-                This market group is currently in use.
-                <br />
-                Are you sure you want to permanently delete this Market Group?
-            </p>
         </div>
     </div>
+    <div class="row">
+        @if (IsPreLoader)
+        {
+            <Preloader />
+        }
+        else
+        {
+            <div class="col text-center">
+                <p>
+                    This market group is currently in use.
+                    <br />
+                    Are you sure you want to permanently delete this Market Group?
+                </p>
+            </div>
+        }
+    </div>
+    @if (ShowErrorMessage)
+    {
+        <AlertMessage AlertStatus="@AlertStatus" AlertMessageStr="@ErrorMessage" @bind-Opacity="@Opacity" />
+    }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Cancel</button>
-    <button type="button" class="btn modal-btn modal-delete waves-effect" data-bs-dismiss="modal" @onclick="OnDeleteModalClick">Delete</button>
+
+    @if (IsPreLoader)
+    {
+        <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" disabled>Cancel</button>
+        <button type="button" class="btn modal-btn modal-delete waves-effect" data-bs-dismiss="modal" disabled>Delete</button>
+    }
+    else
+    {
+        <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Cancel</button>
+        <button type="button" class="btn modal-btn modal-delete waves-effect" data-bs-dismiss="modal" @onclick="OnDeleteModalClick">Delete</button>
+    }
 </div>

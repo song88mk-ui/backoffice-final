@@ -11,7 +11,11 @@
     <Filter @bind-ClientSportOrderFilter="ClientSportOrderFilter" IsPreLoader="IsPreLoader" UserModel="UserModel" OnClientChangedCallback="OnClientChangedEvent" OnInitializeCallback="InitializeCallback" OnSaveClickCallback="OnSaveClickEvent" OnViewLogsCallback="OnViewLogsEvent" OnCopyCallback="OnCopyClickEvent" />
 </div>
 <div class="col-md-12">
-    @if (!IsPreLoader)
+    @if (IsPreLoader)
+    {
+        <Preloader />
+    }
+    else
     {
         <div class="mx-3 mt-4">
             <table class="table table-hover table-bordered">
@@ -86,14 +90,6 @@
                     }
                 </tbody>
             </table>
-        </div>
-    }
-    @if (IsPreLoader)
-    {
-        <div class="text-center">
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
         </div>
     }
 </div>
