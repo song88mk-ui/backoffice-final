@@ -10,61 +10,26 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <th scope="row">
-                    08/07/21 11:40AM
-                </th>
-                <td>
-                    Update
-                </td>
-                <td>
-                    <b>Boosted Odds</b><br />
-                    10.00
-                </td>
-                <td>
-                    <b>Boosted Odds</b><br />
-                    9.80
-                </td>
-                <td>
-                    FCI-Kim
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    08/07/21 11:40AM
-                </th>
-                <td>
-                    Create
-                </td>
-                <td>
-                    -
-                </td>
-                <td>
-                    <b>Boosted Odds</b><br />
-                    9.80
-                </td>
-                <td>
-                    FCI-Nicole
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    08/07/21 11:40AM
-                </th>
-                <td>
-                    Create
-                </td>
-                <td>
-                    -
-                </td>
-                <td>
-                    <b>Boosted Odds</b><br />
-                    9.80
-                </td>
-                <td>
-                    FCI-Nicole
-                </td>
-            </tr>
+            @foreach(var log in ActivityLogs)
+            {
+                <tr>
+                    <th scope="row">
+                        @log.TimeStamp.ToLocalTime().ToString("dd/MM/yy") @log.TimeStamp.ToLocalTime().ToString("HH:mm")
+                    </th>
+                    <td>
+                        @log.Activity
+                    </td>
+                    <td>
+                        @((MarkupString)GetLogDetails(log, true))
+                    </td>
+                    <td>
+                        @((MarkupString)GetLogDetails(log, false))
+                    </td>
+                    <td>
+                        @log.UserId
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>
