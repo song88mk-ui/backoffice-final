@@ -62,25 +62,23 @@ namespace Backoffice.Web.Pages.Authentication
                 var result = await AuthenticationService.Login(UserModel);
                 if (result.Result.Item1)
                 {
-                    return LocalRedirect("/dashboard");
+                    policies = result.Result.Item2;
+                    if (policies.Count > 1)
+                    {
+                        return LocalRedirect("/choose-access");
+                    }
+                    if (policies.Count == 1)
+                    {
+                        switch (policies.FirstOrDefault().ToString())
+                        {
+                            case nameof(Application.SportsbookClient):
+                                return LocalRedirect("/dashboard");
+                            case nameof(Application.Trading):
+                                return LocalRedirect("/odds-engine");
+                        }
+                    }
 
-                    //policies = result.Result.Item2;
-                    //if (policies.Count > 1)
-                    //{
-                    //    return LocalRedirect("/choose-access");
-                    //}
-                    //if (policies.Count == 1)
-                    //{
-                    //    switch (policies.FirstOrDefault().ToString())
-                    //    {
-                    //        case nameof(Application.SportsbookClient):
-                    //            return LocalRedirect("/dashboard");
-                    //        case nameof(Application.Trading):
-                    //            return LocalRedirect("/odds-engine");
-                    //    }
-                    //}
-
-                    //NavigationManager.NavigateTo("/");
+                    NavigationManager.NavigateTo("/");
                 }
 
                 if (UserModel != null)
