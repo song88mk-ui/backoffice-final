@@ -108,7 +108,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                             Activity = x.Activity,
                             From = !string.IsNullOrEmpty(x.From) && x.From != "-" ? JsonConvert.DeserializeObject<PriceBoostLogModel>(x.From) : new PriceBoostLogModel(),
                             To = !string.IsNullOrEmpty(x.To) && x.To != "-" ? JsonConvert.DeserializeObject<PriceBoostLogModel>(x.To) : new PriceBoostLogModel(),
-                            UserId = WithAdministrationPagesAccess ? x.UserId : "Administrator",
+                            UserId = WithAdministrationPagesAccess ? "Administrator" : x.UserId,
                             TimeStamp = x.TimeStamp
                         }).ToList();
 
