@@ -26,10 +26,17 @@ namespace Backoffice.Web.Pages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender)
+            try
             {
-                var url = "https://tableau.song88.com/t/song88/views/design/Dashboard1?:showAppBanner=false&:toolbar=no";
-                await JSRuntime.InvokeVoidAsync("initViz", VizContainer, url);
+                if (firstRender)
+                {
+                    var url = "https://tableau.song88.com/t/song88/views/design/Dashboard1?:showAppBanner=false&:toolbar=no";
+                    await JSRuntime.InvokeVoidAsync("initViz", VizContainer, url);
+                }
+            }
+            catch (Exception)
+            {
+
             }
         }
 

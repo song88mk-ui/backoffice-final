@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Security.Claims;
 
 namespace Backoffice.Web.Shared
 {
@@ -14,7 +15,8 @@ namespace Backoffice.Web.Shared
 
         [Parameter] public NavMenuAccess NavMenuAccess { get; set; }
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
-        
+
+        public IEnumerable<Claim> Claims { get; set; }
         public SportClickCallbackModel SelectedSport { get; set; }
 
         public SportsTreeModel Menu { get; set; }
@@ -65,7 +67,15 @@ namespace Backoffice.Web.Shared
                 await OnSportClickCallback.InvokeAsync(SelectedSport);
             }
         }
-
+        protected override async Task OnParametersSetAsync()
+        {
+            if (UserModel != null)
+            {
+                if (UserModel.Claims != null && Claims == null)
+                    Claims = UserModel.Claims;
+            
+            }
+        }
         public void ToggleNavMenu()
         {
             collapseNavMenu = !collapseNavMenu;
