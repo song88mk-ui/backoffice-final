@@ -9,15 +9,22 @@ namespace Backoffice.Web.Pages
 {
     public partial class TopFixtures : IDisposable
     {
+        #region Properties
+
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-        public MetaData MetaData { get; set; } = new MetaData();
+        public MetaData MetaData { get; set; }
         public TopFixturesModel TopFixturesModel { get; set; }
 
+        #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             PageTitle = "Top Fixtures";
@@ -46,6 +53,7 @@ namespace Backoffice.Web.Pages
             else
             {
                 TopFixturesModel.TopFixtures = new List<ClientTopFixtureModel.OrderedClientTopFixture>();
+
                 foreach(var client in request.SelectedClients)
                 {
                     TopFixturesModel.TopFixtures.Add(new ClientTopFixtureModel.OrderedClientTopFixture 
@@ -63,10 +71,15 @@ namespace Backoffice.Web.Pages
         public async Task OnSearchEvent(string searchString)
         {
             TopFixturesModel.TopFixturesFiltered.Clear();
+
             if (!string.IsNullOrEmpty(searchString))
-                TopFixturesModel.TopFixturesFiltered.AddRange(TopFixturesModel.TopFixtures.Where(t => t.ClientName.Contains(searchString) || t.TopFixtures.Any(tf => tf.SportName.Contains(searchString) )));
+            {
+                TopFixturesModel.TopFixturesFiltered.AddRange(TopFixturesModel.TopFixtures.Where(t => t.ClientName.Contains(searchString) || t.TopFixtures.Any(tf => tf.SportName.Contains(searchString))));
+            }
             else
+            {
                 TopFixturesModel.TopFixturesFiltered.AddRange(TopFixturesModel.TopFixtures);
+            }
 
             MetaData.TotalCount = TopFixturesModel.TopFixturesFiltered.Count();
         }
@@ -92,6 +105,7 @@ namespace Backoffice.Web.Pages
             var options = new ModalOptions();
             ModalService.Open<CopyModal>($"Copy {topFixture.ClientName} Top Fixtures Settings To", parameters, options);
         }
+
         public async Task OnSaveClickEvent(object item)
         {
             var clientIdRefs = string.IsNullOrEmpty(item.ToString()) ? new List<string>() : item.ToString().Split(",").ToList();
@@ -112,6 +126,7 @@ namespace Backoffice.Web.Pages
 
 
         }
+
         protected async Task SelectPage(int page)
         {
             MetaData.CurrentPage = page;
@@ -121,6 +136,7 @@ namespace Backoffice.Web.Pages
         public void Dispose()
         {
         }
+
         #endregion
     }
 }

@@ -1,33 +1,48 @@
-﻿.editModalTbl {
+﻿.table-edit-top-fixture {
     text-align: center;
 }
 
-    .editModalTbl tr:nth-child(2n+2) {
-        background-color: #F5F5F5;
-    }
+.table-edit-top-fixture tr:nth-child(2n+2) {
+    background-color: #F5F5F5;
+}
 
-    .editModalTbl tr {
-        vertical-align: middle;
-    }
+.table-edit-top-fixture tr {
+    vertical-align: middle;
+}
 
-.editModalThead {
+.table-head {
     color: white;
     background-color: #354156;
     border-radius: 5px;
 }
 
-.editModalBtn {
+td.actions a {
+    color: #404E67;
+    font-size: 16px;
+}
+
+.btn.dropdown-toggle {
+    background-color: #FFF;
+    text-align: left;
+}
+
+.btn.dropdown-toggle:after {
+    float: right;
+    margin-top: 0.475rem;
+}
+
+.btn-edit, .btn-cancel {
     width: 112px;
     height: 40px;
     border-radius: 5px;
     color: white;
 }
 
-.editModalCancel {
+.btn-cancel {
     background-color: #9AA0AB;
 }
 
-.editModalSave {
+.btn-edit {
     background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
 

@@ -10,6 +10,7 @@
         public List<OrderedClientTopFixture> TopFixtures { get; set; }
 
         #region Nested Class
+
         public class OrderedClientTopFixture
         {
             public Guid ClientId { get; set; }
@@ -20,6 +21,7 @@
 
         public class TopFixture
         {
+            public int Index { get; set; }
             public int SportId { get; set; }
             public string SportName { get; set; }
             public int SegmentId { get; set; }
