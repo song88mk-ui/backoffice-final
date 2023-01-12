@@ -66,6 +66,9 @@ namespace Backoffice.Web.Components.SubUser
         }
         public async Task OnCancelClickEvent()
         {
+            if(IsEdit)
+                SubUser.UserName = $"{SubUserClaims.MainUserName}{SubUser.UserName}";
+
             ModalService.Cancel();
         }
         public async Task OnSaveClickEvent()
@@ -151,9 +154,9 @@ namespace Backoffice.Web.Components.SubUser
 
             if(IsEdit == true)
             {
-                var result = (await AuthenticationService.UpdateUser(request)).Result;
+                var response = (await AuthenticationService.UpdateUser(request));
 
-                if (result)
+                if (response.Result)
                 {
                     ModalService.Cancel();
 
@@ -164,16 +167,16 @@ namespace Backoffice.Web.Components.SubUser
                     Alerts.Add(new AlertModel
                     {
                         AlertStatus = "Error",
-                        AltertMessage = $"Failed to insert {SubUserClaims.MainUserName}{SubUser.UserName}",
+                        AltertMessage = $"{response.Message}",
                         Opacity = 1.0m
                     });
                 }
             }
             else
             {
-                var result = (await AuthenticationService.Register(request)).Result;
+                var response = (await AuthenticationService.Register(request));
 
-                if (result)
+                if (response.Result)
                 {
                     ModalService.Cancel();
 
@@ -184,7 +187,7 @@ namespace Backoffice.Web.Components.SubUser
                     Alerts.Add(new AlertModel
                     {
                         AlertStatus = "Error",
-                        AltertMessage = $"Failed to insert {SubUserClaims.MainUserName}{SubUser.UserName}",
+                        AltertMessage = $"{response.Message}",
                         Opacity = 1.0m
                     });
                 }
