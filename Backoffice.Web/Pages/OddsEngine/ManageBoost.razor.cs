@@ -242,7 +242,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 Value = s.LeagueId,
                 Name = s.LeagueName
-            }).Take(100).ToList();
+            }).ToList();
 
             return leagues;
         }
