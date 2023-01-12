@@ -7,10 +7,12 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Backoffice.Shared.Models.Response.ClientListResponse;
 
 namespace Backoffice.API.Repositories
 {
@@ -105,16 +107,47 @@ namespace Backoffice.API.Repositories
                 var skip = (request.Page - 1) * request.PageSize;
                 var totalPage = ((totalClientCount - 1) / request.PageSize) + 1;
 
-                var clients = query.Skip(skip).Take(request.PageSize)
-                    .Select(s => new ClientListResponse.Client
+                var clients = query.Skip(skip).Take(request.PageSize).ToList();
+
+                var clientList = new List<ClientListResponse.Client>();
+
+                foreach (var client in clients)
+                {
+                    var clientResponse = new ClientListResponse.Client
                     {
-                        ClientId = s.ClientId,
-                        Name = s.Name,
-                        Website = s.Website,
-                        StatusId = s.StatusId,
-                        StatusName = ((ClientStatus)s.StatusId).ToString(),
-                        Region = s.Region
-                    }).ToList();
+                        ClientId = client.ClientId,
+                        ClientCode = client.Brand,
+                        Name = client.Name,
+                        Website = client.Website,
+                        StatusId = client.StatusId,
+                        StatusName = ((ClientStatus)client.StatusId).ToString(),
+                        Region = client.Region,
+                        IsEmailNotification = client.IsEmailNotification,
+                        Email = client.Email,
+                        TelephoneNumber = client.TelephoneNumber,
+                        MonthlyFee = client.MonthlyFee,
+                    };
+
+                    var taxConfig = string.IsNullOrEmpty(client.TaxConfig) ? new TaxConfig() : JsonConvert.DeserializeObject<TaxConfig>(client.TaxConfig);
+                    var taxConfigPercent = new TaxConfig
+                    {
+                        StakeTax = taxConfig.StakeTax * 100m,
+                        WinningsTax = taxConfig.WinningsTax * 100m,
+                        ExcludeStakeSportTypes = taxConfig.ExcludeStakeSportTypes,
+                        ExcludeWinningsSportTypes = taxConfig.ExcludeWinningsSportTypes
+                    };
+                    clientResponse.TaxConfig = taxConfigPercent;
+
+
+                    var revenueShare = new ClientListResponse.RevenueShare()
+                    {
+                        SportsbookShare = client.SportsbookShare * 100m,
+                        JackpotShare = client.JackpotShare * 100m
+                    };
+
+
+                    clientList.Add(clientResponse);
+                }
 
                 return new BaseResponse<ClientListResponse>
                 {
@@ -126,7 +159,7 @@ namespace Backoffice.API.Repositories
                         PageSize = request.PageSize,
                         Total = totalClientCount,
                         TotalPage = totalPage,
-                        Clients = clients ?? new List<ClientListResponse.Client>()
+                        Clients = clientList ?? new List<ClientListResponse.Client>()
                     }
                 };
             }
@@ -162,7 +195,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        
+
         public async Task<BaseResponse<string>> GetClientRegionByClientCode(string clientCode)
         {
             try
@@ -184,7 +217,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        
+
         public async Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs)
         {
             try

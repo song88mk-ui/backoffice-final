@@ -9,19 +9,26 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="businessNameField" class="form-label">Business Name</label>
-                        <input type="text" class="form-control" id="businessNameField" placeholder="Enter Business Name" />
+                        <input type="text" class="form-control" id="businessNameField" placeholder="Enter Business Name" @bind-value="Client.Name"/>
                     </div>
                     <div class="col-md-4">
                         <label for="websiteField" class="form-label">Website</label>
-                        <input type="text" class="form-control" id="websiteField" placeholder="https://www.song88.com" />
+                        <input type="text" class="form-control" id="websiteField" placeholder="https://www.song88.com" @bind-value="Client.Website" />
                     </div>
                     <div class="col-md-4">
                         <label for="emailField" class="form-label">Email Address</label>
                         <div class="input-group">
-                            <input type="email" class="form-control" id="emailField" placeholder="Enter Email Address" aria-label="Email" />
+                            <input type="email" class="form-control" id="emailField" placeholder="Enter Email Address" aria-label="Email" @bind-value="Client.Email" />
                             <div class="input-group-text">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="emailNotifSwitch" aria-label="Notify email switch" />
+                                    @if(Client.IsEmailNotification)
+                                    {
+                                        <input class="form-check-input" type="checkbox" role="switch" id="emailNotifSwitch" aria-label="Notify email switch" @onchange="(e) => OnEmailNotifClicked(e)" checked/>
+                                    }
+                                    else
+                                    {
+                                        <input class="form-check-input" type="checkbox" role="switch" id="emailNotifSwitch" aria-label="Notify email switch" @onchange="(e) => OnEmailNotifClicked(e)" />
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -34,21 +41,34 @@
                         <div class="input-group" id="monthlyFeeInputGroup">
                             <div class="input-group-text">
                                 <div class="form-check form-switch">
-                                    <input id="monthlyFeeSwitch" class="form-check-input" role="switch" type="checkbox" aria-label="Checkbox for Monthly Fee" />
+                                    @if(monthlyFeeToggle)
+                                    {
+                                        <input id="monthlyFeeSwitch" class="form-check-input" role="switch" type="checkbox" aria-label="Checkbox for Monthly Fee" @onchange="(e) => OnMonthlyFeeClicked(e)" checked/>
+                                    }
+                                    else
+                                    {
+                                        <input id="monthlyFeeSwitch" class="form-check-input" role="switch" type="checkbox" aria-label="Checkbox for Monthly Fee" @onchange="(e) => OnMonthlyFeeClicked(e)" />
+                                    }
                                     <label class="form-check-label monthly-fee-lbl" for="monthlyFeeSwitch">Monthly Fee</label>
                                 </div>
                             </div>
-
-                            <input type="text" class="form-control" placeholder="Enter Monthly Fee" id="monthlyFeeField" />
+                            @if (monthlyFeeToggle)
+                            {
+                                <input type="text" class="form-control" placeholder="Enter Monthly Fee" id="monthlyFeeField" @bind-value="Client.MonthlyFee" />
+                            }
+                            else
+                            {
+                                <input type="text" class="form-control" placeholder="Enter Monthly Fee" id="monthlyFeeField" @bind-value="Client.MonthlyFee" disabled/>
+                            }
                         </div>
                     </div>
                     <div class="col-md-3">
                         <label for="telephoneField" class="form-label">Telephone</label>
-                        <input type="text" class="form-control" id="telephoneField" placeholder="Enter Telephone Number" />
+                        <input type="text" class="form-control" id="telephoneField" placeholder="Enter Telephone Number" @bind-value="Client.TelephoneNumber" />
                     </div>
                     <div class="col-md-3">
                         <label for="brandField" class="form-label">Brand</label>
-                        <input type="text" class="form-control" id="brandField" placeholder="Enter Brand" />
+                        <input type="text" class="form-control" id="brandField" placeholder="Enter Brand" @bind-value="Client.ClientCode" />
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -68,21 +88,37 @@
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sportTypesDropdown">
                                             <li>
-                                                <input class="form-check-input" type="checkbox" id="allSports" aria-label="..." />
+                                                @if (RealSports != null && SelectedRealSports.Count == RealSports.Sports.Count && SelectedRealSports.Count > 0)
+                                                {
+                                                    <input class="form-check-input" type="checkbox" id="allSports" aria-label="..." @onchange="(e) => OnRealSportsClicked(e, 0)" checked/>
+                                                }
+                                                else
+                                                {
+                                                    <input class="form-check-input" type="checkbox" id="allSports" aria-label="..." @onchange="(e) => OnRealSportsClicked(e, 0)" />
+                                                }
                                                 <button class="dropdown-item dropdown-toggle ps-4" id="sportsItemDropdown" data-bs-target="#sportCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sportCollapse">
                                                     Sports
                                                 </button>
 
                                                 <div class="collapse" id="sportCollapse">
                                                     <ul class="list-group">
-                                                        <li class="list-group-item">
-                                                            <input class="form-check-input" type="checkbox" id="soccerCheck" />
-                                                            <label class="form-check-label" for="soccerCheck">Soccer</label>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <input class="form-check-input" type="checkbox" id="basketBallCheck" />
-                                                            <label class="form-check-label" for="basketBallCheck">Basketball</label>
-                                                        </li>
+                                                        @if(RealSports != null && RealSports.Sports.Any())
+                                                        {
+                                                            foreach(var sport in RealSports.Sports)
+                                                            {
+                                                                <li class="list-group-item">
+                                                                    @if(SelectedRealSports.Contains(sport.SportId))
+                                                                    {
+                                                                        <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnRealSportsClicked(e, sport.SportId)" checked/>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnRealSportsClicked(e, sport.SportId)" />
+                                                                    }
+                                                                    <label class="form-check-label" for="soccerCheck">@sport.SportName</label>
+                                                                </li>
+                                                            }
+                                                        }
                                                     </ul>
                                                 </div>
                                             </li>
@@ -175,7 +211,7 @@
                                 <label class="form-label" for="betSlipSettingsField">
                                     Maximum No. of Selections
                                 </label>
-                                <input type="text" id="betSlipSettingsField" placeholder="20" />
+                                <input type="text" id="betSlipSettingsField" placeholder="20" @bind-value="Client.BetSlipSelectionCount" />
                                 <p class="fst-italic p-desc">This will limit the number of bets a user can place in the bet slip.</p>
                             </div>
                         </div>
@@ -291,7 +327,7 @@
             </div>
             <div class="col-md-12">
                 <div class="row">
-                    @foreach (var currency in Currenycies)
+                    @foreach (var currency in Currencies)
                     {
                         <div class="col">
                             <input type="radio" class="btn-check" name="currencyOptions" id="@currency" />
@@ -467,6 +503,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal">Cancel</button>
-    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal">Save</button>
+    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
+    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">Save</button>
 </div>

@@ -78,7 +78,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
                 if (sports != null)
                 {
-                    Sports = sports.SportLookup.Select(s => new SelectListItemModel<int>
+                    Sports = sports.Sports.Select(s => new SelectListItemModel<int>
                     {
                         Value = s.SportId,
                         Name = s.SportName

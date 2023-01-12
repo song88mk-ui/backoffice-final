@@ -56,5 +56,7 @@ namespace Backoffice.Shared.Data.Backoffice.Entities
         public DateTime ModifiedDate { get; set; }
         public string TaxConfig { get; set; }
         public string Region { get; set; }
+        public string Email { get; set; }
+        public bool IsEmailNotification { get; set; }
     }
 }

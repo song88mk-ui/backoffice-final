@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Clients;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -16,7 +17,7 @@ namespace Backoffice.Web.Pages
         [Inject] public IModalService ModalService { get; set; }
 
         public MetaData MetaData { get; set; }
-        public ClientListModel ClientListModel { get; set; }
+        public ClientListResponse ClientListModel { get; set; }
         public ClientListCallbackModel ClientListCallbackModel { get; set; }
 
         public string PageTitle { get; set; }
@@ -28,7 +29,7 @@ namespace Backoffice.Web.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            ClientListModel = new ClientListModel();
+            ClientListModel = new ClientListResponse();
             ClientListCallbackModel = new ClientListCallbackModel();
 
             MetaData = new MetaData
@@ -57,13 +58,27 @@ namespace Backoffice.Web.Pages
 
         public async Task OnCreateClientClickEvent()
         {
+            var sports = (await BackOfficeService.GetSportsAsync("EN")).Result;
+            var realSports = new SportsLookupModel();
+            var virtualSports = new SportsLookupModel();
+
+            if(sports != null && sports.Sports != null && sports.Sports.Any())
+            {
+                realSports.Sports = sports.Sports.Where(s => s.SportId < 1000).ToList();
+                virtualSports.Sports = sports.Sports.Where(s => s.SportId >= 1000).ToList();
+            }
+
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("Client", new ClientListResponse.Client());
+            parameters.Add("RealSports", realSports);
+            parameters.Add("VirtualSports", virtualSports);
+            parameters.Add("IsEdit", false);
 
             var options = new ModalOptions();
-            ModalService.Open<CreateModal>("Create Client", parameters, options);
+            ModalService.Open<CreateOrUpdateModal>("Create Client", parameters, options);
         }
 
         public void Dispose()
@@ -74,7 +89,7 @@ namespace Backoffice.Web.Pages
 
         #region Utilities
 
-        private async Task<ClientListModel> GetClientList(string search, int sortBy, int page)
+        private async Task<ClientListResponse> GetClientList(string search, int sortBy, int page)
         {
             var request = new GetClientListRequest
             {
@@ -96,13 +111,13 @@ namespace Backoffice.Web.Pages
                     TotalPages = response.Result.TotalPage,
                 };
 
-                return new ClientListModel
+                return new ClientListResponse
                 {
                     Page = response.Result.Page,
                     PageSize = response.Result.PageSize,
                     Total = response.Result.Total,
                     TotalPage = response.Result.TotalPage,
-                    Clients = response.Result.Clients.Select((s, index) => new ClientListModel.Client
+                    Clients = response.Result.Clients.Select((s, index) => new ClientListResponse.Client
                     {
                         Num = index + 1,
                         ClientId = s.ClientId,
@@ -115,7 +130,7 @@ namespace Backoffice.Web.Pages
                 };
             }
 
-            return new ClientListModel();
+            return new ClientListResponse();
         }
 
         #endregion

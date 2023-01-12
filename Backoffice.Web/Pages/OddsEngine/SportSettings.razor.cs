@@ -425,7 +425,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (result == null)
                 return new List<SelectListItemModel<int>>();
 
-            var sports = result.SportLookup?.Select(s => new SelectListItemModel<int>()
+            var sports = result.Sports?.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.SportId,
                 Name = s.SportName

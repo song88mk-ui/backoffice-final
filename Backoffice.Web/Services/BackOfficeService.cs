@@ -61,7 +61,7 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<ClientListModel>> GetClientList(GetClientListRequest request)
+        public async Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request)
         {
             try
             {
@@ -71,16 +71,16 @@ namespace Backoffice.Web.Services
                 var Model = await _httpClient.PostAsync($"sportsbook/client/information/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (Model.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ClientListModel>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<ClientListModel>();
+                    return JsonSerializer.Deserialize<BaseResponse<ClientListResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<ClientListResponse>();
                 else
                 {
                     if (Model.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<ClientListModel>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                            ?? new BaseResponse<ClientListModel>();
+                        return JsonSerializer.Deserialize<BaseResponse<ClientListResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<ClientListResponse>();
                     else
                     {
-                        return new BaseResponse<ClientListModel>
+                        return new BaseResponse<ClientListResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
@@ -91,7 +91,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                return new BaseResponse<ClientListModel>
+                return new BaseResponse<ClientListResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
