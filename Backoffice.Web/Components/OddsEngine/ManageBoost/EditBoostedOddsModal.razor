@@ -1,5 +1,10 @@
 ﻿@using Backoffice.Shared.Enums;
-<Preloader />
+
+@if (IsPreloader)
+{
+    <Preloader InlineCss="@InlineCss" />
+}
+
 <div class="modal-body">
     <table class="table table-bordered">
         <thead>
@@ -9,7 +14,7 @@
                 <th scope="col">Details</th>
                 <th scope="col">BR Ctrl</th>
                 <th scope="col">Current Odds</th>
-                <th scope="col">Update Selection</th>        
+                <th scope="col">Update Selection</th>
                 <th scope="col">Boosted Odds</th>
             </tr>
         </thead>
@@ -27,7 +32,7 @@
                     {
                         <span class="period">@PriceBoostConfigModel.CurrentPeriod</span>
                         if (!string.IsNullOrEmpty(PriceBoostConfigModel.CurrentMinute) && int.Parse(PriceBoostConfigModel.CurrentMinute) > 0)
-                        {                            
+                        {
                             <span class="time">@PriceBoostConfigModel.CurrentMinute</span>
                         }
                     }
@@ -39,43 +44,47 @@
                 </td>
                 <td class="text-center">@PriceBoostConfigModel.BROdds.ToString("0.00")</td>
                 <td class="text-center">@PriceBoostConfigModel.ClientOdds.ToString("0.00")</td>
-                <td>
-                    <div class="d-flex flex-column">
-                        <div class="d-flex flex-row">
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle" type="button" id="@PriceBoostConfigModel.SelectionName" data-bs-toggle="dropdown" aria-expanded="false" disabled>
-                                    <i class="icofont icofont-lang-en"></i>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="@PriceBoostConfigModel.SelectionName">
-                                    <li>
-                                        <a class="dropdown-item" href="#"></a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div>
-                                <input type="text" class="form-control" @bind-value="PriceBoostConfigModel.SelectionName"/>
-                            </div>
-                            <div>
-                                <button type="button" class="btn" @onclick="OnAddSelection">
-                                    <i class="fa fa-plus-circle"></i>
-                                </button>
-                            </div>
-                            <div>
-                                <button type="button" class="btn" disabled>
-                                    <i class="fa fa-trash"></i>
-                                </button>
+                <td class="pe-3">
+                    <div class="row selection-width">
+                        <div class="col">
+                            <div class="row align-items-center">
+                                <div class="col-2 p-0">
+                                    <div class="dropdown">
+                                        <button class="btn dropdown-toggle fs-3" type="button" id="@PriceBoostConfigModel.SelectionName" data-bs-toggle="dropdown" aria-expanded="false" disabled>
+                                            <i class="flag-en"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="@PriceBoostConfigModel.SelectionName">
+                                            <li>
+                                                <a class="dropdown-item" href="#"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col p-0">
+                                    <div>
+                                        <input type="text" class="form-control" @bind-value="PriceBoostConfigModel.SelectionName" />
+                                    </div>
+                                </div>
+                                <div class="col-1 p-0">
+                                    <button type="button" class="btn" @onclick="OnAddSelection">
+                                        <i class="fa fa-plus-circle"></i>
+                                    </button>
+                                </div>
+                                <div class="col-1 p-0">
+                                    <button type="button" class="btn" disabled>
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        @if (PriceBoostConfigModel.BoostedSelectionTranslations != null && PriceBoostConfigModel.BoostedSelectionTranslations.Any())
-                        {
-                            <EditBoostedOddsModalRow 
-                                BoostedSelectionTranslationModel="@PriceBoostConfigModel.BoostedSelectionTranslations" LanguagesModel="@Languages"
-                                OnAddSelectionCallback="OnAddSelection"
-                                OnDeleteSelectionCallback="OnDeleteSelection"
-                                OnSelectLanguageCallback="OnSelectLanguage"
-                                />
-                        }
                     </div>
+                    @if (PriceBoostConfigModel.BoostedSelectionTranslations != null && PriceBoostConfigModel.BoostedSelectionTranslations.Any())
+                    {
+                        <EditBoostedOddsModalRow BoostedSelectionTranslationModel="@PriceBoostConfigModel.BoostedSelectionTranslations" LanguagesModel="@Languages"
+                                             OnAddSelectionCallback="OnAddSelection"
+                                             OnDeleteSelectionCallback="OnDeleteSelection"
+                                             OnSelectLanguageCallback="OnSelectLanguage" />
+                    }
                 </td>
                 <td>
                     <input type="number" class="form-control text-center" @bind-value="PriceBoostConfigModel.BoostedOddsStr" />
@@ -85,6 +94,6 @@
     </table>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modalBtn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Cancel</button>
-    <button type="button" class="btn modalBtn modal-save waves-effect" data-bs-dismiss="modal" @onclick="OnSaveModalClick">Save</button>
+    <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Cancel</button>
+    <button type="button" class="btn modal-btn modal-save waves-effect" data-bs-dismiss="modal" @onclick="OnSaveModalClick">Save</button>
 </div>

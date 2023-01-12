@@ -14,17 +14,19 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #region Properties
         [Inject] IModalService ModalService { get; set; }
         [Inject] ITradingService TradingService { get; set; }
+        [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         private PriceBoostConfigModel PriceBoost { get; set; }
         public bool IsPreLoader { get; set; }
-        public const string InlineCss = "";
+        public const string InlineCss = "top:50%";
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            IsPreLoader = false;
+            IsPreLoader = true;
             PriceBoost = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
+            IsPreLoader = false;
         }
         public async Task OnCancelModalClick()
         {
@@ -90,13 +92,16 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 });
             }
 
-                await InvokeAsync(StateHasChanged);
+            IsPreLoader = false;
+            await InvokeAsync(StateHasChanged);
 
-                ModalService.Cancel();
+            await Modal.OnSaveClickCallback.InvokeAsync();
+
+            ModalService.Cancel();
         }
         public void Dispose()
         {
-            
+
         }
         #endregion
 
