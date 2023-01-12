@@ -1,4 +1,8 @@
-﻿.btn-edit, .btn-copy, .btn-cancel, .btn-save {
+﻿.select-container div {
+    width: 33.33%;
+}
+
+.btn-edit, .btn-copy, .btn-cancel, .btn-save {
     color: #FFF;
 }
 

@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <div class="content-filter mx-3 d-flex justify-content-between">
             <div class="select-container d-flex">
-                <div class="me-2">
+                <div class="me-3">
                     <select class="form-select d-block" @onchange="OnClientChangedEvent">
                         @foreach(var client in Clients)
                         {
@@ -17,7 +17,7 @@
                         }
                     </select>
                 </div>
-                <div class="me-2">
+                <div class="me-3">
                     <select class="form-select d-block" @onchange="OnSportChangedEvent">
                         @foreach (var sport in Sports)
                         {
@@ -32,7 +32,7 @@
                         }
                     </select>
                 </div>
-                <div class="me-2">
+                <div class="me-3">
                     <select class="form-select d-block" @onchange="OnFixtureStatusChangedEvent">
                         @foreach (var fixtureStatus in FixtureStatuses)
                         {

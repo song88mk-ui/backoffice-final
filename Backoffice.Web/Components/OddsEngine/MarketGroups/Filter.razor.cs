@@ -49,11 +49,13 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     var clients = (await TradingService.GetClientList()).Result;
 
                     var roleName = UserModel.RoleName;
+
                     if (roleName != "Super Admin")
                     {
                         var clientCodes = UserModel.ClientCodes;
                         clients = clients.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
                     }
+
                     Clients = clients.Select(s => new SelectListItemModel<string>
                     {
                         Value = s.ClientCode,
@@ -161,6 +163,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
             await PrepareMarketGroupModel();
         }
+
         public void Dispose()
         {
         }
