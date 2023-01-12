@@ -150,6 +150,106 @@ a, .btn-link {
     content: "\110D";
 }
 
+.ico-flag {
+    width: 32px;
+}
+
+.flag-br {
+    content: url('../icons/svg/languages/BR.svg');
+    width: 32px;
+}
+
+.flag-bur {
+    content: url('../icons/svg/languages/BUR.svg');
+    width: 32px;
+}
+
+.flag-en {
+    content: url('../icons/svg/languages/EN.svg');
+    width: 32px;
+}
+
+.flag-es {
+    content: url('../icons/svg/languages/ES.svg');
+    width: 32px;
+}
+
+.flag-et {
+    content: url('../icons/svg/languages/ET.svg');
+    width: 32px;
+}
+
+.flag-fr {
+    content: url('../icons/svg/languages/FR.svg');
+    width: 32px;
+}
+
+.flag-id {
+    content: url('../icons/svg/languages/ID.svg');
+    width: 32px;
+}
+
+.flag-ja {
+    content: url('../icons/svg/languages/JA.svg');
+    width: 32px;
+}
+
+.flag-km {
+    content: url('../icons/svg/languages/KM.svg');
+    width: 32px;
+}
+
+.flag-ko {
+    content: url('../icons/svg/languages/ko.svg');
+    width: 32px;
+}
+
+.flag-lo {
+    content: url('../icons/svg/languages/lo.svg');
+    width: 32px;
+}
+
+.flag-ms {
+    content: url('../icons/svg/languages/ms.svg');
+    width: 32px;
+}
+
+
+.flag-pt {
+    content: url('../icons/svg/languages/PT.svg');
+    width: 32px;
+}
+
+.flag-sw {
+    content: url('../icons/svg/languages/SW.svg');
+    width: 32px;
+}
+
+.flag-th {
+    content: url('../icons/svg/languages/TH.svg');
+    width: 32px;
+}
+
+.flag-tr {
+    content: url('../icons/svg/languages/TR.svg');
+    width: 32px;
+}
+
+.flag-vi {
+    content: url('../icons/svg/languages/VI.svg');
+    width: 32px;
+}
+
+.flag-zh {
+    content: url('../icons/svg/languages/ZH.svg');
+    width: 32px;
+}
+
+.flag-zht {
+    content: url('../icons/svg/languages/ZHT.svg');
+    width: 32px;
+}
+
 iframe {
     width: 100% !important;
 }

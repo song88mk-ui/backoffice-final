@@ -92,12 +92,15 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                         stringBuilder.Append($"<b>Boosted Odds</b> </br> {fromDeserialized.Odds.ToString("0.00")}");
                     }
 
-                    if (fromDeserialized.Translations.Count != toDeserialized.Translations.Count)
+                    if (fromDeserialized.Translations.Count != toDeserialized.Translations.Count ||
+                        JsonConvert.SerializeObject(fromDeserialized.Translations) != JsonConvert.SerializeObject(toDeserialized.Translations))
                     {
-                        stringBuilder.Append("$<b>Translations:</b> </br>");
+                        stringBuilder.Append("<b>Translations:</b> </br>");
                         foreach (var translation in fromDeserialized.Translations)
-                        {
+                        {                            
                             stringBuilder.Append($"{translation.Language.LanguageName}<br>");
+                            stringBuilder.Append($"{translation.Language.LanguageCode}<br>");
+                            stringBuilder.Append($"{translation.BoostedSelectionName}<br>");
                         }
                     }
                 }
@@ -108,12 +111,15 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                         stringBuilder.Append($"<b>Boosted Odds</b> </br> {toDeserialized.Odds.ToString("0.00")}");
                     }
 
-                    if (fromDeserialized.Translations.Count != toDeserialized.Translations.Count)
+                    if (fromDeserialized.Translations.Count != toDeserialized.Translations.Count || 
+                        JsonConvert.SerializeObject(fromDeserialized.Translations) != JsonConvert.SerializeObject(toDeserialized.Translations))
                     {
-                        stringBuilder.Append("$<b>Translations:</b> </br>");
+                        stringBuilder.Append("<b>Translations:</b> </br>");
                         foreach (var translation in toDeserialized.Translations)
-                        {
+                        {                            
                             stringBuilder.Append($"{translation.Language.LanguageName}<br>");
+                            stringBuilder.Append($"{translation.Language.LanguageCode}<br>");
+                            stringBuilder.Append($"{translation.BoostedSelectionName}<br>");
                         }
                     }
                 }

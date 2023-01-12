@@ -15,11 +15,13 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
+        [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public LanguagesModel Languages { get; set; }
         public PriceBoostConfigModel PriceBoostConfigModel { get; set; }        
         public bool IsPreloader { get; set; }
-        public const string InlineCss = "";
+        public const string InlineCss = "top:50%";
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
@@ -27,12 +29,28 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             IsPreloader = true;            
             Languages = ModalParameters.TryGet<LanguagesModel>("Languages");
             PriceBoostConfigModel = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
-            IsPreloader = true;
+            IsPreloader = false;
         }
 
         public async Task OnSelectLanguage(Tuple<int, Language> args)
-        {
+        {           
+            //args.Item 1 = index
 
+            var prevLanguage = new Language
+            {
+                LanguageCode = PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].Language.LanguageCode,
+                LanguageName = PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].Language.LanguageName
+            };
+
+            PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].SelectLanguage = false;
+            PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].Language = args.Item2;
+
+            if (!string.IsNullOrEmpty(PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].BoostedSelectionName))
+                PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].IsRequired = false;
+
+            Languages.Languages.Remove(args.Item2);
+            if (!string.IsNullOrEmpty(prevLanguage.LanguageCode))
+                Languages.Languages.Add(prevLanguage);            
         }
 
         public async Task OnAddSelection()
@@ -79,6 +97,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     }
                 }
             }
+
+            PriceBoostConfigModel.UserId = UserModel.Id;
+            PriceBoostConfigModel.UserName = UserModel.UserName;
 
             var result = await TradingService.AddOrUpdatePriceBoost(new List<PriceBoostConfigModel>() { PriceBoostConfigModel });
             if (result.StatusCode == StatusCode.Success)
@@ -178,6 +199,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             }
 
             IsPreloader = false;
+
+            await Modal.OnSaveClickCallback.InvokeAsync();
+
             ModalService.Cancel();
         }
         public void Dispose()

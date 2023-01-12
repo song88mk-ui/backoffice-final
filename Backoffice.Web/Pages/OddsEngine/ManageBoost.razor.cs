@@ -63,7 +63,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("DialogStyle", "max-width: 80rem;top:50%;transform:translateY(-50%)");
+            parameters.Add("DialogStyle", "max-width: 90rem;top:50%;transform:translateY(-50%)");
             parameters.Add("PriceBoostConfigModel", JsonSerializer.Deserialize<PriceBoostConfigModel>(obj));
             parameters.Add("Languages", Languages);            
 

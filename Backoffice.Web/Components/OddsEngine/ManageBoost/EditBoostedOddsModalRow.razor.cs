@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #region Methods
         public async Task OnSelectLanguage(int index, Language language)
         {
-            await OnSelectLanguageCallback.InvokeAsync(new Tuple<int, Language>(index, language));
+            await OnSelectLanguageCallback.InvokeAsync(new Tuple<int, Language>(index, language));            
         }
 
         public async Task OnAddSelection()
@@ -31,6 +31,13 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         public void Dispose()
         {
             GC.SuppressFinalize(this);
+        }
+        #endregion
+
+        #region Utilities
+        public string FormatLanguageClass(Language language)
+        {
+            return $"ico-flag flag-{language.LanguageCode.ToLower()}";
         }
         #endregion
     }

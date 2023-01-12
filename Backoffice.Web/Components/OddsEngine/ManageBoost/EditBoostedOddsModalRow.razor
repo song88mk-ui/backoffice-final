@@ -2,36 +2,42 @@
 {
     var selection = BoostedSelectionTranslationModel[index];
 
-    <div class="d-flex flex-row">
-        <div class="dropdown">
-            <button class="btn dropdown-toggle" type="button" id="@selection.BoostedSelectionName" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="icofont icofont-lang-en" aria-hidden="true"></i>
-            </button>
-            <div class="dropdown-menu" aria-labelledby="@selection.BoostedSelectionName">
-                @for (int langIndex = 0; langIndex < LanguagesModel.Languages.Count; langIndex++)
-                {
-                    var language = LanguagesModel.Languages[langIndex];
+    <div class="row">
+        <div class="col">
+            <div class="row align-items-center">
+                <div class="col-2 p-0">
+                    <div class="dropdown">
+                        <button class="btn dropdown-toggle fs-3" type="button" id="@selection.BoostedSelectionName" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="@($"flag-{selection.Language.LanguageCode.ToLower()}")" aria-hidden="true"></i>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="@selection.BoostedSelectionName">
+                            @for (int langIndex = 0; langIndex < LanguagesModel.Languages.Count; langIndex++)
+                            {
+                                var language = LanguagesModel.Languages[langIndex];
 
-                    <button class="dropdown-item" @onclick="_ => OnSelectLanguage(index,language)">
-                        <i class="@($"fa fa-flag-{language.LanguageCode.ToLower()}")" aria-hidden="true">
-                            <span>@language.LanguageName</span>
-                        </i>
+                                <button class="dropdown-item position-relative" @onclick="_ => OnSelectLanguage(BoostedSelectionTranslationModel.IndexOf(selection),language)">
+                                    <i class="@($"ico-flag flag-{language.LanguageCode.ToLower()}")" aria-hidden="true">                                        
+                                    </i>
+                                    <span class="lang-name">@language.LanguageName</span>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col p-0">
+                    <input type="text" class="form-control" @bind-value="selection.BoostedSelectionName" />
+                </div>
+                <div class="col-1 p-0">
+                    <button type="button" class="btn" @onclick="OnAddSelection">
+                        <i class="fa fa-plus-circle"></i>
                     </button>
-                }
+                </div>
+                <div class="col-1 p-0">
+                    <button type="button" class="btn" @onclick="_ => OnDeleteSelection(selection)">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
             </div>
-        </div>
-        <div>
-            <input type="text" class="form-control" @bind-value="selection.BoostedSelectionName" />
-        </div>
-        <div>
-            <button type="button" class="btn" @onclick="OnAddSelection">
-                <i class="fa fa-plus-circle"></i>
-            </button>
-        </div>
-        <div>
-            <button type="button" class="btn" @onclick="_ => OnDeleteSelection(selection)">
-                <i class="fa fa-trash"></i>
-            </button>
         </div>
     </div>
 }
