@@ -28,3 +28,30 @@
     user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
+
+#togglePassword{
+    cursor: pointer;
+}
+
+.preferenceCol {
+    column-count: 2;
+}
+
+.preferenceCard {
+    break-inside: avoid-column;
+}
+
+.btn-check:checked + .btn-radio {
+    box-shadow: none;
+    color: white;
+    background: transparent linear-gradient(269deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+.btn-check:checked + label {
+    border-bottom: solid 3px #E12E22;
+    color: black;
+}
+
+.btn-check:not(:checked) + label {
+    color: #959595
+}

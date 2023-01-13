@@ -17,31 +17,76 @@ namespace Backoffice.Web.Components.SubUser
         [CascadingParameter] public CustomModal Modal { get; set; }
         public UserResponse SubUser { get; set; }
         public bool IsEdit { get; set; }
-        public string ConfirmPassword { get; set; }
         public SubUserClaimsModel SubUserClaims { get; set; }
         public List<AlertModel> Alerts { get; set; }
+        public List<SubUserClaim> DefaultClaims { get; set; }
+        public bool IsTogglePassword { get; set; }
 
         #endregion
         protected override async Task OnInitializedAsync()
         {
             try
             {
+                IsTogglePassword = false;
                 SubUserClaims = ModalParameters.TryGet<SubUserClaimsModel>("SubUserClaims");
                 Alerts = new List<AlertModel>();
                 SubUser = ModalParameters.TryGet<UserResponse>("SubUser");
                 IsEdit = ModalParameters.TryGet<bool>("IsEdit");
                 SubUser.Status = IsEdit ? SubUser.Status : "Normal";
 
+                DefaultClaims = new List<SubUserClaim>();
+                if(SubUserClaims != null && SubUserClaims.SubUserClaims.Any())
+                {
+                    foreach(var claim in SubUserClaims.SubUserClaims)
+                    {
+                        DefaultClaims.Add(new SubUserClaim
+                        {
+                            ClaimType = claim.ClaimType,
+                            ClaimValue = claim.ClaimValue,
+                            HasReadOnly = claim.HasReadOnly,
+                            IsEnabled= claim.IsEnabled,
+                            Name = claim.Name
+                        });
+                    }
+                }
+
                 if (SubUser.UserName.IndexOf(SubUserClaims.MainUserName) == 0)
                     SubUser.UserName = SubUser.UserName.Replace(SubUserClaims.MainUserName, "");
 
-                ConfirmPassword = string.Empty;
             }
             catch (Exception)
             {
 
             }
         }
+
+        public async Task OnResetClickEvent()
+        {
+            SubUser = new UserResponse();
+
+            SubUserClaims.SubUserClaims = new List<SubUserClaim>();
+            if (DefaultClaims.Any())
+            {
+                foreach (var claim in DefaultClaims)
+                {
+                    SubUserClaims.SubUserClaims.Add(new SubUserClaim
+                    {
+                        ClaimType = claim.ClaimType,
+                        ClaimValue = claim.ClaimValue,
+                        HasReadOnly = claim.HasReadOnly,
+                        IsEnabled = claim.IsEnabled,
+                        Name = claim.Name
+                    });
+                }
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+
+        public async Task OnTogglePasswordClickEvent()
+        {
+            IsTogglePassword = !IsTogglePassword;
+        }
+
         public async Task OnSubUserPreferenceClicked(ChangeEventArgs e, SubUserClaim claim, bool isReadOnly)
         {
             if (Convert.ToBoolean(e.Value) == true)
@@ -60,10 +105,15 @@ namespace Backoffice.Web.Components.SubUser
                 claim.ClaimValue = "0";
             }
         }
-        public async Task OnStatusChangedEvent(ChangeEventArgs e)
+        public async Task OnStatusNormalChangedEvent(ChangeEventArgs e)
         {
-            SubUser.Status = e.Value.ToString();
+            SubUser.Status = "Normal";
         }
+        public async Task OnStatusLockedChangedEvent(ChangeEventArgs e)
+        {
+            SubUser.Status = "Locked";
+        }
+
         public async Task OnCancelClickEvent()
         {
             if(IsEdit)
@@ -104,23 +154,14 @@ namespace Backoffice.Web.Components.SubUser
                     Opacity = 1.0m
                 });
             }
-            else if (!IsEdit && string.IsNullOrEmpty(ConfirmPassword))
+            else if (!IsEdit && (SubUser.Password.Length < 8 || SubUser.Password.Length > 15))
             {
                 Alerts.Add(new AlertModel
                 {
                     AlertStatus = "Error",
-                    AltertMessage = "Please confirm password",
+                    AltertMessage = "Password length must be between 8 to 15",
                     Opacity = 1.0m
 
-                });
-            }
-            else if (!IsEdit && SubUser.Password != ConfirmPassword)
-            {
-                Alerts.Add(new AlertModel
-                {
-                    AlertStatus = "Error",
-                    AltertMessage = "Password does not match",
-                    Opacity = 1.0m
                 });
             }
 
