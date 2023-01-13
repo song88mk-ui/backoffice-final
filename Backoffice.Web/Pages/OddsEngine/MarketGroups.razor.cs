@@ -38,11 +38,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender)
-            {
-                // "tr > td.actions > a.drag-handle"
-                await JSRuntime.InvokeVoidAsync("initSort", $".{TableClass}", ".drag-handle");
-            }
+            //if (firstRender)
+            //{
+            //    // "tr > td.actions > a.drag-handle"
+            //    await JSRuntime.InvokeVoidAsync("initSort", $".{TableClass}", ".drag-handle");
+            //}
         }
         public async Task OnMarketGroupAdd()
         {
@@ -64,7 +64,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnUpdateMarketGroup()
         {
             MarketGroupModel.IsUpdate = true;
-            await InvokeAsync(StateHasChanged);
+
+            await JSRuntime.InvokeVoidAsync("initSort", $".{TableClass}", ".drag-handle");
+            await JSRuntime.InvokeVoidAsync("enableSort", $".{TableClass}");
+
+            //await InvokeAsync(StateHasChanged);
         }
         public async Task OnEditMarketGroup(int marketTemplateGroupId)
         {
@@ -75,6 +79,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
 
             var parameters = new ModalParameters();
+
             parameters.Add("MarketGroupModel", MarketGroupModel);
             parameters.Add("MarketTemplateGroup", marketTemplateGroup);
             parameters.Add("ModalClass", "modal-center modal-show");
@@ -89,6 +94,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnDeleteMarketGroup(ClientMarketTemplateGroupDTO marketTemplateGroup)
         {
             var parameters = new ModalParameters();
+
             parameters.Add("MarketGroupModel", MarketGroupModel);
             parameters.Add("MarketTemplateGroup", marketTemplateGroup);
             parameters.Add("ModalClass", "modal-center modal-show");
@@ -101,7 +107,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnCanceUpdateClickedEvent()
         {
             MarketGroupModel.IsUpdate = false;
-            await InvokeAsync(StateHasChanged);
+
+            await JSRuntime.InvokeVoidAsync("disableSort", $".{TableClass}");
         }
 
         public async Task OnCopyMarketGroup()
