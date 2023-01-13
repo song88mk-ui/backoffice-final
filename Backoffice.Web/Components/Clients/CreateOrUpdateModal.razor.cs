@@ -118,7 +118,7 @@ namespace Backoffice.Web.Components.Clients
                 if(sportId == 0)
                 {
                     SelectedRealSports.Clear();
-                    SelectedRealSports.AddRange(RealSports.Sports.Select(s => s.SportId).ToList());
+                    SelectedRealSports.AddRange(RealSports.SportLookup.Select(s => s.SportId).ToList());
                 }
                 else
                 {

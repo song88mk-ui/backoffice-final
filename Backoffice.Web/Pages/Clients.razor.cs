@@ -62,10 +62,10 @@ namespace Backoffice.Web.Pages
             var realSports = new SportsLookupModel();
             var virtualSports = new SportsLookupModel();
 
-            if(sports != null && sports.Sports != null && sports.Sports.Any())
+            if(sports != null && sports.SportLookup != null && sports.SportLookup.Any())
             {
-                realSports.Sports = sports.Sports.Where(s => s.SportId < 1000).ToList();
-                virtualSports.Sports = sports.Sports.Where(s => s.SportId >= 1000).ToList();
+                realSports.SportLookup = sports.SportLookup.Where(s => s.SportId < 1000).ToList();
+                virtualSports.SportLookup = sports.SportLookup.Where(s => s.SportId >= 1000).ToList();
             }
 
             var parameters = new ModalParameters();

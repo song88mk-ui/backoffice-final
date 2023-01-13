@@ -88,7 +88,7 @@
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sportTypesDropdown">
                                             <li>
-                                                @if (RealSports != null && SelectedRealSports.Count == RealSports.Sports.Count && SelectedRealSports.Count > 0)
+                                                @if (RealSports != null && SelectedRealSports.Count == RealSports.SportLookup.Count && SelectedRealSports.Count > 0)
                                                 {
                                                     <input class="form-check-input" type="checkbox" id="allSports" aria-label="..." @onchange="(e) => OnRealSportsClicked(e, 0)" checked/>
                                                 }
@@ -102,9 +102,9 @@
 
                                                 <div class="collapse" id="sportCollapse">
                                                     <ul class="list-group">
-                                                        @if(RealSports != null && RealSports.Sports.Any())
+                                                        @if (RealSports != null && RealSports.SportLookup.Any())
                                                         {
-                                                            foreach(var sport in RealSports.Sports)
+                                                            foreach (var sport in RealSports.SportLookup)
                                                             {
                                                                 <li class="list-group-item">
                                                                     @if(SelectedRealSports.Contains(sport.SportId))

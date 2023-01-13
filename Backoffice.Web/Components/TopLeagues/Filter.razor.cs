@@ -54,7 +54,7 @@ namespace Backoffice.Web.Components.TopLeagues
                 var sports = (await BackOfficeService.GetSportsAsync()).Result;
                 if (sports != null)
                 {
-                    Sports = sports.Sports.Select(s => new SelectListItemModel<string>
+                    Sports = sports.SportLookup.Select(s => new SelectListItemModel<string>
                     {
                         Value = s.SportId.ToString(),
                         Name = s.SportName

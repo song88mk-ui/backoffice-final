@@ -4,16 +4,13 @@
     {
         public SportsLookupModel()
         {
-            Sports = new List<SportLookup>();
+            SportLookup = new List<SportLookup>();
         }
-        public List<SportLookup> Sports { get; set; }
-
-        #region Nested Class
-        public class SportLookup
-        {
-            public int SportId { get; set; }
-            public string SportName { get; set; }
-        }
-        #endregion
+        public List<SportLookup> SportLookup { get; set; }
+    }
+    public class SportLookup
+    {
+        public int SportId { get; set; }
+        public string SportName { get; set; }
     }
 }
