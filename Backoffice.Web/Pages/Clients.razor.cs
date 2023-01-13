@@ -58,7 +58,7 @@ namespace Backoffice.Web.Pages
 
         public async Task OnCreateClientClickEvent()
         {
-            var sports = (await BackOfficeService.GetSportsAsync("EN")).Result;
+            var sports = (await BackOfficeService.GetSportsAsync()).Result;
             var realSports = new SportsLookupModel();
             var virtualSports = new SportsLookupModel();
 

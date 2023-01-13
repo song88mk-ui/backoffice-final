@@ -51,7 +51,7 @@ namespace Backoffice.Web.Components.TopLeagues
                         Name = "No Clients Available"
                     });
 
-                var sports = (await BackOfficeService.GetSportsAsync("en")).Result;
+                var sports = (await BackOfficeService.GetSportsAsync()).Result;
                 if (sports != null)
                 {
                     Sports = sports.Sports.Select(s => new SelectListItemModel<string>

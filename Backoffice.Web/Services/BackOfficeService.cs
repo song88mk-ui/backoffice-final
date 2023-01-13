@@ -380,7 +380,7 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<SportsLookupModel>> GetSportsAsync(string languageCode)
+        public async Task<BaseResponse<SportsLookupModel>> GetSportsAsync()
         {
             try
             {
@@ -388,7 +388,7 @@ namespace Backoffice.Web.Services
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", userToken.AccessToken);
 
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsLookupModel>>
-                (await _httpClient.GetStreamAsync($"sportsbook/settings/sports?languageCode={languageCode}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (await _httpClient.GetStreamAsync($"api/trading/sports/lookup"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result ?? new BaseResponse<SportsLookupModel>
                 {
