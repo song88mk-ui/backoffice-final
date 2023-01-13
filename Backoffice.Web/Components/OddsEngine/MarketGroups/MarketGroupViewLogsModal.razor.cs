@@ -60,7 +60,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         #endregion
 
         #region Utilities
-        public async Task GetContent()
+        private async Task GetContent()
         {
             var response = (await TradingService.GetActivityLogs(new ActivityLogRequest
             {

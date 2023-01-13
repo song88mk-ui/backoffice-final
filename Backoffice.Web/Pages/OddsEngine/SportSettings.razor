@@ -41,14 +41,14 @@
                                 <tr draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="middle"
                     @ondrop="@(()=> Drop(sport))"
                     @ondrag="@(()=> StartDrag(sport))">
-                                    <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
+                                    <td draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
                                         <Checkbox HasOnChange="ClientSportOrderFilter.IsUpdate" Checked="sport.IsActive" OnChangeCallback="CheckboxSportClicked" Param1="sport" />
-                                    </th>
-                                    <th class="d-flex justify-content-between" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top"
+                                    </td>
+                                    <td class="d-flex justify-content-between" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top"
                         @onclick="()=>sport.IsOpen=!sport.IsOpen">
                                         @sport.SportName <i class="f-right fa @(sport.IsOpen ? "fa-chevron-up" : "fa-chevron-down" )"></i>
-                                    </th>
-                                    <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></th>
+                                    </td>
+                                    <td draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></td>
                                 </tr>
                                 @if (sport.IsOpen && sport.SegmentsSortOrder != null && sport.SegmentsSortOrder.Any())
                                 {
@@ -58,13 +58,13 @@
                                         <tr draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")"
                     @ondrop="@(()=> Drop(segment))"
                     @ondrag="@(()=> StartDrag(segment))">
-                                            <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
-                                            </th>
-                                            <th class="d-flex justify-content-between ps-4" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top"
+                                            <td draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
+                                            </td>
+                                            <td class="d-flex justify-content-between ps-4" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top"
                         @onclick="()=>segment.IsOpen=!segment.IsOpen">
                                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@segment.SegmentName<i class="f-right fa @(segment.IsOpen ? "fa-chevron-up" : "fa-chevron-down" )"></i>
-                                            </th>
-                                            <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></th>
+                                            </td>
+                                            <td draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></td>
                                         </tr>
                                         @if (segment.IsOpen && segment.LeagueSortOrder != null && segment.LeagueSortOrder.Any())
                                         {
@@ -74,12 +74,12 @@
                                                 <tr draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")"
                     @ondrop="@(()=> Drop(league))"
                     @ondrag="@(()=> StartDrag(league))">
-                                                    <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
-                                                    </th>
-                                                    <th class="d-flex justify-content-between ps-5" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top">
+                                                    <td draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="center" valign="top">
+                                                    </td>
+                                                    <td class="d-flex justify-content-between ps-5" draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="top">
                                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@league.LeagueName
-                                                    </th>
-                                                    <th draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></th>
+                                                    </td>
+                                                    <td draggable="@(ClientSportOrderFilter.IsUpdate ? "true" : "false")" align="left" valign="middle"><i class="f-right fa fa-bars"></i></td>
                                                 </tr>
                                             }
                                         }

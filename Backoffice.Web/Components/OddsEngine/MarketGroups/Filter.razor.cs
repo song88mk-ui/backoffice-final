@@ -14,9 +14,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [Parameter] public EventCallback OnAddMarketGroupCallback { get; set; }
-        [Parameter] public EventCallback OnUpdateyMarketGroupCallback { get; set; }
-        [Parameter] public EventCallback OnCopyMarketGroupCallback { get; set; }
+        [Parameter] public EventCallback OnAddCallback { get; set; }
+        [Parameter] public EventCallback OnUpdateCallback { get; set; }
+        [Parameter] public EventCallback OnCopyCallback { get; set; }
         [Parameter] public EventCallback OnViewLogsCallback { get; set; }
         [Parameter] public MarketGroupModel MarketGroupModel { get; set; }
         [Parameter] public EventCallback OnInitCallback { get; set; }
@@ -123,7 +123,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             MarketGroupModel.IsUpdate = true;
 
-            await OnUpdateyMarketGroupCallback.InvokeAsync();
+            await OnUpdateCallback.InvokeAsync();
         }
 
         public async Task OnCancelClickEvent()
@@ -135,12 +135,12 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         public async Task OnAddMarketGroupClickEvent()
         {
-            await OnAddMarketGroupCallback.InvokeAsync();
+            await OnAddCallback.InvokeAsync();
         }
 
         public async Task OnCopyMarketGroupClickEvent()
         {
-            await OnCopyMarketGroupCallback.InvokeAsync();
+            await OnCopyCallback.InvokeAsync();
         }
 
         public async Task OnViewLogsClickEvent()

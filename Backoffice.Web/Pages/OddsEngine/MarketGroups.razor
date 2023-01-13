@@ -9,11 +9,11 @@
 </div>
 <div class="col-md-12">
     <Filter @bind-MarketGroupModel="MarketGroupModel"
-            OnAddMarketGroupCallback="OnMarketGroupAdd"
-            OnCopyMarketGroupCallback="OnCopyMarketGroup"
-            OnUpdateyMarketGroupCallback="OnUpdateMarketGroup"
-            OnViewLogsCallback="OnViewLogs"
-            OnCancelCallback="OnCanceUpdateClickedEvent"
+            OnAddCallback="OnAddClickedEvent"
+            OnCopyCallback="OnCopyClickedEvent"
+            OnUpdateCallback="OnUpdateClickedEvent"
+            OnViewLogsCallback="OnViewLogsClickedEvent"
+            OnCancelCallback="OnCancelUpdateClickedEvent"
             OnInitCallback="OnInit" />
 </div>
 <div class="col-md-12">
@@ -30,7 +30,7 @@
                     <thead class="table-head">
                         <tr>
                             <th scope="col" width="5%" valign="middle" align="center">
-                                <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxSelectAllClicked" />
+                                <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxSelectAllClickedEvent" />
                             </th>
                             <th scope="col">>User Group Name</th>
                             <th scope="col">>Users</th>
@@ -44,7 +44,7 @@
                             <tr>
                                 <td>
                                     <div class="d-flex justify-content-center">
-                                        <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="MarketTemplateGroup.IsActive" OnChangeCallback="CheckboxMarketGroupClicked" Param1="MarketTemplateGroup" />
+                                        <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="MarketTemplateGroup.IsActive" OnChangeCallback="CheckboxClickedEvent" Param1="MarketTemplateGroup" />
                                     </div>
                                 </td>
                                 <td>@MarketTemplateGroup.Name</td>
@@ -52,7 +52,7 @@
                                     @if (!string.IsNullOrEmpty(MarketTemplateGroup.MarketTemplateIds))
                                     {
                                         <a class="btn btn-default btn-sm text-center"
-                           @onclick="async () => await OnViewMarketGroup(MarketTemplateGroup.Name, MarketTemplateGroup.MarketTemplateIds)">
+                           @onclick="async () => await OnViewClickedEvent(MarketTemplateGroup.Name, MarketTemplateGroup.MarketTemplateIds)">
                                             <span data-toggle="tooltip" data-placement="left" title="Click to View" data-original-title="Click to View">
                                                 <i class="fa fa-eye"></i>@(MarketTemplateGroup.MarketTemplateIds.Split(",").ToList().Count)
                                             </span>
@@ -68,11 +68,11 @@
                                     }
                                 </td>
                                 <td class="text-center">
-                                    <a class="link-edit me-2" href="javascript:(0)" @onclick="async () => await OnEditMarketGroup(MarketTemplateGroup.MarketTemplateGroupId)">
+                                    <a class="link-edit me-2" href="javascript:(0)" @onclick="async () => await OnEditClickedEvent(MarketTemplateGroup.MarketTemplateGroupId)">
                                         <i class="fa fa-edit"></i>
                                     </a>
                                     <a class="link-delete me-2" href="javascript:(0)">
-                                        <i class="fa fa-trash" @onclick="async () => await OnDeleteMarketGroup(MarketTemplateGroup)"></i>
+                                        <i class="fa fa-trash" @onclick="async () => await OnDeleteClickedEvent(MarketTemplateGroup)"></i>
                                     </a>
                                 </td>
                                 <td class="text-center actions">
@@ -92,4 +92,4 @@
         }
     </div>
 </div>
-<CustomModal OnSaveClickCallback="OnSaveMarketGroupClickEvent" />
+<CustomModal OnSaveClickCallback="OnSaveClickEvent" />

@@ -36,15 +36,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             TableClass = "table-edit-market-group";
             IsPreLoader = true;
         }
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            //if (firstRender)
-            //{
-            //    // "tr > td.actions > a.drag-handle"
-            //    await JSRuntime.InvokeVoidAsync("initSort", $".{TableClass}", ".drag-handle");
-            //}
-        }
-        public async Task OnMarketGroupAdd()
+
+        public async Task OnAddClickedEvent()
         {
             var marketTemplateGroup = new ClientMarketTemplateGroupDTO
             {
@@ -61,16 +54,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
             ModalService.Open<AddOrEditMarketGroupModal>($"Add Market Group", parameters, options);
         }
-        public async Task OnUpdateMarketGroup()
+        public async Task OnUpdateClickedEvent()
         {
             MarketGroupModel.IsUpdate = true;
 
             await JSRuntime.InvokeVoidAsync("initSort", $".{TableClass}", ".drag-handle");
             await JSRuntime.InvokeVoidAsync("enableSort", $".{TableClass}");
-
-            //await InvokeAsync(StateHasChanged);
         }
-        public async Task OnEditMarketGroup(int marketTemplateGroupId)
+        public async Task OnEditClickedEvent(int marketTemplateGroupId)
         {
             var marketTemplateGroup = new ClientMarketTemplateGroupDTO
             {
@@ -91,7 +82,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             ModalService.Open<AddOrEditMarketGroupModal>($"Edit Market Group", parameters, options);
         }
 
-        public async Task OnDeleteMarketGroup(ClientMarketTemplateGroupDTO marketTemplateGroup)
+        public async Task OnDeleteClickedEvent(ClientMarketTemplateGroupDTO marketTemplateGroup)
         {
             var parameters = new ModalParameters();
 
@@ -104,14 +95,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
             ModalService.Open<DeleteMarketGroupModal>($"Delete Market Group", parameters, options);
         }
-        public async Task OnCanceUpdateClickedEvent()
+        public async Task OnCancelUpdateClickedEvent()
         {
             MarketGroupModel.IsUpdate = false;
 
             await JSRuntime.InvokeVoidAsync("disableSort", $".{TableClass}");
         }
 
-        public async Task OnCopyMarketGroup()
+        public async Task OnCopyClickedEvent()
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
@@ -121,7 +112,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
             ModalService.Open<CopyMarketGroupModal>($"Edit Market Group", parameters, options);
         }
-        public async Task OnViewLogs()
+        public async Task OnViewLogsClickedEvent()
         {
             var parameters = new ModalParameters();
             parameters.Add("MarketGroupModel", MarketGroupModel);
@@ -132,7 +123,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
             ModalService.Open<MarketGroupViewLogsModal>($"View Logs Market Group", parameters, options);
         }
-        public async Task OnViewMarketGroup(string MarketTemplateGroupName, string marketTemplateIds)
+        public async Task OnViewClickedEvent(string MarketTemplateGroupName, string marketTemplateIds)
         {
             var parameters = new ModalParameters();
             parameters.Add("ClientCode", MarketGroupModel.ClientCode);
@@ -146,7 +137,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
             ModalService.Open<ViewMarketGroupModal>($"View Market Group", parameters, options);
         }
-        protected async Task CheckboxSelectAllClicked(CheckBoxModel model)
+        protected async Task CheckboxSelectAllClickedEvent(CheckBoxModel model)
         {
             IsSelectAll = model.Checked;
             if (MarketGroupModel != null && MarketGroupModel.MarketTemplateGroups.Any())
@@ -157,13 +148,13 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             }
         }
-        protected async Task CheckboxMarketGroupClicked(CheckBoxModel model)
+        protected async Task CheckboxClickedEvent(CheckBoxModel model)
         {
             ((ClientMarketTemplateGroupDTO)model.Param1).IsActive = model.Checked;
 
             IsSelectAll = MarketGroupModel != null && !MarketGroupModel.MarketTemplateGroups.Any(s => s.IsActive == false);
         }
-        public async Task OnSaveMarketGroupClickEvent(object item)
+        public async Task OnSaveClickEvent(object item)
         {
             MarketGroupModel.IsUpdate = false;
 
@@ -177,7 +168,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-        public async Task OnInit()
+        private async Task OnInit()
         {
             PageTitle = "Market Groups";
             IconClass = string.Empty;
