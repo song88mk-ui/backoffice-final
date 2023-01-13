@@ -1,4 +1,5 @@
-﻿@using Backoffice.Web.Components.OddsEngine.MarketSettlement
+﻿@using Backoffice.Shared.Enums;
+@using Backoffice.Web.Components.OddsEngine.MarketSettlement
 @layout OEMonitoringLayout
 @page "/odds-engine/market-settlement"
 
@@ -6,113 +7,91 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter />
+    <Filter @bind-ModalFilter="ModalFilter" OnInitializeCallback="GetContent" />
 </div>
 <div class="col-md-12 mt-3 ms-3">
     <span class="fs-6">Manual Market Settlement History</span>
 </div>
 <div class="col-md-12">
-    <!--PUT CONTROL STATEMENT HERE FOR NO RECORDS-->
-    @*<NoRecordFound />*@
-    <div class="mx-3 mt-4">
-        <table class="table table-hover table-bordered">
-            <thead class="table-head">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Fixture</th>
-                    <th scope="col">Market Name</th>
-                    <th scope="col">Sport</th>
-                    <th scope="col">Event Details</th>
-                    <th scope="col">Selection</th>
-                    <th scope="col">Date Settled</th>
-                    <th scope="col">Reason</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">
-                        1
-                    </th>
-                    <td>
-                        <span>Fixture 1</span>
-                    </td>
-                    <td>
-                        <span>Market 1</span>
-                    </td>
-                    <td>
-                        <span>Sport 1</span>
-                    </td>
-                    <td>
-                        <span>Event Details 1</span>
-                    </td>
-                    <td>
-                        <span>Selection 1</span>
-                    </td>
-                    <td>
-                        <span class="date d-block">02/08/2022</span>
-                        <span class="time d-block">07:16:50 AM</span>
-                    </td>
-                    <td>
-                        Lorem ipsum is simply dummy text of the printing and type industry
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        2
-                    </th>
-                    <td>
-                        <span>Fixture 2</span>
-                    </td>
-                    <td>
-                        <span>Market 2</span>
-                    </td>
-                    <td>
-                        <span>Sport 2</span>
-                    </td>
-                    <td>
-                        <span>Event Details 2</span>
-                    </td>
-                    <td>
-                        <span>Selection 2</span>
-                    </td>
-                    <td>
-                        <span class="date d-block">02/08/2022</span>
-                        <span class="time d-block">07:16:50 AM</span>
-                    </td>
-                    <td>
-                        Lorem ipsum is simply dummy text of the printing and type industry
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        3
-                    </th>
-                    <td>
-                        <span>Fixture 3</span>
-                    </td>
-                    <td>
-                        <span>Market 3</span>
-                    </td>
-                    <td>
-                        <span>Sport 3</span>
-                    </td>
-                    <td>
-                        <span>Event Details 3</span>
-                    </td>
-                    <td>
-                        <span>Selection 3</span>
-                    </td>
-                    <td>
-                        <span class="date d-block">02/08/2022</span>
-                        <span class="time d-block">07:16:50 AM</span>
-                    </td>
-                    <td>
-                        Lorem ipsum is simply dummy text of the printing and type industry
-                    </td>
-                </tr>
-            </tbody>
-            <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
-        </table>
-    </div>
+    @if (ManualMarketSettlements != null && ManualMarketSettlements.Any())
+    {
+        @if (IsPreLoader)
+        {
+            <Preloader />
+        }
+        <div class="mx-3 mt-4">
+            <table class="table table-hover table-bordered">
+                <thead class="table-head">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Fixture</th>
+                        <th scope="col">Market Name</th>
+                        <th scope="col">Sport</th>
+                        <th scope="col">Event Details</th>
+                        <th scope="col">Selection</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Settled By</th>
+                        <th scope="col">Date Settled</th>
+                        <th scope="col">Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ManualMarketSettlements)
+                    {                        
+                        int rowCount = (ManualMarketSettlements.IndexOf(item) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                        <tr>
+                            <th scope="row">
+                                @rowCount
+                            </th>
+                            <td>
+                                @if (item.FixtureTypeId == (int)FixtureType.Outright)
+                                {
+                                    <span>@item.FixtureName</span>
+                                }
+                                else
+                                {
+                                    <p>@item.FixtureName.Split("vs.").First()<br>@item.FixtureName.Split("vs.").Last()</p>
+                                }
+                            </td>
+                            <td>
+                                <span>@item.MarketName</span>
+                            </td>
+                            <td>
+                                <span>@item.SportName</span>
+                            </td>
+                            <td>
+                                <span>@item.SegmentName</span> <br>
+                                <span>@item.LeagueName</span> <br>
+                                <strong><span>@item.FixtureName</span></strong>
+                                <span>@item.FixtureStartDate.ToLocalTime().ToString("yyyy/MM/dd hh:mm:ss tt")</span><br>
+                                <span>@item.MarketName @(GetMarketLine(item.MarketName, item.Line))</span>
+                            </td>
+                            <td>
+                                <span>@item.SelectionName</span>
+                            </td>
+                            <td>
+                                <span>@item.ToStatusName</span>
+                            </td>
+                            <td>
+                                <span>@item.ManualSettledBy</span>
+                            </td>
+                            <td>
+                                <span>@item.TimeStamp.ToLocalTime().ToString("MM/dd/yyyy")</span><br>
+                                <span>@item.TimeStamp.ToLocalTime().ToString("hh:mm:ss tt")</span>
+                            </td>
+                            <td>
+                                <span>@item.Reason</span>
+                            </td>
+                        </tr>                        
+                    }                    
+                </tbody>
+                <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="10" />
+            </table>
+        </div>
+    }
+    else
+    {
+        <NoRecordFound/>
+    }
 </div>
-<CustomModal/>
+<CustomModal OnSaveClickCallback="GetContent"/>

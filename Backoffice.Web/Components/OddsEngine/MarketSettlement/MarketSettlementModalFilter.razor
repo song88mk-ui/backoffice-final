@@ -1,47 +1,122 @@
 ﻿<div class="row">
     <div class="col-2">
-        <select class="form-select">
-            <option value="0">Select Sport</option>
-            <option value="1">Sport 1</option>
-            <option value="2">Sport 2</option>
-            <option value="3">Sport 3</option>
+        <select class="form-select" @onchange="OnSportChangedEvent">
+            <optgroup label="Sports">
+                <option value="0">Select Sport</option>
+                @if (AddMarketSettlement != null && AddMarketSettlement.Sports.Any())
+                {
+                    @foreach (var item in AddMarketSettlement.Sports)
+                    {
+                        @if (item.Value == AddMarketSettlement.SportId)
+                        {
+                            <option value="@item.Value" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Name</option>
+                        }
+                    }
+                }
+            </optgroup>
         </select>
     </div>
 
     <div class="col-2">
-        <select class="form-select">
-            <option value="0">Select Segment</option>
-            <option value="1">Segment 1</option>
-            <option value="2">Segment 2</option>
-            <option value="3">Segment 3</option>
+        <select class="form-select" @onchange="OnSegmentChangedEvent">
+            <optgroup label="Segments">
+                <option value="0">Select Segment</option>
+                @if (AddMarketSettlement != null && AddMarketSettlement.Segments.Any())
+                {
+                    @foreach (var item in AddMarketSettlement.Segments)
+                    {
+                        @if (item.Value == AddMarketSettlement.SegmentId)
+                        {
+                            <option value="@item.Value" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Name</option>
+                        }
+                    }
+
+                }
+            </optgroup>
         </select>
     </div>
 
     <div class="col-2">
-        <select class="form-select">
-            <option value="0">Select League</option>
-            <option value="1">League 1</option>
-            <option value="2">League 2</option>
-            <option value="3">League 3</option>
+        <select class="form-select" @onchange="OnLeagueChangedEvent">
+            <optgroup label="Leagues">
+                <option value="0">Select League</option>
+                @if (AddMarketSettlement != null && AddMarketSettlement.Leagues.Any())
+                {
+                    @foreach (var item in AddMarketSettlement.Leagues)
+                    {
+                        @if (item.Value == AddMarketSettlement.LeagueId)
+                        {
+                            <option value="@item.Value" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Name</option>
+                        }
+                    }
+                }
+            </optgroup>
+        </select>
+    </div>
+
+    <div class="col-2">
+        <select class="form-select" @onchange="OnFixtureChangedEvent">
+            <optgroup label="Fixtures">
+                <option value="0">Select Fixture</option>
+                @if (AddMarketSettlement != null && AddMarketSettlement.Fixtures.Any())
+                {
+                    @foreach (var item in AddMarketSettlement.Fixtures)
+                    {
+                        @if (item.Value == AddMarketSettlement.FixtureId)
+                        {
+                            <option value="@item.Value" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Name</option>
+                        }
+                    }
+                }
+            </optgroup>
         </select>
     </div>
 
     <div class="col">
         <div class="row">
             <div class="col">
-                <select class="form-select">
-                    <option value="0">Select Market</option>
-                    <option value="1">Market 1</option>
-                    <option value="2">Market 2</option>
-                    <option value="3">Market 3</option>
+                <select class="form-select" @onchange="OnMarketChangedEvent">
+                    <optgroup label="Markets">
+                        <option value="0">Select Market</option>
+                        @if (AddMarketSettlement != null && AddMarketSettlement.Markets.Any())
+                        {
+                            @foreach (var item in AddMarketSettlement.Markets)
+                            {
+                                @if (item.Value == AddMarketSettlement.MarketId)
+                                {
+                                    <option value="@item.Value" selected>@item.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Name</option>
+                                }
+                            }
+                        }
+                    </optgroup>
                 </select>
             </div>
             <div class="col-2 align-self-center">
                 <span class="d-block text-center justify-content-center">OR</span>
             </div>
             <div class="col">
-                <input type="text" class="form-control" placeholder="Find using BetId" />
+                <input type="text" class="form-control" placeholder="Find using BetId" @onchange="OnBetIdChangedEvent" />
             </div>
-        </div>                       
+        </div>
     </div>
 </div>
