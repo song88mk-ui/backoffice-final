@@ -7,16 +7,22 @@ using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.Fix
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
 using BlazorDateRangePicker;
+using Backoffice.Shared.Utilities;
+using Backoffice.Shared.OutgoingEngineMessages;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.MessageSettlement
 {
     public partial class Filter : IDisposable
     {
         #region Properties
+        [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Parameter] public EventCallback OnInitializeCallback { get; set; }
+        [Parameter] public EventCallback OnAddCallback { get; set; }
         [Parameter] public EventCallback<MarketSettlementFilterModel> MarketSettlementFilterModelChanged { get; set; }
         [Parameter] public MarketSettlementFilterModel MarketSettlementFilterModel { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public MarketFixtureResponse MarketFixtures { get; set; }
         public MarketFixtureResponse MarketFixtureOutrights { get; set; }
@@ -58,6 +64,12 @@ namespace Backoffice.Web.Components.OddsEngine.MessageSettlement
             {
                 //await Initialize();
             }
+        }
+        public async Task OnAddMessageSettlement()
+        {
+            await MarketSettlementFilterModelChanged.InvokeAsync(MarketSettlementFilterModel);
+
+            await OnAddCallback.InvokeAsync();
         }
         public async Task OnFilterClickEvent()
         {
@@ -175,6 +187,28 @@ namespace Backoffice.Web.Components.OddsEngine.MessageSettlement
             await MarketSettlementFilterModelChanged.InvokeAsync(MarketSettlementFilterModel);
 
             await OnInitializeCallback.InvokeAsync();
+        }
+        public async Task OnExportClickEvent()
+        {
+
+            if (MarketSettlementFilterModel == null)
+                return;
+
+            var payload = new OnGetManualMarketSettlementHistoryMessage
+            {
+                FixtureId = string.IsNullOrWhiteSpace(MarketSettlementFilterModel.FixtureId) ? "%" : MarketSettlementFilterModel.FixtureId,
+                MarketId = string.IsNullOrWhiteSpace(MarketSettlementFilterModel.MarketId) ? "0" : MarketSettlementFilterModel.MarketId,
+                SelectionId = string.IsNullOrWhiteSpace(MarketSettlementFilterModel.SelectionId) ? "0" : MarketSettlementFilterModel.SelectionId,
+                SportId = MarketSettlementFilterModel.SportId == 0 ? "%" : MarketSettlementFilterModel.SportId.ToString(),
+                SegmentId = MarketSettlementFilterModel.SegmentId == 0 ? "%" : MarketSettlementFilterModel.SegmentId.ToString(),
+                LeagueId = MarketSettlementFilterModel.LeagueId == 0 ? "%" : MarketSettlementFilterModel.LeagueId.ToString(),
+                ManualSettledBy = MarketSettlementFilterModel.SettledBy,
+                FromDate = MarketSettlementFilterModel.FromDate.ToUniversalTime(),
+                ToDate = MarketSettlementFilterModel.ToDate.ToUniversalTime(),
+                UserId = UserModel.Id
+            };
+
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetManualMessageSettlementHistory", "r.oe.web.config.ongetmanualmessagesettlementhistory", Guid.NewGuid().ToString());
         }
         public void Dispose()
         {

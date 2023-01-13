@@ -1,0 +1,70 @@
+﻿<div class="modal-body">
+    @if (AddMessageSettlementModel != null)
+    {
+        <EditForm Model="@AddMessageSettlementModel" OnValidSubmit="GetBetDetails">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <span class="input-group-append">
+                                <InputText @bind-Value="@AddMessageSettlementModel.BetId" placeholder="Find by BetId" class="form-control" required />
+                                <button type="submit" class="search-btn"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+
+        <EditForm Model="@AddMessageSettlementModel" OnValidSubmit="OnSettleClickEvent">
+            <TableContent>
+                <TableHeaderContent>
+                    <th valign="middle" align="left" style="width:5%"></th>
+                    <th valign="middle" align="left" style="width:30%"><strong>Fixture</strong></th>
+                    <th valign="middle" align="left" style="width:25%"><strong>Reason</strong></th>
+                </TableHeaderContent>
+                <TableBodyContent>
+                    @if (AddMessageSettlementModel.BetSelections != null && AddMessageSettlementModel.BetSelections.Any())
+                    {
+                        int count = AddMessageSettlementModel.BetSelections.Count;
+                        foreach (var logs in AddMessageSettlementModel.BetSelections)
+                        {
+                            <tr>
+                                <td><InputCheckbox @bind-Value="@logs.IsChecked" @onclick="_ => ToggleCheckbox(logs.BetSelectionId)" /></td>
+                                <td>@logs.FixtureName</td>
+                                <td><InputTextArea @bind-Value="@logs.Reason" class="form-control" @attributes="logs.Required"></InputTextArea></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan=5>
+                                <NoRecordFound />
+                            </td>
+                        </tr>
+                    }
+                </TableBodyContent>
+            </TableContent>
+
+            <div class="row">
+                <div class="@divClass col-md-11 mx-auto form-text p-3" style="@divStyles">
+                    <strong>@((MarkupString)message)</strong>
+                </div>
+            </div>
+            <br />
+            @if (AddMessageSettlementModel.BetSelections != null && AddMessageSettlementModel.BetSelections.Any())
+            {
+                <div align="right">
+                    <button type="button" class="btn btn-danger" @onclick="_ => OnCloseClickEvent()">Cancel</button>
+                    <button type="submit" class="btn btn-success" data-type="inverse" data-from="top" data-align="right" data-dismiss="modal" @ref="SaveButton">Settle</button>
+                </div>
+            }
+        </EditForm>
+    }
+    else
+    {
+        <Preloader Classes="@("container-loader")" AlwaysLoad="true" />
+    }
+</div>
+

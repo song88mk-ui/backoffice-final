@@ -9,7 +9,7 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter @bind-MarketSettlementFilterModel="MarketSettlementFilterModel" OnInitializeCallback="GetContents" />
+    <Filter @bind-MarketSettlementFilterModel="MarketSettlementFilterModel" OnInitializeCallback="GetContents" OnAddCallback="OnAddClickedEvent" />
 </div>
 <div class="col-md-12 mt-3 ms-3">
     <span class="fs-6">Manual Message Settlement History</span>
@@ -82,4 +82,4 @@
     </div>
 </div>
 
-<CustomModal />
+<CustomModal OnSaveClickCallback="OnSaveClickedEvent"/>

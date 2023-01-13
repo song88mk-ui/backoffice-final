@@ -6,7 +6,6 @@ using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 using System.Globalization;
-using ActivityLogModel = Backoffice.Web.Models.ActivityLogModel;
 
 namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 {

@@ -1,18 +1,15 @@
-﻿using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
-using Page = Backoffice.Shared.Enums.Page;
-using Microsoft.AspNetCore.Identity;
-using ActivityLogModel = Backoffice.Web.Models.ActivityLogModel;
-using PriceBoostLogModel = Backoffice.Web.Models.PriceBoostLogModel;
-using Activity = Backoffice.Shared.Enums.Activity;
-using System.Diagnostics;
-using System.Text;
-using Backoffice.Shared.Models.Response;
 using System.Globalization;
+using System.Text;
+using Activity = Backoffice.Shared.Enums.Activity;
+using Page = Backoffice.Shared.Enums.Page;
+using PriceBoostLogModel = Backoffice.Web.Models.PriceBoostLogModel;
 
 namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 {

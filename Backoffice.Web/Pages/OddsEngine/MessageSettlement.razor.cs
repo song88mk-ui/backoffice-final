@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Common;
+using Backoffice.Web.Components.OddsEngine.MessageSettlement;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -12,6 +13,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class MessageSettlement : IDisposable
     {
         #region Properties
+        [Inject] IModalService ModalService { get; set; }
         [Inject] ITradingService TradingService { get; set; }
         public MarketSettlementFilterModel MarketSettlementFilterModel { get; set; }
         public List<MessageSettlementModel> MessageSettlementModel { get; set; }
@@ -25,7 +27,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Methods
-
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = true;
@@ -40,9 +41,24 @@ namespace Backoffice.Web.Pages.OddsEngine
                 TotalPages = 1,
             };
         }
+        public async Task OnAddClickedEvent()
+        {
+            var parameters = new ModalParameters();
 
+            parameters.Add("DialogStyle", "max-width: 80%; overflow-y: initial !important");
+
+            var options = new ModalOptions();
+
+            ModalService.Open<AddMessageSettlement>("Add Message Settlement", parameters, options);
+        }
+        public async Task OnSaveClickedEvent()
+        {
+            await GetContents();
+        }
         public async Task SelectPage(int page)
         {
+            MetaData.CurrentPage = page;
+            await GetContents();
         }
 
         public void Dispose()
