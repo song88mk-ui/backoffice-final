@@ -1,4 +1,5 @@
-﻿<div class="row">
+﻿@using BlazorDateRangePicker
+<div class="row">
     <div class="col-md-12">
         <div class="content-filter mx-3 d-flex justify-content-between">
             <div class="button-container d-flex">
@@ -23,81 +24,165 @@
 
 @if (ShowFilter)
 {
-    <div class="row">
-        <div class="col-md-12 mx-3 mt-4">
-            <div class="d-flex">
-                <div class="me-4 select-container">
-                    <select class="form-select d-block">
-                        <option value="0" selected>All Sports</option>
-                        <option value="1">Sport 1</option>
-                        <option value="2">Sport 2</option>
-                        <option value="3">Sport 3</option>
+    <EditForm Model="MarketSettlementFilterModel" OnValidSubmit="OnSubmitClickEvent" Context="FormContext">
+        <div class="row">
+            <div class="d-flex col-md-12 mx-3 mt-4">
+                <div class="col-2 me-2">
+                    <select class="form-select d-block" @onchange="OnSportChangedEvent">
+                        <optgroup label="Sport">
+                            <option value="0" selected>All Sports</option>
+                        </optgroup>
+                        @if (MarketSettlementFilterModel.Sports != null && MarketSettlementFilterModel.Sports.Any())
+                        {
+                            @foreach (var item in MarketSettlementFilterModel.Sports)
+                            {
+                                if (item.Value == MarketSettlementFilterModel.SportId)
+                                {
+                                    <option value="@item.Value" selected>@item.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Name</option>
+                                }
+                            }
+                        }
                     </select>
                 </div>
-                <div class="me-4 select-container">
-                    <select class="form-select d-block">
-                        <option value="0" selected>All Segments</option>
-                        <option value="1">Segment 1</option>
-                        <option value="2">Segment 2</option>
-                        <option value="3">Segment 3</option>
+                <div class="col-2 me-2">
+                    <select class="form-select d-block" @onchange="OnSegmentChangedEvent">
+                        <optgroup label="Segment">
+                            <option value="0" selected>All Segments</option>
+                        </optgroup>
+                        @if (MarketSettlementFilterModel.Segments != null && MarketSettlementFilterModel.Segments.Any())
+                        {
+                            @foreach (var item in MarketSettlementFilterModel.Segments)
+                            {
+                                if (item.Value == MarketSettlementFilterModel.SegmentId)
+                                {
+                                    <option value="@item.Value" selected>@item.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Name</option>
+                                }
+                            }
+                        }
                     </select>
                 </div>
-                <div class="me-4 select-container">
-                    <select class="form-select d-block">
-                        <option value="0" selected>All Leagues</option>
-                        <option value="1">League 1</option>
-                        <option value="2">League 2</option>
-                        <option value="3">League 3</option>
+                <div class="col-2 me-2">
+                    <select class="form-select d-block" @onchange="OnLeagueChangedEvent">
+                        <optgroup label="League">
+                            <option value="0" selected>All Leagues</option>
+                        </optgroup>
+                        @if (MarketSettlementFilterModel.Leagues != null && MarketSettlementFilterModel.Leagues.Any())
+                        {
+                            @foreach (var item in MarketSettlementFilterModel.Leagues)
+                            {
+                                if (item.Value == MarketSettlementFilterModel.LeagueId)
+                                {
+                                    <option value="@item.Value" selected>@item.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Name</option>
+                                }
+                            }
+                        }
                     </select>
                 </div>
-                <div class="me-4 select-container">
-                    <select class="form-select d-block">
-                        <option value="0" selected>All Fixtures</option>
-                        <option value="1">Fixture 1</option>
-                        <option value="2">Fixture 2</option>
-                        <option value="3">Fixture 3</option>
+                <div class="col-2 me-2">
+                    <select class="form-select d-block" @onchange="OnFixtureChangedEvent">
+                        <optgroup label="Fixture">
+                            <option value="0" selected>All Fixtures</option>
+                        </optgroup>
+                        @if (MarketSettlementFilterModel.Fixtures != null && MarketSettlementFilterModel.Fixtures.Any())
+                        {
+                            @foreach (var item in MarketSettlementFilterModel.Fixtures)
+                            {
+                                if (item.Value == MarketSettlementFilterModel.FixtureId)
+                                {
+                                    <option value="@item.Value" selected>@item.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Name</option>
+                                }
+                            }
+                        }
                     </select>
                 </div>
-                <div class="me-4 select-container">
-                    <select class="form-select d-block">
-                        <option value="0" selected>All Status</option>
-                        <option value="1">Status 1</option>
-                        <option value="2">Status 2</option>
-                        <option value="3">Status 3</option>
+                <div class="col-2 me-2">
+                    <select class="form-select d-block" @onchange="OnStatusChangedEvent">
+                        <optgroup label="Status">
+                            <option value="0" selected>All Status</option>
+                            @foreach (var item in MarketSettlementFilterModel.Statuses)
+                            {
+                                if (item.Value == MarketSettlementFilterModel.ToStatus)
+                                {
+                                    <option value="@item.Value" selected>@item.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Name</option>
+                                }
+                            }
+                        </optgroup>
                     </select>
                 </div>
             </div>
-        </div>
-        <div class="col-md-12 mx-3 mt-2">
-            <div class="d-flex">
-                <div class="me-4 select-container">
-                    <select class="form-select d-block">
-                        <option value="0" selected>All Markets</option>
-                        <option value="1">Market 1</option>
-                        <option value="2">Market 2</option>
-                        <option value="3">Market 3</option>
+            <div class="d-flex col-md-12 mx-3 mt-2">
+                <div class="col-2 me-2">
+                    <select class="form-select d-block" @onchange="OnMarketChangedEvent">
+                        <optgroup label="Market">
+                            <option value="0" selected>All Markets</option>
+                            @if (MarketSettlementFilterModel.Markets != null && MarketSettlementFilterModel.Markets.Any())
+                            {
+                                @foreach (var item in MarketSettlementFilterModel.Markets)
+                                {
+                                    if (item.Value == MarketSettlementFilterModel.MarketId)
+                                    {
+                                        <option value="@item.Value" selected>@item.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Value">@item.Name</option>
+                                    }
+                                }
+                            }
+                        </optgroup>
                     </select>
                 </div>
-                <div class="me-4 select-container">
-                    <select class="form-select d-block">
-                        <option value="0" selected>All Selections</option>
-                        <option value="1">Selection 1</option>
-                        <option value="2">Selection 2</option>
-                        <option value="3">Selection 3</option>
+                <div class="col-2 me-2 ">
+                    <select class="form-select d-block" @onchange="OnSelectionChangedEvent">
+                        <optgroup label="Market">
+                            <option value="0" selected>All Selections</option>
+                            @if (MarketSettlementFilterModel.Selections != null && MarketSettlementFilterModel.Selections.Any())
+                            {
+                                @foreach (var item in MarketSettlementFilterModel.Selections)
+                                {
+                                    if (item.Value == MarketSettlementFilterModel.SelectionId)
+                                    {
+                                        <option value="@item.Value" selected>@item.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Value">@item.Name</option>
+                                    }
+                                }
+                            }
+                        </optgroup>
                     </select>
                 </div>
-                <div class="me-4 input-container">
-                    <input type="text" class="form-control" placeholder="06/16/2022 - 06/16/2022" />
+                <div class="col-2 me-2 form-group">
+                    <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="MarketSettlementFilterModel.FromDate" EndDate="MarketSettlementFilterModel.ToDate" MaxDate="@DateTime.Today" OnRangeSelect="OnRangeSelect" />
                 </div>
-                <div class="me-4 input-container">
-                    <input type="text" class="form-control" placeholder="Settled By" />
+                <div class="col-2 me-2">
+                    <input type="text" class="form-control" placeholder="Settled By" @bind-value="MarketSettlementFilterModel.SettledBy" />
                 </div>
-                <div class="me-4 input-container">
-                    <a href="javascript:void(0)" class="btn btn-search px-3">
-                        Search
-                    </a>
+                <div class="col-2 me-2">
+                    <button class="btn btn-search">Search</button>
                 </div>
             </div>
         </div>
-    </div>
+    </EditForm>
 }

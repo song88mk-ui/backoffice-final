@@ -13,6 +13,7 @@ namespace Backoffice.API.Controllers.Trading
     public class TradingController : ControllerBase
     {
         // Include "x-region" in request Header
+        //
         private ITradingRepository _tradingRepository { get; set; }
 
         #region Ctor

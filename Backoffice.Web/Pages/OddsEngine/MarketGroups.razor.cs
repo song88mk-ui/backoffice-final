@@ -18,15 +18,32 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Properties
         [Inject] IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
         public bool IsSelectAll { get; set; }
+        public string TableClass { get; set; }
 
         public MarketGroupModel MarketGroupModel { get; set; }
         #endregion
 
         #region Methods
+        protected override async Task OnInitializedAsync()
+        {
+            MarketGroupModel = new MarketGroupModel();
+            TableClass = "table-edit-market-group";
+            IsPreLoader = true;
+        }
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                // "tr > td.actions > a.drag-handle"
+                await JSRuntime.InvokeVoidAsync("initSort", $".{TableClass}", ".drag-handle");
+            }
+        }
         public async Task OnMarketGroupAdd()
         {
             var marketTemplateGroup = new ClientMarketTemplateGroupDTO
@@ -190,8 +207,22 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             IsSelectAll = MarketGroupModel != null && !MarketGroupModel.MarketTemplateGroups.Any(s => s.IsActive == false);
-
+            await SortOrderRow();
             IsPreLoader = false;
+        }
+        private async Task SortOrderRow()
+        {
+            if (MarketGroupModel != null && MarketGroupModel.MarketTemplateGroups.Any())
+            {
+                MarketGroupModel.MarketTemplateGroups = MarketGroupModel.MarketTemplateGroups.Select((s, index) =>
+                {
+                    s.SortOrder = index + 1;
+
+                    return s;
+                }).ToList();
+            }
+
+            await InvokeAsync(StateHasChanged);
         }
         #endregion
     }

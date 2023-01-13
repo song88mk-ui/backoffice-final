@@ -4,15 +4,15 @@
             <div class="select-container d-flex">
                 <div class="me-2">
                     <select class="form-select d-block" @onchange="OnClientChangedEvent">
-                        @foreach(var client in Clients)
+                        @foreach (var client in Clients)
                         {
-                            @if(SelectedClientCode == client.Value)
+                            @if (SelectedClientCode == client.Value)
                             {
                                 <option value="@client.Value" selected>@client.Name</option>
                             }
                             else
                             {
-                            <option value="@client.Value">@client.Name</option>
+                                <option value="@client.Value">@client.Name</option>
                             }
                         }
                     </select>
@@ -61,16 +61,7 @@
                         Copy
                     </a>
                 </div>
-                @if (!MarketGroupModel.IsUpdate)
-                {
-                    <div class="me-2">
-                        <a href="javascript:void(0)" class="btn btn-edit px-3" @onclick="OnUpdateClickEvent">
-                            <i class="fa fa-edit"></i>
-                            Update
-                        </a>
-                    </div>
-                }
-                else
+                @if (MarketGroupModel.IsUpdate)
                 {
                     <div class="me-2">
                         <a href="javascript:void(0)" class="btn btn-save px-3">
@@ -81,6 +72,15 @@
                     <div class="me-2">
                         <a href="javascript:void(0)" class="btn btn-cancel px-3" @onclick="OnCancelClickEvent">
                             Cancel
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="me-2">
+                        <a href="javascript:void(0)" class="btn btn-edit px-3" @onclick="OnUpdateClickEvent">
+                            <i class="fa fa-edit"></i>
+                            Update
                         </a>
                     </div>
                 }

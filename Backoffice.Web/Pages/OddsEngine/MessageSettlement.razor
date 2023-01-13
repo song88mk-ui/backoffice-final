@@ -9,149 +9,77 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter />
+    <Filter @bind-MarketSettlementFilterModel="MarketSettlementFilterModel" OnInitializeCallback="GetContents" />
 </div>
 <div class="col-md-12 mt-3 ms-3">
     <span class="fs-6">Manual Message Settlement History</span>
 </div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">
-        <table class="table table-hover table-bordered">
-            <thead class="table-head">
-                <tr>
-                    <th>#</th>
-                    <th>Date and Time</th>
-                    <th>Bet ID</th>
-                    <th>Sports</th>
-                    <th>Message Settled</th>
-                    <th>Settled By</th>
-                    <th>Date Settled</th>
-                    <th>Reason</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        1
-                    </td>
-                    <td>
-                        <span class="date d-block">02/08/2022</span>
-                        <span class="time d-block">07:16:50 AM</span>
-                    </td>
-                    <td>
-                        AD850EFD-ED00-4A75-A99D-08DA7789336
-                    </td>
-                    <td>
-                        Soccer
-                    </td>
-                    <td>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                    </td>
-                    <td>
-                        FCI-Bryan
-                    </td>
-                    <td>
-                        <span class="date d-block">02/08/2022</span>
-                        <span class="time d-block">07:16:50 AM</span>
-                    </td>
-                    <td>
-                        Lorem ipsum is simply dummy text of the printing and type industry
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        1
-                    </td>
-                    <td>
-                        <span class="date d-block">02/08/2022</span>
-                        <span class="time d-block">07:16:50 AM</span>
-                    </td>
-                    <td>
-                        AD850EFD-ED00-4A75-A99D-08DA7789336
-                    </td>
-                    <td>
-                        Soccer
-                    </td>
-                    <td>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                    </td>
-                    <td>
-                        FCI-Bryan
-                    </td>
-                    <td>
-                        <span class="date d-block">02/08/2022</span>
-                        <span class="time d-block">07:16:50 AM</span>
-                    </td>
-                    <td>
-                        Lorem ipsum is simply dummy text of the printing and type industry
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        1
-                    </td>
-                    <td>
-                        <span class="date d-block">02/08/2022</span>
-                        <span class="time d-block">07:16:50 AM</span>
-                    </td>
-                    <td>
-                        AD850EFD-ED00-4A75-A99D-08DA7789336
-                    </td>
-                    <td>
-                        Soccer
-                    </td>
-                    <td>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                    </td>
-                    <td>
-                        FCI-Bryan
-                    </td>
-                    <td>
-                        <span class="date d-block">02/08/2022</span>
-                        <span class="time d-block">07:16:50 AM</span>
-                    </td>
-                    <td>
-                        Lorem ipsum is simply dummy text of the printing and type industry
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        1
-                    </td>
-                    <td>
-                        <span class="date d-block">02/08/2022</span>
-                        <span class="time d-block">07:16:50 AM</span>
-                    </td>
-                    <td>
-                        AD850EFD-ED00-4A75-A99D-08DA7789336
-                    </td>
-                    <td>
-                        Soccer
-                    </td>
-                    <td>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                        <span class="d-block">Test Series Sri Lanka vs. England - Premium Cricket</span>
-                    </td>
-                    <td>
-                        FCI-Bryan
-                    </td>
-                    <td>
-                        <span class="date d-block">02/08/2022</span>
-                        <span class="time d-block">07:16:50 AM</span>
-                    </td>
-                    <td>
-                        Lorem ipsum is simply dummy text of the printing and type industry
-                    </td>
-                </tr>
-            </tbody>
-            <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
-        </table>
+        @if (IsPreLoader)
+        {
+            <Preloader />
+        }
+        else
+        {
+            <table class="table table-hover table-bordered">
+                <thead class="table-head">
+                    <tr>
+                        <th>#</th>
+                        <th>Date and Time</th>
+                        <th>Bet ID</th>
+                        <th>Sports</th>
+                        <th>Message Settled</th>
+                        <th>Settled By</th>
+                        <th>Date Settled</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (MessageSettlementModel != null)
+                    {
+                        @foreach (var item in MessageSettlementModel)
+                        {
+                            int RowCount = (MessageSettlementModel.IndexOf(item) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                            <tr>
+                                <td>
+                                    @RowCount
+                                </td>
+                                <td>
+                                    <span class="date d-block">@item.BetDate.ToString("MM/dd/yyyy")</span>
+                                    <span class="time d-block">@item.BetDate.ToString("hh:mm tt")</span>
+                                </td>
+                                <td>
+                                    @item.BetId
+                                </td>
+                                <td>
+                                    @item.Sports
+                                </td>
+                                <td>
+                                    @item.MessagesSettled
+                                </td>
+                                <td>
+                                    @item.SettledBy
+                                </td>
+                                <td>
+                                    <span class="date d-block">@item.DateSettled.ToString("MM/dd/yyyy")</span>
+                                    <span class="time d-block">@item.DateSettled.ToString("hh:mm tt")</span>
+                                </td>
+                                <td>
+                                    @item.Reason
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <NoRecordFound />
+                    }
+                </tbody>
+                <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
+            </table>
+        }
     </div>
 </div>
+
+<CustomModal />

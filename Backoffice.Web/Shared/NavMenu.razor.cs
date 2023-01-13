@@ -66,16 +66,22 @@ namespace Backoffice.Web.Shared
 
                 await OnSportClickCallback.InvokeAsync(SelectedSport);
             }
-        }
-        protected override async Task OnParametersSetAsync()
-        {
             if (UserModel != null)
             {
                 if (UserModel.Claims != null && Claims == null)
                     Claims = UserModel.Claims;
-            
+
             }
         }
+        //protected override void OnParametersSet()
+        //{
+        //    if (UserModel != null)
+        //    {
+        //        if (UserModel.Claims != null && Claims == null)
+        //            Claims = UserModel.Claims;
+
+        //    }
+        //}
         public void ToggleNavMenu()
         {
             collapseNavMenu = !collapseNavMenu;

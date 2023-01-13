@@ -26,16 +26,16 @@
         {
             if (MarketGroupModel != null && MarketGroupModel.MarketTemplateGroups != null)
             {
-                <table class="table table-hover table-bordered">
+                <table class="table table-hover table-bordered @TableClass">
                     <thead class="table-head">
                         <tr>
-                            <th width="5%" valign="middle" align="center">
+                            <th scope="col" width="5%" valign="middle" align="center">
                                 <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxSelectAllClicked" />
                             </th>
-                            <th>User Group Name</th>
-                            <th>Users</th>
-                            <th>Manage</th>
-                            <th></th>
+                            <th scope="col">>User Group Name</th>
+                            <th scope="col">>Users</th>
+                            <th scope="col">>Manage</th>
+                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -75,8 +75,8 @@
                                         <i class="fa fa-trash" @onclick="async () => await OnDeleteMarketGroup(MarketTemplateGroup)"></i>
                                     </a>
                                 </td>
-                                <td class="text-center">
-                                    <a class="link-bars me-2" href="javascript:(0)">
+                                <td class="text-center actions">
+                                    <a href="javascript:void(0);" class="drag-handle">
                                         <i class="fa fa-bars"></i>
                                     </a>
                                 </td>
