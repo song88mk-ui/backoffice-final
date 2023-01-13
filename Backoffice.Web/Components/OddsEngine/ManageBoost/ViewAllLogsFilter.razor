@@ -64,7 +64,7 @@
                             <option value="0">Select Sports</option>
                             @if (FilterModel != null && FilterModel.Sports != null)
                             {
-                                @foreach (var sport in FilterModel.Sports.Sports)
+                                @foreach (var sport in FilterModel.Sports.SportLookup)
                                 {
                                     @if (sport.SportId == FilterModel.SportId)
                                     {

@@ -88,7 +88,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                         });
                     }
 
-                    SelectedSportId = Sports.FirstOrDefault().Value;
+                    SelectedSportId = Sports.Any() ?  Sports.FirstOrDefault().Value : 0;
 
                     FixtureStatuses.Add(new SelectListItemModel<int>
                     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Backoffice.Shared.Models.Response
 {
@@ -8,9 +9,9 @@ namespace Backoffice.Shared.Models.Response
     {
         public SportsLookupResponse()
         {
-            Sports = new List<SportLookup>();
+            SportLookup = new List<SportLookup>();
         }
-        public List<SportLookup> Sports { get; set; }        
+        public List<SportLookup> SportLookup { get; set; }        
     }
 
     public class SportLookup
