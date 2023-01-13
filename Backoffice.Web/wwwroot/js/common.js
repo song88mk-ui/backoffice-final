@@ -25,3 +25,15 @@
         }
     });
 }
+
+window.disableSort = (className) => {
+    var tableClass = className + ' > tbody';
+
+    $(tableClass).sortable('disable');
+}
+
+window.enableSort = (className) => {
+    var tableClass = className + ' > tbody';
+
+    $(tableClass).sortable('option', 'disabled', false);
+}

@@ -9,7 +9,7 @@ namespace Backoffice.Web.Services
     public interface IBackOfficeService
     {
         Task<BaseResponse<ClientModel>> GetClients();
-        Task<BaseResponse<ClientListModel>> GetClientList(GetClientListRequest request);
+        Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);
         Task<BaseResponse<ClientTopFixtureModel>> GetClientTopFixtures(GetClientTopFixtureRequest request);
         Task<BaseResponse<PlatformMessageModel>> PostClientTopFixtures(PostClientTopFixtureRequest request);
         Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);

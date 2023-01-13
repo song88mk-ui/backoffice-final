@@ -166,6 +166,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
             await PrepareMarketGroupModel();
         }
+
         public void Dispose()
         {
         }

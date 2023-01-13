@@ -3,24 +3,48 @@
         <div class="content-filter mx-3 d-flex justify-content-between">
             <div class="select-container d-flex">
                 <div class="me-2">
-                    <select class="form-select d-block">
-                        <option value="1" selected>Client 1</option>
-                        <option value="2">Client 2</option>
-                        <option value="3">Client 3</option>
+                    <select class="form-select d-block" @onchange="OnClientChangedEvent">
+                        @foreach(var client in Clients)
+                        {
+                            if (SelectedClientCode == client.Value)
+                            {
+                                <option value="@client.Value" selected>@client.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@client.Value">@client.Name</option>
+                            }
+                        }
                     </select>
                 </div>
                 <div class="me-2">
-                    <select class="form-select d-block">
-                        <option value="1" selected>Sport 1</option>
-                        <option value="2">Sport 2</option>
-                        <option value="3">Sport 3</option>
+                    <select class="form-select d-block" @onchange="OnSportChangedEvent">
+                        @foreach (var sport in Sports)
+                        {
+                            @if (SelectedSportId == sport.Value)
+                            {
+                                <option value="@sport.Value" selected>@sport.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@sport.Value">@sport.Name</option>
+                            }
+                        }
                     </select>
                 </div>
                 <div class="me-2">
-                    <select class="form-select d-block">
-                        <option value="1" selected>Prematch 1</option>
-                        <option value="2">Prematch 2</option>
-                        <option value="3">Prematch 3</option>
+                    <select class="form-select d-block" @onchange="OnFixtureStatusChangedEvent">
+                        @foreach (var fixtureStatus in FixtureStatuses)
+                        {
+                            @if (SelectedFixtureStatusId == fixtureStatus.Value)
+                            {
+                                <option value="@fixtureStatus.Value" selected>@fixtureStatus.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@fixtureStatus.Value">@fixtureStatus.Name</option>
+                            }
+                        }
                     </select>
                 </div>
             </div>
@@ -60,22 +84,18 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        <div class="d-flex mx-3 mt-3">
-            <div class="me-2">
-                <a href="javascript:void(0)" class="btn btn-market-group active px-3">
-                    Market Group 1
-                </a>
+        @if (ClientMarketTemplateGroups.Any())
+        {
+            <div class="d-flex mx-3 mt-3">
+                @foreach (var model in ClientMarketTemplateGroups)
+                {
+                    <div class="me-2">
+                        <a href="javascript:void(0)" class="btn btn-market-group active px-3">
+                            @model.Name
+                        </a>
+                    </div>
+                }
             </div>
-            <div class="me-2">
-                <a href="javascript:void(0)" class="btn btn-market-group px-3">
-                    Market Group 2
-                </a>
-            </div>
-            <div class="me-2">
-                <a href="javascript:void(0)" class="btn btn-market-group px-3">
-                    Market Group 2
-                </a>
-            </div>
-        </div>
+        }
     </div>
 </div>
