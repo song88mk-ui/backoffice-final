@@ -24,6 +24,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public List<SelectListItemModel<int>> FixtureStatuses { get; set; }
         public int SelectedFixtureStatusId { get; set; }
         public List<MarketSortOrderModel.ClientMarketTemplateGroup> ClientMarketTemplateGroups { get; set; }
+        public int SelectedMarketTemplateGroupId { get; set; }
 
         public bool IsUpdate { get; set; }
 
@@ -109,20 +110,26 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
             SelectedClientCode = e.Value.ToString();
+            IsUpdate = false;
 
+            await OnCancelCallback.InvokeAsync();
             await PrepareMarketSortOrderModel();
         }
         public async void OnSportChangedEvent(ChangeEventArgs e)
         {
             SelectedSportId = int.Parse(e.Value.ToString());
+            IsUpdate = false;
 
+            await OnCancelCallback.InvokeAsync();
             await PrepareMarketSortOrderModel();
         }
 
         public async void OnFixtureStatusChangedEvent(ChangeEventArgs e)
         {
             SelectedFixtureStatusId = int.Parse(e.Value.ToString());
+            IsUpdate = false;
 
+            await OnCancelCallback.InvokeAsync();
             await PrepareMarketSortOrderModel();
         }
 
@@ -138,6 +145,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             IsUpdate = false;
 
             await OnCancelCallback.InvokeAsync();
+        }
+
+        public async Task OnMarketGroupClickEvent(int marketTemplateGroupId)
+        {
+            SelectedMarketTemplateGroupId = marketTemplateGroupId;
         }
 
         public void Dispose()
@@ -164,6 +176,8 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                         SortOrder = s.SortOrder,
                         IsSelected = s.Name == "All Markets" ? true : false,
                     }).ToList();
+
+                SelectedMarketTemplateGroupId = ClientMarketTemplateGroups.FirstOrDefault().MarketTemplateGroupId;
 
                 await MarketSortOrderModelCallback.InvokeAsync(new MarketSortOrderModel
                 {

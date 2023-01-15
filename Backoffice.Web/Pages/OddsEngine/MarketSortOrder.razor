@@ -17,22 +17,30 @@
             <table class="table table-hover table-bordered market-sort-order-table">
                 <thead class="table-head">
                 <tr>
-                    <th>Market</th>
-                    <th>Market Group</th>
-                    <th></th>
+                    <th class="th-market">Market</th>
+                    <th class="th-market-group">Market Group</th>
+                    <th class="th-action"></th>
                 </tr>
                 </thead>
                 <tbody>
                     @foreach (var model in MarketSortOrderModel.MarketTemplates)
                     {
-                        <tr>
+                        <tr @key="@($"row-sp:{MarketSortOrderModel.SportId}-fist:{MarketSortOrderModel.FixtureStatusId}-mate:{model.MarketTemplateId}")">
                             <td id="@model.MarketTemplateId">@model.MarketTemplateName</td>
                             <td>
-                                <div class="d-flex justify-content-center">                            
-                                    <select class="form-select d-block" multiple>
-                                        <option value="1" selected>Market Group 1</option>
-                                        <option value="2">Market Group 2</option>
-                                        <option value="3">Market Group 3</option>
+                                <div @key="@($"select-sp:{MarketSortOrderModel.SportId}-fist:{MarketSortOrderModel.FixtureStatusId}-mate:{model.MarketTemplateId}")" class="d-flex justify-content-center">                            
+                                    <select class="@SelectClass form-select d-block" multiple="multiple">
+                                        @foreach (var group in MarketGroups)
+                                        {
+                                            if (model.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(group.Name.ToLower()))
+                                            {
+                                                <option value="@group.Value" selected>@group.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@group.Value">@group.Name</option>
+                                            }
+                                        }
                                     </select>
                                 </div>
                             </td>
@@ -47,6 +55,7 @@
                     }
                 </tbody>
             </table>
+
         }
     </div>
 </div>

@@ -1,4 +1,5 @@
-﻿window.initSort = (className, handler) => {
+﻿// initialize table sorting
+window.initSort = (className, handler) => {
     var tableClass = className + ' > tbody';
 
     $(tableClass).sortable({
@@ -26,14 +27,29 @@
     });
 }
 
+// disable table sorting
 window.disableSort = (className) => {
     var tableClass = className + ' > tbody';
 
     $(tableClass).sortable('disable');
 }
 
+// enable table sorting
 window.enableSort = (className) => {
     var tableClass = className + ' > tbody';
 
     $(tableClass).sortable('option', 'disabled', false);
+}
+
+// initialize select2
+window.initSelect2 = (className) => {
+    $(className).select2();
+}
+
+window.disableSelect2 = (className) => {
+    $(className).prop("disabled", true);
+}
+
+window.enableSelect2 = (className) => {
+    $(className).prop("disabled", false);
 }
