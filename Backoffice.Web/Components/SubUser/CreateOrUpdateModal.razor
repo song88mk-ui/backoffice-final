@@ -54,11 +54,11 @@
                     {
                         <div class="col-md-6">
                             <div class="d-flex flex-column">
-                                <div class="p-2">
+                                <div>
                                     <label for="selectStatus" class="form-label">Status</label>
                                 </div>
 
-                                <div class="btn-group border rounded p-2" role="group" aria-label="Status Toggle Button Group">
+                                <div class="btn-group border rounded" role="group" aria-label="Status Toggle Button Group">
                                     @if (SubUser.Status == "Normal")
                                     {
                                         <input type="radio" class="btn-check" name="statusRadio" id="normalRadio" autocomplete="off" @onchange="(e) => OnStatusNormalChangedEvent(e)" checked />

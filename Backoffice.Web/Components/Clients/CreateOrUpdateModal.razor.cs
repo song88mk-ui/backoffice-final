@@ -32,7 +32,7 @@ namespace Backoffice.Web.Components.Clients
         public bool SportsbookTierOption { get; set; }
         public bool IsEdit { get; set; }
         public string SelectedCurrency { get; set; }
-        public ClientListResponse.ClientBetSetting SelectedBetSetting { get; set; }
+        public ClientListResponse.BetSetting SelectedBetSetting { get; set; }
         public List<AlertModel> Alerts { get; set; }
         #endregion
 
@@ -72,10 +72,10 @@ namespace Backoffice.Web.Components.Clients
 
             if(!IsEdit)
             {
-                Client.BetSettings = new List<ClientListResponse.ClientBetSetting>();
+                Client.BetSettings = new List<ClientListResponse.BetSetting>();
                 foreach (var currency in Currencies)
                 {
-                    Client.BetSettings.Add(new ClientListResponse.ClientBetSetting
+                    Client.BetSettings.Add(new ClientListResponse.BetSetting
                     {
                         CurrencyCode = currency,
                     });
@@ -88,7 +88,7 @@ namespace Backoffice.Web.Components.Clients
                 {
                     if(!existingCurrencies.Contains(currency))
                     {
-                        Client.BetSettings.Add(new ClientListResponse.ClientBetSetting
+                        Client.BetSettings.Add(new ClientListResponse.BetSetting
                         {
                             CurrencyCode = currency,
                         });

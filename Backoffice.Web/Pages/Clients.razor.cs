@@ -131,7 +131,7 @@ namespace Backoffice.Web.Pages
                 });
             }
 
-            client.BetSettings = new List<ClientListResponse.ClientBetSetting>();
+            client.BetSettings = new List<ClientListResponse.BetSetting>();
 
 
             var parameters = new ModalParameters();
