@@ -42,8 +42,28 @@ window.enableSort = (className) => {
 }
 
 // initialize select2
-window.initSelect2 = (className) => {
+window.initSelect2 = (className, event) => {
     $(className).select2();
+
+    $(className).on('select2:select', function (e) {
+        var data = {
+            parentId: e.currentTarget.id,
+            selectedOptionId: e.params.data.id,
+            isSelect: true
+        }
+
+        DotNet.invokeMethodAsync('Backoffice.Web', event, data);
+    });
+
+    $(className).on('select2:unselecting', function (e) {
+        var data = {
+            parentId: e.currentTarget.id,
+            selectedOptionId: e.params.args.data.id,
+            isSelect: false
+        }
+
+        DotNet.invokeMethodAsync('Backoffice.Web', event, data);
+    })
 }
 
 window.disableSelect2 = (className) => {
@@ -53,6 +73,23 @@ window.disableSelect2 = (className) => {
 window.enableSelect2 = (className) => {
     $(className).prop("disabled", false);
 }
+
+window.getMarketTemplateSortOrder = (className, event) => {
+    var tableClass = className + ' > tbody';
+
+    let data = [];
+
+    $(tableClass).children('tr').each(function (index) {
+        var market = {
+            RowId: $(this).attr('id'),
+            SortOrder: index + 1
+        };
+
+        data.push(JSON.stringify(market));
+    });
+
+    var concat = data.join("\r\n");
+    return new Blob([concat], { type: "application/txt" });
 }
 
 window.showToast = () => {

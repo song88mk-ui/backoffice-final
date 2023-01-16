@@ -8,13 +8,13 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter OnUpdateCallback="OnUpdateClickEvent" OnCancelCallback="OnCancelClickEvent" MarketSortOrderModelCallback="PrepareMarketSortOrderModel" />
+    <Filter OnUpdateCallback="OnUpdateClickEvent" OnCancelCallback="OnCancelClickEvent" OnSaveCallback="OnSaveClickEvent" MarketSortOrderModelCallback="PrepareMarketSortOrderModel" OnMarketGroupCallback="OnMarketGroupClickEvent" />
 </div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">
         @if (MarketSortOrderModel.MarketTemplates.Any())
         {
-            <table class="table table-hover table-bordered market-sort-order-table">
+            <table class="table @(IsUpdate ? "table-hover": "") table-bordered market-sort-order-table">
                 <thead class="table-head">
                 <tr>
                     <th class="th-market">Market</th>
@@ -23,13 +23,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                    @foreach (var model in MarketSortOrderModel.MarketTemplates)
+                    @foreach (var model in FilteredMarketTemplates)
                     {
-                        <tr @key="@($"row-sp:{MarketSortOrderModel.SportId}-fist:{MarketSortOrderModel.FixtureStatusId}-mate:{model.MarketTemplateId}")">
-                            <td id="@model.MarketTemplateId">@model.MarketTemplateName</td>
+                        <tr @key="@($"row-sp:{MarketSortOrderModel.SportId}-fist:{MarketSortOrderModel.FixtureStatusId}-mate:{model.MarketTemplateId}")" class="@(IsUpdate ? "" : "row-disabled")" id="name-@model.MarketTemplateId" data-sort-order="@model.SortOrder">
+                            <td>@model.MarketTemplateName</td>
                             <td>
                                 <div @key="@($"select-sp:{MarketSortOrderModel.SportId}-fist:{MarketSortOrderModel.FixtureStatusId}-mate:{model.MarketTemplateId}")" class="d-flex justify-content-center">                            
-                                    <select class="@SelectClass form-select d-block" multiple="multiple">
+                                    <select id="select-@model.MarketTemplateId" class="@SelectClass form-select d-block" multiple="multiple">
                                         @foreach (var group in MarketGroups)
                                         {
                                             if (model.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(group.Name.ToLower()))

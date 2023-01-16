@@ -15,7 +15,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         [Parameter] public EventCallback OnUpdateCallback { get; set; }
         [Parameter] public EventCallback OnCancelCallback { get; set; }
+        [Parameter] public EventCallback OnSaveCallback { get; set; }
         [Parameter] public EventCallback<MarketSortOrderModel> MarketSortOrderModelCallback { get; set; }
+        [Parameter] public EventCallback<string> OnMarketGroupCallback { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
@@ -115,6 +117,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             await OnCancelCallback.InvokeAsync();
             await PrepareMarketSortOrderModel();
         }
+
         public async void OnSportChangedEvent(ChangeEventArgs e)
         {
             SelectedSportId = int.Parse(e.Value.ToString());
@@ -140,6 +143,13 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             await OnUpdateCallback.InvokeAsync();
         }
 
+        public async Task OnSaveClickEvent()
+        {
+            IsUpdate = false;
+
+            await OnSaveCallback.InvokeAsync();
+        }
+
         public async Task OnCancelClickEvent()
         {
             IsUpdate = false;
@@ -150,6 +160,10 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public async Task OnMarketGroupClickEvent(int marketTemplateGroupId)
         {
             SelectedMarketTemplateGroupId = marketTemplateGroupId;
+
+            var marketTemplateGroup = ClientMarketTemplateGroups.FirstOrDefault(c => c.MarketTemplateGroupId == SelectedMarketTemplateGroupId);
+
+            await OnMarketGroupCallback.InvokeAsync(marketTemplateGroup.Name);
         }
 
         public void Dispose()
@@ -182,15 +196,17 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                 await MarketSortOrderModelCallback.InvokeAsync(new MarketSortOrderModel
                 {
                     ClientCode = SelectedClientCode,
+                    ClientId = marketTemplateResponse.ClientId,
                     SportId = SelectedSportId,
                     FixtureStatusId = SelectedFixtureStatusId,
                     MarketTemplates = marketTemplateResponse.MarketTemplates
-                    .Select(s => new MarketSortOrderModel.ClientMarketTemplate
+                    .OrderBy(o => o.SortOrder)
+                    .Select((s, index) => new MarketSortOrderModel.ClientMarketTemplate
                     {
                         MarketTemplateGroupNames = s.MarketTemplateGroupNames,
                         MarketTemplateId = s.MarketTemplateId,
                         MarketTemplateName = s.MarketTemplateName,
-                        SortOrder = s.SortOrder
+                        SortOrder = s.SortOrder > 1000 ? index + 1 : s.SortOrder
                     }).ToList(),
                     MarketTemplateGroups = ClientMarketTemplateGroups
                 });
