@@ -60,7 +60,7 @@ namespace Backoffice.Web.Components.Clients
             Client.StatusId = IsEdit ? Client.StatusId : (int)ClientStatus.Normal;
             Client.StatusName = IsEdit ? Client.StatusName : ClientStatus.Normal.ToString();
             Client.Region = IsEdit ? Client.Region : "HK";
-            Client.IsTierRevenue = false;
+            Client.IsTierRevenue = IsEdit ? Client.IsTierRevenue : false;
 
             Currencies = new List<string>()
             {

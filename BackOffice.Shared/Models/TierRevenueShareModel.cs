@@ -1,5 +1,7 @@
 ﻿
-namespace Backoffice.Web.Models
+using System.Collections.Generic;
+
+namespace Backoffice.Shared.Models
 {
     public class TierRevenueShareModel
     {

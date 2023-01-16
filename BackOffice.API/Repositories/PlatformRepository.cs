@@ -27,6 +27,75 @@ namespace Backoffice.API.Repositories
             _configuration = configuration;
         }
 
+        #region Client
+        public async Task<BaseResponse<PlatformClientResponse>> AddOrUpdateClient(ClientRequest request, string region)
+        {
+            try
+            {
+                var response = await GetHttpClient(region).PostAsync($"v1/client", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonConvert.DeserializeObject<BaseResponse<PlatformClientResponse>>(await response.Content.ReadAsStringAsync());
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonConvert.DeserializeObject<BaseResponse<PlatformClientResponse>>(await response.Content.ReadAsStringAsync());
+                    else
+                    {
+                        return new BaseResponse<PlatformClientResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<PlatformClientResponse>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+
+        }
+        
+        public async Task<BaseResponse<StatusCode>> ProcessBackOfficeClientBetConfig(AddOrUpdateBetConfigRequest request, string region)
+        {
+            try
+            {
+                var response = await GetHttpClient(region).PostAsync($"v1/client", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonConvert.DeserializeObject<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync());
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonConvert.DeserializeObject<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync());
+                    else
+                    {
+                        return new BaseResponse<StatusCode>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<StatusCode>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+
+        }
+
+        #endregion
+
         #region TOP LEAGUES
         public async Task<BaseResponse<GetAllLeaguesResponse>> GetAllLeagues(GetAllLeaguesRequest request, string region)
         {

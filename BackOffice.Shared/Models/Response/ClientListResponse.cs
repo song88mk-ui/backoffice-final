@@ -22,7 +22,7 @@ namespace Backoffice.Shared.Models.Response
         {
             public Client()
             {
-                BetSettings = new List<ClientBetSetting>();
+                BetSettings = new List<BetSetting>();
                 RevenueShare = new RevenueShare();
                 TaxConfig = new TaxConfig();
             }
@@ -44,12 +44,12 @@ namespace Backoffice.Shared.Models.Response
             public string TierSportsbookShare { get; set; }
             public string TierJackpotShare { get; set; }
             public int BetSlipSelectionCount { get; set; }
-            public List<ClientBetSetting> BetSettings { get; set; }
+            public List<BetSetting> BetSettings { get; set; }
         }
 
-        public class ClientBetSetting
+        public class BetSetting
         {
-            public ClientBetSetting()
+            public BetSetting()
             {
                 BetSettingSoccer = new BetSettingSoccer();
                 BetSettingAllSports = new BetSettingAllSports();

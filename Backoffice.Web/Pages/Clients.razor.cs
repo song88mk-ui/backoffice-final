@@ -100,6 +100,53 @@ namespace Backoffice.Web.Pages
             ModalService.Open<CreateOrUpdateModal>("Create Client", parameters, options);
         }
 
+        public async Task OnEditClientClickEvent(ClientListResponse.Client client)
+        {
+            var sports = (await BackOfficeService.GetSportsAsync()).Result;
+            var realSports = new SportsLookupModel();
+            var virtualSports = new SportsLookupModel();
+
+            if (sports != null && sports.SportLookup != null && sports.SportLookup.Any())
+            {
+                realSports.SportLookup = sports.SportLookup.Where(s => s.SportId < 1000).ToList();
+
+                var virtualSportIds = new int[] { 1001, 1002, 1003, 1005, 1021 };
+
+                virtualSports.SportLookup = sports.SportLookup.Where(s => virtualSportIds.Contains(s.SportId + 1000)).Select(s => new Models.SportLookup
+                {
+                    SportId = s.SportId,
+                    SportName = $"Virtual {s.SportName}"
+                }).ToList();
+
+                virtualSports.SportLookup.Add(new Models.SportLookup
+                {
+                    SportId = 1055,
+                    SportName = "Virtual Horse Racing"
+                });
+
+                virtualSports.SportLookup.Add(new Models.SportLookup
+                {
+                    SportId = 1058,
+                    SportName = "Virtual Dog Racing"
+                });
+            }
+
+            client.BetSettings = new List<ClientListResponse.ClientBetSetting>();
+
+
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("Client", client);
+            parameters.Add("RealSports", realSports);
+            parameters.Add("VirtualSports", virtualSports);
+            parameters.Add("IsEdit", true);
+
+            var options = new ModalOptions();
+            ModalService.Open<CreateOrUpdateModal>("Edit Client", parameters, options);
+        }
+
         public void Dispose()
         {
         }

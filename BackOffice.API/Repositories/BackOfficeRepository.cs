@@ -7,11 +7,17 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Transactions;
+using static Backoffice.Shared.Models.Requests.AddOrUpdateBetConfigRequest;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
 
 namespace Backoffice.API.Repositories
@@ -79,6 +85,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
+
                 var query = _backofficeContext.ClientInformation.AsNoTracking();
 
                 if (!string.IsNullOrEmpty(request.Search))
@@ -128,7 +135,7 @@ namespace Backoffice.API.Repositories
                         MonthlyFee = client.MonthlyFee,
                     };
 
-                    var taxConfig = string.IsNullOrEmpty(client.TaxConfig) ? new TaxConfig() : JsonConvert.DeserializeObject<TaxConfig>(client.TaxConfig);
+                    var taxConfig = string.IsNullOrEmpty(client.TaxConfig) ? new TaxConfig() : JsonSerializer.Deserialize<TaxConfig>(client.TaxConfig);
                     var taxConfigPercent = new TaxConfig
                     {
                         StakeTax = taxConfig.StakeTax * 100m,
@@ -254,6 +261,754 @@ namespace Backoffice.API.Repositories
             }
         }
 
+
+        public async Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request)
+        {
+            try
+            {
+                #region VALIDATION
+                var userId = 0;
+
+                long clientId = 0;
+                if (_backofficeContext.ClientInformation.Any(c => c.Name == request.Name && c.ClientId != request.ClientId))
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = "Business name already exist.",
+                        Result = false
+                    };
+                }
+                if (!request.Website.Contains("https://"))
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = "Website URL should start with https://",
+                        Result = false
+                    };
+                }
+                var isValid = Uri.IsWellFormedUriString(request.Website, UriKind.Absolute);
+
+                if (isValid)
+                {
+                    string url = request.Website;
+
+                    var urlProtocols = new List<string>() { "https://www.", "https://", "http://www.", "http://" };
+
+                    var websites = new List<string>();
+
+                    foreach (var urlProtocol in urlProtocols)
+                    {
+                        url = url.Replace(urlProtocol, string.Empty);
+                    }
+
+                    foreach (var urlProtocol in urlProtocols)
+                    {
+                        var urlToValidate = $"{urlProtocol}{url}";
+                        websites.Add(urlToValidate);
+                    }
+
+                    if (await _backofficeContext.ClientInformation.AnyAsync(c => websites.Contains(c.Website) && c.ClientId != request.ClientId))
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Website is already used by another client.",
+                            Result = false
+                        };
+                    }
+                }
+                else
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = "Website URL should start with https://",
+                        Result = false
+                    };
+                }
+
+                //validate email
+                try
+                {
+                    var emailAddress = new MailAddress(request.Email);
+                }
+                catch
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = "Invalid email address",
+                        Result = false
+                    };
+                }
+
+                if (request.IsTierRevenue)
+                {
+                    //Validate Revenue Share Sportsbook
+                    if (string.IsNullOrEmpty(request.TierSportsbookShare))
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Revenue share sportsbook is required",
+                            Result = false
+                        };
+                    }
+
+                    //Validate Revenue Share Jackpot 
+                    if (string.IsNullOrEmpty(request.TierJackpotShare))
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Revenue share jackpot is required",
+                            Result = false
+                        };
+                    }
+
+                    var revenueShareSB = JsonSerializer.Deserialize<TierRevenueShareModel>(request.TierSportsbookShare);
+                    var revenueShareJp = JsonSerializer.Deserialize<TierRevenueShareModel>(request.TierJackpotShare);
+
+                    if (revenueShareSB.Tiers.Count > 6)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Row count for revenue share sportsbook must be maximum of 6 items only",
+                            Result = false
+                        };
+                    }
+
+                    if (revenueShareSB.Tiers.Select(x => x.Tier).ToList().Min() != 1)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Revenue Share Sportsbook Tier must start at 1",
+                            Result = false
+                        };
+                    }
+
+                    //Check if Tier is sequential
+                    bool isSequential = Enumerable.Range(revenueShareSB.Tiers.Select(x => x.Tier).ToList().Min(), revenueShareSB.Tiers.Select(x => x.Tier).ToList().Count()).SequenceEqual(revenueShareSB.Tiers.Select(x => x.Tier).ToList());
+                    if (!isSequential)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Revenue share sportsbook incorrect sequence for Tier",
+                            Result = false
+                        };
+                    }
+
+
+
+                    if (revenueShareJp.Tiers.Count > 6)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Row count for revenue share sportsbook must be maximum of 6 items only",
+                            Result = false
+                        };
+                    }
+
+                    if (revenueShareJp.Tiers.Select(x => x.Tier).ToList().Min() != 1)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Revenue Share Jackpot Tier must start at 1",
+                            Result = false
+                        };
+                    }
+
+                    //Check if Tier is sequential
+                    isSequential = Enumerable.Range(revenueShareJp.Tiers.Select(x => x.Tier).ToList().Min(), revenueShareJp.Tiers.Select(x => x.Tier).ToList().Count()).SequenceEqual(revenueShareJp.Tiers.Select(x => x.Tier).ToList());
+                    if (!isSequential)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Revenue share jackpot incorrect sequence for Tier",
+                            Result = false
+                        };
+                    }
+
+                    //VALIDATE RANGE
+                    //revenueShareSB = revenueShareSB.Tiers.OrderBy(a => a.Tier).ToList();
+                    for (int i = 0; i < revenueShareSB.Tiers.Count(); i++)
+                    {
+                        if (i == 0 && revenueShareSB.Tiers[i].Tier == 1 && revenueShareSB.Tiers[i].From != 0.01m)
+                        {
+                            return new BaseResponse<bool>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Revenue share sportsbook starting value for Tier 1 must be 0.01",
+                                Result = false
+                            };
+                        }
+
+                        if (revenueShareSB.Tiers[i].Percentage <= 0m)
+                        {
+                            return new BaseResponse<bool>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Percentage must be greater than 0",
+                                Result = false
+                            };
+                        }
+
+                        if (revenueShareSB.Tiers[i].From >= revenueShareSB.Tiers[i].To)
+                        {
+                            return new BaseResponse<bool>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Revenue share sportsbook TO must be greater than FROM",
+                                Result = false
+                            };
+                        }
+
+                        if (i != 0 && (revenueShareSB.Tiers[i].From != revenueShareSB.Tiers[i - 1].To + 0.01m))
+                        {
+                            return new BaseResponse<bool>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Revenue share sportsbook incorrect range for tier " + revenueShareSB.Tiers[i - 1].Tier + " and " + revenueShareSB.Tiers[i].Tier,
+                                Result = false
+                            };
+                        }
+
+                        //validation that % GGR can only be lower in the next tier
+                        if (i != 0 && revenueShareSB.Tiers[i].Percentage > revenueShareSB.Tiers[i - 1].Percentage)
+                        {
+                            return new BaseResponse<bool>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "% GGR for sportsbook can only be lower in the next tier",
+                                Result = false
+                            };
+                        }
+                    }
+
+                    //validate aboveTierPercentage
+                    var aboveTierPercentage = revenueShareSB.AboveTierPercentage;
+                    var minTierPercentage = revenueShareSB.Tiers.Min(a => a.Percentage);
+
+                    if (aboveTierPercentage <= 0m)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Above Tier Percentage sportsbook must be greater than 0",
+                            Result = false
+                        };
+                    }
+
+                    if (aboveTierPercentage > minTierPercentage)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Above tier % GGR for sportsbook can only be lower in the next tier",
+                            Result = false
+                        };
+                    }
+
+                    //revenueShareJp = revenueShareJp.OrderBy(a => a.Tier).ToList();
+                    for (int i = 0; i < revenueShareJp.Tiers.Count(); i++)
+                    {
+                        if (i == 0 && revenueShareJp.Tiers[i].Tier == 1 && revenueShareJp.Tiers[i].From != 0.01m)
+                        {
+                            return new BaseResponse<bool>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Revenue share jackpot starting value for Tier 1 must be 0.01",
+                                Result = false
+                            };
+                        }
+
+                        if (revenueShareJp.Tiers[i].Percentage <= 0m)
+                        {
+                            return new BaseResponse<bool>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Percentage must be greater than 0",
+                                Result = false
+                            };
+                        }
+
+                        if (revenueShareJp.Tiers[i].From >= revenueShareJp.Tiers[i].To)
+                        {
+                            return new BaseResponse<bool>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Revenue share Jackpot TO must be greater than FROM",
+                                Result = false
+                            };
+                        }
+
+                        if (i != 0 && (revenueShareJp.Tiers[i].From != revenueShareJp.Tiers[i - 1].To + 0.01m))
+                        {
+                            return new BaseResponse<bool>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Revenue share jackpot incorrect range for tier " + revenueShareJp.Tiers[i - 1].Tier + " and " + revenueShareJp.Tiers[i].Tier,
+                                Result = false
+                            };
+                        }
+
+                        //validation that % GGR can only be lower in the next tier
+                        if (i != 0 && revenueShareJp.Tiers[i].Percentage > revenueShareJp.Tiers[i - 1].Percentage)
+                        {
+                            return new BaseResponse<bool>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "% GGR for jackpot can only be lower in the next tier",
+                                Result = false
+                            };
+                        }
+                    }
+
+                    //validate aboveTierPercentage
+                    aboveTierPercentage = revenueShareJp.AboveTierPercentage;
+                    minTierPercentage = revenueShareJp.Tiers.Min(a => a.Percentage);
+
+                    if (aboveTierPercentage <= 0m)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Above Tier Percentage jackpot must be greater than 0",
+                            Result = false
+                        };
+                    }
+
+                    if (aboveTierPercentage > minTierPercentage)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Above tier % GGR for jackpot can only be lower in the next tier",
+                            Result = false
+                        };
+                    }
+
+                }
+                else
+                {
+                    if (request.RevenueShare.SportsbookShare < 0 || request.RevenueShare.SportsbookShare > 1m)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Sportsbook revenue share must be between 0 - 100%.",
+                            Result = false
+                        };
+                    }
+
+                    if (request.RevenueShare.JackpotShare < 0 || request.RevenueShare.JackpotShare > 1m)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "JackpotShare revenue share must be between 0 - 100%.",
+                            Result = false
+                        };
+                    }
+
+                }
+
+                if (_backofficeContext.ClientInformation.Any(c => c.Brand == request.ClientCode && c.ClientId != request.ClientId))
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = "Brand is already used by another client.",
+                        Result = false
+                    };
+                }
+
+                if (request.ClientCode.Length > 3)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = "Brand must not be greater than 3 characters.",
+                        Result = false
+                    };
+                }
+
+                if (!Regex.Match(request.ClientCode, @"^[a-zA-Z0-9]+$", RegexOptions.IgnoreCase).Success)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = "Brand must be alphanumeric.",
+                        Result = false
+                    };
+                }
+                #endregion
+
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    
+                    if (request.ClientId == 0)
+                    {
+                        var clientRecord = new ClientInformation
+                        {
+                            Name = request.Name,
+                            TelephoneNumber = request.TelephoneNumber,
+                            Website = request.Website,
+                            CreatedBy = 0,
+                            CreatedDate = DateTime.UtcNow,
+                            ModifiedBy = 0,
+                            ModifiedDate = DateTime.UtcNow,
+                            StatusId = request.StatusId,
+                            ApplicationId = (int)Application.SportsbookClient,
+                            SportsbookShare = request.RevenueShare.SportsbookShare,
+                            JackpotShare = request.RevenueShare.JackpotShare,
+                            ClientShare = 0,
+                            MonthlyFee = request.MonthlyFee,
+                            Brand = request.ClientCode,
+                            IsTierRevenueShare = request.IsTierRevenue,
+                            RevenueShareJackpot = request.IsTierRevenue == true ? request.TierJackpotShare : null,
+                            RevenueShareSportsbook = request.IsTierRevenue == true ? request.TierSportsbookShare : null,
+                            TaxConfig = JsonSerializer.Serialize(request.TaxConfig),
+                            Region = request.Region,
+                            Email = request.Email
+                        };
+
+                        clientId = InsertClientRecord(clientRecord);
+                    }
+                    else
+                    {
+                        var client = _backofficeContext.ClientInformation.Find(request.ClientId);
+
+                        if (client == null)
+                        {
+                            client.Name = request.Name;
+                            client.Email = request.Email;
+                            client.TelephoneNumber = request.TelephoneNumber;
+                            client.Website = request.Website;
+                            client.ModifiedBy = userId;
+                            client.ModifiedDate = DateTime.UtcNow;
+                            client.ClientShare = 0;
+                            client.SportsbookShare = request.RevenueShare.SportsbookShare;
+                            client.JackpotShare = request.RevenueShare.JackpotShare;
+                            client.MonthlyFee = request.MonthlyFee;
+                            client.IsTierRevenueShare = request.IsTierRevenue;
+                            client.RevenueShareJackpot = request.IsTierRevenue == true ? request.TierJackpotShare : null;
+                            client.RevenueShareSportsbook = request.IsTierRevenue == true ? request.TierSportsbookShare : null;
+                            client.TaxConfig = JsonSerializer.Serialize(request.TaxConfig);
+                            client.Region = request.Region;
+                        }
+
+                        UpdateClientRecord(client);
+                    }
+
+                    var clientBetSettings = _backofficeContext.ClientBetSetting.Where(b => b.ClientId == clientId).ToList();
+
+                    var clientBetSettingList = new List<ClientBetSetting>();
+
+                    foreach (var betSetting in request.BetSettings)
+                    {
+                        int[] categories = { (int)BetSettingCategory.Soccer, (int)BetSettingCategory.OtherSports, (int)BetSettingCategory.Parlay, (int)BetSettingCategory.Cricket, (int)BetSettingCategory.Priceboost, (int)BetSettingCategory.BetBuilder };
+
+                        decimal suggestedMinimumBet = 0;
+                        suggestedMinimumBet = await GetSuggestedMinimumBet(betSetting.CurrencyCode);
+
+                        foreach (var i in categories)
+                        {
+                            var clientBetSetting = string.Empty;
+                            var minStake = 0m;
+                            var maxStake = 0m;
+                            var maxWinnings = 0m;
+                            byte decimalPlaces = new byte();
+
+                            switch (i)
+                            {
+                                #region SOCCER
+                                case (int)BetSettingCategory.Soccer:
+                                    var categorySoccerBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.Soccer && x.CurrencyCode == betSetting.CurrencyCode);
+
+                                    if (categorySoccerBetSettingJson == null)
+                                    {
+                                        minStake = betSetting.BetSettingSoccer.MinPerTicket; 
+                                        maxStake = betSetting.BetSettingSoccer.MaxPerTicket;
+
+                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingSoccer);
+                                    }
+                                    break;
+                                #endregion
+
+                                #region ALL SPORTS
+                                case (int)BetSettingCategory.OtherSports:
+
+                                    var categoryAllSportsBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.OtherSports && x.CurrencyCode == betSetting.CurrencyCode);
+                                    if (categoryAllSportsBetSettingJson == null)
+                                    {
+                                        minStake = betSetting.BetSettingAllSports.MinPerTicket;
+                                        maxStake = betSetting.BetSettingAllSports.MaxPerTicket;
+
+                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingAllSports);
+                                    }
+                                    break;
+                                #endregion
+                                #region PARLAY
+                                case (int)BetSettingCategory.Parlay:
+                                    var parlayBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.Parlay && x.CurrencyCode == betSetting.CurrencyCode);
+
+                                    if (parlayBetSettingJson == null)
+                                    {
+                                        minStake = betSetting.BetSettingParlay.MinPerTicket;
+                                        maxStake = betSetting.BetSettingParlay.MaxPerTicket;
+                                        maxWinnings = betSetting.BetSettingParlay.MaxWinningsBonus;
+
+                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingParlay);
+                                    }
+                                    break;
+                                #endregion
+
+                                #region CRICKET
+                                case (int)BetSettingCategory.Cricket:
+                                    var categoryCricketBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.Cricket && x.CurrencyCode == betSetting.CurrencyCode);
+
+                                    if (categoryCricketBetSettingJson == null)
+                                    {
+                                        minStake = betSetting.BetSettingCricket.MinPerTicket;
+                                        maxStake = betSetting.BetSettingCricket.MaxPerTicket;
+
+                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingCricket);
+                                    }
+                                    break;
+                                #endregion
+
+                                #region PRICEBOOST
+                                case (int)BetSettingCategory.Priceboost:
+                                    var categoryPriceboostBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.Priceboost && x.CurrencyCode == betSetting.CurrencyCode);
+
+                                    if (categoryPriceboostBetSettingJson == null)
+                                    {
+                                        decimalPlaces = BitConverter.GetBytes(decimal.GetBits(betSetting.BetSettingPriceboost.MaxStake)[3])[2];
+
+                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingPriceboost);
+                                    }
+
+                                    break;
+                                #endregion
+                                #region BETBUILDER
+                                case (int)BetSettingCategory.BetBuilder:
+                                    var categoryBetBuilderBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.BetBuilder && x.CurrencyCode == betSetting.CurrencyCode);
+                                    if (categoryBetBuilderBetSettingJson == null)
+                                    {
+                                        minStake = betSetting.BetSettingBetBuilder.MinStake;
+                                        maxStake = betSetting.BetSettingBetBuilder.MaxStake;
+
+                                        decimalPlaces = BitConverter.GetBytes(decimal.GetBits(betSetting.BetSettingBetBuilder.MaxStake)[3])[2];
+
+                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingBetBuilder);
+                                    }
+                                    break;
+                                    #endregion
+                            }
+
+                            if((int)BetSettingCategory.Priceboost != i)
+                            {
+
+                                if (minStake < suggestedMinimumBet)
+                                {
+                                    return new BaseResponse<bool>
+                                    {
+                                        StatusCode = StatusCode.Error,
+                                        Message = "Suggested minimum bet not met.",
+                                        Result = false
+                                    };
+                                }
+
+                                if (minStake > maxStake)
+                                {
+                                    return new BaseResponse<bool>
+                                    {
+                                        StatusCode = StatusCode.Error,
+                                        Message = "Max amount must be greater than minimum amount.",
+                                        Result = false
+                                    };
+                                }
+                            }
+
+                            if(i == (int)BetSettingCategory.Parlay)
+                            {
+                                if (maxWinnings < 0.02m)
+                                {
+                                    return new BaseResponse<bool>
+                                    {
+                                        StatusCode = StatusCode.Error,
+                                        Message = "Max Winnings Bonus must be at least 0.02",
+                                        Result = false
+                                    };
+                                }
+                            }
+
+                            if (i == (int)BetSettingCategory.Priceboost || i == (int)BetSettingCategory.BetBuilder)
+                            {
+                                if (maxStake > 99999999999 || decimalPlaces > 12)
+                                {
+                                    return new BaseResponse<bool>
+                                    {
+                                        StatusCode = StatusCode.Error,
+                                        Message = "Maximum stake must be lower or equal 99999999999.",
+                                        Result = false
+                                    };
+                                }
+
+                            }
+
+
+                            if (clientBetSetting != null)
+                            {
+                                clientBetSettingList.Add(new ClientBetSetting
+                                {
+                                    CategoryId = i,
+                                    ClientId = clientId,
+                                    Setting = clientBetSetting,
+                                    CreatedBy = userId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    ModifiedBy = userId,
+                                    ModifiedDate = DateTime.UtcNow,
+                                    CurrencyCode = betSetting.CurrencyCode
+                                });
+                            }
+                        }
+                    }
+
+                    if(clientBetSettings.Any())
+                        _backofficeContext.ClientBetSetting.RemoveRange(clientBetSettings);
+
+                    if (clientBetSettingList.Count > 0)
+                        _backofficeContext.ClientBetSetting.AddRange(clientBetSettingList);
+
+                    await _backofficeContext.SaveChangesAsync();
+
+
+                    try
+                    {
+                        var betConfig = new List<BetConfig>();
+                        foreach (var betSetting in request.BetSettings)
+                        {
+                            betConfig.Add(new BetConfig
+                            {
+                                CurrencyCode = betSetting.CurrencyCode,
+                                Football = new FootballBetSetting()
+                                {
+                                    MinBet = betSetting.BetSettingSoccer.MinPerTicket,
+                                    MaxBet = betSetting.BetSettingSoccer.MaxPerTicket,
+                                    MaxFixtureBet = betSetting.BetSettingSoccer.MaxPerGame
+                                },
+                                OtherSports = new AnySportBetSetting()
+                                {
+                                    MinBet = betSetting.BetSettingAllSports.MinPerTicket,
+                                    MaxBet = betSetting.BetSettingAllSports.MaxPerTicket,
+                                    MaxFixtureBet = betSetting.BetSettingAllSports.MaxPerGame
+                                },
+                                Parlay = new ParlayBetSetting()
+                                {
+                                    MinBet = betSetting.BetSettingParlay.MinPerTicket,
+                                    MaxBet = betSetting.BetSettingParlay.MaxPerTicket,
+                                    MaxPayout = betSetting.BetSettingParlay.MaxPayoutPerTicket,
+                                    ParlayBonusMaxWinnings = betSetting.BetSettingParlay.MaxWinningsBonus
+                                },
+                                Cricket = new CricketBetSetting()
+                                {
+                                    MinBet = betSetting.BetSettingCricket.MinPerTicket,
+                                    MaxBet = betSetting.BetSettingCricket.MaxPerTicket,
+                                    MaxFixtureBet = betSetting.BetSettingCricket.MaxPerGame
+                                },
+                                Priceboost = new PriceboostBetSetting()
+                                {
+                                    MaxStake = betSetting.BetSettingPriceboost.MaxStake
+                                },
+                                BetBuilder = new BetBuilderBetSetting()
+                                {
+                                    MinStake = betSetting.BetSettingBetBuilder.MinStake,
+                                    MaxStake = betSetting.BetSettingBetBuilder.MaxStake
+                                },
+                                TaxConfig = request.TaxConfig
+                            });
+                        }
+
+                        //Update client in NewPlatformDB
+                        decimal companyRevenueShare = request.RevenueShare.SportsbookShare;
+                        if (request.IsTierRevenue)
+                        {
+                            //Get highiest value from SB table
+                            var revenueShareSB = JsonSerializer.Deserialize<TierRevenueShareModel>(request.TierSportsbookShare);
+                            companyRevenueShare = revenueShareSB.Tiers.Select(a => a.Percentage).Max();
+                        }
+
+                        //Insert client in NewPlatformDB
+                        var clientPlatform = new ClientRequest
+                        {
+                            ClientName = request.Name,
+                            ClientCode = request.ClientCode,
+                            IsActive = true,
+                            ClientIdRef = (int)clientId,
+                            //LimitId = string.Empty,
+                            //EndPoint = string.Empty,
+                            MonthlyFee = request.MonthlyFee,
+                            CurrentCompanyShare = companyRevenueShare,
+                            EffectiveDate = DateTime.UtcNow,
+                        };
+
+                        var newPlatformResponse = await _platformRepository.AddOrUpdateClient(clientPlatform, request.Region);
+                        if (newPlatformResponse.StatusCode == StatusCode.Success)
+                        {
+                            var betConfigRequest = new AddOrUpdateBetConfigRequest
+                            {
+                                ClientId = newPlatformResponse.Result.ClientId,
+                                BetConfigPayload = betConfig
+                            };
+                            int retry = 0;
+                            while (retry < 3)
+                            {
+                                var newPlatformBettingResponse = await _platformRepository.ProcessBackOfficeClientBetConfig(betConfigRequest, request.Region);
+                                if (newPlatformBettingResponse.StatusCode == StatusCode.Success)
+                                    break;
+                                retry += 1;
+                            }
+
+                            //new trading
+                            //await _tradingClient.UpdateClientEmail(clientPlatform);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+
+                    scope.Complete();
+
+                    //return response;
+                    return new BaseResponse<bool>()
+                    {
+                        StatusCode = StatusCode.Success,
+                        Message = StatusCode.Success.ToString(),
+                        Result = true
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = false
+                };
+            }
+        }
         #endregion
 
         #region Methods - Top Fixtures
@@ -378,6 +1133,55 @@ namespace Backoffice.API.Repositories
             return _memCache.GetCache("boci", () => _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24) ?? new List<ClientInformation>();
         }
 
+        private long InsertClientRecord(ClientInformation client)
+        {
+            _backofficeContext.ClientInformation.Add(client);
+            _backofficeContext.SaveChanges();
+
+            return client.ClientId;
+        }
+
+        private long UpdateClientRecord(ClientInformation client)
+        {
+            var entity = _backofficeContext.ClientInformation.Update(client).Entity;
+            _backofficeContext.SaveChanges();
+            return client.ClientId;
+        }
+
+        private async Task<decimal> GetSuggestedMinimumBet(string currencyCode)
+        {
+            var currency = (Currency)Enum.Parse(typeof(Currency), currencyCode);
+
+            var suggestedMinimumBet = 1m;
+
+            var highValueArr = new Currency[] { Currency.KRW, Currency.VND, Currency.KHR, Currency.IDR, Currency.MMK };
+            var minValue100Arr = new Currency[] { Currency.CDF, Currency.TZS };
+            var minValue1Arr = new Currency[] { Currency.PKR };
+
+            if (highValueArr.Contains(currency))
+            {
+                suggestedMinimumBet = 1000m;
+            }
+            else if (minValue100Arr.Contains(currency))
+            {
+                suggestedMinimumBet = 100m;
+            }
+            else if (currency == Currency.BTC || currency == Currency.ETH)
+            {
+                //suggestedMinimumBet = 0.000000010000m;
+                suggestedMinimumBet = 0.00010000m; // FCI-6803
+            }
+            else if (minValue1Arr.Contains(currency))
+            {
+                suggestedMinimumBet = 1m;
+            }
+            else
+            {
+                suggestedMinimumBet = 0.02m;
+            }
+
+            return suggestedMinimumBet;
+        }
         #endregion
     }
 }
