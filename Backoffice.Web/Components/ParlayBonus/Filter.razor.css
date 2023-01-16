@@ -13,9 +13,12 @@
 }
 
 .min-odds-input {
-
     border-radius: 0px 3px 3px 0px;
 }
+
+    .min-odds-input:focus {
+        z-index:0;
+    }
 
 .form-label {
     font-size: 13px;
