@@ -149,6 +149,24 @@ namespace Backoffice.Web.Pages
             ModalService.Open<CreateOrUpdateModal>("Edit Client", parameters, options);
         }
 
+        public async Task OnViewBetSettingClickEvent(ClientListResponse.Client client)
+        {
+            
+            client.BetSettings = (await BackOfficeService.GetBetSetting(new BetSettingRequest
+            {
+                ClientId = client.ClientId
+            })).Result.BetSettings ?? new List<ClientListResponse.BetSetting>();
+
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("BetSetting", client.BetSettings);
+
+            var options = new ModalOptions();
+            ModalService.Open<ViewBetSettingsModal>("Bet Settings", parameters, options);
+        }
+
         public void Dispose()
         {
         }
