@@ -708,7 +708,7 @@ namespace Backoffice.API.Repositories
                             client.IsEmailNotification = request.IsEmailNotification;
                         }
 
-                        UpdateClientRecord(client);
+                        clientId = UpdateClientRecord(client);
                     }
 
                     var clientBetSettings = _backofficeContext.ClientBetSetting.Where(b => b.ClientId == clientId).ToList();
