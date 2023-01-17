@@ -1,26 +1,28 @@
 ﻿using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using static Backoffice.Shared.Models.Requests.GetTopLeaguesRequest;
-using static Backoffice.Shared.Models.Response.SportsTreeResponse;
 using static Backoffice.Web.Models.SportsTreeModel;
 
 namespace Backoffice.Web.Components.TopLeagues
 {
     public partial class Select : ComponentBase, IDisposable
     {
-        #region Properties      
-        [Parameter] public List<SportsTreeModel.SportModel> SportsTree { get; set; }
-        [Parameter] public List<OrderedClientTopLeague> CurrentTopLeagues { get; set; }
+        #region Properties
+
+        [Parameter] public List<SportModel> SportsTree { get; set; }
+        [Parameter] public List<TopLeaguesModel.TopLeague> CurrentTopLeagues { get; set; }
         [Parameter] public int SelectedTopLeagues { get; set; }
         [Parameter] public int RowCount { get; set; }
         [Parameter] public int SportId { get; set; }
-        [Parameter] public EventCallback<OrderedClientTopLeague> OnSelectedLeague { get; set; }
+        [Parameter] public EventCallback<TopLeaguesModel.TopLeague> OnSelectedLeague { get; set; }
+
         #endregion
 
         #region Methods
+
         public async void OnSelectedLeagueEvent(LeagueModel league, SegmentModel segmentResponse)
         {
-            var model = new OrderedClientTopLeague
+            var model = new TopLeaguesModel.TopLeague
             {
                 SegmentId = segmentResponse.SegmentId,
                 SegmentName = segmentResponse.SegmentName,
@@ -32,6 +34,7 @@ namespace Backoffice.Web.Components.TopLeagues
                 //SportName = league.SportName,
                 //Status = league.Status
             };
+
             await OnSelectedLeague.InvokeAsync(model);
         }
 
@@ -39,6 +42,7 @@ namespace Backoffice.Web.Components.TopLeagues
         {
 
         }
+
         #endregion
 
     }

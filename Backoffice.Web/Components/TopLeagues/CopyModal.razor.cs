@@ -10,17 +10,23 @@ namespace Backoffice.Web.Components.TopLeagues
     public partial class CopyModal : IDisposable
     {
         #region Properties
+
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         [Parameter] public CopyTopLeaguesModel CopyTopLeaguesModel { get; set; }
+
         public CopyTopLeaguesRequest CopyTopLeaguesRequest { get; set; }
+
         public bool IsSelectAll { get; set; }
         public string ClientIdErrorMessage { get; set; }
         public string AlertMessage { get; set; }
         public string AlertStatus { get; set; }
+
         #endregion
 
         #region Methods
@@ -29,16 +35,29 @@ namespace Backoffice.Web.Components.TopLeagues
         {
             ClientIdErrorMessage = string.Empty;
 
+            var topLeagues = ModalParameters.TryGet<List<TopLeaguesModel.TopLeague>>("CopyFromClientTopLeagues") ?? new List<TopLeaguesModel.TopLeague>();
+
             CopyTopLeaguesModel = new CopyTopLeaguesModel
             {
                 CopyFromClientId = ModalParameters.TryGet<int>("CopyFromClientId"),
                 SportId = int.Parse(ModalParameters.TryGet<string>("SportId")),
-                CopyFromClientTopLeagues = ModalParameters.TryGet<List<OrderedClientTopLeague>>("CopyFromClientTopLeagues") ?? new List<OrderedClientTopLeague>(),
-
+                CopyFromClientTopLeagues = topLeagues.Select(s => new CopyTopLeaguesModel.TopLeague
+                {
+                    SportId = s.SportId,
+                    SportName = s.SportName,
+                    SegmentId = s.SegmentId,
+                    SegmentName = s.SegmentName,
+                    LeagueId = s.LeagueId,
+                    LeagueName = s.LeagueName,
+                    Status = s.Status,
+                    LiveCount = s.LiveCount,
+                    SortOrder = s.SortOrder
+                }).ToList(),
                 ClientIdSelectedModel = new List<ClientIdSelectedModel>()
             };
 
             var clients = (await BackOfficeService.GetClients()).Result;
+
             if (clients != null)
             {
                 if (UserModel.ClientCodes.Any())
@@ -78,23 +97,38 @@ namespace Backoffice.Web.Components.TopLeagues
             {
                 ClientIdErrorMessage = string.Empty;
 
-                var topSetUp = new List<CopyTopLeaguesRequest.SportLeague>();
-                var i = 0;
-                foreach (var item in CopyTopLeaguesModel.CopyFromClientTopLeagues)
-                {
-                    topSetUp.Add(new CopyTopLeaguesRequest.SportLeague()
+                var topSetUp = CopyTopLeaguesModel.CopyFromClientTopLeagues
+                    .Select((s, index) => new CopyTopLeaguesRequest.SportLeague
                     {
-                        SportId = item.SportId,
-                        SportName = item.SportName,
-                        SegmentId = item.SegmentId,
-                        SegmentName = item.SegmentName,
-                        LeagueId = item.LeagueId,
-                        LeagueName = item.LeagueName,
-                        Status = item.Status,
-                        LiveCount = item.LiveCount,
-                        SortOrder = i++
-                    });
-                }
+                        SportId = s.SportId,
+                        SportName = s.SportName,
+                        SegmentId = s.SegmentId,
+                        SegmentName = s.SegmentName,
+                        LeagueId = s.LeagueId,
+                        LeagueName = s.LeagueName,
+                        Status = s.Status,
+                        LiveCount = s.LiveCount,
+                        SortOrder = index + 1
+                    }).ToList();
+
+                //var topSetUp = new List<CopyTopLeaguesRequest.SportLeague>();
+
+                //var i = 0;
+                //foreach (var item in CopyTopLeaguesModel.CopyFromClientTopLeagues)
+                //{
+                //    topSetUp.Add(new CopyTopLeaguesRequest.SportLeague()
+                //    {
+                //        SportId = item.SportId,
+                //        SportName = item.SportName,
+                //        SegmentId = item.SegmentId,
+                //        SegmentName = item.SegmentName,
+                //        LeagueId = item.LeagueId,
+                //        LeagueName = item.LeagueName,
+                //        Status = item.Status,
+                //        LiveCount = item.LiveCount,
+                //        SortOrder = i++
+                //    });
+                //}
 
                 CopyTopLeaguesRequest = new CopyTopLeaguesRequest()
                 {
@@ -104,6 +138,7 @@ namespace Backoffice.Web.Components.TopLeagues
                 };
 
                 var result = await BackOfficeService.CopyTopLeaguesAsync(CopyTopLeaguesRequest);
+
                 if (result.Result)
                 {
                     AlertMessage = "Copy top leagues successful";
@@ -167,6 +202,7 @@ namespace Backoffice.Web.Components.TopLeagues
         {
             GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }

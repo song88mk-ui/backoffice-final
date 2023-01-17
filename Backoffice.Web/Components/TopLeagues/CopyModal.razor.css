@@ -1,31 +1,31 @@
-﻿.clientBtn {
-    border: 1px solid #C7C1C1;
-    text-align: left;
-    width: 14rem;
-}
-
-.dropdown-toggle::after {
+﻿.dropdown-toggle::after {
     float: right;
     position: relative;
     top: 10px;
 }
 
-.copyModalBtn {
+.btn-client {
+    border: 1px solid #C7C1C1;
+    text-align: left;
+    width: 14rem;
+}
+
+.btn-edit, .btn-cancel {
     width: 112px;
     height: 40px;
     border-radius: 5px;
     color: white;
 }
 
-.copyModalCancel {
+.btn-cancel {
     background-color: #9AA0AB;
 }
 
-.copyModalSave {
+.btn-edit {
     background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
 
-.clientBorder {
+.client-border {
     background: #404E67 0% 0% no-repeat padding-box;
     border-radius: 3px;
     color: white;
@@ -36,7 +36,7 @@
     font-weight: bold;
 }
 
-.leagueContainer {
+.league-container {
     min-width: 100px;
     border: 1px solid #C7C1C1;
     border-radius: 3px;
@@ -44,4 +44,16 @@
 
 .dropdown-menu.show {
     width: 14rem;
+}
+
+.select-container {
+    width: 15%;
+}
+
+.input-container {
+    width: 85%;
+}
+
+.input-container .client {
+    min-height: 32px;
 }

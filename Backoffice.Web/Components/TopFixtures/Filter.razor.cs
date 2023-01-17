@@ -31,11 +31,11 @@ namespace Backoffice.Web.Components.TopFixtures
                 {
                     SearchText = string.Empty
                 };
-                
+
                 ClientId = string.Empty;
 
                 var clients = (await BackOfficeService.GetClients()).Result;
-                if(clients != null)
+                if (clients != null)
                 {
 
                     if (UserModel.ClientCodes.Any())

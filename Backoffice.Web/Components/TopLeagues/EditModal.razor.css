@@ -21,52 +21,92 @@
     color: black;
 }
 
-    .actions > span {
-        padding: 0.2rem;
-    }
+.actions > span {
+    padding: 0.2rem;
+}
 
-.editModalTbl {
+.table-edit-top-leagues {
     text-align: center;
 }
 
-.editModalTbl tr:nth-child(2n+2) {
+.table-edit-top-leagues tr:nth-child(2n+2) {
     background-color: #F5F5F5;
 }
 
-.editModalThead {
+.table-edit-top-leagues tr {
+    vertical-align: middle;
+}
+
+.table-head {
     color: white;
     background-color: #354156;
     border-radius: 5px;
 }
 
-.editModalBtn {
+td.actions a {
+    color: #404E67;
+    font-size: 16px;
+}
+
+.th-no {
+    width: 10%;
+}
+
+.th-segment {
+    width: 30%;
+}
+
+.th-league {
+    width: 30%;
+}
+
+.th-status {
+    width: 15%;
+}
+
+.th-action {
+    width: 15%;
+}
+
+.btn-edit, .btn-cancel {
     width: 112px;
     height: 40px;
     border-radius: 5px;
     color: white;
 }
 
-.editModalCancel {
+.btn-cancel {
     background-color: #9AA0AB;
 }
 
-.editModalSave {
+.btn-edit {
     background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
 
-.leagueDropBtn {
+.btn {
     border: 1px solid #C7C1C1;
     border-radius: 3px;
-    min-width: 15rem;
+}
+
+.btn.dropdown-toggle {
+    background-color: #FFF;
     text-align: left;
 }
 
-.dropdown-toggle::after {
+.btn.dropdown-toggle:after {
     float: right;
-    position: relative;
-    top: 10px;
+    margin-top: 0.475rem;
 }
 
-.dropdown-item {
-    min-width: 15rem;
+.status-active, .status-inactive {
+    display: inline-block;
+    color: #FFFFFF;
+}
+
+.status-active {
+    background-image: linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%);
+}
+
+.status-inactive {
+    background-color: #9AA0AB;
 }

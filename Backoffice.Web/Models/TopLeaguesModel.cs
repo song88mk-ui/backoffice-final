@@ -6,15 +6,39 @@ namespace Backoffice.Web.Models
     {
         public TopLeaguesModel()
         {
-            ClientTopLeagues = new List<OrderedClientTopLeagues>();
+            ClientTopLeagues = new List<ClientTopLeague>();
         }
-        public List<OrderedClientTopLeagues> ClientTopLeagues { get; set; }
 
-        public class OrderedClientTopLeagues
+        public List<ClientTopLeague> ClientTopLeagues { get; set; }
+
+        #region Nested Class
+
+        public class ClientTopLeague
         {
+            public ClientTopLeague()
+            {
+                TopLeagues = new List<TopLeague>();
+            }
+
+            public int RowNo { get; set; }
             public int ClientIdRef { get; set; }
             public string ClientName { get; set; }
-            public List<OrderedClientTopLeague> TopLeagues { get; set; }
+            public List<TopLeague> TopLeagues { get; set; }
         }
+
+        public class TopLeague
+        {
+            public int SportId { get; set; }
+            public string SportName { get; set; }
+            public int SegmentId { get; set; }
+            public int LeagueId { get; set; }
+            public string SegmentName { get; set; }
+            public string LeagueName { get; set; }
+            public bool Status { get; set; }
+            public int SortOrder { get; set; }
+            public int LiveCount { get; set; }
+        }
+
+        #endregion
     }
 }

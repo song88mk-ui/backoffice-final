@@ -92,6 +92,25 @@ window.getMarketTemplateSortOrder = (className, event) => {
     return new Blob([concat], { type: "application/txt" });
 }
 
+window.getSortOrder = (className, event) => {
+    var tableClass = className + ' > tbody';
+
+    let data = [];
+
+    $(tableClass).children('tr').each(function (index) {
+        var market = {
+            RowId: $(this).attr('id'),
+            SortOrder: index + 1
+        };
+
+        data.push(JSON.stringify(market));
+    });
+
+    var concat = data.join("\r\n");
+    return new Blob([concat], { type: "application/txt" });
+}
+
+
 window.showToast = () => {
     $('.toast').toast('show');
 }

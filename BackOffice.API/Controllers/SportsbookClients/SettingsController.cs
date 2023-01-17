@@ -163,9 +163,10 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
+
         #endregion
 
-        #region PARLAY BONUS
+        #region Parlay Bonus
 
         [EnableCors("AllowAllOrigins")]
         [HttpGet("parlaybonus/list")]

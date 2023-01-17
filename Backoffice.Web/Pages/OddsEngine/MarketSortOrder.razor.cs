@@ -9,7 +9,7 @@ using System.Text.Json;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class MarketSortOrder : IDisposable
+    public partial class MarketSortOrder : IAsyncDisposable, IDisposable
     {
         #region Properties
 
@@ -201,6 +201,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
+        public async Task OnModalDiscardChanges()
+        {
+            await OnCancelClickEvent();
+        }
+
         public async ValueTask DisposeAsync()
         {
 
@@ -210,11 +215,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             DataReference = null;
 
             GC.SuppressFinalize(this);
-        }
-
-        public async Task OnModalDiscardChanges()
-        {
-            await OnCancelClickEvent();
         }
 
         public void Dispose()

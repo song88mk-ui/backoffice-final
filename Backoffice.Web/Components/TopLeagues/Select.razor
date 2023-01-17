@@ -1,14 +1,13 @@
-﻿<ul class="dropdown-menu" aria-labelledby="Row@(RowCount)" id="Row@(RowCount)">
-
+﻿<ul class="dropdown-menu w-100" aria-labelledby="Row@(RowCount)" id="Row@(RowCount)">
     @if (SportsTree != null && SportsTree.Any(x => x.SportId == SportId))
     {
         var segmentList = SportsTree.FirstOrDefault(x => x.SportId == SportId).Segments;
+
         @for (int x = 0; x < segmentList.Count(); x++)
         {
             var segment = segmentList[x];
             <li>
                 <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" href="#Row@(RowCount)SegmentCollapse@(segment.SegmentId)">@segment.SegmentName</a>
-
                 @if (segment.Leagues != null && segment.Leagues.Any())
                 {
                     <div id="Row@(RowCount)SegmentCollapse@(segment.SegmentId)" class="collapse ms-3">
@@ -20,14 +19,14 @@
                                 if (league.LeagueId == SelectedTopLeagues)
                                 {
                                     <div class="form-check ms-4" id="Row@(RowCount)Fixture@(league.LeagueId)" @onclick="() => OnSelectedLeagueEvent(league, segment)">
-                                        <input class="form-check-input" type="radio" name="@RowCount" value="@league.LeagueId" id="@league.LeagueId" checked />
+                                        <input class="form-check-input me-3" type="radio" name="@RowCount" value="@league.LeagueId" id="@league.LeagueId" checked />
                                         <label class="form-check-label" id="@league.LeagueId" for="@league.LeagueId">@league.LeagueName</label>
                                     </div>
                                 }
                                 else
                                 {
                                     <div class="form-check ms-4" id="Row@(RowCount)Fixture@(league.LeagueId)" @onclick="() => OnSelectedLeagueEvent(league, segment)">
-                                        <input class="form-check-input" type="radio" name="@RowCount" value="@league.LeagueId" id="@league.LeagueId" />
+                                        <input class="form-check-input me-3" type="radio" name="@RowCount" value="@league.LeagueId" id="@league.LeagueId" />
                                         <label class="form-check-label" id="@league.LeagueId" for="@league.LeagueId">@league.LeagueName</label>
                                     </div>
                                 }
