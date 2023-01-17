@@ -8,14 +8,16 @@ namespace Backoffice.Web.Shared.OddsEngine
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         public bool ShowPriceBoostMenu { get; set; }
-        public bool ShowAdministrationMenu { get; set; }
-        public bool ShowSettlementMenu { get; set; }
+        //public bool ShowAdministrationMenu { get; set; }
+        //public bool ShowSettlementMenu { get; set; }
         public bool ShowMarketSettingsMenu { get; set; }
 
         public bool IsActiveMonitoring { get; set; }
         public bool IsActiveConfig { get; set; }
         public bool IsActivePriceBoost { get; set; }
-        public bool IsActiveAdmin { get; set; }
+        public bool IsActiveSportSettings { get; set; }
+        public bool IsActiveMarketSettings { get; set; }
+        //public bool IsActiveAdmin { get; set; }
         #endregion
 
         #region Methods
@@ -43,35 +45,36 @@ namespace Backoffice.Web.Shared.OddsEngine
                 ShowPriceBoostMenu = false;
         }
 
-        public async Task OnAdministrationClickEvent()
-        {
-            if (!ShowAdministrationMenu)
-            {
-                HideAllMenu();
-                HideAllSubmenu();
+        //public async Task OnAdministrationClickEvent()
+        //{
+        //    if (!ShowAdministrationMenu)
+        //    {
+        //        HideAllMenu();
+        //        HideAllSubmenu();
 
-                ShowAdministrationMenu = true;
-            }
-            else
-                ShowAdministrationMenu = false;
-        }
+        //        ShowAdministrationMenu = true;
+        //    }
+        //    else
+        //        ShowAdministrationMenu = false;
+        //}
 
-        public async Task OnSettlementClickEvent()
-        {
-            if (!ShowSettlementMenu)
-            {
-                HideAllSubmenu();
+        //public async Task OnSettlementClickEvent()
+        //{
+        //    if (!ShowSettlementMenu)
+        //    {
+        //        HideAllSubmenu();
 
-                ShowSettlementMenu = true;
-            }
-            else
-                ShowSettlementMenu = false;
-        }
+        //        ShowSettlementMenu = true;
+        //    }
+        //    else
+        //        ShowSettlementMenu = false;
+        //}
 
         public async Task OnMarketSettingsClickEvent()
         {
             if (!ShowMarketSettingsMenu)
             {
+                HideAllMenu();
                 HideAllSubmenu();
 
                 ShowMarketSettingsMenu = true;
@@ -91,18 +94,20 @@ namespace Backoffice.Web.Shared.OddsEngine
         private void HideAllMenu()
         {
             ShowPriceBoostMenu = false;
-            ShowAdministrationMenu = false;
-            ShowSettlementMenu = false;
+            //ShowAdministrationMenu = false;
+            //ShowSettlementMenu = false;
+            ShowMarketSettingsMenu = false;
         }
 
         private void HideAllSubmenu()
         {
-            ShowSettlementMenu = false;
-            ShowMarketSettingsMenu = false;
+            //ShowSettlementMenu = false;
         }
+
         private void CloseMenus(string? menu = null)
         {
             HideAllMenu();
+
             HideAllSubmenu();
             if (menu != null)
                 ActiveMenu(menu);
@@ -115,6 +120,7 @@ namespace Backoffice.Web.Shared.OddsEngine
                 menu = menu.Replace("odds-engine", "");
 
             InActiveAllMenu();
+
             switch (menu.ToUpper())
             {
                 case "":
@@ -129,14 +135,22 @@ namespace Backoffice.Web.Shared.OddsEngine
                 case "BOOSTED-SETTINGS":
                     IsActivePriceBoost = true;
                     break;
-                case "ADMIN":
-                case "MANAGE-USERGROUP":
-                case "MARKET-SETTLEMENT":
-                case "MESSAGE-SETTLEMENT":
+                case "SPORT-SETTINGS":
+                    IsActiveSportSettings = true;
+                    break;
+                case "MARKET-SETTINGS":
                 case "MARKET-SORT-ORDER":
                 case "MARKET-GROUPS":
-                    IsActiveAdmin = true;
+                    IsActiveMarketSettings = true;
                     break;
+                //case "ADMIN":
+                //case "MANAGE-USERGROUP":
+                //case "MARKET-SETTLEMENT":
+                //case "MESSAGE-SETTLEMENT":
+                //case "MARKET-SORT-ORDER":
+                //case "MARKET-GROUPS":
+                //    IsActiveAdmin = true;
+                //    break;
             }
         }
         private void InActiveAllMenu()
@@ -144,7 +158,10 @@ namespace Backoffice.Web.Shared.OddsEngine
             IsActiveMonitoring = false;
             IsActiveConfig = false;
             IsActivePriceBoost = false;
-            IsActiveAdmin = false;
+            IsActiveSportSettings = false;
+            IsActiveMarketSettings = false;
+
+            //IsActiveAdmin = false;
         }
         #endregion
     }

@@ -30,7 +30,8 @@ namespace Backoffice.Web.Pages
             {
                 if (firstRender)
                 {
-                    var url = "https://tableau.song88.com/t/song88/views/design/Dashboard1?:showAppBanner=false&:toolbar=no";
+                    var url = "https://tableau.song88.com/t/song88/views/10bet-URLS/1_Dashboard?:showAppBanner=false&:display_count=n&:showVizHome=n&:origin=viz_share_link";
+                    //var url = "https://tableau.song88.com/t/song88/views/design/Dashboard1?:showAppBanner=false&:toolbar=no";
                     await JSRuntime.InvokeVoidAsync("initViz", VizContainer, url);
                 }
             }

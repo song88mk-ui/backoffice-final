@@ -5,7 +5,7 @@
         </a>
     </div>
     <div class="px-2 me-2 py-3 @(IsActiveConfig ? "active" : "")">
-        <a class="header-link text-decoration-none" href="/odds-engine/config" @onclick='() => ActiveMenu("config")'>
+        <a class="header-link text-decoration-none" href="odds-engine/config" @onclick='() => ActiveMenu("config")'>
             Config
         </a>
     </div>
@@ -37,7 +37,40 @@
             </ul>
         }
     </div>
-    <div class="px-2 me-2 py-3 @(IsActiveAdmin ? "active" : "")">
+    <div class="px-2 me-2 py-3 @(IsActiveSportSettings ? "active" : "")">
+        <a class="header-link text-decoration-none" href="odds-engine/sport-settings" @onclick='() => ActiveMenu("sport-settings")'>
+            Sport Settings
+        </a>
+    </div>
+    <div class="px-2 me-2 py-3 @(IsActiveMarketSettings ? "active" : "")">
+        <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="OnMarketSettingsClickEvent">
+            <span class="me-3">Market Settings</span>
+            @if (ShowMarketSettingsMenu)
+            {
+                <i class="fa fa-chevron-up"></i>
+            }
+            else
+            {
+                <i class="fa fa-chevron-down"></i>
+            }
+        </a>
+        @if (ShowMarketSettingsMenu)
+        {
+            <ul class="sub-menu-container rounded mt-2">
+                <li class="py-2">
+                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/market-sort-order" @onclick='() => CloseMenus("market-settings")'>
+                        Market Sort Order
+                    </a>
+                </li>
+                <li class="py-2">
+                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/market-groups" @onclick='() => CloseMenus("market-settings")'>
+                        Market Group
+                    </a>
+                </li>
+            </ul>
+        }
+    </div>
+    @*<div class="px-2 me-2 py-3 @(IsActiveAdmin ? "active" : "")">
         <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="OnAdministrationClickEvent">
             <span class="me-3">Administration</span>
             @if (ShowAdministrationMenu)
@@ -111,5 +144,5 @@
                 </li>
             </ul>
         }
-    </div>
+    </div>*@
 </div>
