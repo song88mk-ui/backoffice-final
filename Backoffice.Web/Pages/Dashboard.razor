@@ -1,5 +1,4 @@
 ﻿@page "/dashboard"
-@*@inject IJSRuntime jsRuntime*@
 
 <div class="row">
     <div class="main-content col-md-12 mb-4 pb-3">
@@ -14,18 +13,3 @@
         </div>
     </div>
 </div>
-
-@*@code
-{
-    ElementReference vizContainer;
-
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        const string url = "https://tableau.song88.com/t/song88/views/design/Dashboard1?:showAppBanner=false&:toolbar=no";
-
-        await jsRuntime.InvokeVoidAsync("initViz", vizContainer, url);
-
-        await base.OnAfterRenderAsync(firstRender);
-    }
-}*@

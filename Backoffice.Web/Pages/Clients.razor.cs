@@ -71,7 +71,7 @@ namespace Backoffice.Web.Pages
                 virtualSports.SportLookup = sports.SportLookup.Where(s => virtualSportIds.Contains(s.SportId + 1000)).Select(s => new Models.SportLookup
                 {
                     SportId = s.SportId,
-                    SportName= $"Virtual {s.SportName}"
+                    SportName = $"Virtual {s.SportName}"
                 }).ToList();
 
                 virtualSports.SportLookup.Add(new Models.SportLookup
@@ -131,8 +131,10 @@ namespace Backoffice.Web.Pages
                 });
             }
 
-            client.BetSettings = new List<ClientListResponse.BetSetting>();
-
+            client.BetSettings = (await BackOfficeService.GetBetSetting(new BetSettingRequest
+            {
+                ClientId = client.ClientId
+            })).Result.BetSettings ?? new List<ClientListResponse.BetSetting>();
 
             var parameters = new ModalParameters();
 
@@ -191,7 +193,19 @@ namespace Backoffice.Web.Pages
                         StatusId = s.StatusId,
                         StatusName = s.StatusName,
                         Region = s.Region,
-                        Website = s.Website
+                        Website = s.Website,
+                        Email = s.Email,
+                        BetSettings = s.BetSettings,
+                        BetSlipSelectionCount = s.BetSlipSelectionCount,
+                        ClientCode = s.ClientCode,
+                        IsEmailNotification = s.IsEmailNotification,
+                        IsTierRevenue = s.IsTierRevenue,
+                        MonthlyFee = s.MonthlyFee,
+                        RevenueShare = s.RevenueShare,
+                        TaxConfig = s.TaxConfig,
+                        TelephoneNumber = s.TelephoneNumber,
+                        TierJackpotShare = s.TierJackpotShare,
+                        TierSportsbookShare = s.TierSportsbookShare,
                     }).ToList()
                 };
             }

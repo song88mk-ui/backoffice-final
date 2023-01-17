@@ -65,7 +65,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var response = await GetHttpClient(region).PostAsync($"v1/client", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var response = await GetHttpClient(region).PostAsync($"v1/config/client", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonConvert.DeserializeObject<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync());

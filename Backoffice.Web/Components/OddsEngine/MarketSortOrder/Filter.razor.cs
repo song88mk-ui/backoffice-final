@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -10,14 +11,17 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         #region Properties
 
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] private IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }        
 
         [Parameter] public EventCallback OnUpdateCallback { get; set; }
         [Parameter] public EventCallback OnCancelCallback { get; set; }
         [Parameter] public EventCallback OnSaveCallback { get; set; }
         [Parameter] public EventCallback<MarketSortOrderModel> MarketSortOrderModelCallback { get; set; }
-        [Parameter] public EventCallback<string> OnMarketGroupCallback { get; set; }
+        [Parameter] public EventCallback<string> OnMarketGroupCallback { get; set; }        
+        [Parameter] public EventCallback<bool> IsUpdateChanged { get; set; }
+        [Parameter] public bool IsUpdate { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
@@ -26,9 +30,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public List<SelectListItemModel<int>> FixtureStatuses { get; set; }
         public int SelectedFixtureStatusId { get; set; }
         public List<MarketSortOrderModel.ClientMarketTemplateGroup> ClientMarketTemplateGroups { get; set; }
-        public int SelectedMarketTemplateGroupId { get; set; }
-
-        public bool IsUpdate { get; set; }
+        public int SelectedMarketTemplateGroupId { get; set; }        
 
         #endregion
 
@@ -143,6 +145,16 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             await OnUpdateCallback.InvokeAsync();
         }
 
+        public async Task OnCopyClickEvent()
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-md");            
+
+            var options = new ModalOptions();
+            ModalService.Open<CopyModal>($"Copy Market Sort Order", parameters, options);
+        }
+
         public async Task OnSaveClickEvent()
         {
             IsUpdate = false;
@@ -152,9 +164,12 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         public async Task OnCancelClickEvent()
         {
-            IsUpdate = false;
+            var parameters = new ModalParameters();
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
 
-            await OnCancelCallback.InvokeAsync();
+            var options = new ModalOptions();            
+            ModalService.Open<CancelModal>($"Discard Changes?", parameters, options);            
         }
 
         public async Task OnMarketGroupClickEvent(int marketTemplateGroupId)
