@@ -212,6 +212,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             GC.SuppressFinalize(this);
         }
 
+        public async Task OnModalDiscardChanges()
+        {
+            await OnCancelClickEvent();
+        }
+
         public void Dispose()
         {
             GC.SuppressFinalize(this);
