@@ -111,7 +111,7 @@ namespace Backoffice.Web.Pages
 
                 foreach (var config in result.ParlayBonusConfig)
                 {
-                    config.ParlayBonus *= 100;
+                    config.ParlayBonus = Convert.ToDecimal((config.ParlayBonus * 100).ToString("#.00"));
                 }
 
                 ClientParlayBonusResponse.ParlayBonusConfig.RemoveAll(x => TempConfig.Contains(x));
