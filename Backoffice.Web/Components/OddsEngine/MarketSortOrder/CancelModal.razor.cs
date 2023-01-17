@@ -8,11 +8,16 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
     public partial class CancelModal : IDisposable
     {
         #region Properties
+
         [Inject] private IModalService ModalService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] private CustomModal Modal { get; set; }
+
         #endregion
+
         #region Methods
+
         public async Task OnCancelClickEvent()
         {
             ModalService.Cancel();
@@ -26,6 +31,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         {
             
         }
+
         #endregion
     }
 }
