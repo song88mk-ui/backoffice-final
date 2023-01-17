@@ -62,7 +62,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
 
-        [HttpGet("bet/setting")]
+        [HttpPost("bet/setting")]
         public async Task<IActionResult> GetBetSetting([FromBody] BetSettingRequest request)
         {
             var result = await _backofficeRepository.GetBetSetting(request);
