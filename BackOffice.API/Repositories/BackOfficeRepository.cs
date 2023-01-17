@@ -140,8 +140,8 @@ namespace Backoffice.API.Repositories
                     {
                         StakeTax = taxConfig.StakeTax * 100m,
                         WinningsTax = taxConfig.WinningsTax * 100m,
-                        ExcludeStakeSportTypes = taxConfig.ExcludeStakeSportTypes,
-                        ExcludeWinningsSportTypes = taxConfig.ExcludeWinningsSportTypes
+                        ExcludeStakeSportTypes = taxConfig.ExcludeStakeSportTypes ?? string.Empty,
+                        ExcludeWinningsSportTypes = taxConfig.ExcludeWinningsSportTypes ?? string.Empty
                     };
                     clientResponse.TaxConfig = taxConfigPercent;
 
@@ -152,6 +152,7 @@ namespace Backoffice.API.Repositories
                         JackpotShare = client.JackpotShare * 100m
                     };
 
+                    clientResponse.RevenueShare = revenueShare;
 
                     clientList.Add(clientResponse);
                 }

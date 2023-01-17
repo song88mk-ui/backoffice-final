@@ -70,7 +70,7 @@ namespace Backoffice.Web.Pages
 
                 virtualSports.SportLookup = sports.SportLookup.Where(s => virtualSportIds.Contains(s.SportId + 1000)).Select(s => new Models.SportLookup
                 {
-                    SportId = s.SportId,
+                    SportId = s.SportId + 1000,
                     SportName = $"Virtual {s.SportName}"
                 }).ToList();
 
@@ -114,7 +114,7 @@ namespace Backoffice.Web.Pages
 
                 virtualSports.SportLookup = sports.SportLookup.Where(s => virtualSportIds.Contains(s.SportId + 1000)).Select(s => new Models.SportLookup
                 {
-                    SportId = s.SportId,
+                    SportId = s.SportId + 1000,
                     SportName = $"Virtual {s.SportName}"
                 }).ToList();
 
