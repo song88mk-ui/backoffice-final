@@ -6,9 +6,6 @@ using Backoffice.Shared.Utilities;
 using Backoffice.Web.ActionFilter;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -47,7 +44,7 @@ namespace Backoffice.Web.Services
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 var authPayload = await response.Content.ReadAsStringAsync();
-                var token = JsonConvert.DeserializeObject<BaseResponse<TokenModel>>(authPayload);
+                var token = JsonSerializer.Deserialize<BaseResponse<TokenModel>>(authPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 _httpContextAccessor.HttpContext?.Session.SetString("UserToken", token.Result.AccessToken);
                 ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(user.Name);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token.Result.AccessToken);
@@ -62,10 +59,10 @@ namespace Backoffice.Web.Services
                     Result = new Tuple<bool, List<string>>(true, policies)
                 };
             }
-            else if (response.StatusCode == HttpStatusCode.Unauthorized)
+            else if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.BadRequest)
             {
-                var authPayload = await response.Content.ReadAsStreamAsync();
-                var token = await JsonSerializer.DeserializeAsync<BaseResponse<TokenModel>>(authPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                var authPayload = await response.Content.ReadAsStringAsync();
+                var token = JsonSerializer.Deserialize<BaseResponse<TokenModel>>(authPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 result = new BaseResponse<Tuple<bool, List<string>>>
                 {
                     StatusCode = token.StatusCode,

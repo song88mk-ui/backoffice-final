@@ -87,7 +87,14 @@ namespace Backoffice.Web.Pages.Authentication
 
                 //ModelState.AddFormError("Username or Password is incorrect");
                 //ModelState.AddModelError("UserModel.Password", "Username or Password is incorrect");
-                ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
+                if(!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
+                {
+                    ModelState.AddModelError(string.Empty, result.Message);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
+                }
             }
             return Page();
         }
