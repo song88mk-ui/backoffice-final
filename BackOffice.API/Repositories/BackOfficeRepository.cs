@@ -678,7 +678,8 @@ namespace Backoffice.API.Repositories
                             RevenueShareSportsbook = request.IsTierRevenue == true ? request.TierSportsbookShare : null,
                             TaxConfig = JsonSerializer.Serialize(request.TaxConfig),
                             Region = request.Region,
-                            Email = request.Email
+                            Email = request.Email,
+                            IsEmailNotification = request.IsEmailNotification,
                         };
 
                         clientId = InsertClientRecord(clientRecord);
@@ -687,7 +688,7 @@ namespace Backoffice.API.Repositories
                     {
                         var client = _backofficeContext.ClientInformation.Find(request.ClientId);
 
-                        if (client == null)
+                        if (client != null)
                         {
                             client.Name = request.Name;
                             client.Email = request.Email;
@@ -704,6 +705,7 @@ namespace Backoffice.API.Repositories
                             client.RevenueShareSportsbook = request.IsTierRevenue == true ? request.TierSportsbookShare : null;
                             client.TaxConfig = JsonSerializer.Serialize(request.TaxConfig);
                             client.Region = request.Region;
+                            client.IsEmailNotification = request.IsEmailNotification;
                         }
 
                         UpdateClientRecord(client);
