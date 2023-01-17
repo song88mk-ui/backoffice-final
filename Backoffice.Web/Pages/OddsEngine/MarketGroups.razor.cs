@@ -290,7 +290,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             IsSelectAll = MarketGroupModel != null && !MarketGroupModel.MarketTemplateGroups.Any(s => s.IsActive == false);
             await SortOrderRow();
-        }
+        } 
         private async Task SortOrderRow()
         {
             if (MarketGroupModel != null && MarketGroupModel.MarketTemplateGroups.Any())
