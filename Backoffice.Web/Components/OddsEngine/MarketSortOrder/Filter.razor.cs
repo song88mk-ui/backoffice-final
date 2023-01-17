@@ -15,7 +15,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         [Parameter] public EventCallback OnUpdateCallback { get; set; }
         [Parameter] public EventCallback OnCancelCallback { get; set; }
+        [Parameter] public EventCallback OnSaveCallback { get; set; }
         [Parameter] public EventCallback<MarketSortOrderModel> MarketSortOrderModelCallback { get; set; }
+        [Parameter] public EventCallback<string> OnMarketGroupCallback { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
@@ -24,6 +26,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public List<SelectListItemModel<int>> FixtureStatuses { get; set; }
         public int SelectedFixtureStatusId { get; set; }
         public List<MarketSortOrderModel.ClientMarketTemplateGroup> ClientMarketTemplateGroups { get; set; }
+        public int SelectedMarketTemplateGroupId { get; set; }
 
         public bool IsUpdate { get; set; }
 
@@ -109,20 +112,27 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
             SelectedClientCode = e.Value.ToString();
+            IsUpdate = false;
 
+            await OnCancelCallback.InvokeAsync();
             await PrepareMarketSortOrderModel();
         }
+
         public async void OnSportChangedEvent(ChangeEventArgs e)
         {
             SelectedSportId = int.Parse(e.Value.ToString());
+            IsUpdate = false;
 
+            await OnCancelCallback.InvokeAsync();
             await PrepareMarketSortOrderModel();
         }
 
         public async void OnFixtureStatusChangedEvent(ChangeEventArgs e)
         {
             SelectedFixtureStatusId = int.Parse(e.Value.ToString());
+            IsUpdate = false;
 
+            await OnCancelCallback.InvokeAsync();
             await PrepareMarketSortOrderModel();
         }
 
@@ -133,11 +143,27 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             await OnUpdateCallback.InvokeAsync();
         }
 
+        public async Task OnSaveClickEvent()
+        {
+            IsUpdate = false;
+
+            await OnSaveCallback.InvokeAsync();
+        }
+
         public async Task OnCancelClickEvent()
         {
             IsUpdate = false;
 
             await OnCancelCallback.InvokeAsync();
+        }
+
+        public async Task OnMarketGroupClickEvent(int marketTemplateGroupId)
+        {
+            SelectedMarketTemplateGroupId = marketTemplateGroupId;
+
+            var marketTemplateGroup = ClientMarketTemplateGroups.FirstOrDefault(c => c.MarketTemplateGroupId == SelectedMarketTemplateGroupId);
+
+            await OnMarketGroupCallback.InvokeAsync(marketTemplateGroup.Name);
         }
 
         public void Dispose()
@@ -165,18 +191,22 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                         IsSelected = s.Name == "All Markets" ? true : false,
                     }).ToList();
 
+                SelectedMarketTemplateGroupId = ClientMarketTemplateGroups.FirstOrDefault().MarketTemplateGroupId;
+
                 await MarketSortOrderModelCallback.InvokeAsync(new MarketSortOrderModel
                 {
                     ClientCode = SelectedClientCode,
+                    ClientId = marketTemplateResponse.ClientId,
                     SportId = SelectedSportId,
                     FixtureStatusId = SelectedFixtureStatusId,
                     MarketTemplates = marketTemplateResponse.MarketTemplates
-                    .Select(s => new MarketSortOrderModel.ClientMarketTemplate
+                    .OrderBy(o => o.SortOrder)
+                    .Select((s, index) => new MarketSortOrderModel.ClientMarketTemplate
                     {
                         MarketTemplateGroupNames = s.MarketTemplateGroupNames,
                         MarketTemplateId = s.MarketTemplateId,
                         MarketTemplateName = s.MarketTemplateName,
-                        SortOrder = s.SortOrder
+                        SortOrder = s.SortOrder > 1000 ? index + 1 : s.SortOrder
                     }).ToList(),
                     MarketTemplateGroups = ClientMarketTemplateGroups
                 });

@@ -25,7 +25,8 @@ namespace Backoffice.Web.Components.ParlayBonus
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {                   
+        {
+            ClientId = "0";
         }
 
         public void Dispose()
@@ -36,6 +37,7 @@ namespace Backoffice.Web.Components.ParlayBonus
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
             IsUpdating = false;
+            ClientId = e.Value.ToString();
             await OnClientChangedCallback.InvokeAsync(long.Parse(e.Value.ToString()));
         }
 
@@ -64,10 +66,21 @@ namespace Backoffice.Web.Components.ParlayBonus
         }
 
         public async Task OnAddClickEvent()
-        {            
-            await OnAddClickCallback.InvokeAsync(new ParlayBonusConfig() {
-                SelectionCount = ClientParlayBonusResponse.ParlayBonusConfig.Last().SelectionCount + 1
-            });
+        {
+            if (ClientParlayBonusResponse.ParlayBonusConfig.Count == 0)
+            {
+                await OnAddClickCallback.InvokeAsync(new ParlayBonusConfig()
+                {
+                    SelectionCount = 3
+                });
+            }
+            else
+            {
+                await OnAddClickCallback.InvokeAsync(new ParlayBonusConfig()
+                {
+                    SelectionCount = ClientParlayBonusResponse.ParlayBonusConfig.Last().SelectionCount + 1
+                });
+            }
         }
         #endregion
     }

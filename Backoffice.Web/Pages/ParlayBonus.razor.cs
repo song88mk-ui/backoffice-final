@@ -4,6 +4,7 @@ using Backoffice.Web.Components.ParlayBonus;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages
 {
@@ -12,6 +13,7 @@ namespace Backoffice.Web.Pages
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -22,13 +24,17 @@ namespace Backoffice.Web.Pages
         public List<ParlayBonusConfig> TempConfig { get; set; }
         public bool IsPreloading { get; set; }
         public List<SelectListItemModel<ClientModel.Client>> Clients { get; set; }
+        public bool IsEmpty { get; set; }
+        public const string ToastTitle = "Parlay Bonus";
+        public string ToastMessage { get; set; }        
         #endregion
 
+        #region Methods                
         protected override async Task OnInitializedAsync()
-        {            
+        {
             PageTitle = "Parlay Bonus";
             IconClass = "ico ico-parlay-bonus";
-            ClientParlayBonusResponse = new ClientParlayBonusModel();
+            ClientParlayBonusResponse = new ClientParlayBonusModel() { ParlayBonusMinOdds = 1.20m };
             Clients = new List<SelectListItemModel<ClientModel.Client>>();
 
             TempConfig = new List<ParlayBonusConfig>();
@@ -75,15 +81,16 @@ namespace Backoffice.Web.Pages
             //var selectedClients = Clients.Where(c => !string.IsNullOrEmpty(c.Value.ClientCode)).Select(s => s.Value).ToList();            
         }
 
-        public async Task OnClientChangedEvent(long ClientId)        
+        public async Task OnClientChangedEvent(long ClientId)
         {
-            this.ClientId = ClientId;            
+            this.ClientId = ClientId;
             await LoadClientParlayBonus(ClientId);
         }
 
         public async Task LoadClientParlayBonus(long ClientId)
         {
             IsPreloading = true;
+            IsEmpty = true;
 
             var result = (await BackOfficeService.GetClientParlayBonus(new GetParlayBonusRequest()
             {
@@ -101,7 +108,7 @@ namespace Backoffice.Web.Pages
                     TotalCount = result.Total,
                     TotalPages = result.TotalPage
                 };
-                
+
                 foreach (var config in result.ParlayBonusConfig)
                 {
                     config.ParlayBonus *= 100;
@@ -115,6 +122,8 @@ namespace Backoffice.Web.Pages
 
                 ClientParlayBonusResponse = result;
                 IsPreloading = false;
+
+                IsEmpty = ClientParlayBonusResponse.ParlayBonusConfig.Count > 0 ? false : true;
             }
         }
 
@@ -139,7 +148,7 @@ namespace Backoffice.Web.Pages
             parameters.Add("ParlayBonusConfig", parlayBonusConfig);
             parameters.Add("ModalIcon", "<i class=\"fa fa-list-alt m-2\"></i>");
 
-            var options = new ModalOptions();            
+            var options = new ModalOptions();
             ModalService.Open<ViewLogModal>($"Logs", parameters, options);
         }
 
@@ -167,7 +176,7 @@ namespace Backoffice.Web.Pages
         {
             IsPreloading = true;
 
-            var result = (await BackOfficeService.AddOrUpdateParlayBonus(new ParlayBonusRequest() 
+            var result = (await BackOfficeService.AddOrUpdateParlayBonus(new ParlayBonusRequest()
             {
                 ClientIdRef = ClientId,
                 ParlayBonusConfig = ClientParlayBonusResponse.ParlayBonusConfig.Select(x => new ParlayBonusConfigRequest()
@@ -176,9 +185,19 @@ namespace Backoffice.Web.Pages
                     ParlayBonus = (x.ParlayBonus / 100)
                 }).ToList(),
                 ParlayBonusMinOdds = ClientParlayBonusResponse.ParlayBonusMinOdds
-            })).Result;
+            }));
+
+            if (result.StatusCode == Backoffice.Shared.Enums.StatusCode.Success)
+            {
+                ToastMessage = "Parlay bonus updated!";
+            }
+            else
+            {
+                ToastMessage = result.Message;
+            }
 
             await LoadClientParlayBonus(ClientId);
+            await ShowToast();
         }
 
         public async Task OnCancelClick()
@@ -202,5 +221,13 @@ namespace Backoffice.Web.Pages
         public void Dispose()
         {
         }
+        #endregion
+
+        #region Utilities
+        public async Task ShowToast()
+        {
+            await JSRuntime.InvokeVoidAsync("showToast");
+        }
+        #endregion
     }
 }

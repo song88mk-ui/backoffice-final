@@ -17,10 +17,12 @@ namespace Backoffice.API.Controllers.Trading
         private ITradingRepository _tradingRepository { get; set; }
 
         #region Ctor
+
         public TradingController(ITradingRepository tradingRepository)
         {
             _tradingRepository = tradingRepository;
         }
+
         #endregion
 
         #region Sports
@@ -600,6 +602,24 @@ namespace Backoffice.API.Controllers.Trading
                     return BadRequest(result);
             }
         }
+
+        [HttpPost("client/markettemplate")]
+        public async Task<IActionResult> AddOrUpdateClientMarketTemplatesOrder([FromBody] ClientMarketTemplateRequest request)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _tradingRepository.AddOrUpdateClientMarketTemplatesOrder(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+
         [HttpPost("client/markettemplategroup/post")]
         public async Task<IActionResult> AddOrUpdateClientMarketTemplateGroup([FromBody] ClientPostMarketTemplateGroupRequest request)
         {
@@ -690,7 +710,8 @@ namespace Backoffice.API.Controllers.Trading
         }
         #endregion
 
-        #region BET
+        #region Bet
+
         [HttpPost("bet/selections")]
         public async Task<IActionResult> GetBetSelections([FromBody] BetSelectionDetailsRequest request)
         {
@@ -728,7 +749,8 @@ namespace Backoffice.API.Controllers.Trading
         }
         #endregion
 
-        #region FASTODDS
+        #region Fastodds
+
         [HttpGet("fastodds/sports/{fixtureTypeId}")]
         public async Task<IActionResult> GetFastOddsSports(int fixtureTypeId)
         {
@@ -766,7 +788,8 @@ namespace Backoffice.API.Controllers.Trading
         }
         #endregion
 
-        #region MANUAL
+        #region Manual
+
         [HttpPost("manual/marketsettlement")]
         public async Task<IActionResult> AddOrUpdateManualMarketSettlement([FromBody] List<ManualMarketSettlementRequest> request, [FromQuery] string userId)
         {

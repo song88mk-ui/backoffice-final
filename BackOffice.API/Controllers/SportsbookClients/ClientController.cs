@@ -1,6 +1,7 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -46,5 +47,34 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
+
+        [HttpPost("post")]
+        public async Task<IActionResult> AddOrUpdateClient([FromBody] ClientListResponse.Client request)
+        {
+            var result = await _backofficeRepository.AddOrUpdateClient(request);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("bet/setting")]
+        public async Task<IActionResult> GetBetSetting()
+        {
+            var result = await _backofficeRepository.GetClients();
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
     }
 }

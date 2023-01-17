@@ -11,6 +11,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<ClientResponse>> GetClients();
         Task<BaseResponse<string>> GetClientRegion(int clientId);
         Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs);
+        Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
 
         #region TOP FIXTURES
         Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);

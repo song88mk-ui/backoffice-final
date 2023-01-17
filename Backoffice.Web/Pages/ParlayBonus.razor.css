@@ -75,6 +75,11 @@
         visibility: visible;
     }
 
+.parlay-bonus-input {
+    width: 10rem;
+    margin: auto;
+    display: inline-block;
+}
 /*remove arrows for input[type=number]*/
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,

@@ -9,6 +9,11 @@ namespace Backoffice.API.Repositories
 {
     public interface IPlatformRepository
     {
+        #region Client
+        Task<BaseResponse<PlatformClientResponse>> AddOrUpdateClient(ClientRequest request, string region);
+        Task<BaseResponse<StatusCode>> ProcessBackOfficeClientBetConfig(AddOrUpdateBetConfigRequest request, string region);
+        #endregion
+
         #region Top Fixture
         Task<BaseResponse<ClientTopFixtureResponse>> GetClientTopFixtures(IDictionary<string, string> regionclientIds);
         Task<BaseResponse<PlatformMessageResponse>> PostClientTopFixtures(PostClientTopFixtureRequest request, string region);
