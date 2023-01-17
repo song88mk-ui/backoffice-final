@@ -15,6 +15,7 @@ namespace Backoffice.Web.Components.Clients
     public partial class CreateOrUpdateModal : IDisposable
     {
         #region Properties
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
@@ -132,6 +133,26 @@ namespace Backoffice.Web.Components.Clients
                     });
                 }
 
+                if (Alerts.Any())
+                    return;
+
+                var response = (await BackOfficeService.AddOrUpdateClient(Client));
+
+                if (response.Result)
+                {
+                    ModalService.Cancel();
+
+                    await Modal.OnSaveClickCallback.InvokeAsync();
+                }
+                else
+                {
+                    Alerts.Add(new AlertModel
+                    {
+                        AlertStatus = "Error",
+                        AltertMessage = $"{response.Message}",
+                        Opacity = 1.0m
+                    });
+                }
             }
             catch (Exception ex)
             {

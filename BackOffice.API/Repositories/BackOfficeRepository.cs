@@ -654,7 +654,7 @@ namespace Backoffice.API.Repositories
 
                 using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    
+
                     if (request.ClientId == 0)
                     {
                         var clientRecord = new ClientInformation
@@ -736,7 +736,7 @@ namespace Backoffice.API.Repositories
 
                                     if (categorySoccerBetSettingJson == null)
                                     {
-                                        minStake = betSetting.BetSettingSoccer.MinPerTicket; 
+                                        minStake = betSetting.BetSettingSoccer.MinPerTicket;
                                         maxStake = betSetting.BetSettingSoccer.MaxPerTicket;
 
                                         clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingSoccer);
@@ -815,7 +815,7 @@ namespace Backoffice.API.Repositories
                                     #endregion
                             }
 
-                            if((int)BetSettingCategory.Priceboost != i)
+                            if ((int)BetSettingCategory.Priceboost != i)
                             {
 
                                 if (minStake < suggestedMinimumBet)
@@ -839,7 +839,7 @@ namespace Backoffice.API.Repositories
                                 }
                             }
 
-                            if(i == (int)BetSettingCategory.Parlay)
+                            if (i == (int)BetSettingCategory.Parlay)
                             {
                                 if (maxWinnings < 0.02m)
                                 {
@@ -884,7 +884,7 @@ namespace Backoffice.API.Repositories
                         }
                     }
 
-                    if(clientBetSettings.Any())
+                    if (clientBetSettings.Any())
                         _backofficeContext.ClientBetSetting.RemoveRange(clientBetSettings);
 
                     if (clientBetSettingList.Count > 0)
@@ -1006,6 +1006,95 @@ namespace Backoffice.API.Repositories
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
                     Result = false
+                };
+            }
+        }
+
+        public async Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request)
+        {
+            try
+            {
+                var query = _backofficeContext.ClientBetSetting.AsNoTracking();
+
+                if (request.ClientId > 0)
+                    query = query.Where(c => c.ClientId == request.ClientId);
+
+                var result = query.ToList();
+
+                if (result == null || !result.Any())
+                {
+                    return new BaseResponse<BetSettingResponse>
+                    {
+                        StatusCode = StatusCode.Success,
+                        Message = StatusCode.Success.ToString(),
+                        Result = new BetSettingResponse
+                        {
+                            BetSettings = new List<ClientListResponse.BetSetting>()
+                        }
+                    };
+                }
+
+                var currencies = result.Select(s => s.CurrencyCode).Distinct().ToList();
+
+                var betSettings = new List<ClientListResponse.BetSetting>();
+
+                foreach (var currency in currencies)
+                {
+                    var betSetting = new ClientListResponse.BetSetting
+                    {
+                        CurrencyCode = currency
+                    };
+
+                    var currencySettings = result.Where(b => b.CurrencyCode == currency).ToList();
+
+                    foreach (var setting in currencySettings)
+                    {
+                        if (setting.CategoryId == (int)BetSettingCategory.Soccer)
+                        {
+                            betSetting.BetSettingSoccer = JsonSerializer.Deserialize<BetSettingSoccer>(setting.Setting);
+                        }
+                        else if (setting.CategoryId == (int)BetSettingCategory.Parlay)
+                        {
+                            betSetting.BetSettingParlay = JsonSerializer.Deserialize<BetSettingParlay>(setting.Setting);
+                        }
+                        else if (setting.CategoryId == (int)BetSettingCategory.Cricket)
+                        {
+                            betSetting.BetSettingCricket = JsonSerializer.Deserialize<BetSettingCricket>(setting.Setting);
+                        }
+                        else if (setting.CategoryId == (int)BetSettingCategory.OtherSports)
+                        {
+                            betSetting.BetSettingAllSports = JsonSerializer.Deserialize<BetSettingAllSports>(setting.Setting);
+                        }
+                        else if (setting.CategoryId == (int)BetSettingCategory.Priceboost)
+                        {
+                            betSetting.BetSettingPriceboost = JsonSerializer.Deserialize<BetSettingPriceboost>(setting.Setting);
+                        }
+                        else if (setting.CategoryId == (int)BetSettingCategory.BetBuilder)
+                        {
+                            betSetting.BetSettingBetBuilder = JsonSerializer.Deserialize<BetSettingBetBuilder>(setting.Setting);
+                        }
+                    }
+
+                    betSettings.Add(betSetting);
+                }
+
+                return new BaseResponse<BetSettingResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new BetSettingResponse
+                    {
+                        BetSettings = betSettings ?? new List<ClientListResponse.BetSetting>()
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<BetSettingResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = null
                 };
             }
         }
