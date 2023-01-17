@@ -732,85 +732,57 @@ namespace Backoffice.API.Repositories
                             {
                                 #region SOCCER
                                 case (int)BetSettingCategory.Soccer:
-                                    var categorySoccerBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.Soccer && x.CurrencyCode == betSetting.CurrencyCode);
 
-                                    if (categorySoccerBetSettingJson == null)
-                                    {
-                                        minStake = betSetting.BetSettingSoccer.MinPerTicket;
-                                        maxStake = betSetting.BetSettingSoccer.MaxPerTicket;
+                                    minStake = betSetting.BetSettingSoccer.MinPerTicket;
+                                    maxStake = betSetting.BetSettingSoccer.MaxPerTicket;
+                                    clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingSoccer);
 
-                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingSoccer);
-                                    }
                                     break;
                                 #endregion
 
                                 #region ALL SPORTS
                                 case (int)BetSettingCategory.OtherSports:
 
-                                    var categoryAllSportsBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.OtherSports && x.CurrencyCode == betSetting.CurrencyCode);
-                                    if (categoryAllSportsBetSettingJson == null)
-                                    {
-                                        minStake = betSetting.BetSettingAllSports.MinPerTicket;
-                                        maxStake = betSetting.BetSettingAllSports.MaxPerTicket;
+                                    minStake = betSetting.BetSettingAllSports.MinPerTicket;
+                                    maxStake = betSetting.BetSettingAllSports.MaxPerTicket;
 
-                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingAllSports);
-                                    }
+                                    clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingAllSports);
+
                                     break;
                                 #endregion
                                 #region PARLAY
                                 case (int)BetSettingCategory.Parlay:
-                                    var parlayBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.Parlay && x.CurrencyCode == betSetting.CurrencyCode);
+                                    minStake = betSetting.BetSettingParlay.MinPerTicket;
+                                    maxStake = betSetting.BetSettingParlay.MaxPerTicket;
+                                    maxWinnings = betSetting.BetSettingParlay.MaxWinningsBonus;
 
-                                    if (parlayBetSettingJson == null)
-                                    {
-                                        minStake = betSetting.BetSettingParlay.MinPerTicket;
-                                        maxStake = betSetting.BetSettingParlay.MaxPerTicket;
-                                        maxWinnings = betSetting.BetSettingParlay.MaxWinningsBonus;
-
-                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingParlay);
-                                    }
+                                    clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingParlay);
                                     break;
                                 #endregion
 
                                 #region CRICKET
                                 case (int)BetSettingCategory.Cricket:
-                                    var categoryCricketBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.Cricket && x.CurrencyCode == betSetting.CurrencyCode);
+                                    minStake = betSetting.BetSettingCricket.MinPerTicket;
+                                    maxStake = betSetting.BetSettingCricket.MaxPerTicket;
 
-                                    if (categoryCricketBetSettingJson == null)
-                                    {
-                                        minStake = betSetting.BetSettingCricket.MinPerTicket;
-                                        maxStake = betSetting.BetSettingCricket.MaxPerTicket;
-
-                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingCricket);
-                                    }
+                                    clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingCricket);
                                     break;
                                 #endregion
 
                                 #region PRICEBOOST
                                 case (int)BetSettingCategory.Priceboost:
-                                    var categoryPriceboostBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.Priceboost && x.CurrencyCode == betSetting.CurrencyCode);
-
-                                    if (categoryPriceboostBetSettingJson == null)
-                                    {
-                                        decimalPlaces = BitConverter.GetBytes(decimal.GetBits(betSetting.BetSettingPriceboost.MaxStake)[3])[2];
-
-                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingPriceboost);
-                                    }
+                                    clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingPriceboost);
 
                                     break;
                                 #endregion
                                 #region BETBUILDER
                                 case (int)BetSettingCategory.BetBuilder:
-                                    var categoryBetBuilderBetSettingJson = clientBetSettings.FirstOrDefault(x => x.CategoryId == (int)BetSettingCategory.BetBuilder && x.CurrencyCode == betSetting.CurrencyCode);
-                                    if (categoryBetBuilderBetSettingJson == null)
-                                    {
-                                        minStake = betSetting.BetSettingBetBuilder.MinStake;
-                                        maxStake = betSetting.BetSettingBetBuilder.MaxStake;
+                                    minStake = betSetting.BetSettingBetBuilder.MinStake;
+                                    maxStake = betSetting.BetSettingBetBuilder.MaxStake;
 
-                                        decimalPlaces = BitConverter.GetBytes(decimal.GetBits(betSetting.BetSettingBetBuilder.MaxStake)[3])[2];
+                                    decimalPlaces = BitConverter.GetBytes(decimal.GetBits(betSetting.BetSettingBetBuilder.MaxStake)[3])[2];
 
-                                        clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingBetBuilder);
-                                    }
+                                    clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingBetBuilder);
                                     break;
                                     #endregion
                             }

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Net;
 using System.Reflection.Emit;
+using static Backoffice.Shared.Models.Response.ClientListResponse;
 
 namespace Backoffice.Web.Components.Clients
 {
@@ -76,24 +77,122 @@ namespace Backoffice.Web.Components.Clients
                 Client.BetSettings = new List<ClientListResponse.BetSetting>();
                 foreach (var currency in Currencies)
                 {
+                    decimal suggestedMinimumBet = await GetSuggestedMinimumBet(currency);
+                    decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
+
                     Client.BetSettings.Add(new ClientListResponse.BetSetting
                     {
                         CurrencyCode = currency,
+                        BetSettingAllSports = new ClientListResponse.BetSettingAllSports
+                        {
+                            MinPerTicket = suggestedMinimumBet,
+                            MaxPerTicket = suggestedMaximumBet,
+                        },
+                        BetSettingBetBuilder = new BetSettingBetBuilder
+                        {
+                            MinStake = suggestedMinimumBet,
+                            MaxStake = suggestedMaximumBet,
+                        },
+                        BetSettingCricket = new BetSettingCricket
+                        {
+                            MinPerTicket = suggestedMinimumBet,
+                            MaxPerTicket = suggestedMaximumBet,
+                        },
+                        BetSettingSoccer = new BetSettingSoccer
+                        {
+                            MinPerTicket = suggestedMinimumBet,
+                            MaxPerTicket = suggestedMaximumBet,
+                        },
+                        BetSettingParlay = new BetSettingParlay
+                        {
+                            MinPerTicket = suggestedMinimumBet,
+                            MaxPerTicket = suggestedMaximumBet,
+                            MaxWinningsBonus = suggestedMaximumBet
+                        }
                     });
                 }
             }
             else
             {
+
                 var existingCurrencies = Client.BetSettings.Select(s => s.CurrencyCode).ToList();
                 foreach (var currency in Currencies)
                 {
-                    if(!existingCurrencies.Contains(currency))
+                    decimal suggestedMinimumBet = await GetSuggestedMinimumBet(currency);
+                    decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
+                    if (!existingCurrencies.Contains(currency))
                     {
                         Client.BetSettings.Add(new ClientListResponse.BetSetting
                         {
                             CurrencyCode = currency,
+                            BetSettingAllSports = new ClientListResponse.BetSettingAllSports
+                            {
+                                MinPerTicket = suggestedMinimumBet,
+                                MaxPerTicket= suggestedMaximumBet,
+                            },
+                            BetSettingBetBuilder = new BetSettingBetBuilder
+                            {
+                                MinStake = suggestedMinimumBet,
+                                MaxStake = suggestedMaximumBet,
+                            },
+                            BetSettingCricket = new BetSettingCricket
+                            {
+                                MinPerTicket = suggestedMinimumBet,
+                                MaxPerTicket = suggestedMaximumBet,
+                            },
+                            BetSettingSoccer = new BetSettingSoccer
+                            {
+                                MinPerTicket = suggestedMinimumBet,
+                                MaxPerTicket = suggestedMaximumBet,
+                            },
+                            BetSettingParlay = new BetSettingParlay
+                            {
+                                MinPerTicket = suggestedMinimumBet,
+                                MaxPerTicket = suggestedMaximumBet,
+                                MaxWinningsBonus = suggestedMaximumBet
+                            },
+
                         });
                     }
+                }
+
+                foreach(var setting in Client.BetSettings )
+                {
+                    decimal suggestedMinimumBet = await GetSuggestedMinimumBet(setting.CurrencyCode);
+                    decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
+
+                    if (setting.BetSettingBetBuilder.MinStake == 0)
+                        setting.BetSettingBetBuilder.MinStake = suggestedMinimumBet;
+
+                    if (setting.BetSettingBetBuilder.MaxStake == 0)
+                        setting.BetSettingBetBuilder.MaxStake = suggestedMaximumBet;
+
+                    if (setting.BetSettingAllSports.MinPerTicket == 0)
+                        setting.BetSettingAllSports.MinPerTicket = suggestedMinimumBet;
+
+                    if (setting.BetSettingAllSports.MaxPerTicket == 0)
+                        setting.BetSettingAllSports.MaxPerTicket = suggestedMaximumBet;
+
+                    if (setting.BetSettingSoccer.MinPerTicket == 0)
+                        setting.BetSettingSoccer.MinPerTicket = suggestedMinimumBet;
+
+                    if (setting.BetSettingSoccer.MaxPerTicket == 0)
+                        setting.BetSettingSoccer.MaxPerTicket = suggestedMaximumBet;
+
+                    if (setting.BetSettingCricket.MinPerTicket == 0)
+                        setting.BetSettingCricket.MinPerTicket = suggestedMinimumBet;
+
+                    if (setting.BetSettingCricket.MaxPerTicket == 0)
+                        setting.BetSettingCricket.MaxPerTicket = suggestedMaximumBet;
+
+                    if (setting.BetSettingParlay.MinPerTicket == 0)
+                        setting.BetSettingParlay.MinPerTicket = suggestedMinimumBet;
+
+                    if (setting.BetSettingParlay.MaxPerTicket == 0)
+                        setting.BetSettingParlay.MaxPerTicket = suggestedMaximumBet;
+
+                    if (setting.BetSettingParlay.MaxWinningsBonus == 0)
+                        setting.BetSettingParlay.MaxWinningsBonus = suggestedMaximumBet;
                 }
             }
 
@@ -426,6 +525,43 @@ namespace Backoffice.Web.Components.Clients
 
         }
 
+        #endregion
+
+        #region Utilities
+        private async Task<decimal> GetSuggestedMinimumBet(string currencyCode)
+        {
+            var currency = (Currency)Enum.Parse(typeof(Currency), currencyCode);
+
+            var suggestedMinimumBet = 1m;
+
+            var highValueArr = new Currency[] { Currency.KRW, Currency.VND, Currency.KHR, Currency.IDR, Currency.MMK };
+            var minValue100Arr = new Currency[] { Currency.CDF, Currency.TZS };
+            var minValue1Arr = new Currency[] { Currency.PKR };
+
+            if (highValueArr.Contains(currency))
+            {
+                suggestedMinimumBet = 1000m;
+            }
+            else if (minValue100Arr.Contains(currency))
+            {
+                suggestedMinimumBet = 100m;
+            }
+            else if (currency == Currency.BTC || currency == Currency.ETH)
+            {
+                //suggestedMinimumBet = 0.000000010000m;
+                suggestedMinimumBet = 0.00010000m; // FCI-6803
+            }
+            else if (minValue1Arr.Contains(currency))
+            {
+                suggestedMinimumBet = 1m;
+            }
+            else
+            {
+                suggestedMinimumBet = 0.02m;
+            }
+
+            return suggestedMinimumBet;
+        }
         #endregion
     }
 }
