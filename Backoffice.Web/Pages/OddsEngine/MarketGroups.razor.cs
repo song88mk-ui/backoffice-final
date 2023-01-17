@@ -123,7 +123,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnCopyClickedEvent()
         {
             var parameters = new ModalParameters();
-            parameters.Add("MarketGroupModel", MarketGroupModel);
+            parameters.Add("ClientCode", MarketGroupModel.ClientCode);
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
@@ -259,8 +259,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsPreLoader = true;
             
             MarketGroupModel.IsUpdate = false;
-
-            await InvokeAsync(StateHasChanged);
+            StateHasChanged();
 
             if (!string.IsNullOrEmpty(MarketGroupModel.ClientCode) && MarketGroupModel.SportId != 0)
             {
@@ -291,9 +290,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             IsSelectAll = MarketGroupModel != null && !MarketGroupModel.MarketTemplateGroups.Any(s => s.IsActive == false);
             await SortOrderRow();
-            IsPreLoader = false;
-            
-            StateHasChanged();
         }
         private async Task SortOrderRow()
         {
@@ -307,11 +303,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }).ToList();
             }
 
-            await InvokeAsync(StateHasChanged);
+            IsPreLoader = false;
+            StateHasChanged();
         }
         private async Task<List<ClientMarketTemplateGroupDTO>> GetMarketGroupSortOrderUpdate()
         {
-            DataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getMarketTemplateSortOrder", $".{TableClass}");
+            DataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getSortOrder", $".{TableClass}");
 
             var selectionTemplate
                 = new List<SortOrderModel>();

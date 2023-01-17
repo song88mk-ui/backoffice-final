@@ -1,12 +1,9 @@
-﻿using Backoffice.Shared.Data.Backoffice.Entities;
-using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Options;
-using RabbitMQ.Client.Exceptions;
 
 namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 {
@@ -17,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
-        public MarketGroupModel MarketGroupModel { get; set; }
+
         public List<ClientInformationModel> ClientInformations { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
@@ -26,6 +23,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         public int SelectedSportId { get; set; }
         public List<SelectListItemModel<int>> FixtureStatuses { get; set; }
         public int SelectedFixtureStatusId { get; set; }
+        public Guid CopyToClientId { get; set; }
         public string CopyToClientCode { get; set; }
         public string CopyToClientName { get; set; }
         public AlertModel AlertModel { get; set; }
@@ -37,7 +35,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             IsPreLoader = true;
 
-            MarketGroupModel = new MarketGroupModel();
             AlertModel = new AlertModel();
             Clients = new List<SelectListItemModel<string>>();
             Sports = new List<SelectListItemModel<int>>();
@@ -49,6 +46,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             {
                 try
                 {
+                    CopyToClientCode = ModalParameters.TryGet<string>("ClientCode");
                     if (UserModel.ClientCodes != null)
                     {
                         ClientInformations = (await TradingService.GetClientList()).Result;
@@ -74,9 +72,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                         });
                     }
 
-                    MarketGroupModel = ModalParameters.TryGet<MarketGroupModel>("MarketGroupModel");
-                    CopyToClientCode = MarketGroupModel.ClientCode;
-                    CopyToClientName = ClientInformations.Where(x => x.ClientCode == CopyToClientCode).FirstOrDefault().ClientName;
+                    var client = ClientInformations.Where(x => x.ClientCode == CopyToClientCode).FirstOrDefault();
+                    CopyToClientId = client.ClientId;
+                    CopyToClientName = client.ClientName;
                     SelectedClientCode = Clients.FirstOrDefault().Value;
 
                     var sports = (await TradingService.GetSportLookup()).Result;
@@ -153,29 +151,26 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
             var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId)).Result;
 
-            MarketGroupModel.MarketTemplateGroups = marketTemplateGroupResponse.ClientMarketTemplateGroups
-                .Select(s => new ClientMarketTemplateGroupDTO
-                {
-                    MarketTemplateGroupId = s.MarketTemplateGroupId,
-                    Name = s.Name,
-                    MarketTemplateIds = s.MarketTemplateIds,
-                    SortOrder = s.SortOrder,
-                    IsActive = s.IsActive,
-                    FixtureStatusId = MarketGroupModel.FixtureStatusId
-                }).ToList();
-
+            var copyFromMarketGroupModel = new MarketGroupModel()
+            {
+                ClientId = marketTemplateGroupResponse.ClientId,
+                SportId = marketTemplateGroupResponse.SportId,
+                FixtureStatusId = marketTemplateGroupResponse.FixtureStatusId,
+                MarketTemplateGroups = marketTemplateGroupResponse.ClientMarketTemplateGroups,
+                OldMarketTemplateGroups = new List<ClientMarketTemplateGroupDTO>()
+            };
 
             var copyToClient = ClientInformations.FirstOrDefault(f => f.ClientCode == CopyToClientCode);
 
             var parameters = new ModalParameters();
-            parameters.Add("MarketGroupModel", MarketGroupModel);
-            parameters.Add("CopyToClientId", copyToClient.ClientId);
+            parameters.Add("MarketGroupModel", copyFromMarketGroupModel);
+            parameters.Add("CopyToClientId", CopyToClientId);
             parameters.Add("CopyToClientCode", CopyToClientCode);
             parameters.Add("CopyToClientName", CopyToClientName);
             parameters.Add("CopyToSportId", SelectedSportId);
             parameters.Add("CopyToSportName", Sports.Where(x => x.Value == SelectedSportId).FirstOrDefault().Name);
             parameters.Add("CopyToFixtureStatusId", SelectedFixtureStatusId);
-            parameters.Add("CopyToFixtureStatusName", Sports.Where(x => x.Value == SelectedSportId).FirstOrDefault().Name);
+            parameters.Add("CopyToFixtureStatusName", FixtureStatuses.Where(x => x.Value == SelectedFixtureStatusId).FirstOrDefault().Name);
 
             parameters.Add("DialogStyle", "max-width: 600px;");
 

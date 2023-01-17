@@ -69,11 +69,11 @@
                                     }
                                 </td>
                                 <td class="text-center">
-                                    <a class="link-edit me-2" href="javascript:(0)" @onclick="async () => await OnEditClickedEvent(MarketTemplateGroup.MarketTemplateGroupId)">
-                                        <i class="fa fa-edit"></i>
+                                    <a class="link-edit me-2">
+                                        <button class="fa fa-edit" @onclick="async () => await OnEditClickedEvent(MarketTemplateGroup.MarketTemplateGroupId)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
                                     </a>
-                                    <a class="link-delete me-2" href="javascript:(0)">
-                                        <i class="fa fa-trash" @onclick="async () => await OnDeleteClickedEvent(MarketTemplateGroup)"></i>
+                                    <a class="link-delete me-2">
+                                        <button class="fa fa-trash" @onclick="async () => await OnDeleteClickedEvent(MarketTemplateGroup)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
                                     </a>
                                 </td>
                                 <td class="text-center actions">

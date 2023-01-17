@@ -45,3 +45,8 @@ table tfoot td:last-child {
 .link-bars {
     font-size: 14px;
 }
+
+table tbody button {
+    border: none;
+    background: none !important;
+}

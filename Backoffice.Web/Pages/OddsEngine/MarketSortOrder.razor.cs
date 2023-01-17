@@ -242,7 +242,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             var marketTemplates = new List<SortOrderModel>();
 
-            DataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getMarketTemplateSortOrder", $".{TableClass}");
+            DataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getSortOrder", $".{TableClass}");
 
             using (var stream = await DataReference.OpenReadStreamAsync(maxAllowedSize: 10_000_000))
             {

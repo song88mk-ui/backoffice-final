@@ -104,12 +104,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 });
 
                 await InvokeAsync(StateHasChanged);
-
-                //await InitializeCallback(CopyToClientCode);
             }
 
             IsPreLoader = false;
             ModalService.Cancel();
+            await Modal.OnSaveClickCallback.InvokeAsync(true);
         }
         public void Dispose()
         {
