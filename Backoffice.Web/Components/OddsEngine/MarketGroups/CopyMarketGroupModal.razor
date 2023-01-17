@@ -1,43 +1,91 @@
 ﻿<div class="modal-body">
-    <div class="row mb-2">
-        <div class="col-2 text-center">
-            <span>To</span>
-        </div>
-        <div class="col-10">           
-            <select class="form-select">
-                <option value="0">Select Client</option>
-                <option value="1">Client 1</option>
-                <option value="2">Client 2</option>
-                <option value="3">Client 3</option>
-            </select>
-        </div>        
-    </div>
+    @if (IsPreLoader)
+    {
+        <Preloader />
+    }
+    else
+    {
+        <div class="row mb-2">
+            <div class="col-2 text-center">
+                <span>From</span>
+            </div>
+            <div class="col-10">
+                <select class="form-select" placeholder="Select Client" @onchange="OnClientChangedEvent">
+                    @if (Clients != null)
+                    {
+                        <option value="" selected>Select Client</option>
 
-    <div class="row mb-2">
-        <div class="col-2"></div>
-        <div class="col-10">
-            <select class="form-select">
-                <option value="0">Select Sport</option>
-                <option value="1">Sport 1</option>
-                <option value="2">Sport 2</option>
-                <option value="3">Sport 3</option>
-            </select>
+                        foreach (var client in Clients)
+                        {
+                            if (client.Value == SelectedClientCode)
+                            {
+                                <option value="@client.Value" selected>@client.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@client.Value">@client.Name</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
         </div>
-    </div>
+        <div class="row mb-2">
+            <div class="col-2"></div>
+            <div class="col-10">
+                <select class="form-select" placeholder="Select Sport" @onchange="OnSportChangedEvent">
+                    @if (Sports != null)
+                    {
+                        <option value="0" selected>Select Sport</option>
 
-    <div class="row mb-2">
-        <div class="col-2"></div>
-        <div class="col-10">
-            <select class="form-select">
-                <option value="0">Select Scope</option>
-                <option value="1">Scope 1</option>
-                <option value="2">Scope 2</option>
-                <option value="3">Scope 3</option>
-            </select>
+                        foreach (var sport in Sports)
+                        {
+                            if (sport.Value == SelectedSportId)
+                            {
+                                <option value="@sport.Value" selected>@sport.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@sport.Value">@sport.Name</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
         </div>
-    </div>
+        <div class="row mb-2">
+            <div class="col-2"></div>
+            <div class="col-10">
+                <select class="form-select" placeholder="Select Scope" @onchange="OnFixtureStatusChangedEvent">
+                    @if (FixtureStatuses != null)
+                    {
+                        <option value="-1" selected>Select Scope</option>
+
+                        foreach (var fixtureStatus in FixtureStatuses)
+                        {
+                            if (fixtureStatus.Value == SelectedFixtureStatusId)
+                            {
+                                <option value="@fixtureStatus.Value" selected>@fixtureStatus.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@fixtureStatus.Value">@fixtureStatus.Name</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+    }
 </div>
 <div class="modal-footer">
     <button type="button" class="btn modal-btn modal-cancel" data-bs-dismiss="modal" @onclick="OnModalCancelEvent">Cancel</button>
-    <button type="button" class="btn modal-btn modal-save" data-bs-dismiss="modal" @onclick="OnModalCopyEvent">Copy</button>
+    @if (string.IsNullOrEmpty(SelectedClientCode) || SelectedSportId <= 0 || SelectedFixtureStatusId <= -1)
+    {
+        <button type="button" class="btn modal-btn modal-save" data-bs-dismiss="modal" disabled>Copy</button>
+    }
+    else
+    {
+        <button type="button" class="btn modal-btn modal-save" data-bs-dismiss="modal" @onclick="OnModalCopyEvent" disabled="@IsPreLoader">Copy</button>
+    }
 </div>

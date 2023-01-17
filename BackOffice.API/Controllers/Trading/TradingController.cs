@@ -654,6 +654,23 @@ namespace Backoffice.API.Controllers.Trading
                     return BadRequest(result);
             }
         }
+        [HttpPost("client/markettemplategroup/copy")]
+        public async Task<IActionResult> CopyClientMarketTemplateGroup([FromBody] ClientCopyMarketTemplateGroupRequest request)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.CopyClientMarketTemplateGroup(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         #endregion
 
         #region Activity Log

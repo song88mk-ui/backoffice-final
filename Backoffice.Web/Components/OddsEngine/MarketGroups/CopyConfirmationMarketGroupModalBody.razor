@@ -1,0 +1,20 @@
+﻿<div class="modal-body">
+    @if (IsPreLoader)
+    {
+        <Preloader  />
+    }
+    <div class="row">
+        <div class="col-md-12">
+            <p align="center" class="text-center">
+                <br>
+                <i class="fa fa-warning text-danger fa-4x"></i><br>
+                <br>
+                This setting will override @CopyToClientName > @CopyToSportName > @CopyToFixtureStatusName Market Group. <br>Are you sure you want to copy this setting?
+            </p>
+        </div>
+    </div>
+</div>
+<div class="modal-footer notifications">
+    <button type="button" @onclick="OnCancelClickEvent" class="btn btn-default waves-effect " data-dismiss="modal" disabled="@IsPreLoader">Cancel</button>
+    <button type="button" @onclick="OnCopyMarketGroup" data-type="inverse" data-from="top" data-align="right" class="btn btn-success waves-effect waves-light" data-dismiss="modal" disabled="@IsPreLoader">Copy</button>
+</div>

@@ -12,6 +12,7 @@
             OnAddCallback="OnAddClickedEvent"
             OnCopyCallback="OnCopyClickedEvent"
             OnUpdateCallback="OnUpdateClickedEvent"
+            OnSaveUpdateCallback="OnSaveUpdateClickEvent"
             OnViewLogsCallback="OnViewLogsClickedEvent"
             OnCancelCallback="OnCancelUpdateClickedEvent"
             OnInitCallback="OnInit" />
@@ -32,16 +33,16 @@
                             <th scope="col" width="5%" valign="middle" align="center">
                                 <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxSelectAllClickedEvent" />
                             </th>
-                            <th scope="col">>User Group Name</th>
-                            <th scope="col">>Users</th>
-                            <th scope="col">>Manage</th>
+                            <th scope="col">User Group Name</th>
+                            <th scope="col">Users</th>
+                            <th scope="col">Manage</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var MarketTemplateGroup in MarketGroupModel.MarketTemplateGroups.OrderBy(o => o.SortOrder))
                         {
-                            <tr>
+                            <tr @key="@($"row-sp:{MarketTemplateGroup.MarketTemplateGroupId}-fist")" class="@(MarketGroupModel.IsUpdate ? "" : "row-disabled")" id="name-@MarketTemplateGroup.MarketTemplateGroupId" data-sort-order="@MarketTemplateGroup.SortOrder">
                                 <td>
                                     <div class="d-flex justify-content-center">
                                         <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="MarketTemplateGroup.IsActive" OnChangeCallback="CheckboxClickedEvent" Param1="MarketTemplateGroup" />

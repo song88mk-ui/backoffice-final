@@ -16,6 +16,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public EventCallback OnAddCallback { get; set; }
         [Parameter] public EventCallback OnUpdateCallback { get; set; }
+        [Parameter] public EventCallback OnSaveUpdateCallback { get; set; }
         [Parameter] public EventCallback OnCopyCallback { get; set; }
         [Parameter] public EventCallback OnViewLogsCallback { get; set; }
         [Parameter] public MarketGroupModel MarketGroupModel { get; set; }
@@ -66,7 +67,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                         });
                     }
 
-                    var client =
                     SelectedClientCode = Clients.FirstOrDefault().Value;
 
                     var sports = (await TradingService.GetSportLookup()).Result;
@@ -124,6 +124,12 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             MarketGroupModel.IsUpdate = true;
 
             await OnUpdateCallback.InvokeAsync();
+        }
+        public async Task OnSaveUpdateClickEvent()
+        {
+            MarketGroupModel.IsUpdate = true;
+
+            await OnSaveUpdateCallback.InvokeAsync();
         }
 
         public async Task OnCancelClickEvent()

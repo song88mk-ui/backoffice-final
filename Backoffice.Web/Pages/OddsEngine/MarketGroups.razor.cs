@@ -1,6 +1,8 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Components.OddsEngine.MarketGroups;
@@ -8,6 +10,10 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Security.Claims;
+using System.Security.Cryptography.Xml;
+using System.Text;
+using System.Text.Json;
 using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -19,6 +25,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        public IJSStreamReference? DataReference { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -26,7 +34,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public bool IsSelectAll { get; set; }
         public string TableClass { get; set; }
 
-        public MarketGroupModel MarketGroupModel { get; set; }
+        public static MarketGroupModel MarketGroupModel { get; set; }
         #endregion
 
         #region Methods
@@ -35,6 +43,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarketGroupModel = new MarketGroupModel();
             TableClass = "table-edit-market-group";
             IsPreLoader = true;
+            
         }
 
         public async Task OnAddClickedEvent()
@@ -98,13 +107,23 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnCancelUpdateClickedEvent()
         {
             MarketGroupModel.IsUpdate = false;
+            IsPreLoader = true;
+            StateHasChanged();
 
             await JSRuntime.InvokeVoidAsync("disableSort", $".{TableClass}");
+
+            MarketGroupModel.MarketTemplateGroups = new List<ClientMarketTemplateGroupDTO>();
+            MarketGroupModel.MarketTemplateGroups.AddRange(MarketGroupModel.OldMarketTemplateGroups);
+
+            IsPreLoader = false;
+            
+            StateHasChanged();
         }
 
         public async Task OnCopyClickedEvent()
         {
             var parameters = new ModalParameters();
+            parameters.Add("MarketGroupModel", MarketGroupModel);
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
@@ -157,12 +176,77 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnSaveClickEvent(object item)
         {
             MarketGroupModel.IsUpdate = false;
+            
+            IsPreLoader = true;
+            StateHasChanged();
 
             await OnInit();
         }
-
-        public void Dispose()
+        public async Task OnSaveUpdateClickEvent(object item)
         {
+            MarketGroupModel.IsUpdate = false;
+            IsPreLoader = true;
+            
+            StateHasChanged();
+
+            var marketGroups = await GetMarketGroupSortOrderUpdate();
+
+
+            if (marketGroups.Any())
+            {
+                var marketTemplateGroups = new List<ClientMarketTemplateGroupDTO>();
+                foreach (var marketTemplateGroup in MarketGroupModel.MarketTemplateGroups)
+                {
+                    marketTemplateGroup.SortOrder = marketGroups.FirstOrDefault(m => m.MarketTemplateGroupId == marketTemplateGroup.MarketTemplateGroupId).SortOrder;
+                    marketTemplateGroups.Add(marketTemplateGroup);
+                }
+
+                var oldMarketGroupSerialize = JsonSerializer.Serialize(MarketGroupModel.OldMarketTemplateGroups);
+                var newMarketGroupSerialize = JsonSerializer.Serialize(marketTemplateGroups);
+
+                if (oldMarketGroupSerialize == newMarketGroupSerialize)
+                {
+                    await OnInit();
+                    return;
+                }
+
+                var request = new ClientPostMarketTemplateGroupRequest
+                {
+                    ClientId = MarketGroupModel.ClientId,
+                    SportId = MarketGroupModel.SportId,
+                    IsAdd = false,
+                    MarketTemplateGroups = marketTemplateGroups
+                };
+
+                var response = await TradingService.AddOrUpdateClientMarketTemplateGroup(request);
+
+                if (response.StatusCode == StatusCode.Success)
+                {
+                    //activity log
+                    await TradingService.AddActivityLog(new ActivityLogModel
+                    {
+                        Page = Page.OE_Administration_MarketGroup.ToString().Replace("_", "."),
+                        Payload = $"{MarketGroupModel.ClientCode}.{MarketGroupModel.SportId}.{MarketGroupModel.FixtureStatusId}.0",
+                        Activity = Activity.Update.ToString(),
+                        From = JsonSerializer.Serialize(MarketGroupModel.OldMarketTemplateGroups),
+                        To = JsonSerializer.Serialize(marketTemplateGroups),
+                        UserId = UserModel.Id
+                    });
+
+                    // re-assign the updated data on market sort order properties
+                    MarketGroupModel.IsUpdate = false;
+
+                    await OnInit();
+                }
+
+                var AlertMessages = response.StatusCode == StatusCode.Success ? $"Market group order update for {MarketGroupModel.ClientCode} is successful" : $"Market sort order updated for {MarketGroupModel.ClientCode} failed";
+            }
+
+            await OnInit();
+        }
+        public async void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
 
         #endregion
@@ -173,6 +257,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             PageTitle = "Market Groups";
             IconClass = string.Empty;
             IsPreLoader = true;
+            
             MarketGroupModel.IsUpdate = false;
 
             await InvokeAsync(StateHasChanged);
@@ -207,6 +292,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsSelectAll = MarketGroupModel != null && !MarketGroupModel.MarketTemplateGroups.Any(s => s.IsActive == false);
             await SortOrderRow();
             IsPreLoader = false;
+            
+            StateHasChanged();
         }
         private async Task SortOrderRow()
         {
@@ -221,6 +308,56 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             await InvokeAsync(StateHasChanged);
+        }
+        private async Task<List<ClientMarketTemplateGroupDTO>> GetMarketGroupSortOrderUpdate()
+        {
+            DataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getMarketTemplateSortOrder", $".{TableClass}");
+
+            var selectionTemplate
+                = new List<SortOrderModel>();
+
+            using (var stream = await DataReference.OpenReadStreamAsync(maxAllowedSize: 10_000_000))
+            {
+                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    var hasLine = true;
+
+                    while (hasLine)
+                    {
+                        var content = await reader.ReadLineAsync();
+
+                        if (content == null)
+                        {
+                            hasLine = false;
+                            continue;
+                        }
+
+                        selectionTemplate.Add(JsonSerializer.Deserialize<SortOrderModel>(content));
+                    }
+                }
+            }
+
+            var marketTemplateGroup = new List<ClientMarketTemplateGroupDTO>();
+
+            foreach(var item in MarketGroupModel.MarketTemplateGroups)
+            {
+                var newSortOrder = selectionTemplate.Where(x => x.RowId == $"name-{item.MarketTemplateGroupId.ToString()}").FirstOrDefault();
+
+                if(newSortOrder != null)
+                {
+                    marketTemplateGroup.Add(new ClientMarketTemplateGroupDTO()
+                    {
+                        MarketTemplateGroupId = item.MarketTemplateGroupId,
+                        Name = item.Name,
+                        SortOrder = newSortOrder.SortOrder,
+                        MarketTemplateIds = item.MarketTemplateIds,
+                        IsActive = item.IsActive,
+                        FixtureStatusId = item.FixtureStatusId
+                    });
+                }
+            }
+
+            return marketTemplateGroup.OrderBy(x => x.SortOrder).ToList();
         }
         #endregion
     }
