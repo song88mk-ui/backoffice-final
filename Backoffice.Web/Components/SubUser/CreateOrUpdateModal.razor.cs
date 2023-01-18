@@ -63,6 +63,7 @@ namespace Backoffice.Web.Components.SubUser
         public async Task OnResetClickEvent()
         {
             SubUser = new UserResponse();
+            SubUser.Status = "Normal";
 
             SubUserClaims.SubUserClaims = new List<SubUserClaim>();
             if (DefaultClaims.Any())
