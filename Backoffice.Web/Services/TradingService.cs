@@ -985,6 +985,193 @@ namespace Backoffice.Web.Services
             }
         }
 
+        #region Configuration
+        public async Task<BaseResponse<ConfigModel>> GetClientConfig(ClientConfigRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"api/trading/client/config/all", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ConfigModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ConfigModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<ConfigModel>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ConfigModel>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<MarketTemplateGroupResponse>> GetMarketTemplateGroups(int fixtureTypeId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/trading/markettemplategroups/{fixtureTypeId}");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<MarketTemplateGroupResponse>>
+                        (
+                            await response.Content.ReadAsStringAsync(),
+                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<MarketTemplateGroupResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        if (response.StatusCode == HttpStatusCode.BadRequest)
+                        {
+                            return JsonSerializer.Deserialize<BaseResponse<MarketTemplateGroupResponse>>
+                            (
+                                await response.Content.ReadAsStringAsync(),
+                                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                            ) ?? new BaseResponse<MarketTemplateGroupResponse>();
+                        }
+                        else
+                        {
+                            return new BaseResponse<MarketTemplateGroupResponse>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                            };
+                        }
+                    else
+                    {
+                        return new BaseResponse<MarketTemplateGroupResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<MarketTemplateGroupResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<MarketLookupResponse>> GetMarketLookup(MarketLookupRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/trading/marketlookup/{request.FixtureTypeId}/{request.SportId}");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<MarketLookupResponse>>
+                        (
+                            await response.Content.ReadAsStringAsync(),
+                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<MarketLookupResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        if (response.StatusCode == HttpStatusCode.BadRequest)
+                        {
+                            return JsonSerializer.Deserialize<BaseResponse<MarketLookupResponse>>
+                            (
+                                await response.Content.ReadAsStringAsync(),
+                                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                            ) ?? new BaseResponse<MarketLookupResponse>();
+                        }
+                        else
+                        {
+                            return new BaseResponse<MarketLookupResponse>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                            };
+                        }
+                    else
+                    {
+                        return new BaseResponse<MarketLookupResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<MarketLookupResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ClientConfigResponse>> AddOrUpdateConfig(ConfigSettingsModel request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"api/trading/client/config", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ClientConfigResponse>>
+                        (
+                            await response.Content.ReadAsStringAsync(),
+                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<ClientConfigResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        if (response.StatusCode == HttpStatusCode.BadRequest)
+                        {
+                            return JsonSerializer.Deserialize<BaseResponse<ClientConfigResponse>>
+                            (
+                                await response.Content.ReadAsStringAsync(),
+                                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                            ) ?? new BaseResponse<ClientConfigResponse>();
+                        }
+                        else
+                        {
+                            return new BaseResponse<ClientConfigResponse>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                            };
+                        }
+                    else
+                    {
+                        return new BaseResponse<ClientConfigResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ClientConfigResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+        #endregion
+
         public async Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request)
         {
             try

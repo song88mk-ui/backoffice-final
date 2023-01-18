@@ -6,38 +6,117 @@
 
 <div class="col-md-12">
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-    <HeaderConfigTopMenu/>
+    <HeaderConfigTopMenu />
 </div>
 
 <div class="col-md-12">
-    <Filter/>
+    <Filter @bind-ConfigFilterModel="ConfigFilterModel" />
 </div>
 
 <div class="col-md-12 mb-2">
-    <button type="button" class="btn float-end">Deactivate All</button>
+    <button type="button" class="btn float-end" @onclick="OnAllMarketStatusClickEvent">@AllMarketStatusName</button>
 </div>
 
 <div class="col-md-12">
-    <div class="accordion">
-        <div class="accordion-item">
-            <div class="accordion-header">
-                <button class="accordion-button ps-5" type="button" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#accordion1">
-                    Free Text Market
-                </button>
+    @if (ConfigFilterModel != null && ConfigFilterModel.MarketTemplates != null)
+    {
+        SelectedContents = null;
+        if (!string.IsNullOrEmpty(ConfigFilterModel.ClientCode) && ConfigFilterModel.MarketTemplates.Any())
+        {
+            SelectedContents = GetContents();
 
-                <div class="d-flex justify-content-around market-toggle">
-                    <span>Market Active</span>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="market1Toggle"  role="switch" aria-label="Market 1 Toggle Switch"/>
-                    </div>
-                </div>
-            </div>
+            if (SelectedContents.Any())
+            {
+                var marketCount = 0;
+                foreach (var market in SelectedContents)
+                {
 
-            <div id="accordion1" class="accordion-collapse collapse show">
-                <div class="accordion-body">
-                    <PrematchConfig />
-                </div>
-            </div>
-        </div>
+                    if (market.NewMarketLookup == null)
+                        market.IsSelected = marketCount >= 3 ? true : false;
+
+                    GetNewSettings(market);
+                    var configStatus = market.MarketLookup.IsActive ? 1 : 0;
+
+                    if (ConfigFilterModel.FilterConfigStatus == -99 || configStatus == ConfigFilterModel.FilterConfigStatus)
+                    {
+                        if (AllMarketStatus != null)
+                        {
+                            market.NewMarketLookup.IsActive = (int)AllMarketStatus == 1 ? true : false;
+                        }
+                        marketCount++;
+                    }                    
+                }
+
+                if (marketCount > 0)
+                {
+                    if (ConfigFilterModel.FilterConfigStatus == 0)
+                        AllMarketStatusName = "Activate All";
+                    if (ConfigFilterModel.FilterConfigStatus == 1)
+                        AllMarketStatusName = "Deactivate All";
+                    if (!SelectedContents.Any(s => s.NewMarketLookup.IsActive))
+                        AllMarketStatusName = "Activate All";
+                    if (!SelectedContents.Any(s => s.NewMarketLookup.IsActive == false))
+                        AllMarketStatusName = "Deactivate All";
+
+                    <Virtualize Context="market" ItemsProvider="@GetItemProviderContents" OverscanCount="6">
+                        <ItemContent>
+                            <div class="accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header">
+                                        <button class="accordion-button ps-5" type="button" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="@($"#market-{market.MarketLookup.MarketTemplateId}")">
+                                            @market.MarketLookup.MarketTemplateName
+                                        </button>
+
+                                        <div class="d-flex justify-content-around market-toggle">
+                                            <span>Market Active</span>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="@($"{market.MarketLookup.MarketTemplateName}Toggle")" role="switch" aria-label="@($"{market.MarketLookup.MarketTemplateName} Toggle Switch")" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="@($"market-{market.MarketLookup.MarketTemplateId}")" class="accordion-collapse collapse show">
+                                        <div class="accordion-body">
+                                            <PrematchConfig />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ItemContent>
+                    </Virtualize>
+                    
+                }
+                else
+                {
+                    <NoRecordFound />
+                }
+            }
+        }
+        else
+        {
+            <NoRecordFound />
+        }
+    }
+    @*<div class="accordion">
+    <div class="accordion-item">
+    <div class="accordion-header">
+    <button class="accordion-button ps-5" type="button" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#accordion1">
+    Free Text Market
+    </button>
+
+    <div class="d-flex justify-content-around market-toggle">
+    <span>Market Active</span>
+    <div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" id="market1Toggle" role="switch" aria-label="Market 1 Toggle Switch" />
     </div>
+    </div>
+    </div>
+
+    <div id="accordion1" class="accordion-collapse collapse show">
+    <div class="accordion-body">
+    <PrematchConfig />
+    </div>
+    </div>
+    </div>
+    </div>*@
 </div>

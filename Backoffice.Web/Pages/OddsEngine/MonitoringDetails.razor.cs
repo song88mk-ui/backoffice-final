@@ -367,7 +367,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                                     MarketGroupCallback.MarketTemplateGroups.Add(new MarketGroupNavigationModel
                                     {
                                         IsSelected = MarketGroupCallback.MarketTemplateGroups.Count == 1 ? true : false,
-                                        MarketTemplateGroup = new MarketTemplateGroupResponse.MarketTemplateGroup
+                                        MarketTemplateGroup = new MarketTemplateGroup
                                         {
                                             MarketTemplateGroupId = marketTemplateGroupId,
                                             MarketTemplateGroupName = MarketGroupCallback.MarketTemplateGroups.FirstOrDefault(s => s.MarketTemplateGroup.MarketTemplateGroupName == marketTemplateGroupName)?.MarketTemplateGroup.MarketTemplateGroupName,

@@ -34,8 +34,8 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             var marketTemplateGroupResponse = (await BackOfficeService.GetMarketTemplateGroups(99)).Result;
             var sportMarketTemplateGroup = marketTemplateGroupResponse.Sports.FirstOrDefault(s => s.SportId == fixture.SportId);
 
-            var sportMarketTemplateGroupLive = new List<MarketTemplateGroupResponse.MarketTemplateGroup>();
-            var sportMarketTemplateGroupPrematch = new List<MarketTemplateGroupResponse.MarketTemplateGroup>();
+            var sportMarketTemplateGroupLive = new List<MarketTemplateGroup>();
+            var sportMarketTemplateGroupPrematch = new List<MarketTemplateGroup>();
 
             if (sportMarketTemplateGroup != null)
             {
@@ -43,7 +43,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
                 sportMarketTemplateGroupPrematch = sportMarketTemplateGroup?.Prematch;
             }
 
-            List<MarketTemplateGroupResponse.MarketTemplateGroup> fullMarketTemplateGroup = sportMarketTemplateGroupLive;
+            List<MarketTemplateGroup> fullMarketTemplateGroup = sportMarketTemplateGroupLive;
 
             if (sportMarketTemplateGroupPrematch.Count > 0)
             {
@@ -70,7 +70,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
                         MarketTemplateGroups.Add(new MarketGroupNavigationModel
                         {
                             IsSelected = MarketTemplateGroups.Count == 1 ? true : false,
-                            MarketTemplateGroup = new MarketTemplateGroupResponse.MarketTemplateGroup
+                            MarketTemplateGroup = new MarketTemplateGroup
                             {
                                 MarketTemplateGroupId = marketTemplateGroupId,
                                 MarketTemplateGroupName = fullMarketTemplateGroup.FirstOrDefault(s => s.MarketTemplateGroupName == marketTemplateGroupName)?.MarketTemplateGroupName,

@@ -1,62 +1,99 @@
 ﻿<div class="row ms-2 mb-3">
     <div class="col-md-12 mb-3">        
-        <h4 class="fw-bold">Apline Skiing</h4>
+        <h4 class="fw-bold">@SportName</h4>
     </div>
 
     <div class="col">
-        <select class="form-select" aria-label="Sport Select">
-            <option value="1">Value 1</option>
-            <option value="2">Value 2</option>
-            <option value="3">Value 3</option>
+        <select class="form-select" aria-label="Sport Select" @onchange="OnSportChangedEvent">
+            @foreach (var item in ConfigFilterModel.Sports)
+            {
+                if (item.Value == ConfigFilterModel.SportId)
+                {
+                    <option value="@item.Value" selected>@item.Name</option>
+                }
+                else
+                {
+                    <option value="@item.Value">@item.Name</option>
+                }
+            }
         </select>
     </div>
 
     <div class="col">
-        <select class="form-select" aria-label="Segment Select">
-            <option value="1">Value 1</option>
-            <option value="2">Value 2</option>
-            <option value="3">Value 3</option>
+        <select class="form-select" aria-label="Segment Select" @onchange="OnSegmentChangedEvent">
+            @foreach (var item in ConfigFilterModel.Segments)
+            {
+                if (item.Value == ConfigFilterModel.SegmentId)
+                {
+                    <option value="@item.Value" selected>@item.Name</option>
+                }
+                else
+                {
+                    <option value="@item.Value">@item.Name</option>
+                }
+            }
         </select>
     </div>    
     
     <div class="col">
-        <select class="form-select" aria-label="League Select">
-            <option value="1">Value 1</option>
-            <option value="2">Value 2</option>
-            <option value="3">Value 3</option>
+        <select class="form-select" aria-label="League Select" @onchange="OnLeagueChangedEvent">
+            @foreach (var item in ConfigFilterModel.Leagues)
+            {
+                if (item.Value == ConfigFilterModel.LeagueId)
+                {
+                    <option value="@item.Value" selected>@item.Name</option>
+                }
+                else
+                {
+                    <option value="@item.Value">@item.Name</option>
+                }
+            }
         </select>
     </div>        
 
     <div class="col">
-        <select class="form-select" aria-label="Scope Select">
-            <option value="1">Value 1</option>
-            <option value="2">Value 2</option>
-            <option value="3">Value 3</option>
+        <select class="form-select" aria-label="Scope Select" @onchange="OnScopeChangedEvent">
+            @foreach (var item in ConfigFilterModel.Scopes)
+            {
+                <option value="@item.Value">@item.Name</option>
+            }
         </select>
     </div>        
 
     <div class="col">
-        <select class="form-select" aria-label="Client Select">
-            <option value="1">Value 1</option>
-            <option value="2">Value 2</option>
-            <option value="3">Value 3</option>
+        <select class="form-select" aria-label="Client Select" @onchange="OnClientChangedEvent">
+            @foreach (var item in ConfigFilterModel.Clients)
+            {
+                <option value="@item.ClientCode">@item.ClientName</option>
+            }
         </select>
     </div>        
 
     <div class="col">
-        <select class="form-select" aria-label="Config Select">
-            <option value="1">Value 1</option>
-            <option value="2">Value 2</option>
-            <option value="3">Value 3</option>
+        <select class="form-select" aria-label="Config Select" @onchange="OnConfigChangedEvent">
+            @foreach(var item in ConfigFilterModel.ConfigStatuses)
+            {
+                <option value="@item.Value">@item.Name</option>
+            }
         </select>
     </div>        
 
     <div class="col">
-        <select class="form-select" aria-label="Market Select">
-            <option value="1">Value 1</option>
-            <option value="2">Value 2</option>
-            <option value="3">Value 3</option>
-        </select>
+        @if (ConfigFilterModel.MarketTemplateGroups.Count > 0)
+        {
+            <select class="form-select" aria-label="Market Select" @onchange="OnMarketChangedEvent">
+                @foreach(var item in ConfigFilterModel.MarketTemplateGroups)
+                {
+                    <option value="@item.MarketTemplateGroup.MarketTemplateGroupId">@item.MarketTemplateGroup.MarketTemplateGroupName</option>
+                }
+            </select>
+        }
+        else
+        {
+            <select class="form-select" aria-label="Market Select">
+                <option value="" selected></option>
+            </select>
+        }
     </div>        
 
     <div class="col-3 ps-5 pe-4">

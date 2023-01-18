@@ -37,9 +37,15 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<BetSelectionDetailsResponse>> GetBetSelectionDetails(BetSelectionDetailsRequest request);
         Task<BaseResponse<ManualMarketSettlementDetailsResponse>> GetManualMarketSettlementDetails(ManualMarketSettlementDetailsRequest request);
         Task<BaseResponse<ManualMarketSettlementResponse>> AddOrUpdateManualMarketSettlement(List<ManualMarketSettlementRequest> request, string userId);
-
         Task<BaseResponse<ManualBetDetailsResponse>> GetManualBetDetails(ManualBetDetailsRequest request);
         Task<BaseResponse<string>> AddManualMessageSettlement(List<MessageSettlementRequest> request);
+
+
+        Task<BaseResponse<ConfigModel>> GetClientConfig(ClientConfigRequest request);
+        Task<BaseResponse<MarketTemplateGroupResponse>> GetMarketTemplateGroups(int fixtureTypeId);
+        Task<BaseResponse<MarketLookupResponse>> GetMarketLookup(MarketLookupRequest request);
+        Task<BaseResponse<ClientConfigResponse>> AddOrUpdateConfig(ConfigSettingsModel request);
+
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);
         Task<BaseResponse<MessageResponse>> Publish(MessageRequest request);
