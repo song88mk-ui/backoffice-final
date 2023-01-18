@@ -8,7 +8,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
 
-namespace Backoffice.Web.Components.OddsEngine.MarketSettlement
+namespace Backoffice.Web.Components.MarketSettlement
 {
     public partial class AddMarketSettlementModal : IDisposable
     {

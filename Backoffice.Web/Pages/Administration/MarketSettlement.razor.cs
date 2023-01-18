@@ -1,13 +1,12 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Web.Components.OddsEngine.MarketSettlement;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 
-namespace Backoffice.Web.Pages.OddsEngine
+namespace Backoffice.Web.Pages.Administration
 {
     public partial class MarketSettlement : IDisposable
     {
@@ -21,6 +20,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
         #endregion
+
         #region Methods
         protected override async Task OnInitializedAsync()
         {

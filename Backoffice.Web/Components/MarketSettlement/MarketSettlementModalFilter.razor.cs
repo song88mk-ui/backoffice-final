@@ -1,12 +1,11 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace Backoffice.Web.Components.OddsEngine.MarketSettlement
+namespace Backoffice.Web.Components.MarketSettlement
 {
     public partial class MarketSettlementModalFilter : IDisposable
     {

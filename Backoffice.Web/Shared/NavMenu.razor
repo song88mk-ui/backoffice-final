@@ -1,7 +1,7 @@
 ﻿@using Backoffice.Web.Models
 @using Backoffice.Shared.Enums
 
-@if (NavMenuAccess == NavMenuAccess.SBC)
+@if (NavMenuAccess == NavMenuAccess.SBC || NavMenuAccess == NavMenuAccess.Admin)
 {
     <div class="top-row ps-3 navbar">
         <div class="container-fluid">
@@ -104,6 +104,52 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         </NavLink>
                     </div>
                 }
+            </nav>
+        }
+        else if (NavMenuAccess == NavMenuAccess.Admin)
+        {
+            <nav class="flex-column">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="admin/dashboard">
+                        <span class="ico ico-dashboard" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Dashboard</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="admin/manage-user">
+                        <span class="ico ico-manage-user" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Manage User</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="admin/manage-user-group">
+                        <span class="ico ico-manage-user" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Manage User Group</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-settlements" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
+                        <span class="ico ico-settlements" aria-hidden="true"></span>
+                        <span class="nav-menu-text">Settlements</span>
+                        <span class="fa fa-chevron-down"></span>
+                    </NavLink>
+                    <div class="sub-menu collapse show" id="sub-menu-settlements">
+                        <nav class="flex-column">
+                            <div class="nav-item">
+                                <NavLink class="nav-link" href="admin/market-settlement">
+                                    <span class="ico ico-market-settlement" aria-hidden="true"></span>
+                                    <span class="nav-menu-text">Market Settlement</span>
+                                </NavLink>
+                            </div>
+                            <div class="nav-item">
+                                <NavLink class="nav-link" href="admin/message-settlement">
+                                    <span class="ico ico-message-settlement" aria-hidden="true"></span>
+                                    <span class="nav-menu-text">Message Settlement</span>
+                                </NavLink>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
             </nav>
         }
         else if (NavMenuAccess == NavMenuAccess.OE)

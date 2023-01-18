@@ -66,6 +66,7 @@ namespace Backoffice.Web.Shared
 
                 await OnSportClickCallback.InvokeAsync(SelectedSport);
             }
+
             if (UserModel != null)
             {
                 if (UserModel.Claims != null && Claims == null)

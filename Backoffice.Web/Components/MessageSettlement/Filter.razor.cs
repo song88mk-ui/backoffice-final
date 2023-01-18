@@ -1,17 +1,16 @@
-﻿using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
-using Microsoft.AspNetCore.Components;
-using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.FixtureModel;
-using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models.Requests;
 using BlazorDateRangePicker;
-using Backoffice.Shared.Utilities;
-using Backoffice.Shared.OutgoingEngineMessages;
+using Microsoft.AspNetCore.Components;
 using System.Text.Json;
+using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.FixtureModel;
 
-namespace Backoffice.Web.Components.OddsEngine.MessageSettlement
+namespace Backoffice.Web.Components.MessageSettlement
 {
     public partial class Filter : IDisposable
     {

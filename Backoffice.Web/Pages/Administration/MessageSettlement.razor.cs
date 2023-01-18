@@ -1,14 +1,13 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Web.Components.Common;
-using Backoffice.Web.Components.OddsEngine.MessageSettlement;
+using Backoffice.Web.Components.MessageSettlement;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
 
-namespace Backoffice.Web.Pages.OddsEngine
+namespace Backoffice.Web.Pages.Administration
 {
     public partial class MessageSettlement : IDisposable
     {

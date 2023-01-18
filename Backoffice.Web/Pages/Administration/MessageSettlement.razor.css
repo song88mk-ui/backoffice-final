@@ -1,4 +1,9 @@
-﻿.table-head {
+﻿.main-content {
+    background-color: #FFFFFF;
+    border-radius: 3px;
+}
+
+.table-head {
     background-color: #354156;
     color: #fff;
 }
