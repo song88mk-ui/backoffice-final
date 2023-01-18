@@ -83,9 +83,12 @@
             }
         </tbody>
     </table>
-    <div class="mt-3">
-        <Alert Message="@AlertMessage" AlertStatus="AlertStatus" />
-    </div>
+    @if (!string.IsNullOrEmpty(AlertMessage))
+    {
+        <div class="mt-3">
+            <Alert Message="@AlertMessage" AlertStatus="AlertStatus" />
+        </div>
+    }
 </div>
 <div class="modal-footer mx-4 p-0 py-3 border-0">
     <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
