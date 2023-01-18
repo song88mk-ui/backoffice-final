@@ -200,8 +200,18 @@ namespace Backoffice.Web.Components.SubUser
 
                 if (response.Result)
                 {
-                    ModalService.Cancel();
+                    Alerts.Add(new AlertModel
+                    {
+                        AlertStatus = "Success",
+                        AltertMessage = "Sub user successfully updated",
+                        Opacity = 1.0m
 
+                    });
+
+                    await InvokeAsync(StateHasChanged);
+                    await Task.Delay(3500);
+
+                    ModalService.Cancel();
                     await Modal.OnSaveClickCallback.InvokeAsync();
                 }
                 else
@@ -220,6 +230,17 @@ namespace Backoffice.Web.Components.SubUser
 
                 if (response.Result)
                 {
+                    
+                    Alerts.Add(new AlertModel
+                    {
+                        AlertStatus = "Success",
+                        AltertMessage = "Sub user successfully created",
+                        Opacity = 1.0m
+
+                    });
+
+                    await InvokeAsync(StateHasChanged);
+                    await Task.Delay(3500);
                     ModalService.Cancel();
 
                     await Modal.OnSaveClickCallback.InvokeAsync();

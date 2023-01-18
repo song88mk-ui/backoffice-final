@@ -312,6 +312,29 @@ namespace Backoffice.Web.Components.Clients
 
                 if (response.Result)
                 {
+                    if(IsEdit)
+                    {
+                        Alerts.Add(new AlertModel
+                        {
+                            AlertStatus = "Success",
+                            AltertMessage = "Client successfully updated",
+                            Opacity = 1.0m
+                        });
+                    }
+                    else
+                    {
+                        Alerts.Add(new AlertModel
+                        {
+                            AlertStatus = "Success",
+                            AltertMessage = "Client successfully created",
+                            Opacity = 1.0m
+                        });
+                    }
+
+
+                    await InvokeAsync(StateHasChanged);
+                    await Task.Delay(3500);
+
                     ModalService.Cancel();
 
                     await Modal.OnSaveClickCallback.InvokeAsync();
