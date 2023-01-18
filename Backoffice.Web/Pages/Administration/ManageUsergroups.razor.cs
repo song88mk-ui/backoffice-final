@@ -1,4 +1,4 @@
-﻿namespace Backoffice.Web.Pages.OddsEngine
+﻿namespace Backoffice.Web.Pages.Administration
 {
     public partial class ManageUsergroups : IDisposable
     {
