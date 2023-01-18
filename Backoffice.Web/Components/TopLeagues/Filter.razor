@@ -1,9 +1,11 @@
-﻿<div class="content-filter mx-3">
+﻿@using Backoffice.Web.Components.Common
+
+<div class="content-filter mx-3">
     <div class="d-flex flex-row justify-content-between">
         <div class="select-container d-flex">
-            <div class="me-4">
+            <div class="me-4 w-50">
                 <label class="form-label d-block">Client</label>
-                <select class="form-select d-block" @onchange="OnClientChangedEvent">
+                @*<select class="form-select d-block" @onchange="OnClientChangedEvent">
                     @foreach (var item in Clients)
                     {
                         if (item.Value == SelectedClientId)
@@ -15,9 +17,25 @@
                             <option value="@item.Value">@item.Name</option>
                         }
                     }
-                </select>
+                </select>*@
+                <div class="dropdown">
+                    <button class="form-select @(ShowSelectClient ? "client-focus" : "") client-select d-block" @onclick="OnClientClickEvent">
+                        @if (Clients.Any())
+                        {
+                            <span>Clients (@SelectedClientCount)</span>
+                        }
+                        else
+                        {
+                            <span>No Clients Available</span>
+                        }
+                    </button>
+                    @if (Clients.Any())
+                    {
+                        <SelectWithCheckbox Items="Clients" IsShow="ShowSelectClient" OnCheckboxCallback="OnClientCheckboxClickEvent" />
+                    }
+                </div>
             </div>
-            <div class="me-4">
+            <div class="me-4 w-50">
                 <label class="form-label d-block">Sports</label>
                 <select class="form-select d-block" @onchange="OnSportsChangedEvent">
                     @foreach (var item in Sports)

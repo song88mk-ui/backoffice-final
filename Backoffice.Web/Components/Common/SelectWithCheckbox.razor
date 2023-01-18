@@ -1,0 +1,14 @@
+﻿<ul class="dropdown-menu @(IsShow ? "show" : "") w-100">
+    @if (Items != null && Items.Any())
+    {
+        foreach (var item in Items)
+        {
+            <li id="@item.Value">
+                <div class="form-check ms-2">
+                    <input type="checkbox" class="form-check-input" @onclick="() => CheckboxClicked(item)" checked="@item.IsChecked" />
+                    <label class="form-check-label">@item.Name</label>
+                </div>
+            </li>
+        }
+    }
+</ul>
