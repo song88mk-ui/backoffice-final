@@ -8,14 +8,6 @@
     max-height: 50rem;
 }
 
-table thead th:first-child {
-    border-top-left-radius: 3px;
-}
-
-table thead th:last-child {
-    border-top-right-radius: 3px;
-}
-
 table tfoot td:first-child {
     border-bottom-left-radius: 3px;
 }
@@ -35,10 +27,6 @@ table tfoot td:last-child {
     background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
 }
 
-.table tbody td:first-child {
-    max-width: 100px;
-}
-
 .col-bet-setting {
     /*max-width: 100%;*/
     vertical-align: middle;
@@ -47,4 +35,9 @@ table tfoot td:last-child {
 .table-head, .col-header {
     color: #FFF;
     background-color: #404E67;
+}
+
+.table-head {
+    border-color: #404E67;
+    border-width: 1px;
 }
