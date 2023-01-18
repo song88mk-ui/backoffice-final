@@ -5,17 +5,21 @@ using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Components.TopFixtures
 {
-    public partial class Filter : IAsyncDisposable, IDisposable
+    public partial class Filter : IDisposable
     {
         #region Properties
 
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [Parameter] public EventCallback<TopFixtureCallback> OnInitCallback { get; set; }
+
+        [Parameter] public EventCallback<TopFixtureCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<string> OnSearchCallback { get; set; }
-        protected SearchFormModel SearchForm { get; set; }
-        public List<SelectListItemModel<ClientModel.Client>> Clients { get; set; }
-        public string ClientId { get; set; }
+
+        public TopFixtureCallbackModel CallbackModel { get; set; }
+        public SearchFormModel SearchForm { get; set; }
+        public List<SelectListItemModel<string>> Clients { get; set; }
+        public string SelectedClientId { get; set; }
 
         #endregion
 
@@ -23,68 +27,86 @@ namespace Backoffice.Web.Components.TopFixtures
 
         protected override async Task OnInitializedAsync()
         {
-            try
+            CallbackModel = new TopFixtureCallbackModel();
+            Clients = new List<SelectListItemModel<string>>();
+
+            SearchForm = new SearchFormModel()
             {
-                Clients = new List<SelectListItemModel<ClientModel.Client>>();
+                SearchText = string.Empty
+            };
 
-                SearchForm = new SearchFormModel()
+            var clients = (await BackOfficeService.GetClients()).Result;
+
+            if (clients != null && clients.Clients.Any())
+            {
+                if (UserModel.ClientCodes.Any())
+                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+
+                Clients = clients.Clients.Select(s => new SelectListItemModel<string>
                 {
-                    SearchText = string.Empty
-                };
+                    Value = s.ClientId.ToString(),
+                    Name = s.ClientName
+                }).ToList();
 
-                ClientId = string.Empty;
-
-                var clients = (await BackOfficeService.GetClients()).Result;
-                if (clients != null)
+                Clients.Insert(0, new SelectListItemModel<string>
                 {
-
-                    if (UserModel.ClientCodes.Any())
-                    {
-                        clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-                    }
-
-                    Clients = clients.Clients.Select(s => new SelectListItemModel<ClientModel.Client>
-                    {
-                        Value = s,
-                        Name = s.ClientName
-                    }).ToList();
-
-                }
-
-                if (!Clients.Any())
-                    Clients.Add(new SelectListItemModel<ClientModel.Client>
-                    {
-                        Value = new ClientModel.Client(),
-                        Name = "No Clients Available"
-                    });
-                else
-                    Clients.Insert(0, new SelectListItemModel<ClientModel.Client> { Value = new ClientModel.Client(), Name = "Choose client..." });
-
-                var selectedClients = Clients.Where(c => !string.IsNullOrEmpty(c.Value.ClientCode)).Select(s => s.Value).ToList();
-                await OnInitCallback.InvokeAsync(new TopFixtureCallback
-                {
-                    SelectedClients = selectedClients,
-                    SearchText = SearchForm.SearchText
+                    Value = "all",
+                    Name = "All Clients"
                 });
             }
-            catch (Exception)
+            else
             {
+                Clients.Add(new SelectListItemModel<string>
+                {
+                    Value = "",
+                    Name = "No Clients Available"
+                });
             }
+
+            SelectedClientId = Clients.FirstOrDefault().Value;
+
+            CallbackModel.SearchText = string.Empty;
+
+            if (SelectedClientId == "all")
+            {
+                CallbackModel.Clients = Clients.Where(c => c.Value != "all")
+                    .Select(s => new TopFixtureCallbackModel.Client
+                    {
+                        ClientId = long.Parse(s.Value),
+                        ClientName = s.Name
+                    }).ToList();
+            }
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
         }
 
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
-            ClientId = e.Value.ToString();
+            if (string.IsNullOrEmpty(e.Value.ToString()))
+                return;
 
-            var selectedClients = Clients.Where(c => !string.IsNullOrEmpty(c.Value.ClientCode)).Select(s => s.Value).ToList();
-            if(ClientId != "" && ClientId != "0")
-                selectedClients = Clients.Where(c => c.Value.ClientId.ToString() == ClientId).Select(s => s.Value).ToList();
+            SelectedClientId = e.Value.ToString();
 
-            await OnInitCallback.InvokeAsync(new TopFixtureCallback
+            if (SelectedClientId == "all")
             {
-                SelectedClients = selectedClients,
-                SearchText = SearchForm.SearchText
-            });
+                CallbackModel.Clients = Clients.Where(c => c.Value != "all")
+                    .Select(s => new TopFixtureCallbackModel.Client
+                    {
+                        ClientId = long.Parse(s.Value),
+                        ClientName = s.Name
+                    }).ToList();
+            }
+            else
+            {
+                CallbackModel.Clients = Clients.Where(c => c.Value != SelectedClientId)
+                    .Select(s => new TopFixtureCallbackModel.Client
+                    {
+                        ClientId = long.Parse(s.Value),
+                        ClientName = s.Name
+                    }).ToList();
+            }
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
         }
 
         public async Task OnInputSearchEvent()
@@ -92,14 +114,11 @@ namespace Backoffice.Web.Components.TopFixtures
             await OnSearchCallback.InvokeAsync(SearchForm.SearchText);
         }
 
-        public async ValueTask DisposeAsync()
-        {
-            GC.SuppressFinalize(this);
-        }
         public void Dispose()
         {
             GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }

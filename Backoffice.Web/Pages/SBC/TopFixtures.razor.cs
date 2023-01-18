@@ -5,7 +5,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Shared.Models.Requests;
 
-namespace Backoffice.Web.Pages
+namespace Backoffice.Web.Pages.SBC
 {
     public partial class TopFixtures : IDisposable
     {
@@ -13,8 +13,6 @@ namespace Backoffice.Web.Pages
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -41,9 +39,9 @@ namespace Backoffice.Web.Pages
             TopFixturesModel = new TopFixturesModel();
         }
 
-        public async Task OnInitEvent(TopFixtureCallback request)
+        public async Task OnInitEvent(TopFixtureCallbackModel request)
         {
-            var clientIds = string.Join(",", request.SelectedClients.Select(s => s.ClientId).ToList());
+            var clientIds = string.Join(",", request.Clients.Select(s => s.ClientId).ToList());
             var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = clientIds })).Result;
 
             if (result != null && result.TopFixtures.Any())
@@ -54,7 +52,7 @@ namespace Backoffice.Web.Pages
             {
                 TopFixturesModel.TopFixtures = new List<ClientTopFixtureModel.OrderedClientTopFixture>();
 
-                foreach(var client in request.SelectedClients)
+                foreach(var client in request.Clients)
                 {
                     TopFixturesModel.TopFixtures.Add(new ClientTopFixtureModel.OrderedClientTopFixture 
                     { 
@@ -87,22 +85,26 @@ namespace Backoffice.Web.Pages
         public async Task OnEdit(ClientTopFixtureModel.OrderedClientTopFixture topFixture)
         {
             var parameters = new ModalParameters();
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("TopFixture", topFixture);
 
             var options = new ModalOptions();
+
             ModalService.Open<EditModal>($"Set Top Fixtures of {topFixture.ClientName}", parameters, options);
         }
 
         public async Task OnCopy(ClientTopFixtureModel.OrderedClientTopFixture topFixture)
         {
             var parameters = new ModalParameters();
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("TopFixture", topFixture);
 
             var options = new ModalOptions();
+
             ModalService.Open<CopyModal>($"Copy {topFixture.ClientName} Top Fixtures Settings To", parameters, options);
         }
 
@@ -120,11 +122,8 @@ namespace Backoffice.Web.Pages
                     var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = item.ToString() })).Result;
 
                     clientTopFixture.TopFixtures = result.TopFixtures.FirstOrDefault()?.TopFixtures ?? new List<ClientTopFixtureModel.TopFixture>();
-
                 }
             }
-
-
         }
 
         protected async Task SelectPage(int page)

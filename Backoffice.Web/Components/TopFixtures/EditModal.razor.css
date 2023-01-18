@@ -21,6 +21,38 @@ td.actions a {
     font-size: 16px;
 }
 
+.th-no {
+    width: 5%;
+}
+
+.th-sport {
+    width: 15%;
+}
+
+.th-segment {
+    width: 15%;
+}
+
+.th-league {
+    width: 15%;
+}
+
+.th-game {
+    width: 20%;
+}
+
+.th-start-date {
+    width: 15%;
+}
+
+.th-fixture-status {
+    width: 5%;
+}
+
+.th-action {
+    width: 10%;
+}
+
 .btn.dropdown-toggle {
     background-color: #FFF;
     text-align: left;
