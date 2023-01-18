@@ -2,13 +2,12 @@
     <div class="business-container">
         <div class="row">
             <div class="col-md-12">
-
-                <table class="table table-hover table-bordered">
-                    <thead class="table-dark">
+                <table class="table table-bordered">
+                    <tbody>
                         <tr>
-                            <td class="betSetting">Bet Setting</td>
-                            <td class="table-light">
-                                <select class="form-control form-select" aria-label="Currency Dropdown" id="currencyDropdown" @onchange="OnCurrencyClicked">
+                            <td class="col-bet-setting col-header w-50">Bet Setting</td>
+                            <td class="w-50">
+                                <select class="form-control form-select d-block" id="currencyDropdown" @onchange="OnCurrencyClicked">
                                     @foreach (var currency in Currencies)
                                     {
                                         if (currency == SelectedCurrency)
@@ -23,23 +22,23 @@
                                 </select>
                             </td>
                         </tr>
-                    </thead>
+                    </tbody>
                 </table>
             </div>
 
             @if (SelectedSetting != null)
             {
                 <div class="col-md-12">
-
-                    <table class="table table-hover table-bordered">
-                        <thead class="table-dark">
+                    <table class="table table-bordered">
+                        <thead class="table-head">
                             <tr>
-                                <td colspan="2">Soccer</td>
+                                <th class="w-50 border-0">Soccer</th>
+                                <th class="w-50 border-0"></th>
                             </tr>
                         </thead>
-                        <tbody class="table-light">
+                        <tbody>
                             <tr>
-                                <td scope="col">Min Per Ticket</td>
+                                <td>Min Per Ticket</td>
                                 <td>@SelectedSetting.BetSettingSoccer.MinPerTicket</td>
                             </tr>
                             <tr>
@@ -53,18 +52,17 @@
                         </tbody>
                     </table>
                 </div>
-
                 <div class="col-md-12">
-
-                    <table class="table table-hover table-bordered">
-                        <thead class="table-dark">
+                    <table class="table table-bordered">
+                        <thead class="table-head">
                             <tr>
-                                <td colspan="2">Cricket</td>
+                                <th class="w-50 border-0">Cricket</th>
+                                <th class="w-50 border-0"></th>
                             </tr>
                         </thead>
-                        <tbody class="table-light">
+                        <tbody>
                             <tr>
-                                <td scope="col">Min Per Ticket</td>
+                                <td>Min Per Ticket</td>
                                 <td>@SelectedSetting.BetSettingCricket.MinPerTicket</td>
                             </tr>
                             <tr>
@@ -78,18 +76,17 @@
                         </tbody>
                     </table>
                 </div>
-
                 <div class="col-md-12">
-
-                    <table class="table table-hover table-bordered">
-                        <thead class="table-dark">
+                    <table class="table table-bordered">
+                        <thead class="table-head">
                             <tr>
-                                <td colspan="2">Other Sports</td>
+                                <th class="w-50 border-0">Other Sports</th>
+                                <th class="w-50 border-0"></th>
                             </tr>
                         </thead>
-                        <tbody class="table-light">
+                        <tbody>
                             <tr>
-                                <td scope="col">Min Per Ticket</td>
+                                <td>Min Per Ticket</td>
                                 <td>@SelectedSetting.BetSettingAllSports.MinPerTicket</td>
                             </tr>
                             <tr>
@@ -103,19 +100,17 @@
                         </tbody>
                     </table>
                 </div>
-
-
                 <div class="col-md-12">
-
-                    <table class="table table-hover table-bordered">
-                        <thead class="table-dark">
+                    <table class="table table-bordered">
+                        <thead class="table-head">
                             <tr>
-                                <td colspan="2">Parlay</td>
+                                <th class="w-50 border-0">Parlay</th>
+                                <th class="w-50 border-0"></th>
                             </tr>
                         </thead>
-                        <tbody class="table-light">
+                        <tbody>
                             <tr>
-                                <td scope="col">Min Per Ticket</td>
+                                <td>Min Per Ticket</td>
                                 <td>@SelectedSetting.BetSettingParlay.MinPerTicket</td>
                             </tr>
                             <tr>
@@ -133,17 +128,15 @@
                         </tbody>
                     </table>
                 </div>
-
-
                 <div class="col-md-12">
-
-                    <table class="table table-hover table-bordered">
-                        <thead class="table-dark">
+                    <table class="table table-bordered">
+                        <thead class="table-head">
                             <tr>
-                                <td colspan="2">Priceboost</td>
+                                <th class="w-50 border-0">Priceboost</th>
+                                <th class="w-50 border-0"></th>
                             </tr>
                         </thead>
-                        <tbody class="table-light">
+                        <tbody>
                             <tr>
                                 <td>Max Stake</td>
                                 <td>@SelectedSetting.BetSettingPriceboost.MaxStake</td>
@@ -151,17 +144,15 @@
                         </tbody>
                     </table>
                 </div>
-
-
                 <div class="col-md-12">
-
-                    <table class="table table-hover table-bordered">
-                        <thead class="table-dark">
+                    <table class="table table-bordered">
+                        <thead class="table-head">
                             <tr>
-                                <td colspan="2">Bet Builder</td>
+                                <th class="w-50 border-0">Bet Builder</th>
+                                <th class="w-50 border-0"></th>
                             </tr>
                         </thead>
-                        <tbody class="table-light">
+                        <tbody>
                             <tr>
                                 <td scope="col">Min Per Ticket</td>
                                 <td>@SelectedSetting.BetSettingParlay.MinPerTicket</td>
@@ -173,11 +164,10 @@
                         </tbody>
                     </table>
                 </div>
-
             }
         </div>
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Close</button>
+    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Close</button>
 </div>
