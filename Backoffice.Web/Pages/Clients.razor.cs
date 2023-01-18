@@ -168,6 +168,11 @@ namespace Backoffice.Web.Pages
             ModalService.Open<ViewBetSettingsModal>("Bet Settings", parameters, options);
         }
 
+        public async Task OnSaveClickEvent(object item)
+        {
+            ClientListModel = await GetClientList(ClientListCallbackModel.SearchText, ClientListCallbackModel.SortBy, MetaData.CurrentPage);
+        }
+
         public void Dispose()
         {
         }
