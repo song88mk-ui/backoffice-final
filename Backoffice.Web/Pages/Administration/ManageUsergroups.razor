@@ -1,4 +1,4 @@
-﻿@using Backoffice.Web.Components.OddsEngine.ManageUserGroups
+﻿@using Backoffice.Web.Components.Administration.ManageUserGroups
 
 @layout MainLayout
 
@@ -8,7 +8,7 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter />
+    <Filter OnInitCallback="OnInitEvent" OnCreateUserGroupCallback="OnCreateUserGroupClickEvent"/>
 </div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">
@@ -17,8 +17,8 @@
                 <tr>
                     <th>#</th>
                     <th>User Group Name</th>
-                    <th>Status</th>
-                    <th>Manage</th>
+                    <th>Users</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
