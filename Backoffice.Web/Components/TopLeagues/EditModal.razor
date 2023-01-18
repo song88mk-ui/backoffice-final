@@ -13,7 +13,69 @@
         <tbody>
             @if (NewTopLeagues != null && NewTopLeagues.Any())
             {
-                @for (int i = 0; i < NewTopLeagues.Count; i++)
+                foreach (var model in NewTopLeagues)
+                {
+                    if (model.LeagueId != 0)
+                    {
+                        <tr id="@($"name-{@model.SportId}-{@model.SegmentId}-{@model.LeagueId}")">
+                            <td>@model.SortOrder</td>
+                            <td>@model.SegmentName</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn dropdown-toggle d-block w-100" data-bs-auto-close="outside" type="button" id="row-@model.SortOrder" data-bs-toggle="dropdown" aria-expanded="false" @onclick="async () => await OnDropdownSelect(model.SortOrder)">
+                                        @model.LeagueName
+                                    </button>
+                                    <Select SportId="SportId" SportsTree="SportsTree" CurrentTopLeagues="CurrentTopLeagues" SelectedTopLeagues="model.LeagueId" RowCount="model.SortOrder" OnSelectedLeague="OnSelectedLeagueEvent" />
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-active py-1 px-4 rounded-pill">Active</span>
+                            </td>
+                            <td class="actions">
+                                <a href="javascript:void(0);" class="me-2" @onclick="() => OnAddClickEvent(model.SortOrder)">
+                                    <i class="fa fa-plus-square" aria-hidden="true"></i>
+                                </a>
+                                <a href="javascript:void(0);" class="me-2" @onclick="() => OnDeleteClickEvent(model)">
+                                    <i class="fa fa-minus-square" aria-hidden="true"></i>
+                                </a>
+                                <a href="javascript:void(0);" class="drag-handle">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>@model.SortOrder</td>
+                            <td></td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn dropdown-toggle d-block w-100" data-bs-auto-close="outside" type="button" id="Row-@model.SortOrder" data-bs-toggle="dropdown" aria-expanded="false" @onclick="async () => await OnDropdownSelect(model.SortOrder)">
+                                        @model.LeagueName
+                                    </button>
+                                    <Select SportId="SportId" SportsTree="SportsTree" CurrentTopLeagues="CurrentTopLeagues" SelectedTopLeagues="model.LeagueId" RowCount="model.SortOrder" OnSelectedLeague="OnSelectedLeagueEvent" />
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-active py-1 px-4 rounded-pill">Active</span>
+                            </td>
+                            <td class="actions">
+                                <a href="javascript:void(0);" class="me-2" @onclick="() => OnAddClickEvent(model.SortOrder)">
+                                    <i class="fa fa-plus-square" aria-hidden="true"></i>
+                                </a>
+                                <a href="javascript:void(0);" class="me-2" @onclick="() => OnDeleteClickEvent(model)">
+                                    <i class="fa fa-minus-square" aria-hidden="true"></i>
+                                </a>
+                                <a href="javascript:void(0);"  class="drag-handle">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+
+                @*@for (int i = 0; i < NewTopLeagues.Count; i++)
                 {
                     var index = i;
                     if (NewTopLeagues[index].LeagueId != 0)
@@ -30,14 +92,6 @@
                                 </div>
                             </td>
                             <td>
-                                @*@if (NewTopLeagues[index].Status == true)
-                                {
-                                    <span class="status-active py-1 px-4 rounded-pill">Active</span>
-                                }
-                                else
-                                {
-                                    <span class="status-inactive py-1 px-4 rounded-pill">Inactive</span>
-                                }*@
                                 <span class="status-active py-1 px-4 rounded-pill">Active</span>
                             </td>
                             <td class="actions">
@@ -82,7 +136,7 @@
                             </td>
                         </tr>
                     }
-                }
+                }*@
             }
         </tbody>
 

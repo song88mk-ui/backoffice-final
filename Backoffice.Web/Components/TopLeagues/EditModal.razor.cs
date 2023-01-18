@@ -89,13 +89,14 @@ namespace Backoffice.Web.Components.TopLeagues
             {
                 NewTopLeagues = new List<TopLeaguesModel.TopLeague>
                 {
-                    new TopLeaguesModel.TopLeague() { SortOrder = 1 }
+                    new TopLeaguesModel.TopLeague 
+                    { 
+                        SortOrder = 1 
+                    }
                 };
             }
 
             SportsTree = model.Sports;
-
-            await SortOrderRow();
         }
 
         public async Task OnDropdownSelect(int index)
@@ -116,6 +117,7 @@ namespace Backoffice.Web.Components.TopLeagues
                     league.LeagueId = model.LeagueId;
                     league.LeagueName = model.LeagueName;
                     league.SortOrder = model.SortOrder;
+
                     break;
                 }
             }
@@ -123,35 +125,51 @@ namespace Backoffice.Web.Components.TopLeagues
             CurrentTopLeagues = NewTopLeagues.Any() ? NewTopLeagues.ToList() : new List<TopLeaguesModel.TopLeague>();
         }
 
-        public async Task OnAddRow(int rowCtr)
+        public async Task OnAddClickEvent(int count)
         {
-            NewTopLeagues.Insert(rowCtr, new TopLeaguesModel.TopLeague() { SortOrder = (rowCtr + 1) });
-            await SortOrderRow();
+            NewTopLeagues.Insert(count, new TopLeaguesModel.TopLeague
+            {
+                SortOrder = count + 1
+            });
+
+            SortOrderRow();
+
+            //NewTopLeagues.Insert(rowCtr, new TopLeaguesModel.TopLeague() { SortOrder = (rowCtr + 1) });
+            //await SortOrderRow();
         }
 
-        public async Task OnDeleteRow(TopLeaguesModel.TopLeague league)
+        public async Task OnDeleteClickEvent(TopLeaguesModel.TopLeague model)
         {
-            NewTopLeagues.Remove(league);
+            NewTopLeagues.Remove(model);
 
-            if (NewTopLeagues.Count == 0)
-                NewTopLeagues.Add(new TopLeaguesModel.TopLeague() { SortOrder = 1 });
-
-            await SortOrderRow();
+            if (!NewTopLeagues.Any())
+            {
+                NewTopLeagues.Add(new TopLeaguesModel.TopLeague 
+                { 
+                    SortOrder = 1 
+                });
+            }
+            else
+                SortOrderRow();
         }
 
         private async Task SortOrderRow()
         {
-            if (NewTopLeagues != null && NewTopLeagues.Any())
-            {
-                int rowCtr = 0;
-                foreach (var league in NewTopLeagues)
+            NewTopLeagues = NewTopLeagues
+                .Select((s, index) => new TopLeaguesModel.TopLeague
                 {
-                    rowCtr = rowCtr + 1;
-                    league.SortOrder = rowCtr;
-                }
-            }
-
-            await InvokeAsync(StateHasChanged);
+                    SportId = s.SportId,
+                    SportName = s.SportName,
+                    SegmentId = s.SegmentId,
+                    SegmentName = s.SegmentName,
+                    LeagueId = s.LeagueId,
+                    LeagueName = s.LeagueName,
+                    SortOrder = index + 1,
+                    Status = s.Status,
+                    LiveCount = s.LiveCount
+                })
+                .OrderBy(o => o.SortOrder)
+                .ToList();
         }
 
         public async Task OnCancelClickEvent()
