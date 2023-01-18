@@ -11,6 +11,7 @@ namespace Backoffice.Web.Pages.Administration
     public partial class MarketSettlement : IDisposable
     {
         #region Properties
+
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         public MarketSettlementModalFilterModel ModalFilter { get; set; }
@@ -19,6 +20,7 @@ namespace Backoffice.Web.Pages.Administration
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
+
         #endregion
 
         #region Methods
@@ -35,7 +37,7 @@ namespace Backoffice.Web.Pages.Administration
             ManualMarketSettlements = new List<ManualMarketSettlementAuditModel>();
 
             PageTitle = "Market Settlement";
-            IconClass = "";
+            IconClass = "ico ico-market-settlement";
         }
 
         public async Task GetContent()

@@ -13,7 +13,7 @@
 }
 
 .table thead th, .table tbody td, ::deep .table tfoot td {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: inherit;
     vertical-align: middle;
 }

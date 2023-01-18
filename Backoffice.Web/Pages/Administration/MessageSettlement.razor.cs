@@ -30,7 +30,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             IsPreLoader = true;
             PageTitle = "Message Settlement";
-            IconClass = string.Empty;
+            IconClass = "ico ico-message-settlement";
 
             MetaData = new MetaData
             {
