@@ -6,60 +6,175 @@
                 <table class="table table-hover table-bordered">
                     <thead class="table-dark">
                         <tr>
-                            <th>Bet Setting</th>
-                            <th class="table-light">USD</th>
+                            <td class="betSetting">Bet Setting</td>
+                            <td class="table-light">
+                                <select class="form-control form-select" aria-label="Currency Dropdown" id="currencyDropdown" @onchange="OnCurrencyClicked">
+                                    @foreach (var currency in Currencies)
+                                    {
+                                        if (currency == SelectedCurrency)
+                                        {
+                                            <option value="@currency" selected>@currency</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@currency">@currency</option>
+                                        }
+                                    }
+                                </select>
+                            </td>
                         </tr>
                     </thead>
                 </table>
             </div>
-            <div class="col-md-12">
 
-                <table class="table table-hover table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th colspan="2">Soccer</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-light">
-                        <tr>
-                            <td scope="col">Min Per Ticket</td>
-                            <td>0.02</td>
-                        </tr>
-                        <tr>
-                            <td>Max Per Ticket</td>
-                            <td>20</td>
-                        </tr>
-                        <tr>
-                            <td>Max Per Game</td>
-                            <td>20</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-md-12">
+            @if (SelectedSetting != null)
+            {
+                <div class="col-md-12">
 
-                <table class="table table-hover table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th colspan="2">Cricket</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-light">
-                        <tr>
-                            <td scope="col">Min Per Ticket</td>
-                            <td>0.02</td>
-                        </tr>
-                        <tr>
-                            <td>Max Per Ticket</td>
-                            <td>20</td>
-                        </tr>
-                        <tr>
-                            <td>Max Per Game</td>
-                            <td>20</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <td colspan="2">Soccer</td>
+                            </tr>
+                        </thead>
+                        <tbody class="table-light">
+                            <tr>
+                                <td scope="col">Min Per Ticket</td>
+                                <td>@SelectedSetting.BetSettingSoccer.MinPerTicket</td>
+                            </tr>
+                            <tr>
+                                <td>Max Per Ticket</td>
+                                <td>@SelectedSetting.BetSettingSoccer.MaxPerTicket</td>
+                            </tr>
+                            <tr>
+                                <td>Max Per Game</td>
+                                <td>@SelectedSetting.BetSettingSoccer.MinPerTicket</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-12">
+
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <td colspan="2">Cricket</td>
+                            </tr>
+                        </thead>
+                        <tbody class="table-light">
+                            <tr>
+                                <td scope="col">Min Per Ticket</td>
+                                <td>@SelectedSetting.BetSettingCricket.MinPerTicket</td>
+                            </tr>
+                            <tr>
+                                <td>Max Per Ticket</td>
+                                <td>@SelectedSetting.BetSettingCricket.MaxPerTicket</td>
+                            </tr>
+                            <tr>
+                                <td>Max Per Game</td>
+                                <td>@SelectedSetting.BetSettingCricket.MinPerTicket</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-12">
+
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <td colspan="2">Other Sports</td>
+                            </tr>
+                        </thead>
+                        <tbody class="table-light">
+                            <tr>
+                                <td scope="col">Min Per Ticket</td>
+                                <td>@SelectedSetting.BetSettingAllSports.MinPerTicket</td>
+                            </tr>
+                            <tr>
+                                <td>Max Per Ticket</td>
+                                <td>@SelectedSetting.BetSettingAllSports.MaxPerTicket</td>
+                            </tr>
+                            <tr>
+                                <td>Max Per Game</td>
+                                <td>@SelectedSetting.BetSettingAllSports.MinPerTicket</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div class="col-md-12">
+
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <td colspan="2">Parlay</td>
+                            </tr>
+                        </thead>
+                        <tbody class="table-light">
+                            <tr>
+                                <td scope="col">Min Per Ticket</td>
+                                <td>@SelectedSetting.BetSettingParlay.MinPerTicket</td>
+                            </tr>
+                            <tr>
+                                <td>Max Per Ticket</td>
+                                <td>@SelectedSetting.BetSettingParlay.MaxPerTicket</td>
+                            </tr>
+                            <tr>
+                                <td>Max Per Game</td>
+                                <td>@SelectedSetting.BetSettingParlay.MinPerTicket</td>
+                            </tr>
+                            <tr>
+                                <td>Max Bonus Winnings</td>
+                                <td>@SelectedSetting.BetSettingParlay.MaxWinningsBonus</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div class="col-md-12">
+
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <td colspan="2">Priceboost</td>
+                            </tr>
+                        </thead>
+                        <tbody class="table-light">
+                            <tr>
+                                <td>Max Stake</td>
+                                <td>@SelectedSetting.BetSettingPriceboost.MaxStake</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div class="col-md-12">
+
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <td colspan="2">Bet Builder</td>
+                            </tr>
+                        </thead>
+                        <tbody class="table-light">
+                            <tr>
+                                <td scope="col">Min Per Ticket</td>
+                                <td>@SelectedSetting.BetSettingParlay.MinPerTicket</td>
+                            </tr>
+                            <tr>
+                                <td>Max Per Ticket</td>
+                                <td>@SelectedSetting.BetSettingParlay.MaxPerTicket</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            }
         </div>
     </div>
 </div>
