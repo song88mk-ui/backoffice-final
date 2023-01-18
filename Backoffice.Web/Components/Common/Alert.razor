@@ -1,0 +1,9 @@
+﻿@using Backoffice.Shared.Enums
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="fw-b d-block @(AlertStatus == AlertStatus.Success ? "alert-success" : "alert-error")">
+            @Message
+        </div>
+    </div>
+</div>
