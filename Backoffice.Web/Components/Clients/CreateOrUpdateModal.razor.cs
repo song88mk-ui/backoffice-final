@@ -255,14 +255,38 @@ namespace Backoffice.Web.Components.Clients
                 if (Alerts.Any())
                     return;
 
+                var clientRequest = new ClientListResponse.Client()
+                {
+                    ClientId = Client.ClientId,
+                    ClientCode = Client.ClientCode ?? string.Empty,
+                    Name= Client.Name ?? string.Empty,
+                    Region= Client.Region ?? string.Empty,
+                    Email= Client.Email ?? string.Empty,
+                    IsEmailNotification = Client.IsEmailNotification,
+                    MonthlyFee = Client.MonthlyFee,
+                    Num = Client.Num,
+                    StatusId= Client.StatusId,
+                    StatusName= Client.StatusName,
+                    TelephoneNumber= Client.TelephoneNumber ?? string.Empty,
+                    IsTierRevenue = Client.IsTierRevenue,
+                    BetSlipMaxSelection = Client.BetSlipMaxSelection,
+                    TierJackpotShare= Client.TierJackpotShare,
+                    TierSportsbookShare = Client.TierSportsbookShare,
+                    Website = Client.Website ?? string.Empty,
+                    RevenueShare = new RevenueShare
+                    {
+                        JackpotShare = Client.RevenueShare.JackpotShare,
+                        SportsbookShare = Client.RevenueShare.SportsbookShare,
+                    },
+                    BetSettings = Client.BetSettings
+                };
+
                 var selectedStakeSports = new List<int>();
                 if(SelectedRealSports.Any())
                     selectedStakeSports.AddRange(SelectedRealSports);
 
                 if (SelectedVirtualSports.Any())
                     selectedStakeSports.AddRange(SelectedVirtualSports);
-
-                Client.TaxConfig.ExcludeStakeSportTypes = selectedStakeSports.Any() ? string.Join(",", selectedStakeSports) : string.Empty;
 
                 var selectedWinningSports = new List<int>();
                 if (SelectedRealSportsWin.Any())
@@ -271,18 +295,24 @@ namespace Backoffice.Web.Components.Clients
                 if (SelectedVirtualSportsWin.Any())
                     selectedWinningSports.AddRange(SelectedVirtualSportsWin);
 
-                Client.TaxConfig.ExcludeWinningsSportTypes = selectedWinningSports.Any() ? string.Join(",", selectedWinningSports) : string.Empty;
-
+                clientRequest.TaxConfig = new TaxConfig
+                {
+                    ExcludeWinningsSportTypes = selectedWinningSports.Any() ? string.Join(",", selectedWinningSports) : string.Empty,
+                    ExcludeStakeSportTypes = selectedStakeSports.Any() ? string.Join(",", selectedStakeSports) : string.Empty,
+                    StakeTax = Client.TaxConfig.StakeTax,
+                    WinningsTax = Client.TaxConfig.WinningsTax,
+                };
+                
                 if(Client.TaxConfig.StakeTax > 0)
                 {
-                    Client.TaxConfig.StakeTax = Client.TaxConfig.StakeTax / 100m;
+                    clientRequest.TaxConfig.StakeTax = clientRequest.TaxConfig.StakeTax / 100m;
                 }
                 if (Client.TaxConfig.WinningsTax > 0)
                 {
-                    Client.TaxConfig.WinningsTax = Client.TaxConfig.WinningsTax / 100m;
+                    clientRequest.TaxConfig.WinningsTax = clientRequest.TaxConfig.WinningsTax / 100m;
                 }
 
-                if(Client.IsTierRevenue)
+                if(clientRequest.IsTierRevenue)
                 {
                     if(SportsbookTier.Tiers.Any())
                         foreach(var tier in SportsbookTier.Tiers)
@@ -296,19 +326,19 @@ namespace Backoffice.Web.Components.Clients
                             tier.Percentage = tier.Percentage / 100m;
                         }
 
-                    Client.TierSportsbookShare = JsonSerializer.Serialize(SportsbookTier);
-                    Client.TierJackpotShare = JsonSerializer.Serialize(JackpotTier);
+                    clientRequest.TierSportsbookShare = JsonSerializer.Serialize(SportsbookTier);
+                    clientRequest.TierJackpotShare = JsonSerializer.Serialize(JackpotTier);
                 }
                 else
                 {
-                    if (Client.RevenueShare.SportsbookShare > 0)
-                        Client.RevenueShare.SportsbookShare = Client.RevenueShare.SportsbookShare / 100m;
-                    if (Client.RevenueShare.JackpotShare > 0)
-                        Client.RevenueShare.JackpotShare = Client.RevenueShare.JackpotShare / 100m;
+                    if (clientRequest.RevenueShare.SportsbookShare > 0)
+                        clientRequest.RevenueShare.SportsbookShare = clientRequest.RevenueShare.SportsbookShare / 100m;
+                    if (clientRequest.RevenueShare.JackpotShare > 0)
+                        clientRequest.RevenueShare.JackpotShare = clientRequest.RevenueShare.JackpotShare / 100m;
 
                 }
 
-                var response = (await BackOfficeService.AddOrUpdateClient(Client));
+                var response = (await BackOfficeService.AddOrUpdateClient(clientRequest));
 
                 if (response.Result)
                 {

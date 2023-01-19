@@ -167,7 +167,7 @@
                                 <label for="winningsField" class="form-label stake-lbl">Winnings</label>
                                 <div class="input-group">
                                     <span class="input-group-text">%</span>
-                                    <input type="text" id="winningsField" class="form-control rounded border-start-0" @bind-value="Client.TaxConfig.WinningsTax"  />
+                                    <input type="text" id="winningsField" class="form-control rounded border-start-0" @bind-value="Client.TaxConfig.WinningsTax" />
                                     <div class="dropdown mx-2">
                                         <button class="btn tax-settings-btn dropdown-toggle ps-4" type="button" id="sportTypesWinningsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                             Exclude Sport Types
@@ -261,7 +261,7 @@
                                 <label class="form-label" for="betSlipSettingsField">
                                     Maximum No. of Selections
                                 </label>
-                                <input type="text" id="betSlipSettingsField" placeholder="20" @bind-value="Client.BetSlipSelectionCount" />
+                                <input type="text" id="betSlipSettingsField" placeholder="20" @bind-value="Client.BetSlipMaxSelection" />
                                 <p class="fst-italic p-desc">This will limit the number of bets a user can place in the bet slip.</p>
                             </div>
                         </div>
@@ -272,25 +272,51 @@
                                 Region
                             </div>
                             <div class="btn-group border rounded p-2" role="group" aria-label="Region Toggle Button Group">
-                                @if (Client.Region == "HK")
+                                @if (!IsEdit)
                                 {
-                                    <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" @onchange="(e) => OnRegionHKClicked(e)" checked />
-                                }
-                                else
-                                {
-                                    <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" @onchange="(e) => OnRegionHKClicked(e)" />
-                                }
-                                <label class="btn btn-radio" for="hongkongRadio">Hongkong</label>
+                                    if (Client.Region == "HK")
+                                    {
+                                        <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" @onchange="(e) => OnRegionHKClicked(e)" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" @onchange="(e) => OnRegionHKClicked(e)" />
+                                    }
+                                    <label class="btn btn-radio" for="hongkongRadio">Hongkong</label>
 
-                                @if (Client.Region == "SA")
-                                {
-                                    <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" @onchange="(e) => OnRegionAFClicked(e)" checked />
+                                    @if (Client.Region == "SA")
+                                    {
+                                        <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" @onchange="(e) => OnRegionAFClicked(e)" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" @onchange="(e) => OnRegionAFClicked(e)" />
+                                    }
+                                    <label class="btn btn-radio" for="africaRadio">Africa</label>
                                 }
                                 else
                                 {
-                                    <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" @onchange="(e) => OnRegionAFClicked(e)" />
+                                    if (Client.Region == "HK")
+                                    {
+                                        <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" checked disabled/>
+                                    }
+                                    else
+                                    {
+                                        <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" disabled />
+                                    }
+                                    <label class="btn btn-radio" for="hongkongRadio">Hongkong</label>
+
+                                    @if (Client.Region == "SA")
+                                    {
+                                        <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" disabled checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" disabled />
+                                    }
+                                    <label class="btn btn-radio" for="africaRadio">Africa</label>
                                 }
-                                <label class="btn btn-radio" for="africaRadio">Africa</label>
+
                             </div>
 
                             <div class="d-flex flex-column mt-3 tax-settings">
@@ -543,7 +569,7 @@
                         <div class="col">
                             @if (SelectedCurrency == currency)
                             {
-                                <input type="radio" class="btn-check" name="currencyOptions" id="@currency" @onchange="() => OnCurrencyClicked(currency)" checked/>
+                                <input type="radio" class="btn-check" name="currencyOptions" id="@currency" @onchange="() => OnCurrencyClicked(currency)" checked />
                             }
                             else
                             {
@@ -573,7 +599,7 @@
                                     <label class="form-label" for="soccerMaxTicketField">
                                         Max Per Ticket
                                     </label>
-                                    <input type="text" class="form-control" id="soccerMaxTicketField" @bind-value="SelectedBetSetting.BetSettingSoccer.MaxPerTicket"/>
+                                    <input type="text" class="form-control" id="soccerMaxTicketField" @bind-value="SelectedBetSetting.BetSettingSoccer.MaxPerTicket" />
                                 </div>
                             </div>
                             <div class="ps-2 pb-2 padRight">
@@ -631,7 +657,7 @@
                                     <label class="form-label" for="othersMaxTicketField">
                                         Max Per Ticket
                                     </label>
-                                    <input type="text" class="form-control" id="othersMaxTicketField" @bind-value="SelectedBetSetting.BetSettingAllSports.MaxPerTicket"/>
+                                    <input type="text" class="form-control" id="othersMaxTicketField" @bind-value="SelectedBetSetting.BetSettingAllSports.MaxPerTicket" />
                                 </div>
                             </div>
                             <div class="ps-2 pb-2 padRight">
@@ -688,7 +714,7 @@
 
                             <div class="p-2">
                                 <label class="form-label" for="priceboostMaxStake">Max Stake</label>
-                                <input type="text" class="form-control" id="priceboostMaxStake" @bind-value="SelectedBetSetting.BetSettingPriceboost.MaxStake"/>
+                                <input type="text" class="form-control" id="priceboostMaxStake" @bind-value="SelectedBetSetting.BetSettingPriceboost.MaxStake" />
                             </div>
                         </div>
                     </div>

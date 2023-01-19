@@ -1,4 +1,5 @@
-﻿@using Backoffice.Web.Components.ManageUser
+﻿@using Backoffice.Web.Components.Common
+@using Backoffice.Web.Components.ManageUser
 
 @page "/admin/manage-user"
 
@@ -9,7 +10,7 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter />
+                <Filter OnCreateUserCallback="OnCreateUserClickEvent" />
             </div>
             <div class="col-md-12">
                 <table class="table table-hover table-borderless mt-4">
@@ -69,4 +70,7 @@
             </div>
         </div>
     </div>
+</div>
+<div>
+    <CustomModal />
 </div>

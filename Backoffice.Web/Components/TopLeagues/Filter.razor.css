@@ -2,9 +2,11 @@
     background-color: #fff;
 }
 
-.client-select {
+button.form-select {
     background-color: #fff;
     text-align: left;
+    border: 1px solid #ced4da;
+    width: 200px;
 }
 
 button.form-select:focus {
@@ -21,4 +23,8 @@ button.form-select:focus {
 
 button:focus:not(:focus-visible) {
     outline: 0 !important;
+}
+
+.dropdown-toggle::after {
+    content: unset;
 }

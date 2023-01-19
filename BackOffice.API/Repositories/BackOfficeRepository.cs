@@ -133,6 +133,10 @@ namespace Backoffice.API.Repositories
                         Email = client.Email,
                         TelephoneNumber = client.TelephoneNumber,
                         MonthlyFee = client.MonthlyFee,
+                        BetSlipMaxSelection= client.BetSlipMaxSelection,
+                        IsTierRevenue = client.IsTierRevenueShare,
+                        TierJackpotShare = client.RevenueShareJackpot,
+                        TierSportsbookShare = client.RevenueShareSportsbook,
                     };
 
                     var taxConfig = string.IsNullOrEmpty(client.TaxConfig) ? new TaxConfig() : JsonSerializer.Deserialize<TaxConfig>(client.TaxConfig);
@@ -681,6 +685,7 @@ namespace Backoffice.API.Repositories
                             Region = request.Region,
                             Email = request.Email,
                             IsEmailNotification = request.IsEmailNotification,
+                            BetSlipMaxSelection = request.BetSlipMaxSelection,
                         };
 
                         clientId = InsertClientRecord(clientRecord);
@@ -707,6 +712,7 @@ namespace Backoffice.API.Repositories
                             client.TaxConfig = JsonSerializer.Serialize(request.TaxConfig);
                             client.Region = request.Region;
                             client.IsEmailNotification = request.IsEmailNotification;
+                            client.BetSlipMaxSelection = request.BetSlipMaxSelection;
                         }
 
                         clientId = UpdateClientRecord(client);

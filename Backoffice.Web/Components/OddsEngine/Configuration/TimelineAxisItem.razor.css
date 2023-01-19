@@ -70,6 +70,7 @@
 .timeline-axis-item a.timeline-axis-item-key-container {
     z-index: 1;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .timeline-axis-item-key-big {

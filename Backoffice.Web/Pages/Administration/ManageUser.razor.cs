@@ -1,4 +1,9 @@
-﻿using Backoffice.Shared.Models.Response;
+﻿using Backoffice.Web.Components.ManageUser;
+using Backoffice.Web.Models;
+using Backoffice.Web.Services;
+using Microsoft.AspNetCore.Components;
+
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Security;
@@ -9,6 +14,8 @@ namespace Backoffice.Web.Pages.Administration
     {
         #region Properties
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
+
+        [Inject] public IModalService ModalService { get; set; }
 
         public ManageUserListResponse UserList {  get; set; }
         public string PageTitle { get; set; }
@@ -26,6 +33,17 @@ namespace Backoffice.Web.Pages.Administration
             IconClass = "ico ico-manage-user";
 
             UserList = new ManageUserListResponse();
+        }
+
+        public async Task OnCreateUserClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("DialogStyle", "max-width: 65rem;");
+
+            var options = new ModalOptions();
+
+            ModalService.Open<CreateOrUpdateModal>("Create User", parameters, options);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

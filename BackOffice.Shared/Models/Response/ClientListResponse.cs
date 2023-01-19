@@ -43,7 +43,7 @@ namespace Backoffice.Shared.Models.Response
             public RevenueShare RevenueShare { get; set; }
             public string TierSportsbookShare { get; set; }
             public string TierJackpotShare { get; set; }
-            public int BetSlipSelectionCount { get; set; }
+            public int BetSlipMaxSelection { get; set; }
             public List<BetSetting> BetSettings { get; set; }
         }
 

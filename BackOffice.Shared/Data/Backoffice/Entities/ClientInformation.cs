@@ -58,5 +58,6 @@ namespace Backoffice.Shared.Data.Backoffice.Entities
         public string Region { get; set; }
         public string Email { get; set; }
         public bool IsEmailNotification { get; set; }
+        public int BetSlipMaxSelection { get; set; }
     }
 }

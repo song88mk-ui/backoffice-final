@@ -32,14 +32,15 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string AllMarketStatusName { get; set; } = "Deactivate All";
         public bool isSaving { get; set; }
         public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
+        public bool IsPreloader { get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
-        {
+        {            
             PageTitle = "Config";
             IconClass = "";
-            ConfigFilterModel = new ConfigFilterModel();
+            ConfigFilterModel = new ConfigFilterModel();         
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -62,7 +63,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Utilities
         private IEnumerable<MarketLookupNavigationModel> GetContents()
-        {
+        {            
             if (ConfigFilterModel.MarketTemplateGroupId == 0)
                 ConfigFilterModel.MarketTemplateGroupId = ConfigFilterModel.MarketTemplates.FirstOrDefault(m => m.IsSelected).MarketTemplateGroupId;
 
@@ -71,7 +72,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (!string.IsNullOrEmpty(ConfigFilterModel.SearchText))
             {
                 query = query.Where(c => c.MarketLookup.MarketTemplateName.ToUpper().Contains(ConfigFilterModel.SearchText.ToUpper()));
-            }
+            }         
 
             return query;
         }

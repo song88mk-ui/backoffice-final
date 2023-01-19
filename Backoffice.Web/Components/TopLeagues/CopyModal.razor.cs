@@ -21,9 +21,12 @@ namespace Backoffice.Web.Components.TopLeagues
         [Parameter] public CopyTopLeaguesModel CopyTopLeaguesModel { get; set; }
 
         public CopyTopLeaguesRequest CopyTopLeaguesRequest { get; set; }
+        public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
 
         public bool IsSelectAll { get; set; }
         public string ClientIdErrorMessage { get; set; }
+        public int SelectedClientCount { get; set; }
+        public string SelectedClientName { get; set; }
         public string AlertMessage { get; set; }
         public string AlertStatus { get; set; }
 
@@ -34,6 +37,7 @@ namespace Backoffice.Web.Components.TopLeagues
         protected override async Task OnInitializedAsync()
         {
             ClientIdErrorMessage = string.Empty;
+            Clients = new List<SelectListItemWithCheckboxModel<string>>();
 
             var topLeagues = ModalParameters.TryGet<List<TopLeaguesModel.TopLeague>>("CopyFromClientTopLeagues") ?? new List<TopLeaguesModel.TopLeague>();
 
@@ -69,15 +73,34 @@ namespace Backoffice.Web.Components.TopLeagues
                     ClientId = s.ClientId.ToString(),
                     ClientName = s.ClientName
                 }).ToList();
+
+                Clients = CopyTopLeaguesModel.ClientIdSelectedModel
+                    .Select(s => new SelectListItemWithCheckboxModel<string>
+                    {
+                        Value = s.ClientId,
+                        Name = s.ClientName,
+                        IsChecked = false
+                    }).ToList();
+
+                Clients.Insert(0, new SelectListItemWithCheckboxModel<string>
+                {
+                    Value = "all",
+                    Name = "All Clients",
+                    IsChecked = false
+                });
+
+                SelectedClientCount = Clients.Where(c => c.Value != "all" && c.IsChecked).Count();
             }
 
-            if (!CopyTopLeaguesModel.ClientIdSelectedModel.Any())
-                CopyTopLeaguesModel.ClientIdSelectedModel.Add(new ClientIdSelectedModel
-                {
-                    IsSelected = false,
-                    ClientId = string.Empty,
-                    ClientName = "No Clients Available"
-                });
+            //if (!CopyTopLeaguesModel.ClientIdSelectedModel.Any())
+            //{
+            //    CopyTopLeaguesModel.ClientIdSelectedModel.Add(new ClientIdSelectedModel
+            //    {
+            //        IsSelected = false,
+            //        ClientId = string.Empty,
+            //        ClientName = "No Clients Available"
+            //    });
+            //}
 
             CopyTopLeaguesRequest = new CopyTopLeaguesRequest();
         }
@@ -155,17 +178,40 @@ namespace Backoffice.Web.Components.TopLeagues
             }
         }
 
-        public void ToggleCheckbox(string clientId)
+        public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
         {
-            foreach (var item in CopyTopLeaguesModel.ClientIdSelectedModel)
+            SelectedClientName = string.Empty;
+            SelectedClientCount = items.Count;
+
+            if (SelectedClientCount == 1)
             {
-                if (item.ClientId == clientId)
-                    item.IsSelected = !item.IsSelected;
+                SelectedClientName = items.FirstOrDefault().Value;
             }
 
-            var count = CopyTopLeaguesModel.ClientIdSelectedModel.Where(_ => _.IsSelected).Count();
-            ClientIdErrorMessage = count == 0 ? "Select client to proceed" : string.Empty;
+            var selectedIds = items.Select(s => s.Key).ToList();
+
+            foreach (var item in CopyTopLeaguesModel.ClientIdSelectedModel)
+            {
+                if (selectedIds.Contains(item.ClientId))
+                    item.IsSelected = true;
+                else
+                    item.IsSelected = false;
+            }
+
+            ClientIdErrorMessage = SelectedClientCount > 0 ? string.Empty : "Select client to proceed";
         }
+
+        //public void ToggleCheckbox(string clientId)
+        //{
+        //    foreach (var item in CopyTopLeaguesModel.ClientIdSelectedModel)
+        //    {
+        //        if (item.ClientId == clientId)
+        //            item.IsSelected = !item.IsSelected;
+        //    }
+
+        //    var count = CopyTopLeaguesModel.ClientIdSelectedModel.Where(_ => _.IsSelected).Count();
+        //    ClientIdErrorMessage = count == 0 ? "Select client to proceed" : string.Empty;
+        //}
 
         public void RemoveClient(string clientId)
         {
@@ -174,25 +220,25 @@ namespace Backoffice.Web.Components.TopLeagues
                 CopyTopLeaguesModel.ClientIdSelectedModel.Remove(item);
         }
 
-        public void RemoveLeague(int leagueId)
-        {
-            if (CopyTopLeaguesModel.CopyFromClientTopLeagues.Count != 1)
-            {
-                var item = CopyTopLeaguesModel.CopyFromClientTopLeagues.FirstOrDefault(x => x.LeagueId == leagueId);
-                if (item != null)
-                    CopyTopLeaguesModel.CopyFromClientTopLeagues.Remove(item);
-            }
-            else
-            {
-                //require
-            }
-        }
+        //public void RemoveLeague(int leagueId)
+        //{
+        //    if (CopyTopLeaguesModel.CopyFromClientTopLeagues.Count != 1)
+        //    {
+        //        var item = CopyTopLeaguesModel.CopyFromClientTopLeagues.FirstOrDefault(x => x.LeagueId == leagueId);
+        //        if (item != null)
+        //            CopyTopLeaguesModel.CopyFromClientTopLeagues.Remove(item);
+        //    }
+        //    else
+        //    {
+        //        //require
+        //    }
+        //}
 
-        public void SelectAllToggleCheckbox(bool isSelectAll)
-        {
-            CopyTopLeaguesModel.ClientIdSelectedModel.ForEach(x => x.IsSelected = isSelectAll);
-            ClientIdErrorMessage = !isSelectAll ? "Select client to proceed" : string.Empty;
-        }
+        //public void SelectAllToggleCheckbox(bool isSelectAll)
+        //{
+        //    CopyTopLeaguesModel.ClientIdSelectedModel.ForEach(x => x.IsSelected = isSelectAll);
+        //    ClientIdErrorMessage = !isSelectAll ? "Select client to proceed" : string.Empty;
+        //}
 
         public async ValueTask DisposeAsync()
         {

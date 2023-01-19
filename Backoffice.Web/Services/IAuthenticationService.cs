@@ -18,5 +18,9 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ManageUserListResponse>> GetUserList(string search = "", bool isShowSuperAdmin = false);
         Task<BaseResponse<UserListResponse>> GetSubAccounts(SubAccountListRequest request);
         Task<BaseResponse<PermissionResponse>> GetPermissionList(bool isSubUser);
+        Task<BaseResponse<UserGroupListResponse>> GetUserGroupList(UserGroupListRequest request);
+        Task<BaseResponse<List<UserResponse>>> GetUserGroupUsers(UserGroupRequest request);
+        Task<BaseResponse<bool>> AddOrUpdateUserGroup(UserGroupRequest request);
+        Task<BaseResponse<bool>> DeleteUserGroup(UserGroupRequest request);
     }
 }
