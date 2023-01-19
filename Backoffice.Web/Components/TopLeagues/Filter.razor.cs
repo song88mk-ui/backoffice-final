@@ -22,6 +22,7 @@ namespace Backoffice.Web.Components.TopLeagues
         public TopLeaguesFilterModel TopLeaguesFilterModel { get; set; }
         public bool ShowSelectClient { get; set; }
         public int SelectedClientCount { get; set; }
+        public string SelectedClientName { get; set; }
 
         #endregion
 
@@ -111,14 +112,6 @@ namespace Backoffice.Web.Components.TopLeagues
 
             await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
         }
-        
-        //public async void OnClientChangedEvent(ChangeEventArgs e)
-        //{
-        //    SelectedClientId = e.Value.ToString();
-        //    TopLeaguesFilterModel.ClientId = SelectedClientId;
-
-        //    await OnFilterCallback.InvokeAsync(TopLeaguesFilterModel);
-        //}
 
         public async Task OnClientClickEvent()
         {
@@ -148,10 +141,16 @@ namespace Backoffice.Web.Components.TopLeagues
             await OnFilterCallback.InvokeAsync(TopLeaguesFilterModel);
         }
 
-        public async Task OnClientCheckboxClickEvent(List<string> clientIds)
+        public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
         {
-            SelectedClientCount = clientIds.Count;
-            TopLeaguesFilterModel.ClientIds = string.Join(",", clientIds);
+            SelectedClientName = string.Empty;
+            SelectedClientCount = items.Count;
+            TopLeaguesFilterModel.ClientIds = string.Join(",", items);
+
+            if (SelectedClientCount == 1)
+            {
+                SelectedClientName = items.FirstOrDefault().Value;
+            }
 
             await OnFilterCallback.InvokeAsync(TopLeaguesFilterModel);
         }

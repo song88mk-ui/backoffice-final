@@ -9,7 +9,7 @@ namespace Backoffice.Web.Components.Common
 
         [Parameter] public bool IsShow { get; set; }
         [Parameter] public List<SelectListItemWithCheckboxModel<string>> Items { get; set; }
-        [Parameter] public EventCallback<List<string>> OnCheckboxCallback { get; set; }
+        [Parameter] public EventCallback<Dictionary<string, string>> OnCheckboxCallback { get; set; }
 
         #endregion
 
@@ -47,8 +47,8 @@ namespace Backoffice.Web.Components.Common
                 }
             }
 
-            var selectedValues = Items.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
-            await OnCheckboxCallback.InvokeAsync(selectedValues);
+            var dictionary = Items.Where(c => c.Value != "all" && c.IsChecked).ToDictionary(c => c.Value, c => c.Name);
+            await OnCheckboxCallback.InvokeAsync(dictionary);
         }
 
         #endregion
