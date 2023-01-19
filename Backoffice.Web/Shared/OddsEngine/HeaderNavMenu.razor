@@ -1,11 +1,11 @@
 ﻿<div class="d-flex">
     <div class="px-2 me-2 py-3 @(IsActiveMonitoring ? "active" : "")">
-        <a class="header-link text-decoration-none" href="odds-engine/monitoring" @onclick='() => ActiveMenu("monitoring")'>
+        <a class="header-link text-decoration-none" href="odds-engine/monitoring" @onclick='() => ActivateMenu("monitoring")'>
             Monitoring
         </a>
     </div>
     <div class="px-2 me-2 py-3 @(IsActiveConfig ? "active" : "")">
-        <a class="header-link text-decoration-none" href="odds-engine/config" @onclick='() => ActiveMenu("config")'>
+        <a class="header-link text-decoration-none" href="odds-engine/config" @onclick='() => ActivateMenu("config")'>
             Config
         </a>
     </div>
@@ -25,12 +25,12 @@
         {
             <ul class="sub-menu-container rounded mt-2">
                 <li class="py-2">
-                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/manage-boost" @onclick='() => CloseMenus("priceboost")'>
+                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/manage-boost" @onclick='() => ActivateMenu("priceboost")'>
                         Manage Boost
                     </a>
                 </li>
                 <li class="py-2">
-                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/boosted-settings" @onclick='() => CloseMenus("priceboost")'>
+                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/boosted-settings" @onclick='() => ActivateMenu("priceboost")'>
                         Boosted Settings
                     </a>
                 </li>
@@ -38,7 +38,7 @@
         }
     </div>
     <div class="px-2 me-2 py-3 @(IsActiveSportSettings ? "active" : "")">
-        <a class="header-link text-decoration-none" href="odds-engine/sport-settings" @onclick='() => ActiveMenu("sport-settings")'>
+        <a class="header-link text-decoration-none" href="odds-engine/sport-settings" @onclick='() => ActivateMenu("sport-settings")'>
             Sport Settings
         </a>
     </div>
@@ -58,91 +58,16 @@
         {
             <ul class="sub-menu-container rounded mt-2">
                 <li class="py-2">
-                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/market-sort-order" @onclick='() => CloseMenus("market-settings")'>
+                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/market-sort-order" @onclick='() => ActivateMenu("market-settings")'>
                         Market Sort Order
                     </a>
                 </li>
                 <li class="py-2">
-                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/market-groups" @onclick='() => CloseMenus("market-settings")'>
+                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/market-groups" @onclick='() => ActivateMenu("market-settings")'>
                         Market Group
                     </a>
                 </li>
             </ul>
         }
     </div>
-    @*<div class="px-2 me-2 py-3 @(IsActiveAdmin ? "active" : "")">
-        <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="OnAdministrationClickEvent">
-            <span class="me-3">Administration</span>
-            @if (ShowAdministrationMenu)
-            {
-                <i class="fa fa-chevron-up"></i>
-            }
-            else
-            {
-                <i class="fa fa-chevron-down"></i>
-            }
-        </a>
-        @if (ShowAdministrationMenu)
-        {
-            <ul class="sub-menu-container rounded mt-2">
-                <li class="py-2">
-                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/manage-usergroup" @onclick='() => ActiveMenu("admin")'>
-                        Manage User Groups
-                    </a>
-                </li>
-                <li class="py-2">
-                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="javascript:void(0)">
-                        Manage Users
-                    </a>
-                </li>
-                <li class="py-2">
-                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="javascript:void(0)" @onclick="OnSettlementClickEvent">
-                        <span>Settlement</span>
-                        <i class="fa fa-chevron-right pull-right mt-1"></i>
-                    </a>
-                    @if (ShowSettlementMenu)
-                    {
-                        <ul class="settlement-container rounded w-100 ms-1">
-                            <li class="py-2">
-                                <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/market-settlement" @onclick='() => CloseMenus("Admin")'>
-                                    Market Settlement
-                                </a>
-                            </li>
-                            <li class="py-2">
-                                <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/message-settlement" @onclick='() => CloseMenus("Admin")'>
-                                    Message Settlement
-                                </a>
-                            </li>
-                        </ul>
-                    }
-                </li>
-                <li class="py-2">
-                    <a class="sub-header-link text-decoration-none ps-2 pe-3  d-block" href="odds-engine/sport-settings">
-                        Sport Settings
-                    </a>
-                </li>
-                <li class="py-2">
-                    <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="javascript:void(0)" @onclick="OnMarketSettingsClickEvent">
-                        <span>Market Settings</span>
-                        <i class="fa fa-chevron-right pull-right mt-1"></i>
-                    </a>
-                    @if (ShowMarketSettingsMenu)
-                    {
-                        <ul class="market-settings-container rounded w-100 ms-1">
-                            <li class="py-2">
-                                <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/market-sort-order" @onclick='() => CloseMenus("Admin")'>
-                                    Market Sort Order
-                                </a>
-                            </li>
-                            <li class="py-2">
-                                <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/market-groups" @onclick='() => CloseMenus("Admin")'>
-                                    Market Group
-                                </a>
-                            </li>
-                        </ul>
-                    }
-                </li>
-            </ul>
-        }
-    </div>*@
 </div>

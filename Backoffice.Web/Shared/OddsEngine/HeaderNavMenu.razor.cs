@@ -25,7 +25,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         protected override async Task OnInitializedAsync()
         {
             var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
-            CloseMenus(page);
+            ActivateMenu(page);
 
             HideAllMenu();
             HideAllSubmenu();
@@ -104,53 +104,51 @@ namespace Backoffice.Web.Shared.OddsEngine
             //ShowSettlementMenu = false;
         }
 
-        private void CloseMenus(string? menu = null)
+        private void ActivateMenu(string? menu = null)
         {
             HideAllMenu();
-
             HideAllSubmenu();
-            if (menu != null)
-                ActiveMenu(menu);
-        }
-        private void ActiveMenu(string menu)
-        {
-            if (menu.Contains("odds-engine/"))
-                menu = menu.Replace("odds-engine/", "");
-            if (menu.Contains("odds-engine"))
-                menu = menu.Replace("odds-engine", "");
 
-            InActiveAllMenu();
-
-            switch (menu.ToUpper())
+            if(menu != null)
             {
-                case "":
-                case "MONITORING":
-                    IsActiveMonitoring = true;
-                    break;
-                case "CONFIG":
-                    IsActiveConfig = true;
-                    break;
-                case "PRICEBOOST":
-                case "MAMAGE-BOOST":
-                case "BOOSTED-SETTINGS":
-                    IsActivePriceBoost = true;
-                    break;
-                case "SPORT-SETTINGS":
-                    IsActiveSportSettings = true;
-                    break;
-                case "MARKET-SETTINGS":
-                case "MARKET-SORT-ORDER":
-                case "MARKET-GROUPS":
-                    IsActiveMarketSettings = true;
-                    break;
-                //case "ADMIN":
-                //case "MANAGE-USERGROUP":
-                //case "MARKET-SETTLEMENT":
-                //case "MESSAGE-SETTLEMENT":
-                //case "MARKET-SORT-ORDER":
-                //case "MARKET-GROUPS":
-                //    IsActiveAdmin = true;
-                //    break;
+                if (menu.Contains("odds-engine/"))
+                    menu = menu.Replace("odds-engine/", "");
+                if (menu.Contains("odds-engine"))
+                    menu = menu.Replace("odds-engine", "");
+
+                InActiveAllMenu();
+
+                switch (menu.ToUpper())
+                {
+                    case "":
+                    case "MONITORING":
+                        IsActiveMonitoring = true;
+                        break;
+                    case "CONFIG":
+                        IsActiveConfig = true;
+                        break;
+                    case "PRICEBOOST":
+                    case "MAMAGE-BOOST":
+                    case "BOOSTED-SETTINGS":
+                        IsActivePriceBoost = true;
+                        break;
+                    case "SPORT-SETTINGS":
+                        IsActiveSportSettings = true;
+                        break;
+                    case "MARKET-SETTINGS":
+                    case "MARKET-SORT-ORDER":
+                    case "MARKET-GROUPS":
+                        IsActiveMarketSettings = true;
+                        break;
+                        //case "ADMIN":
+                        //case "MANAGE-USERGROUP":
+                        //case "MARKET-SETTLEMENT":
+                        //case "MESSAGE-SETTLEMENT":
+                        //case "MARKET-SORT-ORDER":
+                        //case "MARKET-GROUPS":
+                        //    IsActiveAdmin = true;
+                        //    break;
+                }
             }
         }
         private void InActiveAllMenu()
