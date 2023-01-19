@@ -10,7 +10,10 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter OnCreateUserCallback="OnCreateUserClickEvent" />
+                <Filter
+                    @bind-FilterModel="FilterModel"
+                    OnCreateUserCallback="OnCreateUserClickEvent"
+                        OnInitCallback="GetContent" />
             </div>
             <div class="col-md-12">
                 <table class="table table-hover table-borderless mt-4">

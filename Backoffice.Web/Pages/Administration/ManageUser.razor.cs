@@ -13,6 +13,7 @@ namespace Backoffice.Web.Pages.Administration
 
         [Inject] public IModalService ModalService { get; set; }
 
+        public ManageUserFilterModel FilterModel { get; set; }
         public ManageUserListResponse UserList {  get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -28,6 +29,7 @@ namespace Backoffice.Web.Pages.Administration
             PageTitle = "Manage User";
             IconClass = "ico ico-manage-user";
 
+            FilterModel = new ManageUserFilterModel();
             UserList = new ManageUserListResponse();
         }
 
@@ -42,14 +44,6 @@ namespace Backoffice.Web.Pages.Administration
             ModalService.Open<CreateOrUpdateModal>("Create User", parameters, options);
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if(firstRender)
-            {
-                await GetContent();
-            }
-        }
-
         public void Dispose()
         {
         }
@@ -59,7 +53,7 @@ namespace Backoffice.Web.Pages.Administration
         #region Utilities
         private async Task GetContent()
         {
-            var userResponse = await AuthenticationService.GetUserList();
+            var userResponse = await AuthenticationService.GetUserList(FilterModel.SearchText, FilterModel.UserSorting);
             if (userResponse.Result != null)
                 UserList = userResponse.Result;
 

@@ -2,9 +2,9 @@
     <div class="input-container d-flex">
         <div class="me-4">
             <label class="form-label d-block">Username</label>
-            <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+            <EditForm Model="FilterModel" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                 <div class="input-group">
-                    <InputText id="search" placeholder="Search" class="form-control search-text valid border-end-0" @bind-Value="SearchForm.SearchText" />
+                    <input id="search" placeholder="Search" class="form-control search-text valid border-end-0" @bind-value="FilterModel.SearchText" />
                     <span class="input-group-text border-start-0">
                         <i class="fa fa-search"></i>
                     </span>
@@ -13,7 +13,7 @@
         </div>
         <div class="me-4">
             <label class="form-label d-block">Sort By</label>
-            <select class="form-select d-block">
+            <select class="form-select d-block" @onchange="OnSortByChangedEvent">
                 @foreach (var item in SelectSortByList)
                 {
                     if (SelectedSortBy == item.Value)

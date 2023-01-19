@@ -40,10 +40,10 @@
             <div class="col-md-4">
                 <label class="form-label">Status</label>
                 <div class="btn-group border rounded px-2 d-flex" role="group">
-                    <input id="radio-normal" name="btn-radio" type="radio" class="btn-check" checked />
+                    <input id="radio-normal" name="btn-radio" type="radio" class="btn-check" checked @onclick="() => OnStatusClickedEvent(false)" />
                     <label class="btn btn-radio my-1 w-50 rounded" for="radio-normal">Normal</label>
 
-                    <input id="radio-locked" name="btn-radio" type="radio" class="btn-check" />
+                    <input id="radio-locked" name="btn-radio" type="radio" class="btn-check" @onclick="() => OnStatusClickedEvent(true)" />
                     <label class="btn btn-radio my-1 w-50 rounded" for="radio-locked">Locked</label>
                 </div>
             </div>
@@ -84,38 +84,38 @@
                                 <div class="category mb-3">
                                     <div class="category-title fw-bold mb-1">Dashboard</div>
                                     <div class="form-switch mb-2">
-                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-dashboard" disabled checked>
-                                      <label class="form-check-label" for="cat-dashboard">Dashboard</label>
+                                        <input class="form-check-input me-4" type="checkbox" value="" id="cat-dashboard" disabled checked>
+                                        <label class="form-check-label" for="cat-dashboard">Dashboard</label>
                                     </div>
                                 </div>
                                 <div class="category mb-3">
                                     <div class="category-title fw-bold mb-1">User & User Groups</div>
                                     <div class="form-switch mb-2">
-                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-manage-users" disabled>
-                                      <label class="form-check-label" for="cat-manage-users">Manage Users</label>
+                                        <input class="form-check-input me-4" type="checkbox" value="" id="cat-manage-users" disabled>
+                                        <label class="form-check-label" for="cat-manage-users">Manage Users</label>
                                     </div>
                                     <div class="form-switch mb-2">
-                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-manage-user-groups" disabled>
-                                      <label class="form-check-label" for="cat-manage-user-groups">Manage User Groups</label>
+                                        <input class="form-check-input me-4" type="checkbox" value="" id="cat-manage-user-groups" disabled>
+                                        <label class="form-check-label" for="cat-manage-user-groups">Manage User Groups</label>
                                     </div>
                                 </div>
                                 <div class="category mb-3">
                                     <div class="category-title fw-bold mb-1">Settlements</div>
                                     <div class="form-switch mb-2">
-                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-manual-bet-settlement" disabled>
-                                      <label class="form-check-label" for="cat-manual-bet-settlement">Manual Bet Settlement</label>
+                                        <input class="form-check-input me-4" type="checkbox" value="" id="cat-manual-bet-settlement" disabled>
+                                        <label class="form-check-label" for="cat-manual-bet-settlement">Manual Bet Settlement</label>
                                     </div>
                                     <div class="form-switch mb-2">
-                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-resend-settlement" disabled>
-                                      <label class="form-check-label" for="cat-resend-settlement">Resend Settlement</label>
+                                        <input class="form-check-input me-4" type="checkbox" value="" id="cat-resend-settlement" disabled>
+                                        <label class="form-check-label" for="cat-resend-settlement">Resend Settlement</label>
                                     </div>
                                     <div class="form-switch mb-2">
-                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-market-settlement" disabled>
-                                      <label class="form-check-label" for="cat-market-settlement">Market Settlement</label>
+                                        <input class="form-check-input me-4" type="checkbox" value="" id="cat-market-settlement" disabled>
+                                        <label class="form-check-label" for="cat-market-settlement">Market Settlement</label>
                                     </div>
                                     <div class="form-switch mb-2">
-                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-message-settlement" disabled>
-                                      <label class="form-check-label" for="cat-message-settlement">Message Settlement</label>
+                                        <input class="form-check-input me-4" type="checkbox" value="" id="cat-message-settlement" disabled>
+                                        <label class="form-check-label" for="cat-message-settlement">Message Settlement</label>
                                     </div>
                                 </div>
                             </div>
@@ -123,19 +123,19 @@
                                 <div class="category mb-3">
                                     <div class="category-title fw-bold mb-1">Modify/Cancel Bets</div>
                                     <div class="form-switch mb-2">
-                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-cancel-bets" disabled checked>
-                                      <label class="form-check-label" for="cat-cancel-bets">Cancel Bets</label>
+                                        <input class="form-check-input me-4" type="checkbox" value="" id="cat-cancel-bets" disabled checked>
+                                        <label class="form-check-label" for="cat-cancel-bets">Cancel Bets</label>
                                     </div>
                                     <div class="form-switch mb-2">
-                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-cancel-bet-history" disabled>
-                                      <label class="form-check-label" for="cat-manage-users">Cancel Bet History</label>
+                                        <input class="form-check-input me-4" type="checkbox" value="" id="cat-cancel-bet-history" disabled>
+                                        <label class="form-check-label" for="cat-manage-users">Cancel Bet History</label>
                                     </div>
                                 </div>
                                 <div class="category mb-3">
                                     <div class="category-title fw-bold mb-1">Maintenance</div>
                                     <div class="form-switch mb-2">
-                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-cancel-bet-history" disabled>
-                                      <label class="form-check-label" for="cat-manage-users">Manage Users</label>
+                                        <input class="form-check-input me-4" type="checkbox" value="" id="cat-cancel-bet-history" disabled>
+                                        <label class="form-check-label" for="cat-manage-users">Manage Users</label>
                                     </div>
                                 </div>
                             </div>

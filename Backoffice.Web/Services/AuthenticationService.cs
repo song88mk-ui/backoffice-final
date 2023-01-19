@@ -186,15 +186,15 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<ManageUserListResponse>> GetUserList(string search = "", bool isShowSuperAdmin = false)
+        public async Task<BaseResponse<ManageUserListResponse>> GetUserList(string search = "", UserSorting sortby = UserSorting.SortByCreateDateDesc, bool isShowSuperAdmin = false)
         {
             try
             {
                 var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
-                var query = !string.IsNullOrWhiteSpace(search) ? $"?isSubUserOnly={search}&" : "?";
-                query += $"isShowSuperAdmin={isShowSuperAdmin}";
+                var query = !string.IsNullOrWhiteSpace(search) ? $"?search={search}&" : "?";
+                query += $"sortby={(int)sortby}&isShowSuperAdmin={isShowSuperAdmin}";
                 var response = await _httpClient.GetAsync($"api/authentication/user/list{query}");
 
                 if (response.IsSuccessStatusCode)

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Backoffice.Shared.Models.Requests;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Security.Policy;
 
 namespace Backoffice.API.Repositories
 {
@@ -158,13 +159,13 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<ManageUserListResponse>> GetUserList(string token, string search = "", bool isShowSuperAdmin = false)
+        public async Task<BaseResponse<ManageUserListResponse>> GetUserList(string token, UserSorting sortby = UserSorting.SortByCreateDateDesc, string search = "", bool isShowSuperAdmin = false)
         {
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
-                var query = !string.IsNullOrWhiteSpace(search) ? $"?isSubUserOnly={search}&" : "?";
-                query += $"isShowSuperAdmin={isShowSuperAdmin}";
+                var query = !string.IsNullOrWhiteSpace(search) ? $"?search={search}&" : "?";
+                query += $"sortby={(int)sortby}&isShowSuperAdmin={isShowSuperAdmin}";
                 var response = await _httpClient.GetAsync($"api/user/list{query}");
 
                 if (response.IsSuccessStatusCode)

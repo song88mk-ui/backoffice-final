@@ -171,8 +171,8 @@ namespace Backoffice.Web.Components.SubUser
 
             var request = new UserRegisterRequest()
             {
-                AppId = (int)Application.SportsbookClient,
-                AppName = Application.SportsbookClient.ToString(),
+                AppId = (int)Application.Backoffice,
+                AppName = Application.Backoffice.ToString(),
                 Email = "sbsubaccount@fci.com",
                 MainUserId = SubUserClaims.MainUserId,
                 NickName = SubUser.NickName,

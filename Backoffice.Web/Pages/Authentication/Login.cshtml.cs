@@ -73,9 +73,9 @@ namespace Backoffice.Web.Pages.Authentication
                     {
                         switch (policies.FirstOrDefault().ToString())
                         {
-                            case nameof(Application.SportsbookClient):
+                            case nameof(Application.Backoffice):
                                 return LocalRedirect("/dashboard");
-                            case nameof(Application.Trading):
+                            case nameof(Application.AgentManagementSystem):
                                 return LocalRedirect("/odds-engine");
                         }
                     }

@@ -1,4 +1,5 @@
 ﻿using Backoffice.API.Repositories;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -104,7 +105,7 @@ namespace Backoffice.API.Controllers.Authentication
             }
         }
         [HttpGet("user/list")]
-        public async Task<IActionResult> GetUserList([FromQuery] string? search = null, [FromQuery] bool isShowSuperAdmin = false)
+        public async Task<IActionResult> GetUserList([FromQuery] string? search = null, [FromQuery] UserSorting sortby = UserSorting.SortByCreateDateDesc, [FromQuery] bool isShowSuperAdmin = false)
         {
             var result = new BaseResponse<ManageUserListResponse>()
             {
@@ -115,7 +116,7 @@ namespace Backoffice.API.Controllers.Authentication
             {
                 var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-                result = await _authenticationRepository.GetUserList(token, search ?? "", isShowSuperAdmin);
+                result = await _authenticationRepository.GetUserList(token, sortby, search ?? "", isShowSuperAdmin);
             }
 
             switch (result.StatusCode)

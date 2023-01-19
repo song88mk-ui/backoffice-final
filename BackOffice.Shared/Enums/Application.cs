@@ -3,9 +3,8 @@ namespace Backoffice.Shared.Enums
 {
     public enum Application
     {
-        Admin = 1001,
-        PartnerManagement = 1002,
-        SportsbookClient = 1003,
-        Trading = 1004
+        Backoffice = 1001,
+        Sportsbook = 1002,
+        AgentManagementSystem = 1003,
     }
 }
