@@ -120,23 +120,23 @@ namespace Backoffice.Web.Components.TopFixtures
             SelectedRow = index;
         }
 
-        public async Task OnSelectedGameEvent(EditTopFixturesModel model)
+        public async Task OnSelectedGameEvent(FixtureModel model)
         {
             foreach (var fixture in NewTopFixture.TopFixtures)
             {
-                if (model.SelectedGame.SortOrder == fixture.SortOrder)
+                if (model.SortOrder == fixture.SortOrder)
                 {
-                    fixture.SportId = model.SelectedGame.SportId;
-                    fixture.SportName = model.SelectedGame.SportName;
-                    fixture.SegmentId = model.SelectedGame.SegmentId;
-                    fixture.SegmentName = model.SelectedGame.SegmentName;
-                    fixture.LeagueId = model.SelectedGame.LeagueId;
-                    fixture.LeagueName = model.SelectedGame.LeagueName;
-                    fixture.FixtureStartDate = model.SelectedGame.StartDate;
-                    fixture.FixtureId = model.SelectedGame.FixtureId;
-                    fixture.FixtureName = model.SelectedGame.FixtureName;
-                    fixture.FixtureStatus = model.SelectedGame.FixtureStatus;
-                    fixture.SortOrder = model.SelectedGame.SortOrder;
+                    fixture.SportId = model.SportId;
+                    fixture.SportName = model.SportName;
+                    fixture.SegmentId = model.SegmentId;
+                    fixture.SegmentName = model.SegmentName;
+                    fixture.LeagueId = model.LeagueId;
+                    fixture.LeagueName = model.LeagueName;
+                    fixture.FixtureStartDate = model.StartDate;
+                    fixture.FixtureId = model.FixtureId;
+                    fixture.FixtureName = model.FixtureName;
+                    fixture.FixtureStatus = model.FixtureStatus;
+                    fixture.SortOrder = model.SortOrder;
 
                     break;
                 }

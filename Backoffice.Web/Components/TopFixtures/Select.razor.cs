@@ -12,21 +12,22 @@ namespace Backoffice.Web.Components.TopFixtures
         [Parameter] public List<string> CurrentTopFixtures { get; set; }
         [Parameter] public string SelectedTopFixture { get; set; }
         [Parameter] public int RowCount { get; set; }
-        [Parameter] public EventCallback<EditTopFixturesModel> OnSelectedGame { get; set; }
+        [Parameter] public EventCallback<FixtureModel> OnSelectedGame { get; set; }
 
         #endregion
 
         #region Methods
+
         public async void OnGameSelectedEvent(FixtureModel fixture)
         {
             fixture.SortOrder = RowCount;
 
-            var model = new EditTopFixturesModel
-            {
-                SelectedGame = fixture,
-            };
+            //var model = new EditTopFixturesModel
+            //{
+            //    SelectedGame = fixture,
+            //};
 
-            await OnSelectedGame.InvokeAsync(model);
+            await OnSelectedGame.InvokeAsync(fixture);
         }
 
         public void Dispose()
