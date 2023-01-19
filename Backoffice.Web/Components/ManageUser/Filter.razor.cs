@@ -1,12 +1,15 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
+using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Components.ManageUser
 {
     public partial class Filter
     {
         #region Properties
+
+        [Parameter] public EventCallback OnCreateUserCallback { get; set; }
 
         public SearchFormModel SearchForm { get; set; }
         public List<SelectListItemModel<int>> SelectSortByList { get; set; }
@@ -50,6 +53,11 @@ namespace Backoffice.Web.Components.ManageUser
 
         public async Task OnInputSearchEvent()
         {
+        }
+
+        public async Task OnCreateUserClickEvent()
+        {
+            await OnCreateUserCallback.InvokeAsync();
         }
 
         #endregion
