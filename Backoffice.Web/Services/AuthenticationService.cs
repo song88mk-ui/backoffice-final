@@ -353,7 +353,7 @@ namespace Backoffice.Web.Services
                 var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
-                var response = await _httpClient.PostAsync($"api/authentication/usergroup/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"api/authentication/usergroup/user/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<List<UserResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })

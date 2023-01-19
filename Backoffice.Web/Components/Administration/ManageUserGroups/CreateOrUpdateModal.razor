@@ -1,0 +1,124 @@
+﻿<div class="modal-body">
+    <div class="information-container mb-3">
+        <div class="row">
+            <div class="col-md-12 mb-1">
+                <h6 class="title fw-bold ps-2 py-1">Group Information</h6>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label class="form-label">User Group Name</label>
+                <input type="text" class="form-control" placeholder="Enter User Group Name" @bind-value="UserGroup.UserGroupName" />
+            </div>
+            <div class="col-md-8">
+            </div>
+        </div>
+    </div>
+    <div class="permission-container">
+        <div class="row">
+            <div class="col-md-12 mb-1">
+                <h6 class="title fw-bold ps-2 py-1">Permissions</h6>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="access-container border rounded mb-3">
+                    <div class="access-header mt-3 mx-3 pb-4 border-bottom border-1">
+                        <div class="header-title">
+                            <h6 class="fw-bold d-inline-block">
+                                <i class="fa fa-plus me-3"></i>
+                                Admin
+                            </h6>
+                            <div class="form-switch d-inline-block pull-right">
+                                <input class="form-check-input" type="checkbox" role="switch" checked>
+                            </div>
+                        </div>
+                        <div class="header-information">
+                            Create and manage user and user groups, modify, settle, or cancel bets, and view manual bet settlement history
+                        </div>
+                    </div>
+                    <div class="access-permissions mx-3 my-3">
+                        <div class="sub-title mb-4">
+                            <span class="d-block fw-bold">Permissions</span>
+                            <span class="sub-title-info">Enable the permissions required for this user group</span>
+                        </div>
+                        <div class="d-flex">
+                            <div class="w-50">
+                                <div class="category mb-3">
+                                    <div class="category-title fw-bold mb-1">Dashboard</div>
+                                    <div class="form-switch mb-2">
+                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-dashboard" disabled checked>
+                                      <label class="form-check-label" for="cat-dashboard">Dashboard</label>
+                                    </div>
+                                </div>
+                                <div class="category mb-3">
+                                    <div class="category-title fw-bold mb-1">User & User Groups</div>
+                                    <div class="form-switch mb-2">
+                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-manage-users" disabled>
+                                      <label class="form-check-label" for="cat-manage-users">Manage Users</label>
+                                    </div>
+                                    <div class="form-switch mb-2">
+                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-manage-user-groups" disabled>
+                                      <label class="form-check-label" for="cat-manage-user-groups">Manage User Groups</label>
+                                    </div>
+                                </div>
+                                <div class="category mb-3">
+                                    <div class="category-title fw-bold mb-1">Settlements</div>
+                                    <div class="form-switch mb-2">
+                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-manual-bet-settlement" disabled>
+                                      <label class="form-check-label" for="cat-manual-bet-settlement">Manual Bet Settlement</label>
+                                    </div>
+                                    <div class="form-switch mb-2">
+                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-resend-settlement" disabled>
+                                      <label class="form-check-label" for="cat-resend-settlement">Resend Settlement</label>
+                                    </div>
+                                    <div class="form-switch mb-2">
+                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-market-settlement" disabled>
+                                      <label class="form-check-label" for="cat-market-settlement">Market Settlement</label>
+                                    </div>
+                                    <div class="form-switch mb-2">
+                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-message-settlement" disabled>
+                                      <label class="form-check-label" for="cat-message-settlement">Message Settlement</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-50">
+                                <div class="category mb-3">
+                                    <div class="category-title fw-bold mb-1">Modify/Cancel Bets</div>
+                                    <div class="form-switch mb-2">
+                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-cancel-bets" disabled checked>
+                                      <label class="form-check-label" for="cat-cancel-bets">Cancel Bets</label>
+                                    </div>
+                                    <div class="form-switch mb-2">
+                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-cancel-bet-history" disabled>
+                                      <label class="form-check-label" for="cat-manage-users">Cancel Bet History</label>
+                                    </div>
+                                </div>
+                                <div class="category mb-3">
+                                    <div class="category-title fw-bold mb-1">Maintenance</div>
+                                    <div class="form-switch mb-2">
+                                      <input class="form-check-input me-4" type="checkbox" value="" id="cat-cancel-bet-history" disabled>
+                                      <label class="form-check-label" for="cat-manage-users">Manage Users</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer mx-4">
+    @if (Alerts != null && Alerts.Any())
+    {
+        <div class="col-md-8">
+            @foreach (var alert in Alerts)
+            {
+                <AlertMessage AlertStatus="@alert.AlertStatus" AlertMessageStr="@alert.AltertMessage" Opacity="@alert.Opacity" />
+            }
+        </div>
+    }
+    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
+    <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">Save</button>
+</div>
