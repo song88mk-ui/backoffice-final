@@ -2,6 +2,8 @@
 using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using System.Globalization;
 
 namespace Backoffice.Web.Components.ManageUser
 {
@@ -10,7 +12,9 @@ namespace Backoffice.Web.Components.ManageUser
         #region Properties
 
         [Parameter] public EventCallback OnCreateUserCallback { get; set; }
-
+        [Parameter] public EventCallback OnInitCallback { get; set; }
+        [Parameter] public ManageUserFilterModel FilterModel { get; set; }
+        [Parameter] public EventCallback<ManageUserFilterModel> FilterModelChanged { get; set; }
         public SearchFormModel SearchForm { get; set; }
         public List<SelectListItemModel<int>> SelectSortByList { get; set; }
         public int SelectedSortBy { get; set; }
@@ -21,7 +25,8 @@ namespace Backoffice.Web.Components.ManageUser
 
         protected override async Task OnInitializedAsync()
         {
-            SearchForm= new SearchFormModel();
+            FilterModel = new ManageUserFilterModel();
+            SearchForm = new SearchFormModel();
             SelectSortByList = new List<SelectListItemModel<int>>();
 
             SelectSortByList.Add(new SelectListItemModel<int>
@@ -49,10 +54,22 @@ namespace Backoffice.Web.Components.ManageUser
             });
 
             SelectedSortBy = (int)UserSorting.SortByUsernameAsc;
-        }
 
+            await FilterModelChanged.InvokeAsync(FilterModel);
+            await OnInitCallback.InvokeAsync();
+        }
+        public async Task OnSortByChangedEvent(ChangeEventArgs e)
+        {
+            var sortBy = Convert.ToInt32(e.Value);
+            FilterModel.UserSorting = (UserSorting)sortBy;
+
+            await FilterModelChanged.InvokeAsync(FilterModel);
+            await OnInitCallback.InvokeAsync();
+        }
         public async Task OnInputSearchEvent()
         {
+            await FilterModelChanged.InvokeAsync(FilterModel);
+            await OnInitCallback.InvokeAsync();
         }
 
         public async Task OnCreateUserClickEvent()

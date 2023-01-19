@@ -672,7 +672,7 @@ namespace Backoffice.API.Repositories
                             ModifiedBy = 0,
                             ModifiedDate = DateTime.UtcNow,
                             StatusId = request.StatusId,
-                            ApplicationId = (int)Application.SportsbookClient,
+                            ApplicationId = (int)Application.Backoffice,
                             SportsbookShare = request.RevenueShare.SportsbookShare,
                             JackpotShare = request.RevenueShare.JackpotShare,
                             ClientShare = 0,

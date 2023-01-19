@@ -15,7 +15,7 @@ namespace Backoffice.Web.Services
         Task<bool> Logout();
         Task<BaseResponse<bool>> Register(UserRegisterRequest request);
         Task<BaseResponse<bool>> UpdateUser(UserRegisterRequest request);
-        Task<BaseResponse<ManageUserListResponse>> GetUserList(string search = "", bool isShowSuperAdmin = false);
+        Task<BaseResponse<ManageUserListResponse>> GetUserList(string search = "", UserSorting sortby = UserSorting.SortByCreateDateDesc, bool isShowSuperAdmin = false);
         Task<BaseResponse<UserListResponse>> GetSubAccounts(SubAccountListRequest request);
         Task<BaseResponse<PermissionResponse>> GetPermissionList(bool isSubUser);
         Task<BaseResponse<UserGroupListResponse>> GetUserGroupList(UserGroupListRequest request);

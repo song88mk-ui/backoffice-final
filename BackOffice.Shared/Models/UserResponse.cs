@@ -17,7 +17,7 @@ namespace Backoffice.Shared.Models
         public string Status { get; set; }
         public string MainUserId { get; set; }
         public int AppId { get; set; }
-        public string AppName { get; set; }
+        public string AppName { get; set; } 
         public List<ClaimModel> Claims { get; set; }
         public DateTime CreatedDate { get; set; }
     }
