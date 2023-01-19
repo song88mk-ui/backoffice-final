@@ -13,6 +13,11 @@
 
         public class OrderedClientTopFixture
         {
+            public OrderedClientTopFixture()
+            {
+                TopFixtures = new List<TopFixture>();
+            }
+
             public Guid ClientId { get; set; }
             public int ClientIdRef { get; set; }
             public string ClientName { get; set; }
@@ -21,7 +26,6 @@
 
         public class TopFixture
         {
-            public int Index { get; set; }
             public int SportId { get; set; }
             public string SportName { get; set; }
             public int SegmentId { get; set; }

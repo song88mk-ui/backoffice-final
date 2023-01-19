@@ -33,10 +33,10 @@
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn dropdown-toggle d-block w-100" data-bs-auto-close="outside" type="button" id="row-@fixture.SortOrder"
-                                            data-bs-toggle="dropdown" aria-expanded="false" @onclick="() => OnDropdownSelect(fixture)">
+                                            data-bs-toggle="dropdown" aria-expanded="false" @onclick="() => OnDropdownSelect(fixture.SortOrder)">
                                             @fixture.FixtureName
                                         </button>
-                                        <Select @key="@($"Key{fixture.Index}")" SportsTree="SportsTree" CurrentTopFixtures="@CurrentTopFixtures" SelectedTopFixture="@fixture.FixtureId" RowCount="@(fixture.SortOrder)" OnSelectedGame="OnSelectedGameEvent" />
+                                        <Select @key="@($"Key{fixture.SortOrder}")" SportsTree="SportsTree" CurrentTopFixtures="CurrentTopFixtures" SelectedTopFixture="@fixture.FixtureId" RowCount="fixture.SortOrder" OnSelectedGame="OnSelectedGameEvent" />
                                     </div>
                                 </td>
                                 <td>
@@ -57,7 +57,7 @@
                                     }
                                 </td>
                                 <td class="actions">
-                                    <a href="javascript:void(0);" class="me-2" @onclick="() => OnAddRow(fixture.SortOrder)">
+                                    <a href="javascript:void(0);" class="me-2" @onclick="() => OnAddClickEvent(fixture.SortOrder)">
                                         <i class="fa fa-plus-circle"></i>
                                     </a>
                                     <a href="javascript:void(0);" class="me-2" @onclick="() =>  OnDeleteRow(fixture)">
@@ -79,16 +79,16 @@
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn dropdown-toggle d-block w-100" data-bs-auto-close="outside" type="button" id="row-@fixture.SortOrder"
-                                            data-bs-toggle="dropdown" aria-expanded="false" @onclick="() => OnDropdownSelect(fixture)">
+                                            data-bs-toggle="dropdown" aria-expanded="false" @onclick="() => OnDropdownSelect(fixture.SortOrder)">
                                             No Game
                                         </button>
-                                        <Select @key="@($"Key{fixture.Index}")" SportsTree="SportsTree" CurrentTopFixtures="@CurrentTopFixtures" SelectedTopFixture="@fixture.FixtureId" RowCount="@(fixture.SortOrder)" OnSelectedGame="OnSelectedGameEvent" />
+                                        <Select @key="@($"Key{fixture.SortOrder}")" SportsTree="SportsTree" CurrentTopFixtures="CurrentTopFixtures" SelectedTopFixture="@fixture.FixtureId" RowCount="fixture.SortOrder" OnSelectedGame="OnSelectedGameEvent" />
                                     </div>
                                 </td>
                                 <td></td>
                                 <td></td>
                                 <td class="actions">
-                                    <a href="javascript:void(0);" class="me-2" @onclick="() => OnAddRow(fixture.SortOrder)">
+                                    <a href="javascript:void(0);" class="me-2" @onclick="() => OnAddClickEvent(fixture.SortOrder)">
                                         <i class="fa fa-plus-circle"></i>
                                     </a>
                                     <a href="javascript:void(0);" class="me-2" @onclick="() =>  OnDeleteRow(fixture)">
