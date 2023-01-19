@@ -1,5 +1,65 @@
-﻿<h3>Cancel_Bets</h3>
+﻿@using Backoffice.Web.Components.CancelBets
 
-@code {
+@page "/admin/cancel-bets"
 
-}
+<div class="row">
+    <div class="main-content col-md-12 mb-4 pb-3">
+        <div class="row">
+            <div class="col-md-12">
+                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+            </div>
+            <div class="col-md-12">
+                <Filter />
+            </div>
+            <div class="col-md-12">
+                <div class="content mx-3">
+                    <div class="information-container">
+                        <span>Add up to 10 Bet Reference IDs for bet cancellation requests.</span>
+                    </div>
+                    <table class="table table-bordered mt-4">
+                        <thead class="table-head">
+                            <tr>
+                                <th class="th-number py-3">#</th>
+                                <th class="th-reference-id py-3">Reference ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">1</td>
+                                <td>
+                                    <input type="text" class="form-control" value="4FA62488-A950-402D-6994-08DAF20143E0" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">2</td>
+                                <td>
+                                    <input type="text" class="form-control" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="content mx-3">
+                    <table class="table table-bordered mt-4">
+                        <thead class="table-head">
+                            <tr>
+                                <th class="th-reason py-3">Reason For Canceling</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="form-floating">
+                                        <textarea class="form-control input-reason">Market Suspended</textarea>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

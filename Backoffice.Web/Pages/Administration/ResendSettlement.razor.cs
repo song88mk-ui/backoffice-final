@@ -14,7 +14,7 @@
         protected override async Task OnInitializedAsync()
         {
             PageTitle = "Resend Settlement";
-            IconClass = "ico ico-resend Settlement";
+            IconClass = "ico ico-resend-settlement";
         }
 
         public void Dispose()
