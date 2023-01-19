@@ -52,7 +52,7 @@ namespace Backoffice.Web.Pages.SBC
 
             GetTopLeaguesRequest = new GetTopLeaguesRequest()
             {
-                ClientIdRefs = model.ClientId == "all" ? string.Join(",", model.Clients.Select(s => s.ClientId)) : model.ClientId,
+                ClientIdRefs = model.ClientIds,
                 SportId = int.Parse(model.SportId),
                 LanguageCode = "en"
             };
@@ -157,7 +157,7 @@ namespace Backoffice.Web.Pages.SBC
                 Search = TopLeaguesFilter.Search,
                 SportId = TopLeaguesFilter.SportId,
                 SportName = TopLeaguesFilter.SportName,
-                ClientId = TopLeaguesFilter.ClientId,
+                ClientIds = TopLeaguesFilter.ClientIds,
                 Clients = TopLeaguesFilter.Clients,
             };
                  

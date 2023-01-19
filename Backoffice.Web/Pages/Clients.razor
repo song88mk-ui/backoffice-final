@@ -47,7 +47,7 @@
                                 </td>
                                 <td>@client.Region</td>
                                 <td>
-                                    <a class="btn btn-bet-settings" href="javascript:(0)">View Bet Settings</a>
+                                    <a class="btn btn-bet-settings" href="javascript:(0)" @onclick="() => OnViewBetSettingClickEvent(client)">View Bet Settings</a>
                                 </td>
                                 <td>
                                     <a class="link-edit me-2" href="javascript:(0)" @onclick="() => OnEditClientClickEvent(client)">
@@ -64,5 +64,5 @@
     </div>
 </div>
 <div>
-    <CustomModal />
+    <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
 </div>

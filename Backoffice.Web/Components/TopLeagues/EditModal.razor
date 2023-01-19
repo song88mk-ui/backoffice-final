@@ -13,37 +13,32 @@
         <tbody>
             @if (NewTopLeagues != null && NewTopLeagues.Any())
             {
-                @for (int i = 0; i < NewTopLeagues.Count; i++)
+                foreach (var model in NewTopLeagues)
                 {
-                    var index = i;
-                    if (NewTopLeagues[index].LeagueId != 0)
+                    if (model.LeagueId != 0)
                     {
-                        <tr id="@($"name-{@NewTopLeagues[index].SportId}-{@NewTopLeagues[index].SegmentId}-{@NewTopLeagues[index].LeagueId}")">
-                            <td>@NewTopLeagues[index].SortOrder</td>
-                            <td>@NewTopLeagues[index].SegmentName</td>
+                        <tr id="@($"name-{@model.SportId}-{@model.SegmentId}-{@model.LeagueId}")">
+                            <td>@model.SortOrder</td>
+                            <td>@model.SegmentName</td>
                             <td>
                                 <div class="dropdown">
-                                    <button class="btn dropdown-toggle d-block w-100" data-bs-auto-close="outside" type="button" id="Row@(index+1)" data-bs-toggle="dropdown" aria-expanded="false" @onclick="async () => await OnDropdownSelect(index)">
-                                        @NewTopLeagues[index].LeagueName
+                                    <button class="btn dropdown-toggle d-block w-100" data-bs-auto-close="outside" type="button" id="row-@model.SortOrder" data-bs-toggle="dropdown" aria-expanded="false" @onclick="() => OnDropdownClick(model.SortOrder)">
+                                        @model.LeagueName
                                     </button>
-                                    <Select @key="@($"Key{index}")" SportId="@SportId" SportsTree="@SportsTree" CurrentTopLeagues="@CurrentTopLeagues" SelectedTopLeagues="@NewTopLeagues[index].LeagueId" RowCount="@(index+1)" OnSelectedLeague="OnSelectedLeagueEvent" />
+                                    @if (SelectedRow == model.SortOrder)
+                                    {
+                                        <Select SportId="SportId" SportsTree="SportsTree" CurrentTopLeagues="CurrentTopLeagues" SelectedTopLeagues="model.LeagueId" RowCount="model.SortOrder" OnSelectedLeague="OnSelectedLeagueEvent" />
+                                    }
                                 </div>
                             </td>
                             <td>
-                                @if (NewTopLeagues[index].Status == true)
-                                {
-                                    <span class="status-active py-1 px-4 rounded-pill">Active</span>
-                                }
-                                else
-                                {
-                                    <span class="status-inactive py-1 px-4 rounded-pill">Inactive</span>
-                                }
+                                <span class="status-active py-1 px-4 rounded-pill">Active</span>
                             </td>
                             <td class="actions">
-                                <a href="javascript:void(0);" class="me-2" @onclick="async () => await OnAddRow(NewTopLeagues[index].SortOrder)">
+                                <a href="javascript:void(0);" class="me-2" @onclick="() => OnAddClickEvent(model.SortOrder)">
                                     <i class="fa fa-plus-square" aria-hidden="true"></i>
                                 </a>
-                                <a href="javascript:void(0);" class="me-2" @onclick="async () => await OnDeleteRow(NewTopLeagues[index])">
+                                <a href="javascript:void(0);" class="me-2" @onclick="() => OnDeleteClickEvent(model)">
                                     <i class="fa fa-minus-square" aria-hidden="true"></i>
                                 </a>
                                 <a href="javascript:void(0);" class="drag-handle">
@@ -55,22 +50,27 @@
                     else
                     {
                         <tr>
-                            <td>@NewTopLeagues[index].SortOrder</td>
+                            <td>@model.SortOrder</td>
                             <td></td>
                             <td>
                                 <div class="dropdown">
-                                    <button class="btn dropdown-toggle d-block w-100" data-bs-auto-close="outside" type="button" id="Row@(index+1)" data-bs-toggle="dropdown" aria-expanded="false" @onclick="async () => await OnDropdownSelect(index)">
-                                        @NewTopLeagues[index].LeagueName
+                                    <button class="btn dropdown-toggle d-block w-100" data-bs-auto-close="outside" type="button" id="Row-@model.SortOrder" data-bs-toggle="dropdown" aria-expanded="false" @onclick="() => OnDropdownClick(model.SortOrder)">
+                                        @model.LeagueName
                                     </button>
-                                    <Select @key="@($"Key{index}")" SportId="@SportId" SportsTree="@SportsTree" CurrentTopLeagues="@CurrentTopLeagues" SelectedTopLeagues="@NewTopLeagues[index].LeagueId" RowCount="@(index+1)" OnSelectedLeague="OnSelectedLeagueEvent" />
+                                    @if (SelectedRow == model.SortOrder)
+                                    {
+                                        <Select SportId="SportId" SportsTree="SportsTree" CurrentTopLeagues="CurrentTopLeagues" SelectedTopLeagues="model.LeagueId" RowCount="model.SortOrder" OnSelectedLeague="OnSelectedLeagueEvent" />
+                                    }
                                 </div>
                             </td>
-                            <td></td>
+                            <td>
+                                <span class="status-active py-1 px-4 rounded-pill">Active</span>
+                            </td>
                             <td class="actions">
-                                <a href="javascript:void(0);" class="me-2" @onclick="async () => await OnAddRow(NewTopLeagues[index].SortOrder)">
+                                <a href="javascript:void(0);" class="me-2" @onclick="() => OnAddClickEvent(model.SortOrder)">
                                     <i class="fa fa-plus-square" aria-hidden="true"></i>
                                 </a>
-                                <a href="javascript:void(0);" class="me-2" @onclick="async () => await OnDeleteRow(NewTopLeagues[index])">
+                                <a href="javascript:void(0);" class="me-2" @onclick="() => OnDeleteClickEvent(model)">
                                     <i class="fa fa-minus-square" aria-hidden="true"></i>
                                 </a>
                                 <a href="javascript:void(0);"  class="drag-handle">
@@ -82,8 +82,13 @@
                 }
             }
         </tbody>
-
     </table>
+    @if (!string.IsNullOrEmpty(AlertMessage))
+    {
+        <div class="mt-3">
+            <Alert Message="@AlertMessage" AlertStatus="AlertStatus" />
+        </div>
+    }
 </div>
 <div class="modal-footer mx-4 p-0 py-3 border-0">
     <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>

@@ -43,8 +43,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             FixtureStatuses = new List<SelectListItemModel<int>>();
             ClientMarketTemplateGroups = new List<MarketSortOrderModel.ClientMarketTemplateGroup>();
 
-            IsUpdate = false;
-
             if (UserModel.ClientCodes != null)
             {
                 var clients = (await TradingService.GetClientList()).Result;
@@ -148,10 +146,12 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public async Task OnCopyClickEvent()
         {
             var parameters = new ModalParameters();
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");            
 
             var options = new ModalOptions();
+
             ModalService.Open<CopyModal>($"Copy Market Sort Order", parameters, options);
         }
 
@@ -208,13 +208,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
                 SelectedMarketTemplateGroupId = ClientMarketTemplateGroups.FirstOrDefault().MarketTemplateGroupId;
 
-                await MarketSortOrderModelCallback.InvokeAsync(new MarketSortOrderModel
-                {
-                    ClientCode = SelectedClientCode,
-                    ClientId = marketTemplateResponse.ClientId,
-                    SportId = SelectedSportId,
-                    FixtureStatusId = SelectedFixtureStatusId,
-                    MarketTemplates = marketTemplateResponse.MarketTemplates
+                var marketTemplates = marketTemplateResponse.MarketTemplates
                     .OrderBy(o => o.SortOrder)
                     .Select((s, index) => new MarketSortOrderModel.ClientMarketTemplate
                     {
@@ -222,7 +216,16 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                         MarketTemplateId = s.MarketTemplateId,
                         MarketTemplateName = s.MarketTemplateName,
                         SortOrder = s.SortOrder > 1000 ? index + 1 : s.SortOrder
-                    }).ToList(),
+                    }).ToList();
+
+                await MarketSortOrderModelCallback.InvokeAsync(new MarketSortOrderModel
+                {
+                    ClientCode = SelectedClientCode,
+                    ClientId = marketTemplateResponse.ClientId,
+                    SportId = SelectedSportId,
+                    FixtureStatusId = SelectedFixtureStatusId,
+                    MarketTemplates = marketTemplates,
+                    OriginalMarketTemplates = marketTemplates,
                     MarketTemplateGroups = ClientMarketTemplateGroups
                 });
             }

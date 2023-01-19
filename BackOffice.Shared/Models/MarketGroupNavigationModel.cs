@@ -6,6 +6,6 @@ namespace Backoffice.Shared.Models
     public class MarketGroupNavigationModel
     {
         public bool IsSelected { get; set; }
-        public MarketTemplateGroupResponse.MarketTemplateGroup MarketTemplateGroup { get; set; }
+        public MarketTemplateGroup MarketTemplateGroup { get; set; }
     }
 }

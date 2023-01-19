@@ -1,6 +1,4 @@
-﻿using Backoffice.Shared.Models.Response;
-
-namespace Backoffice.Web.Models
+﻿namespace Backoffice.Web.Models
 {
     public class TopFixturesModel
     {
@@ -12,11 +10,5 @@ namespace Backoffice.Web.Models
         public List<ClientTopFixtureModel.OrderedClientTopFixture> TopFixtures { get; set; }
         public List<ClientTopFixtureModel.OrderedClientTopFixture> TopFixturesFiltered { get; set; }
         
-    }
-
-    public class TopFixtureCallback
-    {
-        public List<ClientModel.Client> SelectedClients { get; set; }
-        public string SearchText { get; set; }
     }
 }

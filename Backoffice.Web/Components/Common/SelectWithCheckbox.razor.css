@@ -1,0 +1,6 @@
+﻿.dropdown-menu {
+    border-radius: 6px;
+    font-size: 13px;
+    max-height: 380px;
+    overflow-y: auto;
+}

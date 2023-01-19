@@ -140,8 +140,8 @@ namespace Backoffice.API.Repositories
                     {
                         StakeTax = taxConfig.StakeTax * 100m,
                         WinningsTax = taxConfig.WinningsTax * 100m,
-                        ExcludeStakeSportTypes = taxConfig.ExcludeStakeSportTypes,
-                        ExcludeWinningsSportTypes = taxConfig.ExcludeWinningsSportTypes
+                        ExcludeStakeSportTypes = taxConfig.ExcludeStakeSportTypes ?? string.Empty,
+                        ExcludeWinningsSportTypes = taxConfig.ExcludeWinningsSportTypes ?? string.Empty
                     };
                     clientResponse.TaxConfig = taxConfigPercent;
 
@@ -152,6 +152,7 @@ namespace Backoffice.API.Repositories
                         JackpotShare = client.JackpotShare * 100m
                     };
 
+                    clientResponse.RevenueShare = revenueShare;
 
                     clientList.Add(clientResponse);
                 }
@@ -678,7 +679,8 @@ namespace Backoffice.API.Repositories
                             RevenueShareSportsbook = request.IsTierRevenue == true ? request.TierSportsbookShare : null,
                             TaxConfig = JsonSerializer.Serialize(request.TaxConfig),
                             Region = request.Region,
-                            Email = request.Email
+                            Email = request.Email,
+                            IsEmailNotification = request.IsEmailNotification,
                         };
 
                         clientId = InsertClientRecord(clientRecord);
@@ -687,7 +689,7 @@ namespace Backoffice.API.Repositories
                     {
                         var client = _backofficeContext.ClientInformation.Find(request.ClientId);
 
-                        if (client == null)
+                        if (client != null)
                         {
                             client.Name = request.Name;
                             client.Email = request.Email;
@@ -704,9 +706,10 @@ namespace Backoffice.API.Repositories
                             client.RevenueShareSportsbook = request.IsTierRevenue == true ? request.TierSportsbookShare : null;
                             client.TaxConfig = JsonSerializer.Serialize(request.TaxConfig);
                             client.Region = request.Region;
+                            client.IsEmailNotification = request.IsEmailNotification;
                         }
 
-                        UpdateClientRecord(client);
+                        clientId = UpdateClientRecord(client);
                     }
 
                     var clientBetSettings = _backofficeContext.ClientBetSetting.Where(b => b.ClientId == clientId).ToList();

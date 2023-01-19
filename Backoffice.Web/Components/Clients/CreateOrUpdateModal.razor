@@ -81,7 +81,7 @@
                                 <label for="stakeField" class="form-label stake-lbl">Stake</label>
                                 <div class="input-group">
                                     <span class="input-group-text">%</span>
-                                    <input type="text" id="stakeField" class="form-control rounded border-start-0" />
+                                    <input type="text" id="stakeField" class="form-control rounded border-start-0" @bind-value="Client.TaxConfig.StakeTax" />
                                     <div class="dropdown mx-2">
                                         <button class="btn tax-settings-btn dropdown-toggle ps-4" type="button" id="sportTypesDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                             Exclude Sport Types
@@ -167,7 +167,7 @@
                                 <label for="winningsField" class="form-label stake-lbl">Winnings</label>
                                 <div class="input-group">
                                     <span class="input-group-text">%</span>
-                                    <input type="text" id="winningsField" class="form-control rounded border-start-0" />
+                                    <input type="text" id="winningsField" class="form-control rounded border-start-0" @bind-value="Client.TaxConfig.WinningsTax"  />
                                     <div class="dropdown mx-2">
                                         <button class="btn tax-settings-btn dropdown-toggle ps-4" type="button" id="sportTypesWinningsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                             Exclude Sport Types
@@ -282,7 +282,7 @@
                                 }
                                 <label class="btn btn-radio" for="hongkongRadio">Hongkong</label>
 
-                                @if (Client.Region == "AF")
+                                @if (Client.Region == "SA")
                                 {
                                     <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" @onchange="(e) => OnRegionAFClicked(e)" checked />
                                 }

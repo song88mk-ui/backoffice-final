@@ -70,7 +70,7 @@ namespace Backoffice.Web.Pages
 
                 virtualSports.SportLookup = sports.SportLookup.Where(s => virtualSportIds.Contains(s.SportId + 1000)).Select(s => new Models.SportLookup
                 {
-                    SportId = s.SportId,
+                    SportId = s.SportId + 1000,
                     SportName = $"Virtual {s.SportName}"
                 }).ToList();
 
@@ -114,7 +114,7 @@ namespace Backoffice.Web.Pages
 
                 virtualSports.SportLookup = sports.SportLookup.Where(s => virtualSportIds.Contains(s.SportId + 1000)).Select(s => new Models.SportLookup
                 {
-                    SportId = s.SportId,
+                    SportId = s.SportId + 1000,
                     SportName = $"Virtual {s.SportName}"
                 }).ToList();
 
@@ -147,6 +147,30 @@ namespace Backoffice.Web.Pages
 
             var options = new ModalOptions();
             ModalService.Open<CreateOrUpdateModal>("Edit Client", parameters, options);
+        }
+
+        public async Task OnViewBetSettingClickEvent(ClientListResponse.Client client)
+        {
+            
+            client.BetSettings = (await BackOfficeService.GetBetSetting(new BetSettingRequest
+            {
+                ClientId = client.ClientId
+            })).Result.BetSettings ?? new List<ClientListResponse.BetSetting>();
+
+            var parameters = new ModalParameters();
+
+            parameters.Add("DialogStyle", "max-width: 30rem;");
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("BetSettings", client.BetSettings);
+
+            var options = new ModalOptions();
+            ModalService.Open<ViewBetSettingsModal>("Bet Settings", parameters, options);
+        }
+
+        public async Task OnSaveClickEvent(object item)
+        {
+            ClientListModel = await GetClientList(ClientListCallbackModel.SearchText, ClientListCallbackModel.SortBy, MetaData.CurrentPage);
         }
 
         public void Dispose()

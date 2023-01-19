@@ -2,7 +2,8 @@
 {
     public enum NavMenuAccess
     {
-        SBC = 0,
-        OE = 1
+        OE = 0,
+        Admin = 1,
+        SBC = 2
     }
 }

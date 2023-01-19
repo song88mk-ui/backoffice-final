@@ -16,11 +16,12 @@ namespace Backoffice.Web.Components.TopLeagues
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnFilterCallback { get; set; }
 
         protected SearchFormModel SearchForm { get; set; }
-        public string SelectedClientId { get; set; }
-        public List<SelectListItemModel<string>> Clients { get; set; }
+        public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
         public string SelectedSportId { get; set; }
         public List<SelectListItemModel<string>> Sports { get; set; }
         public TopLeaguesFilterModel TopLeaguesFilterModel { get; set; }
+        public bool ShowSelectClient { get; set; }
+        public int SelectedClientCount { get; set; }
 
         #endregion
 
@@ -28,7 +29,7 @@ namespace Backoffice.Web.Components.TopLeagues
 
         protected override async Task OnInitializedAsync()
         {
-            Clients = new List<SelectListItemModel<string>>();
+            Clients = new List<SelectListItemWithCheckboxModel<string>>();
             Sports = new List<SelectListItemModel<string>>();
             TopLeaguesFilterModel = new TopLeaguesFilterModel();
 
@@ -37,7 +38,7 @@ namespace Backoffice.Web.Components.TopLeagues
                 SearchText = string.Empty
             };
 
-            SelectedClientId = string.Empty;
+            ShowSelectClient = false;
 
             var clients = (await BackOfficeService.GetClients()).Result;
 
@@ -55,29 +56,25 @@ namespace Backoffice.Web.Components.TopLeagues
                         Region = s.Region
                     }).ToList();
 
-                Clients = TopLeaguesFilterModel.Clients.Select(s => new SelectListItemModel<string>
+                Clients = TopLeaguesFilterModel.Clients.Select(s => new SelectListItemWithCheckboxModel<string>
                 {
                     Value = s.ClientId.ToString(),
-                    Name = s.ClientName
+                    Name = s.ClientName,
+                    IsChecked = true
                 }).ToList();
 
-                Clients.Insert(0, new SelectListItemModel<string>
+                Clients.Insert(0, new SelectListItemWithCheckboxModel<string>
                 {
                     Value = "all",
-                    Name = "All Clients"
+                    Name = "All Clients",
+                    IsChecked = true
                 });
-            }
-            else
-            {
-                Clients.Add(new SelectListItemModel<string>
-                {
-                    Value = "",
-                    Name = "No Clients Available"
-                });
-            }
 
-            SelectedClientId = Clients.FirstOrDefault().Value;
-            TopLeaguesFilterModel.ClientId = SelectedClientId;
+                var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
+
+                SelectedClientCount = selectedClients.Count;
+                TopLeaguesFilterModel.ClientIds = string.Join(",", selectedClients);
+            }
 
             var sports = (await BackOfficeService.GetSportsAsync()).Result;
 
@@ -115,12 +112,24 @@ namespace Backoffice.Web.Components.TopLeagues
             await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
         }
         
-        public async void OnClientChangedEvent(ChangeEventArgs e)
-        {
-            SelectedClientId = e.Value.ToString();
-            TopLeaguesFilterModel.ClientId = SelectedClientId;
+        //public async void OnClientChangedEvent(ChangeEventArgs e)
+        //{
+        //    SelectedClientId = e.Value.ToString();
+        //    TopLeaguesFilterModel.ClientId = SelectedClientId;
 
-            await OnFilterCallback.InvokeAsync(TopLeaguesFilterModel);
+        //    await OnFilterCallback.InvokeAsync(TopLeaguesFilterModel);
+        //}
+
+        public async Task OnClientClickEvent()
+        {
+            if (ShowSelectClient)
+            {
+                ShowSelectClient = false;
+            }
+            else
+            {
+                ShowSelectClient = true;
+            }
         }
         
         public async void OnSportsChangedEvent(ChangeEventArgs e)
@@ -138,7 +147,15 @@ namespace Backoffice.Web.Components.TopLeagues
 
             await OnFilterCallback.InvokeAsync(TopLeaguesFilterModel);
         }
-        
+
+        public async Task OnClientCheckboxClickEvent(List<string> clientIds)
+        {
+            SelectedClientCount = clientIds.Count;
+            TopLeaguesFilterModel.ClientIds = string.Join(",", clientIds);
+
+            await OnFilterCallback.InvokeAsync(TopLeaguesFilterModel);
+        }
+
         public void Dispose()
         {
             GC.SuppressFinalize(this);

@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models.Requests;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -34,7 +35,9 @@ namespace Backoffice.Web.Components.TopLeagues
         public PostTopLeaguesRequest PostTopLeaguesRequest { get; set; }
 
         public string TableClass { get; set; }
-        public int SelectedRowIndex { get; set; }
+        public int SelectedRow { get; set; }
+        public string AlertMessage { get; set; }
+        public AlertStatus AlertStatus { get; set; }
 
         #endregion
 
@@ -48,7 +51,8 @@ namespace Backoffice.Web.Components.TopLeagues
             SportName = !string.IsNullOrWhiteSpace(ModalParameters.TryGet<string>("SportName")) ? ModalParameters.TryGet<string>("SportName") : "Soccer";
 
             CurrentTopLeagues = ModalParameters.TryGet<List<TopLeaguesModel.TopLeague>>("CurrentTopLeagues");
-            SelectedRowIndex = -1;
+            AlertStatus = AlertStatus.Success;
+            //SelectedRow = -1;
 
             GetAllLeaguesRequest = new GetAllLeaguesRequest()
             {
@@ -89,18 +93,26 @@ namespace Backoffice.Web.Components.TopLeagues
             {
                 NewTopLeagues = new List<TopLeaguesModel.TopLeague>
                 {
-                    new TopLeaguesModel.TopLeague() { SortOrder = 1 }
+                    new TopLeaguesModel.TopLeague 
+                    { 
+                        SortOrder = 1 
+                    }
                 };
             }
 
             SportsTree = model.Sports;
-
-            await SortOrderRow();
         }
 
-        public async Task OnDropdownSelect(int index)
+        public async Task OnDropdownClick(int count)
         {
-            SelectedRowIndex = index;
+            if (SelectedRow != count)
+            {
+                SelectedRow = count;
+            }
+            else
+            {
+                SelectedRow = 0;
+            }
         }
 
         public async Task OnSelectedLeagueEvent(TopLeaguesModel.TopLeague model)
@@ -116,42 +128,57 @@ namespace Backoffice.Web.Components.TopLeagues
                     league.LeagueId = model.LeagueId;
                     league.LeagueName = model.LeagueName;
                     league.SortOrder = model.SortOrder;
+
                     break;
                 }
             }
 
             CurrentTopLeagues = NewTopLeagues.Any() ? NewTopLeagues.ToList() : new List<TopLeaguesModel.TopLeague>();
+            SelectedRow = 0;
         }
 
-        public async Task OnAddRow(int rowCtr)
+        public async Task OnAddClickEvent(int count)
         {
-            NewTopLeagues.Insert(rowCtr, new TopLeaguesModel.TopLeague() { SortOrder = (rowCtr + 1) });
-            await SortOrderRow();
+            NewTopLeagues.Insert(count, new TopLeaguesModel.TopLeague
+            {
+                SortOrder = count + 1
+            });
+
+            SortOrderRow();
         }
 
-        public async Task OnDeleteRow(TopLeaguesModel.TopLeague league)
+        public async Task OnDeleteClickEvent(TopLeaguesModel.TopLeague model)
         {
-            NewTopLeagues.Remove(league);
+            NewTopLeagues.Remove(model);
 
-            if (NewTopLeagues.Count == 0)
-                NewTopLeagues.Add(new TopLeaguesModel.TopLeague() { SortOrder = 1 });
-
-            await SortOrderRow();
+            if (!NewTopLeagues.Any())
+            {
+                NewTopLeagues.Add(new TopLeaguesModel.TopLeague 
+                { 
+                    SortOrder = 1 
+                });
+            }
+            else
+                SortOrderRow();
         }
 
         private async Task SortOrderRow()
         {
-            if (NewTopLeagues != null && NewTopLeagues.Any())
-            {
-                int rowCtr = 0;
-                foreach (var league in NewTopLeagues)
+            NewTopLeagues = NewTopLeagues
+                .Select((s, index) => new TopLeaguesModel.TopLeague
                 {
-                    rowCtr = rowCtr + 1;
-                    league.SortOrder = rowCtr;
-                }
-            }
-
-            await InvokeAsync(StateHasChanged);
+                    SportId = s.SportId,
+                    SportName = s.SportName,
+                    SegmentId = s.SegmentId,
+                    SegmentName = s.SegmentName,
+                    LeagueId = s.LeagueId,
+                    LeagueName = s.LeagueName,
+                    SortOrder = index + 1,
+                    Status = s.Status,
+                    LiveCount = s.LiveCount
+                })
+                .OrderBy(o => o.SortOrder)
+                .ToList();
         }
 
         public async Task OnCancelClickEvent()
@@ -195,13 +222,27 @@ namespace Backoffice.Web.Components.TopLeagues
                 }).ToList()
             };
 
-            await BackOfficeService.PostTopLeaguesAsync(PostTopLeaguesRequest);
+            var response = await BackOfficeService.PostTopLeaguesAsync(PostTopLeaguesRequest);
 
-            await Modal.OnSaveClickCallback.InvokeAsync();
+            if (response.StatusCode == StatusCode.Success)
+            {
+                await Modal.OnSaveClickCallback.InvokeAsync();
+                await Task.Delay(1000);
 
-            await Task.Delay(1000);
+                AlertMessage = "Top League Saved!";
+                AlertStatus = AlertStatus.Success;
 
-            ModalService.Cancel();
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(2000);
+
+                ModalService.Cancel();
+            }
+            else
+            {
+                AlertMessage = "Error when saving top leagues.";
+                AlertStatus = AlertStatus.Error;
+            }
+
         }
 
         public async ValueTask DisposeAsync()

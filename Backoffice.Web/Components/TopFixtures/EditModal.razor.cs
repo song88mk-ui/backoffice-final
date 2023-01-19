@@ -5,6 +5,8 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Text;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.TopFixtures
 {
@@ -18,6 +20,8 @@ namespace Backoffice.Web.Components.TopFixtures
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
+
+        public IJSStreamReference? DataReference { get; set; }
 
         public ClientTopFixtureModel.OrderedClientTopFixture TopFixture { get; set; }
         public ClientTopFixtureModel.OrderedClientTopFixture NewTopFixture { get; set; }
@@ -48,7 +52,6 @@ namespace Backoffice.Web.Components.TopFixtures
         {
             if (firstRender)
             {
-                // "tr > td.actions > a.drag-handle"
                 await JSRuntime.InvokeVoidAsync("initSort", $".{TableClass}", ".drag-handle");
             }
         }
@@ -182,26 +185,38 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async Task OnSaveClickEvent()
         {
-            var topFixtures = new List<ClientTopFixtureSetup>();
+            if (NewTopFixture.TopFixtures == null || !NewTopFixture.TopFixtures.Any())
+                return;
 
-            if (NewTopFixture.TopFixtures != null && NewTopFixture.TopFixtures.Any())
-            {
-                int rowCtr = 0;
-
-                foreach (var fixture in NewTopFixture.TopFixtures)
+            var topFixtures = (await GetSortOrders()).Where(c => !string.IsNullOrEmpty(c.RowId))
+                .Select(s => new ClientTopFixtureSetup
                 {
-                    if (string.IsNullOrEmpty(fixture.FixtureId))
-                        continue;
+                    FixtureId = long.Parse(s.RowId.Split("-")[1]),
+                    SortOrder = s.SortOrder
+                }).ToList();
 
-                    rowCtr = rowCtr + 1;
+            #region Old Code
 
-                    topFixtures.Add(new ClientTopFixtureSetup
-                    {
-                        FixtureId = Convert.ToInt64(fixture.FixtureId),
-                        SortOrder = rowCtr
-                    });
-                }
-            }
+            //if (NewTopFixture.TopFixtures != null && NewTopFixture.TopFixtures.Any())
+            //{
+            //    int rowCtr = 0;
+
+            //    foreach (var fixture in NewTopFixture.TopFixtures)
+            //    {
+            //        if (string.IsNullOrEmpty(fixture.FixtureId))
+            //            continue;
+
+            //        rowCtr = rowCtr + 1;
+
+            //        topFixtures.Add(new ClientTopFixtureSetup
+            //        {
+            //            FixtureId = Convert.ToInt64(fixture.FixtureId),
+            //            SortOrder = rowCtr
+            //        });
+            //    }
+            //}
+
+            #endregion
 
             if (!topFixtures.Any())
                 return;
@@ -226,9 +241,34 @@ namespace Backoffice.Web.Components.TopFixtures
 
         #region Utilities
 
-        private int GetIndex(string id)
+        private async Task<List<SortOrderModel>> GetSortOrders()
         {
-            return NewTopFixture.TopFixtures.FindIndex(c => c.FixtureId == id);
+            var rows = new List<SortOrderModel>();
+
+            DataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getSortOrder", $".{TableClass}");
+
+            using (var stream = await DataReference.OpenReadStreamAsync(maxAllowedSize: 10_000_000))
+            {
+                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    var hasLine = true;
+
+                    while (hasLine)
+                    {
+                        var content = await reader.ReadLineAsync();
+
+                        if (content == null)
+                        {
+                            hasLine = false;
+                            continue;
+                        }
+
+                        rows.Add(JsonSerializer.Deserialize<SortOrderModel>(content));
+                    }
+                }
+            }
+
+            return rows;
         }
 
         #endregion

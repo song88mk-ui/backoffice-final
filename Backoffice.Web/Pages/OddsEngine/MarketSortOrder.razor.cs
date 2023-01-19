@@ -29,7 +29,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public bool IsUpdate { get; set; }
 
         public static MarketSortOrderModel MarketSortOrderModel { get; set; }
-        public static List<MarketSortOrderModel.ClientMarketTemplate> FilteredMarketTemplates { get; set; }
+        public List<MarketSortOrderModel.ClientMarketTemplate> FilteredMarketTemplates { get; set; }
         public static List<SelectListItemModel<int>> MarketGroups { get; set; }
 
         #endregion
@@ -48,6 +48,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             InitSortingAndSelect2 = false;
             IsMarketGroupClicked = false;
+            IsUpdate = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -203,7 +204,22 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnModalDiscardChanges()
         {
-            await OnCancelClickEvent();
+            MarketSortOrderModel.MarketTemplates = new List<MarketSortOrderModel.ClientMarketTemplate>();
+            FilteredMarketTemplates = new List<MarketSortOrderModel.ClientMarketTemplate>();
+
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(500);
+
+            MarketSortOrderModel.MarketTemplates = MarketSortOrderModel.OriginalMarketTemplates;
+            FilteredMarketTemplates = MarketSortOrderModel.MarketTemplates;
+
+            if (SelectedMarketGroupName.ToLower() != "all markets")
+            {
+                FilteredMarketTemplates = FilteredMarketTemplates.Where(c => c.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(SelectedMarketGroupName.ToLower())).ToList();
+            }
+
+            InitSortingAndSelect2 = true;
+            IsUpdate = false;
         }
 
         public async ValueTask DisposeAsync()

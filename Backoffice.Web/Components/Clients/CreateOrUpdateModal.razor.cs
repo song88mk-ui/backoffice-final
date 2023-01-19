@@ -5,10 +5,7 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Net;
-using System.Reflection.Emit;
+using System.Text.Json;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
 
 namespace Backoffice.Web.Components.Clients
@@ -50,9 +47,9 @@ namespace Backoffice.Web.Components.Clients
             SelectedVirtualSportsWin = new List<int>();
 
             SportsbookTier = new TierRevenueShareModel();
-            SportsbookTier.AboveTierPercentage = 50;
+            SportsbookTier.AboveTierPercentage = 50m;
             JackpotTier = new TierRevenueShareModel();
-            JackpotTier.AboveTierPercentage = 50;
+            JackpotTier.AboveTierPercentage = 50m;
 
             Alerts = new List<AlertModel>();
             Client = ModalParameters.TryGet<ClientListResponse.Client>("Client");
@@ -63,6 +60,29 @@ namespace Backoffice.Web.Components.Clients
             Client.StatusName = IsEdit ? Client.StatusName : ClientStatus.Normal.ToString();
             Client.Region = IsEdit ? Client.Region : "HK";
             Client.IsTierRevenue = IsEdit ? Client.IsTierRevenue : false;
+            Client.MonthlyFee = Convert.ToDecimal(Client.MonthlyFee.ToString("0.00"));
+
+            if(IsEdit)
+            {
+                //Tax Config
+                var stakeSports = string.IsNullOrEmpty(Client.TaxConfig.ExcludeStakeSportTypes) ? new List<int>() : Client.TaxConfig.ExcludeStakeSportTypes.Split(",").Select(s => Convert.ToInt32(s)).ToList();
+                var winSports = string.IsNullOrEmpty(Client.TaxConfig.ExcludeWinningsSportTypes) ? new List<int>() : Client.TaxConfig.ExcludeWinningsSportTypes.Split(",").Select(s => Convert.ToInt32(s)).ToList();
+
+                SelectedRealSports = stakeSports.Any() ? stakeSports.Where(s => s < 1000).ToList() : new List<int>();
+                SelectedVirtualSports = stakeSports.Any() ? stakeSports.Where(s => s >= 1000).ToList() : new List<int>();
+
+                SelectedRealSportsWin = winSports.Any() ? winSports.Where(s => s < 1000).ToList() : new List<int>();
+                SelectedVirtualSportsWin = winSports.Any() ? winSports.Where(s => s >= 1000).ToList() : new List<int>();
+
+                //Revenue share sportbook
+                if(Client.IsTierRevenue)
+                {
+                    if (!string.IsNullOrEmpty(Client.TierSportsbookShare))
+                        SportsbookTier = JsonSerializer.Deserialize<TierRevenueShareModel>(Client.TierSportsbookShare) ?? new TierRevenueShareModel() { AboveTierPercentage = 50m };
+                    if (!string.IsNullOrEmpty(Client.TierJackpotShare))
+                        JackpotTier = JsonSerializer.Deserialize<TierRevenueShareModel>(Client.TierJackpotShare) ?? new TierRevenueShareModel() { AboveTierPercentage = 50m };
+                }
+            }
 
             Currencies = new List<string>()
             {
@@ -235,10 +255,86 @@ namespace Backoffice.Web.Components.Clients
                 if (Alerts.Any())
                     return;
 
+                var selectedStakeSports = new List<int>();
+                if(SelectedRealSports.Any())
+                    selectedStakeSports.AddRange(SelectedRealSports);
+
+                if (SelectedVirtualSports.Any())
+                    selectedStakeSports.AddRange(SelectedVirtualSports);
+
+                Client.TaxConfig.ExcludeStakeSportTypes = selectedStakeSports.Any() ? string.Join(",", selectedStakeSports) : string.Empty;
+
+                var selectedWinningSports = new List<int>();
+                if (SelectedRealSportsWin.Any())
+                    selectedWinningSports.AddRange(SelectedRealSportsWin);
+
+                if (SelectedVirtualSportsWin.Any())
+                    selectedWinningSports.AddRange(SelectedVirtualSportsWin);
+
+                Client.TaxConfig.ExcludeWinningsSportTypes = selectedWinningSports.Any() ? string.Join(",", selectedWinningSports) : string.Empty;
+
+                if(Client.TaxConfig.StakeTax > 0)
+                {
+                    Client.TaxConfig.StakeTax = Client.TaxConfig.StakeTax / 100m;
+                }
+                if (Client.TaxConfig.WinningsTax > 0)
+                {
+                    Client.TaxConfig.WinningsTax = Client.TaxConfig.WinningsTax / 100m;
+                }
+
+                if(Client.IsTierRevenue)
+                {
+                    if(SportsbookTier.Tiers.Any())
+                        foreach(var tier in SportsbookTier.Tiers)
+                        {
+                            tier.Percentage = tier.Percentage / 100m;
+                        }
+
+                    if (JackpotTier.Tiers.Any())
+                        foreach (var tier in JackpotTier.Tiers)
+                        {
+                            tier.Percentage = tier.Percentage / 100m;
+                        }
+
+                    Client.TierSportsbookShare = JsonSerializer.Serialize(SportsbookTier);
+                    Client.TierJackpotShare = JsonSerializer.Serialize(JackpotTier);
+                }
+                else
+                {
+                    if (Client.RevenueShare.SportsbookShare > 0)
+                        Client.RevenueShare.SportsbookShare = Client.RevenueShare.SportsbookShare / 100m;
+                    if (Client.RevenueShare.JackpotShare > 0)
+                        Client.RevenueShare.JackpotShare = Client.RevenueShare.JackpotShare / 100m;
+
+                }
+
                 var response = (await BackOfficeService.AddOrUpdateClient(Client));
 
                 if (response.Result)
                 {
+                    if(IsEdit)
+                    {
+                        Alerts.Add(new AlertModel
+                        {
+                            AlertStatus = "Success",
+                            AltertMessage = "Client successfully updated",
+                            Opacity = 1.0m
+                        });
+                    }
+                    else
+                    {
+                        Alerts.Add(new AlertModel
+                        {
+                            AlertStatus = "Success",
+                            AltertMessage = "Client successfully created",
+                            Opacity = 1.0m
+                        });
+                    }
+
+
+                    await InvokeAsync(StateHasChanged);
+                    await Task.Delay(3500);
+
                     ModalService.Cancel();
 
                     await Modal.OnSaveClickCallback.InvokeAsync();

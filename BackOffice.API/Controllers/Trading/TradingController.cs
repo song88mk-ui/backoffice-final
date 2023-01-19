@@ -880,6 +880,24 @@ namespace Backoffice.API.Controllers.Trading
         }
         #endregion
 
+        [HttpGet("marketlookup/{fixtureTypeId}/{sportId}")]
+        public async Task<IActionResult> GetMarketLookup(int fixtureTypeId, int sportId)
+        {
+            var region = "";
+            if (HttpContext.Request.Headers.ContainsKey("x-region"))
+                region = HttpContext.Request.Headers["x-region"].ToString();
+
+            var result = await _tradingRepository.GetMarketLookup(fixtureTypeId, sportId, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpPost("publish")]
         public async Task<IActionResult> Publish([FromBody] MessageRequest request)
         {

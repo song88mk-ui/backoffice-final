@@ -1,4 +1,4 @@
-﻿<ul class="dropdown-menu w-100" aria-labelledby="Row@(RowCount)" id="Row@(RowCount)">
+﻿<ul class="dropdown-menu w-100 show" aria-labelledby="Row@(RowCount)" id="Row@(RowCount)">
     @if (SportsTree != null && SportsTree.Any(x => x.SportId == SportId))
     {
         var segmentList = SportsTree.FirstOrDefault(x => x.SportId == SportId).Segments;
