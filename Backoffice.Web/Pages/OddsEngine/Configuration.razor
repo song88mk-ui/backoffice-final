@@ -23,7 +23,7 @@
         SelectedContents = null;
         if (!string.IsNullOrEmpty(ConfigFilterModel.ClientCode) && ConfigFilterModel.MarketTemplates.Any())
         {
-            SelectedContents = GetContents();
+            SelectedContents = GetContents();                        
 
             if (SelectedContents.Any())
             {
@@ -70,14 +70,34 @@
                                         <div class="d-flex justify-content-around market-toggle">
                                             <span>Market Active</span>
                                             <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" id="@($"{market.MarketLookup.MarketTemplateName}Toggle")" role="switch" aria-label="@($"{market.MarketLookup.MarketTemplateName} Toggle Switch")" />
+                                                <input class="form-check-input" type="checkbox"                                                 
+                                                id="@($"market-{market.MarketLookup.MarketTemplateId}Toggle")" role="switch" 
+                                                aria-label="@($"{market.MarketLookup.MarketTemplateName} Toggle Switch")" 
+                                                @bind="market.MarketLookup.IsActive"
+                                                />
                                             </div>
                                         </div>
                                     </div>
 
                                     <div id="@($"market-{market.MarketLookup.MarketTemplateId}")" class="accordion-collapse collapse show">
                                         <div class="accordion-body">
-                                            <PrematchConfig />
+                                            @{
+                                                var configStatus = market.MarketLookup.IsActive ? 1 : 0;
+                                                if ((ConfigFilterModel.FilterConfigStatus == -99 || configStatus == ConfigFilterModel.FilterConfigStatus))
+                                                {
+                                                    if ((ConfigFilterModel.Scope == 99 || ConfigFilterModel.Scope == 0))
+                                                    {
+                                                        //prematch
+                                                        <PreMatchConfig @key=@(market.MarketLookup.MarketTemplateId + "prematch") @bind-PrematchSettings="market.PrematchSettings"/>
+                                                    }
+
+                                                    if ((ConfigFilterModel.Scope == 99 || ConfigFilterModel.Scope == 1))
+                                                    {
+                                                        //live
+                                                        <LiveMatchConfig @key=@(market.MarketLookup.MarketTemplateId + "live") @bind-LiveSettings="market.NewLiveSettings"/>
+                                                    }
+                                                }                                                                                                
+                                            }                                            
                                         </div>
                                     </div>
                                 </div>
@@ -97,26 +117,4 @@
             <NoRecordFound />
         }
     }
-    @*<div class="accordion">
-    <div class="accordion-item">
-    <div class="accordion-header">
-    <button class="accordion-button ps-5" type="button" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#accordion1">
-    Free Text Market
-    </button>
-
-    <div class="d-flex justify-content-around market-toggle">
-    <span>Market Active</span>
-    <div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" id="market1Toggle" role="switch" aria-label="Market 1 Toggle Switch" />
-    </div>
-    </div>
-    </div>
-
-    <div id="accordion1" class="accordion-collapse collapse show">
-    <div class="accordion-body">
-    <PrematchConfig />
-    </div>
-    </div>
-    </div>
-    </div>*@
 </div>
