@@ -1,6 +1,10 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using System.Net.Http;
+using System.Net;
+using System.Text.Json;
 
 namespace Backoffice.Web.Services
 {
@@ -11,6 +15,7 @@ namespace Backoffice.Web.Services
         Task<bool> Logout();
         Task<BaseResponse<bool>> Register(UserRegisterRequest request);
         Task<BaseResponse<bool>> UpdateUser(UserRegisterRequest request);
+        Task<BaseResponse<ManageUserListResponse>> GetUserList(string search = "", bool isShowSuperAdmin = false);
         Task<BaseResponse<UserListResponse>> GetSubAccounts(SubAccountListRequest request);
         Task<BaseResponse<PermissionResponse>> GetPermissionList(bool isSubUser);
     }

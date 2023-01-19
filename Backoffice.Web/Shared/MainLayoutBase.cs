@@ -62,7 +62,7 @@ namespace Backoffice.Web.Shared
                     }
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 NavigationManager.NavigateTo("login", true);
             }

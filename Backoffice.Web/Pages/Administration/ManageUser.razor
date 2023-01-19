@@ -23,38 +23,47 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Username 1</td>
-                            <td>
-                                <span class="status-normal py-1 px-4 rounded-pill">Normal</span>
-                            </td>
-                            <td>Usergroup 1</td>
-                            <td>
-                                <a class="link-edit me-2" href="javascript:(0)">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <a class="link-logs me-2" href="javascript:(0)">
-                                    <i class="fa fa-list"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Username 2</td>
-                            <td>
-                                <span class="status-locked py-1 px-4 rounded-pill">Locked</span>
-                            </td>
-                            <td>Usergroup 1</td>
-                            <td>
-                                <a class="link-edit me-2" href="javascript:(0)">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <a class="link-logs me-2" href="javascript:(0)">
-                                    <i class="fa fa-list"></i>
-                                </a>
-                            </td>
-                        </tr>
+                        @if (IsPreLoader)
+                        {
+                            <tr>
+                                <td colspan="5">
+                                    <Preloader />
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @if (UserList == null)
+                            {
+                                <tr>
+                                    <td colspan="5">
+                                        <NoRecordFound />
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var user in UserList.Users)
+                                {
+                                    <tr>
+                                        <td>1</td>
+                                        <td>@user.UserName</td>
+                                        <td>
+                                            <span class="status-normal py-1 px-4 rounded-pill">@user.Status</span>
+                                        </td>
+                                        <td>@user.RoleName</td>
+                                        <td>
+                                            <a class="link-edit me-2" href="javascript:(0)">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a class="link-logs me-2" href="javascript:(0)">
+                                                <i class="fa fa-list"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
                     </tbody>
                 </table>
             </div>

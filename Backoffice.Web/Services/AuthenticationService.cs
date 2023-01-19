@@ -186,6 +186,44 @@ namespace Backoffice.Web.Services
                 };
             }
         }
+        public async Task<BaseResponse<ManageUserListResponse>> GetUserList(string search = "", bool isShowSuperAdmin = false)
+        {
+            try
+            {
+                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+
+                var query = !string.IsNullOrWhiteSpace(search) ? $"?isSubUserOnly={search}&" : "?";
+                query += $"isShowSuperAdmin={isShowSuperAdmin}";
+                var response = await _httpClient.GetAsync($"api/authentication/user/list{query}");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ManageUserListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<ManageUserListResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
+                        return JsonSerializer.Deserialize<BaseResponse<ManageUserListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<ManageUserListResponse>();
+                    else
+                    {
+                        return new BaseResponse<ManageUserListResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ManageUserListResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
 
 
         #region Methods - SubUsers

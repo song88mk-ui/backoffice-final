@@ -1,14 +1,12 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
-using Backoffice.Shared.Models.Response;
-using System.Net.Http;
-using System.Net;
-using System.Text.Json;
-using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Backoffice.Shared.Models.Requests;
-using Newtonsoft.Json.Linq;
+using Backoffice.Shared.Models.Response;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Backoffice.API.Repositories
 {
@@ -156,7 +154,42 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        public async Task<BaseResponse<ManageUserListResponse>> GetUserList(string token, string search = "", bool isShowSuperAdmin = false)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                var query = !string.IsNullOrWhiteSpace(search) ? $"?isSubUserOnly={search}&" : "?";
+                query += $"isShowSuperAdmin={isShowSuperAdmin}";
+                var response = await _httpClient.GetAsync($"api/user/list{query}");
 
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ManageUserListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<ManageUserListResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
+                        return JsonSerializer.Deserialize<BaseResponse<ManageUserListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<ManageUserListResponse>();
+                    else
+                    {
+                        return new BaseResponse<ManageUserListResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ManageUserListResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
         public async Task<BaseResponse<bool>> UpdateUser(UserRegisterRequest request, string token)
         {
             try

@@ -3,6 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -102,7 +103,29 @@ namespace Backoffice.API.Controllers.Authentication
                     return BadRequest(result);
             }
         }
+        [HttpGet("user/list")]
+        public async Task<IActionResult> GetUserList([FromQuery] string? search = null, [FromQuery] bool isShowSuperAdmin = false)
+        {
+            var result = new BaseResponse<ManageUserListResponse>()
+            {
+                StatusCode = Shared.Enums.StatusCode.Unauthorized,
+                Message = "Missing authorization"
+            };
+            if (HttpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
+                result = await _authenticationRepository.GetUserList(token, search ?? "", isShowSuperAdmin);
+            }
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         [HttpPost("user/modify")]
         public async Task<IActionResult> UpdateUser([FromBody] UserRegisterRequest request)
         {
@@ -198,7 +221,5 @@ namespace Backoffice.API.Controllers.Authentication
                     return BadRequest(result);
             }
         }
-
-
     }
 }

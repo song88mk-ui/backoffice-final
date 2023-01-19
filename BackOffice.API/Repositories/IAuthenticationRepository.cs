@@ -10,6 +10,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<TokenModel>> Login(LogInModel loginModel);
         Task<BaseResponse<TokenModel>> Authenticate(string token);
         Task<BaseResponse<bool>> Logout(string token);
+        Task<BaseResponse<ManageUserListResponse>> GetUserList(string token, string search = "", bool isShowSuperAdmin = false);
         Task<BaseResponse<bool>> Register(UserRegisterRequest request, string token);
         Task<BaseResponse<bool>> UpdateUser(UserRegisterRequest request, string token);
         Task<BaseResponse<UserResponse>> GetCurrentUser(string userId, string token);

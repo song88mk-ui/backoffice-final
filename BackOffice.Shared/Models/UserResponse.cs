@@ -21,4 +21,10 @@ namespace Backoffice.Shared.Models
         public List<ClaimModel> Claims { get; set; }
         public DateTime CreatedDate { get; set; }
     }
+    public class ManageUserResponse : UserResponse
+    {
+        public string RoleId { get; set; }
+        public string RoleName { get; set; }
+        public string RoleNormalizedName { get; set; }
+    }
 }
