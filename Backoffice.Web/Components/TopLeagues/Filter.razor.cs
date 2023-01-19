@@ -20,7 +20,6 @@ namespace Backoffice.Web.Components.TopLeagues
         public string SelectedSportId { get; set; }
         public List<SelectListItemModel<string>> Sports { get; set; }
         public TopLeaguesFilterModel TopLeaguesFilterModel { get; set; }
-        public bool ShowSelectClient { get; set; }
         public int SelectedClientCount { get; set; }
         public string SelectedClientName { get; set; }
 
@@ -38,8 +37,6 @@ namespace Backoffice.Web.Components.TopLeagues
             {
                 SearchText = string.Empty
             };
-
-            ShowSelectClient = false;
 
             var clients = (await BackOfficeService.GetClients()).Result;
 
@@ -112,18 +109,6 @@ namespace Backoffice.Web.Components.TopLeagues
 
             await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
         }
-
-        public async Task OnClientClickEvent()
-        {
-            if (ShowSelectClient)
-            {
-                ShowSelectClient = false;
-            }
-            else
-            {
-                ShowSelectClient = true;
-            }
-        }
         
         public async void OnSportsChangedEvent(ChangeEventArgs e)
         {
@@ -145,7 +130,7 @@ namespace Backoffice.Web.Components.TopLeagues
         {
             SelectedClientName = string.Empty;
             SelectedClientCount = items.Count;
-            TopLeaguesFilterModel.ClientIds = string.Join(",", items);
+            TopLeaguesFilterModel.ClientIds = string.Join(",", items.Select(s => s.Key));
 
             if (SelectedClientCount == 1)
             {

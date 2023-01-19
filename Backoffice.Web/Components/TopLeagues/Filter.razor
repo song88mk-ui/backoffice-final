@@ -5,8 +5,8 @@
         <div class="select-container d-flex">
             <div class="me-4 w-50">
                 <label class="form-label d-block">Client</label>
-                <div class="dropdown">
-                    <button class="form-select @(ShowSelectClient ? "client-focus" : "") client-select d-block" @onclick="OnClientClickEvent">
+                @*<div class="dropdown">
+                    <button type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false" class="btn form-select @(ShowSelectClient ? "client-focus" : "") dropdown-toggle client-select d-block" @onclick="OnClientClickEvent">
                         @if (Clients.Any())
                         {
                             <span>@(SelectedClientCount == 1 ? SelectedClientName : $"Clients ({SelectedClientCount})")</span>
@@ -18,7 +18,23 @@
                     </button>
                     @if (Clients.Any())
                     {
-                        <SelectWithCheckbox Items="Clients" IsShow="ShowSelectClient" OnCheckboxCallback="OnClientCheckboxClickEvent" />
+                        <SelectWithCheckbox Items="Clients" IsShow="ShowSelectClient" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="client-dropdown" />
+                    }
+                </div>*@
+                <div class="dropdown">
+                    <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        @if (Clients.Any())
+                        {
+                            <span>@(SelectedClientCount == 1 ? SelectedClientName : $"Clients ({SelectedClientCount})")</span>
+                        }
+                        else
+                        {
+                            <span>No Clients Available</span>
+                        }
+                    </button>
+                    @if (Clients.Any())
+                    {
+                        <SelectWithCheckbox Items="Clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="client-dropdown" />
                     }
                 </div>
             </div>

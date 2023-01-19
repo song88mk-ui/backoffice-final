@@ -7,9 +7,9 @@ namespace Backoffice.Web.Components.Common
     {
         #region Properties
 
-        [Parameter] public bool IsShow { get; set; }
         [Parameter] public List<SelectListItemWithCheckboxModel<string>> Items { get; set; }
         [Parameter] public EventCallback<Dictionary<string, string>> OnCheckboxCallback { get; set; }
+        [Parameter] public string AriaLabel { get; set; }
 
         #endregion
 
@@ -29,6 +29,10 @@ namespace Backoffice.Web.Components.Common
                 else
                 {
                     model.IsChecked = true;
+
+                    if (!Items.Where(c => c.Value != "all").Any(c => c.IsChecked == false))
+                        Items[0].IsChecked = true;
+
                 }
             }
             else
