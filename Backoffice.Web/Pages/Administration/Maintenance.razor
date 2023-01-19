@@ -11,7 +11,7 @@
                     <div>
                         <i class="ico ico-dashboard d-block text-center"></i>
                         <div class="form-switch mb-3 d-flex justify-content-center">
-                            <input class="form-check-input me-3" type="checkbox" value="" id="maitenance-mode">
+                            <input class="form-check-input me-3" type="checkbox" value="" id="maitenance-mode" @onchange="e => OnMaintenanceClickEvent(e.Value)">
                             <label class="form-check-label fw-bold" for="maitenance-mode">Song88 Maintenance Mode</label>
                         </div>
                         <p class="text-center">
