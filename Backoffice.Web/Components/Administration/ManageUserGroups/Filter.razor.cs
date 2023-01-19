@@ -8,7 +8,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
     public partial class Filter : IDisposable
     {
         #region Properties
-        [Parameter] public EventCallback<ClientListCallbackModel> OnInitCallback { get; set; }
+        [Parameter] public EventCallback<UserGroupCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<bool> OnCreateUserGroupCallback { get; set; }
         protected SearchFormModel SearchForm { get; set; }
 
@@ -35,22 +35,18 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 Value = (int)UserGroupSorting.SortByUserGroupNameDesc
             });
 
-            SelectSortByList.Add(new SelectListItemModel<int>
-            {
-                Name = "Sort by Create Date (Ascending)",
-                Value = (int)UserGroupSorting.SortByCreatedDateAsc
-            });
+            SortBy = (int)UserGroupSorting.SortByUserGroupNameAsc;
 
-            SelectSortByList.Add(new SelectListItemModel<int>
+            await OnInitCallback.InvokeAsync(new UserGroupCallbackModel
             {
-                Name = "Sort by Create Date (Descending)",
-                Value = (int)UserGroupSorting.SortByCreatedDateDesc
+                SearchText = SearchForm.SearchText,
+                SortBy = SortBy
             });
 
         }
         public async Task OnInputSearchEvent()
         {
-            await OnInitCallback.InvokeAsync(new ClientListCallbackModel
+            await OnInitCallback.InvokeAsync(new UserGroupCallbackModel
             {
                 SearchText = SearchForm.SearchText,
                 SortBy = SortBy
@@ -61,7 +57,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         {
             SortBy = Convert.ToInt32(e.Value);
 
-            await OnInitCallback.InvokeAsync(new ClientListCallbackModel
+            await OnInitCallback.InvokeAsync(new UserGroupCallbackModel
             {
                 SearchText = SearchForm.SearchText,
                 SortBy = SortBy
