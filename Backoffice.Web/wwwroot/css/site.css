@@ -73,6 +73,11 @@ a, .btn-link {
     content: "An error has occurred."
 }
 
+.main-content {
+    background-color: #FFFFFF;
+    border-radius: 3px;
+}
+
 .form-control, .form-select, .btn {
     font-size: 13px;
 }

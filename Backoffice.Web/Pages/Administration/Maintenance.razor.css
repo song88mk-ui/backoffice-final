@@ -1,0 +1,16 @@
+﻿.maintenance-container {
+    height: 85vh;
+}
+
+.ico-dashboard {
+    font-size: 10em;
+}
+
+.form-switch {
+    font-size: 20px;
+}
+
+.form-check-input:checked {
+    background-color: #E43F2C;
+    border-color: #E12E22;
+}
