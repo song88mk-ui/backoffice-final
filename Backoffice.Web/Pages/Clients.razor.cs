@@ -220,7 +220,7 @@ namespace Backoffice.Web.Pages
                         Website = s.Website,
                         Email = s.Email,
                         BetSettings = s.BetSettings,
-                        BetSlipSelectionCount = s.BetSlipSelectionCount,
+                        BetSlipMaxSelection = s.BetSlipMaxSelection,
                         ClientCode = s.ClientCode,
                         IsEmailNotification = s.IsEmailNotification,
                         IsTierRevenue = s.IsTierRevenue,
