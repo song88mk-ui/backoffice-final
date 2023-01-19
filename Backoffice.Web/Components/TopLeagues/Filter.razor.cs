@@ -71,6 +71,8 @@ namespace Backoffice.Web.Components.TopLeagues
                 var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
 
                 SelectedClientCount = selectedClients.Count;
+                SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+
                 TopLeaguesFilterModel.ClientIds = string.Join(",", selectedClients);
             }
 

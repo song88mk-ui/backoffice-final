@@ -18,8 +18,9 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public TopFixtureCallbackModel CallbackModel { get; set; }
         public SearchFormModel SearchForm { get; set; }
-        public List<SelectListItemModel<string>> Clients { get; set; }
-        public string SelectedClientId { get; set; }
+        public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
+        public int SelectedClientCount { get; set; }
+        public string SelectedClientName { get; set; }
 
         #endregion
 
@@ -27,8 +28,7 @@ namespace Backoffice.Web.Components.TopFixtures
 
         protected override async Task OnInitializedAsync()
         {
-            CallbackModel = new TopFixtureCallbackModel();
-            Clients = new List<SelectListItemModel<string>>();
+            Clients = new List<SelectListItemWithCheckboxModel<string>>();
 
             SearchForm = new SearchFormModel()
             {
@@ -42,69 +42,84 @@ namespace Backoffice.Web.Components.TopFixtures
                 if (UserModel.ClientCodes.Any())
                     clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
-                Clients = clients.Clients.Select(s => new SelectListItemModel<string>
+                Clients = clients.Clients.Select(s => new SelectListItemWithCheckboxModel<string>
                 {
+                    IsChecked = true,
                     Value = s.ClientId.ToString(),
                     Name = s.ClientName
                 }).ToList();
 
-                Clients.Insert(0, new SelectListItemModel<string>
+                Clients.Insert(0, new SelectListItemWithCheckboxModel<string>
                 {
+                    IsChecked = true,
                     Value = "all",
                     Name = "All Clients"
                 });
-            }
-            else
-            {
-                Clients.Add(new SelectListItemModel<string>
-                {
-                    Value = "",
-                    Name = "No Clients Available"
-                });
+
+                var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
+
+                SelectedClientCount = selectedClients.Count;
+                SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
             }
 
-            SelectedClientId = Clients.FirstOrDefault().Value;
-
-            CallbackModel.SearchText = string.Empty;
-
-            if (SelectedClientId == "all")
+            CallbackModel = new TopFixtureCallbackModel
             {
-                CallbackModel.Clients = Clients.Where(c => c.Value != "all")
+                SearchText = string.Empty,
+                Clients = Clients.Where(c => c.Value != "all" && c.IsChecked)
                     .Select(s => new TopFixtureCallbackModel.Client
                     {
                         ClientId = long.Parse(s.Value),
                         ClientName = s.Name
-                    }).ToList();
-            }
+                    }).ToList()
+            };
 
             await OnInitCallback.InvokeAsync(CallbackModel);
         }
 
-        public async void OnClientChangedEvent(ChangeEventArgs e)
+        //public async void OnClientChangedEvent(ChangeEventArgs e)
+        //{
+        //    if (string.IsNullOrEmpty(e.Value.ToString()))
+        //        return;
+
+        //    SelectedClientId = e.Value.ToString();
+
+        //    if (SelectedClientId == "all")
+        //    {
+        //        CallbackModel.Clients = Clients.Where(c => c.Value != "all")
+        //            .Select(s => new TopFixtureCallbackModel.Client
+        //            {
+        //                ClientId = long.Parse(s.Value),
+        //                ClientName = s.Name
+        //            }).ToList();
+        //    }
+        //    else
+        //    {
+        //        CallbackModel.Clients = Clients.Where(c => c.Value != SelectedClientId)
+        //            .Select(s => new TopFixtureCallbackModel.Client
+        //            {
+        //                ClientId = long.Parse(s.Value),
+        //                ClientName = s.Name
+        //            }).ToList();
+        //    }
+
+        //    await OnInitCallback.InvokeAsync(CallbackModel);
+        //}
+
+        public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
         {
-            if (string.IsNullOrEmpty(e.Value.ToString()))
-                return;
+            SelectedClientName = string.Empty;
+            SelectedClientCount = items.Count;
 
-            SelectedClientId = e.Value.ToString();
+            if (SelectedClientCount == 1)
+            {
+                SelectedClientName = items.FirstOrDefault().Value;
+            }
 
-            if (SelectedClientId == "all")
+            CallbackModel.Clients = items.Select(s => new TopFixtureCallbackModel.Client
             {
-                CallbackModel.Clients = Clients.Where(c => c.Value != "all")
-                    .Select(s => new TopFixtureCallbackModel.Client
-                    {
-                        ClientId = long.Parse(s.Value),
-                        ClientName = s.Name
-                    }).ToList();
-            }
-            else
-            {
-                CallbackModel.Clients = Clients.Where(c => c.Value != SelectedClientId)
-                    .Select(s => new TopFixtureCallbackModel.Client
-                    {
-                        ClientId = long.Parse(s.Value),
-                        ClientName = s.Name
-                    }).ToList();
-            }
+                ClientId = long.Parse(s.Key),
+                ClientName = s.Value
+            }).ToList();
 
             await OnInitCallback.InvokeAsync(CallbackModel);
         }
