@@ -1,5 +1,8 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.Administration.ManageUserGroups;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -9,10 +12,13 @@ namespace Backoffice.Web.Pages.Administration
     public partial class ManageUsergroups : IDisposable
     {
         #region Properties
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         public MetaData MetaData { get; set; }
+        public UserGroupListResponse UserGroupListModel { get; set; }
+        public UserGroupCallbackModel UserGroupCallbackModel { get; set; }
+        public PermissionResponse Permissions { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
 
@@ -22,67 +28,153 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
+            UserGroupListModel = new UserGroupListResponse();
+            UserGroupCallbackModel = new UserGroupCallbackModel();
+            Permissions = new PermissionResponse();
+
+            MetaData = new MetaData
+            {
+                CurrentPage = 1,
+                PageSize = 20,
+                TotalCount = 0,
+                TotalPages = 1,
+            };
+
             PageTitle = "Manage User Group";
             IconClass = string.Empty;
         }
 
-        public async Task OnInitEvent(ClientListCallbackModel request)
+        public async Task OnInitEvent(UserGroupCallbackModel request)
         {
-            //ClientListCallbackModel = request;
-            //ClientListModel = await GetClientList(ClientListCallbackModel.SearchText, ClientListCallbackModel.SortBy, 1);
+            UserGroupCallbackModel = request;
+            UserGroupListModel = await GetUserGroupList(UserGroupCallbackModel.SearchText, UserGroupCallbackModel.SortBy, 1);
         }
         public async Task SelectPage(int page)
         {
-            //MetaData.CurrentPage = page;
-            //ClientListModel = await GetClientList(ClientListCallbackModel.SearchText, ClientListCallbackModel.SortBy, MetaData.CurrentPage);
+            MetaData.CurrentPage = page;
+            UserGroupListModel = await GetUserGroupList(UserGroupCallbackModel.SearchText, UserGroupCallbackModel.SortBy, MetaData.CurrentPage);
         }
 
         public async Task OnCreateUserGroupClickEvent()
         {
-            //var sports = (await BackOfficeService.GetSportsAsync()).Result;
-            //var realSports = new SportsLookupModel();
-            //var virtualSports = new SportsLookupModel();
+            Permissions = await GetPermissionList();
+            
+            var parameters = new ModalParameters();
 
-            //if (sports != null && sports.SportLookup != null && sports.SportLookup.Any())
-            //{
-            //    realSports.SportLookup = sports.SportLookup.Where(s => s.SportId < 1000).ToList();
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("UserGroup", new UserGroupResponse());
+            parameters.Add("Permissions", Permissions);
+            parameters.Add("IsEdit", false);
 
-            //    var virtualSportIds = new int[] { 1001, 1002, 1003, 1005, 1021 };
+            var options = new ModalOptions();
+            ModalService.Open<CreateOrUpdateModal>("Create User Group", parameters, options);
+        }
 
-            //    virtualSports.SportLookup = sports.SportLookup.Where(s => virtualSportIds.Contains(s.SportId + 1000)).Select(s => new Models.SportLookup
-            //    {
-            //        SportId = s.SportId + 1000,
-            //        SportName = $"Virtual {s.SportName}"
-            //    }).ToList();
+        public async Task OnEditUserGroupClickEvent(UserGroupResponse userGroup)
+        {
+            Permissions = await GetPermissionList();
 
-            //    virtualSports.SportLookup.Add(new Models.SportLookup
-            //    {
-            //        SportId = 1055,
-            //        SportName = "Virtual Horse Racing"
-            //    });
+            var parameters = new ModalParameters();
 
-            //    virtualSports.SportLookup.Add(new Models.SportLookup
-            //    {
-            //        SportId = 1058,
-            //        SportName = "Virtual Dog Racing"
-            //    });
-            //}
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("UserGroup", userGroup);
+            parameters.Add("Permissions", Permissions);
+            parameters.Add("IsEdit", true);
 
-            //var parameters = new ModalParameters();
+            var options = new ModalOptions();
+            ModalService.Open<CreateOrUpdateModal>("Edit User Group", parameters, options);
+        }
+        public async Task OnDeleteUserGroupClickEvent(UserGroupResponse userGroup)
+        {
+            
+        }
 
-            //parameters.Add("ModalClass", "modal-center modal-show");
-            //parameters.Add("ModalDialogClass", "modal-lg");
-            //parameters.Add("Client", new ClientListResponse.Client());
-            //parameters.Add("RealSports", realSports);
-            //parameters.Add("VirtualSports", virtualSports);
-            //parameters.Add("IsEdit", false);
+        public async Task OnViewUsersClickEvent(UserGroupResponse userGroup)
+        {
+            var users = (await AuthenticationService.GetUserGroupUsers(new UserGroupRequest
+            {
+                UserGroupId = userGroup.UserGroupId,
+                UserGroupName = userGroup.UserGroupName
+            })).Result;
 
-            //var options = new ModalOptions();
-            //ModalService.Open<CreateOrUpdateModal>("Create Client", parameters, options);
+            var parameters = new ModalParameters();
+
+            parameters.Add("DialogStyle", "max-width: 30rem;");
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("Users", users.Select((u, index) => new UserResponse { UserId = (index + 1).ToString(), UserName = u.UserName } ).ToList());
+            parameters.Add("UserGroupName", userGroup.UserGroupName);
+
+            var options = new ModalOptions();
+            ModalService.Open<ViewUsersModal>("View Users", parameters, options);
+        }
+
+        public async Task OnSaveClickEvent(object item)
+        {
+            UserGroupListModel = await GetUserGroupList(UserGroupCallbackModel.SearchText, UserGroupCallbackModel.SortBy, MetaData.CurrentPage);
         }
 
         public void Dispose()
         {
+        }
+
+        #endregion
+
+        #region Utilities
+        private async Task<PermissionResponse> GetPermissionList()
+        {
+            var response = await AuthenticationService.GetPermissionList(true);
+
+            if (response.StatusCode == StatusCode.Success)
+            {
+                return new PermissionResponse
+                {
+                    Permissions = response.Result.Permissions ?? new List<PermissionModel>(),
+                };
+            }
+
+            return new PermissionResponse();
+        }
+
+        private async Task<UserGroupListResponse> GetUserGroupList(string search, int sortBy, int page)
+        {
+            var request = new UserGroupListRequest
+            {
+                SearchText = search,
+                Page = page,
+                PageSize = 25,
+                ShowSuperAdmin = false,
+            };
+
+            var response = await AuthenticationService.GetUserGroupList(request);
+
+            if (response.StatusCode == StatusCode.Success)
+            {
+                MetaData = response.Result.MetaData;
+
+                var userGroupList = response.Result.UserGroups.Select((s, index) => new UserGroupResponse
+                {
+                    Num = index + 1,
+                    UserGroupId = s.UserGroupId,
+                    UserGroupName = s.UserGroupName,
+                    Claims = s.Claims
+                }).ToList();
+
+                if (sortBy == (int)UserGroupSorting.SortByUserGroupNameAsc)
+                    userGroupList = userGroupList.OrderBy(x => x.UserGroupName).ToList();
+                if (sortBy == (int)UserGroupSorting.SortByUserGroupNameDesc)
+                    userGroupList = userGroupList.OrderByDescending(x => x.UserGroupName).ToList();
+
+                return new UserGroupListResponse
+                {
+                    MetaData = MetaData,
+                    UserGroups = userGroupList
+                };
+            }
+
+            return new UserGroupListResponse();
         }
 
         #endregion

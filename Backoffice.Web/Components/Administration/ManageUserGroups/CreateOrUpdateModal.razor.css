@@ -1,0 +1,62 @@
+﻿.modal-body .title {
+    border-image: linear-gradient(241deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 1;
+    border-left: 3px solid;
+}
+
+.form-label {
+    font-size: 0.8rem;
+}
+
+.form-text, .sub-title-info {
+    font-size: 0.7rem;
+}
+
+.input-group-text {
+    background-color: #fff;
+}
+
+.btn-check:checked + .btn-radio {
+    box-shadow: none;
+    color: white;
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+.btn-edit, .btn-cancel {
+    width: 112px;
+    height: 40px;
+    border-radius: 5px;
+    color: white;
+}
+
+.btn-cancel {
+    background-color: #9AA0AB;
+}
+
+.btn-edit {
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+.admin-checkbox {
+    display: none;
+}
+
+.form-check-input {
+    height: 1.2em;
+    width: 2.3em;
+}
+
+.form-check-input:checked {
+    background-color: #E43F2C;
+    border-color: #E12E22;
+}
+
+.header-information {
+    font-size: 13px;
+    width: 60%;
+}
+
+.access-header .form-check-input:disabled {
+    pointer-events: unset;
+    filter: unset;
+    opacity: unset;
+}

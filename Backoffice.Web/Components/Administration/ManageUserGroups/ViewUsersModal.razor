@@ -1,0 +1,42 @@
+﻿<div class="modal-body">
+    <div class="business-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="input-container d-flex">
+                    <div class="me-4">
+                        <label class="form-label d-block">User Group Name</label>
+                        <input type="text" class="form-control" id="businessNameField" placeholder="Enter User Group Name" @bind-value="UserGroupName" disabled />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <label class="form-label d-block">Users</label>
+            </div>
+            <div class="col-md-12">
+                <table class="table table-bordered">
+                    <thead class="table-head">
+                        <tr>
+                            <th class="w-50 border-0">No.</th>
+                            <th class="w-50 border-0">User Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Users != null)
+                        {
+                            foreach (var user in Users)
+                            {
+                                <tr>
+                                    <td>@user.UserId</td>
+                                    <td>@user.UserName</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Close</button>
+</div>

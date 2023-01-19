@@ -25,7 +25,14 @@
                     <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         @if (Clients.Any())
                         {
-                            <span>@(SelectedClientCount == 1 ? SelectedClientName : $"Clients ({SelectedClientCount})")</span>
+                            if (Clients.Count - 1 == SelectedClientCount)
+                            {
+                                <span>All Clients (@SelectedClientCount)</span>
+                            }
+                            else
+                            {
+                                <span>@(SelectedClientCount == 1 ? SelectedClientName : $"Clients ({SelectedClientCount})")</span>
+                            }
                         }
                         else
                         {

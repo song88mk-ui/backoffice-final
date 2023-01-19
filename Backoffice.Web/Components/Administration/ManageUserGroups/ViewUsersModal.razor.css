@@ -1,0 +1,43 @@
+﻿.modal-body .title {
+    border-image: linear-gradient(241deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 1;
+    border-left: 3px solid;
+}
+
+.modal-body {
+    overflow-y: scroll;
+    max-height: 50rem;
+}
+
+table tfoot td:first-child {
+    border-bottom-left-radius: 3px;
+}
+
+table tfoot td:last-child {
+    border-bottom-right-radius: 3px;
+}
+
+.btn-cancel {
+    width: 112px;
+    height: 40px;
+    border-radius: 5px;
+    color: white;
+}
+
+.btn-cancel {
+    background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
+}
+
+.col-bet-setting {
+    /*max-width: 100%;*/
+    vertical-align: middle;
+}
+
+.table-head, .col-header {
+    color: #FFF;
+    background-color: #404E67;
+}
+
+.table-head {
+    border-color: #404E67;
+    border-width: 1px;
+}

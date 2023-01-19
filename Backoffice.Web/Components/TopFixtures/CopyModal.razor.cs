@@ -10,23 +10,28 @@ namespace Backoffice.Web.Components.TopFixtures
 {
     public partial class CopyModal : IDisposable
     {
-        #region Properties     
+        #region Properties   
+        
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public List<ClientIdSelectedModel> ClientIdSelectedModel { get; set; }
-        public ClientTopFixtureResponse.OrderedClientTopFixture TopFixture { get; set; }
+        public ClientTopFixtureModel.OrderedClientTopFixture TopFixture { get; set; }
         public bool IsSelectAll { get; set; }
+
         #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             try
             {
-                TopFixture = ModalParameters.TryGet<ClientTopFixtureResponse.OrderedClientTopFixture>("TopFixture") ?? new ClientTopFixtureResponse.OrderedClientTopFixture();
+                TopFixture = ModalParameters.TryGet<ClientTopFixtureModel.OrderedClientTopFixture>("TopFixture") ?? new ClientTopFixtureModel.OrderedClientTopFixture();
 
                 var clients = (await BackOfficeService.GetClients()).Result;
                 if (clients != null)
@@ -109,6 +114,7 @@ namespace Backoffice.Web.Components.TopFixtures
         {
 
         }
+
         #endregion
     }
 }
