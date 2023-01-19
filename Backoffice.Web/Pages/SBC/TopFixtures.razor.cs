@@ -82,7 +82,7 @@ namespace Backoffice.Web.Pages.SBC
             MetaData.TotalCount = TopFixturesModel.TopFixturesFiltered.Count();
         }
 
-        public async Task OnEdit(ClientTopFixtureModel.OrderedClientTopFixture topFixture)
+        public async Task OnEditClickEvent(ClientTopFixtureModel.OrderedClientTopFixture topFixture)
         {
             var parameters = new ModalParameters();
 
@@ -95,7 +95,7 @@ namespace Backoffice.Web.Pages.SBC
             ModalService.Open<EditModal>($"Set Top Fixtures of {topFixture.ClientName}", parameters, options);
         }
 
-        public async Task OnCopy(ClientTopFixtureModel.OrderedClientTopFixture topFixture)
+        public async Task OnCopyClickEvent(ClientTopFixtureModel.OrderedClientTopFixture topFixture)
         {
             var parameters = new ModalParameters();
 
