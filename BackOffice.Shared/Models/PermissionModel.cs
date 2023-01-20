@@ -2,7 +2,10 @@
 {
     public class PermissionModel
     {
-        public string Category { get; set; }
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
+        public string SubCategoryName { get; set; }
+        public string GroupName { get; set; }
         public string Name { get; set; }
         public string ClaimType { get; set; }
         public bool HasReadOnly { get; set; }
