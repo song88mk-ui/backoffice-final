@@ -14,7 +14,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <label class="form-label">Business Name</label>
-                    <input type="text" class="form-control" placeholder="Enter Username" @bind-value="UserRegister.UserName" />
+                    <input type="text" class="form-control" placeholder="Enter Username" @bind-value="UserRegister.UserName" disabled="@IsEdit"/>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Email Address</label>
@@ -40,24 +40,17 @@
                     <select class="form-select" @onchange="OnUserGroupOnChangedEvent">
                         @foreach (var userGroup in UserGroupList)
                         {
-                            if (UserRegister.RoleId == userGroup.UserGroupId)
-                            {
-                                <option value="@userGroup.UserGroupName" selected>@userGroup.UserGroupName</option>
-                            }
-                            else
-                            {
-                                <option value="@userGroup.UserGroupName">@userGroup.UserGroupName</option>
-                            }
+                            <option value="@userGroup.UserGroupId" selected="@(UserRegister.RoleId == userGroup.UserGroupId)">@userGroup.UserGroupName</option>
                         }
                     </select>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Status</label>
                     <div class="btn-group border rounded px-2 d-flex" role="group">
-                        <input id="radio-normal" name="btn-radio" type="radio" class="btn-check" checked @onclick="() => OnStatusClickedEvent(false)" />
+                        <input id="radio-normal" name="btn-radio" type="radio" class="btn-check" checked="@(UserRegister.Status == "Normal" || UserRegister.Status == null)" @onclick="() => OnStatusClickedEvent(false)" />
                         <label class="btn btn-radio my-1 w-50 rounded" for="radio-normal">Normal</label>
 
-                        <input id="radio-locked" name="btn-radio" type="radio" class="btn-check" @onclick="() => OnStatusClickedEvent(true)" />
+                        <input id="radio-locked" name="btn-radio" type="radio" class="btn-check" checked="@(UserRegister.Status == "Locked")" @onclick="() => OnStatusClickedEvent(true)" />
                         <label class="btn btn-radio my-1 w-50 rounded" for="radio-locked">Locked</label>
                     </div>
                 </div>

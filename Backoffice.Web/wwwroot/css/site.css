@@ -266,3 +266,11 @@ iframe {
 input .disable {
     pointer-events: none;
 }
+
+.password-eye:hover {
+    cursor: pointer;
+}
+
+.password-eye {
+    z-index: 9999;
+}

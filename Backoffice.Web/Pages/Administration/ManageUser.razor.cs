@@ -5,6 +5,7 @@ using Backoffice.Web.Components.ManageUser;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -43,13 +44,44 @@ namespace Backoffice.Web.Pages.Administration
         {
             var parameters = new ModalParameters();
 
+            parameters.Add("IsEdit", false);
+            parameters.Add("UserModel", new UserRegisterModel());
             parameters.Add("DialogStyle", "max-width: 65rem;");
 
             var options = new ModalOptions();
 
             ModalService.Open<CreateOrUpdateModal>("Create User", parameters, options);
         }
+        public async Task OnEditClickedEvent(UserResponse user)
+        {
+            var parameters = new ModalParameters();
 
+            parameters.Add("IsEdit", true);
+            parameters.Add("UserModel", new UserRegisterModel()
+            {
+                Email = user.Email,
+                NickName = user.NickName,
+                Password = user.Password,
+                Status = user.Status,
+                UserName = user.UserName,
+                UserId = user.UserId,
+                RoleId = user.RoleId,
+                RoleName = user.RoleName,
+                CreatedDate =  user.CreatedDate,
+            });
+            parameters.Add("DialogStyle", "max-width: 65rem;");
+
+            var options = new ModalOptions();
+
+            ModalService.Open<CreateOrUpdateModal>("Edit User", parameters, options);
+        }
+        public async Task OnSaveClickedEvent()
+        {
+            IsPreLoader = true;
+            StateHasChanged();
+
+            await GetContent();
+        }
         public void Dispose()
         {
         }

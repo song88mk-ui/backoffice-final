@@ -49,15 +49,16 @@
                             {
                                 @foreach (var user in UserList)
                                 {
+                                    int RowCount = (UserList.IndexOf(user) + 1);
                                     <tr>
-                                        <td>1</td>
+                                        <td>@RowCount</td>
                                         <td>@user.UserName</td>
                                         <td>
                                             <span class="status-normal py-1 px-4 rounded-pill">@user.Status</span>
                                         </td>
                                         <td>@user.RoleName</td>
                                         <td>
-                                            <a class="link-edit me-2" href="javascript:(0)">
+                                            <a class="link-edit me-2" href="javascript:(0)" @onclick="() => OnEditClickedEvent(user)">
                                                 <i class="fa fa-edit"></i>
                                             </a>
                                             <a class="link-logs me-2" href="javascript:(0)">
@@ -75,5 +76,5 @@
     </div>
 </div>
 <div>
-    <CustomModal />
+    <CustomModal OnSaveClickCallback="OnSaveClickedEvent"/>
 </div>

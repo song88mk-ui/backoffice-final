@@ -107,14 +107,6 @@ body {
         border-color: #E5E5E5;
     }
 
-.password-eye:hover {
-    cursor: pointer;
-}
-
-.password-eye {
-    z-index: 9999;
-}
-
 .form-control {
     font-size: 14px;
 }

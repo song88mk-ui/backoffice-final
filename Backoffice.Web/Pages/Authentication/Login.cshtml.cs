@@ -71,12 +71,14 @@ namespace Backoffice.Web.Pages.Authentication
                     }
                     if (policies.Count == 1)
                     {
-                        switch (policies.FirstOrDefault().ToString())
+                        switch (policies.FirstOrDefault().ToString().ToUpper())
                         {
-                            case nameof(Application.Backoffice):
+                            case "SPORTSBOOKCLIENT":
                                 return LocalRedirect("/dashboard");
-                            case nameof(Application.AgentManagementSystem):
+                            case "Trading":
                                 return LocalRedirect("/odds-engine");
+                            default:
+                                return LocalRedirect("/choose-access");
                         }
                     }
 
