@@ -14,7 +14,7 @@
                             {
                                 <option value="" selected>Select Client</option>
 
-                                foreach (var client in ClientSportOrderFilter.Clients)
+                                @foreach (var client in ClientSportOrderFilter.Clients)
                                 {
                                     if (client.Value == CopyToClientCode)
                                         continue;

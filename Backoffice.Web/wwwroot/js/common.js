@@ -27,6 +27,36 @@ window.initSort = (className, handler) => {
     });
 }
 
+// initialize table sorting with only specified sortable items
+window.initSortItems = (className, items, handler) => {
+    var tableClass = className + ' > tbody';
+
+    $(tableClass).sortable({
+        handle: handler,
+        placeholder: "placeholder",
+        items: items,
+        start: function (event, ui) {
+
+            var item = $(ui.item);
+            var headers = $(className + '> thead > tr').children('th');
+
+            for (var i = 0; i < headers.length; i++) {
+                var rect = $(headers)[i].getBoundingClientRect();
+
+                $(item).children('td')[i].style.width = `${rect.width}px`;
+            }
+        },
+        stop: function (event, ui) {
+            var item = $(ui.item);
+            var columns = $(item).children('td');
+
+            for (var i = 0; i < columns.length; i++) {
+                columns[i].style.width = '';
+            }
+        }
+    });
+}
+
 // disable table sorting
 window.disableSort = (className) => {
     var tableClass = className + ' > tbody';
@@ -39,6 +69,13 @@ window.enableSort = (className) => {
     var tableClass = className + ' > tbody';
 
     $(tableClass).sortable('option', 'disabled', false);
+}
+
+// destroy the sortable funtionality completely
+window.destroySort = (className) => {
+    var tableClass = className + ' > tbody';
+
+    $(tableClass).sortable('destroy');
 }
 
 // initialize select2
@@ -91,7 +128,6 @@ window.getSortOrder = (className, event) => {
     var concat = data.join("\r\n");
     return new Blob([concat], { type: "application/txt" });
 }
-
 
 window.showToast = () => {
     $('.toast').toast('show');

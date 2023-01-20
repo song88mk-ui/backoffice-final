@@ -9,7 +9,7 @@ using Microsoft.JSInterop;
 using System.Text.Json;
 using static Backoffice.Shared.Models.Response.LeagueLookupResponse;
 
-namespace Backoffice.Web.Components.OddsEngine.SportSettings
+namespace Backoffice.Web.Components.SportSettings
 {
     public partial class CopyConfirmationModalBody : IDisposable
     {

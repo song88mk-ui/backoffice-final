@@ -274,3 +274,8 @@ input .disable {
 .password-eye {
     z-index: 9999;
 }
+
+select > option:hover {
+    box-shadow: 0 0 10px 100px red inset;
+    transition: all .2s ease-in-out;
+}

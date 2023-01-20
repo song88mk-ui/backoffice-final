@@ -3,7 +3,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace Backoffice.Web.Components.OddsEngine.SportSettings
+namespace Backoffice.Web.Components.SportSettings
 {
     public partial class SportSettingsCopyModal : IDisposable
     {

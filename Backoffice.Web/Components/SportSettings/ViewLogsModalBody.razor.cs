@@ -5,7 +5,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace Backoffice.Web.Components.OddsEngine.SportSettings
+namespace Backoffice.Web.Components.SportSettings
 {
     public partial class ViewLogsModalBody : IDisposable
     {

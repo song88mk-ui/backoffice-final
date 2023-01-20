@@ -7,6 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Components\SportSettings\CopyConfirmationModalBody.razor.cs" />
+    <Compile Remove="Components\SportSettings\SportSettingsCopyModal.razor.cs" />
+    <Compile Remove="Components\SportSettings\ViewLogsModalBody.razor.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Components\SportSettings\CopyConfirmationModalBody.razor" />
+    <Content Remove="Components\SportSettings\SportSettingsCopyModal.razor" />
+    <Content Remove="Components\SportSettings\ViewLogsModalBody.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Components\SportSettings\CopyConfirmationModalBody.razor.css" />
+    <None Remove="Components\SportSettings\ViewLogsModalBody.razor.css" />
     <None Remove="Pages\OddsEngine\MarketGroups.razor.cs~RF90a442.TMP" />
   </ItemGroup>
 

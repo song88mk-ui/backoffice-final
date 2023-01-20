@@ -1,0 +1,56 @@
+﻿<div class="content-filter mx-3 d-flex justify-content-between">
+    <div class="select-container d-flex">
+        <div class="me-2">
+            <select class="form-select d-block" @onchange="OnClientChangedEvent">
+                @foreach (var item in Clients)
+                {
+                    if (SelectedClientCode == item.Value)
+                    {
+                        <option value="@item.Value" selected>@item.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Value">@item.Name</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+    <div class="button-container d-flex flex-row-reverse align-items-end">
+        <div class="me-2">
+            <a href="javascript:void(0)" class="btn btn-logs px-3">
+                <i class="fa fa-list"></i>
+                Logs
+            </a>
+        </div>
+        <div class="me-2">
+            <a href="javascript:void(0)" class="btn btn-copy px-3">
+                <i class="fa fa-copy"></i>
+                Copy
+            </a>
+        </div>
+        @if (!IsUpdate)
+        {
+            <div class="me-2">
+                <a href="javascript:void(0)" class="btn btn-edit px-3" @onclick="OnUpdateClickEvent">
+                    <i class="fa fa-edit"></i>
+                    Update
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="me-2">
+                <a href="javascript:void(0)" class="btn btn-save px-3">
+                    <i class="fa fa-check"></i>
+                    Save
+                </a>
+            </div>
+            <div class="me-2">
+                <a href="javascript:void(0)" class="btn btn-cancel px-3" @onclick="OnCancelClickEvent">
+                    Cancel
+                </a>
+            </div>
+        }
+    </div>
+</div>
