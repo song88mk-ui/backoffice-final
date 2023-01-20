@@ -1,4 +1,6 @@
-﻿using Backoffice.Shared.Models.Response;
+﻿using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.ManageUser;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -14,7 +16,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IModalService ModalService { get; set; }
 
         public ManageUserFilterModel FilterModel { get; set; }
-        public ManageUserListResponse UserList {  get; set; }
+        public List<UserResponse> UserList {  get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
@@ -30,9 +32,13 @@ namespace Backoffice.Web.Pages.Administration
             IconClass = "ico ico-manage-user";
 
             FilterModel = new ManageUserFilterModel();
-            UserList = new ManageUserListResponse();
+            UserList = new List<UserResponse>();
         }
-
+        public async Task Init()
+        {
+            IsPreLoader = true;
+            await GetContent();
+        }
         public async Task OnCreateUserClickEvent()
         {
             var parameters = new ModalParameters();
@@ -53,9 +59,13 @@ namespace Backoffice.Web.Pages.Administration
         #region Utilities
         private async Task GetContent()
         {
-            var userResponse = await AuthenticationService.GetUserList(FilterModel.SearchText, FilterModel.UserSorting);
+            var userResponse = await AuthenticationService.GetUserList(new UserGroupRequest()
+            { 
+                SearchText = FilterModel.SearchText,
+                SortBy = FilterModel.UserSorting
+            });
             if (userResponse.Result != null)
-                UserList = userResponse.Result;
+                UserList = userResponse.Result.Users;
 
             IsPreLoader = false;
             StateHasChanged();

@@ -13,7 +13,7 @@
                 <Filter
                     @bind-FilterModel="FilterModel"
                     OnCreateUserCallback="OnCreateUserClickEvent"
-                        OnInitCallback="GetContent" />
+                        OnInitCallback="Init" />
             </div>
             <div class="col-md-12">
                 <table class="table table-hover table-borderless mt-4">
@@ -47,7 +47,7 @@
                             }
                             else
                             {
-                                @foreach (var user in UserList.Users)
+                                @foreach (var user in UserList)
                                 {
                                     <tr>
                                         <td>1</td>

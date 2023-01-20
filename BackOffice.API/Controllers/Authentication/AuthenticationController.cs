@@ -104,10 +104,10 @@ namespace Backoffice.API.Controllers.Authentication
                     return BadRequest(result);
             }
         }
-        [HttpGet("user/list")]
-        public async Task<IActionResult> GetUserList([FromQuery] string? search = null, [FromQuery] UserSorting sortby = UserSorting.SortByCreateDateDesc, [FromQuery] bool isShowSuperAdmin = false)
+        [HttpPost("user/list")]
+        public async Task<IActionResult> GetUserList([FromBody] UserGroupRequest request, [FromQuery] bool isShowSuperAdmin = false)
         {
-            var result = new BaseResponse<ManageUserListResponse>()
+            var result = new BaseResponse<UserListResponse>()
             {
                 StatusCode = Shared.Enums.StatusCode.Unauthorized,
                 Message = "Missing authorization"
@@ -116,7 +116,7 @@ namespace Backoffice.API.Controllers.Authentication
             {
                 var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-                result = await _authenticationRepository.GetUserList(token, sortby, search ?? "", isShowSuperAdmin);
+                result = await _authenticationRepository.GetUserList(request, token, isShowSuperAdmin);
             }
 
             switch (result.StatusCode)
@@ -250,7 +250,7 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpPost("usergroup/user/list")]
         public async Task<IActionResult> GetUserGroupUsers([FromBody] UserGroupRequest request)
         {
-            var result = new BaseResponse<List<UserResponse>>()
+            var result = new BaseResponse<UserListResponse>()
             {
                 StatusCode = Shared.Enums.StatusCode.Unauthorized,
                 Message = "Missing authorization"

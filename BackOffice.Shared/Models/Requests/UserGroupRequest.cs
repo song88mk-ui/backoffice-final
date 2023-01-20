@@ -1,4 +1,5 @@
 ﻿
+using Backoffice.Shared.Enums;
 using System.Collections.Generic;
 
 namespace Backoffice.Shared.Models.Requests
@@ -9,8 +10,12 @@ namespace Backoffice.Shared.Models.Requests
         {
             Claims = new List<ClaimModel>();
         }
-        public string UserGroupId { get; set; }
-        public string UserGroupName { get; set; }
-        public List<ClaimModel> Claims { get; set; }
+        public string SearchText { get; set; } = "";
+        public string Selection { get; set; } = "";
+        public string UserGroupId { get; set; } = "";
+        public string UserGroupName { get; set; } = "";
+        public UserSorting SortBy { get; set; } = UserSorting.SortByCreateDateDesc;
+        public List<ClaimModel> Claims { get; set; } = new List<ClaimModel>();
+        public MetaData MetaData { get; set; } = new MetaData();
     }
 }

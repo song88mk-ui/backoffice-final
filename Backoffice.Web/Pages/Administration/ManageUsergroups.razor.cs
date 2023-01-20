@@ -97,7 +97,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 UserGroupId = userGroup.UserGroupId,
                 UserGroupName = userGroup.UserGroupName
-            })).Result;
+            })).Result.Users;
 
             var parameters = new ModalParameters();
 

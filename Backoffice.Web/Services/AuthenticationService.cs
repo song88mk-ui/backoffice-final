@@ -186,28 +186,27 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<ManageUserListResponse>> GetUserList(string search = "", UserSorting sortby = UserSorting.SortByCreateDateDesc, bool isShowSuperAdmin = false)
+        public async Task<BaseResponse<UserListResponse>> GetUserList(UserGroupRequest request, bool isShowSuperAdmin = false)
         {
             try
             {
                 var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
-                var query = !string.IsNullOrWhiteSpace(search) ? $"?search={search}&" : "?";
-                query += $"sortby={(int)sortby}&isShowSuperAdmin={isShowSuperAdmin}";
-                var response = await _httpClient.GetAsync($"api/authentication/user/list{query}");
+                var query = $"?isShowSuperAdmin={isShowSuperAdmin}";
+                var response = await _httpClient.PostAsync($"api/authentication/user/list{query}", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<ManageUserListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<ManageUserListResponse>();
+                    return JsonSerializer.Deserialize<BaseResponse<UserListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<UserListResponse>();
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
-                        return JsonSerializer.Deserialize<BaseResponse<ManageUserListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                            ?? new BaseResponse<ManageUserListResponse>();
+                        return JsonSerializer.Deserialize<BaseResponse<UserListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<UserListResponse>();
                     else
                     {
-                        return new BaseResponse<ManageUserListResponse>
+                        return new BaseResponse<UserListResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -217,7 +216,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                return new BaseResponse<ManageUserListResponse>
+                return new BaseResponse<UserListResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
@@ -346,7 +345,7 @@ namespace Backoffice.Web.Services
             }
         }
         
-        public async Task<BaseResponse<List<UserResponse>>> GetUserGroupUsers(UserGroupRequest request)
+        public async Task<BaseResponse<UserListResponse>> GetUserGroupUsers(UserGroupRequest request)
         {
             try
             {
@@ -356,16 +355,16 @@ namespace Backoffice.Web.Services
                 var response = await _httpClient.PostAsync($"api/authentication/usergroup/user/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<UserResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<List<UserResponse>>();
+                    return JsonSerializer.Deserialize<BaseResponse<UserListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<UserListResponse>();
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<UserResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                            ?? new BaseResponse<List<UserResponse>>();
+                        return JsonSerializer.Deserialize<BaseResponse<UserListResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<UserListResponse>();
                     else
                     {
-                        return new BaseResponse<List<UserResponse>>
+                        return new BaseResponse<UserListResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -376,7 +375,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<UserResponse>>
+                return new BaseResponse<UserListResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
