@@ -1,6 +1,6 @@
 ﻿namespace Backoffice.Web.Pages.Administration
 {
-    public partial class CancelBets
+    public partial class CancelBets : IDisposable
     {
         #region Properties
 
