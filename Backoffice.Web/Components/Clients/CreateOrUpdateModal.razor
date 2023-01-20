@@ -1,4 +1,6 @@
-﻿<div class="modal-body">
+﻿@using Backoffice.Shared.Enums;
+
+<div class="modal-body">
     <div class="business-container">
         <div class="row">
             <div class="col-md-12">
@@ -268,6 +270,35 @@
                     </div>
                     <div class="col-md-6">
                         <div class="d-flex flex-column">
+                            @if (IsEdit)
+                            {
+                                <div class="p-2">
+                                    Status
+                                </div>
+                                <div class="btn-group border rounded p-2" role="group" aria-label="Status Toggle Button Group">
+
+                                    @if (Client.StatusId == (int)ClientStatus.Normal)
+                                    {
+                                        <input type="radio" class="btn-check" name="statusRadio" id="normalRadio" autocomplete="off" checked @onchange="(e) => OnStatusNormalClicked(e)" />
+                                    }
+                                    else
+                                    {
+                                        <input type="radio" class="btn-check" name="statusRadio" id="normalRadio" autocomplete="off" @onchange="(e) => OnStatusNormalClicked(e)" />
+                                    }
+                                    <label class="btn btn-radio" for="normalRadio">Normal</label>
+
+                                    @if (Client.StatusId != (int)ClientStatus.Normal)
+                                    {
+                                        <input type="radio" class="btn-check" name="statusRadio" id="lockedRadio" autocomplete="off" checked @onchange="(e) => OnStatusLockedClicked(e)" />
+                                    }
+                                    else
+                                    {
+                                        <input type="radio" class="btn-check" name="statusRadio" id="lockedRadio" autocomplete="off" @onchange="(e) => OnStatusLockedClicked(e)" />
+                                    }
+                                    <label class="btn btn-radio" for="lockedRadio">Locked</label>
+
+                                </div>
+                            }
                             <div class="p-2">
                                 Region
                             </div>
@@ -298,7 +329,7 @@
                                 {
                                     if (Client.Region == "HK")
                                     {
-                                        <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" checked disabled/>
+                                        <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" checked disabled />
                                     }
                                     else
                                     {
