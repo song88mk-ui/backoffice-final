@@ -4,7 +4,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
+namespace Backoffice.Web.Components.MarketSortOrder
 {
     public partial class Filter : IDisposable
     {
@@ -149,6 +149,10 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
+
+            parameters.Add("FromClientCode", SelectedClientCode);
+            parameters.Add("FromSportId", SelectedSportId);
+            parameters.Add("FromFixtureStatusId", SelectedFixtureStatusId);
 
             var options = new ModalOptions();
 
