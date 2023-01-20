@@ -13,8 +13,8 @@
 
         protected override async Task OnInitializedAsync()
         {
-            PageTitle = "Cancel Bets";
-            IconClass = "ico ico-cancel-bets";
+            PageTitle = "Cancel Bet History";
+            IconClass = "ico ico-cancel-bet-history";
         }
 
         public void Dispose()
