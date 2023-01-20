@@ -194,9 +194,6 @@ namespace Backoffice.Web.Components.TopFixtures
                     SortOrder = s.SortOrder
                 }).ToList();
 
-            if (!topFixtures.Any())
-                return;
-
             await BackOfficeService.PostClientTopFixtures(new PostClientTopFixtureRequest()
             {
                 ClientId = TopFixture.ClientIdRef,
