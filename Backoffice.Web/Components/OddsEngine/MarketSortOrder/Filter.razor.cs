@@ -148,7 +148,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-md");            
+            parameters.Add("ModalDialogClass", "modal-md");
 
             var options = new ModalOptions();
 
@@ -167,6 +167,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
+
+            var client = Clients.FirstOrDefault(c => c.Value == SelectedClientCode);
+            var clientName = client != null ? client.Name : string.Empty;
+
+            parameters.Add("ClientName", clientName);
 
             var options = new ModalOptions();            
             ModalService.Open<CancelModal>($"Discard Changes?", parameters, options);            
