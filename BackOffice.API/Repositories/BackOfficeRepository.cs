@@ -934,7 +934,7 @@ namespace Backoffice.API.Repositories
                         {
                             ClientName = request.Name,
                             ClientCode = request.ClientCode,
-                            IsActive = true,
+                            IsActive = request.StatusId == (int)ClientStatus.Normal ? true : false,
                             ClientIdRef = (int)clientId,
                             //LimitId = string.Empty,
                             //EndPoint = string.Empty,
