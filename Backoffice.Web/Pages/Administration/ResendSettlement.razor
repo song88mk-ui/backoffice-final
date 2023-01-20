@@ -1,5 +1,92 @@
-﻿<h3>ResendSettlement</h3>
+﻿@page "/admin/resend-settlement"
 
-@code {
-
-}
+<div class="row">
+    <div class="main-content col-md-12 mb-4 pb-3">
+        <div class="row">
+            <div class="col-md-12">
+                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+            </div>
+            <div class="col-md-12">
+                <div class="content mx-3 mb-5">
+                    <table class="table table-bordered mt-1">
+                        <thead class="table-head">
+                            <tr>
+                                <th class="th-number py-3">#</th>
+                                <th class="th-reference-id py-3">Reference ID</th>
+                                <th class="th-event-details py-3">Event Details</th>
+                                <th class="th-bet-date py-3">Bet Date</th>
+                                <th class="th-status py-3">Status</th>
+                                <th class="th-reason py-3">Reason</th>
+                                <th class="th-action py-3">
+                                    <a href="javascript:void(0);" class="link-add-row">
+                                        <i class="fa fa-plus-circle"></i>
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>
+                                    <input type="text" class="form-control" value="4FA62488-A950-402D- 6994-08DAF20143E0" />
+                                </td>
+                                <td>
+                                    <div class="information-container">
+                                        <span class="segment-league d-block">ITF Estonia 01A, Women Singles Papadakis,</span>
+                                        <span class="fixture d-block">Lena vs. Cengiz, Berfu</span>
+                                        <span class="start-date d-block">01/12/2023 9:00:00 AM </span>
+                                        <span class="selection-details d-block">Papadakis, Lena x 50 @("@") 5.83(DEC)</span>
+                                        <span class="score d-block">(Bet Result: 0 - 0, Final Score: 0 - 0)</span>
+                                        <span class="status">Lost</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="bet-date d-block">01/12/2023</span>
+                                    <span class="bet-time d-block">8:28:57 AM</span>
+                                </td>
+                                <td>
+                                    Half-Won
+                                </td>
+                                <td>
+                                    <div class="form-floating">
+                                        <textarea class="form-control input-reason">Settled as Half Won</textarea>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:void(0);" class="link-delete">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>
+                                    <input type="text" class="form-control" />
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <div class="form-floating">
+                                        <textarea class="form-control input-reason"></textarea>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:void(0);" class="link-delete">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="d-flex flex-row-reverse mx-3 pt-4 border-top">
+                    <button type="button" class="btn btn-settlement px-4 py-2">Resend Settlement</button>
+                    <button type="button" class="btn btn-reset me-3 px-4 py-2">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

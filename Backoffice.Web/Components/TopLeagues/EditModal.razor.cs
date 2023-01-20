@@ -139,12 +139,15 @@ namespace Backoffice.Web.Components.TopLeagues
 
         public async Task OnAddClickEvent(int count)
         {
-            NewTopLeagues.Insert(count, new TopLeaguesModel.TopLeague
+            if (NewTopLeagues.Count < 50)
             {
-                SortOrder = count + 1
-            });
+                NewTopLeagues.Insert(count, new TopLeaguesModel.TopLeague
+                {
+                    SortOrder = count + 1
+                });
 
-            SortOrderRow();
+                SortOrderRow();
+            }
         }
 
         public async Task OnDeleteClickEvent(TopLeaguesModel.TopLeague model)

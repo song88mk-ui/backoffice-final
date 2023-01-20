@@ -523,6 +523,17 @@ namespace Backoffice.Web.Components.Clients
         {
             Client.Region = "SA";
         }
+        public async Task OnStatusNormalClicked(ChangeEventArgs e)
+        {
+            Client.StatusId = (int)ClientStatus.Normal;
+            Client.StatusName = ClientStatus.Normal.ToString();
+        }
+
+        public async Task OnStatusLockedClicked(ChangeEventArgs e)
+        {
+            Client.StatusId = (int)ClientStatus.Locked;
+            Client.StatusName = ClientStatus.Locked.ToString();
+        }
 
         public async Task ToggleCompanyRevenueSwitch()
         {

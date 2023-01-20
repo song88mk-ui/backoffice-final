@@ -14,9 +14,16 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] private CustomModal Modal { get; set; }
 
+        public string ClientName { get; set; }
+
         #endregion
 
         #region Methods
+
+        protected override async Task OnInitializedAsync()
+        {
+            ClientName = ModalParameters.TryGet<string>("ClientName");
+        }
 
         public async Task OnCancelClickEvent()
         {
