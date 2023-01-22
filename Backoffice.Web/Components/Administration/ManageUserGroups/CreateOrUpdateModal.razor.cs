@@ -26,7 +26,6 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
             UserGroup = ModalParameters.TryGet<UserGroupResponse>("UserGroup");
             Permissions = ModalParameters.TryGet<PermissionResponse>("Permissions");
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
-
         }
 
         public async Task OnCancelClickEvent()

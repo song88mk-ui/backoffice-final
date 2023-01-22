@@ -14,7 +14,8 @@
             </div>
         </div>
     </div>
-    <div class="permission-container">
+    <Permission IsReadOnly="false" Permissions="@Permissions.Permissions" />
+    @*<div class="permission-container">
         <div class="row">
             <div class="col-md-12 mb-1">
                 <h6 class="title fw-bold ps-2 py-1">Permissions</h6>
@@ -107,7 +108,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>*@
 </div>
 <div class="modal-footer mx-4">
     @if (Alerts != null && Alerts.Any())

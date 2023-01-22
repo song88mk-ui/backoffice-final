@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Backoffice.Shared.Enums
 {
-    public enum Permission
+    public enum PermissionCategory
     {
         Admin,
         Sportsbook,
