@@ -187,3 +187,26 @@ function password_show_hide() {
         hide_eye.style.display = "none";
     }
 }
+
+window.ValidateParlayBonusMinOdds = (refEl) => {
+    var element = $(refEl);    
+    var isDisabled = false;
+
+    if (element.val() < 1.20) {
+        isDisabled = true;
+    }
+
+    if (element.val().indexOf('.') >= 1) {
+        //input has .
+        //split the element first to check if there are chars after .
+        if (element.val().split('.').length > 1) {
+            //now check the length after .
+            if (element.val().split('.')[1] > 2) {
+                var splitVal = element.val().split('.');
+                element.val(splitVal[0] + '.' + splitVal[1].substr(0, 2));
+            }
+        }
+    }
+
+    DotNet.invokeMethodAsync('Backoffice.Web', 'DisableSaveButton', isDisabled);
+}
