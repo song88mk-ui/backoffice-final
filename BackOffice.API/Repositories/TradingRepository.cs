@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Backoffice.API.Repositories
 {
@@ -486,7 +487,7 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).PostAsync($"client/config/audit", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonConvert.DeserializeObject<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>>(await response.Content.ReadAsStringAsync());
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)

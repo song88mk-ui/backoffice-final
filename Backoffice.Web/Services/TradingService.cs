@@ -1212,7 +1212,7 @@ namespace Backoffice.Web.Services
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>>
                         (
-                            await response.Content.ReadAsStringAsync(),
+                            await response.Content.ReadAsStringAsync(), 
                             new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
                         ) ?? new BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>();
                 else

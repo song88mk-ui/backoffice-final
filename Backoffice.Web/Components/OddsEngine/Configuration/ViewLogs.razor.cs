@@ -51,7 +51,15 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             };            
         }
 
-        public async Task<IEnumerable<ConfigLogsDetailsModel>> GetContents()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (!firstRender)
+            {
+                                
+            }
+        }
+
+        public async Task GetContents()
         {
             var request = new ConfigLogsRequest()
             {
@@ -91,7 +99,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             CursorId = result?.LastOrDefault()?.Id ?? 0;
             PreviousPage = MetaData.CurrentPage;
 
-            return result;
+            ConfigLogsFilterModel.ConfigLogsDetails = result.ToList();
+
+            await InvokeAsync(StateHasChanged);
         }
 
         public async Task OnCloseModalClickEvent()
@@ -99,9 +109,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ModalService.Cancel();
         }
 
-        protected void SelectedPage(int page)
+        private async Task SelectedPage(int page)
         {
             MetaData.CurrentPage = page;
+
+            await GetContents();
         }
 
         public void Dispose()

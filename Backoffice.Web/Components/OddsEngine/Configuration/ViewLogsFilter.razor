@@ -1,7 +1,7 @@
 ﻿@using BlazorDateRangePicker
 <div class="row">
     <div class="col-4">
-        <button class="btn btn-filter" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+        <button class="btn btn-filter" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse" disabled="@IsFilterButtonDisabled" @onclick="Initialize">
             <i class="fa fa-filter"></i>&nbsp;Filters
         </button>
     </div>

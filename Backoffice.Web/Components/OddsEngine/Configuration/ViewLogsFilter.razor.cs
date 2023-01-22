@@ -15,27 +15,22 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         [Parameter] public ConfigLogsFilterModel ConfigLogsFilterModel { get; set; }
         [Parameter] public EventCallback<ConfigLogsFilterModel> ConfigLogsFilterModelChanged { get; set; }
+        [Parameter] public EventCallback GetContentCallback { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        private bool IsFilterButtonDisabled { get; set; }
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            
-        }
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                ConfigLogsFilterModel = await Initialize();
-                await InvokeAsync(StateHasChanged);
-            }
+            IsFilterButtonDisabled = true;
+            await Initialize();
         }
 
-        public async Task<ConfigLogsFilterModel> Initialize()
+        public async Task Initialize()
         {
             var marketTemplateids = new List<string>();
 
-            return new ConfigLogsFilterModel()
+            ConfigLogsFilterModel = new ConfigLogsFilterModel()
             {
                 FixtureTypeLookUp = GetFixtureTypes(),
                 Clients = await GetClients(),
@@ -51,23 +46,29 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 ToDate = DateTime.Now,
                 Filter = string.Empty,
             };
+
+            IsFilterButtonDisabled = false;
+            await InvokeAsync(StateHasChanged);
         }
 
         public async Task OnSubmitClickEvent()
         {
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
+            await GetContentCallback.InvokeAsync();
         }
 
         public async Task OnFixtureTypeChangedEvent(ChangeEventArgs e)
         {
             ConfigLogsFilterModel.FixtureTypeId = int.Parse(e.Value.ToString());
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
+            await GetContentCallback.InvokeAsync();
         }
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
             ConfigLogsFilterModel.ClientId = Guid.Parse(e.Value.ToString());
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
+            await GetContentCallback.InvokeAsync();
         }
 
         public async Task OnSportsChangedEvent(ChangeEventArgs e)
@@ -78,6 +79,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigLogsFilterModel.MarketTemplateGroups = await GetMarketGroups(ConfigLogsFilterModel.FixtureTypeId, ConfigLogsFilterModel.SportId);
             ConfigLogsFilterModel.Markets = await GetMarkets(ConfigLogsFilterModel.FixtureTypeId, ConfigLogsFilterModel.SportId, ConfigLogsFilterModel.MarketTemplateIds);
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
+            await GetContentCallback.InvokeAsync();
         }
 
         public async Task OnSegmentChangedEvent(ChangeEventArgs e)
@@ -87,6 +89,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigLogsFilterModel.MarketTemplateGroups = await GetMarketGroups(ConfigLogsFilterModel.FixtureTypeId, ConfigLogsFilterModel.SportId);
             ConfigLogsFilterModel.Markets = await GetMarkets(ConfigLogsFilterModel.FixtureTypeId, ConfigLogsFilterModel.SportId, ConfigLogsFilterModel.MarketTemplateIds);
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
+            await GetContentCallback.InvokeAsync();
         }
 
         public async Task OnLeagueChangedEvent(ChangeEventArgs e)
@@ -95,6 +98,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigLogsFilterModel.MarketTemplateGroups = await GetMarketGroups(ConfigLogsFilterModel.FixtureTypeId, ConfigLogsFilterModel.SportId);
             ConfigLogsFilterModel.Markets = await GetMarkets(ConfigLogsFilterModel.FixtureTypeId, ConfigLogsFilterModel.SportId, ConfigLogsFilterModel.MarketTemplateIds);
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
+            await GetContentCallback.InvokeAsync();
         }
 
         public async Task OnMarketGroupChangedEvent(ChangeEventArgs e)
@@ -103,20 +107,21 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigLogsFilterModel.MarketTemplateIds = await GetMarketTemplateIds(ConfigLogsFilterModel.FixtureTypeId, ConfigLogsFilterModel.SportId, ConfigLogsFilterModel.MarketTemplateGroupId);
             ConfigLogsFilterModel.Markets = await GetMarkets(ConfigLogsFilterModel.FixtureTypeId, ConfigLogsFilterModel.SportId, ConfigLogsFilterModel.MarketTemplateIds);
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
+            await GetContentCallback.InvokeAsync();
         }
 
         public async Task OnMarketChangedEvent(ChangeEventArgs e)
         {
-            ConfigLogsFilterModel.MarketTemplateGroupId = int.Parse(e.Value.ToString());
-            ConfigLogsFilterModel.MarketTemplateIds = await GetMarketTemplateIds(ConfigLogsFilterModel.FixtureTypeId, ConfigLogsFilterModel.SportId, ConfigLogsFilterModel.MarketTemplateGroupId);
-            ConfigLogsFilterModel.Markets = await GetMarkets(ConfigLogsFilterModel.FixtureTypeId, ConfigLogsFilterModel.SportId, ConfigLogsFilterModel.MarketTemplateIds);
+            ConfigLogsFilterModel.MarketId = e.Value.ToString();
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
+            await GetContentCallback.InvokeAsync();
         }
 
         public async Task OnScopeChangedEvent(ChangeEventArgs e)
         {
             ConfigLogsFilterModel.Scope = e.Value.ToString();
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
+            await GetContentCallback.InvokeAsync();
         }
 
         public async Task OnDateRangeChangedEvent(DateRange range)
@@ -125,10 +130,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigLogsFilterModel.ToDate = DateTime.Parse(range.End.ToString()).Date.Add(new TimeSpan(23, 59, 59));
 
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
+            await GetContentCallback.InvokeAsync();
         }
         public void Dispose()
         {
-            
+
         }
         #endregion
 

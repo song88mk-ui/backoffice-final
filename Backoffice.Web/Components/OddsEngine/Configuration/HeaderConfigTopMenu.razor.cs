@@ -26,6 +26,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("DialogStyle","max-width:80rem");
 
             var options = new ModalOptions();
             ModalService.Open<ViewLogs>($"View Logs", parameters, options);

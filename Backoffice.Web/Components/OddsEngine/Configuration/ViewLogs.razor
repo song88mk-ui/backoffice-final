@@ -1,11 +1,8 @@
 ﻿<div class="modal-body">
-    <ViewLogsFilter @bind-ConfigLogsFilterModel="ConfigLogsFilterModel" />
+    <ViewLogsFilter @bind-ConfigLogsFilterModel="ConfigLogsFilterModel" GetContentCallback="GetContents"/>
 
     @if(ConfigLogsFilterModel.ConfigLogsDetails != null )
-    {
-
-        ConfigLogsFilterModel.ConfigLogsDetails = Task.Run(() => GetContents()).Result.ToList();
-
+    {        
         @if (ConfigLogsFilterModel.ConfigLogsDetails.Any())
         {
             <table class="table table-bordered mt-3">
@@ -41,8 +38,16 @@
                 <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectedPage" PaginationColspan="7" />
             </table>
         }
+        else
+        {
+            <NoRecordFound/>
+        }
+    }
+    else
+    {
+        <NoRecordFound/>
     }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-close" @onclick="OnCloseModalClickEvent">Close</button>
+    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent">Close</button>
 </div>
