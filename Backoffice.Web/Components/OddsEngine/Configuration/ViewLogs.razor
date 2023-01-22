@@ -1,0 +1,48 @@
+﻿<div class="modal-body">
+    <ViewLogsFilter @bind-ConfigLogsFilterModel="ConfigLogsFilterModel" />
+
+    @if(ConfigLogsFilterModel.ConfigLogsDetails != null )
+    {
+
+        ConfigLogsFilterModel.ConfigLogsDetails = Task.Run(() => GetContents()).Result.ToList();
+
+        @if (ConfigLogsFilterModel.ConfigLogsDetails.Any())
+        {
+            <table class="table table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Client</th>
+                        <th scope="col">Sports</th>
+                        <th scope="col">Segment</th>
+                        <th scope="col">League</th>
+                        <th scope="col">Changes Made</th>
+                        <th scope="col">From</th>
+                        <th scope="col">To</th>
+                        <th scope="col">Updated By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in ConfigLogsFilterModel.ConfigLogsDetails)
+                    {
+                        <tr>
+                            <td>@log.Date</td>
+                            <td>@log.Client</td>
+                            <td>@log.Sports</td>
+                            <td>@log.Segment</td>
+                            <td>@log.League</td>
+                            <td>@log.ChangesMade</td>
+                            <td>@((MarkupString)log.OldValue)</td>
+                            <td>@((MarkupString)log.NewValue)</td>
+                            <td>@log.UpdatedBy</td>
+                        </tr>
+                    }
+                </tbody>
+                <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectedPage" PaginationColspan="7" />
+            </table>
+        }
+    }
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-close" @onclick="OnCloseModalClickEvent">Close</button>
+</div>

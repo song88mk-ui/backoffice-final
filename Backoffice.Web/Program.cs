@@ -71,6 +71,8 @@ builder.Services.AddScoped<ICommonService, CommonService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
 
+builder.Services.AddScoped<IExcelService, ExcelService>();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSignalR();
 builder.Services.AddResponseCompression(opts =>

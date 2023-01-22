@@ -109,7 +109,7 @@ namespace Backoffice.Web.Services
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
                 };
             }
-        }        
+        }
         public async Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId)
         {
             try
@@ -217,7 +217,7 @@ namespace Backoffice.Web.Services
         }
 
         #region Priceboost
-        public async Task<BaseResponse<List<PriceBoostConfigModel>>> GetPriceBoostConfig(PriceBoostConfigRequest request) 
+        public async Task<BaseResponse<List<PriceBoostConfigModel>>> GetPriceBoostConfig(PriceBoostConfigRequest request)
         {
             try
             {
@@ -1196,6 +1196,57 @@ namespace Backoffice.Web.Services
             catch (Exception ex)
             {
                 return new BaseResponse<ClientConfigResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>> GetConfigLogs(ConfigLogsRequest request)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"api/trading/client/config/audit", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>>
+                        (
+                            await response.Content.ReadAsStringAsync(),
+                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        if (response.StatusCode == HttpStatusCode.BadRequest)
+                        {
+                            return JsonSerializer.Deserialize<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>>
+                            (
+                                await response.Content.ReadAsStringAsync(),
+                                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                            ) ?? new BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>();
+                        }
+                        else
+                        {
+                            return new BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                            };
+                        }
+                    else
+                    {
+                        return new BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

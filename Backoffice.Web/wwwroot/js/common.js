@@ -79,10 +79,16 @@ window.destroySort = (className) => {
 }
 
 // initialize select2
-window.initSelect2 = (className, event) => {
-    $(className).select2();
+window.initSelect2 = (className, event, closeOnSelect) => {
+    if (closeOnSelect) {
+        $(className).select2({closeOnSelect: false});
+    }
+    else {
+        $(className).select2();
+    }
 
     $(className).on('select2:select', function (e) {
+
         var data = {
             parentId: e.currentTarget.id,
             selectedOptionId: e.params.data.id,
@@ -101,6 +107,10 @@ window.initSelect2 = (className, event) => {
 
         DotNet.invokeMethodAsync('Backoffice.Web', event, data);
     })
+}
+
+window.destroySelect2 = (className) => {
+    $(className).select2('destroy');
 }
 
 window.disableSelect2 = (className) => {
@@ -129,7 +139,14 @@ window.getSortOrder = (className, event) => {
     return new Blob([concat], { type: "application/txt" });
 }
 
-window.showToast = () => {
+
+window.showToast = (isAutoHide) => {
+    if (isAutoHide !== undefined) {
+        $('.toast').toast({
+            autohide: isAutoHide
+        });
+    }
+    
     $('.toast').toast('show');
 }
 
