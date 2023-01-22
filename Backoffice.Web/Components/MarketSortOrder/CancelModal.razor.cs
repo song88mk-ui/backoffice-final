@@ -32,7 +32,7 @@ namespace Backoffice.Web.Components.MarketSortOrder
         public async Task OnContinueClickEvent()
         {
             ModalService.Cancel();
-            await Modal.OnSaveClickCallback.InvokeAsync();
+            await Modal.OnCancelClickCallback.InvokeAsync();
         }
         public void Dispose()
         {

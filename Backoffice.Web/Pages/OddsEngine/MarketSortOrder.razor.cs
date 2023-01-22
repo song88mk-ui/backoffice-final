@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models.Requests;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -31,6 +32,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         public static MarketSortOrderModel MarketSortOrderModel { get; set; }
         public List<MarketSortOrderModel.ClientMarketTemplate> FilteredMarketTemplates { get; set; }
         public static List<SelectListItemModel<int>> MarketGroups { get; set; }
+
+        public string AlertMessage { get; set; }
+        public AlertStatus AlertStatus { get; set; }
 
         #endregion
 
@@ -220,6 +224,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             InitSortingAndSelect2 = true;
             IsUpdate = false;
+        }
+
+        public async Task OnSaveCopyClickEvent()
+        {
+            AlertMessage = "Market Sort Order settings copied successfully.";
+            AlertStatus = AlertStatus.Success;
         }
 
         public async ValueTask DisposeAsync()

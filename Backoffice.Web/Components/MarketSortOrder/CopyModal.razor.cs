@@ -122,24 +122,24 @@ namespace Backoffice.Web.Components.MarketSortOrder
             var fromClient = ClientInformations.FirstOrDefault(c => c.ClientCode == FromClientCode);
             var toClient = ClientInformations.FirstOrDefault(c => c.ClientCode == SelectedClientCode);
 
-            var request = new CopyClientMarketSortOrderRequest
-            {
-                CopyFromClientId = fromClient.ClientId,
-                CopyFromSportId = FromSportId,
-                CopyFromFixtureStatusId = FromFixtureStatusId,
-                CopyToClientId = toClient.ClientId,
-                CopyToSportId = FromSportId,
-                CopyToFixtureStatusId = FromFixtureStatusId,
-                UserId = UserModel.Id
-            };
+            var parameters = new ModalParameters();
 
+            parameters.Add("ClientName", toClient.ClientName);
+            parameters.Add("SportName", ModalParameters.TryGet<string>("FromSportName"));
+            parameters.Add("FixtureStatusName", ModalParameters.TryGet<string>("FromFixtureStatusName"));
 
-            var response = await TradingService.CopyClientMarketSortOrder(request);
+            parameters.Add("FromClientId", toClient.ClientId);
+            parameters.Add("ToClientId", fromClient.ClientId);
 
-            if (response.StatusCode == StatusCode.Success)
-            {
-                ModalService.Cancel();
-            }
+            parameters.Add("SportId", FromSportId);
+            parameters.Add("FixtureStatusId", FromFixtureStatusId);
+
+            parameters.Add("UserId", UserModel.Id);
+
+            parameters.Add("DialogStyle", "max-width: 600px;");
+
+            var options = new ModalOptions();
+            ModalService.Open<CopyConfirmationModal>("Copy Market Sort Order", parameters, options);
         }
 
         public void Dispose()
