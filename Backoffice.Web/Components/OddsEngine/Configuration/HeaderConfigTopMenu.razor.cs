@@ -35,6 +35,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public async Task OnCopyClientSettingsClickEvent()
         {
 
+            var parameters = new ModalParameters();
+            parameters.Add("ModalClass", "modal-center");
+            parameters.Add("ModalDialogClass", "modal-md");            
+
+            var options = new ModalOptions();
+            ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
         }
         public void Dispose()
         {
