@@ -1,5 +1,6 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
@@ -11,6 +12,7 @@ namespace Backoffice.Web.Shared
         #region Properties
 
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
@@ -39,13 +41,22 @@ namespace Backoffice.Web.Shared
 
                 var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 var userClaims = authState.User.Claims.ToList();
+                var role = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLENAME")?.Value ?? string.Empty;
+                var isSuperAdmin = !string.IsNullOrEmpty(role) && role.ToUpper().Equals("SUPER ADMIN") ? true : false;
+
+                var clients = new ClientModel();
+                if(isSuperAdmin)
+                    clients = (await BackOfficeService.GetClients()).Result;
 
                 Parallel.ForEach(userClaims, (claim) =>
                 {
                     switch (claim.Type.ToUpper())
                     {
                         case "CLIENTCODES":
-                            UserModel.ClientCodes.AddRange(claim.Value.Split(',').ToList());
+                            if(isSuperAdmin)
+                                UserModel.ClientCodes.AddRange(clients.Clients.Select(c => c.ClientCode).ToList());
+                            else
+                                UserModel.ClientCodes.AddRange(claim.Value.Split(',').ToList());
                             break;
                         case "USERID":
                             UserModel.Id = claim.Value;

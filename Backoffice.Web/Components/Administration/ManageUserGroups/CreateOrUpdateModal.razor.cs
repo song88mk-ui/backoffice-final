@@ -68,6 +68,16 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                     });
                 }
 
+                if (UserGroup.UserGroupName.ToLower().Equals("super admin") || UserGroup.UserGroupName.ToLower().Equals("superadmin"))
+                {
+                    Alerts.Add(new AlertModel
+                    {
+                        AlertStatus = "Error",
+                        AltertMessage = "Invalid User Group Name ",
+                        Opacity = 1.0m
+                    });
+                }
+
                 if (Alerts.Any())
                     return;
 
