@@ -128,8 +128,8 @@ namespace Backoffice.Web.Components.MarketSortOrder
             parameters.Add("SportName", ModalParameters.TryGet<string>("FromSportName"));
             parameters.Add("FixtureStatusName", ModalParameters.TryGet<string>("FromFixtureStatusName"));
 
-            parameters.Add("FromClientId", toClient.ClientId);
-            parameters.Add("ToClientId", fromClient.ClientId);
+            parameters.Add("FromClientId", fromClient.ClientId);
+            parameters.Add("ToClientId", toClient.ClientId);
 
             parameters.Add("SportId", FromSportId);
             parameters.Add("FixtureStatusId", FromFixtureStatusId);

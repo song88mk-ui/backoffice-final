@@ -1,5 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -14,6 +15,7 @@ namespace Backoffice.Web.Components.MarketSortOrder
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+        [CascadingParameter] public CustomModal Modal { get; set; }
 
         public string ClientName { get; set; }
         public string SportName { get; set; }
@@ -61,6 +63,7 @@ namespace Backoffice.Web.Components.MarketSortOrder
             if (response.StatusCode == StatusCode.Success)
             {
                 ModalService.Cancel();
+                await Modal.OnSaveClickCallback.InvokeAsync();
             }
         }
 
