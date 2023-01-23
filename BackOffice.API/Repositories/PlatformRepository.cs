@@ -478,7 +478,7 @@ namespace Backoffice.API.Repositories
                     }
                 }
 
-                var skip = (request.Page - 1) * request.PageSize;
+                //var skip = (request.Page - 1) * request.PageSize;
 
                 return new BaseResponse<ClientParlayBonusResponse>()
                 {
@@ -487,7 +487,8 @@ namespace Backoffice.API.Repositories
                     Result = new ClientParlayBonusResponse
                     {
                         ClientIdRef = request.ClientIdRef,
-                        ParlayBonusConfig = bonus.Skip(skip).Take(request.PageSize).ToList(),
+                        //ParlayBonusConfig = bonus.Skip(skip).Take(request.PageSize).ToList(),
+                        ParlayBonusConfig = bonus,
                         ParlayBonusMinOdds = minOdds,
                         Page = request.Page,
                         PageSize = request.PageSize,

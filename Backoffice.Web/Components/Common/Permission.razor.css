@@ -1,1 +1,32 @@
 ﻿
+.clients-btn {
+    border: 1px solid #C7C1C1;
+    font-size: 0.8rem;
+}
+
+
+.dropdown-menu li {
+    position: relative;
+}
+
+.dropdown-menu {
+    font-size: 0.8rem;
+}
+
+.form-label {
+    font-size: 0.8rem;
+}
+
+.input-group-text {
+    background-color: initial;
+    padding: 0rem 1rem;
+}
+
+.form-check-input:checked {
+    background-color: #E43F2C;
+}
+
+.btn-enable-all {
+    color: white;
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}

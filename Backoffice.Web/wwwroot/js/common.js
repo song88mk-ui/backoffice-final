@@ -150,7 +150,7 @@ window.showToast = (isAutoHide) => {
     $('.toast').toast('show');
 }
 
-window.enforceNumberValidation = (ele) => {
+window.enforceNumberValidation = (ele, limit) => {
     if ($(ele).data('decimal') != null) {
         // found valid rule for decimal
         var decimal = parseInt($(ele).data('decimal')) || 0;
@@ -167,6 +167,31 @@ window.enforceNumberValidation = (ele) => {
             if (splitVal.length > 1) {
                 // user entered invalid input
                 $(ele).val(splitVal[0]); // always trim everything after '.'
+            }
+        }
+
+        if (limit !== undefined) {
+            if ($(ele).val() > limit) {
+                $(ele).toggleClass('border-danger');
+            }
+            else {
+                if ($(ele).hasClass('border-danger')) {
+                    $(ele).toggleClass('border-danger');
+                }
+            }
+        }
+
+        //for parlay bonus only        
+        if ($('#filterAddBtn').length == 1) {
+            if ($(ele).val() > 0) {
+                $('#filterAddBtn').prop('disabled', false);
+            }
+            else {
+                $('#filterAddBtn').prop('disabled', true);
+            }
+
+            if ($(ele).hasClass('border-danger')) {
+                $('#filterAddBtn').prop('disabled', true);
             }
         }
     }

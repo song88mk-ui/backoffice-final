@@ -13,12 +13,15 @@ namespace Backoffice.Web.Pages.Administration
     {
         #region Properties
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         public MetaData MetaData { get; set; }
         public UserGroupListResponse UserGroupListModel { get; set; }
         public UserGroupCallbackModel UserGroupCallbackModel { get; set; }
         public PermissionResponse Permissions { get; set; }
+        public ClientModel ClientModel { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
 
@@ -31,6 +34,7 @@ namespace Backoffice.Web.Pages.Administration
             UserGroupListModel = new UserGroupListResponse();
             UserGroupCallbackModel = new UserGroupCallbackModel();
             Permissions = new PermissionResponse();
+            ClientModel = new ClientModel();
 
             MetaData = new MetaData
             {
@@ -39,6 +43,16 @@ namespace Backoffice.Web.Pages.Administration
                 TotalCount = 0,
                 TotalPages = 1,
             };
+
+            var clients = (await BackOfficeService.GetClients()).Result;
+
+            if (clients != null && clients.Clients.Any())
+            {
+                ClientModel = new ClientModel
+                {
+                    Clients = clients.Clients.ToList()
+                };
+            }
 
             PageTitle = "Manage User Group";
             IconClass = string.Empty;
@@ -63,8 +77,12 @@ namespace Backoffice.Web.Pages.Administration
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("UserGroup", new UserGroupResponse());
+            parameters.Add("UserGroup", new UserGroupResponse()
+            {
+                UserGroupId = ""
+            });
             parameters.Add("Permissions", Permissions);
+            parameters.Add("ClientModel", ClientModel);
             parameters.Add("IsEdit", false);
 
             var options = new ModalOptions();
@@ -81,6 +99,7 @@ namespace Backoffice.Web.Pages.Administration
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("UserGroup", userGroup);
             parameters.Add("Permissions", Permissions);
+            parameters.Add("ClientModel", ClientModel);
             parameters.Add("IsEdit", true);
 
             var options = new ModalOptions();

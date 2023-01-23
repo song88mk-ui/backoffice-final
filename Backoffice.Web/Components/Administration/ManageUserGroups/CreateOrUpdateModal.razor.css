@@ -40,7 +40,7 @@
     display: none;
 }
 
-::deep .form-check-input {
+::deep .category .form-check-input {
     height: 1.2em;
     width: 2.3em;
 }
