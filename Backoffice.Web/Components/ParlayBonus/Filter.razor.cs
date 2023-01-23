@@ -39,8 +39,7 @@ namespace Backoffice.Web.Components.ParlayBonus
 
         protected override async Task OnInitializedAsync()
         {
-            ClientId = "0";
-            IsFormValid = ClientParlayBonusResponse.ParlayBonusMinOdds < 1.20m ? false : true;
+            ClientId = "0";                        
         }
 
         public void Dispose()
@@ -59,6 +58,8 @@ namespace Backoffice.Web.Components.ParlayBonus
         {
             OriginalMinOdds = ClientParlayBonusResponse.ParlayBonusMinOdds;
             IsUpdating = !IsUpdating;
+
+            IsFormValid = ClientParlayBonusResponse.ParlayBonusMinOdds < 1.20m ? true : false;
 
             await OnUpdateClickCallback.InvokeAsync(IsUpdating);
 
