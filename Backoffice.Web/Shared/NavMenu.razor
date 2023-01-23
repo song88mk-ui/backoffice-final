@@ -49,7 +49,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                     </NavLink>
                     <div class="sub-menu collapse show" id="sub-menu-setting">
                         <nav class="flex-column">
-                            @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Setting_TopLeagues.ToString().Replace('_','.')) && c.Value != "0").ToList().Count > 0)
+                            @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Settings_TopLeagues.ToString().Replace('_','.')) && c.Value != "0").ToList().Count > 0)
                             {
                                 <div class="nav-item">
                                     <NavLink class="nav-link" href="/top-leagues">
@@ -58,7 +58,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                                     </NavLink>
                                 </div>
                             }
-                            @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Setting_TopFixtures.ToString().Replace('_', '.')) && c.Value != "0").ToList().Count > 0)
+                            @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Settings_TopFixtures.ToString().Replace('_', '.')) && c.Value != "0").ToList().Count > 0)
                             {
                                 <div class="nav-item">
                                     <NavLink class="nav-link" href="/top-fixtures">
@@ -67,7 +67,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                                     </NavLink>
                                 </div>
                             }
-                            @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Setting_Parlay.ToString().Replace('_', '.')) && c.Value != "0").ToList().Count > 0)
+                            @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Settings_Parlay.ToString().Replace('_', '.')) && c.Value != "0").ToList().Count > 0)
                             {
                                 <div class="nav-item">
                                     <NavLink class="nav-link" href="/parlay-bonus">

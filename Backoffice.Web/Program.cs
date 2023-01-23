@@ -24,11 +24,11 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddAuthorization(options =>
 {
     #region SBC
-    options.AddPolicy("sbc-menu-topleagues", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Setting_TopLeagues.ToString().Replace('_', '.')}.Access",
+    options.AddPolicy("sbc-menu-topleagues", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_TopLeagues.ToString().Replace('_', '.')}.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
-    options.AddPolicy("sbc-menu-topfixtures", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Setting_TopFixtures.ToString().Replace('_', '.')}.Access",
+    options.AddPolicy("sbc-menu-topfixtures", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_TopFixtures.ToString().Replace('_', '.')}.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
-    options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Setting_Parlay.ToString().Replace('_', '.')}.Access",
+    options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_Parlay.ToString().Replace('_', '.')}.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("sbc-menu-subuser", policy => policy.RequireClaim("MainUserId",
         ""));
