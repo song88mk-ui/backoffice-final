@@ -1,0 +1,30 @@
+﻿.table {
+    text-align: center;
+}
+
+    .table thead {
+        background: #404E67 0% 0% no-repeat padding-box;
+        border-radius: 3px 3px 0px 0px;
+        color: white;
+    }
+
+    .table tr:nth-child(2n+2) {
+        background-color: #F5F5F5;
+    }
+
+.fa-plus-circle {
+    color: white;
+}
+
+.modal-btn {
+    color: white;
+    border-radius: 2px;
+}
+
+.modal-reset {
+    background: #505050 0% 0% no-repeat padding-box;
+}
+
+.modal-settle-bets {
+    background: transparent linear-gradient(268deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
