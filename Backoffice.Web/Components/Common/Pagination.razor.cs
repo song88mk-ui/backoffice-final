@@ -60,13 +60,5 @@ namespace Backoffice.Web.Components.Common
         public void Dispose()
         {
         }
-
-        #region Utilities
-        public async void RegeneratePaginationLinks()
-        {
-            CreatePaginationLinks();
-            await InvokeAsync(StateHasChanged);
-        }
-        #endregion
     }
 }
