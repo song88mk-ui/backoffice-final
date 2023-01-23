@@ -481,12 +481,12 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<LogInActivityLogResponse>> GetActivityLogList(string token)
+        public async Task<BaseResponse<LogInActivityLogResponse>> GetLogInActivityLogList(string userId, string token)
         {
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
-                var response = await _httpClient.GetAsync($"api/user/activitylog/list");
+                var response = await _httpClient.GetAsync($"api/authentication/activitylog/list?userId={userId}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<LogInActivityLogResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })

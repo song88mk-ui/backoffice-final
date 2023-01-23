@@ -34,7 +34,7 @@ namespace Backoffice.API.Controllers.Authentication
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
             var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
-           
+
             var result = await _authenticationRepository.Login(content, userAgent);
 
             switch (result.StatusCode)
@@ -330,7 +330,7 @@ namespace Backoffice.API.Controllers.Authentication
             }
         }
         [HttpGet("activitylog/list")]
-        public async Task<IActionResult> GetActivityLogList()
+        public async Task<IActionResult> GetActivityLogList([FromQuery] string userId)
         {
             var result = new BaseResponse<LogInActivityLogResponse>()
             {
@@ -341,7 +341,7 @@ namespace Backoffice.API.Controllers.Authentication
             {
                 var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-                result = await _authenticationRepository.GetActivityLogList(token);
+                result = await _authenticationRepository.GetActivityLogList(userId, token);
             }
 
             switch (result.StatusCode)

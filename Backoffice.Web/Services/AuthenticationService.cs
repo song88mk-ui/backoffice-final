@@ -155,7 +155,6 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-
         public async Task<BaseResponse<bool>> UpdateUser(UserRegisterRequest request)
         {
             try
@@ -224,6 +223,42 @@ namespace Backoffice.Web.Services
             catch (Exception ex)
             {
                 return new BaseResponse<UserListResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+        public async Task<BaseResponse<LogInActivityLogModel>> GetLogInActivityLogList(string userId)
+        {
+            try
+            {
+                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+
+                var response = await _httpClient.GetAsync($"api/authentication/user/list?userId={userId}");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<LogInActivityLogModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<LogInActivityLogModel>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
+                        return JsonSerializer.Deserialize<BaseResponse<LogInActivityLogModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<LogInActivityLogModel>();
+                    else
+                    {
+                        return new BaseResponse<LogInActivityLogModel>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<LogInActivityLogModel>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

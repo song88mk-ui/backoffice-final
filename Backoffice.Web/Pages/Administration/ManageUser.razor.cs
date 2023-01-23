@@ -92,7 +92,11 @@ namespace Backoffice.Web.Pages.Administration
         private async Task GetContent()
         {
             var userResponse = await AuthenticationService.GetUserList(new UserGroupRequest()
-            { 
+            {
+                MetaData = new MetaData()
+                {
+                    PageSize = 0
+                },
                 SearchText = FilterModel.SearchText,
                 SortBy = FilterModel.UserSorting
             });
