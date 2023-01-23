@@ -52,7 +52,7 @@
                                         <td class="td-parlay-bonus">
                                             @if (IsUpdating)
                                             {
-                                                <input class="form-control parlay-bonus-input @(item.ParlayBonus < 0 || @item.ParlayBonus > 5000 ? "border border-danger": "")" placeholder="Min. Value 0.01" type="number" @bind-value="@item.ParlayBonus" data-decimal=2 oninput="enforceNumberValidation(this)"/>
+                                                <input class="form-control parlay-bonus-input @(item.ParlayBonus < 0 || @item.ParlayBonus > 5000 ? "border border-danger": "")" placeholder="Min. Value 0.01" type="number" @bind-value="@item.ParlayBonus" data-decimal=2 oninput="enforceNumberValidation(this, 5000)"/>
                                                 <span>%</span>
                                             }
                                             else
