@@ -4,88 +4,82 @@
 @page "/top-fixtures"
 
 
-<AuthorizeView Policy="sbc-menu-topfixtures">
-    <Authorized>
+<div class="row">
+    <div class="main-content col-md-12 mb-4 pb-3">
         <div class="row">
-            <div class="main-content col-md-12 mb-4 pb-3">
-                <div class="row">
-                    <div class="col-md-12">
-                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-                    </div>
-                    <div class="col-md-12">
-                        <Filter OnInitCallback="OnInitEvent" OnSearchCallback="OnSearchEvent" />
-                    </div>
-                    <div class="col-md-12">
-                        <div class="content mx-3">
-                            <table class="table table-hover table-borderless mt-4">
-                                <thead class="table-head">
+            <div class="col-md-12">
+                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+            </div>
+            <div class="col-md-12">
+                <Filter OnInitCallback="OnInitEvent" OnSearchCallback="OnSearchEvent" />
+            </div>
+            <div class="col-md-12">
+                <div class="content mx-3">
+                    <table class="table table-hover table-borderless mt-4">
+                        <thead class="table-head">
+                            <tr>
+                                <th class="th-number py-2">No.</th>
+                                <th class="th-client py-2">Client</th>
+                                <th class="th-top-fixtures py-2">Top Fixtures</th>
+                                <th class="th-action py-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (TopFixturesModel.TopFixturesFiltered.Any())
+                            {
+                                var rowCtr = 0;
+                                foreach (var topFixture in TopFixturesModel.TopFixturesFiltered)
+                                {
+                                    rowCtr = rowCtr + 1;
                                     <tr>
-                                        <th class="th-number py-2">No.</th>
-                                        <th class="th-client py-2">Client</th>
-                                        <th class="th-top-fixtures py-2">Top Fixtures</th>
-                                        <th class="th-action py-2">Action</th>
+                                        <td class="py-2">
+                                            <span>@rowCtr</span>
+                                        </td>
+                                        <td class="py-2">
+                                            <span>@topFixture.ClientName</span>
+                                        </td>
+                                        <td class="py-2">
+                                            <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
+                                                @if (topFixture.TopFixtures != null && topFixture.TopFixtures.Any())
+                                                {
+                                                    foreach (var fixture in topFixture.TopFixtures)
+                                                    {
+                                                        <div class="tl-fixture m-1 py-1 rounded-2">
+                                                            <span class="px-3">@fixture.FixtureName</span>
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+                                        </td>
+                                        <td class="py-2">
+                                            <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="() => OnEditClickEvent(topFixture)">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            @if (topFixture.TopFixtures != null && topFixture.TopFixtures.Any())
+                                            {
+                                                <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="() => OnCopyClickEvent(topFixture)">
+                                                    <i class="fa fa-copy"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a class="tl-link-copy me-2 disabled" href="javascript:(0)">
+                                                    <i class="fa fa-copy"></i>
+                                                </a>
+                                            }
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @if (TopFixturesModel.TopFixturesFiltered.Any())
-                                    {
-                                        var rowCtr = 0;
-                                        foreach (var topFixture in TopFixturesModel.TopFixturesFiltered)
-                                        {
-                                            rowCtr = rowCtr + 1;
-                                            <tr>
-                                                <td class="py-2">
-                                                    <span>@rowCtr</span>
-                                                </td>
-                                                <td class="py-2">
-                                                    <span>@topFixture.ClientName</span>
-                                                </td>
-                                                <td class="py-2">
-                                                    <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
-                                                        @if (topFixture.TopFixtures != null && topFixture.TopFixtures.Any())
-                                                        {
-                                                            foreach (var fixture in topFixture.TopFixtures)
-                                                            {
-                                                                <div class="tl-fixture m-1 py-1 rounded-2">
-                                                                    <span class="px-3">@fixture.FixtureName</span>
-                                                                </div>
-                                                            }
-                                                        }
-                                                    </div>
-                                                </td>
-                                                <td class="py-2">
-                                                    <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="() => OnEditClickEvent(topFixture)">
-                                                        <i class="fa fa-edit"></i>
-                                                    </a>
-                                                    @if (topFixture.TopFixtures != null && topFixture.TopFixtures.Any())
-                                                    {
-                                                        <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="() => OnCopyClickEvent(topFixture)">
-                                                            <i class="fa fa-copy"></i>
-                                                        </a>
-                                                    }
-                                                    else
-                                                    {
-                                                        <a class="tl-link-copy me-2 disabled" href="javascript:(0)">
-                                                            <i class="fa fa-copy"></i>
-                                                        </a>
-                                                    }
-                                                </td>
-                                            </tr>
-                                        }
-                                    }
-                                </tbody>
-                                <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="2" />
-                            </table>
-                        </div>
-                    </div>
+                                }
+                            }
+                        </tbody>
+                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="2" />
+                    </table>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <div>
-            <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
-        </div>
-    </Authorized>
-    <NotAuthorized>
-    </NotAuthorized>
-</AuthorizeView>
+<div>
+    <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
+</div>

@@ -56,6 +56,11 @@ namespace Backoffice.Web.Components.Common
             }
         }
 
+        public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
+        {
+
+        }
+
         public void Dispose()
         {
         }

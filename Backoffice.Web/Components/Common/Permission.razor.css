@@ -25,3 +25,8 @@
 .form-check-input:checked {
     background-color: #E43F2C;
 }
+
+.btn-enable-all {
+    color: white;
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
