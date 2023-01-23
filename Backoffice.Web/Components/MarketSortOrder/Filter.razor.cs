@@ -69,7 +69,7 @@ namespace Backoffice.Web.Components.MarketSortOrder
                 });
             }
 
-            SelectedClientCode = Clients.FirstOrDefault().Value;
+            SelectedClientCode = Clients.FirstOrDefault() != null ? Clients.FirstOrDefault().Value : string.Empty;
 
             var sports = (await TradingService.GetSportLookup()).Result;
 

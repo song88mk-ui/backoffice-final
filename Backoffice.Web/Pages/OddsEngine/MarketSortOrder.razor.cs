@@ -32,6 +32,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public static MarketSortOrderModel MarketSortOrderModel { get; set; }
         public List<MarketSortOrderModel.ClientMarketTemplate> FilteredMarketTemplates { get; set; }
         public static List<SelectListItemModel<int>> MarketGroups { get; set; }
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
 
         public string AlertMessage { get; set; }
         public AlertStatus AlertStatus { get; set; }
@@ -53,6 +54,22 @@ namespace Backoffice.Web.Pages.OddsEngine
             InitSortingAndSelect2 = false;
             IsMarketGroupClicked = false;
             IsUpdate = false;
+
+            Breadcrumbs = new List<BreadcrumbModel>();
+
+            Breadcrumbs.Add(new BreadcrumbModel
+            {
+                Name = "Market Settings",
+                Url = string.Empty,
+                IsCurrentPage = false
+            });
+
+            Breadcrumbs.Add(new BreadcrumbModel
+            {
+                Name = "Market Sort Order",
+                Url = "odds-engine/market-sort-order",
+                IsCurrentPage = true
+            });
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
