@@ -3,100 +3,96 @@
 
 @page "/parlay-bonus"
 
-<AuthorizeView Policy="sbc-menu-parlaybonus">
-    <Authorized>
-        <Toast ToastTitle="Parlay Bonus" ToastMessage="@ToastMessage" />
+<Toast ToastTitle="Parlay Bonus" ToastMessage="@ToastMessage" />
+<div class="row">
+    <div class="main-content col-md-12 mb-4 pb-3">
         <div class="row">
-            <div class="main-content col-md-12 mb-4 pb-3">
-                <div class="row">
-                    <div class="col-md-12">
-                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-                    </div>
-                    <div class="col-md-12">
-                        <Filter Clients="@Clients" ClientParlayBonusResponse="@ClientParlayBonusResponse"
-                                OnUpdateClickCallback="OnUpdateClick" OnAddClickCallback="OnAddClick"
-                                OnSaveClickCallback="OnSaveClick" OnCancelClickCallback="OnCancelClick"
-                                OnClientChangedCallback="OnClientChangedEvent" />
-                    </div>
-                    <div class="col-md-12">
-                        @if (IsPreloading)
-                        {
-                            <Preloader />
-                        }
-                        else
-                        {
-                            @if (ClientParlayBonusResponse.ParlayBonusConfig.Count == 0)
-                            {
-                                <NoRecordFound />
-                            }
-                            else
-                            {
-                                <table class="table table-hover table-borderless mt-4">
-                                    <thead class="table-head-pb">
-                                        <tr>
-                                            <th class="th-number py-3">No. of Selections</th>
-                                            <th class="th-parlay-bonus py-3">
-                                                <span>Parlay Bonus</span>
-                                                <i class="tooltip2 fa fa-info-circle ms-5">
-                                                    <span class="tooltiptext">Minimum Value: 0.01<br />Maximum Value: 5000</span>
-                                                </i>
-                                            </th>
-                                            <th class="th-action py-3">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in ClientParlayBonusResponse.ParlayBonusConfig)
-                                        {
-                                            <tr>
-                                                <td>@item.SelectionCount</td>
-                                                <td class="td-parlay-bonus">
-                                                    @if (IsUpdating)
-                                                    {
-                                                        <input max="5000" class="form-control parlay-bonus-input @(item.ParlayBonus < 0 || @item.ParlayBonus > 5000 ? "border border-danger": "")" placeholder="Min. Value 0.01" type="number" @bind-value="@item.ParlayBonus" data-decimal=2 oninput="enforceNumberValidation(this)" />
-                                                        <span>%</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <input class="form-control parlay-bonus-input" placeholder="Min. Value 0.01" type="number" @bind-value="@item.ParlayBonus" disabled />
-                                                        <span>%</span>
-                                                    }
-                                                </td>
-                                                <td>
-                                                    @if (IsUpdating)
-                                                    {
+            <div class="col-md-12">
+                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+            </div>
+            <div class="col-md-12">
+                <Filter Clients="@Clients" ClientParlayBonusResponse="@ClientParlayBonusResponse"
+                        @bind-IsUpdating="IsUpdating"
+                        MetaData="MetaData"
+                        OnUpdateClickCallback="OnUpdateClick" OnAddClickCallback="OnAddClick"
+                        OnSaveClickCallback="OnSaveClick" OnCancelClickCallback="OnCancelClick"
+                        OnClientChangedCallback="OnClientChangedEvent" />
+            </div>
+            <div class="col-md-12">
+                @if (IsPreloading)
+                {
+                    <Preloader />
+                }
+                else
+                {
+                    @if (ClientParlayBonusResponse.ParlayBonusConfig.Count == 0)
+                    {
+                        <NoRecordFound />
+                    }
+                    else
+                    {
+                        <table class="table table-hover table-borderless mt-4">
+                            <thead class="table-head-pb">
+                                <tr>
+                                    <th class="th-number py-3">No. of Selections</th>
+                                    <th class="th-parlay-bonus py-3">
+                                        <span>Parlay Bonus</span>
+                                        <i class="tooltip2 fa fa-info-circle ms-5">
+                                            <span class="tooltiptext">Minimum Value: 0.01<br />Maximum Value: 5000</span>
+                                        </i>
+                                    </th>
+                                    <th class="th-action py-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ClientParlayBonusResponse.ParlayBonusConfig.Skip(Skip).Take(MetaData.PageSize).ToList())
+                                {
+                                    <tr>
+                                        <td>@item.SelectionCount</td>
+                                        <td class="td-parlay-bonus">
+                                            @if (IsUpdating)
+                                            {
+                                                <input class="form-control parlay-bonus-input @(item.ParlayBonus < 0 || @item.ParlayBonus > 5000 ? "border border-danger": "")" placeholder="Min. Value 0.01" type="number" @bind-value="@item.ParlayBonus" data-decimal=2 oninput="enforceNumberValidation(this)"/>
+                                                <span>%</span>
+                                            }
+                                            else
+                                            {
+                                                <input class="form-control parlay-bonus-input" placeholder="Min. Value 0.01" type="number" @bind-value="@item.ParlayBonus" disabled />
+                                                <span>%</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (IsUpdating)
+                                            {
 
-                                                        <button type="button" class="btn tl-link-add me-2" title="Delete" @onclick="_ => OnDeleteConfig(item)">
-                                                            <i class="fa fa-trash"></i>
-                                                        </button>
-                                                    }
-                                                    else
-                                                    {
-                                                        <button type="button" class="btn tl-link-add me-2" title="Delete" @onclick="_ => OnDeleteConfig(item)" disabled>
-                                                            <i class="fa fa-trash"></i>
-                                                        </button>
-                                                    }
-                                                    @if (!IsEmpty)
-                                                    {
-                                                        <button type="button" class="btn tl-link-minus me-2" title="View History" @onclick="_ => OnViewConfigLog(item)">
-                                                            <i class="fa fa-list-alt"></i>
-                                                        </button>
-                                                    }
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                    <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="1" />
-                                </table>
-                            }
-                        }
-                    </div>
-                </div>
+                                                <button type="button" class="btn tl-link-add me-2" title="Delete" @onclick="_ => OnDeleteConfig(item)">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="btn tl-link-add me-2" title="Delete" @onclick="_ => OnDeleteConfig(item)" disabled>
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            }
+                                            @if (!IsEmpty)
+                                            {
+                                                <button type="button" class="btn tl-link-minus me-2" title="View History" @onclick="_ => OnViewConfigLog(item)">
+                                                    <i class="fa fa-list-alt"></i>
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="1" />
+                        </table>
+                    }
+                }
             </div>
         </div>
-        <div>
-            <CustomModal OnSaveClickCallback="OnDeleteConfigClick" />
-        </div>
-    </Authorized>
-    <NotAuthorized>
-    </NotAuthorized>
-</AuthorizeView>
+    </div>
+</div>
+<div>
+    <CustomModal OnSaveClickCallback="OnDeleteConfigClick" />
+</div>

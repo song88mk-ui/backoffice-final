@@ -1,6 +1,8 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.ParlayBonus;
+using Backoffice.Web.Hubs;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -27,6 +29,9 @@ namespace Backoffice.Web.Pages
         public bool IsEmpty { get; set; }
         public const string ToastTitle = "Parlay Bonus";
         public string ToastMessage { get; set; }        
+        public bool IsAdding { get; set; }
+        public int Skip { get; set; }
+        protected Pagination PaginationComponent { get; set; }
         #endregion
 
         #region Methods                
@@ -92,7 +97,7 @@ namespace Backoffice.Web.Pages
             await LoadClientParlayBonus(ClientId);
         }
 
-        public async Task LoadClientParlayBonus(long ClientId)
+        public async Task LoadClientParlayBonus(long ClientId, bool isSkip = true)
         {
             IsPreloading = true;
             IsEmpty = true;
@@ -123,13 +128,16 @@ namespace Backoffice.Web.Pages
 
                 TempConfig = new List<ParlayBonusConfig>();
 
-                IsUpdating = false;
+                if (!IsAdding)
+                {
+                    IsUpdating = false;
+                }
 
                 ClientParlayBonusResponse = result;
-                IsPreloading = false;
+                IsPreloading = false;                
 
                 IsEmpty = ClientParlayBonusResponse.ParlayBonusConfig.Count > 0 ? false : true;
-            }
+            }            
         }
 
         public async Task OnDeleteConfig(ParlayBonusConfig parlayBonusConfig)
@@ -161,7 +169,10 @@ namespace Backoffice.Web.Pages
         {
             MetaData.CurrentPage = page;
 
-            await LoadClientParlayBonus(ClientId);
+            IsAdding = false;
+            Skip = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+
+            //await LoadClientParlayBonus(ClientId);
         }
 
         public async Task OnUpdateClick()
@@ -169,11 +180,35 @@ namespace Backoffice.Web.Pages
             IsUpdating = !IsUpdating;
         }
 
-        public async Task OnAddClick(ParlayBonusConfig newConfig)
+        public async Task OnAddClick()
         {
+            IsAdding = true;
+            ParlayBonusConfig newConfig = null;                        
+
+            IsUpdating = true;
+
+            if (ClientParlayBonusResponse.ParlayBonusConfig.Count == 0)
+            {
+                newConfig = new ParlayBonusConfig()
+                {
+                    SelectionCount = 3
+                };
+            }
+            else
+            {
+                newConfig = new ParlayBonusConfig()
+                {
+                    SelectionCount = ClientParlayBonusResponse.ParlayBonusConfig.Last().SelectionCount + 1
+                };                
+            }
+
             TempConfig.Add(newConfig);
             ClientParlayBonusResponse.ParlayBonusConfig.Add(newConfig);
 
+            MetaData.TotalCount = ClientParlayBonusResponse.ParlayBonusConfig.Count;
+            MetaData.TotalPages = ((ClientParlayBonusResponse.ParlayBonusConfig.Count - 1) / MetaData.PageSize) + 1;
+            
+            await SelectPage(MetaData.TotalPages);
             await InvokeAsync(StateHasChanged);
         }
 
@@ -199,7 +234,19 @@ namespace Backoffice.Web.Pages
             else
             {
                 ToastMessage = result.Message;
-            }
+            }            
+
+            IsUpdating = false;
+
+            IsAdding = false;
+
+            Skip = 0;
+
+            MetaData = new MetaData()
+            {
+                CurrentPage = 1,
+                PageSize = 10
+            };
 
             await LoadClientParlayBonus(ClientId);
             await ShowToast();
@@ -213,6 +260,18 @@ namespace Backoffice.Web.Pages
 
             IsUpdating = false;
 
+            IsAdding = false;
+
+            Skip = 0;
+
+            MetaData = new MetaData()
+            {
+                CurrentPage = 1,
+                PageSize = 10
+            };
+
+            await LoadClientParlayBonus(ClientId);
+
             await InvokeAsync(StateHasChanged);
         }
 
@@ -221,6 +280,15 @@ namespace Backoffice.Web.Pages
             ParlayBonusConfig configCasted = (ParlayBonusConfig)config;
 
             ClientParlayBonusResponse.ParlayBonusConfig.Remove(configCasted);
+
+            MetaData.TotalCount = ClientParlayBonusResponse.ParlayBonusConfig.Count;
+            MetaData.TotalPages = ((ClientParlayBonusResponse.ParlayBonusConfig.Count - 1) / MetaData.PageSize) + 1;
+
+            if (MetaData.CurrentPage >= MetaData.TotalPages) {
+                await SelectPage(MetaData.CurrentPage - 1);
+            }
+
+            await InvokeAsync(StateHasChanged);
         }
 
         public void Dispose()

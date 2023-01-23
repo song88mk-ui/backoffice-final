@@ -13,15 +13,18 @@ namespace Backoffice.Web.Components.ParlayBonus
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Parameter] public ClientParlayBonusModel ClientParlayBonusResponse { get; set; }        
         [Parameter] public EventCallback<bool> OnUpdateClickCallback { get; set; }
-        [Parameter] public EventCallback<ParlayBonusConfig> OnAddClickCallback { get; set; }
+        [Parameter] public EventCallback OnAddClickCallback { get; set; }
         [Parameter] public EventCallback<long> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [Parameter] public List<SelectListItemModel<ClientModel.Client>> Clients { get; set; }        
-        ElementReference ParlayBonusMinOddsElementReference { get; set; }
+        [Parameter] public List<SelectListItemModel<ClientModel.Client>> Clients { get; set; }
+        [Parameter] public MetaData MetaData { get; set; }
+        public ElementReference ParlayBonusMinOddsElementReference { get; set; }
+        public ElementReference FilterAddButtonElementReference { get; set; }
         public string ClientId { get; set; }
-        public bool IsUpdating { get; set; } = false;        
+        [Parameter] public bool IsUpdating { get; set; }
+        [Parameter] public EventCallback<bool> IsUpdatingChanged { get; set; }
         public decimal OriginalMinOdds { get; set; }
 
         private static bool IsFormValid { get; set; }
@@ -81,21 +84,13 @@ namespace Backoffice.Web.Components.ParlayBonus
         }
 
         public async Task OnAddClickEvent()
+        {            
+            await OnAddClickCallback.InvokeAsync();
+        }
+
+        public async Task FilterAddBtnOnMouseover()
         {
-            if (ClientParlayBonusResponse.ParlayBonusConfig.Count == 0)
-            {
-                await OnAddClickCallback.InvokeAsync(new ParlayBonusConfig()
-                {
-                    SelectionCount = 3
-                });
-            }
-            else
-            {
-                await OnAddClickCallback.InvokeAsync(new ParlayBonusConfig()
-                {
-                    SelectionCount = ClientParlayBonusResponse.ParlayBonusConfig.Last().SelectionCount + 1
-                });
-            }
+            FilterAddButtonElementReference.FocusAsync();
         }
 
         [JSInvokable("DisableSaveButton")]

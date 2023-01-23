@@ -169,6 +169,16 @@ window.enforceNumberValidation = (ele) => {
                 $(ele).val(splitVal[0]); // always trim everything after '.'
             }
         }
+
+        //for parlay bonus only        
+        if ($('#filterAddBtn').length == 1) {
+            if ($(ele).val() > 0) {
+                $('#filterAddBtn').prop('disabled', false);
+            }
+            else {
+                $('#filterAddBtn').prop('disabled', true);
+            }
+        }
     }
 }
 
