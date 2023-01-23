@@ -24,11 +24,11 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddAuthorization(options =>
 {
     #region SBC
-    options.AddPolicy("sbc-menu-topleagues", policy => policy.RequireClaim("SportsbookClient.TopLeagues.Access",
+    options.AddPolicy("sbc-menu-topleagues", policy => policy.RequireClaim("SBC.TopLeagues.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
-    options.AddPolicy("sbc-menu-topfixtures", policy => policy.RequireClaim("SportsbookClient.TopFixtures.Access",
+    options.AddPolicy("sbc-menu-topfixtures", policy => policy.RequireClaim("SBC.TopFixtures.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
-    options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim("SportsbookClient.ParlayBonus.Access",
+    options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim("SBC.ParlayBonus.Access",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("sbc-menu-subuser", policy => policy.RequireClaim("MainUserId",
         ""));

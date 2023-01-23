@@ -22,10 +22,13 @@ namespace Backoffice.API.Repositories
         {
             _httpClient = httpClient;
         }
-        public async Task<BaseResponse<TokenModel>> Login(LogInModel loginModel)
+        public async Task<BaseResponse<TokenModel>> Login(LogInModel loginModel, string browser, string os, string ipAddress)
         {
             try
             {
+                _httpClient.DefaultRequestHeaders.Add("Client-Info", browser);
+                _httpClient.DefaultRequestHeaders.Add("Client-OS", os);
+                _httpClient.DefaultRequestHeaders.Add("Client-IpAddress", ipAddress);
                 var response = await _httpClient.PostAsync($"login", new StringContent(JsonSerializer.Serialize(loginModel), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)

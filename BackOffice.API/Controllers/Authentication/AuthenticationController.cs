@@ -1,11 +1,19 @@
 ﻿using Backoffice.API.Repositories;
-using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using UAParser;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,15 +24,53 @@ namespace Backoffice.API.Controllers.Authentication
     public class AuthenticationController : ControllerBase
     {
         private IAuthenticationRepository _authenticationRepository { get; set; }
+
         public AuthenticationController(IAuthenticationRepository authenticationRepository)
         {
             _authenticationRepository = authenticationRepository;
         }
+        private static string GetUserCountryByIp(string ip)
+        {
+            //var url = "http://freegeoip.net/json/" + IP;
+            //var url = "http://freegeoip.net/json/" + IP;
+            string url = "http://api.ipstack.com/" + ip + "?access_key=[KEY]";
+            var request = System.Net.WebRequest.Create(url);
 
+            using (WebResponse wrs = request.GetResponse())
+            {
+                using (Stream stream = wrs.GetResponseStream())
+                {
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        string json = reader.ReadToEnd();
+                        var obj = JObject.Parse(json);
+                        string City = (string)obj["city"];
+                        string Country = (string)obj["region_name"];
+                        string CountryCode = (string)obj["country_code"];
+
+                        return (CountryCode + " - " + Country + "," + City);
+                    }
+                }
+            }
+
+            return "";
+        }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
-            var result = await _authenticationRepository.Login(content);
+            //var userAgent = HttpContext.Request.Headers["User-Agent"];
+            //var uaParser = Parser.GetDefault();
+            //ClientInfo client = uaParser.Parse(userAgent);
+            //var browser = client.UA.ToString();
+            //var os = client.OS.ToString();
+            //var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            //if (ipAddress == "::1")
+            //{
+            //    ipAddress = Dns.GetHostEntry(Dns.GetHostName()).AddressList[1].ToString();
+            //}
+
+            //var test = GetUserCountryByIp(ipAddress);
+            var result = await _authenticationRepository.Login(content, "", "", "");
 
             switch (result.StatusCode)
             {
@@ -91,7 +137,7 @@ namespace Backoffice.API.Controllers.Authentication
             if (HttpContext.Request.Headers.ContainsKey("Authorization"))
             {
                 var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-                
+
                 result = await _authenticationRepository.Register(request, token);
 
             }
