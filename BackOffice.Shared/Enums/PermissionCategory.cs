@@ -49,6 +49,7 @@ namespace Backoffice.Shared.Enums
         SBC_Setting_Parlay,
         SBC_SubUsers,
         SBC_Clients,
+        SBC_Clients_Access,
         SBC_OE_Monitoring_Match,
         SBC_OE_Monitoring_Outrights,
         SBC_OE_FastOdds,

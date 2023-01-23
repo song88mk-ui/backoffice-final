@@ -3,6 +3,8 @@ using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
+using System.Security.Claims;
+using static Backoffice.Shared.Models.PermissionTreeModel;
 
 namespace Backoffice.Web.Components.Common
 {
@@ -10,8 +12,11 @@ namespace Backoffice.Web.Components.Common
     {
         #region Properties
         [Parameter] public List<PermissionModel> Permissions { get; set; }
+        [Parameter] public ClientModel ClientModel { get; set; }
         [Parameter] public bool IsReadOnly { get; set; }
         public PermissionTreeModel PermissionTree { get; set; }
+        public List<string> SelectedClients { get; set; }
+
         #endregion
 
         #region Methods
@@ -19,7 +24,12 @@ namespace Backoffice.Web.Components.Common
         {
             try
             {
-                PermissionTree = await GetPermissionTree();                
+                SelectedClients = new List<string>();
+                PermissionTree = await GetPermissionTree();
+
+                var clientAccess = Permissions.FirstOrDefault(p => p.ClaimType == SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."));
+                if (clientAccess != null && !string.IsNullOrEmpty(clientAccess.ClaimValue))
+                    SelectedClients = clientAccess.ClaimValue.Split(",").ToList();
             }
             catch (Exception)
             {
@@ -27,6 +37,24 @@ namespace Backoffice.Web.Components.Common
             }
         }
 
+        public async Task OnClientsClicked(ChangeEventArgs e, string clientCode, bool isLabel = false)
+        {
+            if ((isLabel && !SelectedClients.Contains(clientCode)) || (e != null && Convert.ToBoolean(e.Value) == true))
+            {
+                if (!SelectedClients.Any(s => s == clientCode))
+                    SelectedClients.Add(clientCode);
+            }
+            else
+            {
+                SelectedClients.Remove(clientCode);
+            }
+
+            var permission = Permissions.FirstOrDefault(permission => permission.ClaimType == SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."));
+            if (permission != null)
+            {
+                permission.ClaimValue = SelectedClients.Any() ? string.Join(",", SelectedClients) : string.Empty;
+            }
+        }
 
         public void Dispose()
         {
@@ -58,7 +86,8 @@ namespace Backoffice.Web.Components.Common
                     {
                         foreach (var subCategory in subcategories)
                         {
-                            var claims = Permissions.Where(p => p.CategoryId == permission.CategoryId && p.SubCategoryName == subCategory.SubCategoryName && string.IsNullOrEmpty(p.GroupName))
+                            var claims = Permissions.Where(p => p.CategoryId == permission.CategoryId && p.SubCategoryName == subCategory.SubCategoryName 
+                                && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_",".") && string.IsNullOrEmpty(p.GroupName))
                                 .GroupBy(p => p.ClaimType).Select(s => new PermissionTreeModel.PermissionClaim
                             {
                                 Name = s.FirstOrDefault().Name,

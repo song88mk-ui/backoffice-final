@@ -57,6 +57,31 @@
                             </div>
                         </div>
 
+                        @if(category.CategoryId == (int)PermissionCategory.Sportsbook && ClientModel.Clients.Any())
+                        {
+                            <div class="dropdown mx-2">
+                                <button class="btn clients-btn dropdown-toggle ps-4" type="button" id="clientDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                    Select Clients
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="clientDropdown">
+                                    @foreach(var client in ClientModel.Clients)
+                                    {
+                                        <li>
+                                            @if (SelectedClients.Contains(client.ClientCode))
+                                            {
+                                                <input class="form-check-input" type="checkbox" id="@client.ClientCode" aria-label="..." @onchange="(e) => OnClientsClicked(e, client.ClientCode)" checked />
+                                            }
+                                            else
+                                            {
+                                                <input class="form-check-input" type="checkbox" id="@client.ClientCode" aria-label="..." @onchange="(e) => OnClientsClicked(e, client.ClientCode)" />
+                                            }
+                                            <label class="form-check-label" for="@client.ClientCode" @onclick="() => OnClientsClicked(null, client.ClientCode, true)">&nbsp; @client.ClientName</label>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
                         <div class="access-permissions mx-3 my-3">
                             <div class="sub-title mb-4">
                                 <span class="d-block fw-bold">Permissions</span>

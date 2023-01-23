@@ -18,6 +18,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         [CascadingParameter] public CustomModal Modal { get; set; }
         public UserGroupResponse UserGroup { get; set; }
         public PermissionResponse Permissions { get; set; }
+        public ClientModel ClientModel { get; set; }
         public bool IsEdit { get; set; }
         public List<AlertModel> Alerts { get; set; }
         #endregion
@@ -28,7 +29,10 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
             Alerts = new List<AlertModel>();
             UserGroup = ModalParameters.TryGet<UserGroupResponse>("UserGroup");
             Permissions = ModalParameters.TryGet<PermissionResponse>("Permissions");
+            ClientModel = ModalParameters.TryGet<ClientModel>("ClientModel");
+
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
+
 
             if(UserGroup.Claims.Any())
             {
@@ -71,17 +75,14 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
                 foreach(var permission in Permissions.Permissions)
                 {
-                    if(!string.IsNullOrEmpty(permission.ClaimValue))
+                    if (string.IsNullOrEmpty(permission.ClaimValue))
+                        permission.ClaimValue = "0";
+
+                    claims.Add(new ClaimModel
                     {
-                        if(permission.ClaimValue != "0")
-                        {
-                            claims.Add(new ClaimModel
-                            {
-                                ClaimType = permission.ClaimType,
-                                ClaimValue = permission.ClaimValue
-                            });
-                        }
-                    }
+                        ClaimType = permission.ClaimType,
+                        ClaimValue = permission.ClaimValue
+                    });                    
                 }
 
                 var request = new UserGroupRequest()
