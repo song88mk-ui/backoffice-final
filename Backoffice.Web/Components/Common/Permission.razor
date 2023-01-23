@@ -1,0 +1,119 @@
+﻿@using Backoffice.Shared.Enums;
+
+<div class="permission-container">
+    <div class="row">
+        <div class="col-md-12 mb-1">
+            <h6 class="title fw-bold ps-2 py-1">Permissions</h6>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            @if (PermissionTree != null && PermissionTree.Permissions != null && PermissionTree.Permissions.Any())
+            {
+                foreach (var category in PermissionTree.Permissions)
+                {
+                    <div class="access-container border rounded mb-3">
+                        <div class="access-header mt-3 mx-3 pb-4 border-bottom border-1">
+                            <div class="header-title">
+                                <h6 class="fw-bold d-inline-block">
+                                    <i class="fa fa-plus me-3"></i>
+                                    @category.CategoryName
+                                </h6>
+                                <div class="form-switch d-inline-block pull-right">
+
+                                    @if(category.IsEnabled)
+                                    {
+                                        if(IsReadOnly)
+                                        {
+                                            <input class="form-check-input" type="checkbox" role="switch" checked disabled/>
+                                        }
+                                        else
+                                        {
+                                            <input class="form-check-input" type="checkbox" role="switch" checked />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(IsReadOnly)
+                                        {
+                                            <input class="form-check-input" type="checkbox" role="switch" disabled />
+                                        }
+                                        else
+                                        {
+                                            <input class="form-check-input" type="checkbox" role="switch" />
+                                        }
+                                    }
+                                </div>
+                            </div>
+                            <div class="header-information">
+                                @if (category.CategoryId == (int)PermissionCategory.Admin)
+                                {
+                                    <label>Create and manage user and user groups, modify, settle, or cancel bets, and view manual bet settlement history</label>
+                                }
+                                else if (category.CategoryId == (int)PermissionCategory.Sportsbook)
+                                {
+                                    <label>Create and manage user and user groups, modify, settle, or cancel bets, and view manual bet settlement history</label>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="access-permissions mx-3 my-3">
+                            <div class="sub-title mb-4">
+                                <span class="d-block fw-bold">Permissions</span>
+                                <span class="sub-title-info">Enable the permissions required for this user group</span>
+                            </div>
+                            <div class="d-flex">
+                                @if (category.SubCategories.Any())
+                                {
+                                    var maxRow = (int)Math.Ceiling(Convert.ToDecimal(category.SubCategories.Count) / 2m);
+                                    <div class="w-50">
+                                        @for (int rowCount = 0; rowCount < maxRow; rowCount++)
+                                        {
+                                            <div class="category mb-3">
+                                                <div class="category-title fw-bold mb-1">@category.SubCategories[rowCount].SubCategoryName</div>
+
+                                                @if (@category.SubCategories[rowCount].Claims.Any())
+                                                {
+                                                    for(int ctr = 0; ctr<@category.SubCategories[rowCount].Claims.Count; ctr++)
+                                                    {
+                                                        var claim = @category.SubCategories[rowCount].Claims[ctr];
+                                                        var claimId = claim.HasReadOnly ? $"{claim.ClaimType}" : $"{claim.ClaimType}";
+                                                        
+                                                        <PermissionRow Claim="@claim" ClaimId="@claimId" IsReadOnly="@IsReadOnly" Permissions="@Permissions" />
+
+                                                    }
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="w-50">
+                                        @for (int rowCount = maxRow; rowCount < category.SubCategories.Count(); rowCount++)
+                                        {
+                                            <div class="category mb-3">
+                                                <div class="category-title fw-bold mb-1">@category.SubCategories[rowCount].SubCategoryName</div>
+
+                                                @if (category.SubCategories[rowCount].Claims.Any())
+                                                {
+                                                    for (int ctr = 0; ctr < @category.SubCategories[rowCount].Claims.Count; ctr++)
+                                                    {
+                                                        var claim = @category.SubCategories[rowCount].Claims[ctr];
+                                                        var claimId = claim.Name.Contains("readonly", StringComparison.OrdinalIgnoreCase) ? $"{claim.ClaimType}-readonly" : $"{claim.ClaimType}";
+
+                                                        <PermissionRow Claim="@claim" ClaimId="@claimId" IsReadOnly="@IsReadOnly" Permissions="@Permissions" />
+
+                                                    }
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            }
+        </div>
+    </div>
+</div>

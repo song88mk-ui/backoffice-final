@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models.Requests;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -31,6 +32,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         public static MarketSortOrderModel MarketSortOrderModel { get; set; }
         public List<MarketSortOrderModel.ClientMarketTemplate> FilteredMarketTemplates { get; set; }
         public static List<SelectListItemModel<int>> MarketGroups { get; set; }
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
+
+        public string AlertMessage { get; set; }
+        public AlertStatus AlertStatus { get; set; }
 
         #endregion
 
@@ -49,6 +54,22 @@ namespace Backoffice.Web.Pages.OddsEngine
             InitSortingAndSelect2 = false;
             IsMarketGroupClicked = false;
             IsUpdate = false;
+
+            Breadcrumbs = new List<BreadcrumbModel>();
+
+            Breadcrumbs.Add(new BreadcrumbModel
+            {
+                Name = "Market Settings",
+                Url = string.Empty,
+                IsCurrentPage = false
+            });
+
+            Breadcrumbs.Add(new BreadcrumbModel
+            {
+                Name = "Market Sort Order",
+                Url = "odds-engine/market-sort-order",
+                IsCurrentPage = true
+            });
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -220,6 +241,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             InitSortingAndSelect2 = true;
             IsUpdate = false;
+        }
+
+        public async Task OnSaveCopyClickEvent()
+        {
+            AlertMessage = "Market Sort Order settings copied successfully.";
+            AlertStatus = AlertStatus.Success;
         }
 
         public async ValueTask DisposeAsync()

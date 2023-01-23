@@ -1,0 +1,60 @@
+﻿using System.Collections.Generic;
+
+namespace Backoffice.Shared.Models
+{
+    public class PermissionTreeModel
+    {
+        public PermissionTreeModel()
+        {
+            Permissions = new List<PermissionCategory>();
+        }
+
+        public List<PermissionCategory> Permissions { get; set; }
+
+        public class PermissionCategory
+        {
+            public PermissionCategory()
+            {
+                SubCategories = new List<SubCategory>();
+            }
+
+            public int CategoryId { get; set; }
+            public string CategoryName { get; set; }
+            public bool IsEnabled { get; set; }
+            public List<SubCategory> SubCategories { get; set; }
+        }
+
+        public class SubCategory
+        {
+            public SubCategory()
+            {
+                Groups = new List<Group>();
+                Claims = new List<PermissionClaim>();
+            }
+            public string SubCategoryName { get; set; }
+            public bool IsEnabled { get; set; }
+            public List<Group> Groups { get; set; }
+            public List<PermissionClaim> Claims { get; set; }
+        }
+
+        public class Group
+        {
+            public Group()
+            {
+                Claims = new List<PermissionClaim>();
+            }
+            public string GroupName { get; set; }
+            public List<PermissionClaim> Claims { get; set; }
+        }
+        public class PermissionClaim
+        {
+            public string Name { get; set; }
+            public string ClaimType { get; set; }
+            public bool HasReadOnly { get; set; }
+            public int SortOrder { get; set; }
+            public bool IsSubUser { get; set; }
+            public string ClaimValue { get; set; }
+        }
+    }
+
+}

@@ -21,6 +21,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
         [Inject] public IConfiguration AppConfiguration { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         public ConfigFilterModel ConfigFilterModel { get; set; }
         public IEnumerable<MarketLookupNavigationModel> SelectedContents;
@@ -30,6 +31,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string IconClass { get; set; }
         public int? AllMarketStatus { get; set; }
         public string AllMarketStatusName { get; set; } = "Deactivate All";
+        public string ToastTitle { get; set; }
+        public string ToastMessage { get; set; }
+        public bool IsToastMessageMarkup { get; set; }
         public bool isSaving { get; set; }
         public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
         public bool IsPreloader { get; set; }
@@ -40,18 +44,15 @@ namespace Backoffice.Web.Pages.OddsEngine
         {            
             PageTitle = "Config";
             IconClass = "";
-            ConfigFilterModel = new ConfigFilterModel();         
+            ConfigFilterModel = new ConfigFilterModel();
+            IsToastMessageMarkup = true;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                HubConnection = new HubConnectionBuilder()
-                .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
-                .Build();
-
-                //await Subscribe();
+                await Subscribe();
             }
         }
 
@@ -611,50 +612,81 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task Subscribe()
         {
-            HubConnection.On<ConfigSettingsModel>("onconfigchange", message =>
+            HubConnection = new HubConnectionBuilder()
+                .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
+                .Build();
+
+            //HubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
+            //{
+            //    await ProcessOnConfigChange(message);
+            //});
+
+            HubConnection.On<NotificationsModel>("onnewnotification", async message => 
             {
-                if (ConfigFilterModel.ClientCode == message.ClientCode)
-                {
-                    var isUpdated = false;
-
-                    var clientConfig = ConfigFilterModel.ClientConfig;
-                    foreach (var marketSetting in message.MarketConfig)
-                    {
-                        isUpdated = false;
-                        //update existing config
-                        foreach (var marketConfig in clientConfig.ClientMarket)
-                        {
-                            if (marketConfig.MarketTemplateId == marketSetting.MarketTemplateId)
-                            {
-                                marketConfig.IsActive = marketSetting.IsActive;
-                                marketConfig.Prematch = marketSetting.PrematchSettings == null ? marketConfig.Prematch : JsonSerializer.Serialize(marketSetting.PrematchSettings);
-                                marketConfig.Live = marketSetting.LivematchSettings == null ? marketConfig.Live : JsonSerializer.Serialize(marketSetting.LivematchSettings);
-                                isUpdated = true;
-                                break;
-                            }
-                        }
-                        //add new config
-                        if (!isUpdated)
-                        {
-                            clientConfig.ClientMarket.Add(new ClientMarketConfig()
-                            {
-                                SportId = message.SportId,
-                                ClientCode = message.ClientCode,
-                                FixtureTypeId = (int)FixtureType,
-                                MarketTemplateId = marketSetting.MarketTemplateId,
-                                IsActive = marketSetting.IsActive,
-                                Prematch = JsonSerializer.Serialize(marketSetting.PrematchSettings),
-                                Live = JsonSerializer.Serialize(marketSetting.LivematchSettings)
-                            });
-                        }
-
-                    }
-
-                    StateHasChanged();
-                }
+                await ProcessNotification(message);
             });
 
             await HubConnection.StartAsync();
+        }
+
+        private async Task ProcessOnConfigChange(ConfigSettingsModel message)
+        {
+            if (ConfigFilterModel.ClientCode == message.ClientCode)
+            {
+                var isUpdated = false;
+
+                var clientConfig = ConfigFilterModel.ClientConfig;
+                foreach (var marketSetting in message.MarketConfig)
+                {
+                    isUpdated = false;
+                    //update existing config
+                    foreach (var marketConfig in clientConfig.ClientMarket)
+                    {
+                        if (marketConfig.MarketTemplateId == marketSetting.MarketTemplateId)
+                        {
+                            marketConfig.IsActive = marketSetting.IsActive;
+                            marketConfig.Prematch = marketSetting.PrematchSettings == null ? marketConfig.Prematch : JsonSerializer.Serialize(marketSetting.PrematchSettings);
+                            marketConfig.Live = marketSetting.LivematchSettings == null ? marketConfig.Live : JsonSerializer.Serialize(marketSetting.LivematchSettings);
+                            isUpdated = true;
+                            break;
+                        }
+                    }
+                    //add new config
+                    if (!isUpdated)
+                    {
+                        clientConfig.ClientMarket.Add(new ClientMarketConfig()
+                        {
+                            SportId = message.SportId,
+                            ClientCode = message.ClientCode,
+                            FixtureTypeId = (int)FixtureType,
+                            MarketTemplateId = marketSetting.MarketTemplateId,
+                            IsActive = marketSetting.IsActive,
+                            Prematch = JsonSerializer.Serialize(marketSetting.PrematchSettings),
+                            Live = JsonSerializer.Serialize(marketSetting.LivematchSettings)
+                        });
+                    }
+
+                }
+
+                StateHasChanged();
+            }            
+        }
+        private async Task ProcessNotification(NotificationsModel message) 
+        {
+            if (message != null)
+            {
+                if (message.Page.Contains("Config"))
+                {
+                    ToastTitle = "Config";
+                    ToastMessage = $"{message.Details}";
+                    await ShowToast();
+                }
+            }
+        }
+        private async Task ShowToast()
+        {
+            await InvokeAsync(StateHasChanged);
+            await JSRuntime.InvokeVoidAsync("showToast", false);
         }
         #endregion
     }

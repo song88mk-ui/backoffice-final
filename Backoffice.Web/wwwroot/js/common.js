@@ -79,10 +79,16 @@ window.destroySort = (className) => {
 }
 
 // initialize select2
-window.initSelect2 = (className, event) => {
-    $(className).select2();
+window.initSelect2 = (className, event, closeOnSelect) => {
+    if (closeOnSelect) {
+        $(className).select2({closeOnSelect: false});
+    }
+    else {
+        $(className).select2();
+    }
 
     $(className).on('select2:select', function (e) {
+
         var data = {
             parentId: e.currentTarget.id,
             selectedOptionId: e.params.data.id,
@@ -101,6 +107,10 @@ window.initSelect2 = (className, event) => {
 
         DotNet.invokeMethodAsync('Backoffice.Web', event, data);
     })
+}
+
+window.destroySelect2 = (className) => {
+    $(className).select2('destroy');
 }
 
 window.disableSelect2 = (className) => {
@@ -129,7 +139,14 @@ window.getSortOrder = (className, event) => {
     return new Blob([concat], { type: "application/txt" });
 }
 
-window.showToast = () => {
+
+window.showToast = (isAutoHide) => {
+    if (isAutoHide !== undefined) {
+        $('.toast').toast({
+            autohide: isAutoHide
+        });
+    }
+    
     $('.toast').toast('show');
 }
 
@@ -169,4 +186,27 @@ function password_show_hide() {
         show_eye.style.display = "block";
         hide_eye.style.display = "none";
     }
+}
+
+window.ValidateParlayBonusMinOdds = (refEl) => {
+    var element = $(refEl);    
+    var isDisabled = false;
+
+    if (element.val() < 1.20) {
+        isDisabled = true;
+    }
+
+    if (element.val().indexOf('.') >= 1) {
+        //input has .
+        //split the element first to check if there are chars after .
+        if (element.val().split('.').length > 1) {
+            //now check the length after .
+            if (element.val().split('.')[1] > 2) {
+                var splitVal = element.val().split('.');
+                element.val(splitVal[0] + '.' + splitVal[1].substr(0, 2));
+            }
+        }
+    }
+
+    DotNet.invokeMethodAsync('Backoffice.Web', 'DisableSaveButton', isDisabled);
 }

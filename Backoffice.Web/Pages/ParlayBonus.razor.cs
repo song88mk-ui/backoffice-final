@@ -84,6 +84,11 @@ namespace Backoffice.Web.Pages
         public async Task OnClientChangedEvent(long ClientId)
         {
             this.ClientId = ClientId;
+            MetaData = new MetaData()
+            {
+                CurrentPage = 1,
+                PageSize = 10
+            };
             await LoadClientParlayBonus(ClientId);
         }
 

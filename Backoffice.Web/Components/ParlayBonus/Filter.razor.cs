@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Components.ParlayBonus
 {
@@ -9,6 +10,7 @@ namespace Backoffice.Web.Components.ParlayBonus
     {
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
         [Parameter] public ClientParlayBonusModel ClientParlayBonusResponse { get; set; }        
         [Parameter] public EventCallback<bool> OnUpdateClickCallback { get; set; }
         [Parameter] public EventCallback<ParlayBonusConfig> OnAddClickCallback { get; set; }
@@ -17,22 +19,33 @@ namespace Backoffice.Web.Components.ParlayBonus
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public List<SelectListItemModel<ClientModel.Client>> Clients { get; set; }        
+        ElementReference ParlayBonusMinOddsElementReference { get; set; }
         public string ClientId { get; set; }
         public bool IsUpdating { get; set; } = false;        
         public decimal OriginalMinOdds { get; set; }
+
+        private static bool IsFormValid { get; set; }
+        private static Filter filter;
+        #endregion
+
+        #region Ctor
+        public Filter()
+        {
+            filter = this;
+        }
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            ClientId = "0";
+            ClientId = "0";                        
         }
 
         public void Dispose()
         {
             
-        }
+        }        
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
@@ -45,6 +58,8 @@ namespace Backoffice.Web.Components.ParlayBonus
         {
             OriginalMinOdds = ClientParlayBonusResponse.ParlayBonusMinOdds;
             IsUpdating = !IsUpdating;
+
+            IsFormValid = ClientParlayBonusResponse.ParlayBonusMinOdds < 1.20m ? true : false;
 
             await OnUpdateClickCallback.InvokeAsync(IsUpdating);
 
@@ -81,6 +96,20 @@ namespace Backoffice.Web.Components.ParlayBonus
                     SelectionCount = ClientParlayBonusResponse.ParlayBonusConfig.Last().SelectionCount + 1
                 });
             }
+        }
+
+        [JSInvokable("DisableSaveButton")]
+        public static void DisableSaveButton(bool isDisabled)
+        {
+            IsFormValid = isDisabled;
+            filter.StateHasChanged();
+        }
+        #endregion
+
+        #region Utilities
+        private async Task ValidateParlayBonusMinOdds(ChangeEventArgs e)
+        {
+            await JSRuntime.InvokeVoidAsync("ValidateParlayBonusMinOdds", ParlayBonusMinOddsElementReference);
         }
         #endregion
     }

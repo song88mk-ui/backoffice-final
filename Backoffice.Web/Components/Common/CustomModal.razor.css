@@ -1,3 +1,7 @@
 ﻿.modal-header {
     padding: unset;
 }
+
+.modal-z-index {
+    z-index: 1051;
+}

@@ -1,0 +1,58 @@
+﻿<Toast ToastTitle="@ToastTitle" ToastMessage="@ToastMessage" />
+<div class="modal-body">
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-inline-block">
+                <input type="radio" class="btn-check" name="options" id="importRadio" autocomplete="off" @onclick="OnImportRadioClickEvent" checked />
+                <label class="btn" for="importRadio">Import</label>
+            </div>
+            <div class="d-inline-block">
+                <input type="radio" class="btn-check" name="options" id="exportRadio" autocomplete="off" @onclick="OnExportRadioClickEvent">
+                <label class="btn" for="exportRadio">Export</label>
+            </div>
+        </div>
+    </div>
+
+    @if (IsImportTab)
+    {
+        <select class="form-select import-select d-block" multiple="multiple">
+            <option value="0" selected>All Clients</option>
+            @foreach (var client in Clients)
+            {
+                <option value="@client.Value">@client.Name</option>
+            }
+        </select>
+    }
+    else
+    {
+        <div class="d-block mb-3">
+            <select class="form-select" @onchange="OnClientSelectChanged">
+                @foreach (var client in Clients)
+                {
+                    <option value="@client.Value">@client.Name</option>
+                }
+            </select>
+        </div>
+        <div class="d-block">
+            <select class="form-select export-select" multiple="multiple">
+                <option value="0" selected>All Sports</option>
+                @foreach(var sport in Sports)
+                {
+                    <option value="@sport.Value">@sport.Name</option>
+                }
+            </select>
+        </div>
+    }
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnModalCancelClickEvent">Cancel</button>
+    @if (!IsImportTab)
+    {
+        <button disabled="@IsUploading" type="button" class="btn modal-btn btn-export" @onclick="OnExportClickEvent">Export</button>
+    }
+    else
+    {
+        <button disabled="@IsUploading" type="button" class="btn modal-btn btn-export" onclick="document.getElementById('importInputFile').click()">Import From Zip/Excel</button>
+        <InputFile id="importInputFile" OnChange="OnImportInputFileChanged" hidden/>
+    }
+</div>

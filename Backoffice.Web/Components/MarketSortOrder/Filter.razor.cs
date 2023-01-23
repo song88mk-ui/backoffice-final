@@ -69,7 +69,7 @@ namespace Backoffice.Web.Components.MarketSortOrder
                 });
             }
 
-            SelectedClientCode = Clients.FirstOrDefault().Value;
+            SelectedClientCode = Clients.FirstOrDefault() != null ? Clients.FirstOrDefault().Value : string.Empty;
 
             var sports = (await TradingService.GetSportLookup()).Result;
 
@@ -151,8 +151,16 @@ namespace Backoffice.Web.Components.MarketSortOrder
             parameters.Add("ModalDialogClass", "modal-md");
 
             parameters.Add("FromClientCode", SelectedClientCode);
-            parameters.Add("FromSportId", SelectedSportId);
-            parameters.Add("FromFixtureStatusId", SelectedFixtureStatusId);
+
+            var sport = Sports.FirstOrDefault(c => c.Value == SelectedSportId);
+
+            parameters.Add("FromSportId", sport.Value);
+            parameters.Add("FromSportName", sport.Name);
+
+            var fixtureStatus = FixtureStatuses.FirstOrDefault(c => c.Value == SelectedFixtureStatusId);
+
+            parameters.Add("FromFixtureStatusId", fixtureStatus.Value);
+            parameters.Add("FromFixtureStatusName", fixtureStatus.Name);
 
             var options = new ModalOptions();
 

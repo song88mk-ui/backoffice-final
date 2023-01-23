@@ -1,0 +1,16 @@
+﻿.btn-check:checked + label {
+    border-bottom: solid #E12E22 3px;
+    border-radius: 0;
+}
+
+.modal-btn {
+    color: white;
+}
+
+.modal-btn.btn-cancel {
+    background-color: #9AA0AB;
+}
+
+.modal-btn.btn-export {
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}

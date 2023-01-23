@@ -46,6 +46,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<MarketTemplateGroupResponse>> GetMarketTemplateGroups(int fixtureTypeId);
         Task<BaseResponse<MarketLookupResponse>> GetMarketLookup(MarketLookupRequest request);
         Task<BaseResponse<ClientConfigResponse>> AddOrUpdateConfig(ConfigSettingsModel request);
+        Task<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>> GetConfigLogs(ConfigLogsRequest request);
 
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);

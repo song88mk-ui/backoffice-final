@@ -4,12 +4,24 @@
 
 @page "/odds-engine/market-sort-order"
 
+<div class="col-md-12">
+    <Breadcrumb Breadcrumbs="Breadcrumbs" />
+</div>
 <div class="col-md-12">    
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
     <Filter @bind-IsUpdate="IsUpdate" OnUpdateCallback="OnUpdateClickEvent" OnCancelCallback="OnCancelClickEvent" OnSaveCallback="OnSaveClickEvent" MarketSortOrderModelCallback="PrepareMarketSortOrderModel" OnMarketGroupCallback="OnMarketGroupClickEvent" />
 </div>
+
+@if (!string.IsNullOrEmpty(AlertMessage))
+{
+    <div class="col-md-12">
+        <div class="mt-4 mx-3">
+            <Alert Message="@AlertMessage" AlertStatus="AlertStatus" />
+        </div>
+    </div>
+}
 <div class="col-md-12">
     <div class="mx-3 mt-4">
         @if (MarketSortOrderModel.MarketTemplates.Any())
@@ -59,4 +71,4 @@
         }
     </div>
 </div>
-<CustomModal OnSaveClickCallback="OnModalDiscardChanges"/>
+<CustomModal OnSaveClickCallback="OnSaveCopyClickEvent" OnCancelClickCallback="OnModalDiscardChanges"/>

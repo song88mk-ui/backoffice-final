@@ -125,7 +125,7 @@ namespace Backoffice.Web.Pages.Administration
         #region Utilities
         private async Task<PermissionResponse> GetPermissionList()
         {
-            var response = await AuthenticationService.GetPermissionList(true);
+            var response = await AuthenticationService.GetPermissionList(false);
 
             if (response.StatusCode == StatusCode.Success)
             {
