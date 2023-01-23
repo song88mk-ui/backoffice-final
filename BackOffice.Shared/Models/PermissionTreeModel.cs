@@ -20,6 +20,7 @@ namespace Backoffice.Shared.Models
 
             public int CategoryId { get; set; }
             public string CategoryName { get; set; }
+            public bool IsEnabled { get; set; }
             public List<SubCategory> SubCategories { get; set; }
         }
 
@@ -31,6 +32,7 @@ namespace Backoffice.Shared.Models
                 Claims = new List<PermissionClaim>();
             }
             public string SubCategoryName { get; set; }
+            public bool IsEnabled { get; set; }
             public List<Group> Groups { get; set; }
             public List<PermissionClaim> Claims { get; set; }
         }
@@ -51,6 +53,7 @@ namespace Backoffice.Shared.Models
             public bool HasReadOnly { get; set; }
             public int SortOrder { get; set; }
             public bool IsSubUser { get; set; }
+            public string ClaimValue { get; set; }
         }
     }
 

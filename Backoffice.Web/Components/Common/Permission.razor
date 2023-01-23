@@ -20,7 +20,29 @@
                                     @category.CategoryName
                                 </h6>
                                 <div class="form-switch d-inline-block pull-right">
-                                    <input class="form-check-input" type="checkbox" role="switch" checked />
+
+                                    @if(category.IsEnabled)
+                                    {
+                                        if(IsReadOnly)
+                                        {
+                                            <input class="form-check-input" type="checkbox" role="switch" checked disabled/>
+                                        }
+                                        else
+                                        {
+                                            <input class="form-check-input" type="checkbox" role="switch" checked />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(IsReadOnly)
+                                        {
+                                            <input class="form-check-input" type="checkbox" role="switch" disabled />
+                                        }
+                                        else
+                                        {
+                                            <input class="form-check-input" type="checkbox" role="switch" />
+                                        }
+                                    }
                                 </div>
                             </div>
                             <div class="header-information">
@@ -52,19 +74,13 @@
 
                                                 @if (@category.SubCategories[rowCount].Claims.Any())
                                                 {
-                                                    foreach (var claim in @category.SubCategories[rowCount].Claims)
+                                                    for(int ctr = 0; ctr<@category.SubCategories[rowCount].Claims.Count; ctr++)
                                                     {
-                                                        <div class="form-switch mb-2">
-                                                            @if (IsReadOnly)
-                                                            {
-                                                                <input class="form-check-input me-4" type="checkbox" value="" id="cat-dashboard" checked>
-                                                            }
-                                                            else
-                                                            {
-                                                                <input class="form-check-input me-4" type="checkbox" value="" id="cat-dashboard" disabled checked>
-                                                            }
-                                                            <label class="form-check-label" for="cat-dashboard">@claim.Name</label>
-                                                        </div>
+                                                        var claim = @category.SubCategories[rowCount].Claims[ctr];
+                                                        var claimId = claim.HasReadOnly ? $"{claim.ClaimType}" : $"{claim.ClaimType}";
+                                                        
+                                                        <PermissionRow Claim="@claim" ClaimId="@claimId" IsReadOnly="@IsReadOnly" Permissions="@Permissions" />
+
                                                     }
                                                 }
                                             </div>
@@ -79,19 +95,13 @@
 
                                                 @if (category.SubCategories[rowCount].Claims.Any())
                                                 {
-                                                    foreach (var claim in category.SubCategories[rowCount].Claims)
+                                                    for (int ctr = 0; ctr < @category.SubCategories[rowCount].Claims.Count; ctr++)
                                                     {
-                                                        <div class="form-switch mb-2">
-                                                            @if (IsReadOnly)
-                                                            {
-                                                                <input class="form-check-input me-4" type="checkbox" value="" id="cat-dashboard" checked>
-                                                            }
-                                                            else
-                                                            {
-                                                                <input class="form-check-input me-4" type="checkbox" value="" id="cat-dashboard" disabled checked>
-                                                            }
-                                                            <label class="form-check-label" for="cat-dashboard">@claim.Name</label>
-                                                        </div>
+                                                        var claim = @category.SubCategories[rowCount].Claims[ctr];
+                                                        var claimId = claim.Name.Contains("readonly", StringComparison.OrdinalIgnoreCase) ? $"{claim.ClaimType}-readonly" : $"{claim.ClaimType}";
+
+                                                        <PermissionRow Claim="@claim" ClaimId="@claimId" IsReadOnly="@IsReadOnly" Permissions="@Permissions" />
+
                                                     }
                                                 }
                                             </div>

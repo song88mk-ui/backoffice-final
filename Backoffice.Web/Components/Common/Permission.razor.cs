@@ -14,6 +14,7 @@ namespace Backoffice.Web.Components.Common
         public PermissionTreeModel PermissionTree { get; set; }
         #endregion
 
+        #region Methods
         protected override async Task OnInitializedAsync()
         {
             try
@@ -25,9 +26,12 @@ namespace Backoffice.Web.Components.Common
 
             }
         }
+
+
         public void Dispose()
         {
         }
+        #endregion
 
         #region Utilities
         private async Task<PermissionTreeModel> GetPermissionTree()
@@ -62,6 +66,7 @@ namespace Backoffice.Web.Components.Common
                                 IsSubUser = s.FirstOrDefault().IsSubUser,
                                 HasReadOnly = s.FirstOrDefault().HasReadOnly,
                                 SortOrder = s.FirstOrDefault().SortOrder,
+                                ClaimValue = s.FirstOrDefault().ClaimValue
                             }).Distinct().ToList();
 
                             var groups = Permissions.Where(p => p.CategoryId == permission.CategoryId && p.SubCategoryName == subCategory.SubCategoryName && !string.IsNullOrEmpty(p.GroupName)).Select(s => s.GroupName).Distinct().ToList();
@@ -77,6 +82,7 @@ namespace Backoffice.Web.Components.Common
                                         IsSubUser = s.IsSubUser,
                                         HasReadOnly = s.HasReadOnly,
                                         SortOrder = s.SortOrder,
+                                        ClaimValue = s.ClaimValue
                                     }).Distinct().ToList();
 
                                 var groupModel = new PermissionTreeModel.Group

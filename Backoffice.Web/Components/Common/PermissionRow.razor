@@ -1,0 +1,60 @@
+﻿<div class="form-switch mb-2">
+    @if (IsReadOnly)
+    {
+        if (Claim.Name.Contains("readonly", StringComparison.OrdinalIgnoreCase) && Claim.ClaimValue == "2")
+        {
+            <input class="form-check-input me-4" type="checkbox" value="" id="@ClaimId" checked disabled>
+        }
+        else if (Claim.ClaimValue == "1")
+        {
+            <input class="form-check-input me-4" type="checkbox" value="" id="@ClaimId" checked disabled>
+        }
+        else
+        {
+            <input class="form-check-input me-4" type="checkbox" value="" id="@ClaimId" disabled>
+        }
+    }
+    else
+    {
+        if (Claim.ClaimValue == "1")
+        {
+            <input class="form-check-input me-4" type="checkbox" value="" id="@ClaimId" checked @onchange="(e) => OnCheckboxClicked(e, false)">
+        }
+        else
+        {
+            <input class="form-check-input me-4" type="checkbox" value="" id="@ClaimId" @onchange="(e) => OnCheckboxClicked(e, false)">
+        }
+    }
+    <label class="form-check-label" for="@ClaimId">@Claim.Name</label>
+
+</div>
+
+@if (Claim.HasReadOnly)
+{
+    <div class="form-switch mb-2">
+        @if (IsReadOnly)
+        {
+            if (Claim.ClaimValue == "2")
+            {
+                <input class="form-check-input me-4" type="checkbox" value="" id="@(ClaimId)-readonly" checked disabled>
+            }
+            else
+            {
+                <input class="form-check-input me-4" type="checkbox" value="" id="@(ClaimId)-readonly" disabled>
+            }
+        }
+        else
+        {
+            if (Claim.ClaimValue == "2")
+            {
+                <input class="form-check-input me-4" type="checkbox" value="" id="@(ClaimId)-readonly" checked @onchange="(e) => OnCheckboxClicked(e, true)">
+            }
+            else
+            {
+                <input class="form-check-input me-4" type="checkbox" value="" id="@(ClaimId)-readonly" @onchange="(e) => OnCheckboxClicked(e, true)">
+            }
+        }
+        <label class="form-check-label" for="@(ClaimId)-readonly">@Claim.Name (Readonly)</label>
+
+    </div>
+}
