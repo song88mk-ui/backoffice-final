@@ -12,6 +12,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using UAParser;
 
@@ -29,48 +30,12 @@ namespace Backoffice.API.Controllers.Authentication
         {
             _authenticationRepository = authenticationRepository;
         }
-        private static string GetUserCountryByIp(string ip)
-        {
-            //var url = "http://freegeoip.net/json/" + IP;
-            //var url = "http://freegeoip.net/json/" + IP;
-            string url = "http://api.ipstack.com/" + ip + "?access_key=[KEY]";
-            var request = System.Net.WebRequest.Create(url);
-
-            using (WebResponse wrs = request.GetResponse())
-            {
-                using (Stream stream = wrs.GetResponseStream())
-                {
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        string json = reader.ReadToEnd();
-                        var obj = JObject.Parse(json);
-                        string City = (string)obj["city"];
-                        string Country = (string)obj["region_name"];
-                        string CountryCode = (string)obj["country_code"];
-
-                        return (CountryCode + " - " + Country + "," + City);
-                    }
-                }
-            }
-
-            return "";
-        }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
-            //var userAgent = HttpContext.Request.Headers["User-Agent"];
-            //var uaParser = Parser.GetDefault();
-            //ClientInfo client = uaParser.Parse(userAgent);
-            //var browser = client.UA.ToString();
-            //var os = client.OS.ToString();
-            //var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-            //if (ipAddress == "::1")
-            //{
-            //    ipAddress = Dns.GetHostEntry(Dns.GetHostName()).AddressList[1].ToString();
-            //}
-
-            //var test = GetUserCountryByIp(ipAddress);
-            var result = await _authenticationRepository.Login(content, "", "", "");
+            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
+           
+            var result = await _authenticationRepository.Login(content, userAgent);
 
             switch (result.StatusCode)
             {

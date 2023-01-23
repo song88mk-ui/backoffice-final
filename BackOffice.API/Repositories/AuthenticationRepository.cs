@@ -3,15 +3,13 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using System;
+using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Backoffice.Shared.Models.Requests;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.Security.Policy;
+using UAParser;
 
 namespace Backoffice.API.Repositories
 {
@@ -22,13 +20,29 @@ namespace Backoffice.API.Repositories
         {
             _httpClient = httpClient;
         }
-        public async Task<BaseResponse<TokenModel>> Login(LogInModel loginModel, string browser, string os, string ipAddress)
+        public async Task<BaseResponse<TokenModel>> Login(LogInModel loginModel, string userAgent)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("Client-Info", browser);
-                _httpClient.DefaultRequestHeaders.Add("Client-OS", os);
-                _httpClient.DefaultRequestHeaders.Add("Client-IpAddress", ipAddress);
+                if (!string.IsNullOrWhiteSpace(userAgent.ToString()))
+                {
+                    var uaParser = Parser.GetDefault();
+                    ClientInfo client = uaParser.Parse(userAgent);
+                    loginModel.BrowserInfo = client.UA.Family.ToString();
+                    loginModel.BrowserVersion = $"{client.UA.Major}.{client.UA.Minor}.{client.UA.Patch}";
+                    loginModel.OperatingSystem = client.OS.ToString();
+                    loginModel.IpAddress = GetIPAddress();
+                    if (loginModel.IpAddress == "::1")
+                    {
+                        loginModel.IpAddress = Dns.GetHostEntry(Dns.GetHostName()).AddressList[1].ToString();
+                    }
+                    var country = GetUserCountryByIp(loginModel.IpAddress);
+                    if (country != null)
+                    {
+                        loginModel.Country = country;
+                    }
+                }
+
                 var response = await _httpClient.PostAsync($"login", new StringContent(JsonSerializer.Serialize(loginModel), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -477,5 +491,41 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+
+        #region Utilities
+        private static string GetUserCountryByIp(string ip)
+        {
+            IpInfo ipInfo = new IpInfo();
+            try
+            {
+                string info = new WebClient().DownloadString("http://ipinfo.io/" + ip);
+                ipInfo = JsonSerializer.Deserialize<IpInfo>(info, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                RegionInfo myRI1 = new RegionInfo(ipInfo.Country);
+                ipInfo.Country = myRI1.EnglishName;
+            }
+            catch (Exception)
+            {
+                ipInfo.Country = null;
+            }
+
+            return ipInfo.Country;
+        }
+        private string GetIPAddress()
+        {
+            String address = "";
+            WebRequest request = WebRequest.Create("http://checkip.dyndns.org/");
+            using (WebResponse response = request.GetResponse())
+            using (StreamReader stream = new StreamReader(response.GetResponseStream()))
+            {
+                address = stream.ReadToEnd();
+            }
+
+            int first = address.IndexOf("Address: ") + 9;
+            int last = address.LastIndexOf("</body>");
+            address = address.Substring(first, last - first);
+
+            return address;
+        }
+        #endregion
     }
 }

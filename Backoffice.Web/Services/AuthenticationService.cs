@@ -6,9 +6,13 @@ using Backoffice.Shared.Utilities;
 using Backoffice.Web.ActionFilter;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -39,6 +43,9 @@ namespace Backoffice.Web.Services
                 };
             user.Provider = "BoWeb";
             var bodyContent = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
+            var userAgent = _httpContextAccessor.HttpContext.Request.Headers.UserAgent;
+
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", userAgent.ToString());
             var response = await _httpClient.PostAsync("api/authentication/login", bodyContent);
 
             if (response.StatusCode == HttpStatusCode.OK)
