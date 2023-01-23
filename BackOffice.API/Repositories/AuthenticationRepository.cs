@@ -106,7 +106,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<bool>> Logout(string token)
         {
             try
@@ -141,7 +140,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<bool>> Register(UserRegisterRequest request, string token)
         {
             try
@@ -176,7 +174,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        
         public async Task<BaseResponse<UserListResponse>> GetUserList(UserGroupRequest request, string token, bool isShowSuperAdmin = false)
         {
             try
@@ -246,7 +243,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<UserResponse>> GetCurrentUser(string userId, string token)
         {
             try
@@ -281,7 +277,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<UserListResponse>> GetSubAccounts(SubAccountListRequest request, string token)
         {
             try
@@ -316,7 +311,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<PermissionResponse>> GetPermissionList(bool isSubUserOnly, string token)
         {
             try
@@ -351,7 +345,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<UserGroupListResponse>> GetUserGroupList(UserGroupListRequest request, string token)
         {
             try
@@ -386,7 +379,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<UserListResponse>> GetUserGroupUsers(UserGroupRequest request, string token)
         {
             try
@@ -421,7 +413,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<bool>> AddOrUpdateUserGroup(UserGroupRequest request, string token)
         {
             try
@@ -456,7 +447,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<bool>> DeleteUserGroup(UserGroupRequest request, string token)
         {
             try
@@ -491,7 +481,40 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        public async Task<BaseResponse<LogInActivityLogResponse>> GetActivityLogList(string token)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                var response = await _httpClient.GetAsync($"api/user/activitylog/list");
 
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<LogInActivityLogResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<LogInActivityLogResponse>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
+                        return JsonSerializer.Deserialize<BaseResponse<LogInActivityLogResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<LogInActivityLogResponse>();
+                    else
+                    {
+                        return new BaseResponse<LogInActivityLogResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<LogInActivityLogResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
         #region Utilities
         private static string GetUserCountryByIp(string ip)
         {
