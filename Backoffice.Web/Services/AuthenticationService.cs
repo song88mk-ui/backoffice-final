@@ -7,6 +7,7 @@ using Backoffice.Web.ActionFilter;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -236,7 +237,7 @@ namespace Backoffice.Web.Services
                 var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
-                var response = await _httpClient.PostAsJsonAsync($"api/authentication/user/list?userId={userId}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"api/authentication/activitylog/list?userId={userId}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<LogInActivityLogResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })

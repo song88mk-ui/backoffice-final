@@ -487,7 +487,7 @@ namespace Backoffice.API.Repositories
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
-                var response = await _httpClient.PostAsync($"api/authentication/activitylog/list?userId={userId}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"api/user/activitylog/list?userId={userId}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<LogInActivityLogResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
@@ -522,10 +522,11 @@ namespace Backoffice.API.Repositories
             IpInfo ipInfo = new IpInfo();
             try
             {
+                ip = "52.229.219.142";
                 string info = new WebClient().DownloadString("http://ipinfo.io/" + ip);
                 ipInfo = JsonSerializer.Deserialize<IpInfo>(info, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 RegionInfo myRI1 = new RegionInfo(ipInfo.Country);
-                ipInfo.Country = myRI1.EnglishName;
+                ipInfo.Country = myRI1.TwoLetterISORegionName;
             }
             catch (Exception)
             {

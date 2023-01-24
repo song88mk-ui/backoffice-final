@@ -20,7 +20,7 @@ namespace Backoffice.Web.Components.ManageUser
         private string UserId { get; set; }
         private MetaData MetaData { get; set; }
         public bool IsPreLoader { get; set; }
-        public List<LogInActivityLogModel> LogInActivityLogs  {get; set; }
+        public List<LogInActivityLogModel> LogInActivityLogs { get; set; }
         #endregion
 
         #region Methods
@@ -36,25 +36,32 @@ namespace Backoffice.Web.Components.ManageUser
                 TotalPages = 0,
                 TotalCount = 0
             };
+
+            await GetContent();
         }
         public async Task OnCloseModalClickEvent()
         {
             ModalService.Cancel();
         }
+        public async Task SelectPage(int page)
+        {
+            MetaData.CurrentPage = page;
+            await GetContent();
+        }
         public void Dispose()
         {
-            
+
         }
         #endregion
 
         #region Utilities
         private async Task GetContent()
         {
-            var userResponse = await AuthenticationService.GetLogInActivityLogList(UserId, MetaData);
-            if (userResponse.Result != null)
+            var userResponse = (await AuthenticationService.GetLogInActivityLogList(UserId, MetaData)).Result;
+            if (userResponse != null)
             {
-                LogInActivityLogs = userResponse.Result.ActivityLogs;
-                MetaData = userResponse.Result.MetaData;
+                LogInActivityLogs = userResponse.ActivityLogs;
+                MetaData = userResponse.MetaData;
             }
 
             IsPreLoader = false;
