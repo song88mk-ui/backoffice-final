@@ -548,7 +548,7 @@
                                                     <label class="tier-lbl" colspan="3">Above Tier Settings</label>
                                                     @if (SportsbookTierOption)
                                                     {
-                                                        <select class="form-select" aria-label="Above Tier Select" id="aboveTierSelect">
+                                                        <select class="form-select" aria-label="Above Tier Select" id="aboveTierSelect" @onchange="(e) => OnAboveTierSelect(e)">
                                                             @for (int i = 0; i <= 100; i++)
                                                             {
                                                                 if (Convert.ToDecimal(i) == SportsbookTier.AboveTierPercentage)
@@ -564,7 +564,7 @@
                                                     }
                                                     else
                                                     {
-                                                        <select class="form-select" aria-label="Above Tier Select" id="aboveTierSelect">
+                                                        <select class="form-select" aria-label="Above Tier Select" id="aboveTierSelect" @onchange="(e) => OnAboveTierSelect(e)">
                                                             @for (int i = 0; i <= 100; i++)
                                                             {
                                                                 if (Convert.ToDecimal(i) == JackpotTier.AboveTierPercentage)

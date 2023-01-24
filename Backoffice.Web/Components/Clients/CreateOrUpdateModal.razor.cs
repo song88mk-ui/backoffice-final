@@ -88,7 +88,7 @@ namespace Backoffice.Web.Components.Clients
                 SelectedVirtualSportsWin = winSports.Any() ? winSports.Where(s => s >= 1000).ToList() : new List<int>();
 
                 //Revenue share sportbook
-                if(Client.IsTierRevenue)
+                if (Client.IsTierRevenue)
                 {
                     if (!string.IsNullOrEmpty(Client.TierSportsbookShare))
                         SportsbookTier = JsonSerializer.Deserialize<TierRevenueShareModel>(Client.TierSportsbookShare) ?? new TierRevenueShareModel() { AboveTierPercentage = 50m };
@@ -105,7 +105,7 @@ namespace Backoffice.Web.Components.Clients
             };
 
 
-            if(!IsEdit)
+            if (!IsEdit)
             {
                 Client.BetSettings = new List<ClientListResponse.BetSetting>();
                 foreach (var currency in Currencies)
@@ -161,7 +161,7 @@ namespace Backoffice.Web.Components.Clients
                             BetSettingAllSports = new ClientListResponse.BetSettingAllSports
                             {
                                 MinPerTicket = suggestedMinimumBet,
-                                MaxPerTicket= suggestedMaximumBet,
+                                MaxPerTicket = suggestedMaximumBet,
                             },
                             BetSettingBetBuilder = new BetSettingBetBuilder
                             {
@@ -189,7 +189,7 @@ namespace Backoffice.Web.Components.Clients
                     }
                 }
 
-                foreach(var setting in Client.BetSettings )
+                foreach (var setting in Client.BetSettings)
                 {
                     decimal suggestedMinimumBet = await GetSuggestedMinimumBet(setting.CurrencyCode);
                     decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
@@ -273,18 +273,18 @@ namespace Backoffice.Web.Components.Clients
                 {
                     ClientId = Client.ClientId,
                     ClientCode = Client.ClientCode ?? string.Empty,
-                    Name= Client.Name ?? string.Empty,
-                    Region= Client.Region ?? string.Empty,
-                    Email= Client.Email ?? string.Empty,
+                    Name = Client.Name ?? string.Empty,
+                    Region = Client.Region ?? string.Empty,
+                    Email = Client.Email ?? string.Empty,
                     IsEmailNotification = Client.IsEmailNotification,
                     MonthlyFee = Client.MonthlyFee,
                     Num = Client.Num,
-                    StatusId= Client.StatusId,
-                    StatusName= Client.StatusName,
-                    TelephoneNumber= Client.TelephoneNumber ?? string.Empty,
+                    StatusId = Client.StatusId,
+                    StatusName = Client.StatusName,
+                    TelephoneNumber = Client.TelephoneNumber ?? string.Empty,
                     IsTierRevenue = Client.IsTierRevenue,
                     BetSlipMaxSelection = Client.BetSlipMaxSelection,
-                    TierJackpotShare= Client.TierJackpotShare,
+                    TierJackpotShare = Client.TierJackpotShare,
                     TierSportsbookShare = Client.TierSportsbookShare,
                     Website = Client.Website ?? string.Empty,
                     RevenueShare = new RevenueShare
@@ -296,7 +296,7 @@ namespace Backoffice.Web.Components.Clients
                 };
 
                 var selectedStakeSports = new List<int>();
-                if(SelectedRealSports.Any())
+                if (SelectedRealSports.Any())
                     selectedStakeSports.AddRange(SelectedRealSports);
 
                 if (SelectedVirtualSports.Any())
@@ -316,8 +316,8 @@ namespace Backoffice.Web.Components.Clients
                     StakeTax = Client.TaxConfig.StakeTax,
                     WinningsTax = Client.TaxConfig.WinningsTax,
                 };
-                
-                if(Client.TaxConfig.StakeTax > 0)
+
+                if (Client.TaxConfig.StakeTax > 0)
                 {
                     clientRequest.TaxConfig.StakeTax = clientRequest.TaxConfig.StakeTax / 100m;
                 }
@@ -326,22 +326,50 @@ namespace Backoffice.Web.Components.Clients
                     clientRequest.TaxConfig.WinningsTax = clientRequest.TaxConfig.WinningsTax / 100m;
                 }
 
-                if(clientRequest.IsTierRevenue)
+                if (clientRequest.IsTierRevenue)
                 {
-                    if(SportsbookTier.Tiers.Any())
-                        foreach(var tier in SportsbookTier.Tiers)
+                    var newSportsbookTier = new TierRevenueShareModel
+                    {
+                        AboveTierPercentage = SportsbookTier.AboveTierPercentage / 100m
+                    };
+                    var newJackpotTier = new TierRevenueShareModel
+                    {
+                        AboveTierPercentage = JackpotTier.AboveTierPercentage / 100m
+                    };
+
+                    if (SportsbookTier.Tiers.Any())
+                    {
+                        newSportsbookTier.Tiers.Clear();
+                        foreach (var tier in SportsbookTier.Tiers)
                         {
-                            tier.Percentage = tier.Percentage / 100m;
+                            newSportsbookTier.Tiers.Add(new TierRevenueShareModel.TierModel
+                            {
+                                From = tier.From,
+                                Tier = tier.Tier,
+                                To = tier.To,
+                                Percentage = tier.Percentage / 100m
+                            });
                         }
+                        clientRequest.TierSportsbookShare = JsonSerializer.Serialize(newSportsbookTier);
+                    }
+
 
                     if (JackpotTier.Tiers.Any())
+                    {
+                        newJackpotTier.Tiers.Clear();
                         foreach (var tier in JackpotTier.Tiers)
                         {
-                            tier.Percentage = tier.Percentage / 100m;
+                            newJackpotTier.Tiers.Add(new TierRevenueShareModel.TierModel
+                            {
+                                From = tier.From,
+                                Tier = tier.Tier,
+                                To = tier.To,
+                                Percentage = tier.Percentage / 100m
+                            });
                         }
+                        clientRequest.TierJackpotShare = JsonSerializer.Serialize(newJackpotTier);
+                    }
 
-                    clientRequest.TierSportsbookShare = JsonSerializer.Serialize(SportsbookTier);
-                    clientRequest.TierJackpotShare = JsonSerializer.Serialize(JackpotTier);
                 }
                 else
                 {
@@ -356,7 +384,7 @@ namespace Backoffice.Web.Components.Clients
 
                 if (response.Result)
                 {
-                    if(IsEdit)
+                    if (IsEdit)
                     {
                         Alerts.Add(new AlertModel
                         {
@@ -600,7 +628,7 @@ namespace Backoffice.Web.Components.Clients
                     var lastTier = SportsbookTier.Tiers.LastOrDefault();
                     if (lastTier != null)
                     {
-                        fromTier = lastTier.To > lastTier.From ? lastTier.To : lastTier.From;
+                        fromTier = (lastTier.To > lastTier.From ? lastTier.To : lastTier.From) + 0.01m;
                     }
 
                 }
@@ -621,7 +649,7 @@ namespace Backoffice.Web.Components.Clients
                     var lastTier = JackpotTier.Tiers.LastOrDefault();
                     if (lastTier != null)
                     {
-                        fromTier = lastTier.To > lastTier.From ? lastTier.To : lastTier.From;
+                        fromTier = (lastTier.To > lastTier.From ? lastTier.To : lastTier.From) + 0.01m;
                     }
 
                 }
@@ -663,6 +691,17 @@ namespace Backoffice.Web.Components.Clients
         public async Task OnTierSelect(ChangeEventArgs e, TierRevenueShareModel.TierModel tier)
         {
             tier.Percentage = Convert.ToDecimal(e.Value.ToString());
+        }
+        public async Task OnAboveTierSelect(ChangeEventArgs e)
+        {
+            if (SportsbookTierOption)
+            {
+                SportsbookTier.AboveTierPercentage = Convert.ToDecimal(e.Value.ToString());
+            }
+            else
+            {
+                JackpotTier.AboveTierPercentage = Convert.ToDecimal(e.Value.ToString());
+            }
         }
         public async Task OnCurrencyClicked(string currency)
         {
