@@ -71,7 +71,6 @@ namespace Backoffice.Web.Shared
             {
                 if (UserModel.Claims != null && Claims == null)
                     Claims = UserModel.Claims;
-
             }
         }
         //protected override void OnParametersSet()

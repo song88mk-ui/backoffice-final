@@ -57,7 +57,7 @@ namespace Backoffice.Web.Services
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token.Result.AccessToken);
                 var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(token.Result.AccessToken), "jwtAuthType"));
 
-                policies = claimsPrincipal.Claims.Where(x => x.Value == "1" || x.Value == "2").Select(x => x.Type.Split('.').FirstOrDefault()).Distinct().ToList();
+                policies = claimsPrincipal.Claims.Where(x => x.Value != "0").Select(x => x.Type.Split('.').FirstOrDefault()).Distinct().ToList();
 
                 result = new BaseResponse<Tuple<bool, List<string>>>
                 {

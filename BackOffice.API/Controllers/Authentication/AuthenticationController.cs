@@ -341,7 +341,7 @@ namespace Backoffice.API.Controllers.Authentication
             {
                 var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-                result = await _authenticationRepository.GetActivityLogList(userId, token);
+                result = await _authenticationRepository.GetLogInActivityLogList(userId, token);
             }
 
             switch (result.StatusCode)

@@ -23,6 +23,5 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<UserListResponse>> GetUserGroupUsers(UserGroupRequest request, string token);
         Task<BaseResponse<bool>> AddOrUpdateUserGroup(UserGroupRequest request, string token);
         Task<BaseResponse<bool>> DeleteUserGroup(UserGroupRequest request, string token);
-        Task<BaseResponse<LogInActivityLogResponse>> GetActivityLogList(string userId, string token);
     }
 }
