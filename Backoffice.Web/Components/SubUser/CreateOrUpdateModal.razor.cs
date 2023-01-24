@@ -19,7 +19,8 @@ namespace Backoffice.Web.Components.SubUser
         public bool IsEdit { get; set; }
         public SubUserClaimsModel SubUserClaims { get; set; }
         public List<AlertModel> Alerts { get; set; }
-        public List<SubUserClaim> DefaultClaims { get; set; }
+        public List<PermissionModel> Permissions { get; set; }
+        public ClientModel ClientModel { get; set; }
         public bool IsTogglePassword { get; set; }
 
         #endregion
@@ -28,24 +29,31 @@ namespace Backoffice.Web.Components.SubUser
             try
             {
                 IsTogglePassword = false;
+                Permissions = new List<PermissionModel>();
                 SubUserClaims = ModalParameters.TryGet<SubUserClaimsModel>("SubUserClaims");
                 Alerts = new List<AlertModel>();
                 SubUser = ModalParameters.TryGet<UserResponse>("SubUser");
                 IsEdit = ModalParameters.TryGet<bool>("IsEdit");
                 SubUser.Status = IsEdit ? SubUser.Status : "Normal";
+                ClientModel = new ClientModel();
 
-                DefaultClaims = new List<SubUserClaim>();
                 if (SubUserClaims != null && SubUserClaims.SubUserClaims.Any())
                 {
                     foreach (var claim in SubUserClaims.SubUserClaims)
                     {
-                        DefaultClaims.Add(new SubUserClaim
+                        Permissions.Add(new PermissionModel
                         {
+                            CategoryId = claim.CategoryId,
+                            CategoryName = claim.CategoryName,
+                            SubCategoryName = claim.SubCategoryName,
+                            GroupName = claim.GroupName,
+                            IsEnabled = claim.IsEnabled,
+                            IsSubUser = claim.IsSubUser,
+                            SortOrder = claim.SortOrder,
                             ClaimType = claim.ClaimType,
                             ClaimValue = claim.ClaimValue,
                             HasReadOnly = claim.HasReadOnly,
-                            IsEnabled = claim.IsEnabled,
-                            Name = claim.Name
+                            Name = claim.Name,
                         });
                     }
                 }
@@ -73,18 +81,24 @@ namespace Backoffice.Web.Components.SubUser
             SubUser = new UserResponse();
             SubUser.Status = "Normal";
 
-            SubUserClaims.SubUserClaims = new List<SubUserClaim>();
-            if (DefaultClaims.Any())
+            Permissions = new List<PermissionModel>();
+            if (SubUserClaims.SubUserClaims.Any())
             {
-                foreach (var claim in DefaultClaims)
+                foreach (var claim in SubUserClaims.SubUserClaims)
                 {
-                    SubUserClaims.SubUserClaims.Add(new SubUserClaim
+                    SubUserClaims.SubUserClaims.Add(new PermissionModel
                     {
+                        CategoryId = claim.CategoryId,
+                        CategoryName = claim.CategoryName,
+                        SubCategoryName = claim.SubCategoryName,
+                        GroupName = claim.GroupName,
+                        IsEnabled = claim.IsEnabled,
+                        IsSubUser = claim.IsSubUser,
+                        SortOrder = claim.SortOrder,
                         ClaimType = claim.ClaimType,
                         ClaimValue = claim.ClaimValue,
                         HasReadOnly = claim.HasReadOnly,
-                        IsEnabled = claim.IsEnabled,
-                        Name = claim.Name
+                        Name = claim.Name,
                     });
                 }
             }
@@ -96,7 +110,7 @@ namespace Backoffice.Web.Components.SubUser
             IsTogglePassword = !IsTogglePassword;
         }
 
-        public async Task OnSubUserPreferenceClicked(ChangeEventArgs e, SubUserClaim claim, bool isReadOnly)
+        public async Task OnSubUserPreferenceClicked(ChangeEventArgs e, PermissionModel claim, bool isReadOnly)
         {
             if (Convert.ToBoolean(e.Value) == true)
             {
@@ -188,15 +202,16 @@ namespace Backoffice.Web.Components.SubUser
                 Status = SubUser.Status,
                 UserName = $"{SubUserClaims.MainUserName}{SubUser.UserName}",
                 UserId = IsEdit ? SubUser.UserId : Guid.NewGuid().ToString(),
+                RoleId = string.Empty,
                 RoleName = "Default",
                 CreatedDate = IsEdit ? SubUser.CreatedDate : DateTime.UtcNow,
             };
 
             request.Claims = new List<ClaimModel>();
 
-            if (SubUserClaims.SubUserClaims.Any())
+            if (Permissions.Any())
             {
-                foreach (var subClaim in SubUserClaims.SubUserClaims)
+                foreach (var subClaim in Permissions)
                 {
                     request.Claims.Add(new ClaimModel { ClaimType = subClaim.ClaimType, ClaimValue = subClaim.ClaimValue });
                 }

@@ -57,7 +57,7 @@ namespace Backoffice.Web.Pages
             {
                 SubUserClaims.MainUserId = UserModel.Id;
                 SubUserClaims.MainUserName = UserModel.UserName;
-                SubUserClaims.SubUserClaims = new List<SubUserClaim>();
+                SubUserClaims.SubUserClaims = new List<PermissionModel>();
 
                 Permissions = await GetPermissionList();
 
@@ -169,17 +169,23 @@ namespace Backoffice.Web.Pages
             return new PermissionResponse();
         }
 
-        private List<SubUserClaim> GetSubUserClaims(List<ClaimModel> claims)
+        private List<PermissionModel> GetSubUserClaims(List<ClaimModel> claims)
         {
-            var subUserClaims = new List<SubUserClaim>();
+            var subUserClaims = new List<PermissionModel>();
 
             bool hasDashboard = false;
             foreach (var permission in Permissions.Permissions)
             {
                 if (permission.IsSubUser)
                 {
-                    var subUserClaim = new SubUserClaim
+                    var subUserClaim = new PermissionModel
                     {
+                        CategoryId = permission.CategoryId,
+                        CategoryName= permission.CategoryName,
+                        GroupName= permission.GroupName,
+                        IsSubUser= permission.IsSubUser,
+                        SortOrder= permission.SortOrder,
+                        SubCategoryName = permission.SubCategoryName,
                         Name = permission.Name,
                         ClaimType = permission.ClaimType,
                         HasReadOnly = permission.HasReadOnly,
@@ -223,10 +229,15 @@ namespace Backoffice.Web.Pages
 
             if(!hasDashboard)
             {
-                subUserClaims.Insert(0, new SubUserClaim
+                subUserClaims.Insert(0, new PermissionModel
                 {
+                    CategoryId = (int)PermissionCategory.Sportsbook,
+                    CategoryName = PermissionCategory.Sportsbook.ToString(),
+                    SubCategoryName = "Dashboard",
+                    GroupName = string.Empty,
+                    IsSubUser = true,
                     Name = "Dashboard",
-                    ClaimType = "SportsbookClient.Dashboard.Access",
+                    ClaimType = SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", "."),
                     HasReadOnly = false,
                     ClaimValue = "1",
                     IsEnabled = false

@@ -26,7 +26,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
         @if (NavMenuAccess == NavMenuAccess.SBC)
         {
             <nav class="flex-column">
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(SportsbookClientPermission.SBC_Dashboard).Replace('_', '.'))}")).Count > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", ".")}")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="/dashboard">
@@ -35,7 +35,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         </NavLink>
                     </div>
                 }
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.SBC)}.Reports")).Count > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{PermissionCategoryAcronym.SBC}.Reports")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-report" role="button" aria-expanded="false" aria-controls="sub-menu-report">
@@ -48,7 +48,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                     </div>
 
                 }
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.SBC)}.Settings")).Count > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{PermissionCategoryAcronym.SBC}.Settings")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-setting" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
@@ -105,7 +105,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                     </NavLink>
                 </div>
 
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.SBC)}.{PermissionCategoryAcronym.OE}")).Count > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{PermissionCategoryAcronym.SBC}.{PermissionCategoryAcronym.OE}")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="odds-engine">
@@ -119,7 +119,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
         else if (NavMenuAccess == NavMenuAccess.Admin)
         {
             <nav class="flex-column">
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_Dashboard).Replace('_', '.'))}")).Count > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{AdminPermission.Admin_Dashboard.ToString().Replace('_', '.')}")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="admin/dashboard">
@@ -128,7 +128,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         </NavLink>
                     </div>
                 }
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_ManageUser).Replace('_', '.'))}")).Count > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{AdminPermission.Admin_ManageUsers.ToString().Replace('_', '.')}")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="admin/manage-user">
@@ -137,7 +137,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         </NavLink>
                     </div>
                 }
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_ManageUserGroup).Replace('_', '.'))}")).Count > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{AdminPermission.Admin_ManageUserGroups.ToString().Replace('_', '.')}")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="admin/manage-usergroup">
@@ -146,7 +146,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         </NavLink>
                     </div>
                 }
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.Admin)}.Settlemtents")).Count > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{PermissionCategoryAcronym.Admin}.Settlemtents")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-settlements" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
@@ -156,7 +156,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         </NavLink>
                         <div class="sub-menu collapse" id="sub-menu-settlements">
                             <nav class="flex-column">
-                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_Settlements_ManualBetSettlement).Replace('_', '.'))}")).Count > 0)
+                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_', '.')}")).Count() > 0)
                                 {
                                     <div class="nav-item">
                                         <NavLink class="nav-link" href="admin/manual-bet-settlement">
@@ -165,7 +165,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                                         </NavLink>
                                     </div>
                                 }
-                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_Settlements_ResendSettlement).Replace('_', '.'))}")).Count > 0)
+                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{AdminPermission.Admin_Settlements_ResendSettlement.ToString().Replace('_', '.')}")).Count() > 0)
                                 {
                                     <div class="nav-item">
                                         <NavLink class="nav-link" href="admin/resend-settlement">
@@ -174,7 +174,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                                         </NavLink>
                                     </div>
                                 }
-                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_Settlements_MarketSettlement).Replace('_', '.'))}")).Count > 0)
+                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace('_', '.')}")).Count() > 0)
                                 {
                                     <div class="nav-item">
                                         <NavLink class="nav-link" href="admin/market-settlement">
@@ -183,7 +183,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                                         </NavLink>
                                     </div>
                                 }
-                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_Settlements_MessageSettlement).Replace('_', '.'))}")).Count > 0)
+                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace('_', '.')}")).Count() > 0)
                                 {
                                     <div class="nav-item">
                                         <NavLink class="nav-link" href="admin/message-settlement">
