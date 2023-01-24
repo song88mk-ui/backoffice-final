@@ -1,7 +1,12 @@
 ﻿using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Newtonsoft.Json.Bson;
 
 namespace Backoffice.Web.Components.ManageUser
 {
@@ -9,15 +14,28 @@ namespace Backoffice.Web.Components.ManageUser
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
+        [Inject] private IAuthenticationService AuthenticationService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
-        private UserResponse User { get; set; }
+        private string UserId { get; set; }
+        private MetaData MetaData { get; set; }
+        public bool IsPreLoader { get; set; }
+        public List<LogInActivityLogModel> LogInActivityLogs  {get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            User = ModalParameters.TryGet<UserResponse>("UserResponse");
+            IsPreLoader = true;
+            UserId = ModalParameters.TryGet<string>("UserId");
+            LogInActivityLogs = new List<LogInActivityLogModel>();
+            MetaData = new MetaData()
+            {
+                PageSize = 10,
+                CurrentPage = 1,
+                TotalPages = 0,
+                TotalCount = 0
+            };
         }
         public async Task OnCloseModalClickEvent()
         {
@@ -26,6 +44,21 @@ namespace Backoffice.Web.Components.ManageUser
         public void Dispose()
         {
             
+        }
+        #endregion
+
+        #region Utilities
+        private async Task GetContent()
+        {
+            var userResponse = await AuthenticationService.GetLogInActivityLogList(UserId, MetaData);
+            if (userResponse.Result != null)
+            {
+                LogInActivityLogs = userResponse.Result.ActivityLogs;
+                MetaData = userResponse.Result.MetaData;
+            }
+
+            IsPreLoader = false;
+            StateHasChanged();
         }
         #endregion
     }

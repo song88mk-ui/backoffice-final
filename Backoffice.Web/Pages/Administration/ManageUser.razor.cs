@@ -13,7 +13,6 @@ namespace Backoffice.Web.Pages.Administration
     {
         #region Properties
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
-
         [Inject] public IModalService ModalService { get; set; }
 
         public ManageUserFilterModel FilterModel { get; set; }
@@ -76,11 +75,11 @@ namespace Backoffice.Web.Pages.Administration
             ModalService.Open<CreateOrUpdateModal>("Edit User", parameters, options);
         }
 
-        public async Task ViewUserLog(UserResponse user)
+        public async Task ViewUserLog(string userId)
         {
             ModalParameters parameters = new ModalParameters();
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("UserResponse", user);
+            parameters.Add("UserId", userId);
 
             ModalOptions options = new ModalOptions();
 

@@ -329,8 +329,8 @@ namespace Backoffice.API.Controllers.Authentication
                     return BadRequest(result);
             }
         }
-        [HttpGet("activitylog/list")]
-        public async Task<IActionResult> GetActivityLogList([FromQuery] string userId)
+        [HttpPost("activitylog/list")]
+        public async Task<IActionResult> GetActivityLogList([FromQuery] string userId, [FromBody] MetaData metaData)
         {
             var result = new BaseResponse<LogInActivityLogResponse>()
             {
@@ -341,7 +341,7 @@ namespace Backoffice.API.Controllers.Authentication
             {
                 var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-                result = await _authenticationRepository.GetLogInActivityLogList(userId, token);
+                result = await _authenticationRepository.GetLogInActivityLogList(userId,metaData, token);
             }
 
             switch (result.StatusCode)

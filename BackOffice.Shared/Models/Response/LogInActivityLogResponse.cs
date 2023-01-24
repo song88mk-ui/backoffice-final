@@ -11,5 +11,6 @@ namespace Backoffice.Shared.Models.Response
             ActivityLogs = new List<LogInActivityLogModel>();
         }
         public List<LogInActivityLogModel> ActivityLogs { get; set; }
+        public MetaData MetaData { get; set; }
     }
 }
