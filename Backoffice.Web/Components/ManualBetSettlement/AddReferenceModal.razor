@@ -1,0 +1,55 @@
+﻿<div class="modal-body">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Reference ID</th>
+                <th scope="col">Event Details</th>
+                <th scope="col">Bet Date</th>
+                <th scope="col">Status</th>
+                <th scope="col">Reason</th>
+                <th scope="col">
+                    <button type="button" class="btn">
+                        <i class="fa fa-plus-circle" aria-hidden="true"/>
+                    </button>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>
+                    <textarea class="form-control" placeholder="Reference ID"></textarea>
+                </td>
+                <td>
+                    <span>-</span>
+                </td>
+                <td>
+                    <span>-</span>
+                </td>
+                <td>
+                    <select class="form-select">
+                        <option value="0">None</option>
+                        <option value="1">Won</option>
+                        <option value="2">Lost</option>
+                        <option value="3">Half Won</option>
+                        <option value="4">Half Lost</option>
+                        <option value="5">Void</option>
+                    </select>
+                </td>
+                <td>
+                    <textarea class="form-control" placeholder="Reason"></textarea>
+                </td>
+                <td>
+                    <button type="button" class="btn">
+                        <i class="fa fa-trash" />
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn modal-reset" @onclick="OnModalResetClickEvent">Reset</button>
+    <button type="button" class="btn modal-btn modal-settle-bets" @onclick="OnModalSettleClickEvent">Settle Bets</button>
+</div>

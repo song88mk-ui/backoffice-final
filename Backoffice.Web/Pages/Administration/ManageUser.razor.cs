@@ -75,6 +75,17 @@ namespace Backoffice.Web.Pages.Administration
 
             ModalService.Open<CreateOrUpdateModal>("Edit User", parameters, options);
         }
+
+        public async Task ViewUserLog(UserResponse user)
+        {
+            ModalParameters parameters = new ModalParameters();
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("UserResponse", user);
+
+            ModalOptions options = new ModalOptions();
+
+            ModalService.Open<ViewUserLogModal>("View Logs", parameters, options);
+        }
         public async Task OnSaveClickedEvent()
         {
             IsPreLoader = true;

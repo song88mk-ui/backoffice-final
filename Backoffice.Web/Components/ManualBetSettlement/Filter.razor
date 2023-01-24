@@ -1,8 +1,8 @@
-﻿<div class="row">
+﻿<div class="row mb-3">
     <div class="col-md-12">
         <div class="content-filter mx-3 d-flex justify-content-between">
             <div class="add-reference-container d-flex">
-                <button type="button" class="btn btn-add px-4 py-2 me-3">
+                <button type="button" class="btn btn-add px-4 py-2 me-3" @onclick="OnAddReferenceClickEvent">
                     <i class="fa fa-plus me-3"></i>
                     Add Reference ID
                 </button>
@@ -20,6 +20,60 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-md-12"></div>
-</div>
+
+@if(ShowFilter)
+{
+    <div class="row mx-1 mb-2">
+        <div class="col-2">
+            <select class="form-select">
+                <option value="0">Clients</option>
+            </select>
+        </div>
+
+        <div class="col-2">
+            <select class="form-select">
+                <option value="0">Sports</option>
+            </select>
+        </div>
+
+        <div class="col-2">
+            <select class="form-select">
+                <option value="0">Currencies</option>
+            </select>
+        </div>
+
+        <div class="col-2">
+            <select class="form-select">
+                <option value="0">From Status</option>
+            </select>
+        </div>
+
+        <div class="col-2">
+            <select class="form-select">
+                <option value="0">To Status</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row mx-1">
+        <div class="col-2">
+            <input type="text" placeholder="Bet/Reference ID" class="form-control" />
+        </div>
+
+        <div class="col-2">
+            <input type="text" placeholder="Date Range" class="form-control" />
+        </div>
+
+        <div class="col-2">
+            <input type="text" placeholder="Member Name" class="form-control" />
+        </div>
+
+        <div class="col-2">
+            <input type="text" placeholder="Settled By" class="form-control" />
+        </div>
+
+        <div class="col-2">
+            <button type="button" class="btn filter-btn-search">Search</button>
+        </div>
+    </div>
+}

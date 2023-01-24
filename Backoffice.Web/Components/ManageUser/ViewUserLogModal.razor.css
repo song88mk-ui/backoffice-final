@@ -1,0 +1,44 @@
+﻿.modal-scroll {
+    max-height: 30rem;    
+}
+
+.modal-close {
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+    border-radius: 5px;
+    color: white;
+}
+
+.table {
+    text-align: center;
+}
+
+    .table thead {
+        background: #404E67 0% 0% no-repeat padding-box;
+        border-radius: 3px 3px 0px 0px;
+        color: white;
+    }
+
+    .table tr:nth-child(2n+2) {
+        background-color: #F5F5F5;
+    }
+
+.icon-inline {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 1.6rem;
+}
+
+.flag-ph {
+    width: 20px;
+}
+
+.col-max-height {
+    max-height: 25rem;
+    overflow-y: scroll;
+}
+
+.thead-sticky {
+    position: sticky;
+    top: 0;
+}

@@ -255,6 +255,11 @@ a, .btn-link {
     width: 32px;
 }
 
+.flag-ph {
+    content: url('../icons/svg/languages/PH.svg');
+    width: 32px;
+}
+
 iframe {
     width: 100% !important;
 }
