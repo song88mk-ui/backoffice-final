@@ -624,7 +624,8 @@
                                         <label class="form-label" for="soccerMinTicketField">
                                             Min Per Ticket
                                         </label>
-                                        <input type="text" class="form-control" id="soccerMinTicketField" @bind-value="SelectedBetSetting.BetSettingSoccer.MinPerTicket" />
+                                        <InputDecimal Min="0.02m" class="form-control" id="soccerMinTicketField" @bind-Value="SelectedBetSetting.BetSettingSoccer.MinPerTicket" />
+                                        <ValidationMessage For="@(() => SelectedBetSetting.BetSettingSoccer.MinPerTicket)" />
                                         <p class="fst-italic p-desc">Minimum is 0.02</p>
                                     </div>
 
@@ -632,7 +633,8 @@
                                         <label class="form-label" for="soccerMaxTicketField">
                                             Max Per Ticket
                                         </label>
-                                        <input type="text" class="form-control" id="soccerMaxTicketField" @bind-value="SelectedBetSetting.BetSettingSoccer.MaxPerTicket" />
+                                        <InputDecimal class="form-control" id="soccerMaxTicketField" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerTicket" />
+                                        <ValidationMessage For="@(() => SelectedBetSetting.BetSettingSoccer.MaxPerTicket)" />
                                     </div>
                                 </div>
                                 <div class="ps-2 pb-2 padRight">
@@ -653,7 +655,8 @@
                                         <label class="form-label" for="cricketMinTicketField">
                                             Min Per Ticket
                                         </label>
-                                        <input type="text" class="form-control" id="cricketMinTicketField" @bind-value="SelectedBetSetting.BetSettingCricket.MinPerTicket" />
+                                        <InputDecimal Min="0.02m" class="form-control" id="cricketMinTicketField" @bind-Value="SelectedBetSetting.BetSettingCricket.MinPerTicket" />
+                                        <ValidationMessage For="@(() => SelectedBetSetting.BetSettingCricket.MinPerTicket)" />
                                         <p class="fst-italic p-desc">Minimum is 0.02</p>
                                     </div>
 
@@ -661,7 +664,8 @@
                                         <label class="form-label" for="cricketMaxTicketField">
                                             Max Per Ticket
                                         </label>
-                                        <input type="text" class="form-control" id="cricketMaxTicketField" @bind-value="SelectedBetSetting.BetSettingCricket.MaxPerTicket" />
+                                        <InputDecimal class="form-control" id="cricketMaxTicketField" @bind-Value="SelectedBetSetting.BetSettingCricket.MaxPerTicket" />
+                                        <ValidationMessage For="@(() => SelectedBetSetting.BetSettingCricket.MaxPerTicket)" />
                                     </div>
                                 </div>
                                 <div class="ps-2 pb-2 padRight">
@@ -684,7 +688,8 @@
                                         <label class="form-label" for="othersMinTicketField">
                                             Min Per Ticket
                                         </label>
-                                        <input type="text" class="form-control" id="othersMinTicketField" @bind-value="SelectedBetSetting.BetSettingAllSports.MinPerTicket" />
+                                        <InputDecimal Min="0.02m" class="form-control" id="othersMinTicketField" @bind-Value="SelectedBetSetting.BetSettingAllSports.MinPerTicket" />
+                                        <ValidationMessage For="@(() => SelectedBetSetting.BetSettingAllSports.MinPerTicket)" />
                                         <p class="fst-italic p-desc">Minimum is 0.02</p>
                                     </div>
 
@@ -692,7 +697,8 @@
                                         <label class="form-label" for="othersMaxTicketField">
                                             Max Per Ticket
                                         </label>
-                                        <input type="text" class="form-control" id="othersMaxTicketField" @bind-value="SelectedBetSetting.BetSettingAllSports.MaxPerTicket" />
+                                        <InputDecimal class="form-control" id="othersMaxTicketField" @bind-Value="SelectedBetSetting.BetSettingAllSports.MaxPerTicket" />
+                                        <ValidationMessage For="@(() => SelectedBetSetting.BetSettingAllSports.MaxPerTicket)" />
                                     </div>
                                 </div>
                                 <div class="ps-2 pb-2 padRight">
@@ -713,7 +719,8 @@
                                         <label class="form-label" for="parlayMinTicketField">
                                             Min Per Ticket
                                         </label>
-                                        <input type="text" class="form-control" id="parlayMinTicketField" @bind-value="SelectedBetSetting.BetSettingParlay.MinPerTicket" />
+                                        <InputDecimal Min="0.02m" class="form-control" id="parlayMinTicketField" @bind-Value="SelectedBetSetting.BetSettingParlay.MinPerTicket" />
+                                        <ValidationMessage For="@(() => SelectedBetSetting.BetSettingParlay.MinPerTicket)" />
                                         <p class="fst-italic p-desc">Minimum is 0.02</p>
                                     </div>
 
@@ -721,18 +728,21 @@
                                         <label class="form-label" for="parlayMaxTicketField">
                                             Max Per Ticket
                                         </label>
-                                        <input type="text" class="form-control" id="parlayMaxTicketField" @bind-value="SelectedBetSetting.BetSettingParlay.MaxPerTicket" />
+                                        <InputDecimal class="form-control" id="parlayMaxTicketField" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxPerTicket" />
+                                        <ValidationMessage For="@(() => SelectedBetSetting.BetSettingParlay.MaxPerTicket)" />
                                     </div>
                                 </div>
                                 <div class="ps-2 pb-2">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <label class="form-label" for="parlayMaxPayoutField">Max Payout Per Ticket</label>
-                                            <input type="text" class="form-control" id="parlayMaxPayoutField" @bind-value="SelectedBetSetting.BetSettingParlay.MaxPayoutPerTicket" />
+                                            <InputDecimal class="form-control" id="parlayMaxPayoutField" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxPayoutPerTicket" />
+                                            <ValidationMessage For="@(() => SelectedBetSetting.BetSettingParlay.MaxPayoutPerTicket)" />
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label" for="parlayMaxBonusWinnings">Max Bonus Winnings</label>
-                                            <input type="text" class="form-control" id="parlayMaxBonusWinnings" @bind-value="SelectedBetSetting.BetSettingParlay.MaxWinningsBonus" />
+                                            <InputDecimal class="form-control" id="parlayMaxBonusWinnings" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxWinningsBonus" />
+                                            <ValidationMessage For="@(() => SelectedBetSetting.BetSettingParlay.MaxWinningsBonus)" />
                                         </div>
                                     </div>
                                 </div>
@@ -750,7 +760,8 @@
 
                                 <div class="p-2">
                                     <label class="form-label" for="priceboostMaxStake">Max Stake</label>
-                                    <input type="text" class="form-control" id="priceboostMaxStake" @bind-value="SelectedBetSetting.BetSettingPriceboost.MaxStake" />
+                                    <InputDecimal class="form-control" id="priceboostMaxStake" @bind-Value="SelectedBetSetting.BetSettingPriceboost.MaxStake" />
+                                    <ValidationMessage For="@(() => SelectedBetSetting.BetSettingPriceboost.MaxStake)" />
                                 </div>
                             </div>
                         </div>
@@ -765,13 +776,15 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <label class="form-label" for="betBuilderMinTicket">Min Per Ticket</label>
-                                            <input type="text" id="betBuilderMinTicket" class="form-control" @bind-value="SelectedBetSetting.BetSettingBetBuilder.MinStake" />
+                                            <InputDecimal Min="0.02m" class="form-control" id="betBuilderMinTicket" @bind-Value="SelectedBetSetting.BetSettingBetBuilder.MinStake" />
+                                            <ValidationMessage For="@(() => SelectedBetSetting.BetSettingBetBuilder.MinStake)" />
                                             <p class="fst-italic p-desc">Minimum is 0.02</p>
                                         </div>
 
                                         <div class="col-md-6">
                                             <label class="form-label" for="betBuilderMaxTicket">Max Per Ticket</label>
-                                            <input type="text" id="betBuilderMaxTicket" class="form-control" @bind-value="SelectedBetSetting.BetSettingBetBuilder.MaxStake" />
+                                            <InputDecimal class="form-control" id="betBuilderMaxTicket" @bind-Value="SelectedBetSetting.BetSettingBetBuilder.MaxStake" />
+                                            <ValidationMessage For="@(() => SelectedBetSetting.BetSettingBetBuilder.MaxStake)" />
                                         </div>
                                     </div>
                                 </div>
