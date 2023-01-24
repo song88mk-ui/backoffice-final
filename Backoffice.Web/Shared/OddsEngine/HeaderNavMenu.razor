@@ -1,9 +1,13 @@
-﻿<div class="d-flex">
-    <div class="px-2 me-2 py-3 @(IsActiveMonitoring ? "active" : "")">
-        <a class="header-link text-decoration-none" href="odds-engine/monitoring" @onclick='() => ActivateMenu("monitoring")'>
-            Monitoring
-        </a>
-    </div>
+﻿@using Backoffice.Shared.Enums;
+<div class="d-flex">
+    @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.SBC)}.{PermissionCategoryAcronym.OE}.Monitoring")).Count > 0)
+    {
+        <div class="px-2 me-2 py-3 @(IsActiveMonitoring ? "active" : "")">
+            <a class="header-link text-decoration-none" href="odds-engine/monitoring" @onclick='() => ActivateMenu("monitoring")'>
+                Monitoring
+            </a>
+        </div>
+    }
     <div class="px-2 me-2 py-3 @(IsActiveConfig ? "active" : "")">
         <a class="header-link text-decoration-none" href="odds-engine/config" @onclick='() => ActivateMenu("config")'>
             Config

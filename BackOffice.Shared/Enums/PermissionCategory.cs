@@ -11,15 +11,22 @@ namespace Backoffice.Shared.Enums
         PartnerManagement,
         OddsEngine
     }
+    public enum PermissionCategoryAcronym
+    {
+        Admin,
+        SBC,
+        PMS,
+        OE
+    }
     public enum AdminPermission
     {
         Admin_Dashboard,
-        Admin_Manage_User,
-        Admin_Manage_UserGroup,
-        Admin_Settlement_Bet,
-        Admin_Settlement_Resend,
-        Admin_Settlement_Market,
-        Admin_Settlement_Message,
+        Admin_ManageUsers,
+        Admin_ManageUserGroups,
+        Admin_Settlements_ManualBetSettlement,
+        Admin_Settlements_ResendSettlement,
+        Admin_Settlements_MarketSettlement,
+        Admin_Settlements_MessageSettlement,
         Admin_Bet_Cancel,
         Admin_Bet_History,
         Admin_Maintenance
@@ -27,12 +34,12 @@ namespace Backoffice.Shared.Enums
     public enum PartnerManagementPermission
     {
         PMS_Dashboard,
-        PartnerManagement_ManagePartner,
-        PartnerManagement_Setting,
-        PartnerManagement_Bet_Parlay,
-        PartnerManagement_Bet_All,
-        PartnerManagement_Payment_Transfer,
-        PartnerManagement_Payment_Settlement
+        PMS_ManagePartner,
+        PMS_Setting,
+        PMS_Bet_Parlay,
+        PMS_Bet_All,
+        PMS_Payment_Transfer,
+        PMS_Payment_Settlement
     }
     public enum SportsbookClientPermission
     {

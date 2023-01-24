@@ -15,11 +15,14 @@ namespace Backoffice.Web.Components.ManageUser
         #region Properties
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+        public Permission PermissionComponent { get; set; }
 
-
+        public PermissionResponse Permissions { get; set; }
+        public ClientModel ClientModel { get; set; }
         public List<UserGroupResponse> UserGroupList { get; set; }
         public UserRegisterModel UserRegister { get; set; }
         public string OldPassword { get; set; }
@@ -31,19 +34,31 @@ namespace Backoffice.Web.Components.ManageUser
 
         protected override async Task OnInitializedAsync()
         {
+            ClientModel = new ClientModel();
             UserRegister = new UserRegisterModel();
             UserGroupList = new List<UserGroupResponse>();
             IsValidPassword = true;
             IsPreLoader = true;
-
+            Permissions = ModalParameters.TryGet<PermissionResponse>("Permissions");
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
             UserRegister = ModalParameters.TryGet<UserRegisterModel>("UserModel");
+
+            var clients = (await BackOfficeService.GetClients()).Result;
+
+            if (clients != null && clients.Clients.Any())
+            {
+                ClientModel = new ClientModel
+                {
+                    Clients = clients.Clients.ToList()
+                };
+            }
 
             if (IsEdit)
             {
                 OldPassword = UserRegister.Password;
                 UserRegister.Password = "";
             }
+
             await GetUserGroupList();
         }
         public async Task OnPasswordFocusOutEvent()
@@ -170,6 +185,23 @@ namespace Backoffice.Web.Components.ManageUser
         {
             UserRegister.RoleId = e.Value.ToString();
             UserRegister.RoleName = UserGroupList.Where(x => x.UserGroupId == UserRegister.RoleId).FirstOrDefault().UserGroupName;
+
+            var userGroup = UserGroupList.Where(x => x.UserGroupId == UserRegister.RoleId).FirstOrDefault();
+
+            if (userGroup.Claims.Any())
+            {
+                foreach (var claim in userGroup.Claims)
+                {
+                    var permission = Permissions.Permissions.FirstOrDefault(p => p.ClaimType == claim.ClaimType);
+                    if (permission != null)
+                    {
+                        var index = Permissions.Permissions.IndexOf(permission);
+                        Permissions.Permissions[index].ClaimValue = claim.ClaimValue;
+                    }
+                }
+            }
+
+            await PermissionComponent.OnGroupSelectChangedEvent();
         }
         #region Methods
         public void Dispose()
@@ -185,13 +217,28 @@ namespace Backoffice.Web.Components.ManageUser
                 PageSize = -1,
                 ShowSuperAdmin = false,
             })).Result.UserGroups;
-
             UserGroupList = response;
+
             if (!IsEdit)
             {
                 UserRegister.RoleId = UserGroupList != null ? UserGroupList.FirstOrDefault().UserGroupId : "";
                 UserRegister.RoleName = UserGroupList.Where(x => x.UserGroupId == UserRegister.RoleId).FirstOrDefault().UserGroupName;
             }
+
+            var userGroup = UserGroupList.Where(x => x.UserGroupId == UserRegister.RoleId).FirstOrDefault();
+
+            if (userGroup.Claims.Any())
+            {
+                foreach (var claim in userGroup.Claims)
+                {
+                    var permission = Permissions.Permissions.FirstOrDefault(p => p.ClaimType == claim.ClaimType);
+                    if (permission != null)
+                    {
+                        permission.ClaimValue = claim.ClaimValue;
+                    }
+                }
+            }
+
 
             IsPreLoader = false;
             StateHasChanged();

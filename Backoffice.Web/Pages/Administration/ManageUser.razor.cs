@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.ManageUser;
@@ -15,8 +16,9 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
+        public PermissionResponse Permissions { get; set; }
         public ManageUserFilterModel FilterModel { get; set; }
-        public List<UserResponse> UserList {  get; set; }
+        public List<UserResponse> UserList { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
@@ -33,6 +35,7 @@ namespace Backoffice.Web.Pages.Administration
 
             FilterModel = new ManageUserFilterModel();
             UserList = new List<UserResponse>();
+            Permissions = await GetPermissionList();
         }
         public async Task Init()
         {
@@ -43,6 +46,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             var parameters = new ModalParameters();
 
+            parameters.Add("Permissions", Permissions);
             parameters.Add("IsEdit", false);
             parameters.Add("UserModel", new UserRegisterModel());
             parameters.Add("DialogStyle", "max-width: 65rem;");
@@ -56,6 +60,7 @@ namespace Backoffice.Web.Pages.Administration
             var parameters = new ModalParameters();
 
             parameters.Add("IsEdit", true);
+            parameters.Add("Permissions", Permissions);
             parameters.Add("UserModel", new UserRegisterModel()
             {
                 Email = user.Email,
@@ -66,7 +71,7 @@ namespace Backoffice.Web.Pages.Administration
                 UserId = user.UserId,
                 RoleId = user.RoleId,
                 RoleName = user.RoleName,
-                CreatedDate =  user.CreatedDate,
+                CreatedDate = user.CreatedDate,
             });
             parameters.Add("DialogStyle", "max-width: 65rem;");
 
@@ -99,6 +104,20 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         #region Utilities
+        private async Task<PermissionResponse> GetPermissionList()
+        {
+            var response = await AuthenticationService.GetPermissionList(false);
+
+            if (response.StatusCode == StatusCode.Success)
+            {
+                return new PermissionResponse
+                {
+                    Permissions = response.Result.Permissions ?? new List<PermissionModel>(),
+                };
+            }
+
+            return new PermissionResponse();
+        }
         private async Task GetContent()
         {
             var userResponse = await AuthenticationService.GetUserList(new UserGroupRequest()
@@ -110,6 +129,7 @@ namespace Backoffice.Web.Pages.Administration
                 SearchText = FilterModel.SearchText,
                 SortBy = FilterModel.UserSorting
             });
+
             if (userResponse.Result != null)
                 UserList = userResponse.Result.Users;
 

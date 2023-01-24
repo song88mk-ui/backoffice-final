@@ -6,14 +6,14 @@ namespace Backoffice.Shared.Models
     {
         public PermissionTreeModel()
         {
-            Permissions = new List<PermissionCategory>();
+            Permissions = new List<PermissionCategoryModel>();
         }
 
-        public List<PermissionCategory> Permissions { get; set; }
+        public List<PermissionCategoryModel> Permissions { get; set; }
 
-        public class PermissionCategory
+        public class PermissionCategoryModel
         {
-            public PermissionCategory()
+            public PermissionCategoryModel()
             {
                 SubCategories = new List<SubCategory>();
             }

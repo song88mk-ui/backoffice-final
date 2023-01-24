@@ -25,25 +25,11 @@
                                     {
                                         if (category.IsEnabled)
                                         {
-                                            if (IsReadOnly)
-                                            {
-                                                <input class="form-check-input" type="checkbox" role="switch" checked disabled />
-                                            }
-                                            else
-                                            {
-                                                <input class="form-check-input" type="checkbox" role="switch" checked @onclick="() => OnEnableCategoryClickEvent(category)" />
-                                            }
+                                            <input class="form-check-input" type="checkbox" role="switch" checked @onclick="() => OnEnableCategoryClickEvent(category)" disabled="@IsReadOnly" />
                                         }
                                         else
                                         {
-                                            if (IsReadOnly)
-                                            {
-                                                <input class="form-check-input" type="checkbox" role="switch" disabled />
-                                            }
-                                            else
-                                            {
-                                                <input class="form-check-input" type="checkbox" role="switch" @onclick="() => OnEnableCategoryClickEvent(category)" />
-                                            }
+                                            <input class="form-check-input" type="checkbox" role="switch" @onclick="() => OnEnableCategoryClickEvent(category)" disabled="@IsReadOnly" />
                                         }
                                     }
                                 </div>
@@ -83,14 +69,14 @@
                                                             Name = x.ClientName,
                                                             Value = x.ClientCode,
                                                             IsChecked = SelectedClients.Contains(x.ClientCode)
-                                                        }).ToList()" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="clientDropdown" />
+                                                        }).ToList()" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="clientDropdown" IsReadOnly="@IsReadOnly" />
                                                     }
 
                                                 </div>
                                             </div>
                                         }
                                         <div class="col text-center">
-                                            <button type="button" class="btn btn-enable-all" @onclick="() => OnEnableClickEvent(category)">Enable All</button>
+                                            <button type="button" class="btn btn-enable-all" @onclick="() => OnEnableClickEvent(category)" disabled="@IsReadOnly">Enable All</button>
                                         </div>
                                     </div>
                                 </div>
@@ -104,7 +90,7 @@
                                                 <div class="category mb-3">
                                                     <div class="category-title fw-bold mb-1">@category.SubCategories[rowCount].SubCategoryName</div>
 
-                                                    @if (@category.SubCategories[rowCount].Claims.Any())
+                                                    @if (category.SubCategories[rowCount].Claims.Any())
                                                     {
                                                         for (int ctr = 0; ctr < @category.SubCategories[rowCount].Claims.Count; ctr++)
                                                         {

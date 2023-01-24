@@ -26,59 +26,69 @@ else if (NavMenuAccess == NavMenuAccess.OE)
         @if (NavMenuAccess == NavMenuAccess.SBC)
         {
             <nav class="flex-column">
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/dashboard">
-                        <span class="ico ico-dashboard" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Dashboard</span>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-report" role="button" aria-expanded="false" aria-controls="sub-menu-report">
-                        <span class="ico ico-reports" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Reports</span>
-                        <span class="fa fa-chevron-right"></span>
-                    </NavLink>
-                    <div class="sub-menu collapse" id="sub-menu-report">
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(SportsbookClientPermission.SBC_Dashboard).Replace('_', '.'))}")).Count > 0)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/dashboard">
+                            <span class="ico ico-dashboard" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Dashboard</span>
+                        </NavLink>
                     </div>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-setting" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
-                        <span class="ico ico-settings" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Settings</span>
-                        <span class="fa fa-chevron-down"></span>
-                    </NavLink>
-                    <div class="sub-menu collapse show" id="sub-menu-setting">
-                        <nav class="flex-column">
-                            @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Settings_TopLeagues.ToString().Replace('_','.')) && c.Value != "0").ToList().Count > 0)
-                            {
-                                <div class="nav-item">
-                                    <NavLink class="nav-link" href="/top-leagues">
-                                        <span class="ico ico-top-leagues" aria-hidden="true"></span>
-                                        <span class="nav-menu-text">Top Leagues</span>
-                                    </NavLink>
-                                </div>
-                            }
-                            @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Settings_TopFixtures.ToString().Replace('_', '.')) && c.Value != "0").ToList().Count > 0)
-                            {
-                                <div class="nav-item">
-                                    <NavLink class="nav-link" href="/top-fixtures">
-                                        <span class="ico ico-top-fixtures" aria-hidden="true"></span>
-                                        <span class="nav-menu-text">Top Fixtures</span>
-                                    </NavLink>
-                                </div>
-                            }
-                            @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Settings_Parlay.ToString().Replace('_', '.')) && c.Value != "0").ToList().Count > 0)
-                            {
-                                <div class="nav-item">
-                                    <NavLink class="nav-link" href="/parlay-bonus">
-                                        <span class="ico ico-parlay-bonus" aria-hidden="true"></span>
-                                        <span class="nav-menu-text">Parlay Bonus</span>
-                                    </NavLink>
-                                </div>
-                            }
-                        </nav>
+                }
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.SBC)}.Reports")).Count > 0)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-report" role="button" aria-expanded="false" aria-controls="sub-menu-report">
+                            <span class="ico ico-reports" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Reports</span>
+                            <span class="fa fa-chevron-right"></span>
+                        </NavLink>
+                        <div class="sub-menu collapse" id="sub-menu-report">
+                        </div>
                     </div>
-                </div>
+
+                }
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.SBC)}.Settings")).Count > 0)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-setting" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
+                            <span class="ico ico-settings" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Settings</span>
+                            <span class="fa fa-chevron-down"></span>
+                        </NavLink>
+                        <div class="sub-menu collapse show" id="sub-menu-setting">
+                            <nav class="flex-column">
+                                @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Settings_TopLeagues.ToString().Replace('_', '.')) && c.Value != "0").ToList().Count > 0)
+                                {
+                                    <div class="nav-item">
+                                        <NavLink class="nav-link" href="/top-leagues">
+                                            <span class="ico ico-top-leagues" aria-hidden="true"></span>
+                                            <span class="nav-menu-text">Top Leagues</span>
+                                        </NavLink>
+                                    </div>
+                                }
+                                @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Settings_TopFixtures.ToString().Replace('_', '.')) && c.Value != "0").ToList().Count > 0)
+                                {
+                                    <div class="nav-item">
+                                        <NavLink class="nav-link" href="/top-fixtures">
+                                            <span class="ico ico-top-fixtures" aria-hidden="true"></span>
+                                            <span class="nav-menu-text">Top Fixtures</span>
+                                        </NavLink>
+                                    </div>
+                                }
+                                @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Settings_Parlay.ToString().Replace('_', '.')) && c.Value != "0").ToList().Count > 0)
+                                {
+                                    <div class="nav-item">
+                                        <NavLink class="nav-link" href="/parlay-bonus">
+                                            <span class="ico ico-parlay-bonus" aria-hidden="true"></span>
+                                            <span class="nav-menu-text">Parlay Bonus</span>
+                                        </NavLink>
+                                    </div>
+                                }
+                            </nav>
+                        </div>
+                    </div>
+                }
                 @if (string.IsNullOrWhiteSpace(UserModel?.MainUserId))
                 {
                     <div class="nav-item px-3">
@@ -95,7 +105,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                     </NavLink>
                 </div>
 
-                @if (Claims.Where(c => c.Type.Contains("OE.") && c.Value != "0").ToList().Count > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.SBC)}.{PermissionCategoryAcronym.OE}")).Count > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="odds-engine">
@@ -109,59 +119,84 @@ else if (NavMenuAccess == NavMenuAccess.OE)
         else if (NavMenuAccess == NavMenuAccess.Admin)
         {
             <nav class="flex-column">
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="admin/dashboard">
-                        <span class="ico ico-dashboard" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Dashboard</span>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="admin/manage-user">
-                        <span class="ico ico-manage-user" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Manage User</span>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="admin/manage-user-group">
-                        <span class="ico ico-manage-user" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Manage User Group</span>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-settlements" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
-                        <span class="ico ico-settlements" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Settlements</span>
-                        <span class="fa fa-chevron-right"></span>
-                    </NavLink>
-                    <div class="sub-menu collapse" id="sub-menu-settlements">
-                        <nav class="flex-column">
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="admin/manual-bet-settlement">
-                                    <span class="ico ico-resend-settlement" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">Manual Bet Settlement</span>
-                                </NavLink>
-                            </div>
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="admin/resend-settlement">
-                                    <span class="ico ico-resend-settlement" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">Resend Settlement</span>
-                                </NavLink>
-                            </div>
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="admin/market-settlement">
-                                    <span class="ico ico-market-settlement" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">Market Settlement</span>
-                                </NavLink>
-                            </div>
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="admin/message-settlement">
-                                    <span class="ico ico-message-settlement" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">Message Settlement</span>
-                                </NavLink>
-                            </div>
-                        </nav>
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_Dashboard).Replace('_', '.'))}")).Count > 0)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="admin/dashboard">
+                            <span class="ico ico-dashboard" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Dashboard</span>
+                        </NavLink>
                     </div>
-                </div>
+                }
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_ManageUser).Replace('_', '.'))}")).Count > 0)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="admin/manage-user">
+                            <span class="ico ico-manage-user" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Manage User</span>
+                        </NavLink>
+                    </div>
+                }
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_ManageUserGroup).Replace('_', '.'))}")).Count > 0)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="admin/manage-usergroup">
+                            <span class="ico ico-manage-user" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Manage User Group</span>
+                        </NavLink>
+                    </div>
+                }
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.Admin)}.Settlemtents")).Count > 0)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-settlements" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
+                            <span class="ico ico-settlements" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Settlements</span>
+                            <span class="fa fa-chevron-right"></span>
+                        </NavLink>
+                        <div class="sub-menu collapse" id="sub-menu-settlements">
+                            <nav class="flex-column">
+                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_Settlements_ManualBetSettlement).Replace('_', '.'))}")).Count > 0)
+                                {
+                                    <div class="nav-item">
+                                        <NavLink class="nav-link" href="admin/manual-bet-settlement">
+                                            <span class="ico ico-resend-settlement" aria-hidden="true"></span>
+                                            <span class="nav-menu-text">Manual Bet Settlement</span>
+                                        </NavLink>
+                                    </div>
+                                }
+                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_Settlements_ResendSettlement).Replace('_', '.'))}")).Count > 0)
+                                {
+                                    <div class="nav-item">
+                                        <NavLink class="nav-link" href="admin/resend-settlement">
+                                            <span class="ico ico-resend-settlement" aria-hidden="true"></span>
+                                            <span class="nav-menu-text">Resend Settlement</span>
+                                        </NavLink>
+                                    </div>
+                                }
+                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_Settlements_MarketSettlement).Replace('_', '.'))}")).Count > 0)
+                                {
+                                    <div class="nav-item">
+                                        <NavLink class="nav-link" href="admin/market-settlement">
+                                            <span class="ico ico-market-settlement" aria-hidden="true"></span>
+                                            <span class="nav-menu-text">Market Settlement</span>
+                                        </NavLink>
+                                    </div>
+                                }
+                                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(AdminPermission.Admin_Settlements_MessageSettlement).Replace('_', '.'))}")).Count > 0)
+                                {
+                                    <div class="nav-item">
+                                        <NavLink class="nav-link" href="admin/message-settlement">
+                                            <span class="ico ico-message-settlement" aria-hidden="true"></span>
+                                            <span class="nav-menu-text">Message Settlement</span>
+                                        </NavLink>
+                                    </div>
+                                }
+                            </nav>
+                        </div>
+                    </div>
+
+                }
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" data-bs-toggle="collapse" href="#cancel-bets" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
                         <span class="ico ico-cancel-bets" aria-hidden="true"></span>
