@@ -107,7 +107,13 @@ namespace Backoffice.Web.Pages.Administration
         }
         public async Task OnDeleteUserGroupClickEvent(UserGroupResponse userGroup)
         {
-            
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+
+            var options = new ModalOptions();
+            ModalService.Open<DeleteUserGroupModal>("Delete User Group", parameters, options);
         }
 
         public async Task OnViewUsersClickEvent(UserGroupResponse userGroup)
