@@ -33,6 +33,18 @@ namespace Backoffice.Web.Components.Clients
         public string SelectedCurrency { get; set; }
         public ClientListResponse.BetSetting SelectedBetSetting { get; set; }
         public List<AlertModel> Alerts { get; set; }
+
+        #endregion
+
+        #region Fields
+        const decimal maxInputVal = 100;
+        private decimal? InputStake { get; set; }
+        private decimal inputWinnings;
+        private decimal InputWinnings
+        {
+            get => inputWinnings;
+            set => inputWinnings = Math.Min(value, maxInputVal);
+        }
         #endregion
 
         #region Methods
@@ -61,8 +73,9 @@ namespace Backoffice.Web.Components.Clients
             Client.Region = IsEdit ? Client.Region : "HK";
             Client.IsTierRevenue = IsEdit ? Client.IsTierRevenue : false;
             Client.MonthlyFee = Convert.ToDecimal(Client.MonthlyFee.ToString("0.00"));
+            monthlyFeeToggle = Client.MonthlyFee > 0 ? true : false;
 
-            if(IsEdit)
+            if (IsEdit)
             {
                 //Tax Config
                 var stakeSports = string.IsNullOrEmpty(Client.TaxConfig.ExcludeStakeSportTypes) ? new List<int>() : Client.TaxConfig.ExcludeStakeSportTypes.Split(",").Select(s => Convert.ToInt32(s)).ToList();
@@ -223,6 +236,7 @@ namespace Backoffice.Web.Components.Clients
 
         public async Task OnCancelClickEvent()
         {
+
             ModalService.Cancel();
         }
 

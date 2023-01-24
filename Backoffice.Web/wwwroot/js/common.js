@@ -171,8 +171,10 @@ window.enforceNumberValidation = (ele, limit) => {
         }
 
         if (limit !== undefined) {
-            if ($(ele).val() > limit) {
-                $(ele).toggleClass('border-danger');
+            if ($(ele).val() > limit || $(ele).val() <= 0) {
+                if (!$(ele).hasClass('border-danger')) {
+                    $(ele).toggleClass('border-danger');
+                }
             }
             else {
                 if ($(ele).hasClass('border-danger')) {
@@ -184,14 +186,16 @@ window.enforceNumberValidation = (ele, limit) => {
         //for parlay bonus only        
         if ($('#filterAddBtn').length == 1) {
             if ($(ele).val() > 0) {
-                $('#filterAddBtn').prop('disabled', false);
-            }
+                if (!$('#filterAddBtn').prop('disabled')) {
+                    $('#filterAddBtn').prop('disabled', false);
+                }
+            }            
             else {
                 $('#filterAddBtn').prop('disabled', true);
             }
 
             if ($(ele).hasClass('border-danger')) {
-                $('#filterAddBtn').prop('disabled', true);
+                $('#saveChangesBtn').prop('disabled', true);
             }
         }
     }
