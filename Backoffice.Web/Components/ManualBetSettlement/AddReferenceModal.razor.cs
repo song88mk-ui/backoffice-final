@@ -8,6 +8,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
+        [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         #endregion
