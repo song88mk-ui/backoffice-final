@@ -5,8 +5,8 @@
 <input type="number" class="@this.CssClass" @attributes=this.AdditionalAttributes value=@this.CurrentValueAsString @oninput=OnValueChanged />
 
 @code {
-    [Parameter] public decimal Min { get; set; } = decimal.MinValue;
-    [Parameter] public decimal Max { get; set; } = decimal.MaxValue;
+    [Parameter] public decimal? Min { get; set; } = decimal.MinValue;
+    [Parameter] public decimal? Max { get; set; } = decimal.MaxValue;
 
     private async Task OnValueChanged(ChangeEventArgs e)
     {

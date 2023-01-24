@@ -21,7 +21,7 @@
                                     @category.CategoryName
                                 </h6>
                                 <div class="form-switch d-inline-block pull-right">
-                                    @if (category.CategoryId == SelectedCategoryId)
+                                    @if (category.CategoryId == SelectedCategoryId && IsSubUser == false)
                                     {
                                         if (category.IsEnabled)
                                         {
@@ -72,25 +72,27 @@
                                         {
                                             <div class="col text-end">
                                                 <div class="dropdown mx-2 w-100">
-                                                    <button class="btn clients-btn dropdown-toggle ps-4" type="button" id="clientDropdown" data-bs-toggle="dropdown" data-bs-auto-close="dropdown" aria-expanded="false">
-                                                        Select Clients
-                                                    </button>
-                                                    @if (ClientModel.Clients.Any())
+                                                    @if (!IsSubUser)
                                                     {
-                                                        <SelectWithCheckbox Items="ClientModel.Clients.Select(
+                                                        <button class="btn clients-btn dropdown-toggle ps-4" type="button" id="clientDropdown" data-bs-toggle="dropdown" data-bs-auto-close="dropdown" aria-expanded="false">
+                                                            Select Clients
+                                                        </button>
+                                                        @if (ClientModel.Clients.Any())
+                                                        {
+                                                            <SelectWithCheckbox Items="ClientModel.Clients.Select(
                                                         x => new SelectListItemWithCheckboxModel<string>()
                                                         {
                                                             Name = x.ClientName,
                                                             Value = x.ClientCode,
                                                             IsChecked = SelectedClients.Contains(x.ClientCode)
-                                                        }).ToList()" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="clientDropdown" />
+                                                        }).ToList()" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="clientDropdown" IsReadOnly="@IsReadOnly" />
+                                                        }
                                                     }
-
                                                 </div>
                                             </div>
                                         }
                                         <div class="col text-center">
-                                            <button type="button" class="btn btn-enable-all" @onclick="() => OnEnableClickEvent(category)">Enable All</button>
+                                            <button type="button" class="btn btn-enable-all" @onclick="() => OnEnableClickEvent(category)" disabled="@IsReadOnly">Enable All</button>
                                         </div>
                                     </div>
                                 </div>
@@ -104,13 +106,13 @@
                                                 <div class="category mb-3">
                                                     <div class="category-title fw-bold mb-1">@category.SubCategories[rowCount].SubCategoryName</div>
 
-                                                    @if (@category.SubCategories[rowCount].Claims.Any())
+                                                    @if (category.SubCategories[rowCount].Claims.Any())
                                                     {
                                                         for (int ctr = 0; ctr < @category.SubCategories[rowCount].Claims.Count; ctr++)
                                                         {
                                                             var claim = @category.SubCategories[rowCount].Claims[ctr];
                                                             var claimId = claim.HasReadOnly ? $"{claim.ClaimType}" : $"{claim.ClaimType}";
-                                                            var isReadOnly = IsReadOnly || !category.IsEnabled;
+                                                            var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
 
                                                             <PermissionRow Claim="@claim" ClaimId="@claimId" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
 
@@ -132,7 +134,7 @@
                                                         {
                                                             var claim = @category.SubCategories[rowCount].Claims[ctr];
                                                             var claimId = claim.Name.Contains("readonly", StringComparison.OrdinalIgnoreCase) ? $"{claim.ClaimType}-readonly" : $"{claim.ClaimType}";
-                                                            var isReadOnly = IsReadOnly || !category.IsEnabled;
+                                                            var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
 
                                                             <PermissionRow Claim="@claim" ClaimId="@claimId" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
 

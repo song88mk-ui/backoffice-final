@@ -27,36 +27,6 @@ window.initSort = (className, handler) => {
     });
 }
 
-// initialize table sorting with only specified sortable items
-window.initSortItems = (className, items, handler) => {
-    var tableClass = className + ' > tbody';
-
-    $(tableClass).sortable({
-        handle: handler,
-        placeholder: "placeholder",
-        items: items,
-        start: function (event, ui) {
-
-            var item = $(ui.item);
-            var headers = $(className + '> thead > tr').children('th');
-
-            for (var i = 0; i < headers.length; i++) {
-                var rect = $(headers)[i].getBoundingClientRect();
-
-                $(item).children('td')[i].style.width = `${rect.width}px`;
-            }
-        },
-        stop: function (event, ui) {
-            var item = $(ui.item);
-            var columns = $(item).children('td');
-
-            for (var i = 0; i < columns.length; i++) {
-                columns[i].style.width = '';
-            }
-        }
-    });
-}
-
 // disable table sorting
 window.disableSort = (className) => {
     var tableClass = className + ' > tbody';
@@ -121,7 +91,7 @@ window.enableSelect2 = (className) => {
     $(className).prop("disabled", false);
 }
 
-window.getSortOrder = (className, event) => {
+window.getSortOrder = (className) => {
     var tableClass = className + ' > tbody';
 
     let data = [];
@@ -239,4 +209,115 @@ window.ValidateParlayBonusMinOdds = (refEl) => {
     }
 
     DotNet.invokeMethodAsync('Backoffice.Web', 'DisableSaveButton', isDisabled);
+}
+
+// initialize table sorting with only specified sortable items
+// as of right now codes below are only appliable for Sport Settings
+window.initSortItems = (className, items, handler, categorySelector) => {
+    var tableClass = className + ' > tbody';
+
+    $(tableClass).sortable({
+        handle: handler,
+        placeholder: "placeholder",
+        items: items,
+        start: function (event, ui) {
+            var item = $(ui.item);
+            var headers = $(className + '> thead > tr').children('th');
+
+            for (var i = 0; i < headers.length; i++) {
+                var rect = $(headers)[i].getBoundingClientRect();
+
+                $(item).children('td')[i].style.width = `${rect.width}px`;
+            }
+        },
+        stop: function (event, ui) {
+            var item = $(ui.item);
+            var columns = $(item).children('td');
+
+            for (var i = 0; i < columns.length; i++) {
+                columns[i].style.width = '';
+            }
+
+            var id = item.attr('id');
+            var index = item.index(categorySelector);
+
+            DotNet.invokeMethodAsync('Backoffice.Web', 'OnStopSortOrder', id, index);
+        }
+    });
+}
+
+window.getSortOrderBySelector = (className, selector) => {
+    var tableClass = className + ' > tbody';
+
+    let data = [];
+
+    $(tableClass).children(selector).each(function (index) {
+        var market = {
+            RowId: $(this).attr('id'),
+            SortOrder: index + 1
+        };
+
+        data.push(JSON.stringify(market));
+    });
+
+    var concat = data.join("\r\n");
+    return new Blob([concat], { type: "application/txt" });
+}
+
+window.loadSegmentItems = (id, collection) => {
+    var mainRow = $(id);
+    var rowChild;
+
+    $.each(collection, function (index, value) {
+        var colNo = $("<td class='text-center'></td>").append(`<span class="ms-2">${value.sortOrder}</span>`);
+        var colCheckbox = $("<td></td>");
+        var colName = $("<td></td>").append(`<div class="d-flex justify-content-between"><span class="ms-2">${value.segmentName}</span><span class="dropdown-league"><i class="fa fa-chevron-down"></i></span></div>`);
+        var colAction = $("<td class='text-center'></td>").append(`<a class="link-bars me-2 drag-handle" href="javascript:(0)"><i class="fa fa-bars"></i></a>`)
+
+        rowChild = $(`<tr id="${value.id}" class="${value.rowClass}"></tr>`)
+            .append(colNo).append(colCheckbox).append(colName).append(colAction);
+
+        rowChild.insertAfter(mainRow);
+
+        // user the currentChild as the main row for the next insertion
+        mainRow = rowChild;
+    });
+
+    $('tr.segment-row .dropdown-league .fa').bind('click', leagueEventHandler);
+}
+
+window.loadLeagueItems = (id, collection) => {
+    var mainRow = $(id);
+    var rowChild;
+
+    $.each(collection, function (index, value) {
+        var colNo = $("<td class='text-center fst-italic'></td>").append(`<span class="ms-4">${value.sortOrder}</span>`);
+        var colCheckbox = $("<td></td>");
+        var colName = $("<td></td>").append(`<div class="d-flex justify-content-between"><span class="ms-2">${value.leagueName}</span></div>`);
+        var colAction = $("<td class='text-center'></td>").append(`<a class="link-bars me-2 drag-handle" href="javascript:(0)"><i class="fa fa-bars"></i></a>`)
+
+        rowChild = $(`<tr id="${value.id}" class="${value.rowClass}"></tr>`)
+            .append(colNo).append(colCheckbox).append(colName).append(colAction);
+
+        rowChild.insertAfter(mainRow);
+
+        // user the currentChild as the main row for the next insertion
+        mainRow = rowChild;
+    });
+}
+
+window.unloadItems = (className, rowClass) => {
+    var tableClass = className + ' > tbody';
+
+    if (rowClass == '.segment-row') {
+        $('tr.segment-row .dropdown-league .fa').unbind('click', leagueEventHandler);
+    }
+
+    $(tableClass).children(rowClass).remove();
+}
+
+var leagueEventHandler = function () {
+    var row = $(this).closest('tr');
+
+    DotNet.invokeMethodAsync('Backoffice.Web', 'OnInvokeSegmentClick', row.attr('id'));
 }

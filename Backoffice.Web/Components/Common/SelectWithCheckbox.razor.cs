@@ -10,6 +10,7 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public List<SelectListItemWithCheckboxModel<string>> Items { get; set; }
         [Parameter] public EventCallback<Dictionary<string, string>> OnCheckboxCallback { get; set; }
         [Parameter] public string AriaLabel { get; set; }
+        [Parameter] public bool IsReadOnly { get; set; } = false;
 
         #endregion
 

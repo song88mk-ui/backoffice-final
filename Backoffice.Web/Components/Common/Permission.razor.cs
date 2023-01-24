@@ -1,7 +1,10 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -12,9 +15,11 @@ namespace Backoffice.Web.Components.Common
     public partial class Permission : IDisposable
     {
         #region Properties
+        [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Parameter] public List<PermissionModel> Permissions { get; set; }
         [Parameter] public ClientModel ClientModel { get; set; }
         [Parameter] public bool IsReadOnly { get; set; }
+        [Parameter] public bool IsSubUser { get; set; }
         public PermissionTreeModel PermissionTree { get; set; }
         public List<string> SelectedClients { get; set; }
         public int SelectedCategoryId { get; set; }
@@ -26,32 +31,19 @@ namespace Backoffice.Web.Components.Common
         {
             try
             {
-                SelectedClients = new List<string>();
-                PermissionTree = await GetPermissionTree();
-
-                var clientAccess = Permissions.FirstOrDefault(p => p.ClaimType == SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."));
-                if (clientAccess != null && !string.IsNullOrEmpty(clientAccess.ClaimValue))
-                    SelectedClients = clientAccess.ClaimValue.Split(",").ToList();
-
-                SelectedCategoryId = PermissionTree.Permissions.FirstOrDefault().CategoryId;
-
-                foreach (var category in PermissionTree.Permissions)
-                {
-                    if (category.SubCategories.Any(s => s.Claims.Any(c => c.ClaimValue != "0")))
-                        category.IsEnabled = true;
-                }
+                Init();
             }
             catch (Exception)
             {
 
             }
         }
-        public async Task OnDropCategoryClickEvent(PermissionTreeModel.PermissionCategory category)
+        public async Task OnDropCategoryClickEvent(PermissionTreeModel.PermissionCategoryModel category)
         {
             SelectedCategoryId = category.CategoryId;
         }
 
-        public async Task OnEnableCategoryClickEvent(PermissionTreeModel.PermissionCategory category)
+        public async Task OnEnableCategoryClickEvent(PermissionTreeModel.PermissionCategoryModel category)
         {
             category.IsEnabled = !category.IsEnabled;
 
@@ -61,7 +53,7 @@ namespace Backoffice.Web.Components.Common
             }
         }
 
-        public async Task OnDisableClickEvent(PermissionTreeModel.PermissionCategory category)
+        public async Task OnDisableClickEvent(PermissionTreeModel.PermissionCategoryModel category)
         {
             if (category.SubCategories.Any())
             {
@@ -83,7 +75,7 @@ namespace Backoffice.Web.Components.Common
 
         }
 
-        public async Task OnEnableClickEvent(PermissionTreeModel.PermissionCategory category)
+        public async Task OnEnableClickEvent(PermissionTreeModel.PermissionCategoryModel category)
         {
             if (category.SubCategories.Any())
             {
@@ -91,13 +83,14 @@ namespace Backoffice.Web.Components.Common
                 {
                     foreach (var claim in subCategory.Claims)
                     {
-                        if (claim.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
+                        if ((IsSubUser && !claim.IsEnabled) == false && claim.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
                             claim.ClaimValue = "1";
                     }
                 }
             }
 
-            var permissions = Permissions.Where(p => p.CategoryId == category.CategoryId && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."));
+            var permissions = Permissions.Where(p => p.CategoryId == category.CategoryId && (IsSubUser && !p.IsEnabled) == false
+                && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."));
             foreach (var permission in permissions)
             {
                 permission.ClaimValue = "1";
@@ -105,6 +98,10 @@ namespace Backoffice.Web.Components.Common
 
         }
 
+        public async Task OnGroupSelectChangedEvent()
+        {
+            Init();
+        }
 
         public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
         {
@@ -124,13 +121,30 @@ namespace Backoffice.Web.Components.Common
         #endregion
 
         #region Utilities
+        private async void Init()
+        {
+            SelectedClients = new List<string>();
+            PermissionTree = await GetPermissionTree();
+
+            var clientAccess = Permissions.FirstOrDefault(p => p.ClaimType == SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."));
+            if (clientAccess != null && !string.IsNullOrEmpty(clientAccess.ClaimValue))
+                SelectedClients = clientAccess.ClaimValue.Split(",").ToList();
+
+            SelectedCategoryId = PermissionTree.Permissions.FirstOrDefault().CategoryId;
+
+            foreach (var category in PermissionTree.Permissions)
+            {
+                if (category.SubCategories.Any(s => s.Claims.Any(c => c.ClaimValue != "0")))
+                    category.IsEnabled = true;
+            }
+        }
         private async Task<PermissionTreeModel> GetPermissionTree()
         {
             var permissionTree = new PermissionTreeModel();
 
             if (Permissions != null && Permissions.Any())
             {
-                var permissionCategories = Permissions.GroupBy(p => p.CategoryId).Select(s => new PermissionTreeModel.PermissionCategory
+                var permissionCategories = Permissions.GroupBy(p => p.CategoryId).Select(s => new PermissionTreeModel.PermissionCategoryModel
                 {
                     CategoryId = s.Key,
                     CategoryName = s.FirstOrDefault().CategoryName,
@@ -157,7 +171,8 @@ namespace Backoffice.Web.Components.Common
                                     IsSubUser = s.FirstOrDefault().IsSubUser,
                                     HasReadOnly = s.FirstOrDefault().HasReadOnly,
                                     SortOrder = s.FirstOrDefault().SortOrder,
-                                    ClaimValue = s.FirstOrDefault().ClaimValue
+                                    ClaimValue = s.FirstOrDefault().ClaimValue,
+                                    IsEnabled = s.FirstOrDefault().IsEnabled
                                 }).Distinct().ToList();
 
                             var groups = Permissions.Where(p => p.CategoryId == permission.CategoryId && p.SubCategoryName == subCategory.SubCategoryName && !string.IsNullOrEmpty(p.GroupName)).Select(s => s.GroupName).Distinct().ToList();
@@ -173,7 +188,8 @@ namespace Backoffice.Web.Components.Common
                                         IsSubUser = s.IsSubUser,
                                         HasReadOnly = s.HasReadOnly,
                                         SortOrder = s.SortOrder,
-                                        ClaimValue = s.ClaimValue
+                                        ClaimValue = s.ClaimValue,
+                                        IsEnabled = s.IsEnabled
                                     }).Distinct().ToList();
 
                                 var groupModel = new PermissionTreeModel.Group

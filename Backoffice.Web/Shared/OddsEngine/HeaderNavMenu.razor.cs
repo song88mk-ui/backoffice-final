@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Backoffice.Web.Models;
+using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Shared.OddsEngine
 {
@@ -6,6 +7,7 @@ namespace Backoffice.Web.Shared.OddsEngine
     {
         #region Properties
         [Inject] public NavigationManager NavigationManager { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public bool ShowPriceBoostMenu { get; set; }
         //public bool ShowAdministrationMenu { get; set; }

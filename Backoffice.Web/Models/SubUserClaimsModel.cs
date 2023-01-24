@@ -8,11 +8,11 @@ namespace Backoffice.Web.Models
     {
         public SubUserClaimsModel()
         {
-            SubUserClaims = new List<SubUserClaim>();
+            SubUserClaims = new List<PermissionModel>();
         }
         public string MainUserId { get; set; }
         public string MainUserName { get; set; }
-        public List<SubUserClaim> SubUserClaims { get; set; }
+        public List<PermissionModel> SubUserClaims { get; set; }
     }
 
     public class SubUserClaim : ClaimModel

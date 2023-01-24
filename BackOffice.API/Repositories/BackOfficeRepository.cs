@@ -742,8 +742,8 @@ namespace Backoffice.API.Repositories
                                 #region SOCCER
                                 case (int)BetSettingCategory.Soccer:
 
-                                    minStake = betSetting.BetSettingSoccer.MinPerTicket;
-                                    maxStake = betSetting.BetSettingSoccer.MaxPerTicket;
+                                    minStake = betSetting.BetSettingSoccer.MinPerTicket ?? 0;
+                                    maxStake = betSetting.BetSettingSoccer.MaxPerTicket ?? 0;
                                     clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingSoccer);
 
                                     break;
@@ -752,8 +752,8 @@ namespace Backoffice.API.Repositories
                                 #region ALL SPORTS
                                 case (int)BetSettingCategory.OtherSports:
 
-                                    minStake = betSetting.BetSettingAllSports.MinPerTicket;
-                                    maxStake = betSetting.BetSettingAllSports.MaxPerTicket;
+                                    minStake = betSetting.BetSettingAllSports.MinPerTicket ?? 0;
+                                    maxStake = betSetting.BetSettingAllSports.MaxPerTicket ?? 0;
 
                                     clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingAllSports);
 
@@ -761,9 +761,9 @@ namespace Backoffice.API.Repositories
                                 #endregion
                                 #region PARLAY
                                 case (int)BetSettingCategory.Parlay:
-                                    minStake = betSetting.BetSettingParlay.MinPerTicket;
-                                    maxStake = betSetting.BetSettingParlay.MaxPerTicket;
-                                    maxWinnings = betSetting.BetSettingParlay.MaxWinningsBonus;
+                                    minStake = betSetting.BetSettingParlay.MinPerTicket ?? 0;
+                                    maxStake = betSetting.BetSettingParlay.MaxPerTicket ?? 0;
+                                    maxWinnings = betSetting.BetSettingParlay.MaxWinningsBonus ?? 0;
 
                                     clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingParlay);
                                     break;
@@ -771,8 +771,8 @@ namespace Backoffice.API.Repositories
 
                                 #region CRICKET
                                 case (int)BetSettingCategory.Cricket:
-                                    minStake = betSetting.BetSettingCricket.MinPerTicket;
-                                    maxStake = betSetting.BetSettingCricket.MaxPerTicket;
+                                    minStake = betSetting.BetSettingCricket.MinPerTicket ?? 0;
+                                    maxStake = betSetting.BetSettingCricket.MaxPerTicket ?? 0;
 
                                     clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingCricket);
                                     break;
@@ -786,10 +786,10 @@ namespace Backoffice.API.Repositories
                                 #endregion
                                 #region BETBUILDER
                                 case (int)BetSettingCategory.BetBuilder:
-                                    minStake = betSetting.BetSettingBetBuilder.MinStake;
-                                    maxStake = betSetting.BetSettingBetBuilder.MaxStake;
+                                    minStake = betSetting.BetSettingBetBuilder.MinStake ?? 0;
+                                    maxStake = betSetting.BetSettingBetBuilder.MaxStake ?? 0;
 
-                                    decimalPlaces = BitConverter.GetBytes(decimal.GetBits(betSetting.BetSettingBetBuilder.MaxStake)[3])[2];
+                                    decimalPlaces = BitConverter.GetBytes(decimal.GetBits(betSetting.BetSettingBetBuilder.MaxStake ?? 0)[3])[2];
 
                                     clientBetSetting = JsonSerializer.Serialize(betSetting.BetSettingBetBuilder);
                                     break;
@@ -884,37 +884,37 @@ namespace Backoffice.API.Repositories
                                 CurrencyCode = betSetting.CurrencyCode,
                                 Football = new FootballBetSetting()
                                 {
-                                    MinBet = betSetting.BetSettingSoccer.MinPerTicket,
-                                    MaxBet = betSetting.BetSettingSoccer.MaxPerTicket,
-                                    MaxFixtureBet = betSetting.BetSettingSoccer.MaxPerGame
+                                    MinBet = betSetting.BetSettingSoccer.MinPerTicket ?? 0,
+                                    MaxBet = betSetting.BetSettingSoccer.MaxPerTicket ?? 0,
+                                    MaxFixtureBet = betSetting.BetSettingSoccer.MaxPerGame ?? 0
                                 },
                                 OtherSports = new AnySportBetSetting()
                                 {
-                                    MinBet = betSetting.BetSettingAllSports.MinPerTicket,
-                                    MaxBet = betSetting.BetSettingAllSports.MaxPerTicket,
-                                    MaxFixtureBet = betSetting.BetSettingAllSports.MaxPerGame
+                                    MinBet = betSetting.BetSettingAllSports.MinPerTicket ?? 0,
+                                    MaxBet = betSetting.BetSettingAllSports.MaxPerTicket ?? 0,
+                                    MaxFixtureBet = betSetting.BetSettingAllSports.MaxPerGame ?? 0
                                 },
                                 Parlay = new ParlayBetSetting()
                                 {
-                                    MinBet = betSetting.BetSettingParlay.MinPerTicket,
-                                    MaxBet = betSetting.BetSettingParlay.MaxPerTicket,
-                                    MaxPayout = betSetting.BetSettingParlay.MaxPayoutPerTicket,
-                                    ParlayBonusMaxWinnings = betSetting.BetSettingParlay.MaxWinningsBonus
+                                    MinBet = betSetting.BetSettingParlay.MinPerTicket ?? 0,
+                                    MaxBet = betSetting.BetSettingParlay.MaxPerTicket ?? 0,
+                                    MaxPayout = betSetting.BetSettingParlay.MaxPayoutPerTicket ?? 0,
+                                    ParlayBonusMaxWinnings = betSetting.BetSettingParlay.MaxWinningsBonus ?? 0
                                 },
                                 Cricket = new CricketBetSetting()
                                 {
-                                    MinBet = betSetting.BetSettingCricket.MinPerTicket,
-                                    MaxBet = betSetting.BetSettingCricket.MaxPerTicket,
-                                    MaxFixtureBet = betSetting.BetSettingCricket.MaxPerGame
+                                    MinBet = betSetting.BetSettingCricket.MinPerTicket ?? 0,
+                                    MaxBet = betSetting.BetSettingCricket.MaxPerTicket ?? 0,
+                                    MaxFixtureBet = betSetting.BetSettingCricket.MaxPerGame ?? 0
                                 },
                                 Priceboost = new PriceboostBetSetting()
                                 {
-                                    MaxStake = betSetting.BetSettingPriceboost.MaxStake
+                                    MaxStake = betSetting.BetSettingPriceboost.MaxStake ?? 0
                                 },
                                 BetBuilder = new BetBuilderBetSetting()
                                 {
-                                    MinStake = betSetting.BetSettingBetBuilder.MinStake,
-                                    MaxStake = betSetting.BetSettingBetBuilder.MaxStake
+                                    MinStake = betSetting.BetSettingBetBuilder.MinStake ?? 0,
+                                    MaxStake = betSetting.BetSettingBetBuilder.MaxStake ?? 0
                                 },
                                 TaxConfig = request.TaxConfig
                             });

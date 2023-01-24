@@ -93,9 +93,21 @@ namespace Backoffice.Web.Components.Clients
                 if (Client.IsTierRevenue)
                 {
                     if (!string.IsNullOrEmpty(Client.TierSportsbookShare))
-                        SportsbookTier = JsonSerializer.Deserialize<TierRevenueShareModel>(Client.TierSportsbookShare) ?? new TierRevenueShareModel() { AboveTierPercentage = 50m };
+                        SportsbookTier = JsonSerializer.Deserialize<TierRevenueShareModel>(Client.TierSportsbookShare) ?? new TierRevenueShareModel() { AboveTierPercentage = 0.50m };
                     if (!string.IsNullOrEmpty(Client.TierJackpotShare))
-                        JackpotTier = JsonSerializer.Deserialize<TierRevenueShareModel>(Client.TierJackpotShare) ?? new TierRevenueShareModel() { AboveTierPercentage = 50m };
+                        JackpotTier = JsonSerializer.Deserialize<TierRevenueShareModel>(Client.TierJackpotShare) ?? new TierRevenueShareModel() { AboveTierPercentage = 0.50m };
+
+                    SportsbookTier.AboveTierPercentage = SportsbookTier.AboveTierPercentage * 100m;
+                    foreach(var tier in SportsbookTier.Tiers)
+                    {
+                        tier.Percentage = tier.Percentage * 100m;
+                    }
+                    JackpotTier.AboveTierPercentage = JackpotTier.AboveTierPercentage * 100m;
+                    foreach (var tier in JackpotTier.Tiers)
+                    {
+                        tier.Percentage = tier.Percentage * 100m;
+                    }
+
                 }
             }
 
@@ -248,12 +260,24 @@ namespace Backoffice.Web.Components.Clients
             try
             {
 
+                Alerts.Clear();
+
                 if (!EditContext.Validate())
                 {
+                    foreach(var message in EditContext.GetValidationMessages().ToList())
+                    {
+                        if(!Alerts.Any(a => a.AltertMessage == message))
+                        {
+                            Alerts.Add(new AlertModel
+                            {
+                                AlertStatus = "Error",
+                                AltertMessage = $"{message}",
+                                Opacity = 1.0m
+                            });
+                        }
+                    }
                     return;
                 }
-
-                Alerts.Clear();
 
                 if (string.IsNullOrEmpty(Client.Name))
                 {
@@ -273,6 +297,55 @@ namespace Backoffice.Web.Components.Clients
                         AltertMessage = "Brand Name is required",
                         Opacity = 1.0m
                     });
+                }
+
+                if (Alerts.Any())
+                    return;
+
+                foreach(var setting in Client.BetSettings)
+                {
+                    if(setting.BetSettingSoccer.MaxPerGame > 0 && setting.BetSettingSoccer.MaxPerGame < setting.BetSettingSoccer.MaxPerTicket)
+                    {
+                        var message = $"MaxPerGame must be greater than or equal {setting.BetSettingSoccer.MaxPerTicket}";
+                        if (!Alerts.Any(a => a.AltertMessage == message))
+                        {
+                            Alerts.Add(new AlertModel
+                            {
+                                AlertStatus = "Error",
+                                AltertMessage = message,
+                                Opacity = 1.0m
+                            });
+                        }
+                    }
+
+                    if (setting.BetSettingAllSports.MaxPerGame > 0 && setting.BetSettingAllSports.MaxPerGame < setting.BetSettingAllSports.MaxPerTicket)
+                    {
+                        var message = $"MaxPerGame must be greater than or equal {setting.BetSettingAllSports.MaxPerTicket}";
+                        if (!Alerts.Any(a => a.AltertMessage == message))
+                        {
+                            Alerts.Add(new AlertModel
+                            {
+                                AlertStatus = "Error",
+                                AltertMessage = message,
+                                Opacity = 1.0m
+                            });
+                        }
+                    }
+
+                    if (setting.BetSettingCricket.MaxPerGame > 0 && setting.BetSettingCricket.MaxPerGame < setting.BetSettingCricket.MaxPerTicket)
+                    {
+                        var message = $"MaxPerGame must be greater than or equal {setting.BetSettingCricket.MaxPerTicket}";
+                        if (!Alerts.Any(a => a.AltertMessage == message))
+                        {
+                            Alerts.Add(new AlertModel
+                            {
+                                AlertStatus = "Error",
+                                AltertMessage = message,
+                                Opacity = 1.0m
+                            });
+                        }
+                    }
+
                 }
 
                 if (Alerts.Any())

@@ -16,6 +16,8 @@ namespace Backoffice.Web.Components.SportSettings
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback OnUpdateClickCallback {get;set; }
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
+        [Parameter] public EventCallback OnSaveClickCallback { get; set; }
+        [Parameter] public EventCallback OnCopyClickCallback { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
@@ -54,6 +56,7 @@ namespace Backoffice.Web.Components.SportSettings
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
             SelectedClientCode = e.Value.ToString();
+            IsUpdate = false;
 
             await OnClientChangedCallback.InvokeAsync(SelectedClientCode);
         }
@@ -72,12 +75,20 @@ namespace Backoffice.Web.Components.SportSettings
             await OnCancelClickCallback.InvokeAsync();
         }
 
-        //public async Task OnSaveClickEvent()
-        //{
-        //    ClientSportOrderFilter.IsUpdate = false;
+        public async Task OnSaveClickEvent()
+        {
+            IsUpdate = false;
 
-        //    await OnSaveClickCallback.InvokeAsync();
-        //}
+            await OnSaveClickCallback.InvokeAsync();
+        }
+
+        public async Task OnCopyClickEvent()
+        {
+            if (string.IsNullOrEmpty(SelectedClientCode))
+                return;
+
+            await OnCopyClickCallback.InvokeAsync();
+        }
 
         //public async Task OnViewLogsClickEvent()
         //{
@@ -85,21 +96,6 @@ namespace Backoffice.Web.Components.SportSettings
         //        return;
 
         //    await OnViewLogsCallback.InvokeAsync();
-        //}
-
-        //public async Task OnCopyClickEvent()
-        //{
-        //    if (string.IsNullOrEmpty(ClientSportOrderFilter.ClientCode))
-        //        return;
-
-        //    await OnCopyCallback.InvokeAsync();
-        //}
-
-        //public async Task OnCancelClickEvent()
-        //{
-        //    ClientSportOrderFilter.IsUpdate = false;
-
-        //    await OnInitializeCallback.InvokeAsync(ClientSportOrderFilter.ClientCode);
         //}
 
         public void Dispose()
