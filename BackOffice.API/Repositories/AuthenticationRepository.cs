@@ -522,7 +522,6 @@ namespace Backoffice.API.Repositories
             IpInfo ipInfo = new IpInfo();
             try
             {
-                ip = "52.229.219.142";
                 string info = new WebClient().DownloadString("http://ipinfo.io/" + ip);
                 ipInfo = JsonSerializer.Deserialize<IpInfo>(info, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 RegionInfo myRI1 = new RegionInfo(ipInfo.Country);
