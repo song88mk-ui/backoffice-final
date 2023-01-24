@@ -11,7 +11,7 @@
             </span>
             if (!string.IsNullOrEmpty(model.Url))
             {
-                <a href="model.Url" class="me-1 text-decoration-none @(model.IsCurrentPage ? "link-page" : string.Empty)">
+                <a href="@model.Url" class="me-1 text-decoration-none @(model.IsCurrentPage ? "link-page" : string.Empty)">
                     @model.Name
                 </a>
             }
