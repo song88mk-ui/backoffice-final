@@ -5,6 +5,7 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using System.Text.Json;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
 
@@ -33,6 +34,7 @@ namespace Backoffice.Web.Components.Clients
         public string SelectedCurrency { get; set; }
         public ClientListResponse.BetSetting SelectedBetSetting { get; set; }
         public List<AlertModel> Alerts { get; set; }
+        private EditContext EditContext { get; set; }
 
         #endregion
 
@@ -232,6 +234,7 @@ namespace Backoffice.Web.Components.Clients
             SelectedCurrency = Currencies.FirstOrDefault() ?? string.Empty;
             SelectedBetSetting = Client.BetSettings.FirstOrDefault(b => b.CurrencyCode == SelectedCurrency);
 
+            EditContext = new EditContext(Client);
         }
 
         public async Task OnCancelClickEvent()
@@ -244,6 +247,12 @@ namespace Backoffice.Web.Components.Clients
         {
             try
             {
+
+                if (!EditContext.Validate())
+                {
+                    return;
+                }
+
                 Alerts.Clear();
 
                 if (string.IsNullOrEmpty(Client.Name))

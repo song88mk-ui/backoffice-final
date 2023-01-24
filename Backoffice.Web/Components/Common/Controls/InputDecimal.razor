@@ -5,8 +5,8 @@
 <input type="number" class="@this.CssClass" @attributes=this.AdditionalAttributes value=@this.CurrentValueAsString @oninput=OnValueChanged />
 
 @code {
-    [Parameter] public int Min { get; set; } = int.MinValue;
-    [Parameter] public int Max { get; set; } = int.MaxValue;
+    [Parameter] public decimal Min { get; set; } = decimal.MinValue;
+    [Parameter] public decimal Max { get; set; } = decimal.MaxValue;
 
     private async Task OnValueChanged(ChangeEventArgs e)
     {
@@ -16,7 +16,7 @@
 
         // Check if we need to reset the display value
         if (BindConverter.TryConvertTo<decimal?>(e.Value?.ToString(), CultureInfo.InvariantCulture, out decimal? value))
-            resetToCurrent = value < this.Min || value > this.Max;
+            resetToCurrent = value > this.Max;
 
         // Sets off the internal InputBase update process
         this.CurrentValueAsString = e.Value?.ToString();

@@ -1,7 +1,7 @@
 ﻿@using Backoffice.Shared.Enums;
 
 <div class="modal-body">
-    <EditForm Model=Client>
+    <EditForm EditContext="EditContext">
 
         <div class="business-container">
             <div class="row">
@@ -637,7 +637,8 @@
                                 </div>
                                 <div class="ps-2 pb-2 padRight">
                                     <label class="form-label" for="soccerMaxGameField">Max Per Game</label>
-                                    <input type="text" class="form-control" id="soccerMaxGameField" @bind-value="SelectedBetSetting.BetSettingSoccer.MaxPerGame" />
+                                    <InputDecimal Min="SelectedBetSetting.BetSettingSoccer.MaxPerTicket" class="form-control" id="soccerMaxGameField" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerGame" />
+                                    <ValidationMessage For="@(() => SelectedBetSetting.BetSettingSoccer.MaxPerGame)" />
                                 </div>
                             </div>
                         </div>
@@ -665,7 +666,8 @@
                                 </div>
                                 <div class="ps-2 pb-2 padRight">
                                     <label class="form-label" for="cricketMaxGameField">Max Per Game</label>
-                                    <input type="text" class="form-control" id="cricketMaxGameField" @bind-value="SelectedBetSetting.BetSettingCricket.MaxPerGame" />
+                                    <InputDecimal Min="SelectedBetSetting.BetSettingAllSports.MaxPerTicket" class="form-control" id="cricketMaxGameField" @bind-Value="SelectedBetSetting.BetSettingCricket.MaxPerGame" />
+                                    <ValidationMessage For="@(() => SelectedBetSetting.BetSettingCricket.MaxPerGame)" />
                                 </div>
                             </div>
                         </div>
@@ -695,7 +697,8 @@
                                 </div>
                                 <div class="ps-2 pb-2 padRight">
                                     <label class="form-label" for="othersMaxGameField">Max Per Game</label>
-                                    <input type="text" class="form-control" id="othersMaxGameField" @bind-value="SelectedBetSetting.BetSettingAllSports.MaxPerGame" />
+                                    <InputDecimal Min="SelectedBetSetting.BetSettingAllSports.MaxPerTicket" class="form-control" id="othersMaxGameField" @bind-Value="SelectedBetSetting.BetSettingAllSports.MaxPerGame" />
+                                    <ValidationMessage For="@(() => SelectedBetSetting.BetSettingAllSports.MaxPerGame)" />
                                 </div>
                             </div>
                         </div>

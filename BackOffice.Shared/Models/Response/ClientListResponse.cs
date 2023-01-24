@@ -86,14 +86,14 @@ namespace Backoffice.Shared.Models.Response
         {
             public decimal MinPerTicket { get; set; }
             public decimal MaxPerTicket { get; set; }
-            public decimal MaxPerGame { get; set; }
+            public decimal? MaxPerGame { get; set; }
         }
 
         public class BetSettingAllSports
         {
             public decimal MinPerTicket { get; set; }
             public decimal MaxPerTicket { get; set; }
-            public decimal MaxPerGame { get; set; }
+            public decimal? MaxPerGame { get; set; }
         }
 
         public class BetSettingParlay
@@ -108,7 +108,7 @@ namespace Backoffice.Shared.Models.Response
         {
             public decimal MinPerTicket { get; set; }
             public decimal MaxPerTicket { get; set; }
-            public decimal MaxPerGame { get; set; }
+            public decimal? MaxPerGame { get; set; }
         }
 
         public class BetSettingPriceboost
