@@ -84,42 +84,42 @@ namespace Backoffice.Shared.Models.Response
 
         public class BetSettingSoccer
         {
-            public decimal MinPerTicket { get; set; }
-            public decimal MaxPerTicket { get; set; }
-            public decimal MaxPerGame { get; set; }
+            public decimal? MinPerTicket { get; set; }
+            public decimal? MaxPerTicket { get; set; }
+            public decimal? MaxPerGame { get; set; }
         }
 
         public class BetSettingAllSports
         {
-            public decimal MinPerTicket { get; set; }
-            public decimal MaxPerTicket { get; set; }
-            public decimal MaxPerGame { get; set; }
+            public decimal? MinPerTicket { get; set; }
+            public decimal? MaxPerTicket { get; set; }
+            public decimal? MaxPerGame { get; set; }
         }
 
         public class BetSettingParlay
         {
-            public decimal MinPerTicket { get; set; }
-            public decimal MaxPerTicket { get; set; }
-            public decimal MaxPayoutPerTicket { get; set; }
-            public decimal MaxWinningsBonus { get; set; }
+            public decimal? MinPerTicket { get; set; }
+            public decimal? MaxPerTicket { get; set; }
+            public decimal? MaxPayoutPerTicket { get; set; }
+            public decimal? MaxWinningsBonus { get; set; }
         }
 
         public class BetSettingCricket
         {
-            public decimal MinPerTicket { get; set; }
-            public decimal MaxPerTicket { get; set; }
-            public decimal MaxPerGame { get; set; }
+            public decimal? MinPerTicket { get; set; }
+            public decimal? MaxPerTicket { get; set; }
+            public decimal? MaxPerGame { get; set; }
         }
 
         public class BetSettingPriceboost
         {
-            public decimal MaxStake { get; set; }
+            public decimal? MaxStake { get; set; }
         }
 
         public class BetSettingBetBuilder
         {
-            public decimal MinStake { get; set; }
-            public decimal MaxStake { get; set; }
+            public decimal? MinStake { get; set; }
+            public decimal? MaxStake { get; set; }
         }
         #endregion
     }

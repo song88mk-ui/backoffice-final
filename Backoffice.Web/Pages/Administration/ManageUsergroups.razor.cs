@@ -105,6 +105,18 @@ namespace Backoffice.Web.Pages.Administration
             var options = new ModalOptions();
             ModalService.Open<CreateOrUpdateModal>("Edit User Group", parameters, options);
         }
+        public async Task OnViewUserGroupLogClickEvent(UserGroupResponse userGroup)
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("UserGroup", userGroup);
+
+            var options = new ModalOptions();
+            ModalService.Open<ViewUserGroupLogModal>("View User Group Logs", parameters, options);
+        }
+
         public async Task OnDeleteUserGroupClickEvent(UserGroupResponse userGroup)
         {
             var parameters = new ModalParameters();

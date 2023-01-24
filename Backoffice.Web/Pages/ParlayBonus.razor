@@ -52,12 +52,12 @@
                                         <td class="td-parlay-bonus">
                                             @if (IsUpdating)
                                             {
-                                                <input class="form-control parlay-bonus-input @(item.ParlayBonus < 0 || @item.ParlayBonus > 5000 ? "border border-danger": "")" placeholder="Min. Value 0.01" type="number" @bind-value="@item.ParlayBonus" data-decimal=2 oninput="enforceNumberValidation(this, 5000)"/>
+                                                <input id="@($"parlay-bonus-input-{item.SelectionCount}")" class="form-control parlay-bonus-input @(item.ParlayBonus < 0 || @item.ParlayBonus > 5000 ? "border border-danger": "")" placeholder="Min. Value 0.01" type="number" @bind-value="@item.ParlayBonus" data-decimal=2 oninput="enforceNumberValidation(this, 5000)"/>
                                                 <span>%</span>
                                             }
                                             else
                                             {
-                                                <input class="form-control parlay-bonus-input" placeholder="Min. Value 0.01" type="number" @bind-value="@item.ParlayBonus" disabled />
+                                                <input id="@($"parlay-bonus-input-{item.SelectionCount}")" class="form-control parlay-bonus-input" placeholder="Min. Value 0.01" type="number" @bind-value="@item.ParlayBonus" disabled />
                                                 <span>%</span>
                                             }
                                         </td>
@@ -95,4 +95,7 @@
 </div>
 <div>
     <CustomModal OnSaveClickCallback="OnDeleteConfigClick" />
+</div>
+<div class="visually-hidden">
+    <input id="totalCount" type="number" @bind-value="TotalCount"/>
 </div>

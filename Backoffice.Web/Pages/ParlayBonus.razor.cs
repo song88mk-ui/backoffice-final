@@ -32,6 +32,7 @@ namespace Backoffice.Web.Pages
         public bool IsAdding { get; set; }
         public int Skip { get; set; }
         protected Pagination PaginationComponent { get; set; }
+        public int TotalCount { get; set; }
         #endregion
 
         #region Methods                
@@ -137,6 +138,13 @@ namespace Backoffice.Web.Pages
                 IsPreloading = false;                
 
                 IsEmpty = ClientParlayBonusResponse.ParlayBonusConfig.Count > 0 ? false : true;
+
+                TotalCount = ClientParlayBonusResponse.ParlayBonusConfig.Count;
+
+                if (ClientParlayBonusResponse.ParlayBonusMinOdds == 0)
+                {
+                    ClientParlayBonusResponse.ParlayBonusMinOdds = 1.20m;
+                }
             }            
         }
 
@@ -207,7 +215,9 @@ namespace Backoffice.Web.Pages
 
             MetaData.TotalCount = ClientParlayBonusResponse.ParlayBonusConfig.Count;
             MetaData.TotalPages = ((ClientParlayBonusResponse.ParlayBonusConfig.Count - 1) / MetaData.PageSize) + 1;
-            
+
+            TotalCount = ClientParlayBonusResponse.ParlayBonusConfig.Count;
+
             await SelectPage(MetaData.TotalPages);
             await InvokeAsync(StateHasChanged);
         }
