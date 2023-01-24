@@ -111,6 +111,7 @@ namespace Backoffice.Web.Pages.Administration
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("UserGroup", userGroup);
 
             var options = new ModalOptions();
             ModalService.Open<DeleteUserGroupModal>("Delete User Group", parameters, options);

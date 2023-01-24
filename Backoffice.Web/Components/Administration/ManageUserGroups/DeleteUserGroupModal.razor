@@ -4,13 +4,22 @@
             <img src="icons/svg/warning-icon.svg" />
         </div>
         <div class="text-center">
-            You are about to delete "<span class="fw-bold">User Group 1</span>".
+            You are about to delete "<span class="fw-bold">@UserGroup.UserGroupName</span>".
             <br />
             Please be certain as this cannot be undone
         </div>
     </div>
 </div>
 <div class="modal-footer">
+    @if (Alerts != null && Alerts.Any())
+    {
+            <div class="col-md-8">
+            @foreach (var alert in Alerts)
+            {
+                        <AlertMessage AlertStatus="@alert.AlertStatus" AlertMessageStr="@alert.AltertMessage" Opacity="@alert.Opacity" />
+            }
+            </div>
+    }
     <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent">Close</button>
-    <button type="button" class="btn modal-btn modal-apply">Apply</button>
+    <button type="button" class="btn modal-btn modal-apply" @onclick="OnDeleteClickEvent">Apply</button>
 </div>
