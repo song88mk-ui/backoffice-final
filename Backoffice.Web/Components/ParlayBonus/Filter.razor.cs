@@ -11,13 +11,13 @@ namespace Backoffice.Web.Components.ParlayBonus
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
-        [Parameter] public ClientParlayBonusModel ClientParlayBonusResponse { get; set; }        
+        [Parameter] public ClientParlayBonusModel ClientParlayBonusResponse { get; set; }
         [Parameter] public EventCallback<bool> OnUpdateClickCallback { get; set; }
         [Parameter] public EventCallback OnAddClickCallback { get; set; }
         [Parameter] public EventCallback<long> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }        
         [Parameter] public List<SelectListItemModel<ClientModel.Client>> Clients { get; set; }
         [Parameter] public MetaData MetaData { get; set; }
         public ElementReference ParlayBonusMinOddsElementReference { get; set; }
@@ -27,10 +27,10 @@ namespace Backoffice.Web.Components.ParlayBonus
         [Parameter] public EventCallback<bool> IsUpdatingChanged { get; set; }
         public decimal OriginalMinOdds { get; set; }
 
-        private static bool IsFormValid { get; set; }
+        public static bool IsFormValid { get; set; }
         private static Filter filter;
         private int InvalidCount { get; set; }
-        private bool IsSaveEnabled { get; set; }
+        public static bool IsSaveDisabled { get; set; }
         #endregion
 
         #region Ctor
@@ -86,8 +86,10 @@ namespace Backoffice.Web.Components.ParlayBonus
         }
 
         public async Task OnAddClickEvent()
-        {            
+        {
+            IsSaveDisabled = true;
             await OnAddClickCallback.InvokeAsync();
+            await InvokeAsync(StateHasChanged);
         }
 
         public async Task FilterAddBtnOnMouseover()
@@ -96,9 +98,17 @@ namespace Backoffice.Web.Components.ParlayBonus
         }
 
         [JSInvokable("DisableSaveButton")]
-        public static void DisableSaveButton(bool isDisabled)
+        public static async Task DisableSaveButton(bool isDisabled)
         {
             IsFormValid = isDisabled;            
+            filter.CheckForInvalidData();
+            filter.StateHasChanged();
+        }
+
+        [JSInvokable("DisableSaveButtonOnInput")]
+        public static async Task DisableSaveButtonOnInput(bool isDisabled)
+        {
+            IsSaveDisabled = isDisabled;            
             filter.CheckForInvalidData();
             filter.StateHasChanged();
         }
@@ -110,16 +120,9 @@ namespace Backoffice.Web.Components.ParlayBonus
             await JSRuntime.InvokeVoidAsync("ValidateParlayBonusMinOdds", ParlayBonusMinOddsElementReference);
         }
 
-        private void CheckForInvalidData()
-        {
-            InvalidCount = 0;
-            foreach (var item in ClientParlayBonusResponse.ParlayBonusConfig)
-            {
-                if (item.ParlayBonus < 0 || item.ParlayBonus > 5000)
-                {
-                    InvalidCount++;
-                }
-            }
+        private async Task CheckForInvalidData()
+        {            
+            InvalidCount = ClientParlayBonusResponse.ParlayBonusConfig.Where(x => x.ParlayBonus < 0 || x.ParlayBonus > 5000 || x.ParlayBonus == 0).Count();
         }
         #endregion
     }

@@ -28,10 +28,9 @@ namespace Backoffice.Web.Pages
         public List<SelectListItemModel<ClientModel.Client>> Clients { get; set; }
         public bool IsEmpty { get; set; }
         public const string ToastTitle = "Parlay Bonus";
-        public string ToastMessage { get; set; }        
+        public string ToastMessage { get; set; }
         public bool IsAdding { get; set; }
         public int Skip { get; set; }
-        protected Pagination PaginationComponent { get; set; }
         public int TotalCount { get; set; }
         #endregion
 
@@ -135,7 +134,7 @@ namespace Backoffice.Web.Pages
                 }
 
                 ClientParlayBonusResponse = result;
-                IsPreloading = false;                
+                IsPreloading = false;
 
                 IsEmpty = ClientParlayBonusResponse.ParlayBonusConfig.Count > 0 ? false : true;
 
@@ -145,7 +144,7 @@ namespace Backoffice.Web.Pages
                 {
                     ClientParlayBonusResponse.ParlayBonusMinOdds = 1.20m;
                 }
-            }            
+            }
         }
 
         public async Task OnDeleteConfig(ParlayBonusConfig parlayBonusConfig)
@@ -191,7 +190,7 @@ namespace Backoffice.Web.Pages
         public async Task OnAddClick()
         {
             IsAdding = true;
-            ParlayBonusConfig newConfig = null;                        
+            ParlayBonusConfig newConfig = null;
 
             IsUpdating = true;
 
@@ -199,15 +198,17 @@ namespace Backoffice.Web.Pages
             {
                 newConfig = new ParlayBonusConfig()
                 {
-                    SelectionCount = 3
+                    SelectionCount = 3,
+                    ParlayBonus = 0m
                 };
             }
             else
             {
                 newConfig = new ParlayBonusConfig()
                 {
-                    SelectionCount = ClientParlayBonusResponse.ParlayBonusConfig.Last().SelectionCount + 1
-                };                
+                    SelectionCount = ClientParlayBonusResponse.ParlayBonusConfig.Last().SelectionCount + 1,
+                    ParlayBonus = 0m
+                };
             }
 
             TempConfig.Add(newConfig);
@@ -244,7 +245,7 @@ namespace Backoffice.Web.Pages
             else
             {
                 ToastMessage = result.Message;
-            }            
+            }
 
             IsUpdating = false;
 

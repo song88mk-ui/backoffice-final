@@ -163,10 +163,12 @@ window.enforceNumberValidation = (ele, limit) => {
             }
 
             if ($('.parlay-bonus-input.border-danger').length > 0 || $('#invalidCount').val() > 0) {
-                $('#saveChangesBtn').prop('disabled', true);                
+                $('#saveChangesBtn').prop('disabled', true);                  
+                DotNet.invokeMethodAsync('Backoffice.Web', 'DisableSaveButtonOnInput', true);
             }
             else {
-                $('#saveChangesBtn').prop('disabled', false);                
+                $('#saveChangesBtn').prop('disabled', false);                            
+                DotNet.invokeMethodAsync('Backoffice.Web', 'DisableSaveButtonOnInput', false);
             }
         }
     }
