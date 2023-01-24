@@ -35,23 +35,31 @@ namespace Backoffice.Web.Components.SubUser
                 SubUser.Status = IsEdit ? SubUser.Status : "Normal";
 
                 DefaultClaims = new List<SubUserClaim>();
-                if(SubUserClaims != null && SubUserClaims.SubUserClaims.Any())
+                if (SubUserClaims != null && SubUserClaims.SubUserClaims.Any())
                 {
-                    foreach(var claim in SubUserClaims.SubUserClaims)
+                    foreach (var claim in SubUserClaims.SubUserClaims)
                     {
                         DefaultClaims.Add(new SubUserClaim
                         {
                             ClaimType = claim.ClaimType,
                             ClaimValue = claim.ClaimValue,
                             HasReadOnly = claim.HasReadOnly,
-                            IsEnabled= claim.IsEnabled,
+                            IsEnabled = claim.IsEnabled,
                             Name = claim.Name
                         });
                     }
                 }
 
-                if (SubUser.UserName.IndexOf(SubUserClaims.MainUserName) == 0)
-                    SubUser.UserName = SubUser.UserName.Replace(SubUserClaims.MainUserName, "");
+                if (!string.IsNullOrEmpty(SubUser.UserName))
+                {
+                    if (SubUser.UserName.IndexOf(SubUserClaims.MainUserName) == 0)
+                        SubUser.UserName = SubUser.UserName.Replace(SubUserClaims.MainUserName, "");
+                }
+                else
+                {
+                    SubUser.UserName = string.Empty;
+                }
+
 
             }
             catch (Exception)
@@ -117,7 +125,7 @@ namespace Backoffice.Web.Components.SubUser
 
         public async Task OnCancelClickEvent()
         {
-            if(IsEdit)
+            if (IsEdit)
                 SubUser.UserName = $"{SubUserClaims.MainUserName}{SubUser.UserName}";
 
             ModalService.Cancel();
@@ -194,7 +202,7 @@ namespace Backoffice.Web.Components.SubUser
                 }
             }
 
-            if(IsEdit == true)
+            if (IsEdit == true)
             {
                 var response = (await AuthenticationService.UpdateUser(request));
 
@@ -230,7 +238,7 @@ namespace Backoffice.Web.Components.SubUser
 
                 if (response.Result)
                 {
-                    
+
                     Alerts.Add(new AlertModel
                     {
                         AlertStatus = "Success",
@@ -255,7 +263,7 @@ namespace Backoffice.Web.Components.SubUser
                     });
                 }
             }
-            
+
         }
         public void Dispose()
         {

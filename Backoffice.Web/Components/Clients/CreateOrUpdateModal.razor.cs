@@ -33,6 +33,18 @@ namespace Backoffice.Web.Components.Clients
         public string SelectedCurrency { get; set; }
         public ClientListResponse.BetSetting SelectedBetSetting { get; set; }
         public List<AlertModel> Alerts { get; set; }
+
+        #endregion
+
+        #region Fields
+        const decimal maxInputVal = 100;
+        private decimal? InputStake { get; set; }
+        private decimal inputWinnings;
+        private decimal InputWinnings
+        {
+            get => inputWinnings;
+            set => inputWinnings = Math.Min(value, maxInputVal);
+        }
         #endregion
 
         #region Methods
@@ -223,6 +235,7 @@ namespace Backoffice.Web.Components.Clients
 
         public async Task OnCancelClickEvent()
         {
+
             ModalService.Cancel();
         }
 
