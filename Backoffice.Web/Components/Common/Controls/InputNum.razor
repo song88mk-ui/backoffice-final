@@ -16,7 +16,7 @@
 
         // Check if we need to reset the display value
         if (BindConverter.TryConvertTo<int?>(e.Value?.ToString(), CultureInfo.InvariantCulture, out int? value))
-            resetToCurrent = value < this.Min || value > this.Max;
+            resetToCurrent = value > this.Max;
 
         // Sets off the internal InputBase update process
         this.CurrentValueAsString = e.Value?.ToString();
