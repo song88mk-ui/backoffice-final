@@ -29,6 +29,8 @@ namespace Backoffice.Web.Components.ParlayBonus
 
         private static bool IsFormValid { get; set; }
         private static Filter filter;
+        private int InvalidCount { get; set; }
+        private bool IsSaveEnabled { get; set; }
         #endregion
 
         #region Ctor
@@ -96,7 +98,8 @@ namespace Backoffice.Web.Components.ParlayBonus
         [JSInvokable("DisableSaveButton")]
         public static void DisableSaveButton(bool isDisabled)
         {
-            IsFormValid = isDisabled;
+            IsFormValid = isDisabled;            
+            filter.CheckForInvalidData();
             filter.StateHasChanged();
         }
         #endregion
@@ -105,6 +108,18 @@ namespace Backoffice.Web.Components.ParlayBonus
         private async Task ValidateParlayBonusMinOdds(ChangeEventArgs e)
         {
             await JSRuntime.InvokeVoidAsync("ValidateParlayBonusMinOdds", ParlayBonusMinOddsElementReference);
+        }
+
+        private void CheckForInvalidData()
+        {
+            InvalidCount = 0;
+            foreach (var item in ClientParlayBonusResponse.ParlayBonusConfig)
+            {
+                if (item.ParlayBonus < 0 || item.ParlayBonus > 5000)
+                {
+                    InvalidCount++;
+                }
+            }
         }
         #endregion
     }

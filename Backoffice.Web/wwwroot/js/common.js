@@ -185,15 +185,18 @@ window.enforceNumberValidation = (ele, limit) => {
 
         //for parlay bonus only        
         if ($('#filterAddBtn').length == 1) {            
-            if ($(ele).val() > 0 && $('#totalCount').val() != 50) {
+            if ($(ele).val() > 0 && $('#totalCount').val() < 50) {
                 $('#filterAddBtn').prop('disabled', false);
             }            
             else {
                 $('#filterAddBtn').prop('disabled', true);
             }
 
-            if ($(ele).hasClass('border-danger')) {
-                $('#saveChangesBtn').prop('disabled', true);
+            if ($('.parlay-bonus-input.border-danger').length > 0 || $('#invalidCount').val() > 0) {
+                $('#saveChangesBtn').prop('disabled', true);                
+            }
+            else {
+                $('#saveChangesBtn').prop('disabled', false);                
             }
         }
     }
