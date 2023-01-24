@@ -184,11 +184,9 @@ window.enforceNumberValidation = (ele, limit) => {
         }
 
         //for parlay bonus only        
-        if ($('#filterAddBtn').length == 1) {
-            if ($(ele).val() > 0) {
-                if (!$('#filterAddBtn').prop('disabled')) {
-                    $('#filterAddBtn').prop('disabled', false);
-                }
+        if ($('#filterAddBtn').length == 1) {            
+            if ($(ele).val() > 0 && $('#totalCount').val() != 50) {
+                $('#filterAddBtn').prop('disabled', false);
             }            
             else {
                 $('#filterAddBtn').prop('disabled', true);
