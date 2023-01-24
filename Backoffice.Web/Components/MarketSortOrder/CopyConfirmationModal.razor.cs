@@ -32,12 +32,12 @@ namespace Backoffice.Web.Components.MarketSortOrder
             FixtureStatusName = ModalParameters.TryGet<string>("FixtureStatusName");
         }
 
-        public async Task OnModalCancel()
+        public async Task OnCancelClickEvent()
         {
             ModalService.Cancel();
         }
 
-        public async Task OnModalCopy()
+        public async Task OnCopyClickEvent()
         {
             var fromClientId = ModalParameters.TryGet<Guid>("FromClientId");
             var toClientId = ModalParameters.TryGet<Guid>("ToClientId");

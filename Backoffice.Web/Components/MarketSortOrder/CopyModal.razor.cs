@@ -109,12 +109,12 @@ namespace Backoffice.Web.Components.MarketSortOrder
             SelectedClientCode = e.Value.ToString();
         }
 
-        public async Task OnModalCancel()
+        public async Task OnCancelClickEvent()
         {
             ModalService.Cancel();
         }
 
-        public async Task OnModalCopy()
+        public async Task OnCopyClickEvent()
         {
             if (string.IsNullOrEmpty(SelectedClientCode) || FromClientCode == SelectedClientCode)
                 return;

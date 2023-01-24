@@ -5,114 +5,88 @@
 @page "/odds-engine/sport-settings"
 
 <div class="col-md-12">
+    <Breadcrumb Breadcrumbs="Breadcrumbs" />
+</div>
+<div class="col-md-12">
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" />
+    <Filter OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickCallback="OnCancelClickEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyClickCallback="OnCopyClickEvent" />
 </div>
+
+@if (!string.IsNullOrEmpty(AlertMessage))
+{
+    <div class="col-md-12">
+        <div class="mt-4 mx-3">
+            <Alert Message="@AlertMessage" AlertStatus="AlertStatus" />
+        </div>
+    </div>
+}
+
 <div class="col-md-12">
     <div class="mx-3 mt-4">
-        <table class="table table-hover table-bordered @TableClass">
-            <thead class="table-head">
-                <tr>
-                    <th class="th-no py-3">#</th>
-                    <th class="th-checkbox py-3">
-                        @*<Tooltip CssClass="bottom" Text="Select/Unselect all sports<br>To Enable/Disable in Client Site.">
-                            <Checkbox HasOnChange="ClientSportOrderFilter.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxClicked" />
-                        </Tooltip>*@
-                        <div class="form-check d-flex justify-content-center">
-                            <input class="form-check-input" type="checkbox" @onchange="e => OnActiveHeaderChangedEvent(e)">
-                        </div>
-                    </th>
-                    <th class="th-sports py-3">Sports</th>
-                    <th class="th-action py-3"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (ClientSportsSettingsModel.Sports.Any())
-                {
-                    foreach (var sport in ClientSportsSettingsModel.Sports)
+        @if (IsPreload)
+        {
+            <Preloader />
+        }
+        else
+        {
+            <table class="table table-hover table-bordered @TableClass">
+                <thead class="table-head">
+                    <tr>
+                        <th class="th-no py-3">#</th>
+                        <th class="th-checkbox py-3">
+                            @*<Tooltip CssClass="bottom" Text="Select/Unselect all sports<br>To Enable/Disable in Client Site.">
+                                <Checkbox HasOnChange="ClientSportOrderFilter.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxClicked" />
+                            </Tooltip>*@
+                            <div class="form-check d-flex justify-content-center">
+                                <input class="form-check-input" type="checkbox" @onchange="e => OnActiveHeaderChangedEvent(e)">
+                            </div>
+                        </th>
+                        <th class="th-sports py-3">Sports</th>
+                        <th class="th-action py-3"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ClientSportsSettingsModel.Sports.Any())
                     {
-                        <tr @key="@($"sport-{sport.SportId}")" id="sport-@sport.SportId" class="sport-row">
-                            <td class="text-center fw-bold">@sport.SortOrder</td>
-                            <td>
-                                <div class="form-check d-flex justify-content-center">
-                                    @if (sport.IsActive)
-                                    {
-                                        <input class="form-check-input" type="checkbox" checked>
-                                    }
-                                    else
-                                    {
-                                        <input class="form-check-input" type="checkbox">
-                                    }
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex justify-content-between">
-                                    <span>@sport.SportName</span>
-                                    <span class="dropdown-segment @(IsUpdate ? "" : "disabled")">
-                                        <i class="fa @(sport.IsOpen ? "fa-chevron-up" : "fa-chevron-down" )" @onclick="() => OnSportClickEvent(sport)"></i>
-                                    </span>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <a class="link-bars me-2 drag-handle" href="javascript:(0)">
-                                    <i class="fa fa-bars"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <!-- Segment -->
-                        @if (sport.IsOpen && sport.Segments.Any())
+
+                        foreach (var sport in ClientSportsSettingsModel.Sports)
                         {
-                            foreach (var segment in sport.Segments)
-                            {
-                                <tr id="segment-@segment.SegmentId" class="segment-row">
-                                    <td class="text-center">
-                                        <span class="ms-2">@segment.SortOrder</span>
-                                    </td>
-                                    <td></td>
-                                    <td>
-                                        <div class="d-flex justify-content-between">
-                                            <span>@segment.SegmentName</span>
-                                            <span class="dropdown-segment @(IsUpdate ? "" : "disabled")">
-                                                <i class="fa @(segment.IsOpen ? "fa-chevron-up" : "fa-chevron-down" )" @onclick="() => OnSegmentClickEvent(sport.SportId, segment)"></i>
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <a class="link-bars me-2 drag-handle" href="javascript:(0)">
-                                            <i class="fa fa-bars"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                @if (segment.IsOpen && segment.Leagues.Any())
-                                {
-                                    foreach (var league in segment.Leagues)
-                                    {
-                                        <tr id="league-@league.LeagueId" class="league-row">
-                                            <td class="text-center fw-italic">
-                                                <span class="ms-4">@league.SortOrder</span>
-                                            </td>
-                                            <td></td>
-                                            <td>
-                                                <div class="d-flex justify-content-between">
-                                                    <span>@league.LeagueName</span>
-                                                </div>
-                                            </td>
-                                            <td class="text-center">
-                                                <a class="link-bars me-2 drag-handle" href="javascript:(0)">
-                                                    <i class="fa fa-bars"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                            }
+                            <tr @key="@($"sport-{sport.SportId}")" id="sport-@sport.SportId" class="sport-row">
+                                <td class="text-center fw-bold">@sport.SortOrder</td>
+                                <td>
+                                    <div class="form-check d-flex justify-content-center">
+                                        @if (sport.IsActive)
+                                        {
+                                            <input class="form-check-input" type="checkbox" checked>
+                                        }
+                                        else
+                                        {
+                                            <input class="form-check-input" type="checkbox">
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-between">
+                                        <span>@sport.SportName</span>
+                                        <span class="dropdown-segment @(IsUpdate ? "" : "disabled")">
+                                            <i class="fa fa-chevron-down" @onclick="() => OnSportClickEvent(sport)"></i>
+                                            @*<i class="fa @(sport.IsOpen ? "fa-chevron-up" : "fa-chevron-down")" @onclick="() => OnSportClickEvent(sport)"></i>*@
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <a class="link-bars me-2 drag-handle" href="javascript:(0)">
+                                        <i class="fa fa-bars"></i>
+                                    </a>
+                                </td>
+                            </tr>
                         }
                     }
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        }
     </div>
 </div>
-<CustomModal />
+<CustomModal OnSaveClickCallback="OnSaveCopyClickEvent" />

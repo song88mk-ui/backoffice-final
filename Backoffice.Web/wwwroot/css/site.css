@@ -179,3 +179,11 @@ select > option:hover {
     box-shadow: 0 0 10px 100px red inset;
     transition: all .2s ease-in-out;
 }
+
+.sport-setting-table {
+    font-size: 0.9rem;
+}
+
+.sport-setting-table .link-bars {
+    color: #404E67;
+}
