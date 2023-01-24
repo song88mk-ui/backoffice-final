@@ -1,6 +1,5 @@
 ﻿.modal-scroll {
-    max-height: 30rem;
-    overflow-y: scroll;
+    max-height: 30rem;    
 }
 
 .modal-close {
@@ -28,4 +27,18 @@
     top: 50%;
     transform: translateY(-50%);
     right: 1.6rem;
+}
+
+.flag-ph {
+    width: 20px;
+}
+
+.col-max-height {
+    max-height: 25rem;
+    overflow-y: scroll;
+}
+
+.thead-sticky {
+    position: sticky;
+    top: 0;
 }
