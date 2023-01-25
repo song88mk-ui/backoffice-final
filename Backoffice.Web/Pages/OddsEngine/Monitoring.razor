@@ -21,33 +21,42 @@
     }
 </div>
 <div class="col-md-12">
-    <div class="table-container mt-4">
-        <table class="table table-hover table-bordered">
-            <thead class="table-head">
-                <tr>
-                    <th class="th-start-date py-3"></th>
-                    <th class="th-fixture-name py-3"></th>
-                    <th>BTR CTRL</th>
-                    @foreach (var client in ClientModel.Clients)
-                    {
-                        <th>@client.ClientName</th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @if (FixtureMarkets != null && FixtureMarkets.Any())
-                {
-                    foreach (var market in FixtureMarkets)
-                    {
-                        <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@MonitoringCallbackModel.SelectedMarketTemplateId" Market="market" />
-                    }
-                }
-            </tbody>
-        </table>
-
-        @if (FixtureMarkets != null && !FixtureMarkets.Any())
+        @if (IsPreloader)
         {
-            <NoRecordFound />
+            <Preloader />
         }
-    </div>
+        else
+        {
+            if (FixtureMarkets != null && !FixtureMarkets.Any())
+            {
+                <NoRecordFound />
+            }
+            else
+            {
+                <div class="table-container mt-4">
+                    <table class="table table-hover table-bordered mb-0">
+                        <thead class="table-head">
+                            <tr>
+                                <th class="th-start-date py-3"></th>
+                                <th class="th-fixture-name py-3"></th>
+                                <th>BTR CTRL</th>
+                                @foreach (var client in ClientModel.Clients)
+                                {
+                                    <th>@client.ClientName</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (FixtureMarkets != null && FixtureMarkets.Any())
+                            {
+                                foreach (var market in FixtureMarkets)
+                                {
+                                    <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@MonitoringCallbackModel.SelectedMarketTemplateId" Market="market" />
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
 </div>
