@@ -238,12 +238,13 @@ namespace Backoffice.Web.Pages.OddsEngine
             var parameters = new ModalParameters();
 
             parameters.Add("ClientCode", ClientCode);
+
             parameters.Add("DialogStyle", "max-width: 1300px !important;");
             parameters.Add("ModalClass", "show logs-modal");
 
             var options = new ModalOptions();
 
-            //ModalService.Open<ViewLogsModalBody>("View Logs", parameters, options);
+            ModalService.Open<ViewLogsModal>("View Logs", parameters, options);
         }
 
         public async Task OnActiveHeaderChangedEvent(ChangeEventArgs e)
