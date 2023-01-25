@@ -8,6 +8,9 @@ namespace Backoffice.API.Repositories
 {
     public interface IBackofficeRepository
     {
+        Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);
+        Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request);
+        Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<ClientResponse>> GetClients();
         Task<BaseResponse<string>> GetClientRegion(int clientId);
         Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs);

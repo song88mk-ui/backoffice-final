@@ -18,6 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #region Properties
         [Inject] IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
@@ -76,7 +77,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 MetaData.PageSize = int.MaxValue;
             }
 
-            var response = (await TradingService.GetPriceboostActivityLogs(new PriceboostActivityLogRequest
+            var response = (await BackOfficeService.GetPriceboostActivityLogs(new PriceboostActivityLogRequest
             {
                 Page = CurrentPage.ToString().Replace("_", "."),
                 Payload = payload,

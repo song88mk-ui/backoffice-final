@@ -689,60 +689,6 @@ namespace Backoffice.API.Controllers.Trading
         }
         #endregion
 
-        #region Activity Log
-        [HttpPost("activitylog")]
-        public async Task<IActionResult> AddClientActivityLog([FromBody] ActivityLogModel request)
-        {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
-
-            var result = await _tradingRepository.AddActivityLog(request, region);
-
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-        [HttpPost("activitylog/list")]
-        public async Task<IActionResult> GetActivityLogs([FromBody] ActivityLogRequest request)
-        {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
-
-            var result = await _tradingRepository.GetActivityLogs(request, region);
-
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-        [HttpPost("activitylog/priceboostlist")]
-        public async Task<IActionResult> GetPriceboostActivityLogs([FromBody] PriceboostActivityLogRequest request)
-        {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
-
-            var result = await _tradingRepository.GetPriceboostActivityLogs(request, region);
-
-            switch (result.StatusCode)
-            {
-                case Shared.Enums.StatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-        #endregion
-
         #region Bet
 
         [HttpPost("bet/selections")]

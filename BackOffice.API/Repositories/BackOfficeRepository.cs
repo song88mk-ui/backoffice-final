@@ -45,6 +45,184 @@ namespace Backoffice.API.Repositories
 
         #endregion
 
+        #region Methods - Activity Logs
+        public async Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request)
+        {
+            try
+            {
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    if (request.TimeStamp == DateTime.MinValue)
+                    {
+                        request.TimeStamp = DateTime.UtcNow;
+                    }
+
+                    var activityLog = new ActivityLog
+                    {
+                        Page = request.Page,
+                        Payload = request.Payload,
+                        From = request.From,
+                        To = request.To,
+                        Activity = request.Activity,
+                        UserId = request.UserId,
+                        TimeStamp = request.TimeStamp
+                    };
+
+                    _backofficeContext.ActivityLog.Add(activityLog);
+
+                    await _backofficeContext.SaveChangesAsync();
+
+                    scope.Complete();
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return new BaseResponse<bool>
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = true
+            };
+        }
+        public async Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request)
+        {
+            try
+            {
+                var metaData = request.MetaData;
+                if (metaData == null)
+                    metaData = new MetaData()
+                    {
+                        CurrentPage = 0,
+                        PageSize = 10,
+                    };
+                if (request.DateFrom == DateTime.MinValue)
+                    request.DateFrom = DateTime.UtcNow.AddDays(-1).Date;
+                if (request.DateTo == DateTime.MinValue)
+                    request.DateTo = DateTime.UtcNow.Date;
+
+                request.DateFrom = request.DateFrom.Date.Add(new TimeSpan(0, 0, 0));
+                request.DateTo = request.DateTo.Date.Add(new TimeSpan(23, 59, 59));
+
+                var activityLogs = (await _backofficeContext.ReadActivityLog
+                        .FromSqlRaw($"GetActivityLogs '{request.Page}', '{request.Payload}', '{request.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
+                    .ToListAsync())
+                    .Select(s => new ActivityLogModel
+                    {
+                        Id = s.Id,
+                        Page = s.Page,
+                        Payload = s.Payload,
+                        Activity = s.Activity,
+                        From = s.From,
+                        To = s.To,
+                        UserId = s.UserId,
+                        TimeStamp = s.TimeStamp,
+                    }).Where(x => request.UserClients.Contains(x.Payload.Split('.')[0], StringComparer.OrdinalIgnoreCase)).ToList();
+
+                //TODO: get username from Authentication Repository
+
+                metaData.TotalCount = activityLogs.Count();
+                metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
+
+                var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
+
+                if (metaData.CurrentPage > 0)
+                    activityLogs = activityLogs.Skip(skip).Take(metaData.PageSize).ToList();
+
+                return new BaseResponse<ActivityLogResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new ActivityLogResponse
+                    {
+                        ActivityLogs = activityLogs,
+                        MetaData = metaData
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ActivityLogResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request)
+        {
+            try
+            {
+                var metaData = request.MetaData;
+
+                if (request.DateFrom == DateTime.MinValue)
+                    request.DateFrom = DateTime.UtcNow.AddDays(-1).Date;
+                if (request.DateTo == DateTime.MinValue)
+                    request.DateTo = DateTime.UtcNow.Date;
+
+                var fromUTC = request.DateFrom.Date.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
+                var toUTC = request.DateTo.Date.AddDays(1).AddSeconds(-1).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
+
+                var activityLogs = (await _backofficeContext.ReadActivityLog
+                        .FromSqlRaw($"GetActivityLogs '{request.Page}', '{request.Payload}', '{fromUTC}', '{toUTC}'")
+                    .ToListAsync())
+                    .Select(s => new ActivityLogModel
+                    {
+                        Id = s.Id,
+                        Page = s.Page,
+                        Payload = s.Payload,
+                        Activity = s.Activity,
+                        From = s.From,
+                        To = s.To,
+                        UserId = s.UserId,
+                        TimeStamp = s.TimeStamp,
+                    }).ToList();
+
+                //TODO: get username from Authentication Repository
+
+                if (metaData == null)
+                {
+                    metaData = new MetaData()
+                    {
+                        CurrentPage = 0,
+                        PageSize = activityLogs.Count(),
+                    };
+                }
+
+                metaData.TotalCount = activityLogs.Count();
+                metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
+
+                var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
+
+                if (metaData.CurrentPage > 0)
+                    activityLogs = activityLogs.Skip(skip).Take(metaData.PageSize).ToList();
+
+                return new BaseResponse<ActivityLogResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new ActivityLogResponse
+                    {
+                        ActivityLogs = activityLogs,
+                        MetaData = metaData
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ActivityLogResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        #endregion
+
         #region Methods - Client
 
         public async Task<BaseResponse<ClientResponse>> GetClients()
@@ -133,7 +311,7 @@ namespace Backoffice.API.Repositories
                         Email = client.Email,
                         TelephoneNumber = client.TelephoneNumber,
                         MonthlyFee = client.MonthlyFee,
-                        BetSlipMaxSelection= client.BetSlipMaxSelection,
+                        BetSlipMaxSelection = client.BetSlipMaxSelection,
                         IsTierRevenue = client.IsTierRevenueShare,
                         TierJackpotShare = client.RevenueShareJackpot,
                         TierSportsbookShare = client.RevenueShareSportsbook,

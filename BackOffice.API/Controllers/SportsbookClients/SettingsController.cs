@@ -1,5 +1,6 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -204,5 +205,53 @@ namespace Backoffice.API.Controllers.SportsbookClients
 
         #endregion
 
+        #region User Activity Logs
+
+        [EnableCors("AllowAllOrigins")]
+        [HttpPost("activitylog")]
+        public async Task<IActionResult> ActivityLog([FromBody] ActivityLogModel request)
+        {
+            var result = await _backofficeRepository.AddActivityLog(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [EnableCors("AllowAllOrigins")]
+        [HttpPost("activitylog/list")]
+        public async Task<IActionResult> GetActivityLogs([FromBody] ActivityLogRequest request)
+        {
+            var result = await _backofficeRepository.GetActivityLogs(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [EnableCors("AllowAllOrigins")]
+        [HttpPost("activitylog/priceboostlist")]
+        public async Task<IActionResult> GetPriceboostActivityLogs([FromBody] PriceboostActivityLogRequest request)
+        {
+            var result = await _backofficeRepository.GetPriceboostActivityLogs(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        #endregion
     }
 }

@@ -16,7 +16,6 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<List<PriceBoostConfigModel>>> GetPriceBoostConfig(PriceBoostConfigRequest request);
         Task<BaseResponse<List<BoostedSettingsModel>>> GetBoostedSettings(BoostedSettingsRequest request);
         Task<BaseResponse<bool>> AddOrUpdateBoostedSetting(BoostedSettingsModel request, string userId);
-        Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request);
         Task<BaseResponse<PriceBoostConfigResponse>> AddOrUpdatePriceBoost(AddPriceBoostFilterModel request);
         Task<BaseResponse<PriceBoostConfigResponse>> AddOrUpdatePriceBoost(List<PriceBoostConfigModel> request);
         Task<BaseResponse<MarketFixtureResponse>> GetSportsBookFixtures(MarketFixtureRequest request);
@@ -48,8 +47,6 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ClientConfigResponse>> AddOrUpdateConfig(ConfigSettingsModel request);
         Task<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>> GetConfigLogs(ConfigLogsRequest request);
 
-        Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
-        Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);
         Task<BaseResponse<MessageResponse>> Publish(MessageRequest request);
     }
 }

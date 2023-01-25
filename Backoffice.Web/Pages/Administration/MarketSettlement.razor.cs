@@ -14,6 +14,7 @@ namespace Backoffice.Web.Pages.Administration
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         public MarketSettlementModalFilterModel ModalFilter { get; set; }
         public List<ManualMarketSettlementAuditModel> ManualMarketSettlements { get; set; }
         public MetaData MetaData { get; set; }
@@ -51,7 +52,7 @@ namespace Backoffice.Web.Pages.Administration
             var filterLeagueId = ModalFilter.LeagueId == 0 ? "%%" : ModalFilter.LeagueId.ToString();
             var filterFixtureId = string.IsNullOrEmpty(ModalFilter.FixtureId) ? "%" : ModalFilter.FixtureId;
             
-            var response = (await TradingService.GetActivityLogs(new ActivityLogRequest
+            var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = Page.OE_Administration_ManualSettlement.ToString().Replace("_", "."),
                 Payload = $"{filterSportsId}.{filterSegmentId}.{filterLeagueId}.{filterFixtureId}",

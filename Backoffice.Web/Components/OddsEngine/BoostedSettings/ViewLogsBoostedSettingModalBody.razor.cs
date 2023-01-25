@@ -15,6 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         #region Properties
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         protected SearchFormModel SearchForm { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
@@ -74,7 +75,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             await InvokeAsync(StateHasChanged);
 
             ActivityLogs = new List<ActivityLogModel>();
-            var response = (await TradingService.GetActivityLogs(new ActivityLogRequest
+            var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = "OE_PriceBoost_Settings".ToString().Replace("_", "."),
                 Payload = $"{ClientCode}",
