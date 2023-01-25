@@ -54,7 +54,7 @@ builder.Services.AddAuthorization(options =>
     #endregion
 
     #region Admin
-    options.AddPolicy("trading-menu-manage-user", policy => policy.RequireClaim($"{AdminPermission.Admin_Manage_User.ToString().Replace('_', '.')}",
+    options.AddPolicy("trading-menu-manage-user", policy => policy.RequireClaim($"{AdminPermission.Admin_ManageUsers.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     #endregion
 });
