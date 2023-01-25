@@ -203,6 +203,10 @@ namespace Backoffice.Web.Components.ManageUser
 
             await PermissionComponent.OnGroupSelectChangedEvent();
         }
+        public void OnCloseClickEvent()
+        {
+            ModalService.Cancel();
+        }
         #region Methods
         public void Dispose()
         {

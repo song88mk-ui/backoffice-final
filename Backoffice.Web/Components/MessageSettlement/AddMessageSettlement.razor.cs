@@ -1,9 +1,11 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.MessageSettlement
 {
@@ -91,132 +93,128 @@ namespace Backoffice.Web.Components.MessageSettlement
 
         public async Task OnSettleClickEvent()
         {
-            // Test
-            await Modal.OnSaveClickCallback.InvokeAsync();
-            IsPreloader = false;
+            var betselectionCount = AddMessageSettlementModel.BetSelections.Count;
+            var isAnyChecked = AddMessageSettlementModel.BetSelections.Any(x => x.IsChecked);
 
-            //var betselectionCount = AddMessageSettlementModel.BetSelections.Count;
-            //var isAnyChecked = AddMessageSettlementModel.BetSelections.Any(x => x.IsChecked);
+            if (betselectionCount == 1 || isAnyChecked)
+            {
+                var messageSettlementRequest = new List<MessageSettlementRequest>();
 
-            //if (betselectionCount == 1 || isAnyChecked)
-            //{
-            //    var messageSettlementRequest = new List<MessageSettlementRequest>();
+                foreach (var item in AddMessageSettlementModel.BetSelections)
+                {
+                    if ((betselectionCount == 1 && !string.IsNullOrWhiteSpace(item.Reason)) || (item.IsChecked && !string.IsNullOrWhiteSpace(item.Reason)))
+                    {
+                        int requestId = 318;
+                        var activityLog = new ActivityLogModel()
+                        {
+                            Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
+                            Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
+                            Activity = Activity.Create.ToString(),
+                            From = "-",
+                            To = JsonSerializer.Serialize(new MessageSettlementTo()
+                            {
+                                BetId = AddMessageSettlementModel.BetId,
+                                BetSelectionId = item.BetSelectionId,
+                                BetDate = AddMessageSettlementModel.BetDate,
+                                SportName = item.SportName,
+                                FixtureName = item.FixtureName,
+                                Reason = item.Reason,
+                                SelectionSpecifier = item.SelectionSpecifier,
+                                FixtureSpecifier = item.FixtureSpecifier,
+                                RequestId = requestId,
+                                ProductId = item.ProductId,
+                                InitialBetSelectionStatusId = item.InitialBetSelectionStatusId,
+                                MarketTemplateId = item.MarketTemplateId
+                            }),
+                            UserId = UserModel.Id,
+                            TimeStamp = DateTime.UtcNow
+                        };
 
-            //    foreach (var item in AddMessageSettlementModel.BetSelections)
-            //    {
-            //        if ((betselectionCount == 1 && !string.IsNullOrWhiteSpace(item.Reason)) || (item.IsChecked && !string.IsNullOrWhiteSpace(item.Reason)))
-            //        {
-            //            int requestId = 318;
-            //            var activityLog = new ActivityLogModel()
-            //            {
-            //                Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
-            //                Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
-            //                Activity = Activity.Create.ToString(),
-            //                From = "-",
-            //                To = JsonConvert.SerializeObject(new MessageSettlementTo()
-            //                {
-            //                    BetId = AddMessageSettlementModel.BetId,
-            //                    BetSelectionId = item.BetSelectionId,
-            //                    BetDate = AddMessageSettlementModel.BetDate,
-            //                    SportName = item.SportName,
-            //                    FixtureName = item.FixtureName,
-            //                    Reason = item.Reason,
-            //                    SelectionSpecifier = item.SelectionSpecifier,
-            //                    FixtureSpecifier = item.FixtureSpecifier,
-            //                    RequestId = requestId,
-            //                    ProductId = item.ProductId,
-            //                    InitialBetSelectionStatusId = item.InitialBetSelectionStatusId,
-            //                    MarketTemplateId = item.MarketTemplateId
-            //                }),
-            //                UserId = UserModel.Id,
-            //                TimeStamp = DateTime.UtcNow
-            //            };
+                        var productId = int.Parse(item.SelectionSpecifier.Split("/sr:sport").FirstOrDefault().Split("uof:").LastOrDefault());
+                        var messageSettlementIodocsRequest = new MessageSettlementIodocsRequest()
+                        {
+                            Product = GetProducts().FirstOrDefault(c => c.Value == productId).Name,
+                            FixtureSpecifier = item.FixtureSpecifier,
+                            RequestId = requestId,
+                        };
 
-            //            var productId = int.Parse(item.SelectionSpecifier.Split("/sr:sport").FirstOrDefault().Split("uof:").LastOrDefault());
-            //            var messageSettlementIodocsRequest = new MessageSettlementIodocsRequest()
-            //            {
-            //                Product = GetProducts().FirstOrDefault(c => c.Value == productId).Name,
-            //                FixtureSpecifier = item.FixtureSpecifier,
-            //                RequestId = requestId,
-            //            };
+                        var request = new MessageSettlementRequest()
+                        {
+                            MessageSettlementIodocsRequest = messageSettlementIodocsRequest,
+                            OnActivityLogMessage = activityLog
+                        };
 
-            //            var request = new MessageSettlementRequest()
-            //            {
-            //                MessageSettlementIodocsRequest = messageSettlementIodocsRequest,
-            //                OnActivityLogMessage = activityLog
-            //            };
+                        messageSettlementRequest.Add(request);
 
-            //            messageSettlementRequest.Add(request);
+                        if (messageSettlementIodocsRequest.Product == "pre" || messageSettlementIodocsRequest.Product == "liveodds")
+                        {
+                            var prod = messageSettlementIodocsRequest.Product == "pre" ? "liveodds" : "pre";
+                            var messageSettlementIodocsRequest2 = new MessageSettlementIodocsRequest()
+                            {
+                                Product = prod,
+                                FixtureSpecifier = item.FixtureSpecifier,
+                                RequestId = requestId,
+                            };
 
-            //            if (messageSettlementIodocsRequest.Product == "pre" || messageSettlementIodocsRequest.Product == "liveodds")
-            //            {
-            //                var prod = messageSettlementIodocsRequest.Product == "pre" ? "liveodds" : "pre";
-            //                var messageSettlementIodocsRequest2 = new MessageSettlementIodocsRequest()
-            //                {
-            //                    Product = prod,
-            //                    FixtureSpecifier = item.FixtureSpecifier,
-            //                    RequestId = requestId,
-            //                };
+                            var activityLog2 = new ActivityLogModel()
+                            {
+                                Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
+                                Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
+                                Activity = Activity.Create.ToString(),
+                                From = "-",
+                                To = JsonSerializer.Serialize(new MessageSettlementTo()
+                                {
+                                    BetId = AddMessageSettlementModel.BetId,
+                                    BetSelectionId = item.BetSelectionId,
+                                    BetDate = AddMessageSettlementModel.BetDate,
+                                    SportName = item.SportName,
+                                    FixtureName = item.FixtureName,
+                                    Reason = item.Reason,
+                                    SelectionSpecifier = item.SelectionSpecifier,
+                                    FixtureSpecifier = item.FixtureSpecifier,
+                                    RequestId = requestId,
+                                    ProductId = GetProducts().FirstOrDefault(c => c.Name == prod).Value,
+                                    InitialBetSelectionStatusId = item.InitialBetSelectionStatusId,
+                                    MarketTemplateId = item.MarketTemplateId
+                                }),
+                                UserId = UserModel.Id,
+                                TimeStamp = DateTime.UtcNow
+                            };
 
-            //                var activityLog2 = new ActivityLogModel()
-            //                {
-            //                    Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
-            //                    Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
-            //                    Activity = Activity.Create.ToString(),
-            //                    From = "-",
-            //                    To = JsonConvert.SerializeObject(new MessageSettlementTo()
-            //                    {
-            //                        BetId = AddMessageSettlementModel.BetId,
-            //                        BetSelectionId = item.BetSelectionId,
-            //                        BetDate = AddMessageSettlementModel.BetDate,
-            //                        SportName = item.SportName,
-            //                        FixtureName = item.FixtureName,
-            //                        Reason = item.Reason,
-            //                        SelectionSpecifier = item.SelectionSpecifier,
-            //                        FixtureSpecifier = item.FixtureSpecifier,
-            //                        RequestId = requestId,
-            //                        ProductId = GetProducts().FirstOrDefault(c => c.Name == prod).Value,
-            //                        InitialBetSelectionStatusId = item.InitialBetSelectionStatusId,
-            //                        MarketTemplateId = item.MarketTemplateId
-            //                    }),
-            //                    UserId = UserModel.Id,
-            //                    TimeStamp = DateTime.UtcNow
-            //                };
+                            var request2 = new MessageSettlementRequest()
+                            {
+                                MessageSettlementIodocsRequest = messageSettlementIodocsRequest2,
+                                OnActivityLogMessage = activityLog2
+                            };
 
-            //                var request2 = new MessageSettlementRequest()
-            //                {
-            //                    MessageSettlementIodocsRequest = messageSettlementIodocsRequest2,
-            //                    OnActivityLogMessage = activityLog2
-            //                };
+                            messageSettlementRequest.Add(request2);
+                        }
+                    }
+                }
 
-            //                messageSettlementRequest.Add(request2);
-            //            }
-            //        }
-            //    }
+                if (messageSettlementRequest.Count != 0)
+                {
+                    var response = await TradingService.AddManualMessageSettlement(messageSettlementRequest);
 
-            //    if (messageSettlementRequest.Count != 0)
-            //    {
-            //        var response = await TradingService.AddManualMessageSettlement(messageSettlementRequest);
+                    divClass = response.Result.Contains("NOTE") ? "bg-warning" : "bg-success";
+                    divStyles = "display: inline";
+                    if (!response.Result.Contains("NOTE"))
+                        message = $"Done: Request to resend all stateful-messages (BetSettlement, RollbackBetSettlement, BetCancel, UndoBetCancel) for a sport event. {response.Result}";
+                    else
+                        message = response.Result;
 
-            //        divClass = response.Result.Contains("NOTE") ? "bg-warning" : "bg-success";
-            //        divStyles = "display: inline";
-            //        if (!response.Result.Contains("NOTE"))
-            //            message = $"Done: Request to resend all stateful-messages (BetSettlement, RollbackBetSettlement, BetCancel, UndoBetCancel) for a sport event. {response.Result}";
-            //        else
-            //            message = response.Result;
-
-            //        await InvokeAsync(StateHasChanged);
-            //        await Modal.OnSaveClickCallback.InvokeAsync();
-            //        await Task.Delay(3500);
-            //        ModalService.Cancel();
-            //    }
-            //}
-            //else
-            //{
-            //    divClass = "bg-danger";
-            //    divStyles = "display: inline";
-            //    message = "Please select an item to settle. ";
-            //}
+                    await InvokeAsync(StateHasChanged);
+                    await Modal.OnSaveClickCallback.InvokeAsync();
+                    await Task.Delay(3500);
+                    ModalService.Cancel();
+                }
+            }
+            else
+            {
+                divClass = "bg-danger";
+                divStyles = "display: inline";
+                message = "Please select an item to settle. ";
+            }
         }
 
         public void ToggleCheckbox(string betSelectionId)
