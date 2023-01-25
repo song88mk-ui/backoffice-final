@@ -14,3 +14,11 @@ BackOffice.Shared/bin
 /Backoffice.Web/obj/Debug/net6.0
 /Backoffice.Web/obj/Debug/net6.0/ref/Backoffice.Web.dll
 /Backoffice.Web/obj/Debug/net6.0/scopedcss
+/Backoffice.Utility/obj/Debug/netcoreapp3.1/Backoffice.Utility.csproj.AssemblyReference.cache
+/Backoffice.Utility/obj/Debug/netcoreapp3.1/Backoffice.Utility.pdb
+/Backoffice.Web/Services/BackOfficeService.cs
+/Backoffice.Utility/obj/Debug/netcoreapp3.1/Backoffice.Utility.dll
+/Backoffice.Utility/bin/Debug/netcoreapp3.1/Backoffice.Shared.dll
+/Backoffice.Utility/bin/Debug/netcoreapp3.1/Backoffice.Shared.pdb
+/Backoffice.Utility/bin/Debug/netcoreapp3.1/Backoffice.Utility.dll
+/Backoffice.Utility/bin/Debug/netcoreapp3.1/Backoffice.Utility.pdb
