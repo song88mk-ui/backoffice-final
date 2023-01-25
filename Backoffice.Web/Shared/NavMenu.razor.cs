@@ -86,14 +86,19 @@ namespace Backoffice.Web.Shared
 
                 SelectedSport.SportId = sport.SportId;
                 SelectedSport.SportName = sport.SportName;
-
-                // reset selected segment and league if new sport has been selected. 
-                SelectedSport.SegmentId = 0;
-                SelectedSport.SegmentName = string.Empty;
-
-                SelectedSport.LeagueId = 0;
-                SelectedSport.LeagueName = string.Empty;
             }
+            else
+            {
+                SelectedSport.SportId = 0;
+                SelectedSport.SportName = string.Empty;
+            }
+
+            // reset selected segment and league if new sport has been selected. 
+            SelectedSport.SegmentId = 0;
+            SelectedSport.SegmentName = string.Empty;
+
+            SelectedSport.LeagueId = 0;
+            SelectedSport.LeagueName = string.Empty;
         }
 
         public async Task OnSegmentClickEvent(int segmentId)
@@ -112,6 +117,14 @@ namespace Backoffice.Web.Shared
                 SelectedSport.LeagueName = league.LeagueName;
 
                 await OnSportClickCallback.InvokeAsync(SelectedSport);
+            }
+            else
+            {
+                SelectedSport.SegmentId = 0;
+                SelectedSport.SegmentName = string.Empty;
+
+                SelectedSport.LeagueId = 0;
+                SelectedSport.LeagueName = string.Empty;
             }
         }
 

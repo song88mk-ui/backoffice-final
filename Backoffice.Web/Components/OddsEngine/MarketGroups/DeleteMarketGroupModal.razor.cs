@@ -15,6 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         #region Properties
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
@@ -83,7 +84,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 ErrorMessage = $"Market group {MarketTemplateGroup.Name} is successfully deleted.";
 
                 //activity log
-                await TradingService.AddActivityLog(new ActivityLogModel
+                await BackOfficeService.AddActivityLog(new ActivityLogModel
                 {
                     Page = Page.OE_Administration_MarketGroup.ToString().Replace("_", "."),
                     Payload = $"{MarketGroupModel.ClientCode}.{MarketGroupModel.SportId}.{MarketGroupModel.FixtureStatusId}",

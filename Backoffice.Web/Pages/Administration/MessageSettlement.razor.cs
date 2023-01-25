@@ -14,6 +14,7 @@ namespace Backoffice.Web.Pages.Administration
         #region Properties
         [Inject] IModalService ModalService { get; set; }
         [Inject] ITradingService TradingService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         public MarketSettlementFilterModel MarketSettlementFilterModel { get; set; }
         public List<MessageSettlementModel> MessageSettlementModel { get; set; }
         public string PageTitle { get; set; }
@@ -80,7 +81,7 @@ namespace Backoffice.Web.Pages.Administration
                 DateTo = MarketSettlementFilterModel.ToDate.Date.Add(new TimeSpan(23, 59, 59))
             };
 
-            var logs = await TradingService.GetActivityLogs(request);
+            var logs = await BackOfficeService.GetActivityLogs(request);
 
             var result = new List<MessageSettlementModel>();
 

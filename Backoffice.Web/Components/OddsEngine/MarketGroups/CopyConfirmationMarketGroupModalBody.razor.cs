@@ -14,6 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         #region Properties
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
@@ -93,7 +94,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 }
 
                 //activity log
-                await TradingService.AddActivityLog(new ActivityLogModel
+                await BackOfficeService.AddActivityLog(new ActivityLogModel
                 {
                     Page = Page.OE_Administration_MarketGroup.ToString().Replace("_", "."),
                     Payload = $"{CopyToClientCode}.{CopyToSportId}.{CopyToFixtureStatusId}.0",

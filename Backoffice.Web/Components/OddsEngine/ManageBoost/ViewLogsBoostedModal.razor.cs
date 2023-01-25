@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private ITradingService TradingService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         public List<PriceBoostActivityLog> ActivityLogs { get; set; }
         public PriceBoostConfigModel PriceBoost { get; set; } 
@@ -31,7 +31,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             var payload = $"{PriceBoost.ClientCode}.{PriceBoost.SportId}.{PriceBoost.SegmentId}.{PriceBoost.LeagueId}";
 
-            var result = (await TradingService.GetActivityLogs(new ActivityLogRequest()
+            var result = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
             {
                 Page = Page.OE_PriceBoost_Manage.ToString().Replace("_", "."),
                 Payload = payload,

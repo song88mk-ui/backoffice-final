@@ -1,4 +1,10 @@
-﻿.table-head {
+﻿.table-container {
+    display: inline-block;
+    width: 100%;
+    overflow-x: scroll;
+}
+
+.table-head {
     background-color: #354156;
     color: #fff;
 }
@@ -23,4 +29,12 @@ table thead th:last-child {
 
 .table-head th {
     border-width: 1px 0;
+}
+
+.th-start-date {
+    width: 15%;
+}
+
+.th-fixture-name {
+    width: 25%;
 }

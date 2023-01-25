@@ -24,6 +24,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Properties
         [Inject] IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public IJSStreamReference? DataReference { get; set; }
@@ -223,7 +224,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (response.StatusCode == StatusCode.Success)
                 {
                     //activity log
-                    await TradingService.AddActivityLog(new ActivityLogModel
+                    await BackOfficeService.AddActivityLog(new ActivityLogModel
                     {
                         Page = Page.OE_Administration_MarketGroup.ToString().Replace("_", "."),
                         Payload = $"{MarketGroupModel.ClientCode}.{MarketGroupModel.SportId}.{MarketGroupModel.FixtureStatusId}.0",

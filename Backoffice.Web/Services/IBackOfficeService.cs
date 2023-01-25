@@ -8,6 +8,9 @@ namespace Backoffice.Web.Services
 {
     public interface IBackOfficeService
     {
+        Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
+        Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);
+        Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request);
         Task<BaseResponse<ClientModel>> GetClients();
         Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
