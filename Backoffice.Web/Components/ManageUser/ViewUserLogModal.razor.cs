@@ -19,6 +19,7 @@ namespace Backoffice.Web.Components.ManageUser
 
         private string UserId { get; set; }
         private MetaData MetaData { get; set; }
+        public SearchFormModel SearchForm { get; set; }
         public bool IsPreLoader { get; set; }
         public List<LogInActivityLogModel> LogInActivityLogs { get; set; }
         #endregion
@@ -27,6 +28,7 @@ namespace Backoffice.Web.Components.ManageUser
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = true;
+            SearchForm = new SearchFormModel();
             UserId = ModalParameters.TryGet<string>("UserId");
             LogInActivityLogs = new List<LogInActivityLogModel>();
             MetaData = new MetaData()
@@ -36,6 +38,12 @@ namespace Backoffice.Web.Components.ManageUser
                 TotalPages = 0,
                 TotalCount = 0
             };
+
+            await GetContent();
+        }
+        public async Task OnInputSearchEvent()
+        {
+            IsPreLoader = true;
 
             await GetContent();
         }
@@ -57,7 +65,7 @@ namespace Backoffice.Web.Components.ManageUser
         #region Utilities
         private async Task GetContent()
         {
-            var userResponse = (await AuthenticationService.GetLogInActivityLogList(UserId, MetaData)).Result;
+            var userResponse = (await AuthenticationService.GetLogInActivityLogList(UserId, MetaData, SearchForm.SearchText)).Result;
             if (userResponse != null)
             {
                 LogInActivityLogs = userResponse.ActivityLogs;

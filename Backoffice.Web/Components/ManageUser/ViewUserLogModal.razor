@@ -1,9 +1,13 @@
 ﻿<div class="modal-body modal-scroll">
     <div class="row mb-3">
-        <div class="col-4 position-relative">
-            <input type="text" class="form-control pe-5" placeholder="Search here..." />
-            <i class="fa fa-search icon-inline" aria-hidden="true" />
-        </div>
+        <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+            <div class="input-group">
+                <input id="search" type="text" placeholder="Search" class="form-control search-text valid border-end-0" @bind-value="SearchForm.SearchText" />
+                <span class="input-group-text border-start-0">
+                    <i class="fa fa-search"></i>
+                </span>
+            </div>
+        </EditForm>
     </div>
     <div class="row">
         <div class="col col-max-height">
@@ -23,6 +27,8 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @if(LogInActivityLogs != null)
+                        {
                         @foreach (var item in LogInActivityLogs)
                         {
                             <tr class="text-center">
@@ -43,6 +49,15 @@
                                     <span>
                                         <i class="flag-@item.Country.ToLower()"></i>
                                     </span>
+                                </td>
+                            </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan=4>
+                                    <NoRecordFound />
                                 </td>
                             </tr>
                         }

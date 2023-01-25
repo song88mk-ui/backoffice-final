@@ -37,11 +37,11 @@ namespace Backoffice.Web.Services
         {
             var policies = new List<string>();
             var result = new BaseResponse<Tuple<bool, List<string>>>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = StatusCode.Error.ToString(),
-                    Result = new Tuple<bool, List<string>>(false, policies)
-                };
+            {
+                StatusCode = StatusCode.Error,
+                Message = StatusCode.Error.ToString(),
+                Result = new Tuple<bool, List<string>>(false, policies)
+            };
             user.Provider = "BoWeb";
             var bodyContent = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
             var userAgent = _httpContextAccessor.HttpContext.Request.Headers.UserAgent;
@@ -230,14 +230,16 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<LogInActivityLogResponse>> GetLogInActivityLogList(string userId, MetaData metaData)
+        public async Task<BaseResponse<LogInActivityLogResponse>> GetLogInActivityLogList(string userId, MetaData metaData, string searchText = "")
         {
             try
             {
                 var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
-                var response = await _httpClient.PostAsync($"api/authentication/activitylog/list?userId={userId}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"));
+                var query = !string.IsNullOrWhiteSpace(searchText) ? $"?search={searchText}" : "";
+
+                var response = await _httpClient.PostAsync($"api/authentication/activitylog/list/{userId}{query}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<LogInActivityLogResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
@@ -387,7 +389,7 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        
+
         public async Task<BaseResponse<UserListResponse>> GetUserGroupUsers(UserGroupRequest request)
         {
             try
@@ -425,7 +427,7 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        
+
         public async Task<BaseResponse<bool>> AddOrUpdateUserGroup(UserGroupRequest request)
         {
             try

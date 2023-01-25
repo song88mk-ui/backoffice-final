@@ -78,6 +78,10 @@ a, .btn-link {
     border-radius: 3px;
 }
 
+.input-group-text {
+    background-color: #fff;
+}
+
 .form-control, .form-select, .btn {
     font-size: 13px;
 }

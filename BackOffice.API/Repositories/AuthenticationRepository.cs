@@ -482,12 +482,14 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<LogInActivityLogResponse>> GetLogInActivityLogList(string userId, MetaData metaData, string token)
+        public async Task<BaseResponse<LogInActivityLogResponse>> GetLogInActivityLogList(string userId,string search, MetaData metaData, string token)
         {
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
-                var response = await _httpClient.PostAsync($"api/user/activitylog/list?userId={userId}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"));
+                var query = !string.IsNullOrWhiteSpace(search) ? $"?search={search}" : "";
+
+                var response = await _httpClient.PostAsync($"api/user/activitylog/list/{userId}{query}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<LogInActivityLogResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })

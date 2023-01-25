@@ -1,35 +1,29 @@
 ﻿<div class="modal-body">
     @if (AddMessageSettlementModel != null)
     {
-        <EditForm Model="@AddMessageSettlementModel" OnValidSubmit="GetBetDetails">
-            <div class="col-md-12">
-                <div class="row">
-                    <div class="col-md-4">
-                        @*<div class="form-group">
-                            <span class="input-group-append">
-                                <InputText @bind-Value="@AddMessageSettlementModel.BetId" placeholder="Find by BetId" class="form-control" required />
-                                <button type="submit" class="search-btn"><i class="fa fa-search"></i></button>
-                            </span>
-                        </div>*@
-                        <div class="input-group">
-                            <input id="search" placeholder="Search" class="form-control search-text valid border-end-0" @bind-value="AddMessageSettlementModel.BetId" />
-                            <span class="input-group-text border-start-0">
-                                <i class="fa fa-search"></i>
-                            </span>
-                        </div>
+        <div class="input-container d-flex my-3">
+            <div class="me-4">
+                <EditForm Model="@AddMessageSettlementModel" OnValidSubmit="GetBetDetails">
+                    <div class="input-group">
+                        <input id="search" type="text" placeholder="Search Bet ID" class="form-control search-text valid border-end-0" @bind-value="AddMessageSettlementModel.BetId" />
+                        <span class="input-group-text border-start-0">
+                            <i class="fa fa-search"></i>
+                        </span>
                     </div>
-                </div>
+                </EditForm>
             </div>
-        </EditForm>
+        </div>
 
         <EditForm Model="@AddMessageSettlementModel" OnValidSubmit="OnSettleClickEvent">
-            <TableContent>
-                <TableHeaderContent>
-                    <th valign="middle" align="left" style="width:5%"></th>
-                    <th valign="middle" align="left" style="width:30%"><strong>Fixture</strong></th>
-                    <th valign="middle" align="left" style="width:25%"><strong>Reason</strong></th>
-                </TableHeaderContent>
-                <TableBodyContent>
+            <table class="table align-middle">
+                <thead class="text-center thead-sticky">
+                    <tr>
+                        <th valign="middle" align="left" style="width:5%"></th>
+                        <th valign="middle" align="left" style="width:30%"><strong>Fixture</strong></th>
+                        <th valign="middle" align="left" style="width:25%"><strong>Reason</strong></th>
+                    </tr>
+                </thead>
+                <tbody>
                     @if (AddMessageSettlementModel.BetSelections != null && AddMessageSettlementModel.BetSelections.Any())
                     {
                         int count = AddMessageSettlementModel.BetSelections.Count;
@@ -50,8 +44,8 @@
                             </td>
                         </tr>
                     }
-                </TableBodyContent>
-            </TableContent>
+                </tbody>
+            </table>
 
             <div class="row">
                 <div class="@divClass col-md-11 mx-auto form-text p-3" style="@divStyles">
