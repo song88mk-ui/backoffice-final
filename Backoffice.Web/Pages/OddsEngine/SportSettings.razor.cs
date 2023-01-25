@@ -1,14 +1,18 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.SportSettings;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Text;
+using System.Text.Json;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class SportSettings : IDisposable
+    public partial class SportSettings : IAsyncDisposable, IDisposable
     {
         #region Properties
 
@@ -16,17 +20,36 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
+        public IJSStreamReference? DataReference { get; set; }
+
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public string TableClass { get; set; }
+        public string ClientCode { get; set; }
 
-        public ClientSportOrderFilterModel ClientSportOrderFilter { get; set; }
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
+        public ClientSportsSettingsModel ModifiedClientSportsSettingsModel { get; set; }
         public ClientSportsSettingsModel ClientSportsSettingsModel { get; set; }
         public List<ClientSegmentSortOrderModel> ClientSegmentOrders { get; set; }
         public List<ClientLeagueSortOrderModel> ClientLeagueOrders { get; set; }
+        public SegmentLookupResponse SegmentLookupResponse { get; set; }
+        public LeagueLookupResponse LeagueLookupResponse { get; set; }
+        public List<ClientInformationModel> ClientInformations { get; set; }
+
         public bool IsUpdate { get; set; }
+        public bool IsPreload { get; set; }
+
+        public string AlertMessage { get; set; }
+        public AlertStatus AlertStatus { get; set; }
+
+        #endregion
+
+        #region Fields
+
+        public static Func<int, int, Task> OnSegmentActionAsync;
+        public static Func<string, int, Task> OnUpdateSortOrderActionAsync;
 
         #endregion
 
@@ -39,21 +62,115 @@ namespace Backoffice.Web.Pages.OddsEngine
             TableClass = "sport-setting-table";
 
             ClientSportsSettingsModel = new ClientSportsSettingsModel();
+            ModifiedClientSportsSettingsModel = new ClientSportsSettingsModel();
+
             ClientSegmentOrders = new List<ClientSegmentSortOrderModel>();
             ClientLeagueOrders = new List<ClientLeagueSortOrderModel>();
+
+            OnSegmentActionAsync = OnSegmentClickEvent;
+            OnUpdateSortOrderActionAsync = OnUpdateSortOrder;
+
+            Breadcrumbs = new List<BreadcrumbModel>();
+
+            Breadcrumbs.Add(new BreadcrumbModel
+            {
+                Name = "Sport Settings",
+                Url = "odds-engine/sport-settings",
+                IsCurrentPage = true
+            });
+
+            ClientInformations = (await TradingService.GetClientList()).Result;
+
+            SegmentLookupResponse = (await TradingService.GetSegmentLookup(0)).Result;
+            LeagueLookupResponse = (await TradingService.GetLeagueLookup(0, 0)).Result;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            AlertMessage = string.Empty;
         }
 
         public async Task OnClientChangedEvent(string clientCode)
         {
-            await GetSports(clientCode);
+            ClientCode = clientCode;
+
+            IsPreload = true;
+
+            await GetSports();
+
+            IsPreload = false;
         }
 
         public async Task OnUpdateClickEvent()
         {
             IsUpdate = true;
+            IsUpdate = false;
 
-            await JSRuntime.InvokeVoidAsync("initSortItems", $".{TableClass}", "> tr.sport-row", ".drag-handle");
+            await InitializeSortTable("> tr.sport-row", ".sport-row");
             await JSRuntime.InvokeVoidAsync("enableSort", $".{TableClass}");
+        }
+
+        public async Task OnSaveClickEvent()
+        {
+            IsPreload = true;
+            IsUpdate = false;
+
+            var request = new ClientSportSettingRequest
+            {
+                ClientCode = ClientCode,
+                UserId = UserModel.Id,
+                UserName = UserModel.UserName,
+                TimeStamp = DateTime.UtcNow,
+                SportsSortOrder = GetSportSortOrder(),
+            };
+
+            var response = await TradingService.AddOrUpdateClientSportSettings(request);
+
+            if (response.StatusCode == StatusCode.Success)
+            {
+                ClientSportsSettingsModel = new ClientSportsSettingsModel();
+
+                Thread.Sleep(1000);
+
+                ClientSportsSettingsModel.Sports = ModifiedClientSportsSettingsModel.Sports
+                .Select((s, spIndex) => new ClientSportsSettingsModel.Sport
+                {
+                    SportId = s.SportId,
+                    SportName = s.SportName,
+                    SortOrder = spIndex + 1,
+                    Segments = s.Segments.Select((se, seIndex) => new ClientSportsSettingsModel.Segment
+                    {
+                        SportId = s.SportId,
+                        SegmentId = se.SegmentId,
+                        SegmentName = se.SegmentName,
+                        Leagues = se.Leagues.Select((le, leIndex) => new ClientSportsSettingsModel.League
+                        {
+                            SportId = s.SportId,
+                            SegmentId = se.SegmentId,
+                            LeagueId = le.LeagueId,
+                            LeagueName = le.LeagueName,
+                            SortOrder = leIndex + 1,
+                            IsActive = le.IsActive
+                        }).ToList(),
+                        SortOrder = seIndex + 1,
+                        IsActive = se.IsActive,
+                        IsOpen = se.IsOpen
+                    }).ToList(),
+                    IsActive = s.IsActive,
+                    IsOpen = s.IsOpen
+                }).ToList();
+
+                AlertMessage = "Succesfully saved Sport - Segment - League ordering.";
+                AlertStatus = AlertStatus.Success;
+            }
+            else
+            {
+                AlertMessage = response.Message;
+                AlertStatus = AlertStatus.Error;
+            }
+
+
+            IsPreload = false;
         }
 
         public async Task OnCancelClickEvent()
@@ -61,6 +178,67 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsUpdate = false;
 
             await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
+        }
+
+        public async Task OnCopyClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("FromClientCode", ClientCode);
+
+            var sports = ClientSportsSettingsModel.Sports
+                .Select(s => new SportsSortOrder
+                {
+                    SportId = s.SportId,
+                    SportName = s.SportName,
+                    SortOrder = s.SortOrder,
+                    SegmentsSortOrder = s.Segments.Select(se => new SportsSegmentSortOrder
+                    {
+                        SportId = s.SportId,
+                        SportName = s.SportName,
+                        SegmentId = se.SegmentId,
+                        SegmentName = se.SegmentName,
+                        LeagueSortOrder = se.Leagues.Select(le => new SportSegmentLeagueSortOrder
+                        {
+                            SportId = s.SportId,
+                            SportName = s.SportName,
+                            SegmentId = se.SegmentId,
+                            SegmentName = se.SegmentName,
+                            LeagueId = le.LeagueId,
+                            LeagueName = le.LeagueName,
+                            SortOrder = le.SortOrder,
+                            IsActive = le.IsActive
+                        }).ToList(),
+                        SortOrder = se.SortOrder,
+                        IsActive = se.IsActive,
+                        IsOpen = se.IsOpen
+                    }).ToList(),
+                    IsActive = s.IsActive,
+                    IsOpen = s.IsOpen
+                }).ToList();
+
+            parameters.Add("Sports", sports);
+
+            parameters.Add("DialogStyle", "max-width: 600px;");
+
+            var options = new ModalOptions();
+
+            var client = ClientInformations.FirstOrDefault(c => c.ClientCode == ClientCode);
+
+            ModalService.Open<CopyModal>($"Copy {client.ClientName} Sports Settings", parameters, options);
+        }
+
+        public async Task OnViewLogsClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ClientCode", ClientCode);
+            parameters.Add("DialogStyle", "max-width: 1300px !important;");
+            parameters.Add("ModalClass", "show logs-modal");
+
+            var options = new ModalOptions();
+
+            //ModalService.Open<ViewLogsModalBody>("View Logs", parameters, options);
         }
 
         public async Task OnActiveHeaderChangedEvent(ChangeEventArgs e)
@@ -81,260 +259,186 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (!IsUpdate)
                 return;
 
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+
+            // verify if there are any open rows for segment
+            // if there is open then close it.
+            if (ClientSportsSettingsModel.Sports.Any(c => c.SportId != model.SportId && c.IsOpen))
+            {
+                var sport = ClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId != model.SportId && c.IsOpen);
+                sport.IsOpen = false;
+            }
+
             await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
 
             if (model.IsOpen)
             {
-                await JSRuntime.InvokeVoidAsync("initSortItems", $".{TableClass}", "> tr.sport-row", ".drag-handle");
                 model.IsOpen = false;
+
+                await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
+                await InitializeSortTable("> tr.sport-row", ".sport-row");
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("initSortItems", $".{TableClass}", "> tr.segment-row", ".drag-handle");
                 model.IsOpen = true;
-            }
 
-            // prepare segments (one time only)
-            if (!model.Segments.Any())
-            {
-                var segmentResponse = await TradingService.GetSegmentLookup(model.SportId);
-
-                if (segmentResponse.StatusCode == StatusCode.Success)
+                // fetch the records on ModifiedClientSportsSettingsModel since this is the record that's being modified
+                var modSport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
+                var segments = modSport.Segments.Select((s, index) => new
                 {
-                    model.Segments = segmentResponse.Result.SegmentLookup
-                        .GroupJoin(ClientSegmentOrders,
-                        se => new { se.SportId, se.SegmentId },
-                        so => new { so.SportId, so.SegmentId },
-                        (se, so) => new { Lookup = se, LookupOrder = so })
-                        .SelectMany(
-                        temp => temp.LookupOrder.DefaultIfEmpty(),
-                        (temp, s) => new ClientSportsSettingsModel.Segment
-                        {
-                            SegmentId = temp.Lookup.SegmentId,
-                            SegmentName = temp.Lookup.SegmentName,
-                            IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
-                            SortOrder = temp.LookupOrder.FirstOrDefault() != null ? temp.LookupOrder.FirstOrDefault().SortOrder : 1000,
-                            IsOpen = false
-                        })
-                        .OrderBy(o => o.SortOrder)
-                        .ToList();
-                }
+                    Id = $"segment-{s.SportId}-{s.SegmentId}",
+                    SegmentName = s.SegmentName,
+                    SortOrder = s.SortOrder,
+                    RowClass = "segment-row"
+                }).ToList();
+
+                await JSRuntime.InvokeVoidAsync("loadSegmentItems", $"#sport-{model.SportId}", segments);
+                await InitializeSortTable("> tr.segment-row", ".segment-row");
             }
         }
 
-        public async Task OnSegmentClickEvent(int sportId, ClientSportsSettingsModel.Segment model)
+        public async Task OnSaveCopyClickEvent()
+        {
+            AlertMessage = "Sport settings copied successfully.";
+            AlertStatus = AlertStatus.Success;
+        }
+
+        public async Task OnSegmentClickEvent(int sportId, int segmentId)
         {
             if (!IsUpdate)
                 return;
 
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+
+            var sport = ClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == sportId);
+            var model = sport.Segments.FirstOrDefault(c => c.SegmentId == segmentId);
+
+            // verify if there are any open rows for leagues
+            // if there is open then close it.
+            if (sport.Segments.Any(c => c.SportId != model.SportId && c.SegmentId != model.SegmentId && c.IsOpen))
+            {
+                var segment = sport.Segments.FirstOrDefault(c => c.SportId != model.SportId && c.SegmentId != model.SegmentId && c.IsOpen);
+                segment.IsOpen = false;
+            }
+
             await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
 
             if (model.IsOpen)
             {
-                await JSRuntime.InvokeVoidAsync("initSortItems", $".{TableClass}", "> tr.segment-row", ".drag-handle");
                 model.IsOpen = false;
+
+                await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+                await InitializeSortTable("> tr.segment-row", ".segment-row");
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("initSortItems", $".{TableClass}", "> tr.league-row", ".drag-handle");
                 model.IsOpen = true;
-            }
 
-            // prepare leagues (one time only)
-            if (!model.Leagues.Any())
-            {
-                var leagueResponse = await TradingService.GetLeagueLookup(sportId, model.SegmentId);
+                // fetch the records on ModifiedClientSportsSettingsModel since this is the record that's being modified
+                var modSport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
+                var modSegment = modSport.Segments.FirstOrDefault(c => c.SegmentId == model.SegmentId);
 
-                if (leagueResponse.StatusCode == StatusCode.Success)
+                var leagues = modSegment.Leagues.Select((s, index) => new
                 {
-                    model.Leagues = leagueResponse.Result.LeagueLookup
-                        .GroupJoin(ClientLeagueOrders,
-                        le => new { le.SportId, le.SegmentId, le.LeagueId },
-                        so => new { so.SportId, so.SegmentId, so.LeagueId },
-                        (le, so) => new { Lookup = le, LookupOrder = so })
-                        .SelectMany(
-                        temp => temp.LookupOrder.DefaultIfEmpty(),
-                        (temp, s) => new ClientSportsSettingsModel.League
-                        {
-                            LeagueId = temp.Lookup.LeagueId,
-                            LeagueName = temp.Lookup.LeagueName,
-                            IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
-                            SortOrder = temp.LookupOrder.FirstOrDefault() != null ? temp.LookupOrder.FirstOrDefault().SortOrder : 1000
-                        })
-                        .OrderBy(o => o.SortOrder)
-                        .ToList();
-                }
+                    Id = $"league-{s.SportId}-{s.SegmentId}-{s.LeagueId}",
+                    LeagueName = s.LeagueName,
+                    SortOrder = s.SortOrder,
+                    RowClass = "league-row"
+                }).ToList();
+
+                await JSRuntime.InvokeVoidAsync("loadLeagueItems", $"#segment-{model.SportId}-{model.SegmentId}", leagues);
+                await InitializeSortTable("> tr.league-row", ".league-row");
             }
         }
 
-        //public async Task CheckboxClicked(CheckBoxModel model)
-        //{
-        //    //IsSelectAll = model.Checked;
-        //    //if (ClientSportOrderList.Any())
-        //    //{
-        //    //    Parallel.ForEach(ClientSportOrderList, sport =>
-        //    //    {
-        //    //        sport.IsActive = model.Checked;
-        //    //    });
-        //    //}
-        //}
+        public async Task OnUpdateSortOrder(string id, int index)
+        {
+            // update the index of an element inside the list which is (ModifiedClientSportsSettingsModel)
+            var splitId = id.Split('-');
 
-        //protected async Task CheckboxSportClicked(CheckBoxModel model)
-        //{
-        //    ((SportsSortOrder)model.Param1).IsActive = model.Checked;
+            if (splitId[0].ToLower() == "sport")
+            {
+                var sportId = int.Parse(splitId[1]);
+                var sport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == sportId);
 
-        //    IsSelectAll = !ClientSportOrderList.Any(s => s.IsActive == false);
-        //}
+                ModifiedClientSportsSettingsModel.Sports.Remove(sport);
+                ModifiedClientSportsSettingsModel.Sports.Insert(index, sport);
+            }
+            else if (splitId[0].ToLower() == "segment")
+            {
+                var sportId = int.Parse(splitId[1]);
+                var sport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == sportId);
 
-        //protected async Task OnCopyClickEvent()
-        //{
-        //    var parameters = new ModalParameters();
-        //    parameters.Add("ClientSportOrderFilter", ClientSportOrderFilter);
-        //    parameters.Add("DialogStyle", "max-width: 600px;");
+                var segmentId = int.Parse(splitId[2]);
+                var segment = sport.Segments.FirstOrDefault(c => c.SegmentId == segmentId);
 
-        //    var options = new ModalOptions();
-        //    ModalService.Open<SportSettingsCopyModal>($"Copy {ClientSportOrderFilter.ClientName} Sports Settings", parameters, options);
-        //    await InvokeAsync(StateHasChanged);
-        //}
+                sport.Segments.Remove(segment);
+                sport.Segments.Insert(index, segment);
+            }
+            else if (splitId[0].ToLower() == "league")
+            {
+                var sportId = int.Parse(splitId[1]);
+                var sport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == sportId);
 
-        //public async Task OnSaveClickEvent()
-        //{
-        //    ClientSportOrderFilter.IsUpdate = false;
-        //    IsPreLoader = true;
-        //    await InvokeAsync(StateHasChanged);
+                var segmentId = int.Parse(splitId[2]);
+                var segment = sport.Segments.FirstOrDefault(c => c.SegmentId == segmentId);
 
-        //    //int sortOrder = 0;
-        //    //var newSportOrder = new List<SportsSortOrder>();
-        //    //foreach (var sport in ClientSportOrderList)
-        //    //{
-        //    //    sortOrder++;
-        //    //    var sportOrder = new SportsSortOrder()
-        //    //    {
-        //    //        SportId = sport.SportId,
-        //    //        SportName = sport.SportName,
-        //    //        SortOrder = sortOrder,
-        //    //        IsActive = sport.IsActive,
-        //    //        SegmentsSortOrder = new List<SportsSegmentSortOrder>()
-        //    //    };
+                var leagueId = int.Parse(splitId[3]);
+                var league = segment.Leagues.FirstOrDefault(c => c.LeagueId == leagueId);
 
-        //    //    int segmentOrderCtr = 0;
-        //    //    var segmentOrders = new List<SportsSegmentSortOrder>();
-        //    //    var segments = sport.SegmentsSortOrder.ToList();
-        //    //    if (segments.Any())
-        //    //    {
-        //    //        foreach (var segment in segments)
-        //    //        {
-        //    //            segmentOrderCtr++;
-        //    //            var segmentOrder = new SportsSegmentSortOrder
-        //    //            {
-        //    //                SportId = segment.SportId,
-        //    //                SportName = segment.SportName,
-        //    //                SegmentId = segment.SegmentId,
-        //    //                SegmentName = segment.SegmentName,
-        //    //                SortOrder = segmentOrderCtr,
-        //    //                IsActive = segment.IsActive,
-        //    //            };
+                segment.Leagues.Remove(league);
+                segment.Leagues.Insert(index, league);
+            }
+        }
 
-        //    //            int leagueOrderCtr = 0;
-        //    //            var leagueOrders = new List<SportSegmentLeagueSortOrder>();
-        //    //            var leagues = segment.LeagueSortOrder.ToList();
-        //    //            if (leagues.Any())
-        //    //            {
-        //    //                foreach (var league in leagues)
-        //    //                {
-        //    //                    leagueOrderCtr++;
-        //    //                    leagueOrders.Add(new SportSegmentLeagueSortOrder
-        //    //                    {
-        //    //                        SportId = league.SportId,
-        //    //                        SportName = league.SportName,
-        //    //                        SegmentId = league.SegmentId,
-        //    //                        SegmentName = league.SegmentName,
-        //    //                        LeagueId = league.LeagueId,
-        //    //                        LeagueName = league.LeagueName,
-        //    //                        SortOrder = leagueOrderCtr,
-        //    //                        IsActive = league.IsActive,
-        //    //                    });
-        //    //                }
-        //    //            }
-        //    //            segmentOrder.LeagueSortOrder = leagueOrders;
+        [JSInvokable]
+        public static async Task OnInvokeSegmentClick(string id)
+        {
+            var splitId = id.Split("-");
 
-        //    //            segmentOrders.Add(segmentOrder);
-        //    //        }
-        //    //        sportOrder.SegmentsSortOrder = segmentOrders;
-        //    //    }
+            var sportId = int.Parse(splitId[1]);
+            var segmentId = int.Parse(splitId[2]);
 
-        //    //    newSportOrder.Add(sportOrder);
-        //    //}
+            await OnSegmentActionAsync.Invoke(sportId, segmentId);
+        }
 
-        //    var request = new ClientSportSettingRequest
-        //    {
-        //        ClientCode = ClientSportOrderFilter.ClientCode,
-        //        UserId = UserModel.Id,
-        //        UserName = UserModel.UserName,
-        //        TimeStamp = DateTime.UtcNow,
-        //        SportsSortOrder = ClientSportOrderList,
-        //    };
+        [JSInvokable]
+        public static async Task OnStopSortOrder(string id, int index)
+        {
+            await OnUpdateSortOrderActionAsync.Invoke(id, index);
+        }
 
-        //    var response = await TradingService.AddOrUpdateClientSportSettings(request);
-        //    IsPreLoader = false;
-        //    await InvokeAsync(StateHasChanged);
+        public async ValueTask DisposeAsync()
+        {
+            if (DataReference is not null)
+                await DataReference.DisposeAsync();
 
-        //    var AlertMessages = response?.Result.StatusCode == StatusCode.Success ? $"Sport Settings of {ClientSportOrderFilter.ClientCode} has been successfully updated." : $"Update Sport Settings for {ClientSportOrderFilter.ClientCode} Failed!";
+            DataReference = null;
 
-        //}
-
-        //protected async Task OnViewLogsEvent()
-        //{
-        //    var parameters = new ModalParameters();
-
-        //    parameters.Add("ClientCode", ClientSportOrderFilter.ClientCode);
-        //    parameters.Add("DialogStyle", "max-width: 1300px !important;");
-        //    parameters.Add("ModalClass", "show logs-modal");
-
-        //    var options = new ModalOptions();
-
-        //    ModalService.Open<ViewLogsModalBody>("View Logs", parameters, options);
-        //}
+            GC.SuppressFinalize(this);
+        }
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
         }
 
         #endregion
 
         #region Utilities
 
-        private async Task GetSports(string clientCode)
+        private async Task GetSports()
         {
-            if (string.IsNullOrEmpty(clientCode))
+            if (string.IsNullOrEmpty(ClientCode))
             {
                 ClientSportsSettingsModel.Sports = new List<ClientSportsSettingsModel.Sport>();
                 return;
             }
 
-            var clientSportsOrderResponse = await TradingService.GetClientSportOrderList(new ClientSportOrderListRequest
-            {
-                ClientCode = clientCode
-            });
-
-            if (clientSportsOrderResponse.StatusCode == StatusCode.Success)
-            {
-                ClientSportsSettingsModel.Sports = clientSportsOrderResponse.Result
-                    .Select(sp => new ClientSportsSettingsModel.Sport
-                    {
-                        SportId = sp.SportId,
-                        SportName = sp.SportName,
-                        SortOrder = sp.SortOrder,
-                        IsActive = sp.IsActive,
-                        IsOpen = false
-                    })
-                    .OrderBy(o => o.SortOrder)
-                    .ToList();
-            }
-
             var clientSegmentResponse = await TradingService.GetClientSegmentOrderList(new ClientSegmentOrderListRequest
             {
-                ClientCode = clientCode
+                ClientCode = ClientCode
             });
 
             if (clientSegmentResponse.StatusCode == StatusCode.Success)
@@ -348,14 +452,14 @@ namespace Backoffice.Web.Pages.OddsEngine
                         SportId= s.SportId,
                         SportName= s.SportName,
                         SegmentId = s.SegmentId,
-                        SegmentName = s.SegmentName,
+                        SegmentName = s.SegmentName.TrimEnd(),
                         SortOrder = s.SortOrder
                     }).ToList();
             }
 
             var clientLeagueResponse = await TradingService.GetClientLeagueOrderList(new ClientLeagueOrderListRequest
             {
-                ClientCode = clientCode
+                ClientCode = ClientCode
             });
 
             if (clientLeagueResponse.StatusCode == StatusCode.Success)
@@ -367,196 +471,117 @@ namespace Backoffice.Web.Pages.OddsEngine
                         ClientId = s.ClientId,
                         ClientName = s.ClientName,
                         SportId = s.SportId,
-                        SportName = s.SportName,
+                        SportName = s.SportName.TrimEnd(),
                         SegmentId = s.SegmentId,
-                        SegmentName = s.SegmentName,
+                        SegmentName = s.SegmentName.TrimEnd(),
                         LeagueId = s.LeagueId,
-                        LeagueName = s.LeagueName,
+                        LeagueName = s.LeagueName.TrimEnd(),
                         SortOrder = s.SortOrder
                     }).ToList();
             }
+
+            var clientSportsOrderResponse = await TradingService.GetClientSportOrderList(new ClientSportOrderListRequest
+            {
+                ClientCode = ClientCode
+            });
+
+            if (clientSportsOrderResponse.StatusCode == StatusCode.Success)
+            {
+
+                var leagues = LeagueLookupResponse.LeagueLookup.GroupJoin(ClientLeagueOrders,
+                        le => new { le.SportId, le.SegmentId, le.LeagueId },
+                        so => new { so.SportId, so.SegmentId, so.LeagueId },
+                        (le, so) => new { Lookup = le, LookupOrder = so })
+                        .SelectMany(
+                        temp => temp.LookupOrder.DefaultIfEmpty(),
+                        (temp, s) => new ClientSportsSettingsModel.League
+                        {
+                            SportId = temp.Lookup.SportId,
+                            SegmentId = temp.Lookup.SegmentId,
+                            LeagueId = temp.Lookup.LeagueId,
+                            LeagueName = temp.Lookup.LeagueName.TrimEnd(),
+                            IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
+                            SortOrder = temp.LookupOrder.FirstOrDefault() != null ? temp.LookupOrder.FirstOrDefault().SortOrder : 1000
+                        })
+                        .OrderBy(o => o.SortOrder)
+                        .ToList();
+
+                var segments = SegmentLookupResponse.SegmentLookup.GroupJoin(ClientSegmentOrders,
+                    seg => new { seg.SportId, seg.SegmentId },
+                    lp => new { lp.SportId, lp.SegmentId },
+                    (seg, lp) => new { Lookup = seg, LookupOrder = lp })
+                    .SelectMany(
+                    temp => temp.LookupOrder.DefaultIfEmpty(),
+                    (temp, s) => new ClientSportsSettingsModel.Segment
+                    {
+                        SportId = temp.Lookup.SportId,
+                        SegmentId = temp.Lookup.SegmentId,
+                        SegmentName = temp.Lookup.SegmentName.TrimEnd(),
+                        IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
+                        SortOrder = temp.LookupOrder.FirstOrDefault() != null ? temp.LookupOrder.FirstOrDefault().SortOrder : 1000,
+                        IsOpen = false,
+                        Leagues = leagues.Where(c => c.SportId == temp.Lookup.SportId && c.SegmentId == temp.Lookup.SegmentId).ToList()
+                    })
+                    .OrderBy(o => o.SortOrder)
+                    .ToList();
+
+                ClientSportsSettingsModel.Sports = clientSportsOrderResponse.Result
+                    .Select(sp => new ClientSportsSettingsModel.Sport
+                    {
+                        SportId = sp.SportId,
+                        SportName = sp.SportName.TrimEnd(),
+                        SortOrder = sp.SortOrder,
+                        IsActive = sp.IsActive,
+                        IsOpen = false,
+                        Segments = segments.Where(c => c.SportId == sp.SportId).ToList()
+                    })
+                    .OrderBy(o => o.SortOrder)
+                    .ToList();
+            }
+
+            ModifiedClientSportsSettingsModel = ClientSportsSettingsModel;
         }
 
-        //private async Task GetContent(string clientCode)
-        //{
-        //    if (string.IsNullOrEmpty(clientCode))
-        //    {
-        //        ClientSportOrderList = new List<SportsSortOrder>();
-        //        return;
-        //    }
+        private async Task InitializeSortTable(string rowSelector, string categorySelector)
+        {
+            await JSRuntime.InvokeVoidAsync("initSortItems", $".{TableClass}", rowSelector, ".drag-handle", categorySelector);
+        }
 
-        //    var clientSports = new List<SportsSortOrder>();
+        private List<SportsSortOrder> GetSportSortOrder()
+        {
+            var result = ModifiedClientSportsSettingsModel.Sports
+                .Select((s, spIndex) => new SportsSortOrder
+                {
+                    SportId = s.SportId,
+                    SportName = s.SportName,
+                    SortOrder = spIndex + 1,
+                    SegmentsSortOrder = s.Segments.Select((se, seIndex) => new SportsSegmentSortOrder
+                    {
+                        SportId = s.SportId,
+                        SportName = s.SportName,
+                        SegmentId = se.SegmentId,
+                        SegmentName = se.SegmentName,
+                        LeagueSortOrder = se.Leagues.Select((le, leIndex) => new SportSegmentLeagueSortOrder
+                        {
+                            SportId = s.SportId,
+                            SportName = s.SportName,
+                            SegmentId = se.SegmentId,
+                            SegmentName = se.SegmentName,
+                            LeagueId = le.LeagueId,
+                            LeagueName = le.LeagueName,
+                            SortOrder = leIndex + 1,
+                            IsActive = le.IsActive
+                        }).ToList(),
+                        SortOrder = seIndex + 1,
+                        IsActive = se.IsActive,
+                        IsOpen = se.IsOpen
+                    }).ToList(),
+                    IsActive = s.IsActive,
+                    IsOpen = s.IsOpen
+                }).ToList();
 
-        //    var sportOrder = (await TradingService.GetClientSportOrderList(new ClientSportOrderListRequest { ClientCode = clientCode })).Result;
-
-        //    var result = sportOrder ?? new List<ClientSportOrderListResponse>();
-
-        //    if (result.Any())
-        //    {
-        //        clientSports = result.Select(s => new SportsSortOrder
-        //        {
-        //            SportId = s.SportId,
-        //            SportName = s.SportName,
-        //            SortOrder = s.SortOrder,
-        //            IsActive = s.IsActive,
-        //            IsOpen = false,
-        //        }).ToList();
-        //    }
-
-        //    var sports = await GetSports();
-
-        //    if (sports != null && sports.Any())
-        //    {
-        //        //temporarily add virtual sports since it is not handled in API
-        //        sports.Add(new SelectListItemModel<int> { Value = 1001, Name = "Virtual Soccer" });
-        //        sports.Add(new SelectListItemModel<int> { Value = 1002, Name = "Virtual Basketball" });
-        //        sports.Add(new SelectListItemModel<int> { Value = 1003, Name = "Virtual Baseball" });
-        //        sports.Add(new SelectListItemModel<int> { Value = 1005, Name = "Virtual Tennis" });
-        //        sports.Add(new SelectListItemModel<int> { Value = 1021, Name = "Virtual Cricket" });
-        //        sports.Add(new SelectListItemModel<int> { Value = 1055, Name = "Virtual Horse Racing" });
-        //        sports.Add(new SelectListItemModel<int> { Value = 1058, Name = "Virtual Dog Racing" });
-
-        //        var sortOrder = clientSports.Count();
-        //        var newSports = new List<SportsSortOrder>();
-
-        //        if (clientSports != null && clientSports.Any())
-        //        {
-        //            var existingSportIds = clientSports.Select(s => s.SportId).ToList() ?? new List<int>();
-        //            var tempSports = sports.Where(c => !existingSportIds.Contains(c.Value));
-        //            if (tempSports != null && tempSports.Any())
-        //            {
-        //                foreach (var sport in tempSports)
-        //                {
-        //                    sortOrder++;
-        //                    newSports.Add(new SportsSortOrder
-        //                    {
-        //                        SportId = sport.Value,
-        //                        SportName = sport.Name,
-        //                        SortOrder = sortOrder,
-        //                        IsActive = false,
-        //                        IsOpen = false,
-        //                    });
-        //                }
-        //            }
-        //        }
-        //        else
-        //        {
-        //            foreach (var sport in sports)
-        //            {
-        //                sortOrder++;
-        //                newSports.Add(new SportsSortOrder
-        //                {
-        //                    SportId = sport.Value,
-        //                    SportName = sport.Name,
-        //                    SortOrder = sortOrder,
-        //                    IsActive = false,
-        //                    IsOpen = false,
-        //                });
-        //            }
-        //        }
-
-        //        if (newSports.Any())
-        //            clientSports.AddRange(newSports);
-        //    }
-
-        //    //get segments
-        //    if (clientSports.Any())
-        //    {
-        //        var clientSegment = (await TradingService.GetClientSegmentOrderList(new ClientSegmentOrderListRequest { ClientCode = clientCode })).Result;
-        //        var clientLeagues = (await TradingService.GetClientLeagueOrderList(new ClientLeagueOrderListRequest { ClientCode = clientCode })).Result;
-        //        var clientSegmentResult = clientSegment ?? new List<ClientSegmentOrderListResponse>();
-        //        var clientLeagueResult = clientLeagues ?? new List<ClientLeagueOrderListResponse>();
-
-        //        var segmentLookup = (await TradingService.GetSegmentLookup(0)).Result ?? new SegmentLookupResponse();
-        //        var leagueLookup = (await TradingService.GetLeagueLookup(0, 0)).Result ?? new LeagueLookupResponse();
-
-        //        var sportIds = clientSports.Select(s => s.SportId).Distinct().ToList();
-        //        var tierLeagueSortOrder = (await TradingService.GetTierLeagueOrder()).Result ?? new List<TierLeagueOrderModel>();
-
-        //        foreach (var sport in clientSports)
-        //        {
-        //            var segmentResult = clientSegmentResult.Where(s => s.SportId == sport.SportId).ToList();
-        //            var segments = segmentLookup?.SegmentLookup?.Where(s => s.SportId == sport.SportId) ?? new List<SegmentLookupModel>();
-        //            if (segments.Any())
-        //            {
-        //                sport.SegmentsSortOrder = segments.Select(s => new SportsSegmentSortOrder
-        //                {
-        //                    SportId = sport.SportId,
-        //                    SportName = sport.SportName,
-        //                    SegmentId = s.SegmentId,
-        //                    SegmentName = s.SegmentName,
-        //                    IsActive = segmentResult?.Any(c => c.SegmentId == s.SegmentId) ?? false,
-        //                    SortOrder = segmentResult.FirstOrDefault(c => c.SegmentId == s.SegmentId)?.SortOrder ?? 1000,
-        //                    IsOpen = false,
-        //                }).OrderBy(o => o.SortOrder).ThenBy(o => o.SegmentName).ToList();
-
-
-        //                //get leagues
-        //                var segmentOrder = 0;
-        //                sport.SegmentsSortOrder.ForEach(c =>
-        //                {
-        //                    segmentOrder++;
-        //                    c.SortOrder = segmentOrder;
-        //                    var leagueResult = clientLeagueResult.Where(s => s.SportId == c.SportId && s.SegmentId == c.SegmentId).ToList();
-
-        //                    var leagues = leagueLookup?.LeagueLookup?.Where(s => s.SportId == sport.SportId && s.SegmentId == c.SegmentId) ?? new List<LeagueLookupModel>();
-        //                    if (leagues.Any())
-        //                    {
-        //                        c.LeagueSortOrder = leagues.Select(l => new SportSegmentLeagueSortOrder
-        //                        {
-        //                            SportId = sport.SportId,
-        //                            SportName = sport.SportName,
-        //                            SegmentId = c.SegmentId,
-        //                            SegmentName = c.SegmentName,
-        //                            LeagueId = l.LeagueId,
-        //                            LeagueName = l.LeagueName,
-        //                            IsActive = leagueResult?.Any(c => c.LeagueId == l.LeagueId) ?? false,
-        //                            SortOrder = leagueResult.FirstOrDefault(c => c.LeagueId == l.LeagueId)?.SortOrder ??
-        //                                tierLeagueSortOrder.FirstOrDefault(t => t.SportId == l.SportId && t.SegmentId == l.SegmentId && t.LeagueId == l.LeagueId)?.SortOrder + 1000 ?? 2000
-        //                        }).OrderBy(o => o.SortOrder).ThenBy(o => o.LeagueName).ToList();
-
-        //                        var leagueOrder = 0;
-        //                        c.LeagueSortOrder.ForEach(ls =>
-        //                        {
-        //                            leagueOrder++;
-        //                            ls.SortOrder = leagueOrder;
-        //                        });
-        //                    }
-        //                    else
-        //                    {
-        //                        c.LeagueSortOrder = new List<SportSegmentLeagueSortOrder>();
-        //                    }
-        //                });
-        //            }
-        //            else
-        //            {
-        //                sport.SegmentsSortOrder = new List<SportsSegmentSortOrder>();
-        //            }
-        //        }
-        //    }
-
-        //    IsSelectAll = !clientSports.Any(s => s.IsActive == false);
-        //    ClientSportOrderList = clientSports.OrderBy(o => o.SortOrder).ToList();
-        //    IsPreLoader = false;
-
-        //    await InvokeAsync(StateHasChanged);
-        //}
-
-        //private async Task<List<SelectListItemModel<int>>> GetSports()
-        //{
-        //    var result = (await TradingService.GetSportLookup()).Result;
-
-        //    if (result == null)
-        //        return new List<SelectListItemModel<int>>();
-
-        //    var sports = result.SportLookup?.Select(s => new SelectListItemModel<int>()
-        //    {
-        //        Value = s.SportId,
-        //        Name = s.SportName
-        //    }).ToList();
-
-        //    return sports;
-        //}
+            return result;
+        }
 
         #endregion
     }

@@ -19,6 +19,7 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public List<PermissionModel> Permissions { get; set; }
         [Parameter] public ClientModel ClientModel { get; set; }
         [Parameter] public bool IsReadOnly { get; set; }
+        [Parameter] public bool IsSubUser { get; set; }
         public PermissionTreeModel PermissionTree { get; set; }
         public List<string> SelectedClients { get; set; }
         public int SelectedCategoryId { get; set; }
@@ -82,13 +83,14 @@ namespace Backoffice.Web.Components.Common
                 {
                     foreach (var claim in subCategory.Claims)
                     {
-                        if (claim.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
+                        if ((IsSubUser && !claim.IsEnabled) == false && claim.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
                             claim.ClaimValue = "1";
                     }
                 }
             }
 
-            var permissions = Permissions.Where(p => p.CategoryId == category.CategoryId && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."));
+            var permissions = Permissions.Where(p => p.CategoryId == category.CategoryId && (IsSubUser && !p.IsEnabled) == false
+                && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."));
             foreach (var permission in permissions)
             {
                 permission.ClaimValue = "1";
@@ -169,7 +171,8 @@ namespace Backoffice.Web.Components.Common
                                     IsSubUser = s.FirstOrDefault().IsSubUser,
                                     HasReadOnly = s.FirstOrDefault().HasReadOnly,
                                     SortOrder = s.FirstOrDefault().SortOrder,
-                                    ClaimValue = s.FirstOrDefault().ClaimValue
+                                    ClaimValue = s.FirstOrDefault().ClaimValue,
+                                    IsEnabled = s.FirstOrDefault().IsEnabled
                                 }).Distinct().ToList();
 
                             var groups = Permissions.Where(p => p.CategoryId == permission.CategoryId && p.SubCategoryName == subCategory.SubCategoryName && !string.IsNullOrEmpty(p.GroupName)).Select(s => s.GroupName).Distinct().ToList();
@@ -185,7 +188,8 @@ namespace Backoffice.Web.Components.Common
                                         IsSubUser = s.IsSubUser,
                                         HasReadOnly = s.HasReadOnly,
                                         SortOrder = s.SortOrder,
-                                        ClaimValue = s.ClaimValue
+                                        ClaimValue = s.ClaimValue,
+                                        IsEnabled = s.IsEnabled
                                     }).Distinct().ToList();
 
                                 var groupModel = new PermissionTreeModel.Group

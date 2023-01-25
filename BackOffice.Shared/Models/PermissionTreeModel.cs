@@ -54,6 +54,7 @@ namespace Backoffice.Shared.Models
             public int SortOrder { get; set; }
             public bool IsSubUser { get; set; }
             public string ClaimValue { get; set; }
+            public bool IsEnabled { get; set; }
         }
     }
 

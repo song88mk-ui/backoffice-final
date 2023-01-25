@@ -34,6 +34,7 @@
                 Leagues = new List<League>();
             }
 
+            public int SportId { get; set; }
             public int SegmentId { get; set; }
             public string SegmentName { get; set; }
             public List<League> Leagues { get; set; }
@@ -44,6 +45,8 @@
 
         public class League
         {
+            public int SportId { get; set; }
+            public int SegmentId { get; set; }
             public int LeagueId { get; set; }
             public string LeagueName { get; set; }
             public int SortOrder { get; set; }

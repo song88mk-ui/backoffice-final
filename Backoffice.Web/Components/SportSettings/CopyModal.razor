@@ -1,0 +1,34 @@
+﻿<div class="modal-body">
+    <div class="row mb-2">
+        <div class="col-2 text-center">
+            <span>To</span>
+        </div>
+        <div class="col">
+            <select class="form-select" @onchange="OnClientChangedEvent">
+                <option value="" selected>Select Client</option>
+                @foreach (var item in Clients)
+                {
+                    if (item.Value == SelectedClientCode)
+                    {
+                        <option value="@item.Value" selected>@item.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Value">@item.Name</option>
+                    }
+                }
+             </select>
+        </div>
+    </div>
+</div>
+<div class="modal-footer mx-4">
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickEvent">Cancel</button>
+    @if (!string.IsNullOrEmpty(SelectedClientCode))
+    {
+        <button type="button" class="btn modal-btn btn-copy" @onclick="OnCopyClickEvent">Copy</button>
+    }
+    else
+    {
+        <button type="button" class="btn modal-btn btn-copy" disabled>Copy</button>
+    }
+</div>

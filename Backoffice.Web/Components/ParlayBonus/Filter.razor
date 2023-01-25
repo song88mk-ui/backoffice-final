@@ -43,7 +43,7 @@
             @if (IsUpdating)
             {
                 <button type="button" class="btn btn-cancel px-4 me-2" @onclick="OnCancelClickEvent">Cancel</button>
-                <button type="button" class="btn btn-save px-4 me-2" @onclick="OnSaveClickEvent" id="saveChangesBtn" disabled="@IsFormValid">Save Changes</button>
+                <button type="button" class="btn btn-save px-4 me-2" @onclick="OnSaveClickEvent" id="saveChangesBtn" disabled="@IsSaveDisabled">Save Changes</button>
 
                 @if (ClientParlayBonusResponse.ParlayBonusConfig.Any())
                 {
@@ -83,3 +83,4 @@
         </div>
     </div>
 </div>
+<input type="number" @bind="InvalidCount" id="invalidCount" hidden/>
