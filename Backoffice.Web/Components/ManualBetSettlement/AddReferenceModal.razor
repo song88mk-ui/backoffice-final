@@ -1,4 +1,6 @@
-﻿<div class="modal-body">
+﻿@using Backoffice.Shared.Enums;
+@using static Backoffice.Shared.Models.ManualBetDetailsModel;
+<div class="modal-body">    
     <table class="table">
         <thead class="align-middle">
             <tr>
@@ -9,43 +11,56 @@
                 <th scope="col">Status</th>
                 <th scope="col">Reason</th>
                 <th scope="col">
-                    <button type="button" class="btn">
+                    <button type="button" class="btn" @onclick="OnAddReferenceIdClickedEvent">
                         <i class="fa fa-plus-circle" aria-hidden="true"/>
                     </button>
                 </th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>
-                    <textarea class="form-control" placeholder="Reference ID"></textarea>
-                </td>
-                <td>
-                    <span>-</span>
-                </td>
-                <td>
-                    <span>-</span>
-                </td>
-                <td>
-                    <select class="form-select">
-                        <option value="0">None</option>
-                        <option value="1">Won</option>
-                        <option value="2">Lost</option>
-                        <option value="3">Half Won</option>
-                        <option value="4">Half Lost</option>
-                        <option value="5">Void</option>
-                    </select>
-                </td>
-                <td>
-                    <textarea class="form-control" placeholder="Reason"></textarea>
-                </td>
-                <td>
-                    <button type="button" class="btn">
-                        <i class="fa fa-trash" />
-                    </button>
-                </td>
-            </tr>
+            @foreach (var bet in ManualBetDetailsModel.Bets)
+            {
+                <tr>
+                    <th scope="row">
+                        <span>@(ManualBetDetailsModel.Bets.IndexOf(bet) + 1)</span>
+                    </th>
+
+                    <td>
+                        <textarea class="form-control" placeholder="Reference ID" @oninput="OnReferenceIdOnChangeEvent"></textarea>
+                    </td>
+
+                    <td class="fw-bold">
+                        <div class="d-flex flex-column text-start">
+                            @((MarkupString)BuildEventDetails(bet.Selections.FirstOrDefault(), bet.OddsTypeName))
+                        </div>
+                    </td>
+
+                    <td class="fw-bold">
+                        <div class="d-flex flex-column text-start">
+                            @((MarkupString)BuildBetDate(bet))
+                        </div>
+                    </td>
+
+                    <td>
+                        <select class="form-select" @onchange="(ChangeEventArgs e) => OnBetStatusChangedEvent(e, bet)">
+                            <option value="0">None</option>
+                            <option value="@((int)BetStatus.Won)">Won</option>
+                            <option value="@((int)BetStatus.Lost)">Lost</option>
+                            <option value="@((int)BetStatus.HalfWon)">Half Won</option>
+                            <option value="@((int)BetStatus.HalfLost)">Half Lost</option>
+                            <option value="@((int)BetStatus.Void)">Void</option>
+                        </select>
+                    </td>
+                    <td>
+                        <textarea class="form-control" placeholder="Reason" @oninput="(ChangeEventArgs e) => OnReasonChangedEvent(e, bet)"></textarea>
+                    </td>
+                    <td>
+                        <button type="button" class="btn" @onclick="() => OnDeleteClickEvent(bet)" disabled="@(ManualBetDetailsModel.Bets.Count == 1 ? true: false)">
+                            <i class="fa fa-trash"/>
+                        </button>
+                    </td>
+                </tr>
+            }           
         </tbody>
     </table>
 </div>
