@@ -18,6 +18,7 @@ namespace Backoffice.Web.Components.SportSettings
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCopyClickCallback { get; set; }
+        [Parameter] public bool IsPreload { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
@@ -63,6 +64,9 @@ namespace Backoffice.Web.Components.SportSettings
 
         public async Task OnUpdateClickEvent()
         {
+            if (IsPreload)
+                return;
+
             IsUpdate = true;
 
             await OnUpdateClickCallback.InvokeAsync();
@@ -70,6 +74,9 @@ namespace Backoffice.Web.Components.SportSettings
 
         public async Task OnCancelClickEvent()
         {
+            if (IsPreload)
+                return;
+
             IsUpdate = false;
 
             await OnCancelClickCallback.InvokeAsync();
@@ -77,6 +84,9 @@ namespace Backoffice.Web.Components.SportSettings
 
         public async Task OnSaveClickEvent()
         {
+            if (IsPreload)
+                return;
+
             IsUpdate = false;
 
             await OnSaveClickCallback.InvokeAsync();
@@ -84,6 +94,9 @@ namespace Backoffice.Web.Components.SportSettings
 
         public async Task OnCopyClickEvent()
         {
+            if (IsPreload)
+                return;
+
             if (string.IsNullOrEmpty(SelectedClientCode))
                 return;
 

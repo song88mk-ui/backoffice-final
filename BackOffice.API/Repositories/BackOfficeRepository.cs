@@ -702,6 +702,7 @@ namespace Backoffice.API.Repositories
                             client.Website = request.Website;
                             client.ModifiedBy = userId;
                             client.ModifiedDate = DateTime.UtcNow;
+                            client.StatusId = request.StatusId;
                             client.ClientShare = 0;
                             client.SportsbookShare = request.RevenueShare.SportsbookShare;
                             client.JackpotShare = request.RevenueShare.JackpotShare;

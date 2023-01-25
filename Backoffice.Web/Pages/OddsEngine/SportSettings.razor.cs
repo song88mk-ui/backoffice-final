@@ -36,7 +36,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<ClientLeagueSortOrderModel> ClientLeagueOrders { get; set; }
         public SegmentLookupResponse SegmentLookupResponse { get; set; }
         public LeagueLookupResponse LeagueLookupResponse { get; set; }
-        public List<ClientInformationModel> ClientInformations { get; set; }
+        //public List<ClientInformationModel> ClientInformations { get; set; }
 
         public bool IsUpdate { get; set; }
         public bool IsPreload { get; set; }
@@ -79,7 +79,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 IsCurrentPage = true
             });
 
-            ClientInformations = (await TradingService.GetClientList()).Result;
+            //ClientInformations = (await TradingService.GetClientList()).Result;
 
             SegmentLookupResponse = (await TradingService.GetSegmentLookup(0)).Result;
             LeagueLookupResponse = (await TradingService.GetLeagueLookup(0, 0)).Result;
@@ -104,7 +104,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnUpdateClickEvent()
         {
             IsUpdate = true;
-            IsUpdate = false;
 
             await InitializeSortTable("> tr.sport-row", ".sport-row");
             await JSRuntime.InvokeVoidAsync("enableSort", $".{TableClass}");
@@ -223,9 +222,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
 
-            var client = ClientInformations.FirstOrDefault(c => c.ClientCode == ClientCode);
+            //var client = ClientInformations.FirstOrDefault(c => c.ClientCode == ClientCode);
 
-            ModalService.Open<CopyModal>($"Copy {client.ClientName} Sports Settings", parameters, options);
+            ModalService.Open<CopyModal>($"Copy Sports Settings", parameters, options);
         }
 
         public async Task OnViewLogsClickEvent()
