@@ -1,5 +1,9 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -555,6 +559,17 @@ namespace Backoffice.Web.Services
                 else
                     strActivity = isFrom ? string.Empty : GetDifference(activity, dataTo, dataFrom, typeof(List<ClientMarketTemplateGroupDTO>));
             }
+            else if (page == Page.Admin_ManageUserGroups)
+            {
+                if (activity == Activity.Update.ToString())
+                    strActivity = isFrom ? GetDifference(Activity.Update.ToString(), dataFrom, dataTo, typeof(UserGroupResponse)) : GetDifference(Activity.Update.ToString(), dataTo, dataFrom, typeof(UserGroupResponse));
+                else if (activity == Activity.Create.ToString())
+                    strActivity = isFrom ? "-" : GetDifference(Activity.Create.ToString(), dataTo, dataFrom, typeof(UserGroupRequest));
+                else if (activity == Activity.Delete.ToString())
+                    strActivity = isFrom ? GetDifference(Activity.Delete.ToString(), dataFrom, dataTo, typeof(UserGroupResponse)) : "-";
+                else
+                    strActivity = isFrom ? string.Empty : GetDifference(activity, dataTo, dataFrom, typeof(UserGroupResponse));
+            }
             //TODO: add another page condition here
 
             return strActivity;
@@ -621,6 +636,48 @@ namespace Backoffice.Web.Services
                     result = result + GetProperties(obj, new ClientMarketTemplateGroupDTO()) + "|";
 
             }
+            else if (obj.GetType().Name == typeof(UserGroupResponse).Name)
+            {
+                var another = new object();
+                if (data2 != "-")
+                {
+                    another = string.IsNullOrEmpty(data2) ? new UserGroupResponse() : JsonSerializer.Deserialize(data2, type);
+                }
+
+                if (!string.IsNullOrEmpty(data2))
+                    result = result + GetProperties(obj, another) + "|";
+                else
+                    result = result + GetProperties(obj, new UserGroupResponse()) + "|";
+
+                var claims = ((UserGroupResponse)obj).Claims;
+                var anotherClaims = !string.IsNullOrEmpty(data2) ? ((UserGroupResponse)another).Claims : new List<ClaimModel>();
+
+                if (claims.Any() || anotherClaims.Any())
+                {
+                    foreach (var claim in claims)
+                    {
+                        var check = anotherClaims.FirstOrDefault(c => c.ClaimType == claim.ClaimType);
+                        if (check == null)
+                        {
+                            if (claim.ClaimValue == "1")
+                                result = result + $"{claim.ClaimType} - Has Access|";
+                            else if (claim.ClaimValue == "2")
+                                result = result + $"{claim.ClaimType} - ReadOnly Access|";
+
+                        }
+                        else if (claim.ClaimValue != check.ClaimValue)
+                        {
+                            if (claim.ClaimValue == "1")
+                                result = result + $"{claim.ClaimType} - Has Access|";
+                            else if (claim.ClaimValue == "2")
+                                result = result + $"{claim.ClaimType} - ReadOnly Access|";
+                            else
+                                result = result + $"{claim.ClaimType} - No Access|";
+                        }
+                    }
+                }
+
+            }
             else
             {
                 var another = string.IsNullOrEmpty(data2) ? new object() : JsonSerializer.Deserialize(data2, type);
@@ -649,18 +706,21 @@ namespace Backoffice.Web.Services
                 if (objValue == null && anotherValue == null)
                     continue;
 
-                if (objValue.GetType() == typeof(List<object>) && anotherValue.GetType() == typeof(List<object>))
+                if (objValue.GetType().Name == typeof(List<object>).Name && anotherValue.GetType().Name == typeof(List<object>).Name)
                 {
-                    //foreach (var item in (List<object>)objValue)
+                    //foreach (object item in Enumerable.OfType<objValue.GetType()>())
                     //{
-                    //    foreach (var anotherItem in (List<KeyTimeModel>)anotherValue)
+                    //}
+                    //foreach (var item in (objValue.GetType())objValue)
+                    //{
+                    //    foreach (var anotherItem in (List<object>)anotherValue)
                     //    {
-                    //        if (item.Time == anotherItem.Time)
-                    //        {
-                    //            if (!item.Key.Equals(anotherItem.Key))
-                    //                result = false;
-                    //            break;
-                    //        }
+                    //        //if (item.Time == anotherItem.Time)
+                    //        //{
+                    //        //    if (!item.Key.Equals(anotherItem.Key))
+                    //        //        result = false;
+                    //        //    break;
+                    //        //}
                     //    }
                     //}
                 }

@@ -1,228 +1,53 @@
-﻿<div class="modal-body modal-scroll">
-    <div class="row mb-3">
-        <div class="col-4 position-relative">
-            <input type="text" class="form-control pe-5" placeholder="Search here..." />
-            <i class="fa fa-search icon-inline" aria-hidden="true" />
-        </div>
-    </div>
+﻿@using Backoffice.Shared.Enums;
+@using Backoffice.Web.Services;
+
+<div class="modal-body">
+    @*<NoRecordFound />*@
+
+    <!--uncomment block code below for output-->
     <div class="row">
-        <div class="col col-max-height">
-            <table class="table align-middle">
-                <thead class="text-center thead-sticky">
-                    <tr>
-                        <th scope="col">Last Login Date</th>
-                        <th scope="col">IP Address</th>
-                        <th scope="col">Device</th>
-                        <th scope="col">Country of Origin</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="text-center">
-                        <th scope="row">
-                            <span>2022/08/29 7:04:31 AM</span>
-                        </th>
-                        <td>
-                            <span>192.168.1.1</span>
-                        </td>
-                        <td>
-                            <p>
-                                Browser: chrome,<br />
-                                Browser Version: 104.0.0, <br />
-                                OS: Windows 10
-                            </p>
-                        </td>
-                        <td>
-                            <span>
-                                <i class="flag-ph"></i>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <th scope="row">
-                            <span>2022/08/29 7:04:31 AM</span>
-                        </th>
-                        <td>
-                            <span>192.168.1.1</span>
-                        </td>
-                        <td>
-                            <p>
-                                Browser: chrome,<br />
-                                Browser Version: 104.0.0, <br />
-                                OS: Windows 10
-                            </p>
-                        </td>
-                        <td>
-                            <span>
-                                <i class="flag-ph"></i>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <th scope="row">
-                            <span>2022/08/29 7:04:31 AM</span>
-                        </th>
-                        <td>
-                            <span>192.168.1.1</span>
-                        </td>
-                        <td>
-                            <p>
-                                Browser: chrome,<br />
-                                Browser Version: 104.0.0, <br />
-                                OS: Windows 10
-                            </p>
-                        </td>
-                        <td>
-                            <span>
-                                <i class="flag-ph"></i>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <th scope="row">
-                            <span>2022/08/29 7:04:31 AM</span>
-                        </th>
-                        <td>
-                            <span>192.168.1.1</span>
-                        </td>
-                        <td>
-                            <p>
-                                Browser: chrome,<br />
-                                Browser Version: 104.0.0, <br />
-                                OS: Windows 10
-                            </p>
-                        </td>
-                        <td>
-                            <span>
-                                <i class="flag-ph"></i>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <th scope="row">
-                            <span>2022/08/29 7:04:31 AM</span>
-                        </th>
-                        <td>
-                            <span>192.168.1.1</span>
-                        </td>
-                        <td>
-                            <p>
-                                Browser: chrome,<br />
-                                Browser Version: 104.0.0, <br />
-                                OS: Windows 10
-                            </p>
-                        </td>
-                        <td>
-                            <span>
-                                <i class="flag-ph"></i>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <th scope="row">
-                            <span>2022/08/29 7:04:31 AM</span>
-                        </th>
-                        <td>
-                            <span>192.168.1.1</span>
-                        </td>
-                        <td>
-                            <p>
-                                Browser: chrome,<br />
-                                Browser Version: 104.0.0, <br />
-                                OS: Windows 10
-                            </p>
-                        </td>
-                        <td>
-                            <span>
-                                <i class="flag-ph"></i>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <th scope="row">
-                            <span>2022/08/29 7:04:31 AM</span>
-                        </th>
-                        <td>
-                            <span>192.168.1.1</span>
-                        </td>
-                        <td>
-                            <p>
-                                Browser: chrome,<br />
-                                Browser Version: 104.0.0, <br />
-                                OS: Windows 10
-                            </p>
-                        </td>
-                        <td>
-                            <span>
-                                <i class="flag-ph"></i>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <th scope="row">
-                            <span>2022/08/29 7:04:31 AM</span>
-                        </th>
-                        <td>
-                            <span>192.168.1.1</span>
-                        </td>
-                        <td>
-                            <p>
-                                Browser: chrome,<br />
-                                Browser Version: 104.0.0, <br />
-                                OS: Windows 10
-                            </p>
-                        </td>
-                        <td>
-                            <span>
-                                <i class="flag-ph"></i>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <th scope="row">
-                            <span>2022/08/29 7:04:31 AM</span>
-                        </th>
-                        <td>
-                            <span>192.168.1.1</span>
-                        </td>
-                        <td>
-                            <p>
-                                Browser: chrome,<br />
-                                Browser Version: 104.0.0, <br />
-                                OS: Windows 10
-                            </p>
-                        </td>
-                        <td>
-                            <span>
-                                <i class="flag-ph"></i>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <th scope="row">
-                            <span>2022/08/29 7:04:31 AM</span>
-                        </th>
-                        <td>
-                            <span>192.168.1.1</span>
-                        </td>
-                        <td>
-                            <p>
-                                Browser: chrome,<br />
-                                Browser Version: 104.0.0, <br />
-                                OS: Windows 10
-                            </p>
-                        </td>
-                        <td>
-                            <span>
-                                <i class="flag-ph"></i>
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            @*<Pagination></Pagination>*@
+        <div class="col-12">
+            @if (IsPreLoader)
+            {
+                <Preloader />
+            }
+            else
+            {
+                @if (ActivityLogs != null && ActivityLogs.Any())
+                {
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col"><strong>Date</strong></th>
+                                <th scope="col"><strong>Activity</strong></th>
+                                <th scope="col"><strong>From</strong></th>
+                                <th scope="col"><strong>To</strong></th>
+                                <th scope="col"><strong>Updated By</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var logs in ActivityLogs)
+                            {
+                                <tr>
+                                    <td>@logs.TimeStamp.ToLocalTime().ToString("dd/MM/yy") @logs.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
+                                    <td>@logs.Activity</td>
+                                    <td>@((MarkupString)CommonService.GetActivity(logs.From, logs.To, Page.Admin_ManageUserGroups, logs.Activity, true))</td>
+                                    <td>@((MarkupString)CommonService.GetActivity(logs.From, logs.To, Page.Admin_ManageUserGroups, logs.Activity, false))</td>
+                                    <td>@logs.UserId</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectedPage" />
+                }
+                else
+                {
+                    <NoRecordFound />
+                }
+            }
         </div>
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-close" @onclick="OnCloseModalClickEvent">Close</button>
+    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent">Close</button>
 </div>

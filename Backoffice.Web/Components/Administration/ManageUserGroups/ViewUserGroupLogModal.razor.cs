@@ -1,4 +1,6 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Data.Backoffice.Entities;
+using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
@@ -14,21 +16,22 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IAuthenticationService AuthenticationService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
-        private string UserId { get; set; }
+        private string UserGroupId { get; set; }
         private MetaData MetaData { get; set; }
         public bool IsPreLoader { get; set; }
-        public List<LogInActivityLogModel> LogInActivityLogs  {get; set; }
+        public List<ActivityLogModel> ActivityLogs { get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            ActivityLogs = null;
             IsPreLoader = true;
-            UserId = ModalParameters.TryGet<string>("UserId");
-            LogInActivityLogs = new List<LogInActivityLogModel>();
+            UserGroupId = ModalParameters.TryGet<string>("UserGroupId");
+            ActivityLogs = new List<ActivityLogModel>();
             MetaData = new MetaData()
             {
                 PageSize = 10,
@@ -36,10 +39,19 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 TotalPages = 0,
                 TotalCount = 0
             };
+            await InvokeAsync(StateHasChanged);
+            await GetContent();
         }
         public async Task OnCloseModalClickEvent()
         {
             ModalService.Cancel();
+        }
+        protected async Task SelectedPage(int page)
+        {
+            MetaData.CurrentPage = page;
+            IsPreLoader = true;
+            await InvokeAsync(StateHasChanged);
+            await GetContent();
         }
         public void Dispose()
         {
@@ -47,18 +59,24 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         }
         #endregion
 
+
         #region Utilities
         private async Task GetContent()
         {
-            var userResponse = await AuthenticationService.GetLogInActivityLogList(UserId, MetaData);
-            if (userResponse.Result != null)
+            var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
-                LogInActivityLogs = userResponse.Result.ActivityLogs;
-                MetaData = userResponse.Result.MetaData;
-            }
+                Page = AdminPermission.Admin_ManageUserGroups.ToString().Replace("_", "."),
+                Payload = $"{UserGroupId}",
+                MetaData = MetaData
+            })).Result;
 
+            if (response != null)
+            {
+                ActivityLogs = response.ActivityLogs;
+                MetaData = response.MetaData;
+            }
             IsPreLoader = false;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
         #endregion
     }

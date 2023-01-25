@@ -1,19 +1,24 @@
-﻿using Backoffice.Shared.Models.Response;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.Administration.ManageUserGroups
 {
     public partial class DeleteUserGroupModal : IDisposable
     {
         #region Properties
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public UserGroupResponse UserGroup { get; set; }
         public List<AlertModel> Alerts { get; set; }
         #endregion
@@ -43,6 +48,18 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
                 if (response.Result)
                 {
+                    //activity log
+                    await BackOfficeService.AddActivityLog(new ActivityLogModel
+                    {
+                        Page = Page.Admin_ManageUserGroups.ToString().Replace("_", "."),
+                        Payload = $"{UserGroup.UserGroupId}",
+                        Activity = Activity.Delete.ToString(),
+                        From = JsonSerializer.Serialize(UserGroup),
+                        To = "-",
+                        UserId = UserModel.Id
+                    });
+
+
                     Alerts.Add(new AlertModel
                     {
                         AlertStatus = "Success",
