@@ -31,7 +31,7 @@ namespace Backoffice.Web.Shared
 
         #region Methods
 
-        protected override async Task OnInitializedAsync()
+        protected override async void OnInitialized()
         {
             Menu = new SportsTreeModel();
             SelectedSport = new SportClickCallbackModel();
@@ -73,15 +73,6 @@ namespace Backoffice.Web.Shared
                     Claims = UserModel.Claims;
             }
         }
-        //protected override void OnParametersSet()
-        //{
-        //    if (UserModel != null)
-        //    {
-        //        if (UserModel.Claims != null && Claims == null)
-        //            Claims = UserModel.Claims;
-
-        //    }
-        //}
         public void ToggleNavMenu()
         {
             collapseNavMenu = !collapseNavMenu;

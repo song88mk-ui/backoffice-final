@@ -47,10 +47,8 @@
                 </tbody>
             </table>
 
-            <div class="row">
-                <div class="@divClass col-md-11 mx-auto form-text p-3" style="@divStyles">
-                    <strong>@((MarkupString)message)</strong>
-                </div>
+            <div class="@divClass mx-auto form-text p-3" style="@divStyles">
+                <strong>@((MarkupString)message)</strong>
             </div>
             <br />
             @if (AddMessageSettlementModel.BetSelections != null && AddMessageSettlementModel.BetSelections.Any())

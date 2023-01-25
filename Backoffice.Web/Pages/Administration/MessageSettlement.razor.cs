@@ -83,24 +83,30 @@ namespace Backoffice.Web.Pages.Administration
 
             var logs = await BackOfficeService.GetActivityLogs(request);
 
-            var result = logs?.Result?.ActivityLogs?.Select(x => new MessageSettlementModel()
+            var result = new List<MessageSettlementModel>();
+
+            if(logs != null)
             {
-                Id = x.Id,
-                BetDate = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).BetDate,
-                BetId = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).BetId,
-                Sports = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).SportName,
-                MessagesSettled = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).FixtureName,
-                Product = GetProducts().FirstOrDefault(y => y.Value == JsonSerializer.Deserialize<MessageSettlementTo>(x.To).ProductId).Name,
-                SettledBy = x.UserId,
-                DateSettled = x.TimeStamp,
-                Reason = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).Reason
-            }).ToList();
+                result = logs?.Result?.ActivityLogs?.Select(x => new MessageSettlementModel()
+                {
+                    Id = x.Id,
+                    BetDate = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).BetDate,
+                    BetId = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).BetId,
+                    Sports = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).SportName,
+                    MessagesSettled = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).FixtureName,
+                    Product = GetProducts().FirstOrDefault(y => y.Value == JsonSerializer.Deserialize<MessageSettlementTo>(x.To).ProductId).Name,
+                    SettledBy = x.UserId,
+                    DateSettled = x.TimeStamp,
+                    Reason = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).Reason
+                }).ToList();
+            }
 
             MetaData = logs?.Result?.MetaData;
             CursorId = result?.LastOrDefault()?.Id ?? 0;
             PreviousPage = MetaData.CurrentPage;
             IsPreLoader = false;
             MessageSettlementModel = result;
+            StateHasChanged();
         }
         private string BuildPayload()
         {

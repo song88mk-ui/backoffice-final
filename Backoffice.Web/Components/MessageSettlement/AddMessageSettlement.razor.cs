@@ -45,6 +45,9 @@ namespace Backoffice.Web.Components.MessageSettlement
         {
             IsPreloader = true;
             AddMessageSettlementModel = new AddMessageSettlementModel();
+            divClass = "bg-success";
+            divStyles = "display: block";
+            message = $"Done: Request to resend all stateful-messages (BetSettlement, RollbackBetSettlement, BetCancel, UndoBetCancel) for a sport event.";
         }
 
         public async Task<AddMessageSettlementModel> GetBetDetails()
