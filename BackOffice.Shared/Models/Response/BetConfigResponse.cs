@@ -1,16 +1,16 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models.Response;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using static Backoffice.Shared.Models.Requests.AddOrUpdateBetConfigRequest;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
 
-namespace Backoffice.Shared.Models.Requests
+namespace Backoffice.Shared.Models.Response
 {
     public class BetConfigResponse
     {
-        public BetConfigResponse() {
+        public BetConfigResponse()
+        {
 
         }
         public DefaultSportConfigFE DefaultSportConfig { get; set; }

@@ -14,16 +14,20 @@ using System.Threading.Tasks;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using System.Text.Json;
 using Newtonsoft.Json;
+using Backoffice.Shared.Data.Backoffice.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Backoffice.API.Repositories
 {
     public class TradingRepository : ITradingRepository
     {
         private readonly IConfiguration _configuration;
+        private readonly IRabbitMQRepository _rabbitMqRepository;
 
-        public TradingRepository(IConfiguration configuration)
+        public TradingRepository(IConfiguration configuration, IRabbitMQRepository rabbitMqRepository)
         {
             _configuration = configuration;
+            _rabbitMqRepository = rabbitMqRepository;
         }
 
         #region SPORTS
@@ -41,7 +45,7 @@ namespace Backoffice.API.Repositories
                         return JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
                     {
-                        return new BaseResponse <SportsTreeResponse>
+                        return new BaseResponse<SportsTreeResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -319,7 +323,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        
+
         public async Task<BaseResponse<FixtureOddsHistoryResponse>> GetFixtureMarketSelections(int fixtureTypeId, string providerFixtureId, string providerMarketId, string providerSelectionId, string region)
         {
             try
@@ -1403,10 +1407,27 @@ namespace Backoffice.API.Repositories
         {
             try
             {
+                var activityLogList = new OnActivityLogListMessage();
                 var response = await GetHttpClient(region).PostAsync($"manual/messagesettlement", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
+                {
+                    var result = string.Empty;
+                    foreach (var item in request)
+                    {
+                        activityLogList.OnActivityLogMessages.Add(item.OnActivityLogMessage);
+                    }
+
+                    await _rabbitMqRepository.Publish(new MessageRequest()
+                    {
+                        CorrelationId = Guid.NewGuid().ToString(),
+                        MessageType = "LogActivityList",
+                        RoutingKey = $"r.bo.util.logs",
+                        Payload = JsonSerializer.Serialize(activityLogList)
+                    });
+
                     return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)

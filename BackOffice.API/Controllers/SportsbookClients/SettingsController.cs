@@ -86,8 +86,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
         #endregion
 
         #region Top Leagues
-
-        [EnableCors("AllowAllOrigins")]
         [HttpPost("allleagues")]
         public async Task<IActionResult> GetAllLeagues([FromBody] GetAllLeaguesRequest request)
         {
@@ -102,8 +100,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-        
-        [EnableCors("AllowAllOrigins")]
         [HttpPost("topleagues")]
         public async Task<IActionResult> GetTopLeagues([FromBody] GetTopLeaguesRequest request)
         {
@@ -118,8 +114,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-
-        [EnableCors("AllowAllOrigins")]
         [HttpPost("topleagues/post")]
         public async Task<IActionResult> PostTopLeagues([FromBody] PostTopLeaguesRequest request)
         {
@@ -134,8 +128,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-
-        [EnableCors("AllowAllOrigins")]
         [HttpPost("topleagues/copy")]
         public async Task<IActionResult> CopyTopLeagues([FromBody] CopyTopLeaguesRequest request)
         {
@@ -150,8 +142,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-
-        [EnableCors("AllowAllOrigins")]
         [HttpGet("sports")]
         public async Task<IActionResult> GetClientSports([FromQuery] string LanguageCode)
         {
@@ -164,12 +154,9 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-
         #endregion
 
         #region Parlay Bonus
-
-        [EnableCors("AllowAllOrigins")]
         [HttpGet("parlaybonus/list")]
         public async Task<IActionResult> GetClientParlayBonus([FromQuery] GetParlayBonusRequest request)
         {
@@ -185,8 +172,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-
-        [EnableCors("AllowAllOrigins")]
         [HttpPost("parlaybonus")]
         public async Task<IActionResult> AddOrUpdateParlayBonus([FromBody] ParlayBonusRequest request)
         {
@@ -202,12 +187,9 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-
         #endregion
 
         #region User Activity Logs
-
-        [EnableCors("AllowAllOrigins")]
         [HttpPost("activitylog")]
         public async Task<IActionResult> ActivityLog([FromBody] ActivityLogModel request)
         {
@@ -221,8 +203,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-
-        [EnableCors("AllowAllOrigins")]
         [HttpPost("activitylog/list")]
         public async Task<IActionResult> GetActivityLogs([FromBody] ActivityLogRequest request)
         {
@@ -236,8 +216,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-
-        [EnableCors("AllowAllOrigins")]
         [HttpPost("activitylog/priceboostlist")]
         public async Task<IActionResult> GetPriceboostActivityLogs([FromBody] PriceboostActivityLogRequest request)
         {
@@ -251,7 +229,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
-
         #endregion
     }
 }

@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "Backoffice.Utility": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

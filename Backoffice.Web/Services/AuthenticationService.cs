@@ -351,7 +351,6 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region User Group
-
         public async Task<BaseResponse<UserGroupListResponse>> GetUserGroupList(UserGroupListRequest request)
         {
             try
@@ -389,7 +388,6 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-
         public async Task<BaseResponse<UserListResponse>> GetUserGroupUsers(UserGroupRequest request)
         {
             try
@@ -427,7 +425,6 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-
         public async Task<BaseResponse<bool>> AddOrUpdateUserGroup(UserGroupRequest request)
         {
             try
@@ -465,7 +462,6 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-
         public async Task<BaseResponse<bool>> DeleteUserGroup(UserGroupRequest request)
         {
             try

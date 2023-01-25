@@ -4,6 +4,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Backoffice.Web.Shared
 {
@@ -45,33 +46,39 @@ namespace Backoffice.Web.Shared
                 var isSuperAdmin = !string.IsNullOrEmpty(role) && role.ToUpper().Equals("SUPER ADMIN") ? true : false;
 
                 var clients = new ClientModel();
-                if(isSuperAdmin)
+                if (isSuperAdmin)
                     clients = (await BackOfficeService.GetClients()).Result;
 
+                var tasks = new List<Task>();
                 Parallel.ForEach(userClaims, (claim) =>
                 {
-                    switch (claim.Type.ToUpper())
+                    tasks.Add(Task.Run(() =>
                     {
-                        case "CLIENTCODES":
-                            if(isSuperAdmin)
-                                UserModel.ClientCodes.AddRange(clients.Clients.Select(c => c.ClientCode).ToList());
-                            else
-                                UserModel.ClientCodes.AddRange(claim.Value.Split(',').ToList());
-                            break;
-                        case "USERID":
-                            UserModel.Id = claim.Value;
-                            break;
-                        case "TOKENNAME":
-                            UserModel.UserName = claim.Value;
-                            break;
-                        case "MAINUSERID":
-                            UserModel.MainUserId = claim.Value;
-                            break;
-                        default:
-                            UserModel.Claims.Add(claim);
-                            break;
-                    }
+                        switch (claim.Type.ToUpper())
+                        {
+                            case "CLIENTCODES":
+                                if (isSuperAdmin)
+                                    UserModel.ClientCodes.AddRange(clients.Clients.Select(c => c.ClientCode).ToList());
+                                else
+                                    UserModel.ClientCodes.AddRange(claim.Value.Split(',').ToList());
+                                break;
+                            case "USERID":
+                                UserModel.Id = claim.Value;
+                                break;
+                            case "TOKENNAME":
+                                UserModel.UserName = claim.Value;
+                                break;
+                            case "MAINUSERID":
+                                UserModel.MainUserId = claim.Value;
+                                break;
+                            default:
+                                UserModel.Claims.Add(claim);
+                                break;
+                        }
+                    }));
                 });
+
+                Task.WaitAll(tasks.ToArray());
             }
             catch (Exception)
             {
@@ -83,44 +90,6 @@ namespace Backoffice.Web.Shared
         {
             //if (firstRender)
             //{
-            //    try
-            //    {
-            //        UserModel = new UserModel();
-            //        if (HttpContextAccessor.HttpContext.Session.GetString("UserToken") == null)
-            //        {
-            //            NavigationManager.NavigateTo("login", true);
-            //            return;
-            //        }
-
-            //        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            //        var userClaims = authState.User.Claims.ToList();
-
-            //        Parallel.ForEach(userClaims, (claim) =>
-            //        {
-            //            switch (claim.Type.ToUpper())
-            //            {
-            //                case "CLIENTCODES":
-            //                    UserModel.ClientCodes.AddRange(claim.Value.Split(',').ToList());
-            //                    break;
-            //                case "USERID":
-            //                    UserModel.Id = claim.Value;
-            //                    break;
-            //                case "TOKENNAME":
-            //                    UserModel.UserName = claim.Value;
-            //                    break;
-            //                case "MAINUSERID":
-            //                    UserModel.MainUserId = claim.Value;
-            //                    break;
-            //                default:
-            //                    UserModel.Claims.Add(claim);
-            //                    break;
-            //            }
-            //        });
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        NavigationManager.NavigateTo("login", true);
-            //    }
             //}
         }
 

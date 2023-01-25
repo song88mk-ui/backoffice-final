@@ -29,6 +29,18 @@ namespace Backoffice.Web.Pages.Administration
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            MarketSettlementFilterModel = new MarketSettlementFilterModel()
+            {
+                Sports = new List<SelectListItemModel<int>>(),
+                Segments = new List<SelectListItemModel<int>>(),
+                Leagues = new List<SelectListItemModel<int>>(),
+                Fixtures = new List<SelectListItemModel<string>>(),
+                Markets = new List<SelectListItemModel<string>>(),
+                Selections = new List<SelectListItemModel<string>>(),
+                Statuses = new List<SelectListItemModel<int>>(),
+                FromDate = DateTime.Now.Date,
+                ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
+            };
             IsPreLoader = true;
             PageTitle = "Message Settlement";
             IconClass = "ico ico-message-settlement";
@@ -53,11 +65,14 @@ namespace Backoffice.Web.Pages.Administration
         }
         public async Task OnSaveClickedEvent()
         {
+            IsPreLoader = true;
             await GetContents();
         }
         public async Task SelectPage(int page)
         {
             MetaData.CurrentPage = page;
+            IsPreLoader = true;
+
             await GetContents();
         }
 
@@ -70,8 +85,6 @@ namespace Backoffice.Web.Pages.Administration
         #region Utulities
         public async Task GetContents()
         {
-            IsPreLoader = true;
-
             var request = new ActivityLogRequest()
             {
                 Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
@@ -85,7 +98,7 @@ namespace Backoffice.Web.Pages.Administration
 
             var result = new List<MessageSettlementModel>();
 
-            if(logs != null)
+            if (logs != null)
             {
                 result = logs?.Result?.ActivityLogs?.Select(x => new MessageSettlementModel()
                 {

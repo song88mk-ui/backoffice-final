@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -108,7 +109,7 @@ namespace Backoffice.Web.Components.MessageSettlement
                     if ((betselectionCount == 1 && !string.IsNullOrWhiteSpace(item.Reason)) || (item.IsChecked && !string.IsNullOrWhiteSpace(item.Reason)))
                     {
                         int requestId = 318;
-                        var activityLog = new ActivityLogModel()
+                        var activityLog = new OnActivityLogMessage()
                         {
                             Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
                             Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
@@ -159,7 +160,7 @@ namespace Backoffice.Web.Components.MessageSettlement
                                 RequestId = requestId,
                             };
 
-                            var activityLog2 = new ActivityLogModel()
+                            var activityLog2 = new OnActivityLogMessage()
                             {
                                 Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
                                 Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",

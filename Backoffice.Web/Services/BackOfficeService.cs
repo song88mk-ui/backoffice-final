@@ -38,6 +38,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var response = await _httpClient.PostAsync($"sportsbook/settings/activitylog/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -73,6 +76,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var response = await _httpClient.PostAsync($"sportsbook/settings/activitylog", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -104,6 +110,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var response = await _httpClient.PostAsync($"sportsbook/settings/activitylog/priceboostlist", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -735,6 +744,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var stringUri = string.IsNullOrEmpty(request.MarketTemplateId) ?
                     $"api/trading/fixtures/market/{request.FixtureTypeId}/{request.SportId}/{request.SegmentId}/{request.LeagueId}" :
                     $"api/trading/fixtures/market/{request.FixtureTypeId}/{request.SportId}/{request.SegmentId}/{request.LeagueId}/{request.MarketTemplateId}";
@@ -764,6 +776,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var stringUri = $"api/trading/fixtures2/market/details/{providerFixtureId}";
 
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<MarketFixtureDetailResponse>>
@@ -791,6 +806,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var stringUri = $"api/trading/markettemplategroups/{fixtureTypeId}";
 
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<MarketTemplateGroupResponse>>
@@ -820,6 +838,7 @@ namespace Backoffice.Web.Services
             {
                 var userToken = await _authenticationService.AuthenticateToken();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var Model = await _httpClient.PostAsync($"api/trading/markettemplateplayerprops", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (Model.IsSuccessStatusCode)
@@ -854,8 +873,11 @@ namespace Backoffice.Web.Services
         #region Bet
         public async Task<BaseResponse<ManualBetDetailsResponse>> GetManualBetDetails(ManualBetDetailsRequest request)
         {
-            try 
+            try
             {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
                 var response = await _httpClient.PostAsync($"api/trading/priceboost/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)

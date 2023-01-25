@@ -77,6 +77,7 @@ namespace Backoffice.API
                 client.DefaultRequestHeaders.Add("x-api-key", Configuration["API:AuthenticationAPI:Security:APIKey"]);
             });
             services.AddDbContext<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"]));
+            services.AddHttpClient<IRabbitMQRepository, RabbitMQRepository>();
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
             services.AddScoped<IPlatformRepository, PlatformRepository>();
             services.AddScoped<ITradingRepository, TradingRepository>();
