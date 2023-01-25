@@ -280,7 +280,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     model.IsOpen = false;
 
+                    await JSRuntime.InvokeVoidAsync("collapseButton", ".sport-row");
                     await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
+
                     await InitializeSortTable("> tr.sport-row", ".sport-row");
                 }
                 else
@@ -307,6 +309,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     model.IsOpen = false;
 
+                    await JSRuntime.InvokeVoidAsync("collapseButton", ".sport-row");
                     await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
                 }
                 else
@@ -356,7 +359,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     model.IsOpen = false;
 
+                    await JSRuntime.InvokeVoidAsync("collapseButton", ".segment-row");
                     await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+
                     await InitializeSortTable("> tr.segment-row", ".segment-row");
                 }
                 else
@@ -385,6 +390,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     model.IsOpen = false;
 
+                    await JSRuntime.InvokeVoidAsync("collapseButton", ".segment-row");
                     await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
                 }
                 else

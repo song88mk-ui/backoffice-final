@@ -273,7 +273,7 @@ window.loadSegmentItems = (id, collection) => {
     $.each(collection, function (index, value) {
         var colNo = $("<td class='text-center'></td>").append(`<span class="ms-2">${value.sortOrder}</span>`);
         var colCheckbox = $("<td></td>");
-        var colName = $("<td></td>").append(`<div class="d-flex justify-content-between"><span class="ms-2">${value.segmentName}</span><span class="dropdown-league"><i class="fa fa-chevron-down"></i></span></div>`);
+        var colName = $("<td></td>").append(`<div class="d-flex justify-content-between"><span class="ms-2">${value.segmentName}</span><span class="dropdown-cat dropdown-league"><i class="fa fa-chevron-down"></i></span></div>`);
         var colAction = $("<td class='text-center'></td>").append(`<a class="link-bars me-2 drag-handle" href="javascript:(0)"><i class="fa fa-bars"></i></a>`)
 
         rowChild = $(`<tr id="${value.id}" class="${value.rowClass}"></tr>`)
@@ -285,6 +285,7 @@ window.loadSegmentItems = (id, collection) => {
         mainRow = rowChild;
     });
 
+    expandButton('.sport-row', id);
     $('tr.segment-row .dropdown-league .fa').bind('click', leagueEventHandler);
 }
 
@@ -306,15 +307,18 @@ window.loadLeagueItems = (id, collection) => {
         // user the currentChild as the main row for the next insertion
         mainRow = rowChild;
     });
+
+    expandButton('.segment-row', id);
 }
 
 window.unloadItems = (className, rowClass) => {
     var tableClass = className + ' > tbody';
 
     if (rowClass == '.segment-row') {
-        $('tr.segment-row .dropdown-league .fa').unbind('click', leagueEventHandler);
+        $('tr.segment-row .dropdown-cat .fa').unbind('click', leagueEventHandler);
     }
 
+    /*collapseButton(rowClass);*/
     $(tableClass).children(rowClass).remove();
 }
 
@@ -322,4 +326,26 @@ var leagueEventHandler = function () {
     var row = $(this).closest('tr');
 
     DotNet.invokeMethodAsync('Backoffice.Web', 'OnInvokeSegmentClick', row.attr('id'));
+}
+
+window.expandButton = (selector, id) => {
+    collapseButton(selector);
+
+    var classSelector = `${id} .dropdown-cat .fa`;
+
+    // reset all dropdowns
+    $(classSelector).removeClass('fa-chevron-up');
+    $(classSelector).removeClass('fa-chevron-down');
+
+    $(classSelector).addClass('fa-chevron-up');
+}
+
+window.collapseButton = (selector) => {
+    var classSelector = `${selector} .dropdown-cat .fa`;
+
+    // reset all dropdowns
+    $(classSelector).removeClass('fa-chevron-up');
+    $(classSelector).removeClass('fa-chevron-down');
+
+    $(classSelector).addClass('fa-chevron-down');
 }
