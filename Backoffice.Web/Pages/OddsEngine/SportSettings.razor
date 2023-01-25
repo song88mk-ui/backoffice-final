@@ -11,7 +11,7 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickCallback="OnCancelClickEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyClickCallback="OnCopyClickEvent" IsPreload="IsPreload" />
+    <Filter OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickCallback="OnCancelClickEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyClickCallback="OnCopyClickEvent" OnViewLogsCallback="OnViewLogsClickEvent" IsPreload="IsPreload" />
 </div>
 
 @if (!string.IsNullOrEmpty(AlertMessage))
@@ -70,7 +70,7 @@
                                 <td>
                                     <div class="d-flex justify-content-between">
                                         <span>@sport.SportName</span>
-                                        <span class="dropdown-segment @(IsUpdate ? "" : "disabled")">
+                                        <span class="dropdown-cat dropdown-segment @(IsUpdate ? "" : "disabled")">
                                             <i class="fa fa-chevron-down" @onclick="() => OnSportClickEvent(sport)"></i>
                                             @*<i class="fa @(sport.IsOpen ? "fa-chevron-up" : "fa-chevron-down")" @onclick="() => OnSportClickEvent(sport)"></i>*@
                                         </span>

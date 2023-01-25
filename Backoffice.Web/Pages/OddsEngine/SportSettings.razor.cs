@@ -105,6 +105,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             IsUpdate = true;
 
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+
             await InitializeSortTable("> tr.sport-row", ".sport-row");
             await JSRuntime.InvokeVoidAsync("enableSort", $".{TableClass}");
         }
@@ -176,6 +179,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             IsUpdate = false;
 
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+
             await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
         }
 
@@ -232,12 +238,13 @@ namespace Backoffice.Web.Pages.OddsEngine
             var parameters = new ModalParameters();
 
             parameters.Add("ClientCode", ClientCode);
+
             parameters.Add("DialogStyle", "max-width: 1300px !important;");
             parameters.Add("ModalClass", "show logs-modal");
 
             var options = new ModalOptions();
 
-            //ModalService.Open<ViewLogsModalBody>("View Logs", parameters, options);
+            ModalService.Open<ViewLogsModal>("View Logs", parameters, options);
         }
 
         public async Task OnActiveHeaderChangedEvent(ChangeEventArgs e)
@@ -255,9 +262,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnSportClickEvent(ClientSportsSettingsModel.Sport model)
         {
-            if (!IsUpdate)
-                return;
-
             await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
             await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
 
@@ -269,31 +273,61 @@ namespace Backoffice.Web.Pages.OddsEngine
                 sport.IsOpen = false;
             }
 
-            await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
-
-            if (model.IsOpen)
+            if (IsUpdate)
             {
-                model.IsOpen = false;
+                await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
 
-                await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
-                await InitializeSortTable("> tr.sport-row", ".sport-row");
+                if (model.IsOpen)
+                {
+                    model.IsOpen = false;
+
+                    await JSRuntime.InvokeVoidAsync("collapseButton", ".sport-row");
+                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
+
+                    await InitializeSortTable("> tr.sport-row", ".sport-row");
+                }
+                else
+                {
+                    model.IsOpen = true;
+
+                    // fetch the records on ModifiedClientSportsSettingsModel since this is the record that's being modified
+                    var modSport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
+                    var segments = modSport.Segments.Select((s, index) => new
+                    {
+                        Id = $"segment-{s.SportId}-{s.SegmentId}",
+                        SegmentName = s.SegmentName,
+                        SortOrder = s.SortOrder,
+                        RowClass = "segment-row"
+                    }).ToList();
+
+                    await JSRuntime.InvokeVoidAsync("loadSegmentItems", $"#sport-{model.SportId}", segments);
+                    await InitializeSortTable("> tr.segment-row", ".segment-row");
+                }
             }
             else
             {
-                model.IsOpen = true;
-
-                // fetch the records on ModifiedClientSportsSettingsModel since this is the record that's being modified
-                var modSport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
-                var segments = modSport.Segments.Select((s, index) => new
+                if (model.IsOpen)
                 {
-                    Id = $"segment-{s.SportId}-{s.SegmentId}",
-                    SegmentName = s.SegmentName,
-                    SortOrder = s.SortOrder,
-                    RowClass = "segment-row"
-                }).ToList();
+                    model.IsOpen = false;
 
-                await JSRuntime.InvokeVoidAsync("loadSegmentItems", $"#sport-{model.SportId}", segments);
-                await InitializeSortTable("> tr.segment-row", ".segment-row");
+                    await JSRuntime.InvokeVoidAsync("collapseButton", ".sport-row");
+                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
+                }
+                else
+                {
+                    model.IsOpen = true;
+
+                    var modSport = ClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
+                    var segments = modSport.Segments.Select((s, index) => new
+                    {
+                        Id = $"segment-{s.SportId}-{s.SegmentId}",
+                        SegmentName = s.SegmentName,
+                        SortOrder = s.SortOrder,
+                        RowClass = "segment-row"
+                    }).ToList();
+
+                    await JSRuntime.InvokeVoidAsync("loadSegmentItems", $"#sport-{model.SportId}", segments);
+                }
             }
         }
 
@@ -305,9 +339,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnSegmentClickEvent(int sportId, int segmentId)
         {
-            if (!IsUpdate)
-                return;
-
             await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
 
             var sport = ClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == sportId);
@@ -321,34 +352,67 @@ namespace Backoffice.Web.Pages.OddsEngine
                 segment.IsOpen = false;
             }
 
-            await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
-
-            if (model.IsOpen)
+            if (IsUpdate)
             {
-                model.IsOpen = false;
+                await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
 
-                await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
-                await InitializeSortTable("> tr.segment-row", ".segment-row");
+                if (model.IsOpen)
+                {
+                    model.IsOpen = false;
+
+                    await JSRuntime.InvokeVoidAsync("collapseButton", ".segment-row");
+                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+
+                    await InitializeSortTable("> tr.segment-row", ".segment-row");
+                }
+                else
+                {
+                    model.IsOpen = true;
+
+                    // fetch the records on ModifiedClientSportsSettingsModel since this is the record that's being modified
+                    var modSport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
+                    var modSegment = modSport.Segments.FirstOrDefault(c => c.SegmentId == model.SegmentId);
+
+                    var leagues = modSegment.Leagues.Select((s, index) => new
+                    {
+                        Id = $"league-{s.SportId}-{s.SegmentId}-{s.LeagueId}",
+                        LeagueName = s.LeagueName,
+                        SortOrder = s.SortOrder,
+                        RowClass = "league-row"
+                    }).ToList();
+
+                    await JSRuntime.InvokeVoidAsync("loadLeagueItems", $"#segment-{model.SportId}-{model.SegmentId}", leagues);
+                    await InitializeSortTable("> tr.league-row", ".league-row");
+                }
             }
             else
             {
-                model.IsOpen = true;
-
-                // fetch the records on ModifiedClientSportsSettingsModel since this is the record that's being modified
-                var modSport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
-                var modSegment = modSport.Segments.FirstOrDefault(c => c.SegmentId == model.SegmentId);
-
-                var leagues = modSegment.Leagues.Select((s, index) => new
+                if (model.IsOpen)
                 {
-                    Id = $"league-{s.SportId}-{s.SegmentId}-{s.LeagueId}",
-                    LeagueName = s.LeagueName,
-                    SortOrder = s.SortOrder,
-                    RowClass = "league-row"
-                }).ToList();
+                    model.IsOpen = false;
 
-                await JSRuntime.InvokeVoidAsync("loadLeagueItems", $"#segment-{model.SportId}-{model.SegmentId}", leagues);
-                await InitializeSortTable("> tr.league-row", ".league-row");
+                    await JSRuntime.InvokeVoidAsync("collapseButton", ".segment-row");
+                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+                }
+                else
+                {
+                    model.IsOpen = true;
+
+                    var modSport = ClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
+                    var modSegment = modSport.Segments.FirstOrDefault(c => c.SegmentId == model.SegmentId);
+
+                    var leagues = modSegment.Leagues.Select((s, index) => new
+                    {
+                        Id = $"league-{s.SportId}-{s.SegmentId}-{s.LeagueId}",
+                        LeagueName = s.LeagueName,
+                        SortOrder = s.SortOrder,
+                        RowClass = "league-row"
+                    }).ToList();
+
+                    await JSRuntime.InvokeVoidAsync("loadLeagueItems", $"#segment-{model.SportId}-{model.SegmentId}", leagues);
+                }
             }
+            
         }
 
         public async Task OnUpdateSortOrder(string id, int index)

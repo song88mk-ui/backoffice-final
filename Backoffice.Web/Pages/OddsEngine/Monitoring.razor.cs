@@ -23,7 +23,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Parameter] public string SportId { get; set; }
         [Parameter] public string SegmentId { get; set; }
         [Parameter] public string LeagueId { get; set; }
+
         private HubConnection HubConnection { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
 
@@ -31,6 +33,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public ClientModel ClientModel { get; set; }
         public List<FixtureMarketModel> FixtureMarkets { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
+
+        public bool IsPreloader { get; set; }
 
         #endregion
 
@@ -67,6 +71,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                         clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientModel.Client>()
                 };
             }
+
+            IsPreloader = true;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -116,6 +122,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnInitEvent()
         {
+            IsPreloader = true;
+
             // if user selected a new sport OnInitEvent will be triggered by MonitoringCallback
             if (SelectedSport.SportId != MonitoringCallbackModel.SportId)
             {
@@ -132,6 +140,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 MarketTemplateId = MonitoringCallbackModel.SelectedMarketTemplateId,
                 SearchText = MonitoringCallbackModel.SearchText,
             });
+
+            IsPreloader = false;
         }
 
         public async Task MonitoringCallback(MonitoringCallbackModel model)

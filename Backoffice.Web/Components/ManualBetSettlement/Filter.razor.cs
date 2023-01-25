@@ -24,6 +24,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         {
             ModalParameters parameters = new ModalParameters();
             parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("DialogStyle", "max-width: 80rem");
 
             ModalOptions options = new ModalOptions();
 

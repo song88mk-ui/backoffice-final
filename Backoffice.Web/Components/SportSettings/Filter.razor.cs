@@ -18,6 +18,7 @@ namespace Backoffice.Web.Components.SportSettings
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCopyClickCallback { get; set; }
+        [Parameter] public EventCallback OnViewLogsCallback { get; set; }
         [Parameter] public bool IsPreload { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
@@ -103,13 +104,16 @@ namespace Backoffice.Web.Components.SportSettings
             await OnCopyClickCallback.InvokeAsync();
         }
 
-        //public async Task OnViewLogsClickEvent()
-        //{
-        //    if (string.IsNullOrEmpty(ClientSportOrderFilter.ClientCode))
-        //        return;
+        public async Task OnViewLogsClickEvent()
+        {
+            if (IsPreload)
+                return;
 
-        //    await OnViewLogsCallback.InvokeAsync();
-        //}
+            if (string.IsNullOrEmpty(SelectedClientCode))
+                return;
+
+            await OnViewLogsCallback.InvokeAsync();
+        }
 
         public void Dispose()
         {

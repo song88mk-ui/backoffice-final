@@ -20,17 +20,16 @@
 
     </td>
     <td>
-        <div class="d-flex px-2">
+        <div class="d-flex justify-content-between px-2">
             <a href="@($"odds-engine/monitoring-details/{Market.ProviderFixtureId}")" class="fixture-details text-decoration-none">
                 <span class="fw-bold">@Market.HomeName.ToUpper()</span>
                 <br />
                 <span>@Market.AwayName.ToUpper()</span>
-
-                @if (Market.FixtureStatusId == 1)
-                {
-                    <span>@Market.Score</span>
-                }
             </a>
+            @if (Market.FixtureStatusId == 1)
+            {
+                <span class="score-info ms-5">@Market.Score</span>
+            }
         </div>
     </td>
 

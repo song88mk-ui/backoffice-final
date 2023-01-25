@@ -18,7 +18,7 @@
     </div>
     <div class="button-container d-flex flex-row-reverse align-items-end">
         <div class="me-2">
-            <a href="javascript:void(0)" class="btn btn-logs px-3 @(IsPreload ? "disabled" : "")">
+            <a href="javascript:void(0)" class="btn btn-logs px-3 @(IsPreload ? "disabled" : "")" @onclick="OnViewLogsClickEvent">
                 <i class="fa fa-list"></i>
                 Logs
             </a>

@@ -16,6 +16,11 @@
     color: white;
 }
 
+.modal-body {
+    max-height: 30rem;
+    overflow-y: auto;
+}
+
 .modal-btn {
     color: white;
     border-radius: 2px;
@@ -27,4 +32,8 @@
 
 .modal-settle-bets {
     background: transparent linear-gradient(268deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+textarea.form-control {
+    height:10rem;
 }
