@@ -30,6 +30,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public MonitoringCallbackModel MonitoringCallbackModel { get; set; }
         public ClientModel ClientModel { get; set; }
         public List<FixtureMarketModel> FixtureMarkets { get; set; }
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
 
         #endregion
 
@@ -46,6 +47,15 @@ namespace Backoffice.Web.Pages.OddsEngine
             FixtureMarkets = null;
             MonitoringCallbackModel = new MonitoringCallbackModel();
             ClientModel = new ClientModel();
+
+            Breadcrumbs = new List<BreadcrumbModel>();
+
+            Breadcrumbs.Add(new BreadcrumbModel
+            {
+                Name = "Monitoring",
+                Url = "odds-engine/monitoring",
+                IsCurrentPage = true
+            });
 
             var clients = (await BackOfficeService.GetClients()).Result;
 

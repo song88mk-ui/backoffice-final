@@ -9,6 +9,9 @@
 @page "/odds-engine/monitoring/{SportId}/{SegmentId}/{LeagueId}"
 
 <div class="col-md-12">
+    <Breadcrumb Breadcrumbs="Breadcrumbs" />
+</div>
+<div class="col-md-12">
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
@@ -18,31 +21,33 @@
     }
 </div>
 <div class="col-md-12">
-    <table class="table table-hover table-bordered mt-4">
-        <thead class="table-head">
-            <tr>
-                <th class="th-start-date py-3"></th>
-                <th class="th-fixture-name py-3"></th>
-                <th>BTR CTRL</th>
-                @foreach (var client in ClientModel.Clients)
+    <div class="table-container mt-4">
+        <table class="table table-hover table-bordered">
+            <thead class="table-head">
+                <tr>
+                    <th class="th-start-date py-3"></th>
+                    <th class="th-fixture-name py-3"></th>
+                    <th>BTR CTRL</th>
+                    @foreach (var client in ClientModel.Clients)
+                    {
+                        <th>@client.ClientName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (FixtureMarkets != null && FixtureMarkets.Any())
                 {
-                    <th>@client.ClientName</th>
+                    foreach (var market in FixtureMarkets)
+                    {
+                        <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@MonitoringCallbackModel.SelectedMarketTemplateId" Market="market" />
+                    }
                 }
-            </tr>
-        </thead>
-        <tbody>
-            @if (FixtureMarkets != null && FixtureMarkets.Any())
-            {
-                foreach (var market in FixtureMarkets)
-                {
-                    <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@MonitoringCallbackModel.SelectedMarketTemplateId" Market="market" />
-                }
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 
-    @if (FixtureMarkets != null && !FixtureMarkets.Any())
-    {
-        <NoRecordFound />
-    }
+        @if (FixtureMarkets != null && !FixtureMarkets.Any())
+        {
+            <NoRecordFound />
+        }
+    </div>
 </div>
