@@ -22,7 +22,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
-        protected bool IsPreLoader { get; set; } = false;        
+        protected bool IsPreLoader { get; set; } = false;
         public Page CurrentPage { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
         public List<string> UserClients { get; set; }
@@ -106,7 +106,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                             Activity = x.Activity,
                             From = !string.IsNullOrEmpty(x.From) && x.From != "-" ? JsonConvert.DeserializeObject<PriceBoostLogModel>(x.From) : new PriceBoostLogModel(),
                             To = !string.IsNullOrEmpty(x.To) && x.To != "-" ? JsonConvert.DeserializeObject<PriceBoostLogModel>(x.To) : new PriceBoostLogModel(),
-                            UserId = WithAdministrationPagesAccess ? "Administrator" : x.UserId,
+                            UserId = x.UserId,
+                            Username = WithAdministrationPagesAccess ? "Administrator" : x.Username,
                             TimeStamp = x.TimeStamp
                         }).ToList();
 
@@ -141,7 +142,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                                 Activity = activity,
                                 From = activityLog.From,
                                 To = activityLog.To,
-                                UserId = WithAdministrationPagesAccess ? "Administrator" : activityLog.UserId ,
+                                UserId = activityLog.UserId,
+                                Username = WithAdministrationPagesAccess ? "Administrator" : activityLog.Username,
                                 TimeStamp = activityLog.TimeStamp
                             });
                         }

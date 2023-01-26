@@ -43,6 +43,7 @@ namespace Backoffice.Utility.Repository
                             To = message.To,
                             Activity = message.Activity,
                             UserId = message.UserId,
+                            Username = message.Username,
                             TimeStamp = timeStamp
                         };
 
@@ -82,6 +83,7 @@ namespace Backoffice.Utility.Repository
                         To = item.To,
                         Activity = item.Activity,
                         UserId = item.UserId,
+                        Username = item.Username,
                         TimeStamp = timeStamp
                     });
                 };

@@ -128,6 +128,7 @@ namespace Backoffice.Web.Components.MessageSettlement
                                 MarketTemplateId = item.MarketTemplateId
                             }),
                             UserId = UserModel.Id,
+                            Username = UserModel.UserName,
                             TimeStamp = DateTime.UtcNow
                         };
 
@@ -179,6 +180,7 @@ namespace Backoffice.Web.Components.MessageSettlement
                                     MarketTemplateId = item.MarketTemplateId
                                 }),
                                 UserId = UserModel.Id,
+                                Username = UserModel.UserName,
                                 TimeStamp = DateTime.UtcNow
                             };
 

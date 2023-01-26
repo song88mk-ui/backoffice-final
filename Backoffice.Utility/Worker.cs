@@ -1,4 +1,3 @@
-using Backoffice.Shared.Models;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Utility.Repository;
@@ -6,8 +5,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client.Events;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -34,14 +31,7 @@ namespace Backoffice.Utility
 
         public override Task StopAsync(CancellationToken cancellationToken)
         {
-            try
-            {
-                _messageBroker.Dispose();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            _messageBroker.Dispose();
 
             return base.StopAsync(cancellationToken);
         }

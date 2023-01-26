@@ -51,6 +51,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     From = x.From != "-" ? JsonConvert.DeserializeObject<Models.PriceBoostLogModel>(x.From) : new Models.PriceBoostLogModel(),
                     To = x.To != "-" ? JsonConvert.DeserializeObject<Models.PriceBoostLogModel>(x.To) : new Models.PriceBoostLogModel(),
                     UserId = x.UserId,
+                    Username = x.Username,
                     TimeStamp = x.TimeStamp
                 }).Where(x => (x.From.MarketSpecifier == PriceBoost.MarketSpecifier || x.To.MarketSpecifier == PriceBoost.MarketSpecifier) &&
                 (x.From.SelectionTemplateId == PriceBoost.SelectionTemplateId || x.To.SelectionTemplateId == PriceBoost.SelectionTemplateId))

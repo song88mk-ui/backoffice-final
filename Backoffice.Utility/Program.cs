@@ -10,9 +10,7 @@ namespace Backoffice.Utility
     {
         public static void Main(string[] args)
         {
-            Console.Title = "Backoffce Utility Service";
             CreateHostBuilder(args).Build().Run();
-            Console.Title = "Backoffce Utility Service";
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -22,6 +20,6 @@ namespace Backoffice.Utility
                     services.AddSingleton<IBackofficeRepository, BackofficeRepository>();
                     services.AddSingleton<IMessageBroker, MessageBroker>();
                     services.AddHostedService<Worker>();
-                });
+                }).UseWindowsService();
     }
 }

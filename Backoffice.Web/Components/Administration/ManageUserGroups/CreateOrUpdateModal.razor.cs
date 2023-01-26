@@ -133,7 +133,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 if (response.Result)
                 {
                     UserGroup.Claims = claims;
-                    //activity log
+
                     await BackOfficeService.AddActivityLog(new ActivityLogModel
                     {
                         Page = Page.Admin_ManageUserGroups.ToString().Replace("_", "."),
@@ -141,7 +141,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                         Activity = !IsEdit ? Activity.Create.ToString() : Activity.Update.ToString(),
                         From = !IsEdit ? "-" : JsonSerializer.Serialize(OldUserGroup),
                         To = JsonSerializer.Serialize(UserGroup),
-                        UserId = UserModel.Id
+                        UserId = UserModel.Id,
+                        Username = UserModel.UserName
                     });
 
                     if (IsEdit)

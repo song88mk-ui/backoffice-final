@@ -108,7 +108,7 @@ namespace Backoffice.Web.Pages.Administration
                     Sports = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).SportName,
                     MessagesSettled = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).FixtureName,
                     Product = GetProducts().FirstOrDefault(y => y.Value == JsonSerializer.Deserialize<MessageSettlementTo>(x.To).ProductId).Name,
-                    SettledBy = x.UserId,
+                    SettledBy = x.Username,
                     DateSettled = x.TimeStamp,
                     Reason = JsonSerializer.Deserialize<MessageSettlementTo>(x.To).Reason
                 }).ToList();

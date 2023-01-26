@@ -66,6 +66,7 @@ namespace Backoffice.API.Repositories
                         To = request.To,
                         Activity = request.Activity,
                         UserId = request.UserId,
+                        Username = request.Username,
                         TimeStamp = request.TimeStamp
                     };
 
@@ -119,6 +120,7 @@ namespace Backoffice.API.Repositories
                         From = s.From,
                         To = s.To,
                         UserId = s.UserId,
+                        Username = s.Username,
                         TimeStamp = s.TimeStamp,
                     }).Where(x => request.UserClients.Contains(x.Payload.Split('.')[0], StringComparer.OrdinalIgnoreCase)).ToList();
 
@@ -179,6 +181,7 @@ namespace Backoffice.API.Repositories
                         From = s.From,
                         To = s.To,
                         UserId = s.UserId,
+                        Username = s.Username,
                         TimeStamp = s.TimeStamp,
                     }).ToList();
 
