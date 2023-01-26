@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -18,10 +19,9 @@ namespace Backoffice.API.Repositories
         {
             _configuration = configuration;
             _httpClient = httpClient;
-            _httpClient.BaseAddress = new Uri(_configuration["API:RabbitMQAPI"]);
         }
 
-        public async Task<BaseResponse<MessageResponse>> Publish(MessageRequest request)
+        public async Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region)
         {
             try
             {
@@ -55,5 +55,25 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+
+        #region Utilities
+        private HttpClient GetHttpClient(string region)
+        {
+            var uri = GetBaseUrl(region);
+            if (uri.LastOrDefault() != '/')
+                uri += "/";
+
+            var client = _httpClient;
+
+            return client;
+        }
+        private string GetBaseUrl(string region)
+        {
+            if (region.ToUpper() == "SA")
+                return _configuration[$"API:RabbitMqApi:SA:Uri"];
+            else
+                return _configuration[$"API:RabbitMqApi:HK:Uri"];
+        }
+        #endregion
     }
 }

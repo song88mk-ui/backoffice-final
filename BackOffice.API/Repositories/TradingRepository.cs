@@ -1424,7 +1424,7 @@ namespace Backoffice.API.Repositories
                         MessageType = "LogActivityList",
                         RoutingKey = $"r.bo.util.logs",
                         Payload = JsonSerializer.Serialize(activityLogList)
-                    });
+                    }, region);
 
                     return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 }

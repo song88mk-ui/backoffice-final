@@ -46,6 +46,7 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Methods - Activity Logs
+        // Note: Will Remove
         public async Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request)
         {
             try

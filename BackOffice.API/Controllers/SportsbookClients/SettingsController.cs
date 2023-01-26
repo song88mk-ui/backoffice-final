@@ -190,6 +190,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         #endregion
 
         #region User Activity Logs
+        // Note: will remove
         [HttpPost("activitylog")]
         public async Task<IActionResult> ActivityLog([FromBody] ActivityLogModel request)
         {

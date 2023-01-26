@@ -57,7 +57,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
         }
         public async Task ProcessActivityLog(OnActivityLogListMessage message)
@@ -101,7 +101,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
         }
     }
