@@ -39,6 +39,16 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
             try
             {
                 Alerts.Clear();
+                if (UserGroup.UserGroupName.ToLower().Equals("default"))
+                {
+                    Alerts.Add(new AlertModel
+                    {
+                        AlertStatus = "Error",
+                        AltertMessage = "Cannot delete this user group",
+                        Opacity = 1.0m
+                    });
+                    return;
+                }
 
                 var response = (await AuthenticationService.DeleteUserGroup(new Backoffice.Shared.Models.Requests.UserGroupRequest
                 {

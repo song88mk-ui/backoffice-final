@@ -45,11 +45,6 @@
     width: 2.3em;
 }
 
-::deep .form-check-input:checked {
-    background-color: #E43F2C;
-    border-color: #E12E22;
-}
-
 ::deep .header-information {
     font-size: 13px;
     width: 60%;

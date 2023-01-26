@@ -660,19 +660,19 @@ namespace Backoffice.Web.Services
                         if (check == null)
                         {
                             if (claim.ClaimValue == "1")
-                                result = result + $"{claim.ClaimType} - Has Access|";
+                                result = result + $"{claim.ClaimType} - <div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}\" disabled checked></div>|";
                             else if (claim.ClaimValue == "2")
-                                result = result + $"{claim.ClaimType} - ReadOnly Access|";
+                                result = result + $"{claim.ClaimType} ReadOnly - <div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>|";
 
                         }
                         else if (claim.ClaimValue != check.ClaimValue)
                         {
                             if (claim.ClaimValue == "1")
-                                result = result + $"{claim.ClaimType} - Has Access|";
+                                result = result + $"{claim.ClaimType} -  <div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>|";
                             else if (claim.ClaimValue == "2")
-                                result = result + $"{claim.ClaimType} - ReadOnly Access|";
+                                result = result + $"{claim.ClaimType} ReadOnly - <div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>|";
                             else
-                                result = result + $"{claim.ClaimType} - No Access|";
+                                result = result + $"{claim.ClaimType} - <div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled></div>|";
                         }
                     }
                 }
