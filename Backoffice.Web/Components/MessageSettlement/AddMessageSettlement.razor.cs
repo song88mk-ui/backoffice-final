@@ -46,9 +46,6 @@ namespace Backoffice.Web.Components.MessageSettlement
         {
             IsPreloader = true;
             AddMessageSettlementModel = new AddMessageSettlementModel();
-            divClass = "bg-success";
-            divStyles = "display: block";
-            message = $"Done: Request to resend all stateful-messages (BetSettlement, RollbackBetSettlement, BetCancel, UndoBetCancel) for a sport event.";
         }
 
         public async Task<AddMessageSettlementModel> GetBetDetails()
@@ -201,11 +198,11 @@ namespace Backoffice.Web.Components.MessageSettlement
                     var response = await TradingService.AddManualMessageSettlement(messageSettlementRequest);
 
                     divClass = response.Result.Contains("NOTE") ? "bg-warning" : "bg-success";
-                    divStyles = "display: inline";
+                    divStyles = "display: block";
                     if (!response.Result.Contains("NOTE"))
                         message = $"Done: Request to resend all stateful-messages (BetSettlement, RollbackBetSettlement, BetCancel, UndoBetCancel) for a sport event. {response.Result}";
                     else
-                        message = response.Result;
+                        message = response.Result.Replace("<br/>","");
 
                     await InvokeAsync(StateHasChanged);
                     await Modal.OnSaveClickCallback.InvokeAsync();
