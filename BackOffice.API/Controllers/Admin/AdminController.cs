@@ -30,8 +30,7 @@ namespace Backoffice.API.Controllers.Admin
         [HttpPost("bet/details")]
         public async Task<IActionResult> GetManualBetDetails([FromBody] ManualBetDetailsRequest request)
         {
-            //var region = await _backofficeRepository.GetClientRegion((int)request.ClientIdRef);
-            var region = "";
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _platformRepository.GetManualBetDetails(request, region);
 
@@ -47,10 +46,25 @@ namespace Backoffice.API.Controllers.Admin
         [HttpPost("bet/manualsettlement")]
         public async Task<IActionResult> ManualSettlement([FromBody] ManualBetSettlementRequest request)
         {
-            //var region = await _backofficeRepository.GetClientRegion((int)request.ClientIdRef);
-            var region = "";
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _platformRepository.ManualSettlement(request, region);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("bet/reports/manualbet/history")]
+        public async Task<IActionResult> GetManualBetHistory([FromBody] ManualBetDetailHistoryRequest request)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _backofficeRepository.GetManualBetSettlementHistory(request, region);
 
             switch (result.StatusCode)
             {

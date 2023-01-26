@@ -29,6 +29,7 @@ namespace Backoffice.Web.Services
 
             _httpClient.BaseAddress = new Uri(_configuration["API:Backoffice:Uri"]);
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:Backoffice:Security:APIKey"]);
+            _httpClient.DefaultRequestHeaders.Add("x-region", _configuration["API:Region"]);
         }
         #endregion
 
@@ -934,6 +935,41 @@ namespace Backoffice.Web.Services
             catch (Exception ex)
             {
                 return new BaseResponse<ManualBetSettlementResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ManualBetHistoryResponse>> GetManualBetSettlmentHistory(ManualBetDetailHistoryRequest request)
+        {
+            try
+            {
+                var userToken = await _authenticationService.AuthenticateToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
+                var response = await _httpClient.PostAsync($"api/admin/bet/reports/manualbet/history", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ManualBetHistoryResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ManualBetHistoryResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<ManualBetHistoryResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ManualBetHistoryResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

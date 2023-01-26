@@ -22,14 +22,17 @@
     padding: 0rem 1rem;
 }
 
-.form-check-input:checked {
+::deep .form-check-input:checked {
     background-color: #E43F2C;
+    border-color: #E12E22;
 }
+
 
 .btn-enable-all {
     color: white;
     background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
+
 
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */

@@ -1,4 +1,5 @@
-﻿<div class="row mb-3">
+﻿@using BlazorDateRangePicker
+<div class="row mb-3">
     <div class="col-md-12">
         <div class="content-filter mx-3 d-flex justify-content-between">
             <div class="add-reference-container d-flex">
@@ -21,59 +22,159 @@
     </div>
 </div>
 
-@if(ShowFilter)
+@if (ShowFilter)
 {
     <div class="row mx-1 mb-2">
         <div class="col-2">
-            <select class="form-select">
-                <option value="0">Clients</option>
-            </select>
+            <div class="dropdown">
+                <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (FilterModel.Clients.Any())
+                    {
+                        if (FilterModel.Clients.Count - 1 == FilterModel.SelectedClientCount)
+                        {
+                            <span>All Clients (@FilterModel.SelectedClientCount)</span>
+                        }
+                        else
+                        {
+                            <span>@(FilterModel.SelectedClientCount == 1 ? FilterModel.SelectedClientName : $"Clients ({FilterModel.SelectedClientCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No Clients Available</span>
+                    }
+                </button>
+                @if (FilterModel.Clients.Any())
+                {
+                    <SelectWithCheckbox Items="FilterModel.Clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="client-dropdown" />
+                }
+            </div>
         </div>
 
         <div class="col-2">
-            <select class="form-select">
-                <option value="0">Sports</option>
-            </select>
+            <div class="dropdown">
+                <button class="btn form-select dropdown-toggle" type="button" id="sport-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (FilterModel.Sports.Any())
+                    {
+                        if (FilterModel.Sports.Count - 1 == FilterModel.SelectedSportCount)
+                        {
+                            <span>All Sports (@FilterModel.SelectedSportCount)</span>
+                        }
+                        else
+                        {
+                            <span>@(FilterModel.SelectedSportCount == 1 ? FilterModel.SelectedSportName : $"Sports ({FilterModel.SelectedSportCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No sports Available</span>
+                    }
+                </button>
+                @if (FilterModel.Sports.Any())
+                {
+                    <SelectWithCheckbox Items="FilterModel.Sports" OnCheckboxCallback="OnSportCheckboxClickEvent" AriaLabel="sport-dropdown" />
+                }
+            </div>
         </div>
 
         <div class="col-2">
-            <select class="form-select">
-                <option value="0">Currencies</option>
-            </select>
+            <div class="dropdown">
+                <button class="btn form-select dropdown-toggle" type="button" id="currency-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (FilterModel.Currencies.Any())
+                    {
+                        if (FilterModel.Currencies.Count - 1 == FilterModel.SelectedCurrencyCount)
+                        {
+                            <span>All Currencies (@FilterModel.SelectedCurrencyCount)</span>
+                        }
+                        else
+                        {
+                            <span>@(FilterModel.SelectedCurrencyCount == 1 ? FilterModel.SelectedCurrencyName : $"Currencies ({FilterModel.SelectedCurrencyCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No Currencies Available</span>
+                    }
+                </button>
+                @if (FilterModel.Sports.Any())
+                {
+                    <SelectWithCheckbox Items="FilterModel.Currencies" OnCheckboxCallback="OnCurrencyCheckboxClickEvent" AriaLabel="currency-dropdown-dropdown" />
+                }
+            </div>
         </div>
 
         <div class="col-2">
-            <select class="form-select">
-                <option value="0">From Status</option>
-            </select>
+            <div class="dropdown">
+                <button class="btn form-select dropdown-toggle" type="button" id="fromstatus-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (FilterModel.FromStatuses.Any())
+                    {
+                        if (FilterModel.FromStatuses.Count - 1 == FilterModel.FromSelectedStatusCount)
+                        {
+                            <span>All From Status (@FilterModel.FromSelectedStatusCount)</span>
+                        }
+                        else
+                        {
+                            <span>@(FilterModel.FromSelectedStatusCount == 1 ? FilterModel.FromSelectedStatusName : $"All From Status ({FilterModel.FromSelectedStatusCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No From Status Available</span>
+                    }
+                </button>
+                @if (FilterModel.FromStatuses.Any())
+                {
+                    <SelectWithCheckbox Items="FilterModel.FromStatuses" OnCheckboxCallback="OnFromStatusCheckboxClickEvent" AriaLabel="fromstatus-dropdown" />
+                }
+            </div>
         </div>
 
         <div class="col-2">
-            <select class="form-select">
-                <option value="0">To Status</option>
-            </select>
+            <div class="dropdown">
+                <button class="btn form-select dropdown-toggle" type="button" id="tostatus-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (FilterModel.ToStatuses.Any())
+                    {
+                        if (FilterModel.ToStatuses.Count - 1 == FilterModel.ToSelectedStatusCount)
+                        {
+                            <span>All To Status (@FilterModel.ToSelectedStatusCount)</span>
+                        }
+                        else
+                        {
+                            <span>@(FilterModel.ToSelectedStatusCount == 1 ? FilterModel.ToSelectedStatusName : $"All To Status ({FilterModel.ToSelectedStatusCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No To Status Available</span>
+                    }
+                </button>
+                @if (FilterModel.ToStatuses.Any())
+                {
+                    <SelectWithCheckbox Items="FilterModel.ToStatuses" OnCheckboxCallback="OnToStatusCheckboxClickEvent" AriaLabel="tostatus-dropdown" />
+                }
+            </div>
         </div>
     </div>
 
     <div class="row mx-1">
         <div class="col-2">
-            <input type="text" placeholder="Bet/Reference ID" class="form-control" />
+            <input type="text" placeholder="Bet/Reference ID" class="form-control" @bind="FilterModel.BetId"/>
         </div>
 
         <div class="col-2">
-            <input type="text" placeholder="Date Range" class="form-control" />
+            <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="FilterModel.DateFrom" EndDate="FilterModel.DateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDateRangeChangedEvent"></DateRangePicker>
         </div>
 
         <div class="col-2">
-            <input type="text" placeholder="Member Name" class="form-control" />
+            <input type="text" placeholder="Member Name" class="form-control" @bind="FilterModel.MemberName"/>
         </div>
 
         <div class="col-2">
-            <input type="text" placeholder="Settled By" class="form-control" />
+            <input type="text" placeholder="Settled By" class="form-control" @bind="FilterModel.SettledBy"/>
         </div>
 
         <div class="col-2">
-            <button type="button" class="btn filter-btn-search">Search</button>
+            <button type="button" class="btn filter-btn-search" @onclick="OnSearchButtonClickedEvent">Search</button>
         </div>
     </div>
-}
+} 

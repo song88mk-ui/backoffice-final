@@ -9,3 +9,8 @@ thead {
     color: white;
     background: #354156 0% 0% no-repeat padding-box;
 }
+
+::deep .form-check-input:checked {
+    background-color: #E43F2C;
+    border-color: #E12E22;
+}

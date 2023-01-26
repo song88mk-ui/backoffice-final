@@ -9,7 +9,7 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter />
+                <Filter @bind-FilterModel="FilterModel" OnSearchButtonCallback="OnSearchButtonClicked" />
             </div>
             <div class="col-md-12">
                 <div class="content mx-3">
