@@ -1,0 +1,18 @@
+﻿<div class="modal-body">
+    <div class="d-flex flex-column justify-content-center p-5">
+        <div class="text-center">
+            <img src="icons/svg/warning-icon.svg" />
+        </div>
+        <div class="text-center">
+            You are about to delete the bet with
+            <br />
+            reference ID <span class="fw-bold">@Bet.Bet.BetId.ToString().ToUpper()</span>
+            <br />
+            Please be certain as this cannot be undone
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn modal-btn modal-cancel" type="button" @onclick="OnModalCancel">Cancel</button>
+    <button class="btn modal-btn modal-delete" type="button" @onclick="OnModalDelete">Delete</button>
+</div>

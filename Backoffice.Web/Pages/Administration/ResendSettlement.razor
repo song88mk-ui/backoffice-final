@@ -18,75 +18,60 @@
                                 <th class="th-status py-3">Status</th>
                                 <th class="th-reason py-3">Reason</th>
                                 <th class="th-action py-3">
-                                    <a href="javascript:void(0);" class="link-add-row">
+                                    <a href="javascript:void(0);" class="link-add-row" @onclick="OnAddRow">
                                         <i class="fa fa-plus-circle"></i>
                                     </a>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>
-                                    <input type="text" class="form-control" value="4FA62488-A950-402D- 6994-08DAF20143E0" />
-                                </td>
-                                <td>
-                                    <div class="information-container">
-                                        <span class="segment-league d-block">ITF Estonia 01A, Women Singles Papadakis,</span>
-                                        <span class="fixture d-block">Lena vs. Cengiz, Berfu</span>
-                                        <span class="start-date d-block">01/12/2023 9:00:00 AM </span>
-                                        <span class="selection-details d-block">Papadakis, Lena x 50 @("@") 5.83(DEC)</span>
-                                        <span class="score d-block">(Bet Result: 0 - 0, Final Score: 0 - 0)</span>
-                                        <span class="status">Lost</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="bet-date d-block">01/12/2023</span>
-                                    <span class="bet-time d-block">8:28:57 AM</span>
-                                </td>
-                                <td>
-                                    Half-Won
-                                </td>
-                                <td>
-                                    <div class="form-floating">
-                                        <textarea class="form-control input-reason">Settled as Half Won</textarea>
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <a href="javascript:void(0);" class="link-delete">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>
-                                    <input type="text" class="form-control" />
-                                </td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <div class="form-floating">
-                                        <textarea class="form-control input-reason"></textarea>
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <a href="javascript:void(0);" class="link-delete">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
+                            @foreach(var item in ResendSettlementModel)
+                            {
+
+                                <tr>
+                                    <td>@(ResendSettlementModel.IndexOf(item) + 1)</td>
+                                    <td>
+                                        <input type="text" class="form-control text-uppercase" @bind="item.Bet.BetId" @oninput="(ChangeEventArgs e) => OnReferenceIdOnChangeEvent(e,ResendSettlementModel.IndexOf(item))" />
+                                    </td>
+                                    <td>
+                                        @((MarkupString) BuildEventDetails(item))
+                                    </td>
+                                    <td>
+                                        @((MarkupString) BuildBetDate(item))
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.Bet.BetStatusName))
+                                        {
+                                            @item.Bet.BetStatusName
+                                        }               
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="form-floating">
+                                            <textarea class="form-control input-reason" placeholder="Reason" @bind="@item.Bet.Reason"></textarea>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn link-delete" @onclick="() => OnDeleteReference(item)" disabled="@(ResendSettlementModel.Count == 1 ? true: false)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="d-flex flex-row-reverse mx-3 pt-4 border-top">
-                    <button type="button" class="btn btn-settlement px-4 py-2">Resend Settlement</button>
-                    <button type="button" class="btn btn-reset me-3 px-4 py-2">Reset</button>
+                    <button type="button" class="btn btn-settlement px-4 py-2" @onclick="OnResendSettlement" disabled="@(BetIds.Count == 0 ? true : false)">Resend Settlement</button>
+                    <button type="button" class="btn btn-reset me-3 px-4 py-2" @onclick="OnResetSettlement">Reset</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<CustomModal OnSaveClickCallback="ResetSettlementEntries"/>

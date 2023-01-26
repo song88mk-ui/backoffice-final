@@ -74,6 +74,38 @@ namespace Backoffice.API.Controllers.Admin
                     return BadRequest(result);
             }
         }
+
+        [HttpPost("bet/resendsettlement/details")]
+        public async Task<IActionResult> GetResendSettlementBetDetails([FromBody] ResendSettlementBetDetailRequest request)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _platformRepository.GetResendSettlementBetDetails(request, region);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("bet/resendsettlement")]
+        public async Task<IActionResult> ResendSettlement([FromBody] ResendSettlementRequest request)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _platformRepository.ResendSettlement(request, region);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         #endregion
     }
 }

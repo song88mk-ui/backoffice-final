@@ -1,0 +1,12 @@
+﻿.modal-btn {
+    border-radius: 2px;
+    color: white;
+}
+
+.modal-cancel {
+    background: #9AA0AB 0% 0% no-repeat padding-box;
+}
+
+.modal-delete {
+    background: transparent linear-gradient(268deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
