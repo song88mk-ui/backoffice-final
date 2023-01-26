@@ -46,3 +46,5 @@ BackOffice.Shared/bin
 /Backoffice.Utility/obj/Release/netcoreapp3.1/Backoffice.Utility.dll
 /Backoffice.Utility/obj/Release/netcoreapp3.1/Backoffice.Utility.csproj.AssemblyReference.cache
 /Backoffice.Utility/Properties/PublishProfiles/FolderProfile.pubxml.user
+/Backoffice.Utility/obj/Debug/netcoreapp3.1/Backoffice.Utility.GeneratedMSBuildEditorConfig.editorconfig
+/Backoffice.Utility/obj/Debug/netcoreapp3.1/Backoffice.Utility.assets.cache
