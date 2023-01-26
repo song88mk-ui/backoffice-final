@@ -79,6 +79,7 @@ namespace Backoffice.Web.Shared
                 });
 
                 Task.WaitAll(tasks.ToArray());
+                StateHasChanged();
             }
             catch (Exception)
             {

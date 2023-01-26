@@ -25,18 +25,19 @@
             {
                 @if (ActivityLogs != null && ActivityLogs.Any())
                 {
-                    <TableContent>
-                        <TableHeaderContent>
-                            <th valign="middle" align="left"><strong>#</strong></th>
-                            <th valign="middle" align="left"><strong>Date</strong></th>
-                            <th valign="middle" align="left"><strong>Client Name</strong></th>
-                            <th valign="middle" align="left"><strong>Activity</strong></th>
-                            <th valign="middle" align="left"><strong>Changed From</strong></th>
-                            <th valign="middle" align="left"><strong>Changed To</strong></th>
-                            <th valign="middle" align="left"><strong>Updated By</strong></th>
-                        </TableHeaderContent>
-
-                        <TableBodyContent>
+                    <table class="table table-bordered mt-3">
+                        <thead>
+                            <tr>
+                                <th valign="middle" align="left"><strong>#</strong></th>
+                                <th valign="middle" align="left"><strong>Date</strong></th>
+                                <th valign="middle" align="left"><strong>Client Name</strong></th>
+                                <th valign="middle" align="left"><strong>Activity</strong></th>
+                                <th valign="middle" align="left"><strong>Changed From</strong></th>
+                                <th valign="middle" align="left"><strong>Changed To</strong></th>
+                                <th valign="middle" align="left"><strong>Updated By</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             @foreach (var log in ActivityLogs)
                             {
                                 int RowCount = (ActivityLogs.IndexOf(log) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
@@ -50,10 +51,10 @@
                                     <td>@log.UserName</td>
                                 </tr>
                             }
-                        </TableBodyContent>
-                    </TableContent>
+                        </tbody>
+                        <Pagination MetaData="MetaData" Spread="2" SelectPageEvent="SelectedPage" PaginationColspan="7" />
+                    </table>
 
-                    <Pagination MetaData="MetaData" Spread="2" SelectPageEvent="SelectedPage" />
                 }
                 else
                 {
