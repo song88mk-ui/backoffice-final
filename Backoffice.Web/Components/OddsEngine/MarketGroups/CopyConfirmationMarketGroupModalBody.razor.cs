@@ -102,7 +102,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     From = JsonSerializer.Serialize(fromData),
                     To = JsonSerializer.Serialize(toData),
                     UserId = UserModel.Id,
-                    Username = UserModel.UserName
+                    UserName = UserModel.UserName,
                 });
 
                 await InvokeAsync(StateHasChanged);

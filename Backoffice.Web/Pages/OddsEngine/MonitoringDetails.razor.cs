@@ -1,6 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
-using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Components.MonitoringDetails;
@@ -18,7 +17,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Inject] public ICommonService CommonService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public ITradingService TradingService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
@@ -29,7 +28,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
 
-        //public MonitoringDetailsCallbackModel CallbackModel { get; set; }
         public MonitoringDetailsModel MonitoringDetailsModel { get; set; }
         public MarketFilterCallbackModel MarketGroupCallback { get; set; }
         public ClientModel ClientModel { get; set; }
@@ -56,7 +54,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             MonitoringDetailsModel = new MonitoringDetailsModel();
             MarketTemplates = new List<MarketNavigationModel>();
             PlayerPropsMarketTemplates = new List<MarketTemplatePlayerPropsResponse>();
-            //CallbackModel = new MonitoringDetailsCallbackModel();
             MarketGroupCallback = new MarketFilterCallbackModel();
             ClientModel = new ClientModel();
             Breadcrumbs = new List<BreadcrumbModel>();
@@ -64,14 +61,21 @@ namespace Backoffice.Web.Pages.OddsEngine
             PageTitle = string.Empty;
             IconClass = string.Empty;
 
-            var clients = (await BackOfficeService.GetClients()).Result;
+            var clients = (await TradingService.GetClientList()).Result;
 
             if (clients != null)
             {
                 ClientModel = new ClientModel
                 {
                     Clients = UserModel.ClientCodes.Any() ?
-                        clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientModel.Client>()
+                        clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()))
+                        .Select(s => new ClientModel.Client
+                        {
+                            ClientCode = s.ClientCode,
+                            ClientName = s.ClientName,
+                            Region = Configuration["Region"]
+                        })
+                        .ToList() : new List<ClientModel.Client>()
                 };
             }
         }

@@ -56,7 +56,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                         Activity = Activity.Delete.ToString(),
                         From = JsonSerializer.Serialize(UserGroup),
                         To = "-",
-                        UserId = UserModel.Id
+                        UserId = UserModel.Id,
+                        UserName = UserModel.UserName,
                     });
 
 

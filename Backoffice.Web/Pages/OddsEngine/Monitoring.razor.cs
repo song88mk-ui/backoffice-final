@@ -10,12 +10,14 @@ using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class Monitoring : IDisposable
+    public partial class Monitoring : IAsyncDisposable, IDisposable
     {
         #region Properties
+
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public ICommonService CommonService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public ITradingService TradingService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
@@ -38,12 +40,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #endregion
 
-        #region Fields
-
-        public SportClickCallbackModel selectedSport = new SportClickCallbackModel();
-
-        #endregion
-
         #region Methods
 
         protected override async Task OnInitializedAsync()
@@ -61,14 +57,21 @@ namespace Backoffice.Web.Pages.OddsEngine
                 IsCurrentPage = true
             });
 
-            var clients = (await BackOfficeService.GetClients()).Result;
+            var clients = (await TradingService.GetClientList()).Result;
 
             if (clients != null)
             {
                 ClientModel = new ClientModel
                 {
                     Clients = UserModel.ClientCodes.Any() ?
-                        clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientModel.Client>()
+                        clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()))
+                        .Select(s => new ClientModel.Client
+                        {
+                            ClientCode = s.ClientCode,
+                            ClientName = s.ClientName,
+                            Region = Configuration["Region"]
+                        })
+                        .ToList() : new List<ClientModel.Client>()
                 };
             }
 
@@ -124,13 +127,17 @@ namespace Backoffice.Web.Pages.OddsEngine
             await OnInitEvent();
         }
 
-        public async void Dispose()
+        public async ValueTask DisposeAsync()
         {
             if (HubConnection != null)
             {
                 await HubConnection.StopAsync();
                 await HubConnection.DisposeAsync();
             }
+        }
+
+        public void Dispose()
+        {
         }
 
         #endregion
