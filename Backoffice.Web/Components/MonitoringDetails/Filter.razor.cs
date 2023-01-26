@@ -19,6 +19,7 @@ namespace Backoffice.Web.Components.MonitoringDetails
 
         public List<SelectListItemModel<string>> MarketTemplates { get; set; }
         public MonitoringDetailsModel MonitoringDetailsModel { get; set; }
+        public MarketFixtureResponse.FixtureModel Fixture { get; set; }
 
         #endregion
 
@@ -28,27 +29,23 @@ namespace Backoffice.Web.Components.MonitoringDetails
         {
             MonitoringDetailsModel = new MonitoringDetailsModel();
             MarketTemplates = new List<SelectListItemModel<string>>();
+            Fixture = new MarketFixtureResponse.FixtureModel();
 
             var marketFixtureResponse = await BackOfficeService.GetMarketFixtureDetails(ProviderFixtureId);
 
             if (marketFixtureResponse.StatusCode == StatusCode.Success)
             {
-                var fixture = marketFixtureResponse.Result.Fixture;
+                Fixture = marketFixtureResponse.Result.Fixture;
 
                 MonitoringDetailsModel = new MonitoringDetailsModel
                 {
-                    SportId = fixture.SportId,
-                    SportName = fixture.SportName,
-                    SegmentName = fixture.SegmentName,
-                    LeagueName = fixture.LeagueName,
-                    Fixtures = GetFixtureDetails(fixture),
+                    SportId = Fixture.SportId,
+                    SportName = Fixture.SportName,
+                    SegmentName = Fixture.SegmentName,
+                    LeagueName = Fixture.LeagueName,
                     SelectedMarketTemplateId = string.Empty
                 };
 
-            }
-
-            if (MonitoringDetailsModel.Fixtures.Any())
-            {
                 var mainMarketTemplateResponse = await BackOfficeService.GetTopMarkets(MonitoringDetailsModel.SportId);
 
                 if (mainMarketTemplateResponse.StatusCode == StatusCode.Success)
@@ -64,6 +61,8 @@ namespace Backoffice.Web.Components.MonitoringDetails
                 {
                     MonitoringDetailsModel.SelectedMarketTemplateId = MarketTemplates.FirstOrDefault().Value;
                 }
+
+                MonitoringDetailsModel.Fixtures = GetFixtureDetails();
             }
 
             await OnInitCallback.InvokeAsync(MonitoringDetailsModel);
@@ -72,6 +71,7 @@ namespace Backoffice.Web.Components.MonitoringDetails
         public async void OnMarketChangedEvent(ChangeEventArgs e)
         {
             MonitoringDetailsModel.SelectedMarketTemplateId = e.Value.ToString();
+            MonitoringDetailsModel.Fixtures = GetFixtureDetails();
 
             await OnInitCallback.InvokeAsync(MonitoringDetailsModel);
         }
@@ -84,27 +84,27 @@ namespace Backoffice.Web.Components.MonitoringDetails
 
         #region Utilities
 
-        private List<FixtureMarketModel> GetFixtureDetails(MarketFixtureResponse.FixtureModel fixture)
+        private List<FixtureMarketModel> GetFixtureDetails()
         {
-            var result = fixture.Markets.Where(c => c.MarketTemplateId == MonitoringDetailsModel.SelectedMarketTemplateId)
+            var result = Fixture.Markets.Where(c => c.MarketTemplateId == MonitoringDetailsModel.SelectedMarketTemplateId)
                     .Select(s => new FixtureMarketModel
                     {
-                        FixtureName = fixture.FixtureName,
+                        FixtureName = Fixture.FixtureName,
                         MarketId = s.MarketId,
                         ClientCode = s.ClientCode,
                         ClientCodeMargin = s.ClientCodeMargin,
                         MarketName = s.MarketName,
                         ProviderMarketId = s.ProviderMarketId,
                         ProviderFixtureId = s.ProviderFixtureId,
-                        AwayName = fixture.AwayName,
-                        BetStop = fixture.BetStop,
-                        CurrentMinute = fixture.CurrentMinute,
-                        CurrentPeriod = fixture.CurrentPeriod,
-                        FixtureStartDate = fixture.FixtureStartDate,
-                        FixtureStatusId = fixture.FixtureStatusId,
-                        HomeName = fixture.HomeName,
-                        IsBetStopGlobal = fixture.IsBetStopGlobal,
-                        Score = fixture.Score,
+                        AwayName = Fixture.AwayName,
+                        BetStop = Fixture.BetStop,
+                        CurrentMinute = Fixture.CurrentMinute,
+                        CurrentPeriod = Fixture.CurrentPeriod,
+                        FixtureStartDate = Fixture.FixtureStartDate,
+                        FixtureStatusId = Fixture.FixtureStatusId,
+                        HomeName = Fixture.HomeName,
+                        IsBetStopGlobal = Fixture.IsBetStopGlobal,
+                        Score = Fixture.Score,
                         Line = s.Line,
                         MarketSpecifier = s.MarketSpecifier,
                         MarketStatusId = s.MarketStatusId,

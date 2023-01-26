@@ -38,19 +38,23 @@
         <div class="d-flex justify-content-center">
             @if (Market != null && Market.Selections.Any())
             {
+                var hasLine = HasLine;
+
                 foreach (var selection in Market?.Selections)
                 {
                     var selectionKey = $"br-{selection.ProviderSelectionId}";
 
                     <SelectionRow @key="selectionKey" Selection="selection" ColumnSize="@ColumnSize" IsBetStop="IsBetStop" CurrentMarketStatus="@Market.MarketStatusId" HasClientConfig="true" />
 
-                    if (HasLine)
+                    if (hasLine)
                     {
                         <div>
-                            <span class="margin-value odds-bg-grey m-rl-xs">@MarketLine</span>
+                            <div class="margin-value me-2 py-1">
+                                <span class="d-block text-center">@MarketLine</span>
+                            </div>
                         </div>
 
-                        HasLine = false;
+                        hasLine = false;
                     }
                 }
 
@@ -83,6 +87,7 @@
         foreach (var client in Clients)
         {
             var hasLine = HasLine;
+
             <td>
                 <div class="d-flex justify-content-center">
                     @if (Market != null && Market.Selections.Any())
@@ -102,13 +107,17 @@
                                 if (hasClientConfig)
                                 {
                                     <div>
-                                        <span class="margin-value odds-bg-grey m-rl-xs">@MarketLine</span>
+                                        <div class="margin-value me-2 py-1">
+                                            <span class="d-block text-center">@MarketLine</span>
+                                        </div>
                                     </div>
                                 }
                                 else
                                 {
                                     <div>
-                                        <span class="margin-value odds-bg-grey m-rl-xs">-.-</span>
+                                        <div class="margin-value me-2 py-1">
+                                            <span class="d-block text-center">-.-</span>
+                                        </div>
                                     </div>
                                 }
 

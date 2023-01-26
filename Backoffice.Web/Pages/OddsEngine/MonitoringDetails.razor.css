@@ -1,4 +1,10 @@
-﻿.table-head {
+﻿.table-container {
+    display: inline-block;
+    width: calc(100% - 28px);
+    overflow-x: scroll;
+}
+
+.table-head {
     background-color: #354156;
     color: #fff;
 }

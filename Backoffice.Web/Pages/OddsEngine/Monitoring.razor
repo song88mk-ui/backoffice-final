@@ -33,7 +33,7 @@
             }
             else
             {
-                <div class="table-container mt-4">
+                <div class="table-container mt-4 mx-3">
                     <table class="table table-hover table-bordered mb-0">
                         <thead class="table-head">
                             <tr>
@@ -51,7 +51,7 @@
                             {
                                 foreach (var market in FixtureMarkets)
                                 {
-                                    <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@MonitoringCallbackModel.SelectedMarketTemplateId" Market="market" />
+                                    <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" />
                                 }
                             }
                         </tbody>

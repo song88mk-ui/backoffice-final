@@ -1,6 +1,6 @@
 ﻿.table-container {
     display: inline-block;
-    width: 100%;
+    width: calc(100% - 28px);
     overflow-x: scroll;
 }
 
