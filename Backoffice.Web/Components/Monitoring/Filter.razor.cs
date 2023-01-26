@@ -4,7 +4,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace Backoffice.Web.Components.OddsEngine.Monitoring
+namespace Backoffice.Web.Components.Monitoring
 {
     public partial class Filter : IDisposable
     {

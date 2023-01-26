@@ -1,43 +1,46 @@
-﻿using Backoffice.Shared.Models.Requests;
+﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineBookmakerMessages;
+using Backoffice.Web.Components.MonitoringDetails;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
-using Backoffice.Web.Components.OddsEngine.MonitoringDetails;
-using static Backoffice.Shared.Models.Response.MarketTemplateGroupResponse;
 using Microsoft.AspNetCore.SignalR.Client;
-using Backoffice.Shared.Enums;
-using Backoffice.Shared.OutgoingEngineBookmakerMessages;
+using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class MonitoringDetails : IDisposable
+    public partial class MonitoringDetails : IAsyncDisposable, IDisposable
     {
         #region Properties
+
         [Inject] public ICommonService CommonService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public string Id { get; set; }
+
         private HubConnection HubConnection { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-        public MonitoringDetailsCallbackModel CallbackModel { get; set; }
+
+        //public MonitoringDetailsCallbackModel CallbackModel { get; set; }
+        public MonitoringDetailsModel MonitoringDetailsModel { get; set; }
         public MarketFilterCallbackModel MarketGroupCallback { get; set; }
         public ClientModel ClientModel { get; set; }
-        public List<FixtureMarketModel> FilteredMarkets { get; set; }
         public List<MarketNavigationModel> MarketTemplates { get; set; }
         public List<MarketTemplatePlayerPropsResponse> PlayerPropsMarketTemplates { get; set; }
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
 
         #endregion
 
         #region Fields
-        //public List<MarketTemplateGroupResponse.MarketTemplateGroup> fullMarketTemplateGroup;
+
         public MarketGroupFilter _marketGroupFilter = default!;
         public MarketFilter _marketFilter = default!;
         public MarketFixtureResponse.FixtureModel fixture;
@@ -50,14 +53,16 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            //MarketTemplateGroups = new List<MarketGroupNavigationModel>();
+            MonitoringDetailsModel = new MonitoringDetailsModel();
             MarketTemplates = new List<MarketNavigationModel>();
             PlayerPropsMarketTemplates = new List<MarketTemplatePlayerPropsResponse>();
-
-            CallbackModel = new MonitoringDetailsCallbackModel();
+            //CallbackModel = new MonitoringDetailsCallbackModel();
             MarketGroupCallback = new MarketFilterCallbackModel();
             ClientModel = new ClientModel();
+            Breadcrumbs = new List<BreadcrumbModel>();
 
+            PageTitle = string.Empty;
+            IconClass = string.Empty;
 
             var clients = (await BackOfficeService.GetClients()).Result;
 
@@ -69,57 +74,52 @@ namespace Backoffice.Web.Pages.OddsEngine
                         clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientModel.Client>()
                 };
             }
-
-
-            PageTitle = "American Football - USA - NCAA, Regular Season";
-            IconClass = "fa fa-trophy";
         }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                try
-                {
-                    await Subscribe();
-                }
-                catch (Exception)
-                {
-                }
+                //try
+                //{
+                //    await Subscribe();
+                //}
+                //catch (Exception ex)
+                //{
+                //    Console.WriteLine(ex.Message);
+                //}
 
             }
         }
 
-        public async Task OnInitEvent()
+        //public async Task OnInitEvent()
+        //{
+        //    fixture = CallbackModel.Fixture.Fixture;
+
+        //    if (fixture != null)
+        //    {
+        //        FilteredMarkets = GetFixtureMarkets(fixture.Markets.Where(c => c.MarketTemplateId == CallbackModel.SelectedMarketTemplateId).ToList());
+
+        //        PlayerPropsMarketTemplates = (await BackOfficeService.GetMarketTemplatePlayerProps(new MarketTemplatePlayerPropsRequest
+        //        {
+        //            SportId = fixture.SportId
+        //        })).Result;
+
+        //        #region Market Template Group Nagivation
+        //        //MarketTemplateGroups = new List<MarketGroupNavigationModel>();
+        //        await _marketGroupFilter.OnInitMarketTemplateGroup(fixture);
+
+        //        #endregion
+        //    }
+
+        //}
+
+        public async Task OnInitCallback(MonitoringDetailsModel model)
         {
-            fixture = CallbackModel.Fixture.Fixture;
-            if (fixture != null)
-            {
-                FilteredMarkets = GetFixtureMarkets(fixture.Markets.Where(c => c.MarketTemplateId == CallbackModel.SelectedMarketTemplateId).ToList());
+            MonitoringDetailsModel = model;
 
-                PlayerPropsMarketTemplates = (await BackOfficeService.GetMarketTemplatePlayerProps(new MarketTemplatePlayerPropsRequest
-                {
-                    SportId = fixture.SportId
-                })).Result;
-
-                #region Market Template Group Nagivation
-                //MarketTemplateGroups = new List<MarketGroupNavigationModel>();
-                await _marketGroupFilter.OnInitMarketTemplateGroup(fixture);
-
-                #endregion
-
-
-            }
-
-        }
-
-        public async Task MonitoringDetailsCallback(MonitoringDetailsCallbackModel model)
-        {
-            CallbackModel = model;
-
-            await OnInitEvent();
-
-            PageTitle = $"{model.Fixture.Fixture.SportName} - {model.Fixture.Fixture.SegmentName} - {model.Fixture.Fixture.LeagueName}";
-            IconClass = $"iconfont iconfont-{model.Fixture.Fixture.SportName.ToLower().Replace(" ", "-")}";
+            PageTitle = $"{MonitoringDetailsModel.SportName} - {MonitoringDetailsModel.SegmentName} - {MonitoringDetailsModel.LeagueName}";
+            IconClass = $"iconfont iconfont-{MonitoringDetailsModel.SportName.ToLower().Replace(" ", "-")}";
 
         }
 
@@ -214,6 +214,15 @@ namespace Backoffice.Web.Pages.OddsEngine
             isPlayerProps = marketTemplateIds.Contains(marginMarket.MarketTemplateId);
         }
 
+        public async ValueTask DisposeAsync()
+        {
+            if (HubConnection != null)
+            {
+                await HubConnection.StopAsync();
+                await HubConnection.DisposeAsync();
+            }
+        }
+
         public void Dispose()
         {
         }
@@ -221,6 +230,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
+
         private async Task Subscribe()
         {
             HubConnection = new HubConnectionBuilder()
@@ -450,7 +460,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 return;
 
             fixture.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>();
-            FilteredMarkets.ForEach(m =>
+
+            MonitoringDetailsModel.Fixtures.ForEach(m =>
             {
                 m.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>();
             });
@@ -464,7 +475,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 return;
 
             fixture.IsBetStopGlobal = message.IsBetStop;
-            FilteredMarkets.ForEach(m =>
+
+            MonitoringDetailsModel.Fixtures.ForEach(m =>
             {
                 m.IsBetStopGlobal = message.IsBetStop;
             });
@@ -472,41 +484,42 @@ namespace Backoffice.Web.Pages.OddsEngine
             await InvokeAsync(StateHasChanged);
         }
 
-        private List<FixtureMarketModel> GetFixtureMarkets(List<MarketModel> markets)
-        {
-            var fixture = CallbackModel.Fixture.Fixture;
+        //private List<FixtureMarketModel> GetFixtureMarkets(List<MarketModel> markets)
+        //{
+        //    var fixture = CallbackModel.Fixture.Fixture;
 
-            var fixtureMarkets = new List<FixtureMarketModel>();
-            foreach (var market in markets)
-            {
-                fixtureMarkets.Add(new FixtureMarketModel()
-                {
-                    FixtureName = fixture.FixtureName,
-                    MarketId = market.MarketId,
-                    ClientCode = market.ClientCode,
-                    ClientCodeMargin = market.ClientCodeMargin,
-                    MarketName = market.MarketName,
-                    ProviderMarketId = market.ProviderMarketId,
-                    ProviderFixtureId = market.ProviderFixtureId,
-                    AwayName = fixture.AwayName,
-                    BetStop = fixture.BetStop,
-                    CurrentMinute = fixture.CurrentMinute,
-                    CurrentPeriod = fixture.CurrentPeriod,
-                    FixtureStartDate = fixture.FixtureStartDate,
-                    FixtureStatusId = fixture.FixtureStatusId,
-                    HomeName = fixture.HomeName,
-                    IsBetStopGlobal = fixture.IsBetStopGlobal,
-                    Score = fixture.Score,
-                    Line = market.Line,
-                    MarketSpecifier = market.MarketSpecifier,
-                    MarketStatusId = market.MarketStatusId,
-                    MarketStatusName = market.MarketStatusName,
-                    MarketTemplateId = market.MarketTemplateId,
-                    Selections = market.Selections
-                });
-            }
-            return fixtureMarkets;
-        }
+        //    var fixtureMarkets = new List<FixtureMarketModel>();
+
+        //    foreach (var market in markets)
+        //    {
+        //        fixtureMarkets.Add(new FixtureMarketModel()
+        //        {
+        //            FixtureName = fixture.FixtureName,
+        //            MarketId = market.MarketId,
+        //            ClientCode = market.ClientCode,
+        //            ClientCodeMargin = market.ClientCodeMargin,
+        //            MarketName = market.MarketName,
+        //            ProviderMarketId = market.ProviderMarketId,
+        //            ProviderFixtureId = market.ProviderFixtureId,
+        //            AwayName = fixture.AwayName,
+        //            BetStop = fixture.BetStop,
+        //            CurrentMinute = fixture.CurrentMinute,
+        //            CurrentPeriod = fixture.CurrentPeriod,
+        //            FixtureStartDate = fixture.FixtureStartDate,
+        //            FixtureStatusId = fixture.FixtureStatusId,
+        //            HomeName = fixture.HomeName,
+        //            IsBetStopGlobal = fixture.IsBetStopGlobal,
+        //            Score = fixture.Score,
+        //            Line = market.Line,
+        //            MarketSpecifier = market.MarketSpecifier,
+        //            MarketStatusId = market.MarketStatusId,
+        //            MarketStatusName = market.MarketStatusName,
+        //            MarketTemplateId = market.MarketTemplateId,
+        //            Selections = market.Selections
+        //        });
+        //    }
+        //    return fixtureMarkets;
+        //}
 
         protected string GetClientMargin(string clientCode, string clientCodeMargin, List<SelectionModel> selections, bool isPlayerProps)
         {
@@ -608,6 +621,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 OldOdds = clientUnderOdds,
             };
         }
+
         #endregion
 
     }

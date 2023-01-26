@@ -91,37 +91,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
-        protected override async Task OnParametersSetAsync()
-        {
-            if (SelectedSport != null && selectedSport != SelectedSport)
-            {
-                if (selectedSport.SportId != SelectedSport.SportId)
-                {
-                    selectedSport.SportId = SelectedSport.SportId;
-                    selectedSport.SportName = SelectedSport.SportName;
-                }
-
-                if (selectedSport.SegmentId != SelectedSport.SegmentId)
-                {
-                    selectedSport.SegmentId = SelectedSport.SegmentId;
-                    selectedSport.SegmentName = SelectedSport.SegmentName;
-                }
-
-                if (selectedSport.LeagueId != SelectedSport.LeagueId)
-                {
-                    selectedSport.LeagueId = SelectedSport.LeagueId;
-                    selectedSport.LeagueName = SelectedSport.LeagueName;
-                }
-
-                PageTitle = $"{SelectedSport.SportName} - {SelectedSport.SegmentName} - {selectedSport.LeagueName}";
-                IconClass = $"iconfont iconfont-{SelectedSport.SportName.ToLower().Replace(" ", "-")}";
-
-                await OnInitEvent();
-            }
-        }
-
         public async Task OnInitEvent()
         {
+            PageTitle = $"{SelectedSport.SportName} - {SelectedSport.SegmentName} - {SelectedSport.LeagueName}";
+            IconClass = $"iconfont iconfont-{SelectedSport.SportName.ToLower().Replace(" ", "-")}";
+
             IsPreloader = true;
 
             // if user selected a new sport OnInitEvent will be triggered by MonitoringCallback

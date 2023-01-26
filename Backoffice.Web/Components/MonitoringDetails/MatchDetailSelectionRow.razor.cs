@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 using System.Drawing;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
-namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
+namespace Backoffice.Web.Components.MonitoringDetails
 {
     public partial class MatchDetailSelectionRow : IDisposable
     {
