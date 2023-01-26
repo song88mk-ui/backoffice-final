@@ -1408,39 +1408,59 @@ namespace Backoffice.API.Repositories
             try
             {
                 var activityLogList = new OnActivityLogListMessage();
-                var response = await GetHttpClient(region).PostAsync($"manual/messagesettlement", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                if (response.IsSuccessStatusCode)
+                foreach (var item in request)
                 {
-                    var result = string.Empty;
-                    foreach (var item in request)
-                    {
-                        activityLogList.OnActivityLogMessages.Add(item.OnActivityLogMessage);
-                    }
+                    activityLogList.OnActivityLogMessages.Add(item.OnActivityLogMessage);
+                }
 
-                    await _rabbitMqRepository.Publish(new MessageRequest()
-                    {
-                        CorrelationId = Guid.NewGuid().ToString(),
-                        MessageType = "LogActivityList",
-                        RoutingKey = $"r.bo.util.logs",
-                        Payload = JsonSerializer.Serialize(activityLogList)
-                    }, region);
+                var response = await _rabbitMqRepository.Publish(new MessageRequest()
+                {
+                    CorrelationId = Guid.NewGuid().ToString(),
+                    MessageType = "LogActivityList",
+                    RoutingKey = $"r.bo.util.logs",
+                    Payload = JsonSerializer.Serialize(activityLogList)
+                }, region);
+                
+                if (response.StatusCode == StatusCode.Success)
+                {
 
-                    return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<string>>(response.Result.ToString(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 }
                 else
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    if (response.StatusCode == StatusCode.Error)
+                        return JsonSerializer.Deserialize<BaseResponse<string>>(response.Result.ToString(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
                     {
                         return new BaseResponse<string>
                         {
                             StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.Result.ToString()})"
                         };
                     }
                 }
+
+                //var response = await GetHttpClient(region).PostAsync($"manual/messagesettlement", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+                //if (response.IsSuccessStatusCode)
+                //{
+
+                //    return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                //}
+                //else
+                //{
+                //    if (response.StatusCode == HttpStatusCode.BadRequest)
+                //        return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                //    else
+                //    {
+                //        return new BaseResponse<string>
+                //        {
+                //            StatusCode = StatusCode.Error,
+                //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                //        };
+                //    }
+                //}
             }
             catch (Exception ex)
             {
