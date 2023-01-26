@@ -2,7 +2,7 @@
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 
-namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
+namespace Backoffice.Web.Components.MonitoringDetails
 {
     public partial class MarketFilter : IDisposable
     {

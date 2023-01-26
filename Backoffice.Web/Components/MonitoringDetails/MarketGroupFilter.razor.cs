@@ -5,7 +5,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
-namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
+namespace Backoffice.Web.Components.MonitoringDetails
 {
     public partial class MarketGroupFilter : IDisposable
     {
