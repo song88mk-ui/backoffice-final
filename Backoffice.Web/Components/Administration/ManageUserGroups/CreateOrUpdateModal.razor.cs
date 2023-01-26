@@ -141,7 +141,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                         Activity = !IsEdit ? Activity.Create.ToString() : Activity.Update.ToString(),
                         From = !IsEdit ? "-" : JsonSerializer.Serialize(OldUserGroup),
                         To = JsonSerializer.Serialize(UserGroup),
-                        UserId = UserModel.Id
+                        UserId = UserModel.Id,
+                        UserName = UserModel.UserName,
                     });
 
                     if (IsEdit)
