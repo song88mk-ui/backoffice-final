@@ -21,6 +21,7 @@ namespace Backoffice.Web.Services
 
             _httpClient.BaseAddress = new Uri(_configuration["API:Backoffice:Uri"]);
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:Backoffice:Security:APIKey"]);
+            _httpClient.DefaultRequestHeaders.Add("x-region", _configuration["API:Region"]);
             _authenticationService = authenticationService;
         }
 
