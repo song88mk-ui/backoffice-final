@@ -634,7 +634,7 @@ namespace Backoffice.API.Repositories
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
                 };
             }
-        }
+        }        
         #endregion
 
         #region Utilities
@@ -648,7 +648,7 @@ namespace Backoffice.API.Repositories
             client.DefaultRequestHeaders.Add("x-api-key", GetApikey(region));
 
             return client;
-        }
+        }      
         private string GetBaseUrl(string region)
         {
             if (region.ToUpper() == "SA")

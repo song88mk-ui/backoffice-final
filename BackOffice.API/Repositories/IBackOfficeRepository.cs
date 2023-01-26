@@ -23,5 +23,6 @@ namespace Backoffice.API.Repositories
 
         Task<BaseResponse<List<CurrenciesResponse>>> GetCurrencies();
         Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);
+        Task<BaseResponse<ManualBetHistoryResponse>> GetManualBetSettlementHistory(ManualBetDetailHistoryRequest request, string region);
     }
 }
