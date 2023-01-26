@@ -63,7 +63,10 @@ namespace Backoffice.API.Repositories
             if (uri.LastOrDefault() != '/')
                 uri += "/";
 
-            var client = _httpClient;
+            var client = new HttpClient()
+            {
+                BaseAddress = new Uri($"{uri}")
+            };
 
             return client;
         }

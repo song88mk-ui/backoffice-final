@@ -1409,58 +1409,34 @@ namespace Backoffice.API.Repositories
             {
                 var activityLogList = new OnActivityLogListMessage();
 
-                foreach (var item in request)
-                {
-                    activityLogList.OnActivityLogMessages.Add(item.OnActivityLogMessage);
-                }
+                var response = await GetHttpClient(region).PostAsync($"manual/messagesettlement", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                var response = await _rabbitMqRepository.Publish(new MessageRequest()
+                if (response.IsSuccessStatusCode)
                 {
-                    CorrelationId = Guid.NewGuid().ToString(),
-                    MessageType = "LogActivityList",
-                    RoutingKey = $"r.bo.util.logs",
-                    Payload = JsonSerializer.Serialize(activityLogList)
-                }, region);
-                
-                if (response.StatusCode == StatusCode.Success)
-                {
+                    activityLogList.OnActivityLogMessages.AddRange(request.Select(x => x.OnActivityLogMessage).ToList());
 
-                    return JsonSerializer.Deserialize<BaseResponse<string>>(response.Result.ToString(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    await _rabbitMqRepository.Publish(new MessageRequest()
+                    {
+                        CorrelationId = Guid.NewGuid().ToString(),
+                        MessageType = "LogActivityList",
+                        RoutingKey = $"r.bo.util.logs",
+                        Payload = JsonSerializer.Serialize(activityLogList)
+                    }, region);
+                    return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 }
                 else
                 {
-                    if (response.StatusCode == StatusCode.Error)
-                        return JsonSerializer.Deserialize<BaseResponse<string>>(response.Result.ToString(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
                     {
                         return new BaseResponse<string>
                         {
                             StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.Result.ToString()})"
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
                         };
                     }
                 }
-
-                //var response = await GetHttpClient(region).PostAsync($"manual/messagesettlement", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
-
-                //if (response.IsSuccessStatusCode)
-                //{
-
-                //    return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                //}
-                //else
-                //{
-                //    if (response.StatusCode == HttpStatusCode.BadRequest)
-                //        return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                //    else
-                //    {
-                //        return new BaseResponse<string>
-                //        {
-                //            StatusCode = StatusCode.Error,
-                //            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                //        };
-                //    }
-                //}
             }
             catch (Exception ex)
             {

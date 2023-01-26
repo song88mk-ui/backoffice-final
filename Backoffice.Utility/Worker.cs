@@ -34,7 +34,14 @@ namespace Backoffice.Utility
 
         public override Task StopAsync(CancellationToken cancellationToken)
         {
-            _messageBroker.Dispose();
+            try
+            {
+                _messageBroker.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
             return base.StopAsync(cancellationToken);
         }
