@@ -142,7 +142,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                         From = !IsEdit ? "-" : JsonSerializer.Serialize(OldUserGroup),
                         To = JsonSerializer.Serialize(UserGroup),
                         UserId = UserModel.Id,
-                        Username = UserModel.UserName
+                        UserName = UserModel.UserName
                     });
 
                     if (IsEdit)

@@ -107,7 +107,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                             From = !string.IsNullOrEmpty(x.From) && x.From != "-" ? JsonConvert.DeserializeObject<PriceBoostLogModel>(x.From) : new PriceBoostLogModel(),
                             To = !string.IsNullOrEmpty(x.To) && x.To != "-" ? JsonConvert.DeserializeObject<PriceBoostLogModel>(x.To) : new PriceBoostLogModel(),
                             UserId = x.UserId,
-                            Username = WithAdministrationPagesAccess ? "Administrator" : x.Username,
+                            Username = WithAdministrationPagesAccess ? "Administrator" : x.UserName,
                             TimeStamp = x.TimeStamp
                         }).ToList();
 
@@ -143,7 +143,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                                 From = activityLog.From,
                                 To = activityLog.To,
                                 UserId = activityLog.UserId,
-                                Username = WithAdministrationPagesAccess ? "Administrator" : activityLog.Username,
+                                UserName = WithAdministrationPagesAccess ? "Administrator" : activityLog.UserName,
                                 TimeStamp = activityLog.TimeStamp
                             });
                         }

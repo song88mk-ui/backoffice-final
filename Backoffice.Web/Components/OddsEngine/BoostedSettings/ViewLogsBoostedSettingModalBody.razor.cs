@@ -59,7 +59,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             await GetContent();
 
             ActivityLogs = ActivityLogs.Where(s => s.Activity.ToLower().Contains(SearchForm.SearchText.ToLower()) || s.From.ToLower().Contains(SearchForm.SearchText.ToLower()) ||
-            s.To.ToLower().Contains(SearchForm.SearchText.ToLower()) || s.Username.ToLower().Contains(SearchForm.SearchText.ToLower())
+            s.To.ToLower().Contains(SearchForm.SearchText.ToLower()) || s.UserName.ToLower().Contains(SearchForm.SearchText.ToLower())
             ).ToList();
 
             MetaData.TotalCount = ActivityLogs.Count();
@@ -87,7 +87,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             if (response != null)
             {
                 var tempActivityLogs = response.ActivityLogs.Where(s => s.Activity.ToLower().Contains(SearchForm.SearchText.ToLower()) || s.From.ToLower().Contains(SearchForm.SearchText.ToLower()) ||
-                                       s.To.ToLower().Contains(SearchForm.SearchText.ToLower()) || s.Username.ToLower().Contains(SearchForm.SearchText.ToLower())).ToList();
+                                       s.To.ToLower().Contains(SearchForm.SearchText.ToLower()) || s.UserName.ToLower().Contains(SearchForm.SearchText.ToLower())).ToList();
 
                 foreach (var activityLog in tempActivityLogs)
                 {
@@ -110,7 +110,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                         From = activityLog.From,
                         To = activityLog.To,
                         UserId = activityLog.UserId,
-                        Username = activityLog.Username,
+                        UserName = activityLog.UserName,
                         TimeStamp = activityLog.TimeStamp
                     });
                 }

@@ -92,7 +92,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     From = JsonSerializer.Serialize(OldMarketTemplateGroup),
                     To = "-",
                     UserId = UserModel.Id,
-                    UserName = UserModel.UserName,
+                    UserName = UserModel.UserName
                 });
 
                 ModalService.Cancel();

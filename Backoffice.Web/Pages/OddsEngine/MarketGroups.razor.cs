@@ -232,7 +232,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         From = JsonSerializer.Serialize(MarketGroupModel.OldMarketTemplateGroups),
                         To = JsonSerializer.Serialize(marketTemplateGroups),
                         UserId = UserModel.Id,
-                        UserName = UserModel.UserName,
+                        UserName = UserModel.UserName
                     });
 
                     // re-assign the updated data on market sort order properties
