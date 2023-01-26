@@ -37,7 +37,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             IsPreLoader = true;
             CurrentPage = ModalParameters.TryGet<Page>("SelectedPage");
             UserClients = await GetUserClients();
-            var clients = await GetClients();
+            var clients = GetClients().Result;
             WithAdministrationPagesAccess = false;
             BoostedSettingsActivityLogs = new List<ActivityLogModel>();
 
