@@ -1,10 +1,13 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Security.Claims;
+using System.Text.Json;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
 
 namespace Backoffice.Web.Components.Administration.ManageUserGroups
@@ -12,11 +15,14 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
     public partial class CreateOrUpdateModal : IDisposable
     {
         #region Properties
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public UserGroupResponse UserGroup { get; set; }
+        public UserGroupResponse OldUserGroup { get; set; }
         public PermissionResponse Permissions { get; set; }
         public ClientModel ClientModel { get; set; }
         public bool IsEdit { get; set; }
@@ -31,6 +37,13 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
             Permissions = ModalParameters.TryGet<PermissionResponse>("Permissions");
             ClientModel = ModalParameters.TryGet<ClientModel>("ClientModel");
 
+            OldUserGroup = new UserGroupResponse
+            {
+                UserGroupId = UserGroup.UserGroupId,
+                UserGroupName = UserGroup.UserGroupName,
+                Num = UserGroup.Num,
+            };
+
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
 
 
@@ -43,12 +56,25 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                     {
                         permission.ClaimValue = claim.ClaimValue;
                     }
+                    OldUserGroup.Claims.Add(new ClaimModel
+                    {
+                        ClaimType = claim.ClaimType,
+                        ClaimValue = claim.ClaimValue
+                    });
                 }
             }
         }
 
         public async Task OnCancelClickEvent()
         {
+            UserGroup = new UserGroupResponse
+            {
+                Num = OldUserGroup.Num,
+                UserGroupId = OldUserGroup.UserGroupId,
+                UserGroupName = OldUserGroup.UserGroupName,
+                Claims = OldUserGroup.Claims 
+            };
+
             ModalService.Cancel();
         }
 
@@ -106,6 +132,18 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
                 if (response.Result)
                 {
+                    UserGroup.Claims = claims;
+                    //activity log
+                    await BackOfficeService.AddActivityLog(new ActivityLogModel
+                    {
+                        Page = Page.Admin_ManageUserGroups.ToString().Replace("_", "."),
+                        Payload = $"{request.UserGroupId}",
+                        Activity = !IsEdit ? Activity.Create.ToString() : Activity.Update.ToString(),
+                        From = !IsEdit ? "-" : JsonSerializer.Serialize(OldUserGroup),
+                        To = JsonSerializer.Serialize(UserGroup),
+                        UserId = UserModel.Id
+                    });
+
                     if (IsEdit)
                     {
                         Alerts.Add(new AlertModel

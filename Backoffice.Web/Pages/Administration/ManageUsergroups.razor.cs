@@ -111,7 +111,8 @@ namespace Backoffice.Web.Pages.Administration
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("UserGroup", userGroup);
+            parameters.Add("UserGroupId", userGroup.UserGroupId);
+            parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
 
             var options = new ModalOptions();
             ModalService.Open<ViewUserGroupLogModal>("View User Group Logs", parameters, options);

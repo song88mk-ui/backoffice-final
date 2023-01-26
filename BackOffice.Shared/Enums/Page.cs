@@ -19,5 +19,6 @@ namespace Backoffice.Shared.Enums
         OE_Administration_MarketSortOrder,
         OE_Administration_MarketGroup,
         OE_Config,
+        Admin_ManageUserGroups
     }
 }
