@@ -7,54 +7,66 @@ namespace Backoffice.Web.Components.MonitoringDetails
     public partial class MarketFilter : IDisposable
     {
         #region Properties
-        [Parameter] public EventCallback<List<MarketNavigationModel>> OnMarketTemplateClicked { get; set; }
+
+        [Parameter] public List<MarketNavigationModel2> MarketTemplates { get; set; }
+        [Parameter] public EventCallback<string> OnMarketTemplateClickCallback { get; set; }
+        //[Parameter] public EventCallback<List<MarketNavigationModel>> OnMarketTemplateClicked { get; set; }
+
         #endregion
 
-        #region Fields
-        public List<MarketNavigationModel> MarketTemplates;
-
-        #endregion
-
+        #region Methods
 
         public async Task OnInitMarketTemplates(List<MarketNavigationModel> marketTemplates, int SelectedMarketTemplateGroupId, SearchFormModel searchForm)
         {
-            MarketTemplates = new List<MarketNavigationModel>();
+            //MarketTemplates = new List<MarketNavigationModel>();
 
-            var result = marketTemplates.Where(m => m.MarketTemplateGroupId == SelectedMarketTemplateGroupId).Distinct().OrderBy(m => m.MarketName).ToList();
+            //var result = marketTemplates.Where(m => m.MarketTemplateGroupId == SelectedMarketTemplateGroupId).Distinct().OrderBy(m => m.MarketName).ToList();
 
-            if (!string.IsNullOrEmpty(searchForm.SearchText) && searchForm.SearchText.Length > 1)
-                result = result.Where(c => c.MarketName.ToUpper().Contains(searchForm.SearchText.ToUpper())).ToList();
+            //if (!string.IsNullOrEmpty(searchForm.SearchText) && searchForm.SearchText.Length > 1)
+            //    result = result.Where(c => c.MarketName.ToUpper().Contains(searchForm.SearchText.ToUpper())).ToList();
 
-            MarketTemplates = result;
+            //MarketTemplates = result;
 
-            await InvokeAsync(StateHasChanged);
+            //await InvokeAsync(StateHasChanged);
 
-            await OnMarketTemplateClicked.InvokeAsync(MarketTemplates);
+            //await OnMarketTemplateClicked.InvokeAsync(MarketTemplates);
         }
 
-        public async Task OnMarketTemplateClickEvent(string marketTemplateId, int marketTemplateGroupId, string marketName)
+        public async Task OnMarketTemplateClickEvent(MarketNavigationModel2 model)
         {
-            var marketTemplate = MarketTemplates.FirstOrDefault(c => c.MarketTemplateId == marketTemplateId && c.MarketTemplateGroupId == marketTemplateGroupId && c.MarketName == marketName);
+            if (model.IsSelected)
+                return;
 
-            if (marketTemplate != null && !marketTemplate.IsSelected)
+            MarketTemplates.ForEach(s =>
             {
-                // set all selected property to false
-                MarketTemplates.Select(s =>
-                {
-                    s.IsSelected = false;
-                    return s;
-                }).ToList();
+                s.IsSelected = false;
+            });
 
-                marketTemplate.IsSelected = true;
-            }
+            model.IsSelected = true;
 
-            await OnMarketTemplateClicked.InvokeAsync(MarketTemplates);
+            await OnMarketTemplateClickCallback.InvokeAsync(model.MarketTemplateId);
+
+            //var marketTemplate = MarketTemplates.FirstOrDefault(c => c.MarketTemplateId == marketTemplateId && c.MarketTemplateGroupId == marketTemplateGroupId && c.MarketName == marketName);
+
+            //if (marketTemplate != null && !marketTemplate.IsSelected)
+            //{
+            //    // set all selected property to false
+            //    MarketTemplates.Select(s =>
+            //    {
+            //        s.IsSelected = false;
+            //        return s;
+            //    }).ToList();
+
+            //    marketTemplate.IsSelected = true;
+            //}
+
+            //await OnMarketTemplateClicked.InvokeAsync(MarketTemplates);
         }
 
         public void Dispose()
         {
         }
 
-
+        #endregion
     }
 }

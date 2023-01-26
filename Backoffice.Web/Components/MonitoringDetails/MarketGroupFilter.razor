@@ -1,18 +1,13 @@
 ﻿<div class="content-filter mx-3 d-flex justify-content-between mt-3">
     <div class="button-cotainer d-flex">
-
-        @if (MarketTemplateGroups != null)
+        @foreach (var model in MarketTemplateGroups)
         {
-            foreach (var template in MarketTemplateGroups)
-            {
-                <div class="me-2">
-                    <a href="" @onclick:preventDefault @onclick="_ => OnMarketTemplateGroupClickEvent(template.MarketTemplateGroup.MarketTemplateGroupId)" class="@(template.IsSelected ? "btn btn-market-group active px-3" : "btn btn-market-group px-3") ">
-                        @template.MarketTemplateGroup.MarketTemplateGroupName
-                    </a>
-                </div>
-            }
+            <div class="me-2">
+                <a href="javascript:void(0);" @onclick="_ => OnMarketTemplateGroupClickEvent(model)" class="btn btn-market-group px-3 @(model.IsSelected ? "active" : "") ">
+                    @model.MarketTemplateGroup.MarketTemplateGroupName
+                </a>
+            </div>
         }
-        
     </div>
     <div class="input-container d-flex flex-row-reverse align-items-end">
         <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">

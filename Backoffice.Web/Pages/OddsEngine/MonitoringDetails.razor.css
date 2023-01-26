@@ -1,4 +1,4 @@
-﻿.table-container {
+﻿.table-container, .market-template-fixture-container {
     display: inline-block;
     width: calc(100% - 28px);
     overflow-x: scroll;
@@ -38,4 +38,12 @@ table thead th:last-child {
 .odds-container.betstop {
     border-color: #EB3422;
     background-color: #E2E2E2;
+}
+
+.market-template-container {
+    width: 15%;
+}
+
+.market-template-fixture-container {
+    width: 85%;
 }

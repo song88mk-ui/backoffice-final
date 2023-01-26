@@ -1,11 +1,10 @@
 ﻿<div class="d-flex flex-column">
     <div class="me-3">
-        @if (MarketTemplates != null && MarketTemplates.Any())
+        @if (MarketTemplates.Any())
         {
             foreach (var marketTemplate in MarketTemplates)
             {
-                <a id="@marketTemplate.Id" class="@(marketTemplate.IsSelected ? "d-block btn btn-market active px-3 border-bottom" : "d-block btn btn-market px-3 border-bottom")"
-                    @onclick:preventDefault @onclick="_ => OnMarketTemplateClickEvent(marketTemplate.MarketTemplateId, marketTemplate.MarketTemplateGroupId, marketTemplate.MarketName)">
+                <a href="javascript:void(0);" class="d-block btn btn-market px-3 border-bottom @(marketTemplate.IsSelected ? "active" : "")" @onclick="_ => OnMarketTemplateClickEvent(marketTemplate)">
                     @marketTemplate.MarketName
                 </a>
             }

@@ -18,6 +18,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public ICommonService CommonService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
@@ -28,35 +29,32 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
 
-        public MonitoringDetailsModel MonitoringDetailsModel { get; set; }
-        public MarketFilterCallbackModel MarketGroupCallback { get; set; }
         public ClientModel ClientModel { get; set; }
-        public List<MarketNavigationModel> MarketTemplates { get; set; }
-        public List<MarketTemplatePlayerPropsResponse> PlayerPropsMarketTemplates { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
+        public MarketFixtureResponse.FixtureModel Fixture { get; set; }
+        public List<FixtureMarketModel> FixtureMarkets { get; set; }
+        public List<FixtureMarketModel> FixtureMarketTemplates { get; set; }
+        public List<MarketNavigationModel2> MarketTemplateNavigation { get; set; }
+        public MarketModel MarginMarket { get; set; }
+        public int SportId { get; set; }
+        public string Search { get; set; }
 
         #endregion
 
-        #region Fields
 
-        public MarketGroupFilter _marketGroupFilter = default!;
-        public MarketFilter _marketFilter = default!;
-        public MarketFixtureResponse.FixtureModel fixture;
-        public MarketModel marginMarket;
         public bool isPlayerProps;
-
-        #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            MonitoringDetailsModel = new MonitoringDetailsModel();
-            MarketTemplates = new List<MarketNavigationModel>();
-            PlayerPropsMarketTemplates = new List<MarketTemplatePlayerPropsResponse>();
-            MarketGroupCallback = new MarketFilterCallbackModel();
             ClientModel = new ClientModel();
             Breadcrumbs = new List<BreadcrumbModel>();
+            Fixture = new MarketFixtureResponse.FixtureModel();
+            FixtureMarkets = new List<FixtureMarketModel>();
+            FixtureMarketTemplates = new List<FixtureMarketModel>();
+            MarketTemplateNavigation = new List<MarketNavigationModel2>();
+            MarginMarket = new MarketModel();
 
             PageTitle = string.Empty;
             IconClass = string.Empty;
@@ -78,6 +76,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                         .ToList() : new List<ClientModel.Client>()
                 };
             }
+
+            await PrepareMonitoringDetails();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -96,126 +96,125 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
-        //public async Task OnInitEvent()
-        //{
-        //    fixture = CallbackModel.Fixture.Fixture;
-
-        //    if (fixture != null)
-        //    {
-        //        FilteredMarkets = GetFixtureMarkets(fixture.Markets.Where(c => c.MarketTemplateId == CallbackModel.SelectedMarketTemplateId).ToList());
-
-        //        PlayerPropsMarketTemplates = (await BackOfficeService.GetMarketTemplatePlayerProps(new MarketTemplatePlayerPropsRequest
-        //        {
-        //            SportId = fixture.SportId
-        //        })).Result;
-
-        //        #region Market Template Group Nagivation
-        //        //MarketTemplateGroups = new List<MarketGroupNavigationModel>();
-        //        await _marketGroupFilter.OnInitMarketTemplateGroup(fixture);
-
-        //        #endregion
-        //    }
-
-        //}
-
-        public async Task OnInitCallback(MonitoringDetailsModel model)
+        public async Task OnMarketChangedEvent(string marketTemplateId)
         {
-            MonitoringDetailsModel = model;
+            var markets = Fixture.Markets.Where(c => c.MarketTemplateId == marketTemplateId).ToList();
+            FixtureMarkets = PrepareFixtureMarkets(markets);
 
-            PageTitle = $"{MonitoringDetailsModel.SportName} - {MonitoringDetailsModel.SegmentName} - {MonitoringDetailsModel.LeagueName}";
-            IconClass = $"iconfont iconfont-{MonitoringDetailsModel.SportName.ToLower().Replace(" ", "-")}";
-
+            MarginMarket = markets.FirstOrDefault();
         }
 
-        public async Task OnInitMarketTemplate(MarketFilterCallbackModel callback)
+        public async Task OnInputSearchEvent(string search)
         {
-            MarketGroupCallback = callback;
+            Search = search;
 
-            if (fixture != null)
+            var filteredMarkets = Fixture.Markets.AsQueryable();
+
+            var selectedNavigation = MarketTemplateNavigation.FirstOrDefault(c => c.IsSelected);
+
+            if (selectedNavigation != null)
             {
-                #region Market Template Navigation
-
-                MarketTemplates = new List<MarketNavigationModel>();
-
-                foreach (var MarketTemplateGroup in callback.MarketTemplateGroups)
-                {
-                    var groupId = MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId;
-
-                    foreach (var market in fixture.Markets)
-                    {
-                        if (MarketTemplateGroup.MarketTemplateGroup.MarketTemplateIds.Contains(market.MarketTemplateId))
-                        {
-                            var marketTemplate = MarketTemplates.FirstOrDefault(c => c.MarketTemplateId == market.MarketTemplateId && c.MarketTemplateGroupId == groupId && c.MarketName == market.MarketName);
-
-                            // check if market templates is already existing in the list
-                            if (marketTemplate == null)
-                            {
-                                // add market template if not existing
-                                MarketTemplates.Add(new MarketNavigationModel()
-                                {
-                                    Id = $"{market.MarketTemplateId}-{groupId}-{market.MarketName.ToLower().Replace(' ', '-')}",
-                                    IsSelected = !MarketTemplates.Any(m => m.MarketTemplateGroupId == groupId && m.IsSelected),
-                                    MarketTemplateGroupId = groupId,
-                                    MarketTemplateId = market.MarketTemplateId,
-                                    MarketName = market.MarketName,
-                                    Fixture = new MarketFixtureResponse.FixtureModel()
-                                    {
-                                        SportId = fixture.SportId,
-                                        SportName = fixture.SportName,
-                                        SegmentId = fixture.SegmentId,
-                                        SegmentName = fixture.SegmentName,
-                                        LeagueId = fixture.LeagueId,
-                                        LeagueName = fixture.LeagueName,
-                                        ProviderFixtureId = fixture.ProviderFixtureId,
-                                        FixtureName = fixture.FixtureName,
-                                        HomeName = fixture.HomeName,
-                                        AwayName = fixture.AwayName,
-                                        FixtureStartDate = fixture.FixtureStartDate,
-                                        IsLive = fixture.IsLive,
-                                        IsLiveStream = fixture.IsLiveStream,
-                                        IsSuspended = fixture.IsSuspended,
-                                        FixtureStatusId = fixture.FixtureStatusId,
-                                        FixtureStatusName = fixture.FixtureStatusName,
-                                        SMSCode = fixture.SMSCode,
-                                        Score = fixture.Score,
-                                        CurrentPeriod = fixture.CurrentPeriod,
-                                        CurrentMinute = fixture.CurrentMinute,
-                                        BetStop = fixture.BetStop,
-                                        IsBetStopGlobal = fixture.IsBetStopGlobal,
-                                        Markets = new List<MarketModel>() { market }
-                                    }
-                                });
-                            }
-                            else
-                            {
-                                // only add the market in the existing markert template
-                                marketTemplate.Fixture.Markets.Add(market);
-                            }
-                        }
-                    }
-                }
-
-                var marketTemplateGroupId = callback.MarketTemplateGroups?.FirstOrDefault(c => c.IsSelected)?.MarketTemplateGroup.MarketTemplateGroupId ?? 0;
-
-                await _marketFilter.OnInitMarketTemplates(MarketTemplates, marketTemplateGroupId, callback.SearchForm);
-
-
-                #endregion
+                filteredMarkets = filteredMarkets.Where(c => c.MarketTemplateId == selectedNavigation.MarketTemplateId);
             }
+
+            if (!string.IsNullOrEmpty(Search))
+            {
+                filteredMarkets = filteredMarkets.Select(s => new MarketModel
+                {
+                    ProviderFixtureId = s.ProviderFixtureId,
+                    MarketTemplateId = s.MarketTemplateId,
+                    MarketId = s.MarketId,
+                    ProviderMarketId = s.ProviderMarketId,
+                    MarketName = s.MarketName,
+                    Line = s.Line,
+                    MarketStatusId = s.MarketStatusId,
+                    MarketStatusName = s.MarketStatusName,
+                    MarketSpecifier = s.MarketSpecifier,
+                    ClientCode = s.ClientCode,
+                    ClientCodeMargin = s.ClientCodeMargin,
+                    IsBoosted = s.IsBoosted,
+                    Selections = s.Selections.Where(se => se.SelectionName.ToLower().Contains(Search.ToLower())).ToList(),
+                }).Where(c => c.Selections.Any());
+            }
+
+            FixtureMarketTemplates = PrepareFixtureMarkets(filteredMarkets.ToList());
         }
 
-        public async Task OnMarketTemplateClicked(List<MarketNavigationModel> marketTemplates)
+        public async Task OnMarketTemplateGroupClickEvent(MarketGroupNavigationModel model)
         {
-            MarketTemplates = marketTemplates;
+            var marketTemplateIds = model.MarketTemplateGroup.MarketTemplateIds;
+            var markets = Fixture.Markets.Where(c => marketTemplateIds.Contains(c.MarketTemplateId)).ToList();
 
-            var marketTemplate = marketTemplates.FirstOrDefault(c => c.IsSelected);
+            // display list of markets available on the selected group
+            MarketTemplateNavigation = markets.Select((s, index) => new MarketNavigationModel2
+            {
+                IsSelected = index == 0 ? true: false,
+                MarketTemplateId = s.MarketTemplateId,
+                MarketName = s.MarketName,
+                MarketTemplateGroupId = model.MarketTemplateGroup.MarketTemplateGroupId
+            })
+            .DistinctBy(d => new { d.MarketTemplateId, d.MarketName })
+            .ToList();
 
-            marginMarket = marketTemplate == null ? new MarketModel() : fixture.Markets.FirstOrDefault(c => c.MarketTemplateId == marketTemplate.MarketTemplateId && c.MarketName == marketTemplate.MarketName) ?? new MarketModel();
+            var filteredMarkets = Fixture.Markets.AsQueryable();
 
-            var playerPropMarketTemplates = PlayerPropsMarketTemplates.FirstOrDefault(c => c.FixtureStatusId == 0)?.MarketTemplates ?? string.Empty;
-            var marketTemplateIds = playerPropMarketTemplates.Split(",").ToList();
+            var selectedNavigation = MarketTemplateNavigation.FirstOrDefault(c => c.IsSelected);
 
-            isPlayerProps = marketTemplateIds.Contains(marginMarket.MarketTemplateId);
+            if (selectedNavigation != null)
+            {
+                filteredMarkets = filteredMarkets.Where(c => c.MarketTemplateId == selectedNavigation.MarketTemplateId);
+            }
+
+            if (!string.IsNullOrEmpty(Search))
+            {
+                filteredMarkets = filteredMarkets.Select(s => new MarketModel
+                {
+                    ProviderFixtureId = s.ProviderFixtureId,
+                    MarketTemplateId = s.MarketTemplateId,
+                    MarketId = s.MarketId,
+                    ProviderMarketId = s.ProviderMarketId,
+                    MarketName = s.MarketName,
+                    Line = s.Line,
+                    MarketStatusId = s.MarketStatusId,
+                    MarketStatusName = s.MarketStatusName,
+                    MarketSpecifier = s.MarketSpecifier,
+                    ClientCode = s.ClientCode,
+                    ClientCodeMargin = s.ClientCodeMargin,
+                    IsBoosted = s.IsBoosted,
+                    Selections = s.Selections.Where(se => se.SelectionName.ToLower().Contains(Search.ToLower())).ToList(),
+                }).Where(c => c.Selections.Any());
+            }
+
+            FixtureMarketTemplates = PrepareFixtureMarkets(filteredMarkets.ToList());
+        }
+
+        public async Task OnMarketTemplateClickEvent(string marketTemplateId)
+        {
+            var markets = Fixture.Markets.Where(c => c.MarketTemplateId == marketTemplateId);
+
+            if (!string.IsNullOrEmpty(Search))
+            {
+                markets = markets.Select(s => new MarketModel
+                {
+                    ProviderFixtureId = s.ProviderFixtureId,
+                    MarketTemplateId = s.MarketTemplateId,
+                    MarketId = s.MarketId,
+                    ProviderMarketId = s.ProviderMarketId,
+                    MarketName = s.MarketName,
+                    Line = s.Line,
+                    MarketStatusId = s.MarketStatusId,
+                    MarketStatusName = s.MarketStatusName,
+                    MarketSpecifier = s.MarketSpecifier,
+                    ClientCode = s.ClientCode,
+                    ClientCodeMargin = s.ClientCodeMargin,
+                    IsBoosted = s.IsBoosted,
+                    Selections = s.Selections.Where(se => se.SelectionName.ToLower().Contains(Search.ToLower())).ToList(),
+                }).Where(c => c.Selections.Any());
+            }
+
+            FixtureMarketTemplates = PrepareFixtureMarkets(markets.ToList());
+
+            MarginMarket = markets.FirstOrDefault();
         }
 
         public async ValueTask DisposeAsync()
@@ -235,294 +234,320 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Utilities
 
-        private async Task Subscribe()
+        private async Task PrepareMonitoringDetails()
         {
-            HubConnection = new HubConnectionBuilder()
-            .WithUrl(new Uri(Configuration["API:HubAPI"]))
-            .Build();
+            var marketFixtureResponse = await BackOfficeService.GetMarketFixtureDetails(Id);
 
-            HubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
+            if (marketFixtureResponse.StatusCode == StatusCode.Success)
             {
-                await ProcessOddsChangeMonitoring(message);
+                Fixture = marketFixtureResponse.Result.Fixture;
+                SportId = Fixture.SportId;
 
-            });
-
-            HubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async (message) =>
-            {
-                await ProcessOnBetStopFixture(message);
-
-            });
-
-            HubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async (message) =>
-            {
-                await ProcessOnBetStopGlobal(message);
-
-            });
-
-            await HubConnection.StartAsync();
-        }
-
-        private async Task ProcessOddsChangeMonitoring(OnExternalOddsChangeMessage message)
-        {
-            if (fixture == null || fixture.FixtureTypeId != message.FixtureTypeId || Id != message.ProviderFixtureId)
-                return;
-
-            if (MarketGroupCallback == null || MarketGroupCallback.MarketTemplateGroups == null || !MarketGroupCallback.MarketTemplateGroups.Any())
-                return;
-
-            var newMarketTemplateIds = message.Markets.Select(s => s.MarketTemplateId).ToList();
-            var marketFixtures = fixture.Markets.Where(c => newMarketTemplateIds.Contains(c.MarketTemplateId)).ToList();
-
-            if (marketFixtures != null && marketFixtures.Any())
-            {
-                foreach (var marketFixture in marketFixtures)
-                {
-                    fixture.BetStop = new List<int>();
-                    fixture.CurrentPeriod = message.CurrentPeriod;
-                    fixture.CurrentMinute = message.CurrentMinute.ToString();
-                    fixture.Score = message.Score;
-                    fixture.FixtureStatusId = message.FixtureStatusId;
-
-                    foreach (var newMarket in message.Markets.Where(c => c.MarketTemplateId == marketFixture.MarketTemplateId && c.MarketName == marketFixture.MarketName && c.MarketSpecifier == marketFixture.MarketSpecifier))
-                    {
-                        var selectionIds = newMarket.Selections.Select(s => s.SelectionTemplateId).Distinct().ToList();
-
-                        var providerMarketId = $"{fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newMarket.MarketSpecifier}";
-                        var currentMarket = fixture.Markets.FirstOrDefault(c => c.ProviderMarketId == providerMarketId && c.MarketName == newMarket.MarketName);
-
-                        if (currentMarket != null)
-                        {
-                            currentMarket.MarketStatusId = newMarket.MarketStatusId;
-                            currentMarket.MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString();
-                            currentMarket.ClientCode = newMarket.ClientCodes;
-                            currentMarket.ClientCodeMargin = newMarket.ClientCodeMargin;
-
-                            foreach (var newSelection in newMarket.Selections)
-                            {
-                                var providerSelectionId = $"{fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newSelection.SelectionTemplateId}:{newMarket.MarketSpecifier}";
-                                var currentSelection = currentMarket.Selections.FirstOrDefault(c => c.ProviderSelectionId == providerSelectionId);
-
-                                if (currentSelection != null)
-                                {
-                                    if (newSelection.IsActive)
-                                    {
-                                        currentSelection.OldDecimalOdds = currentSelection.DecimalOdds;
-                                        currentSelection.DecimalOdds = CommonService.GetFinalOdds(newSelection.Odds).ToString("0.00");
-                                        currentSelection.IsActive = newSelection.IsActive;
-                                        currentSelection.ClientOdds = newSelection.ClientOdds.Select(s =>
-                                            new ClientOddsModel
-                                            {
-                                                ClientCode = s.ClientCode,
-                                                SelectionTemplateId = s.SelectionTemplateId,
-                                                Odds = s.DecimalOdds,
-                                                OldOdds = currentSelection.ClientOdds != null && currentSelection.ClientOdds.Any(c => c.ClientCode == s.ClientCode) ?
-                                                            currentSelection.ClientOdds.Where(c => c.ClientCode == s.ClientCode).FirstOrDefault().Odds : s.DecimalOdds
-                                            }).ToList();
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // add market
-                            var market = new MarketModel()
-                            {
-                                MarketId = newMarket.MarketId.ToString(),
-                                ProviderMarketId = providerMarketId,
-                                ProviderFixtureId = message.ProviderFixtureId,
-                                Line = newMarket.Line,
-                                ClientCode = newMarket.ClientCodes,
-                                ClientCodeMargin = newMarket.ClientCodeMargin,
-                                MarketStatusId = newMarket.MarketStatusId,
-                                MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString(),
-                                MarketName = newMarket.MarketName,
-                                MarketTemplateId = newMarket.MarketTemplateId,
-                                Selections = newMarket.Selections.Select(s => new SelectionModel
-                                {
-                                    SelectionId = s.SelectionId.ToString(),
-                                    ProviderSelectionId = $"{fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{s.SelectionTemplateId}:{newMarket.MarketSpecifier}",
-                                    OldDecimalOdds = CommonService.GetFinalOdds(s.Odds).ToString("0.00"),
-                                    DecimalOdds = CommonService.GetFinalOdds(s.Odds).ToString("0.00"),
-                                    IsActive = s.IsActive,
-                                    SelectionName = s.SelectionName,
-                                    SelectionTemplateId = s.SelectionTemplateId,
-                                    SortOrder = s.SortOrder,
-                                    ClientOdds = s.ClientOdds.Select(ss =>
-                                            new ClientOddsModel
-                                            {
-                                                ClientCode = ss.ClientCode,
-                                                SelectionTemplateId = ss.SelectionTemplateId,
-                                                Odds = ss.DecimalOdds,
-                                                OldOdds = s.ClientOdds != null && s.ClientOdds.Any(c => c.ClientCode == ss.ClientCode) ?
-                                                            s.ClientOdds.Where(c => c.ClientCode == ss.ClientCode).FirstOrDefault().DecimalOdds : ss.DecimalOdds
-                                            }).ToList()
-                                }).ToList()
-                            };
-
-                            fixture.Markets.Add(market);
-
-                            var marketTemplateGroupNames = MarketGroupCallback.MarketTemplateGroups.Where(c => c.MarketTemplateGroup.MarketTemplateIds.Contains(market.MarketTemplateId)).Select(s => s.MarketTemplateGroup.MarketTemplateGroupName).Distinct().ToList();
-                            var marketTemplateGroupId = MarketGroupCallback.MarketTemplateGroups.Max(s => s.MarketTemplateGroup.SortOrder) + 1;
-
-                            foreach (var marketTemplateGroupName in marketTemplateGroupNames)
-                            {
-                                // validate if market template group is already existing in UI
-                                if (!MarketGroupCallback.MarketTemplateGroups.Any(c => c.MarketTemplateGroup.MarketTemplateGroupName == marketTemplateGroupName))
-                                {
-                                    var marketTemplates = new List<string>();
-                                    var rawMarketTemplate = MarketGroupCallback.MarketTemplateGroups.Where(c => c.MarketTemplateGroup.MarketTemplateGroupName == marketTemplateGroupName).Select(s => s.MarketTemplateGroup.MarketTemplateIds).ToList();
-
-                                    foreach (var lst in rawMarketTemplate)
-                                    {
-                                        marketTemplates.AddRange(lst);
-                                    }
-
-                                    // add market template group navigation if doesn't exist yet
-                                    MarketGroupCallback.MarketTemplateGroups.Add(new MarketGroupNavigationModel
-                                    {
-                                        IsSelected = MarketGroupCallback.MarketTemplateGroups.Count == 1 ? true : false,
-                                        MarketTemplateGroup = new MarketTemplateGroup
-                                        {
-                                            MarketTemplateGroupId = marketTemplateGroupId,
-                                            MarketTemplateGroupName = MarketGroupCallback.MarketTemplateGroups.FirstOrDefault(s => s.MarketTemplateGroup.MarketTemplateGroupName == marketTemplateGroupName)?.MarketTemplateGroup.MarketTemplateGroupName,
-                                            SortOrder = MarketGroupCallback.MarketTemplateGroups.FirstOrDefault(s => s.MarketTemplateGroup.MarketTemplateGroupName == marketTemplateGroupName).MarketTemplateGroup.SortOrder,
-                                            MarketTemplateIds = marketTemplates.Distinct().ToList()
-                                        }
-                                    });
-
-                                    marketTemplateGroupId++;
-                                }
-                            }
-
-                            // add market template navigation if it doesn't exist yet
-                            foreach (var MarketTemplateGroup in MarketGroupCallback.MarketTemplateGroups)
-                            {
-                                var groupId = MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId;
-
-                                if (MarketTemplateGroup.MarketTemplateGroup.MarketTemplateIds.Contains(market.MarketTemplateId))
-                                {
-                                    var marketTemplate = MarketTemplates.FirstOrDefault(c => c.MarketTemplateId == market.MarketTemplateId && c.MarketTemplateGroupId == groupId && c.MarketName == market.MarketName);
-
-                                    // check if market templates is already existing in the list
-                                    if (marketTemplate == null)
-                                    {
-                                        // add market template if not existing
-                                        MarketTemplates.Add(new MarketNavigationModel()
-                                        {
-                                            Id = $"{market.MarketTemplateId}-{groupId}-{market.MarketName.ToLower().Replace(' ', '-')}",
-                                            IsSelected = !MarketTemplates.Any(m => m.MarketTemplateGroupId == groupId && m.IsSelected),
-                                            MarketTemplateGroupId = groupId,
-                                            MarketTemplateId = market.MarketTemplateId,
-                                            MarketName = market.MarketName,
-                                            Fixture = new MarketFixtureResponse.FixtureModel()
-                                            {
-                                                SportId = fixture.SportId,
-                                                SportName = fixture.SportName,
-                                                SegmentId = fixture.SegmentId,
-                                                SegmentName = fixture.SegmentName,
-                                                LeagueId = fixture.LeagueId,
-                                                LeagueName = fixture.LeagueName,
-                                                ProviderFixtureId = fixture.ProviderFixtureId,
-                                                FixtureName = fixture.FixtureName,
-                                                HomeName = fixture.HomeName,
-                                                AwayName = fixture.AwayName,
-                                                FixtureStartDate = fixture.FixtureStartDate,
-                                                IsLive = fixture.IsLive,
-                                                IsLiveStream = fixture.IsLiveStream,
-                                                IsSuspended = fixture.IsSuspended,
-                                                FixtureStatusId = fixture.FixtureStatusId,
-                                                FixtureStatusName = fixture.FixtureStatusName,
-                                                SMSCode = fixture.SMSCode,
-                                                Score = fixture.Score,
-                                                CurrentPeriod = fixture.CurrentPeriod,
-                                                CurrentMinute = fixture.CurrentMinute,
-                                                BetStop = fixture.BetStop,
-                                                IsBetStopGlobal = fixture.IsBetStopGlobal,
-                                                Markets = new List<MarketModel>() { market }
-                                            }
-                                        });
-                                    }
-                                    else
-                                    {
-                                        // only add the market in the existing markert template
-                                        marketTemplate.Fixture.Markets.Add(market);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                await InvokeAsync(StateHasChanged);
+                PageTitle = $"{Fixture.SportName} - {Fixture.SegmentName} - {Fixture.LeagueName}";
+                IconClass = $"iconfont iconfont-{Fixture.SportName.ToLower().Replace(" ", "-")}";
             }
-
         }
 
-        private async Task ProcessOnBetStopFixture(OnExternalBetStopFixtureMessage message)
+        private List<FixtureMarketModel> PrepareFixtureMarkets(List<MarketModel> markets)
         {
-            if (fixture == null || Id != message.ProviderFixtureId)
-                return;
-
-            fixture.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>();
-
-            MonitoringDetailsModel.Fixtures.ForEach(m =>
+            return markets.Select(s => new FixtureMarketModel
             {
-                m.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>();
-            });
-
-            await InvokeAsync(StateHasChanged);
+                FixtureName = Fixture.FixtureName,
+                MarketId = s.MarketId,
+                ClientCode = s.ClientCode,
+                ClientCodeMargin = s.ClientCodeMargin,
+                MarketName = s.MarketName,
+                ProviderMarketId = s.ProviderMarketId,
+                ProviderFixtureId = s.ProviderFixtureId,
+                AwayName = Fixture.AwayName,
+                BetStop = Fixture.BetStop,
+                CurrentMinute = Fixture.CurrentMinute,
+                CurrentPeriod = Fixture.CurrentPeriod,
+                FixtureStartDate = Fixture.FixtureStartDate,
+                FixtureStatusId = Fixture.FixtureStatusId,
+                HomeName = Fixture.HomeName,
+                IsBetStopGlobal = Fixture.IsBetStopGlobal,
+                Score = Fixture.Score,
+                Line = s.Line,
+                MarketSpecifier = s.MarketSpecifier,
+                MarketStatusId = s.MarketStatusId,
+                MarketStatusName = s.MarketStatusName,
+                MarketTemplateId = s.MarketTemplateId,
+                Selections = s.Selections.Select(se => new SelectionModel
+                {
+                    ProviderSelectionId = se.ProviderSelectionId,
+                    SelectionId = se.SelectionId,
+                    SelectionTemplateId = se.SelectionTemplateId,
+                    SelectionName = se.SelectionName,
+                    SelectionSpecifier = se.SelectionSpecifier,
+                    DecimalOdds = se.DecimalOdds,
+                    IsActive = se.IsActive,
+                    SortOrder = se.SortOrder,
+                    CorrelationId = se.CorrelationId,
+                    OldDecimalOdds = se.OldDecimalOdds,
+                    ClientOdds = se.ClientOdds.Select(od => new ClientOddsModel
+                    {
+                        ClientCode = od.ClientCode,
+                        Odds = od.Odds,
+                        OldOdds = od.OldOdds,
+                        SelectionTemplateId = od.SelectionTemplateId,
+                        SelectionId = od.SelectionId
+                    }).ToList()
+                }).ToList()
+            }).ToList();
         }
 
-        private async Task ProcessOnBetStopGlobal(OnExternalBetStopGlobalMessage message)
-        {
-            if (MarketTemplates == null)
-                return;
-
-            fixture.IsBetStopGlobal = message.IsBetStop;
-
-            MonitoringDetailsModel.Fixtures.ForEach(m =>
-            {
-                m.IsBetStopGlobal = message.IsBetStop;
-            });
-
-            await InvokeAsync(StateHasChanged);
-        }
-
-        //private List<FixtureMarketModel> GetFixtureMarkets(List<MarketModel> markets)
+        //private async Task Subscribe()
         //{
-        //    var fixture = CallbackModel.Fixture.Fixture;
+        //    HubConnection = new HubConnectionBuilder()
+        //    .WithUrl(new Uri(Configuration["API:HubAPI"]))
+        //    .Build();
 
-        //    var fixtureMarkets = new List<FixtureMarketModel>();
-
-        //    foreach (var market in markets)
+        //    HubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
         //    {
-        //        fixtureMarkets.Add(new FixtureMarketModel()
+        //        await ProcessOddsChangeMonitoring(message);
+
+        //    });
+
+        //    HubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async (message) =>
+        //    {
+        //        await ProcessOnBetStopFixture(message);
+
+        //    });
+
+        //    HubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async (message) =>
+        //    {
+        //        await ProcessOnBetStopGlobal(message);
+
+        //    });
+
+        //    await HubConnection.StartAsync();
+        //}
+
+        //private async Task ProcessOddsChangeMonitoring(OnExternalOddsChangeMessage message)
+        //{
+        //    if (fixture == null || fixture.FixtureTypeId != message.FixtureTypeId || Id != message.ProviderFixtureId)
+        //        return;
+
+        //    if (MarketGroupCallback == null || MarketGroupCallback.MarketTemplateGroups == null || !MarketGroupCallback.MarketTemplateGroups.Any())
+        //        return;
+
+        //    var newMarketTemplateIds = message.Markets.Select(s => s.MarketTemplateId).ToList();
+        //    var marketFixtures = fixture.Markets.Where(c => newMarketTemplateIds.Contains(c.MarketTemplateId)).ToList();
+
+        //    if (marketFixtures != null && marketFixtures.Any())
+        //    {
+        //        foreach (var marketFixture in marketFixtures)
         //        {
-        //            FixtureName = fixture.FixtureName,
-        //            MarketId = market.MarketId,
-        //            ClientCode = market.ClientCode,
-        //            ClientCodeMargin = market.ClientCodeMargin,
-        //            MarketName = market.MarketName,
-        //            ProviderMarketId = market.ProviderMarketId,
-        //            ProviderFixtureId = market.ProviderFixtureId,
-        //            AwayName = fixture.AwayName,
-        //            BetStop = fixture.BetStop,
-        //            CurrentMinute = fixture.CurrentMinute,
-        //            CurrentPeriod = fixture.CurrentPeriod,
-        //            FixtureStartDate = fixture.FixtureStartDate,
-        //            FixtureStatusId = fixture.FixtureStatusId,
-        //            HomeName = fixture.HomeName,
-        //            IsBetStopGlobal = fixture.IsBetStopGlobal,
-        //            Score = fixture.Score,
-        //            Line = market.Line,
-        //            MarketSpecifier = market.MarketSpecifier,
-        //            MarketStatusId = market.MarketStatusId,
-        //            MarketStatusName = market.MarketStatusName,
-        //            MarketTemplateId = market.MarketTemplateId,
-        //            Selections = market.Selections
-        //        });
+        //            fixture.BetStop = new List<int>();
+        //            fixture.CurrentPeriod = message.CurrentPeriod;
+        //            fixture.CurrentMinute = message.CurrentMinute.ToString();
+        //            fixture.Score = message.Score;
+        //            fixture.FixtureStatusId = message.FixtureStatusId;
+
+        //            foreach (var newMarket in message.Markets.Where(c => c.MarketTemplateId == marketFixture.MarketTemplateId && c.MarketName == marketFixture.MarketName && c.MarketSpecifier == marketFixture.MarketSpecifier))
+        //            {
+        //                var selectionIds = newMarket.Selections.Select(s => s.SelectionTemplateId).Distinct().ToList();
+
+        //                var providerMarketId = $"{fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newMarket.MarketSpecifier}";
+        //                var currentMarket = fixture.Markets.FirstOrDefault(c => c.ProviderMarketId == providerMarketId && c.MarketName == newMarket.MarketName);
+
+        //                if (currentMarket != null)
+        //                {
+        //                    currentMarket.MarketStatusId = newMarket.MarketStatusId;
+        //                    currentMarket.MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString();
+        //                    currentMarket.ClientCode = newMarket.ClientCodes;
+        //                    currentMarket.ClientCodeMargin = newMarket.ClientCodeMargin;
+
+        //                    foreach (var newSelection in newMarket.Selections)
+        //                    {
+        //                        var providerSelectionId = $"{fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newSelection.SelectionTemplateId}:{newMarket.MarketSpecifier}";
+        //                        var currentSelection = currentMarket.Selections.FirstOrDefault(c => c.ProviderSelectionId == providerSelectionId);
+
+        //                        if (currentSelection != null)
+        //                        {
+        //                            if (newSelection.IsActive)
+        //                            {
+        //                                currentSelection.OldDecimalOdds = currentSelection.DecimalOdds;
+        //                                currentSelection.DecimalOdds = CommonService.GetFinalOdds(newSelection.Odds).ToString("0.00");
+        //                                currentSelection.IsActive = newSelection.IsActive;
+        //                                currentSelection.ClientOdds = newSelection.ClientOdds.Select(s =>
+        //                                    new ClientOddsModel
+        //                                    {
+        //                                        ClientCode = s.ClientCode,
+        //                                        SelectionTemplateId = s.SelectionTemplateId,
+        //                                        Odds = s.DecimalOdds,
+        //                                        OldOdds = currentSelection.ClientOdds != null && currentSelection.ClientOdds.Any(c => c.ClientCode == s.ClientCode) ?
+        //                                                    currentSelection.ClientOdds.Where(c => c.ClientCode == s.ClientCode).FirstOrDefault().Odds : s.DecimalOdds
+        //                                    }).ToList();
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    // add market
+        //                    var market = new MarketModel()
+        //                    {
+        //                        MarketId = newMarket.MarketId.ToString(),
+        //                        ProviderMarketId = providerMarketId,
+        //                        ProviderFixtureId = message.ProviderFixtureId,
+        //                        Line = newMarket.Line,
+        //                        ClientCode = newMarket.ClientCodes,
+        //                        ClientCodeMargin = newMarket.ClientCodeMargin,
+        //                        MarketStatusId = newMarket.MarketStatusId,
+        //                        MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString(),
+        //                        MarketName = newMarket.MarketName,
+        //                        MarketTemplateId = newMarket.MarketTemplateId,
+        //                        Selections = newMarket.Selections.Select(s => new SelectionModel
+        //                        {
+        //                            SelectionId = s.SelectionId.ToString(),
+        //                            ProviderSelectionId = $"{fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{s.SelectionTemplateId}:{newMarket.MarketSpecifier}",
+        //                            OldDecimalOdds = CommonService.GetFinalOdds(s.Odds).ToString("0.00"),
+        //                            DecimalOdds = CommonService.GetFinalOdds(s.Odds).ToString("0.00"),
+        //                            IsActive = s.IsActive,
+        //                            SelectionName = s.SelectionName,
+        //                            SelectionTemplateId = s.SelectionTemplateId,
+        //                            SortOrder = s.SortOrder,
+        //                            ClientOdds = s.ClientOdds.Select(ss =>
+        //                                    new ClientOddsModel
+        //                                    {
+        //                                        ClientCode = ss.ClientCode,
+        //                                        SelectionTemplateId = ss.SelectionTemplateId,
+        //                                        Odds = ss.DecimalOdds,
+        //                                        OldOdds = s.ClientOdds != null && s.ClientOdds.Any(c => c.ClientCode == ss.ClientCode) ?
+        //                                                    s.ClientOdds.Where(c => c.ClientCode == ss.ClientCode).FirstOrDefault().DecimalOdds : ss.DecimalOdds
+        //                                    }).ToList()
+        //                        }).ToList()
+        //                    };
+
+        //                    fixture.Markets.Add(market);
+
+        //                    var marketTemplateGroupNames = MarketGroupCallback.MarketTemplateGroups.Where(c => c.MarketTemplateGroup.MarketTemplateIds.Contains(market.MarketTemplateId)).Select(s => s.MarketTemplateGroup.MarketTemplateGroupName).Distinct().ToList();
+        //                    var marketTemplateGroupId = MarketGroupCallback.MarketTemplateGroups.Max(s => s.MarketTemplateGroup.SortOrder) + 1;
+
+        //                    foreach (var marketTemplateGroupName in marketTemplateGroupNames)
+        //                    {
+        //                        // validate if market template group is already existing in UI
+        //                        if (!MarketGroupCallback.MarketTemplateGroups.Any(c => c.MarketTemplateGroup.MarketTemplateGroupName == marketTemplateGroupName))
+        //                        {
+        //                            var marketTemplates = new List<string>();
+        //                            var rawMarketTemplate = MarketGroupCallback.MarketTemplateGroups.Where(c => c.MarketTemplateGroup.MarketTemplateGroupName == marketTemplateGroupName).Select(s => s.MarketTemplateGroup.MarketTemplateIds).ToList();
+
+        //                            foreach (var lst in rawMarketTemplate)
+        //                            {
+        //                                marketTemplates.AddRange(lst);
+        //                            }
+
+        //                            // add market template group navigation if doesn't exist yet
+        //                            MarketGroupCallback.MarketTemplateGroups.Add(new MarketGroupNavigationModel
+        //                            {
+        //                                IsSelected = MarketGroupCallback.MarketTemplateGroups.Count == 1 ? true : false,
+        //                                MarketTemplateGroup = new MarketTemplateGroup
+        //                                {
+        //                                    MarketTemplateGroupId = marketTemplateGroupId,
+        //                                    MarketTemplateGroupName = MarketGroupCallback.MarketTemplateGroups.FirstOrDefault(s => s.MarketTemplateGroup.MarketTemplateGroupName == marketTemplateGroupName)?.MarketTemplateGroup.MarketTemplateGroupName,
+        //                                    SortOrder = MarketGroupCallback.MarketTemplateGroups.FirstOrDefault(s => s.MarketTemplateGroup.MarketTemplateGroupName == marketTemplateGroupName).MarketTemplateGroup.SortOrder,
+        //                                    MarketTemplateIds = marketTemplates.Distinct().ToList()
+        //                                }
+        //                            });
+
+        //                            marketTemplateGroupId++;
+        //                        }
+        //                    }
+
+        //                    // add market template navigation if it doesn't exist yet
+        //                    foreach (var MarketTemplateGroup in MarketGroupCallback.MarketTemplateGroups)
+        //                    {
+        //                        var groupId = MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId;
+
+        //                        if (MarketTemplateGroup.MarketTemplateGroup.MarketTemplateIds.Contains(market.MarketTemplateId))
+        //                        {
+        //                            var marketTemplate = MarketTemplates.FirstOrDefault(c => c.MarketTemplateId == market.MarketTemplateId && c.MarketTemplateGroupId == groupId && c.MarketName == market.MarketName);
+
+        //                            // check if market templates is already existing in the list
+        //                            if (marketTemplate == null)
+        //                            {
+        //                                // add market template if not existing
+        //                                MarketTemplates.Add(new MarketNavigationModel()
+        //                                {
+        //                                    Id = $"{market.MarketTemplateId}-{groupId}-{market.MarketName.ToLower().Replace(' ', '-')}",
+        //                                    IsSelected = !MarketTemplates.Any(m => m.MarketTemplateGroupId == groupId && m.IsSelected),
+        //                                    MarketTemplateGroupId = groupId,
+        //                                    MarketTemplateId = market.MarketTemplateId,
+        //                                    MarketName = market.MarketName,
+        //                                    Fixture = new MarketFixtureResponse.FixtureModel()
+        //                                    {
+        //                                        SportId = fixture.SportId,
+        //                                        SportName = fixture.SportName,
+        //                                        SegmentId = fixture.SegmentId,
+        //                                        SegmentName = fixture.SegmentName,
+        //                                        LeagueId = fixture.LeagueId,
+        //                                        LeagueName = fixture.LeagueName,
+        //                                        ProviderFixtureId = fixture.ProviderFixtureId,
+        //                                        FixtureName = fixture.FixtureName,
+        //                                        HomeName = fixture.HomeName,
+        //                                        AwayName = fixture.AwayName,
+        //                                        FixtureStartDate = fixture.FixtureStartDate,
+        //                                        IsLive = fixture.IsLive,
+        //                                        IsLiveStream = fixture.IsLiveStream,
+        //                                        IsSuspended = fixture.IsSuspended,
+        //                                        FixtureStatusId = fixture.FixtureStatusId,
+        //                                        FixtureStatusName = fixture.FixtureStatusName,
+        //                                        SMSCode = fixture.SMSCode,
+        //                                        Score = fixture.Score,
+        //                                        CurrentPeriod = fixture.CurrentPeriod,
+        //                                        CurrentMinute = fixture.CurrentMinute,
+        //                                        BetStop = fixture.BetStop,
+        //                                        IsBetStopGlobal = fixture.IsBetStopGlobal,
+        //                                        Markets = new List<MarketModel>() { market }
+        //                                    }
+        //                                });
+        //                            }
+        //                            else
+        //                            {
+        //                                // only add the market in the existing markert template
+        //                                marketTemplate.Fixture.Markets.Add(market);
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+
+        //        await InvokeAsync(StateHasChanged);
         //    }
-        //    return fixtureMarkets;
+
+        //}
+
+        //private async Task ProcessOnBetStopFixture(OnExternalBetStopFixtureMessage message)
+        //{
+        //    if (fixture == null || Id != message.ProviderFixtureId)
+        //        return;
+
+        //    fixture.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>();
+
+        //    FixtureMarkets.ForEach(m =>
+        //    {
+        //        m.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>();
+        //    });
+
+        //    await InvokeAsync(StateHasChanged);
+        //}
+
+        //private async Task ProcessOnBetStopGlobal(OnExternalBetStopGlobalMessage message)
+        //{
+        //    if (MarketTemplates == null)
+        //        return;
+
+        //    fixture.IsBetStopGlobal = message.IsBetStop;
+
+        //    FixtureMarkets.ForEach(m =>
+        //    {
+        //        m.IsBetStopGlobal = message.IsBetStop;
+        //    });
+
+        //    await InvokeAsync(StateHasChanged);
         //}
 
         protected string GetClientMargin(string clientCode, string clientCodeMargin, List<SelectionModel> selections, bool isPlayerProps)

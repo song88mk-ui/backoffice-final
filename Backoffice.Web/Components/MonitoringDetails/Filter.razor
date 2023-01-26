@@ -4,7 +4,7 @@
             <select class="form-select d-block" @onchange="OnMarketChangedEvent">
                 @foreach (var item in MarketTemplates)
                 {
-                    if (item.Value == MonitoringDetailsModel.SelectedMarketTemplateId)
+                    if (item.Value == SelectedMarketTemplateId)
                     {
                         <option value="@item.Value" selected>@item.Name</option>
                     }
