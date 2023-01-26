@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Backoffice.API.Repositories
 {
-    public interface IRabbitMQRepository
+    public interface IRabbitMqRepository
     {
         Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region);
     }

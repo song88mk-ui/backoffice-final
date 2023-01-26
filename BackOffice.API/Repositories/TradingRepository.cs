@@ -22,12 +22,12 @@ namespace Backoffice.API.Repositories
     public class TradingRepository : ITradingRepository
     {
         private readonly IConfiguration _configuration;
-        private readonly IRabbitMQRepository _rabbitMqRepository;
+        private readonly IBackofficeActivityLogRepository _activityLogRepository;
 
-        public TradingRepository(IConfiguration configuration, IRabbitMQRepository rabbitMqRepository)
+        public TradingRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository)
         {
             _configuration = configuration;
-            _rabbitMqRepository = rabbitMqRepository;
+            _activityLogRepository = activityLogRepository;
         }
 
         #region SPORTS
@@ -1407,21 +1407,14 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var activityLogList = new OnActivityLogListMessage();
-
                 var response = await GetHttpClient(region).PostAsync($"manual/messagesettlement", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                 {
+                    var activityLogList = new OnActivityLogListMessage();
                     activityLogList.OnActivityLogMessages.AddRange(request.Select(x => x.OnActivityLogMessage).ToList());
+                    await _activityLogRepository.ProcessActivityLog(activityLogList);
 
-                    await _rabbitMqRepository.Publish(new MessageRequest()
-                    {
-                        CorrelationId = Guid.NewGuid().ToString(),
-                        MessageType = "LogActivityList",
-                        RoutingKey = $"r.bo.util.logs",
-                        Payload = JsonSerializer.Serialize(activityLogList)
-                    }, region);
                     return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 }
                 else

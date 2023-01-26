@@ -77,10 +77,11 @@ namespace Backoffice.API
                 client.DefaultRequestHeaders.Add("x-api-key", Configuration["API:AuthenticationAPI:Security:APIKey"]);
             });
             services.AddDbContext<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"]));
-            services.AddHttpClient<IRabbitMQRepository, RabbitMQRepository>();
+            services.AddHttpClient<IRabbitMqRepository, RabbitMqRepository>();
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
             services.AddScoped<IPlatformRepository, PlatformRepository>();
             services.AddScoped<ITradingRepository, TradingRepository>();
+            services.AddScoped<IBackofficeActivityLogRepository, BackofficeActivityLogRepository>();
             services.AddSingleton<IMemCache, MemCache>();
             services.AddScoped<ApiKeyFilter>();
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);

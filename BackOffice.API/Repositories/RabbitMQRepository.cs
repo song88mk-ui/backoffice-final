@@ -11,14 +11,12 @@ using System.Threading.Tasks;
 
 namespace Backoffice.API.Repositories
 {
-    public class RabbitMQRepository : IRabbitMQRepository
+    public class RabbitMqRepository : IRabbitMqRepository
     {
-        private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
-        public RabbitMQRepository(HttpClient httpClient, IConfiguration configuration)
+        public RabbitMqRepository(HttpClient httpClient, IConfiguration configuration)
         {
             _configuration = configuration;
-            _httpClient = httpClient;
         }
 
         public async Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region)
