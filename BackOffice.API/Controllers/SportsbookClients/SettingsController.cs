@@ -188,48 +188,5 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
         #endregion
-
-        #region User Activity Logs
-        // Note: will remove
-        [HttpPost("activitylog")]
-        public async Task<IActionResult> ActivityLog([FromBody] ActivityLogModel request)
-        {
-            var result = await _backofficeRepository.AddActivityLog(request);
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-        [HttpPost("activitylog/list")]
-        public async Task<IActionResult> GetActivityLogs([FromBody] ActivityLogRequest request)
-        {
-            var result = await _backofficeRepository.GetActivityLogs(request);
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-        [HttpPost("activitylog/priceboostlist")]
-        public async Task<IActionResult> GetPriceboostActivityLogs([FromBody] PriceboostActivityLogRequest request)
-        {
-            var result = await _backofficeRepository.GetPriceboostActivityLogs(request);
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-        #endregion
     }
 }

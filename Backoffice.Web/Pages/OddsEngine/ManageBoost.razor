@@ -6,16 +6,26 @@
 @page "/odds-engine/manage-boost"
 
 <div class="col-md-12">
+    <Breadcrumb Breadcrumbs="Breadcrumbs" />
+</div>
+<div class="col-md-12">
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter PriceboostFilterModel="@PriceBoostFilterModel"
-            OnClientChangedCallback="OnClientChangedEvent" OnSportChangedCallback="OnSportChangedEvent" OnSegmentChangedCallback="OnSegmentChangedEvent"
-            OnLeagueChangedCallback="OnLeagueChangedEvent" />
+    <Filter @bind-PriceboostFilterModel="PriceBoostFilterModel"
+            OnClientChangedCallback="OnClientChangedEvent"
+            OnSportChangedCallback="OnSportChangedEvent"
+            OnSegmentChangedCallback="OnSegmentChangedEvent"
+            OnLeagueChangedCallback="OnLeagueChangedEvent"
+            OnInitCallback="GetContents" />
 </div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">
-        @if (PriceBoostList != null)
+        @if (IsPreLoader)
+        {
+            <Preloader />
+        }
+        else
         {
             @if (PriceBoostList != null && PriceBoostList.Any())
             {
@@ -110,10 +120,6 @@
                 <NoRecordFound />
             }
         }
-        else
-        {
-            <Preloader />
-        }        
     </div>
 </div>
 <Backoffice.Web.Components.Common.CustomModal OnSaveClickCallback="OnModalSave" OnCancelClickCallback="OnModalBack" />

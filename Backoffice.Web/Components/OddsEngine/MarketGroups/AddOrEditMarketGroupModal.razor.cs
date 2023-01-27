@@ -97,7 +97,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 });
 
                 ModalService.Cancel();
-                await Modal.OnSaveClickCallback.InvokeAsync(true);
+                await Modal.OnSaveClickCallback.InvokeAsync(MarketTemplateGroup.Name);
             }
             else
             {

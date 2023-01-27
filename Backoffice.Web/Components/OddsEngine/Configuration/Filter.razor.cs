@@ -17,6 +17,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public ConfigFilterModel ConfigFilterModel { get; set; }
         [Parameter] public EventCallback<ConfigFilterModel> ConfigFilterModelChanged { get; set; }
         [Parameter] public FixtureType FixtureType { get; set; }
+        [Parameter] public EventCallback OnInitCallBack { get; set; }
 
         public MarketLookupResponse MarketLookup { get; set; }
         private MarketTemplateGroupResponse MarketTemplateGroupResponse { get; set; }
@@ -27,82 +28,76 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            
-        }
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
+            IsPreloader = true;
+            var sports = await GetSports();
+            var sportId = sports.Any() ? sports.FirstOrDefault().Value : 0;
+            var headerTitle = sports.Any() ? sports.FirstOrDefault(c => c.Value == sportId).Name : "";
+            SportName = headerTitle;
+
+            var segments = await GetSegments(sportId);
+            var segmentId = segments.Any() ? segments.FirstOrDefault().Value : 0;
+
+            var leagues = await GetLeagues(sportId, segmentId);
+            var leagueId = leagues.Any() ? leagues.FirstOrDefault().Value : 0;
+
+            var scopes = GetScopes();
+            var scopeId = int.Parse(scopes.FirstOrDefault().Value);
+
+            var configStatuses = GetConfigStatus();
+            var configStatus = int.Parse(configStatuses.FirstOrDefault().Value);
+
+            var clients = await GetClients();
+            var clientCode = string.Empty;
+            var clientId = string.Empty;
+
+            if (clients != null && clients.Any())
             {
-                IsPreloader = true;
-                var sports = await GetSports();
-                var sportId = sports.Any() ? sports.FirstOrDefault().Value : 0;
-                var headerTitle = sports.Any() ? sports.FirstOrDefault(c => c.Value == sportId).Name : "";
-                SportName = headerTitle;
-
-                var segments = await GetSegments(sportId);
-                var segmentId = segments.Any() ? segments.FirstOrDefault().Value : 0;
-
-                var leagues = await GetLeagues(sportId, segmentId);
-                var leagueId = leagues.Any() ? leagues.FirstOrDefault().Value : 0;
-
-                var scopes = GetScopes();
-                var scopeId = int.Parse(scopes.FirstOrDefault().Value);
-
-                var configStatuses = GetConfigStatus();
-                var configStatus = int.Parse(configStatuses.FirstOrDefault().Value);
-
-                var clients = await GetClients();
-                var clientCode = string.Empty;
-                var clientId = string.Empty;
-
-                if (clients != null && clients.Any())
-                {
-                    clientCode = clients.FirstOrDefault().ClientCode;
-                    clientId = clients.FirstOrDefault().ClientId.ToString();
-                }
-
-                var clientConfig = (await TradingService.GetClientConfig(new ClientConfigRequest
-                {
-                    ClientCode = clientCode,
-                    SportId = sportId,
-                    SegmentId = segmentId,
-                    LeagueId = leagueId,
-                    FixtureTypeId = (int)FixtureType,
-                    IsActive = configStatus
-                })).Result;
-
-                var marketTemplateGroups = await GetMarketTemplateGroup(scopeId, sportId);
-                var marketTemplateGroup = marketTemplateGroups.Count > 0 && marketTemplateGroups.Any(g => g.MarketTemplateGroup.MarketTemplateGroupId == 2) ?
-                    marketTemplateGroups.FirstOrDefault(g => g.MarketTemplateGroup.MarketTemplateGroupId == 2).MarketTemplateGroup :
-                    new MarketTemplateGroup() { MarketTemplateGroupId = 0, MarketTemplateGroupName = string.Empty };
-
-                ConfigFilterModel = new ConfigFilterModel()
-                {
-                    Sports = sports,
-                    SportId = sportId,
-                    HeaderTitle = headerTitle,
-                    Segments = segments,
-                    SegmentId = segmentId,
-                    Leagues = leagues,
-                    LeagueId = leagueId,
-                    Scopes = scopes,
-                    Scope = scopeId,
-                    ConfigStatuses = configStatuses,
-                    FilterConfigStatus = configStatus,
-                    Clients = clients,
-                    ClientCode = clientCode,
-                    ClientId = clientId,
-                    MarketTemplateGroups = marketTemplateGroups,
-                    MarketTemplates = marketTemplateGroups.Count > 0 ? await GetMarketTemplate(marketTemplateGroups) : new List<MarketLookupNavigationModel>(),
-                    MarketTemplateGroupId = marketTemplateGroup.MarketTemplateGroupId,
-                    MarketTemplateGroupName = marketTemplateGroup.MarketTemplateGroupName,
-                    ClientConfig = clientConfig
-                };
-
-                IsPreloader = false;
-
-                await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+                clientCode = clients.FirstOrDefault().ClientCode;
+                clientId = clients.FirstOrDefault().ClientId.ToString();
             }
+
+            var clientConfig = (await TradingService.GetClientConfig(new ClientConfigRequest
+            {
+                ClientCode = clientCode,
+                SportId = sportId,
+                SegmentId = segmentId,
+                LeagueId = leagueId,
+                FixtureTypeId = (int)FixtureType,
+                IsActive = configStatus
+            })).Result;
+
+            var marketTemplateGroups = await GetMarketTemplateGroup(scopeId, sportId);
+            var marketTemplateGroup = marketTemplateGroups.Count > 0 && marketTemplateGroups.Any(g => g.MarketTemplateGroup.MarketTemplateGroupId == 2) ?
+                marketTemplateGroups.FirstOrDefault(g => g.MarketTemplateGroup.MarketTemplateGroupId == 2).MarketTemplateGroup :
+                new MarketTemplateGroup() { MarketTemplateGroupId = 0, MarketTemplateGroupName = string.Empty };
+
+            ConfigFilterModel = new ConfigFilterModel()
+            {
+                Sports = sports,
+                SportId = sportId,
+                HeaderTitle = headerTitle,
+                Segments = segments,
+                SegmentId = segmentId,
+                Leagues = leagues,
+                LeagueId = leagueId,
+                Scopes = scopes,
+                Scope = scopeId,
+                ConfigStatuses = configStatuses,
+                FilterConfigStatus = configStatus,
+                Clients = clients,
+                ClientCode = clientCode,
+                ClientId = clientId,
+                MarketTemplateGroups = marketTemplateGroups,
+                MarketTemplates = marketTemplateGroups.Count > 0 ? await GetMarketTemplate(marketTemplateGroups) : new List<MarketLookupNavigationModel>(),
+                MarketTemplateGroupId = marketTemplateGroup.MarketTemplateGroupId,
+                MarketTemplateGroupName = marketTemplateGroup.MarketTemplateGroupName,
+                ClientConfig = clientConfig
+            };
+
+            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            IsPreloader = false;
+            StateHasChanged();
+            await OnInitCallBack.InvokeAsync();
         }
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {

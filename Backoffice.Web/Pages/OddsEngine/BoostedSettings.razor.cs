@@ -10,27 +10,43 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class BoostedSettings : IDisposable
     {
         #region Properties
+        [Inject] public ITradingService TradingService { get; set; }
+        [Inject] IModalService ModalService { get; set; }
+        [Parameter] public string THeadClass { get; set; }
+        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-
-
-        [Parameter] public string THeadClass { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
-        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
+        public bool IsPreLoader { get; set; } = true;
         protected List<BoostedSettingsModel> ClientsView { get; set; }
         protected SearchFormModel SearchForm { get; set; }
-        [Inject] IModalService ModalService { get; set; }
-
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            Breadcrumbs = new List<BreadcrumbModel>();
             THeadClass = "table-head";
             PageTitle = "Boosted Settings";
             IconClass = string.Empty;
+
+            Breadcrumbs = new List<BreadcrumbModel>()
+            {
+                new BreadcrumbModel
+                {
+                    Name = "Price Boost",
+                    Url = string.Empty,
+                    IsCurrentPage = true
+                },
+                new BreadcrumbModel
+                {
+                    Name = "Boosted Settings",
+                    Url = "odds-engine/boosted-settings",
+                    IsCurrentPage = true
+                }
+            };
 
             SearchForm = new SearchFormModel();
             ClientsView = new List<BoostedSettingsModel>();
@@ -43,23 +59,19 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async Task GetContent()
         {
-            await InvokeAsync(StateHasChanged);
-
             try
             {
-                ClientsView = (await TradingService.GetBoostedSettings(new BoostedSettingsRequest()
+                var result = await TradingService.GetBoostedSettings(new BoostedSettingsRequest()
                 {
                     ClientCodes = UserModel.ClientCodes.ToList(),
                     Search = SearchForm.SearchText
-                })).Result;
+                });
+                ClientsView = result.Result;
+                StateHasChanged();
             }
             catch (Exception)
             {
 
-            }
-            finally
-            {
-                await InvokeAsync(StateHasChanged);
             }
         }
         public async Task OnEditSetting(BoostedSettingsModel client)

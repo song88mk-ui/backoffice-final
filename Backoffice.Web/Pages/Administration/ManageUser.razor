@@ -54,7 +54,7 @@
                                         <td>@RowCount</td>
                                         <td>@user.UserName</td>
                                         <td>
-                                            <span class="status-normal py-1 px-4 rounded-pill">@user.Status</span>
+                                            <span class="@(user.Status.ToUpper() == "LOCKED" ? "status-locked" : "status-normal") py-1 px-4 rounded-pill">@user.Status</span>
                                         </td>
                                         <td>@user.RoleName</td>
                                         <td>
@@ -70,6 +70,7 @@
                             }
                         }
                     </tbody>
+                        <Pagination MetaData="MetaData" Spread="5" SelectPageEvent="SelectedPage" PaginationColspan="5" />
                 </table>
             </div>
         </div>

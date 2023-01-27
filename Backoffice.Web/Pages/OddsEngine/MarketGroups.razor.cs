@@ -34,17 +34,33 @@ namespace Backoffice.Web.Pages.OddsEngine
         public bool IsPreLoader { get; set; }
         public bool IsSelectAll { get; set; }
         public string TableClass { get; set; }
-
-        public static MarketGroupModel MarketGroupModel { get; set; }
+        public static MarketGroupModel MarketGroupModel { get; set; } = new MarketGroupModel();
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
+        private bool _isDelete = false;
+        private bool _isUpdate = false;
+        private int _tempUpdateGroupId = -1;
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            MarketGroupModel = new MarketGroupModel();
             TableClass = "table-edit-market-group";
             IsPreLoader = true;
-            
+            Breadcrumbs = new List<BreadcrumbModel>()
+            {
+                new BreadcrumbModel
+                {
+                    Name = "Market Settings",
+                    Url = string.Empty,
+                    IsCurrentPage = true
+                },
+                new BreadcrumbModel
+                {
+                    Name = "Boosted Settings",
+                    Url = "odds-engine/market-groups",
+                    IsCurrentPage = true
+                }
+            };
         }
 
         public async Task OnAddClickedEvent()
@@ -73,13 +89,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public async Task OnEditClickedEvent(int marketTemplateGroupId)
         {
-            var marketTemplateGroup = new ClientMarketTemplateGroupDTO
-            {
-                FixtureStatusId = MarketGroupModel.FixtureStatusId,
-                MarketTemplateGroupId = marketTemplateGroupId
-            };
-
+            var marketTemplateGroup = MarketGroupModel.MarketTemplateGroups.Where(x => x.MarketTemplateGroupId == marketTemplateGroupId).FirstOrDefault();
             var parameters = new ModalParameters();
+            _isUpdate = true;
+            _tempUpdateGroupId = marketTemplateGroupId;
 
             parameters.Add("MarketGroupModel", MarketGroupModel);
             parameters.Add("MarketTemplateGroup", marketTemplateGroup);
@@ -95,6 +108,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnDeleteClickedEvent(ClientMarketTemplateGroupDTO marketTemplateGroup)
         {
             var parameters = new ModalParameters();
+            _isDelete = true;
 
             parameters.Add("MarketGroupModel", MarketGroupModel);
             parameters.Add("MarketTemplateGroup", marketTemplateGroup);
@@ -117,7 +131,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarketGroupModel.MarketTemplateGroups.AddRange(MarketGroupModel.OldMarketTemplateGroups);
 
             IsPreLoader = false;
-            
+
             StateHasChanged();
         }
 
@@ -176,22 +190,50 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public async Task OnSaveClickEvent(object item)
         {
-            MarketGroupModel.IsUpdate = false;
-            
-            IsPreLoader = true;
-            StateHasChanged();
+            if (_isDelete)
+            {
+                if (item is not null)
+                {
+                    if (int.TryParse(item.ToString(), out int groupId))
+                    {
+                        MarketGroupModel.MarketTemplateGroups.Remove(MarketGroupModel.MarketTemplateGroups.Where(x => x.MarketTemplateGroupId == groupId).FirstOrDefault());
+                        StateHasChanged();
+                    }
+                }
+            }
+            else if (_isUpdate)
+            {
+                if (item is not null)
+                {
+                    var group = MarketGroupModel.MarketTemplateGroups.Where(x => x.MarketTemplateGroupId == _tempUpdateGroupId).FirstOrDefault();
+                    if(group != null)
+                    {
+                        group.Name = item.ToString();
+                        StateHasChanged();
+                    }
+                }
+            }
+            else
+            {
+                MarketGroupModel.IsUpdate = false;
+                IsPreLoader = true;
+                StateHasChanged();
 
-            await OnInit();
+                await OnInit();
+            }
+
+            _isDelete = false;
+            _isUpdate = false;
+            _tempUpdateGroupId = -1;
         }
         public async Task OnSaveUpdateClickEvent(object item)
         {
             MarketGroupModel.IsUpdate = false;
             IsPreLoader = true;
-            
+
             StateHasChanged();
 
             var marketGroups = await GetMarketGroupSortOrderUpdate();
-
 
             if (marketGroups.Any())
             {
@@ -259,7 +301,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             PageTitle = "Market Groups";
             IconClass = string.Empty;
             IsPreLoader = true;
-            
+
             MarketGroupModel.IsUpdate = false;
             StateHasChanged();
 
@@ -292,7 +334,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             IsSelectAll = MarketGroupModel != null && !MarketGroupModel.MarketTemplateGroups.Any(s => s.IsActive == false);
             await SortOrderRow();
-        } 
+        }
         private async Task SortOrderRow()
         {
             if (MarketGroupModel != null && MarketGroupModel.MarketTemplateGroups.Any())
@@ -338,11 +380,11 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var marketTemplateGroup = new List<ClientMarketTemplateGroupDTO>();
 
-            foreach(var item in MarketGroupModel.MarketTemplateGroups)
+            foreach (var item in MarketGroupModel.MarketTemplateGroups)
             {
                 var newSortOrder = selectionTemplate.Where(x => x.RowId == $"name-{item.MarketTemplateGroupId.ToString()}").FirstOrDefault();
 
-                if(newSortOrder != null)
+                if (newSortOrder != null)
                 {
                     marketTemplateGroup.Add(new ClientMarketTemplateGroupDTO()
                     {

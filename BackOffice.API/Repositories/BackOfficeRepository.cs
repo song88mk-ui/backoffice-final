@@ -230,7 +230,6 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Methods - Client
-
         public async Task<BaseResponse<ClientResponse>> GetClients()
         {
             try
@@ -264,7 +263,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request)
         {
             try
@@ -369,7 +367,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<string>> GetClientRegion(int clientId)
         {
             try
@@ -391,7 +388,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<string>> GetClientRegionByClientCode(string clientCode)
         {
             try
@@ -413,7 +409,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         public async Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs)
         {
             try
@@ -449,8 +444,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
-
         public async Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request)
         {
             try

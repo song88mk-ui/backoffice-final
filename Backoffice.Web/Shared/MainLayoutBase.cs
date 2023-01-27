@@ -20,10 +20,11 @@ namespace Backoffice.Web.Shared
 
         [Parameter] public SportClickCallbackModel SelectedSport { get; set; }
 
-        public UserModel UserModel { get; set; }
+        public UserModel UserModel { get; set; } = new UserModel();
         public LogInModel Model { get; set; }
 
         public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
+        public bool IsPreLoader { get; set; } = true;
 
         #endregion
 
@@ -33,8 +34,7 @@ namespace Backoffice.Web.Shared
         {
             try
             {
-                UserModel = new UserModel();
-                if (HttpContextAccessor.HttpContext.Session.GetString("UserToken") == null)
+                if (HttpContextAccessor?.HttpContext?.Session.GetString("UserToken") == null)
                 {
                     NavigationManager.NavigateTo("login", true);
                     return;
@@ -50,35 +50,21 @@ namespace Backoffice.Web.Shared
                     clients = (await BackOfficeService.GetClients()).Result;
 
                 var tasks = new List<Task>();
-                Parallel.ForEach(userClaims, (claim) =>
-                {
-                    tasks.Add(Task.Run(() =>
-                    {
-                        switch (claim.Type.ToUpper())
-                        {
-                            case "CLIENTCODES":
-                                if (isSuperAdmin)
-                                    UserModel.ClientCodes.AddRange(clients.Clients.Select(c => c.ClientCode).ToList());
-                                else
-                                    UserModel.ClientCodes.AddRange(claim.Value.Split(',').ToList());
-                                break;
-                            case "USERID":
-                                UserModel.Id = claim.Value;
-                                break;
-                            case "TOKENNAME":
-                                UserModel.UserName = claim.Value;
-                                break;
-                            case "MAINUSERID":
-                                UserModel.MainUserId = claim.Value;
-                                break;
-                            default:
-                                UserModel.Claims.Add(claim);
-                                break;
-                        }
-                    }));
-                });
+                var permissions = new List<string>() { "CLIENTCODES", "USERID", "TOKENNAME", "MAINUSERID" };
 
-                Task.WaitAll(tasks.ToArray());
+                if (userClaims is not null)
+                {
+                    if (isSuperAdmin)
+                        UserModel.ClientCodes = clients.Clients.Select(c => c.ClientCode).ToList();
+                    else
+                        UserModel.ClientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>();
+
+                    UserModel.Id = userClaims.Where(x => x.Type.ToUpper() == "USERID").FirstOrDefault()?.Value ?? "";
+                    UserModel.UserName = userClaims.Where(x => x.Type.ToUpper() == "TOKENNAME").FirstOrDefault()?.Value ?? "";
+                    UserModel.MainUserId = userClaims.Where(x => x.Type.ToUpper() == "MAINUSERID").FirstOrDefault()?.Value ?? "";
+                    UserModel.Claims = userClaims.Where(x => !permissions.Contains(x.Type.ToUpper())).ToList();
+                }
+                IsPreLoader = false;
                 StateHasChanged();
             }
             catch (Exception)
@@ -86,20 +72,12 @@ namespace Backoffice.Web.Shared
                 NavigationManager.NavigateTo("login", true);
             }
         }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            //if (firstRender)
-            //{
-            //}
-        }
-
-        public async Task OnSportClickEvent(SportClickCallbackModel model)
+        public void OnSportClickEvent(SportClickCallbackModel model)
         {
             SelectedSport = model;
         }
 
-        public async void Dispose()
+        public void Dispose()
         {
         }
 

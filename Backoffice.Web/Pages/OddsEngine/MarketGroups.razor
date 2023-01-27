@@ -5,6 +5,9 @@
 @page "/odds-engine/market-groups"
 
 <div class="col-md-12">
+    <Breadcrumb Breadcrumbs="Breadcrumbs" />
+</div>
+<div class="col-md-12">
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
@@ -33,7 +36,7 @@
                             <th scope="col" width="5%" valign="middle" align="center">
                                 <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxSelectAllClickedEvent" />
                             </th>
-                            <th scope="col">Market Group Name</th>
+                            <th scope="col" class="text-start">Market Group Name</th>
                             <th scope="col">Markets</th>
                             <th scope="col">Manage</th>
                             <th scope="col"></th>
@@ -70,10 +73,10 @@
                                 </td>
                                 <td class="text-center">
                                     <a class="link-edit me-2">
-                                        <button class="fa fa-edit" @onclick="async () => await OnEditClickedEvent(MarketTemplateGroup.MarketTemplateGroupId)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
+                                        <button class="fa fa-edit" @onclick="async () => await OnEditClickedEvent(MarketTemplateGroup.MarketTemplateGroupId)"></button>
                                     </a>
                                     <a class="link-delete me-2">
-                                        <button class="fa fa-trash" @onclick="async () => await OnDeleteClickedEvent(MarketTemplateGroup)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
+                                        <button class="fa fa-trash" @onclick="async () => await OnDeleteClickedEvent(MarketTemplateGroup)"></button>
                                     </a>
                                 </td>
                                 <td class="text-center actions">

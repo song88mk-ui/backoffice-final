@@ -5,12 +5,15 @@
 @page "/odds-engine/config"
 
 <div class="col-md-12">
+    <Breadcrumb Breadcrumbs="Breadcrumbs" />
+</div>
+<div class="col-md-12">
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
     <HeaderConfigTopMenu />
 </div>
 
 <div class="col-md-12">
-    <Filter @bind-ConfigFilterModel="ConfigFilterModel" />
+    <Filter @bind-ConfigFilterModel="ConfigFilterModel" OnInitCallBack="@GetContents" />
 </div>
 
 <div class="col-md-12 mb-2">
@@ -18,34 +21,32 @@
 </div>
 
 <div class="col-md-12">
-    <Toast ToastMessage="@ToastMessage" ToastTitle="@ToastTitle" IsMessageMarkup=@IsToastMessageMarkup/>
-    @if (ConfigFilterModel != null && ConfigFilterModel.MarketTemplates != null)
+    <Toast ToastMessage="@ToastMessage" ToastTitle="@ToastTitle" IsMessageMarkup=@IsToastMessageMarkup />
+    @if (IsPreloader)
     {
-        SelectedContents = null;
-        if (!string.IsNullOrEmpty(ConfigFilterModel.ClientCode) && ConfigFilterModel.MarketTemplates.Any())
+        <Preloader />
+    }
+    else
+    {
+        @if (SelectedContents.Any())
         {
-            SelectedContents = GetContents();                        
-
-            if (SelectedContents.Any())
+            var marketCount = 0;
+            foreach (var market in SelectedContents)
             {
-                var marketCount = 0;
-                foreach (var market in SelectedContents)
+
+                if (market.NewMarketLookup == null)
+                    market.IsSelected = marketCount >= 3 ? true : false;
+
+                GetNewSettings(market);
+                var configStatus = market.MarketLookup.IsActive ? 1 : 0;
+
+                if (ConfigFilterModel.FilterConfigStatus == -99 || configStatus == ConfigFilterModel.FilterConfigStatus)
                 {
-
-                    if (market.NewMarketLookup == null)
-                        market.IsSelected = marketCount >= 3 ? true : false;
-
-                    GetNewSettings(market);
-                    var configStatus = market.MarketLookup.IsActive ? 1 : 0;
-
-                    if (ConfigFilterModel.FilterConfigStatus == -99 || configStatus == ConfigFilterModel.FilterConfigStatus)
+                    if (AllMarketStatus != null)
                     {
-                        if (AllMarketStatus != null)
-                        {
-                            market.NewMarketLookup.IsActive = (int)AllMarketStatus == 1 ? true : false;
-                        }
-                        marketCount++;
-                    }                    
+                        market.NewMarketLookup.IsActive = (int)AllMarketStatus == 1 ? true : false;
+                    }
+                    marketCount++;
                 }
 
                 if (marketCount > 0)
@@ -71,11 +72,10 @@
                                         <div class="d-flex justify-content-around market-toggle">
                                             <span>Market Active</span>
                                             <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox"                                                 
-                                                id="@($"market-{market.MarketLookup.MarketTemplateId}Toggle")" role="switch" 
-                                                aria-label="@($"{market.MarketLookup.MarketTemplateName} Toggle Switch")" 
-                                                @bind="market.MarketLookup.IsActive"
-                                                />
+                                                <input class="form-check-input" type="checkbox"
+                                       id="@($"market-{market.MarketLookup.MarketTemplateId}Toggle")" role="switch"
+                                       aria-label="@($"{market.MarketLookup.MarketTemplateName} Toggle Switch")"
+                                       @bind="market.MarketLookup.IsActive" />
                                             </div>
                                         </div>
                                     </div>
@@ -89,23 +89,23 @@
                                                     if ((ConfigFilterModel.Scope == 99 || ConfigFilterModel.Scope == 0))
                                                     {
                                                         //prematch
-                                                        <PreMatchConfig @key=@(market.MarketLookup.MarketTemplateId + "prematch") @bind-PrematchSettings="market.PrematchSettings"/>
+                                                        <PreMatchConfig @key=@(market.MarketLookup.MarketTemplateId + "prematch") @bind-PrematchSettings="market.PrematchSettings" />
                                                     }
 
                                                     if ((ConfigFilterModel.Scope == 99 || ConfigFilterModel.Scope == 1))
                                                     {
                                                         //live
-                                                        <LiveMatchConfig @key=@(market.MarketLookup.MarketTemplateId + "live") @bind-LiveSettings="market.NewLiveSettings"/>
+                                                        <LiveMatchConfig @key=@(market.MarketLookup.MarketTemplateId + "live") @bind-LiveSettings="market.NewLiveSettings" />
                                                     }
-                                                }                                                                                                
-                                            }                                            
+                                                }
+                                            }
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </ItemContent>
                     </Virtualize>
-                    
+
                 }
                 else
                 {
@@ -113,10 +113,6 @@
                 }
             }
         }
-        else
-        {
-            <NoRecordFound />
-        }
     }
 </div>
-<CustomModal/>
+<CustomModal />

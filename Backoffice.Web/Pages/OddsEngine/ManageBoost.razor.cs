@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -16,24 +17,41 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
-        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }        
+        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
         public MetaData MetaData { get; set; }
-        public PriceboostFilterModel PriceBoostFilterModel { get; set; }
+        public PriceboostFilterModel PriceBoostFilterModel { get; set; } = new PriceboostFilterModel();
         public string PageTitle { get; set; }
-        public string IconClass { get; set; }        
+        public string IconClass { get; set; }
         public List<PriceBoostConfigModel> PriceBoostList { get; set; }
         public LanguagesModel Languages { get; set; }
         private PriceBoostConfigModel TempConfig { get; set; }
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
+        public bool IsPreLoader { get; set; }
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            IsPreLoader = true;
             PageTitle = "Manage Boost";
             IconClass = string.Empty;
 
-            PriceBoostFilterModel = new PriceboostFilterModel();
+            Breadcrumbs = new List<BreadcrumbModel>()
+            {
+                new BreadcrumbModel
+                {
+                    Name = "Price Boost",
+                    Url = string.Empty,
+                    IsCurrentPage = true
+                },
+                new BreadcrumbModel
+                {
+                Name = "Manage Boost",
+                    Url = "odds-engine/manage-boost",
+                    IsCurrentPage = true
+                }
+            };
 
             MetaData = new MetaData()
             {
@@ -42,17 +60,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                 TotalCount = 10000,
                 TotalPages = 100
             };
-            
-            PriceBoostFilterModel.Clients = await LoadClients();
-            PriceBoostFilterModel.Sports = await LoadSports();
-            PriceBoostFilterModel.Segments = await LoadSegments(PriceBoostFilterModel.SportId);
-            PriceBoostFilterModel.Leagues = await LoadLeagues(PriceBoostFilterModel.SportId, PriceBoostFilterModel.SegmentId);
-            await GetContents();
-            await InvokeAsync(StateHasChanged);
-        }        
+        }
 
         public async Task OnEdit(PriceBoostConfigModel priceboost)
-        {            
+        {
             Languages = new LanguagesModel();
 
             Languages.Languages = Languages.Languages.Where(x => !priceboost.BoostedSelectionTranslations
@@ -65,9 +76,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "max-width: 90rem;top:50%;transform:translateY(-50%)");
             parameters.Add("PriceBoostConfigModel", JsonSerializer.Deserialize<PriceBoostConfigModel>(obj));
-            parameters.Add("Languages", Languages);            
+            parameters.Add("Languages", Languages);
 
-            var options = new ModalOptions();            
+            var options = new ModalOptions();
             ModalService.Open<EditBoostedOddsModal>($"Edit Boosted Odds", parameters, options);
         }
 
@@ -96,7 +107,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task GetContents()
         {
-            var priceBoostList = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest 
+            var priceBoostList = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
             {
                 ClientCode = !string.IsNullOrEmpty(PriceBoostFilterModel.ClientCode) ? PriceBoostFilterModel.ClientCode : "",
                 SportId = PriceBoostFilterModel.SportId > 0 ? PriceBoostFilterModel.SportId.ToString() : "",
@@ -115,6 +126,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             PriceBoostList = priceBoostList;
+            IsPreLoader = false;
+            StateHasChanged();
         }
 
         public async Task OnClientChangedEvent(string clientCode)
@@ -131,10 +144,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             PriceBoostFilterModel.Leagues = await LoadLeagues(sportId, PriceBoostFilterModel.SegmentId);
 
             await GetContents();
-            await InvokeAsync(StateHasChanged);
         }
 
-        public async Task OnSegmentChangedEvent(Tuple<int,int> param)
+        public async Task OnSegmentChangedEvent(Tuple<int, int> param)
         {
             PriceBoostFilterModel.LeagueId = 0;
 
@@ -179,26 +191,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-        private async Task<List<SelectListItemModel<string>>> LoadClients()
-        {
-            ClientModel clients = new ClientModel();
-            clients = (await BackOfficeService.GetClients()).Result;
-            if (clients != null)
-            {
-
-                if (UserModel.ClientCodes.Any())
-                {
-                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-                }
-            }
-
-            return clients.Clients.Select(x => new SelectListItemModel<string>()
-            {
-                Name = x.ClientName,
-                Value = x.ClientCode
-            }).ToList();
-        }
-
         private async Task<List<SelectListItemModel<int>>> LoadSports()
         {
             var result = (await TradingService.GetSportLookup()).Result;

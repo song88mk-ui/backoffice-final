@@ -11,15 +11,17 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
+        [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Parameter] public PriceboostFilterModel PriceboostFilterModel { get; set; }
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback<int> OnSportChangedCallback { get; set; }
         [Parameter] public EventCallback<Tuple<int,int>> OnSegmentChangedCallback { get; set; }
         [Parameter] public EventCallback OnLeagueChangedCallback { get; set; }        
-        //[Parameter] public EventCallback OnFilterChangedCallback { get; set; }
+        [Parameter] public EventCallback<PriceboostFilterModel> PriceboostFilterModelChanged { get; set; }
+        [Parameter] public EventCallback OnInitCallback { get; set; }
+        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
         public SearchFormModel SearchForm { get; set; }
-
         #endregion
 
         #region Methods
@@ -28,11 +30,13 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             SearchForm = new SearchFormModel();
 
-            //PriceboostFilterModel = new PriceboostFilterModel();
+            PriceboostFilterModel.Clients = await LoadClients();
+            PriceboostFilterModel.Sports = await LoadSports();
+            PriceboostFilterModel.Segments = await LoadSegments(PriceboostFilterModel.SportId);
+            PriceboostFilterModel.Leagues = await LoadLeagues(PriceboostFilterModel.SportId, PriceboostFilterModel.SegmentId);
 
-            //PriceboostFilterModel.Sports =  await LoadSports();
-            //PriceboostFilterModel.Segments = await LoadSegments(PriceboostFilterModel.SportId);
-            //PriceboostFilterModel.Leagues = await LoadLeagues(PriceboostFilterModel.SportId, PriceboostFilterModel.SegmentId);
+            await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
+            await OnInitCallback.InvokeAsync();
         }
 
         public async Task OnInputSearchEvent()
@@ -115,6 +119,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             PriceboostFilterModel.ClientCode = e.Value.ToString();
 
+            await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
             await OnClientChangedCallback.InvokeAsync(PriceboostFilterModel.ClientCode);
         }
 
@@ -122,6 +127,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             PriceboostFilterModel.SportId = int.Parse(e.Value.ToString());
 
+            await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
             await OnSportChangedCallback.InvokeAsync(PriceboostFilterModel.SportId);
         }
 
@@ -129,6 +135,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             PriceboostFilterModel.SegmentId = int.Parse(e.Value.ToString());
 
+            await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
             await OnSegmentChangedCallback.InvokeAsync(new Tuple<int, int>(PriceboostFilterModel.SportId, PriceboostFilterModel.SegmentId));
         }
 
@@ -136,6 +143,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             PriceboostFilterModel.LeagueId = int.Parse(e.Value.ToString());
 
+            await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
             await OnLeagueChangedCallback.InvokeAsync();
         }
 
@@ -143,6 +151,27 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
         }
 
+        #endregion
+        #region Utilities
+        private async Task<List<SelectListItemModel<string>>> LoadClients()
+        {
+            ClientModel clients = new ClientModel();
+            clients = (await BackOfficeService.GetClients()).Result;
+            if (clients != null)
+            {
+
+                if (UserModel.ClientCodes.Any())
+                {
+                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                }
+            }
+
+            return clients.Clients.Select(x => new SelectListItemModel<string>()
+            {
+                Name = x.ClientName,
+                Value = x.ClientCode
+            }).ToList();
+        }
         #endregion
     }
 }

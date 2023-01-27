@@ -11,20 +11,25 @@ using Microsoft.JSInterop;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Shared.OutgoingEngineMessages;
+using System.Runtime.CompilerServices;
+using Backoffice.Web.Components.Common;
+using System.Security.Policy;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class Configuration : IDisposable
     {
         #region Properties
+        [Inject] private IHttpContextAccessor _httpContextAccessor { get; set; }
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
         [Inject] public IConfiguration AppConfiguration { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        public ConfigFilterModel ConfigFilterModel { get; set; }
-        public IEnumerable<MarketLookupNavigationModel> SelectedContents;
+        public Configuration ConfigComponent { get; set; }
+        public ConfigFilterModel ConfigFilterModel { get; set; } = new ConfigFilterModel();
+        public List<MarketLookupNavigationModel> SelectedContents;
         public FixtureType FixtureType { get; set; }
         private HubConnection HubConnection { get; set; }
         public string PageTitle { get; set; }
@@ -36,7 +41,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public bool IsToastMessageMarkup { get; set; }
         public bool isSaving { get; set; }
         public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
-        public bool IsPreloader { get; set; }
+        public bool IsPreloader { get; set; } = true;
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
         #endregion
 
         #region Methods
@@ -46,6 +52,16 @@ namespace Backoffice.Web.Pages.OddsEngine
             IconClass = "";
             ConfigFilterModel = new ConfigFilterModel();
             IsToastMessageMarkup = true;
+
+            Breadcrumbs = new List<BreadcrumbModel>()
+            {
+                new BreadcrumbModel
+                {
+                    Name = "Config",
+                    Url = "odds-engine/config",
+                    IsCurrentPage = true
+                }
+            };
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -63,19 +79,21 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-        private IEnumerable<MarketLookupNavigationModel> GetContents()
-        {            
+        private async Task GetContents()
+        {   
             if (ConfigFilterModel.MarketTemplateGroupId == 0)
                 ConfigFilterModel.MarketTemplateGroupId = ConfigFilterModel.MarketTemplates.FirstOrDefault(m => m.IsSelected).MarketTemplateGroupId;
 
-            var query = ConfigFilterModel.MarketTemplates.Where(c => c.MarketTemplateGroupId == ConfigFilterModel.MarketTemplateGroupId);
+            var result = ConfigFilterModel.MarketTemplates.Where(c => c.MarketTemplateGroupId == ConfigFilterModel.MarketTemplateGroupId);
 
             if (!string.IsNullOrEmpty(ConfigFilterModel.SearchText))
             {
-                query = query.Where(c => c.MarketLookup.MarketTemplateName.ToUpper().Contains(ConfigFilterModel.SearchText.ToUpper()));
-            }         
+                result = result.Where(c => c.MarketLookup.MarketTemplateName.ToUpper().Contains(ConfigFilterModel.SearchText.ToUpper()));
+            }
 
-            return query;
+            SelectedContents= result.ToList();
+            IsPreloader = false;
+            StateHasChanged();
         }
 
         private void GetNewSettings(MarketLookupNavigationModel market)
@@ -612,21 +630,30 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task Subscribe()
         {
-            HubConnection = new HubConnectionBuilder()
-                .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
-                .Build();
-
-            //HubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
-            //{
-            //    await ProcessOnConfigChange(message);
-            //});
-
-            HubConnection.On<NotificationsModel>("onnewnotification", async message => 
+            try
             {
-                await ProcessNotification(message);
-            });
+                var request = _httpContextAccessor.HttpContext?.Request;
 
-            await HubConnection.StartAsync();
+                HubConnection = new HubConnectionBuilder()
+                    .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
+                    .Build();
+
+                //HubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
+                //{
+                //    await ProcessOnConfigChange(message);
+                //});
+
+                HubConnection.On<NotificationsModel>("onnewnotification", async message =>
+                {
+                    await ProcessNotification(message);
+                });
+
+
+                await HubConnection.StartAsync();
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         private async Task ProcessOnConfigChange(ConfigSettingsModel message)

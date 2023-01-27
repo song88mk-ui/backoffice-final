@@ -55,6 +55,8 @@ namespace Backoffice.Web.Components.MessageSettlement
             {
                 Fixtures = new List<FixtureModel>(),
             };
+
+            await MarketSettlementFilterModelChanged.InvokeAsync(MarketSettlementFilterModel);
             await Initialize();
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)

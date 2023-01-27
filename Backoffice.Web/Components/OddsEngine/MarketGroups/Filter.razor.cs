@@ -38,77 +38,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             if(firstRender)
             {
-                try
-                {
-                    MarketGroupModel.IsUpdate = false;
-
-                    if (UserModel.ClientCodes != null)
-                    {
-                        var clients = (await TradingService.GetClientList()).Result;
-
-                        var roleName = UserModel.RoleName;
-                        if (roleName != "Super Admin")
-                        {
-                            var clientCodes = UserModel.ClientCodes;
-                            clients = clients.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
-                        }
-                        Clients = clients.Select(s => new SelectListItemModel<string>
-                        {
-                            Value = s.ClientCode,
-                            Name = s.ClientName
-                        }).ToList();
-                    }
-                    else
-                    {
-                        Clients.Add(new SelectListItemModel<string>
-                        {
-                            Value = "",
-                            Name = "No Clients Available"
-                        });
-                    }
-
-                    SelectedClientCode = Clients.FirstOrDefault().Value;
-
-                    var sports = (await TradingService.GetSportLookup()).Result;
-
-                    if (sports != null)
-                    {
-                        Sports = sports.SportLookup.Select(s => new SelectListItemModel<int>
-                        {
-                            Value = s.SportId,
-                            Name = s.SportName
-                        }).ToList();
-                    }
-                    else
-                    {
-                        Sports.Add(new SelectListItemModel<int>
-                        {
-                            Value = 0,
-                            Name = "No Sports Available"
-                        });
-                    }
-
-                    SelectedSportId = Sports.Any() ?  Sports.FirstOrDefault().Value : 0;
-
-                    FixtureStatuses.Add(new SelectListItemModel<int>
-                    {
-                        Value = (int)FixtureStatus.Prematch,
-                        Name = FixtureStatus.Prematch.ToString()
-                    });
-
-                    FixtureStatuses.Add(new SelectListItemModel<int>
-                    {
-                        Value = (int)FixtureStatus.Live,
-                        Name = FixtureStatus.Live.ToString()
-                    });
-
-                    SelectedFixtureStatusId = FixtureStatuses.FirstOrDefault().Value;
-
-                    await PrepareMarketGroupModel();
-                }
-                catch (Exception)
-                {
-                }
             }
         }
         protected override async Task OnInitializedAsync()
@@ -117,6 +46,77 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             Sports = new List<SelectListItemModel<int>>();
             FixtureStatuses = new List<SelectListItemModel<int>>();
             MarketGroupModel = new MarketGroupModel();
+            try
+            {
+                MarketGroupModel.IsUpdate = false;
+
+                if (UserModel.ClientCodes != null)
+                {
+                    var clients = (await TradingService.GetClientList()).Result;
+
+                    var roleName = UserModel.RoleName;
+                    if (roleName != "Super Admin")
+                    {
+                        var clientCodes = UserModel.ClientCodes;
+                        clients = clients.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
+                    }
+                    Clients = clients.Select(s => new SelectListItemModel<string>
+                    {
+                        Value = s.ClientCode,
+                        Name = s.ClientName
+                    }).ToList();
+                }
+                else
+                {
+                    Clients.Add(new SelectListItemModel<string>
+                    {
+                        Value = "",
+                        Name = "No Clients Available"
+                    });
+                }
+
+                SelectedClientCode = Clients.FirstOrDefault().Value;
+
+                var sports = (await TradingService.GetSportLookup()).Result;
+
+                if (sports != null)
+                {
+                    Sports = sports.SportLookup.Select(s => new SelectListItemModel<int>
+                    {
+                        Value = s.SportId,
+                        Name = s.SportName
+                    }).ToList();
+                }
+                else
+                {
+                    Sports.Add(new SelectListItemModel<int>
+                    {
+                        Value = 0,
+                        Name = "No Sports Available"
+                    });
+                }
+
+                SelectedSportId = Sports.Any() ? Sports.FirstOrDefault().Value : 0;
+
+                FixtureStatuses.Add(new SelectListItemModel<int>
+                {
+                    Value = (int)FixtureStatus.Prematch,
+                    Name = FixtureStatus.Prematch.ToString()
+                });
+
+                FixtureStatuses.Add(new SelectListItemModel<int>
+                {
+                    Value = (int)FixtureStatus.Live,
+                    Name = FixtureStatus.Live.ToString()
+                });
+
+                SelectedFixtureStatusId = FixtureStatuses.FirstOrDefault().Value;
+
+                await PrepareMarketGroupModel();
+            }
+            catch (Exception)
+            {
+            }
         }
 
         public async Task OnUpdateClickEvent()
@@ -195,6 +195,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     await MarketGroupModelChanged.InvokeAsync(MarketGroupModel);
                 }
             }
+            await MarketGroupModelChanged.InvokeAsync(MarketGroupModel);
             await OnInitCallback.InvokeAsync();
         }
         #endregion

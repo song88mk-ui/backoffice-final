@@ -55,7 +55,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         public async Task OnDeleteModalClick()
         {
             IsPreLoader = true;
-
             await InvokeAsync(StateHasChanged);
 
             if (MarketTemplateGroup.Name.ToLower() == "all markets")
@@ -96,7 +95,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 });
 
                 ModalService.Cancel();
-                await Modal.OnSaveClickCallback.InvokeAsync();
+                await Modal.OnSaveClickCallback.InvokeAsync($"{MarketTemplateGroup.MarketTemplateGroupId}");
             }
             else
             {

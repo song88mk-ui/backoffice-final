@@ -16,8 +16,9 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
+        private MetaData MetaData { get; set; }
         public PermissionResponse Permissions { get; set; }
-        public ManageUserFilterModel FilterModel { get; set; }
+        public ManageUserFilterModel FilterModel { get; set; } = new ManageUserFilterModel();
         public List<UserResponse> UserList { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -33,7 +34,13 @@ namespace Backoffice.Web.Pages.Administration
             PageTitle = "Manage User";
             IconClass = "ico ico-manage-user";
 
-            FilterModel = new ManageUserFilterModel();
+            MetaData = new MetaData()
+            {
+                PageSize = 10,
+                CurrentPage = 1,
+                TotalPages = 0,
+                TotalCount = 0
+            };
             UserList = new List<UserResponse>();
             Permissions = await GetPermissionList();
         }
@@ -97,6 +104,13 @@ namespace Backoffice.Web.Pages.Administration
 
             await GetContent();
         }
+        protected async Task SelectedPage(int page)
+        {
+            MetaData.CurrentPage = page;
+            IsPreLoader = true;
+            await InvokeAsync(StateHasChanged);
+            await GetContent();
+        }
         public void Dispose()
         {
         }
@@ -122,16 +136,16 @@ namespace Backoffice.Web.Pages.Administration
         {
             var userResponse = await AuthenticationService.GetUserList(new UserGroupRequest()
             {
-                MetaData = new MetaData()
-                {
-                    PageSize = 0
-                },
+                MetaData = MetaData,
                 SearchText = FilterModel.SearchText,
                 SortBy = FilterModel.UserSorting
             });
 
             if (userResponse.Result != null)
+            {
+                MetaData = userResponse.Result.MetaData;
                 UserList = userResponse.Result.Users;
+            }
 
             IsPreLoader = false;
             StateHasChanged();

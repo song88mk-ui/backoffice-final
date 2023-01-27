@@ -4,20 +4,12 @@
             <span>Market Group Name</span>
         </div>
         <div class="col-7">
-                <input class="form-control @(IsPreLoader ? "disable" : "")" type="text" id="marketGroupNameField" aria-label="Market Group Name Field"
+            <input class="form-control @(IsPreLoader ? "disable" : "")" type="text" id="marketGroupNameField" aria-label="Market Group Name Field"
                    @bind-value="@MarketTemplateGroup.Name" />
         </div>
     </div>
 </div>
 <div class="modal-footer">
-    @if(IsPreLoader)
-    {
-        <button type="button" class="btn modal-btn modal-cancel" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn modal-btn modal-save" data-bs-dismiss="modal">Save</button>
-    }
-    else
-    {
-        <button type="button" class="btn modal-btn modal-cancel" data-bs-dismiss="modal" @onclick="OnModalCancelEvent">Cancel</button>
-        <button type="button" class="btn modal-btn modal-save" data-bs-dismiss="modal" @onclick="OnModalSaveEvent">Save</button>
-    }
+    <button type="button" class="btn modal-btn modal-cancel" data-bs-dismiss="modal" @onclick="OnModalCancelEvent" disabled="@IsPreLoader">Cancel</button>
+    <button type="button" class="btn modal-btn modal-save" data-bs-dismiss="modal" @onclick="OnModalSaveEvent" disabled="@IsPreLoader">Save</button>
 </div>
