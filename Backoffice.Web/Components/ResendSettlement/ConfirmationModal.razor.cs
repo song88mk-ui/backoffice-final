@@ -3,6 +3,8 @@ using Backoffice.Web.Services;
 using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Models;
 
 namespace Backoffice.Web.Components.ResendSettlement
 {
@@ -13,12 +15,14 @@ namespace Backoffice.Web.Components.ResendSettlement
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         private List<ResendSettlementBetDetailModel> ResendSettlementModel { get; set; }
+        private EventCallback<BaseResponse<ResendSettlementResponse>> OnResendSettlementCallback { get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
             ResendSettlementModel = ModalParameters.TryGet<List<ResendSettlementBetDetailModel>>("ResendSettlementModel");
+            OnResendSettlementCallback = ModalParameters.TryGet<EventCallback<BaseResponse<ResendSettlementResponse>>>("OnResendSettlementCallback");
         }
 
         public async Task OnModalCancel()
@@ -40,14 +44,11 @@ namespace Backoffice.Web.Components.ResendSettlement
                             CurrentStatus = (BetStatus)x.Bet.BetStatusId
                         }).ToList()
                 }
-                )).Result;
-
-                if (response.Data != null && response.Data.Any())
-                {
-
-                }
+                ));
 
                 ModalService.Cancel();
+
+                await OnResendSettlementCallback.InvokeAsync(response);                
             }
         }
 
