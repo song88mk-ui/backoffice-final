@@ -130,14 +130,16 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
                 var response = (await AuthenticationService.AddOrUpdateUserGroup(request));
 
-                if (response.Result)
+                if (response.StatusCode == StatusCode.Success && response.Result != null)
                 {
                     UserGroup.Claims = claims;
+
+                    var userGroupId = !IsEdit ? response.Result.UserGroupId : request.UserGroupId;
 
                     await BackOfficeService.AddActivityLog(new ActivityLogModel
                     {
                         Page = Page.Admin_ManageUserGroups.ToString().Replace("_", "."),
-                        Payload = $"{request.UserGroupId}",
+                        Payload = $"{userGroupId}",
                         Activity = !IsEdit ? Activity.Create.ToString() : Activity.Update.ToString(),
                         From = !IsEdit ? "-" : JsonSerializer.Serialize(OldUserGroup),
                         To = JsonSerializer.Serialize(UserGroup),
