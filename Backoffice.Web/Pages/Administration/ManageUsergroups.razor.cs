@@ -193,18 +193,20 @@ namespace Backoffice.Web.Pages.Administration
             {
                 MetaData = response.Result.MetaData;
 
-                var userGroupList = response.Result.UserGroups.Select((s, index) => new UserGroupResponse
+                var temp = response.Result.UserGroups;
+
+                if (sortBy == (int)UserGroupSorting.SortByUserGroupNameAsc)
+                    temp = temp.OrderBy(x => x.UserGroupName).ToList();
+                if (sortBy == (int)UserGroupSorting.SortByUserGroupNameDesc)
+                    temp = temp.OrderByDescending(x => x.UserGroupName).ToList();
+
+                var userGroupList = temp.Select((s, index) => new UserGroupResponse
                 {
                     Num = index + 1,
                     UserGroupId = s.UserGroupId,
                     UserGroupName = s.UserGroupName,
                     Claims = s.Claims
                 }).ToList();
-
-                if (sortBy == (int)UserGroupSorting.SortByUserGroupNameAsc)
-                    userGroupList = userGroupList.OrderBy(x => x.UserGroupName).ToList();
-                if (sortBy == (int)UserGroupSorting.SortByUserGroupNameDesc)
-                    userGroupList = userGroupList.OrderByDescending(x => x.UserGroupName).ToList();
 
                 return new UserGroupListResponse
                 {
