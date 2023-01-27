@@ -689,7 +689,7 @@ namespace Backoffice.Web.Services
 
             }
 
-            return result.TrimEnd('|').Replace("|", "<br>");
+            return result.TrimEnd('|').Replace("|", "");
         }
 
         private static string GetProperties(object obj, object another)
