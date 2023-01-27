@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Components;
 using System.Text;
 using System;
 using Backoffice.Web.Components.ResendSettlement;
+using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Models;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -16,7 +18,8 @@ namespace Backoffice.Web.Pages.Administration
         private List<ResendSettlementBetDetailModel> ResendSettlementModel { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-        public HashSet<string> BetIds { get; set; }        
+        public HashSet<string> BetIds { get; set; }
+        public List<AlertModel> Alerts { get; set; }
         #endregion
 
         #region Methods
@@ -29,6 +32,7 @@ namespace Backoffice.Web.Pages.Administration
             BetIds = new HashSet<string>();
 
             ResendSettlementModel = new List<ResendSettlementBetDetailModel>();
+            Alerts = new List<AlertModel>();
 
             if (ResendSettlementModel.Count == 0)
             {
@@ -93,6 +97,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("OnResendSettlementCallback", EventCallback.Factory.Create<BaseResponse<ResendSettlementResponse>>(this, OnResendSettlementCallback));
             parameters.Add("ResendSettlementModel", ResendSettlementModel);
 
             var options = new ModalOptions();
@@ -122,6 +127,19 @@ namespace Backoffice.Web.Pages.Administration
             BetIds.Remove(bet.Bet.BetId.ToString());
 
             await InvokeAsync(StateHasChanged);
+        }
+
+        public async Task OnResendSettlementCallback(BaseResponse<ResendSettlementResponse> response)
+        {
+            Alerts.Add(new AlertModel()
+            {
+                AlertStatus = response.StatusCode.ToString(),
+                AltertMessage = response.Message,
+                Opacity = 1.0m
+            });
+
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(3500);
         }
 
         public void Dispose()
