@@ -1,11 +1,11 @@
 ﻿<tr>
     <td>
-        <span class="fw-bold">@Selection.SelectionName</span>
+        <span class="selection-name-container fw-bold">@Selection.SelectionName</span>
     </td>
     <td>
         <div class="d-flex justify-content-center">
-            <div class="odds-container me-2 py-1 px-3">
-                <span>@GetClientOdds(null)</span>
+            <div class="odds-container @GetClientColor() py-1">
+                <span class="d-block text-center">@GetClientOdds(null)</span>
             </div>
         </div>
     </td>
@@ -13,14 +13,14 @@
     {
         <td>
             <div class="d-flex justify-content-center">
-                <div class="odds-container me-2 py-1 px-3">
+                <div class="odds-container @GetClientColor(client.ClientCode) py-1">
                     @if (HasClientConfig(client.ClientCode, Market.ClientCode, Market.ClientCodeMargin))
                     {
-                        <span>@GetClientOdds(client.ClientCode)</span>
+                        <span class="d-block text-center">@GetClientOdds(client.ClientCode)</span>
                     }
                     else
                     {
-                        <span>-.-</span>
+                        <span class="d-block text-center">-.-</span>
                     }
                 </div>
             </div>

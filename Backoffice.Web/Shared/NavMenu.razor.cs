@@ -11,6 +11,8 @@ namespace Backoffice.Web.Shared
         #region Properties
 
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; }
+
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public NavMenuAccess NavMenuAccess { get; set; }
@@ -117,6 +119,14 @@ namespace Backoffice.Web.Shared
                 SelectedSport.LeagueId = league.LeagueId;
                 SelectedSport.LeagueName = league.LeagueName;
 
+                // verify if you're in the monitoring page, if not then the user will be navigated.
+                var slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
+
+                if (slugs.Count != 1 && slugs[1].ToLower() != "monitoring")
+                {
+                    NavigationManager.NavigateTo("/odds-engine");
+                }
+
                 await OnSportClickCallback.InvokeAsync(SelectedSport);
             }
             else
@@ -139,6 +149,14 @@ namespace Backoffice.Web.Shared
 
                 SelectedSport.LeagueId = league.LeagueId;
                 SelectedSport.LeagueName = league.LeagueName;
+
+                // verify if you're in the monitoring page, if not then the user will be navigated.
+                var slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
+
+                if (slugs.Count != 1 && slugs[1].ToLower() != "monitoring")
+                {
+                    NavigationManager.NavigateTo("/odds-engine");
+                }
 
                 await OnSportClickCallback.InvokeAsync(SelectedSport);
             }

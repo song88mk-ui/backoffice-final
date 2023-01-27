@@ -14,6 +14,8 @@ namespace Backoffice.Web.Components.Monitoring
 
         [Parameter] public EventCallback<MonitoringCallbackModel> OnInitCallback { get; set; }
         [Parameter] public int SportId { get; set; }
+        [Parameter] public int SegmentId { get; set; }
+        [Parameter] public int LeagueId { get; set; }
 
         public SearchFormModel SearchForm { get; set; }
         public List<MainMarketTemplateResponse> TopMarketTemplates { get; set; }
@@ -25,6 +27,8 @@ namespace Backoffice.Web.Components.Monitoring
         #region Fields
 
         protected int sportId;
+        protected int segmentId;
+        protected int leagueId;
 
         #endregion
 
@@ -40,19 +44,17 @@ namespace Backoffice.Web.Components.Monitoring
         {
             if (sportId != SportId)
             {
-                sportId = SportId;
 
                 TopMarketTemplates = (await BackOfficeService.GetTopMarkets(SportId)).Result;
 
                 if (TopMarketTemplates != null && TopMarketTemplates.Any())
                     MarketTemplateId = TopMarketTemplates.FirstOrDefault().MainMarketTemplateId;
 
-                await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
-                {
-                    SportId = SportId,
-                    SearchText = string.Empty,
-                    SelectedMarketTemplateId = MarketTemplateId
-                });
+                await PrepareMonitoringData();
+            }
+            else if (sportId != SportId || segmentId != SegmentId || leagueId != LeagueId)
+            {
+                await PrepareMonitoringData();
             }
         }
 
@@ -80,6 +82,24 @@ namespace Backoffice.Web.Components.Monitoring
 
         public void Dispose()
         {
+        }
+
+        #endregion
+
+        #region Utilities
+
+        private async Task PrepareMonitoringData()
+        {
+            sportId = SportId;
+            segmentId = SegmentId;
+            leagueId = LeagueId;
+
+            await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
+            {
+                SportId = SportId,
+                SearchText = string.Empty,
+                SelectedMarketTemplateId = MarketTemplateId
+            });
         }
 
         #endregion

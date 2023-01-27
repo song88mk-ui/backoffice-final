@@ -41,26 +41,26 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task GetContents()
         {
-            var response = (await BackOfficeService.GetManualBetSettlmentHistory(new ManualBetDetailHistoryRequest()
-            {
-                Page = MetaData.CurrentPage,
-                PageSize = MetaData.PageSize,
-                ClientIdRefs = string.Join(',', FilterModel.Clients.Select(x => x.Value)),
-                SportIds = string.Join(',', FilterModel.Sports.Select(x => x.Value)),
-                Currencies = string.Join(',', FilterModel.Currencies.Select(x => x.Value)),
-                FromStatus = string.Join(',', FilterModel.FromStatuses.Select(x => x.Value)),
-                ToStatus = string.Join(',', FilterModel.ToStatuses.Select(x => x.Value)),
-                ReferenceIds = FilterModel.BetId,
-                FromSettleDate = FilterModel.DateFrom,
-                ToSettleDate = FilterModel.DateTo,
-                MemberName = FilterModel.MemberName,
-                SettledBy = FilterModel.SettledBy
-            })).Result;
+            //var response = (await BackOfficeService.GetManualBetSettlmentHistory(new ManualBetDetailHistoryRequest()
+            //{
+            //    Page = MetaData.CurrentPage,
+            //    PageSize = MetaData.PageSize,
+            //    ClientIdRefs = string.Join(',', FilterModel.Clients.Select(x => x.Value)),
+            //    SportIds = string.Join(',', FilterModel.Sports.Select(x => x.Value)),
+            //    Currencies = string.Join(',', FilterModel.Currencies.Select(x => x.Value)),
+            //    FromStatus = string.Join(',', FilterModel.FromStatuses.Select(x => x.Value)),
+            //    ToStatus = string.Join(',', FilterModel.ToStatuses.Select(x => x.Value)),
+            //    ReferenceIds = FilterModel.BetId,
+            //    FromSettleDate = FilterModel.DateFrom,
+            //    ToSettleDate = FilterModel.DateTo,
+            //    MemberName = FilterModel.MemberName,
+            //    SettledBy = FilterModel.SettledBy
+            //})).Result;
 
-            if (response != null) 
-            {
+            //if (response != null) 
+            //{
 
-            }
+            //}
         }
 
         public async Task OnSearchButtonClicked()

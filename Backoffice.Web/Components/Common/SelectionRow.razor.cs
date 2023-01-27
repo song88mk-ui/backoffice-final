@@ -7,14 +7,17 @@ namespace Backoffice.Web.Components.Common
     public partial class SelectionRow : IDisposable
     {
         #region Properties
+
         [Parameter] public SelectionModel Selection { get; set; }
         [Parameter] public string CurrentClientCode { get; set; }
         [Parameter] public bool HasClientConfig { get; set; }
         [Parameter] public string ColumnSize { get; set; }
         [Parameter] public bool IsBetStop { get; set; }
         [Parameter] public int CurrentMarketStatus { get; set; }
+
         public string Color { get; set; }
         public Dictionary<string, object> SpanAttributes { get; set; }
+
         #endregion
 
         #region Methods
@@ -144,6 +147,7 @@ namespace Backoffice.Web.Components.Common
             }
             return Color;
         }
+
         #endregion
     }
 }

@@ -22,9 +22,11 @@ namespace Backoffice.API.Repositories
     public class PlatformRepository : IPlatformRepository
     {
         private readonly IConfiguration _configuration;
-        public PlatformRepository(IConfiguration configuration)
+        private readonly IBackofficeActivityLogRepository _activityLogRepository;
+        public PlatformRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository)
         {
             _configuration = configuration;
+            _activityLogRepository = activityLogRepository;
         }
 
         #region Client
@@ -611,7 +613,10 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).PostAsync($"v1/bet/manualsettlement", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
+                {
+                    await _activityLogRepository.ProcessActivityLog(request.ActivityLogs);
                     return JsonConvert.DeserializeObject<BaseResponse<ManualBetSettlementResponse>>(await response.Content.ReadAsStringAsync());
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
@@ -693,6 +698,38 @@ namespace Backoffice.API.Repositories
             catch (Exception ex)
             {
                 return new BaseResponse<ResendSettlementResponse>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<BetModifyResponse>> CancelBet(BetModifyRequest request, string region)
+        {
+            try
+            {
+                var response = await GetHttpClient(region).PostAsync($"v1/bet/cancel", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonConvert.DeserializeObject<BaseResponse<BetModifyResponse>>(await response.Content.ReadAsStringAsync());
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonConvert.DeserializeObject<BaseResponse<BetModifyResponse>>(await response.Content.ReadAsStringAsync());
+                    else
+                    {
+                        return new BaseResponse<BetModifyResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<BetModifyResponse>()
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
@@ -39,6 +40,66 @@ namespace Backoffice.Web.Components.MonitoringDetails
             }
 
             return false;
+        }
+
+        public string GetClientColor(string ClientCode = null)
+        {
+            var color = "odds-bg-default";
+
+            if (Market.IsBetStopGlobal || Market.MarketStatusId != (int)MarketStatus.Active)
+            {
+                if (Market.MarketStatusId == (int)MarketStatus.Inactive)
+                {
+                    color = "odds-bg-inactive";
+                }
+                else
+                {
+                    color = "odds-bg-betstop";
+                }
+            }
+            else
+            {
+                if (ClientCode == null)
+                {
+                    if (!string.IsNullOrEmpty(Selection.OldDecimalOdds))
+                    {
+                        if (Convert.ToDecimal(Selection.OldDecimalOdds) > Convert.ToDecimal(Selection.DecimalOdds))
+                        {
+                            color = "odds-bg-danger-active";
+                        }
+
+                        if (Convert.ToDecimal(Selection.OldDecimalOdds) < Convert.ToDecimal(Selection.DecimalOdds))
+                        {
+                            color = "odds-bg-success-active";
+                        }
+                    }
+                }
+                else
+                {
+                    if (Selection.ClientOdds == null)
+                        return color;
+
+                    var clientOdds = Selection.ClientOdds.FirstOrDefault(c => c.ClientCode == ClientCode && c.SelectionTemplateId == Selection.SelectionTemplateId);
+
+                    if (clientOdds != null)
+                    {
+                        if (clientOdds.OldOdds != 0)
+                        {
+                            if (clientOdds.OldOdds > clientOdds.Odds)
+                            {
+                                color = "odds-bg-danger-active";
+                            }
+
+                            if (clientOdds.OldOdds < clientOdds.Odds)
+                            {
+                                color = "odds-bg-success-active";
+                            }
+                        }
+                    }
+                }
+            }
+
+            return color;
         }
 
         public void Dispose()

@@ -1,10 +1,11 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.ManualBetSettlement
 {
@@ -36,6 +37,24 @@ namespace Backoffice.Web.Components.ManualBetSettlement
 
         public async Task OnModalConfirm()
         {
+            OnActivityLogListMessage ActivityLogs = new OnActivityLogListMessage();
+            foreach (var bet in ManualBetDetailsModel.Bets)
+            {
+                OnActivityLogMessage ActivityLog = new OnActivityLogMessage()
+                {
+                    Page = Page.OE_Administration_ManualSettlement.ToString().Replace('_','.'),
+                    Activity = Activity.ManualSettlement.ToString(),
+                    Payload = $"{bet.ClientCode}.{bet.Selections.FirstOrDefault().SportId}.{bet.BetId}",
+                    From = "-",
+                    To = JsonSerializer.Serialize(bet),
+                    UserId = UserModel.Id,
+                    UserName = UserModel.UserName,
+                    TimeStamp = DateTime.Now
+                };
+
+                ActivityLogs.OnActivityLogMessages.Add(ActivityLog);
+            }
+
             var response = (await BackOfficeService.ManualSettlement(new ManualBetSettlementRequest()
             {
                 BetData = ManualBetDetailsModel.Bets.Select(bet => new ManualBetRequest()
@@ -43,13 +62,9 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                     BetId = bet.BetId.ToString(),
                     NewStatus = (BetStatus) bet.BetStatusId,
                     Reason = bet.Reason,
-                }).ToList()                
+                }).ToList(),
+                ActivityLogs = ActivityLogs
             })).Result;
-
-            if (response.IsSuccess)
-            {
-                
-            }
 
             ModalService.Cancel();
         }
