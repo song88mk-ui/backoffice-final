@@ -18,6 +18,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public ICommonService CommonService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
@@ -35,8 +36,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         public ClientModel ClientModel { get; set; }
         public List<FixtureMarketModel> FixtureMarkets { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
+        public List<string> Slugs { get; set; }
 
         public bool IsPreloader { get; set; }
+        public bool PassParametersToModel { get; set; }
 
         #endregion
 
@@ -47,6 +50,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             FixtureMarkets = null;
             MonitoringCallbackModel = new MonitoringCallbackModel();
             ClientModel = new ClientModel();
+            Slugs = new List<string>();
 
             Breadcrumbs = new List<BreadcrumbModel>();
 
@@ -75,7 +79,54 @@ namespace Backoffice.Web.Pages.OddsEngine
                 };
             }
 
+            Slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
+
+            if (Slugs.Count > 2)
+                PassParametersToModel = true;
+
             IsPreloader = true;
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            if (SelectedSport != null && PassParametersToModel)
+            {
+                // Check if endpoint contains parameters. If yes, then pass them to the SelectedSport model
+                if (Slugs.Count <= 2)
+                    return;
+
+                // If SportId, SegmentId, and LeagueId has value then monitoring will initialize data.
+                if (!string.IsNullOrEmpty(SportId) && !string.IsNullOrEmpty(SegmentId) && !string.IsNullOrEmpty(LeagueId))
+                {
+                    if (SelectedSport.SportId != int.Parse(SportId) && SelectedSport.SegmentId != int.Parse(SegmentId) && SelectedSport.LeagueId != int.Parse(LeagueId))
+                    {
+                        SelectedSport.SportId = int.Parse(SportId);
+                        SelectedSport.SegmentId = int.Parse(SegmentId);
+                        SelectedSport.LeagueId = int.Parse(LeagueId);
+                    }
+
+                    PassParametersToModel = false;
+                }
+                //else if (!string.IsNullOrEmpty(SportId) && !string.IsNullOrEmpty(SegmentId))
+                //{
+                //    if (SelectedSport.SportId != int.Parse(SportId) && SelectedSport.SegmentId != int.Parse(SegmentId))
+                //    {
+                //        SelectedSport.SportId = int.Parse(SportId);
+                //        SelectedSport.SegmentId = int.Parse(SegmentId);
+                //    }
+
+                //    PassParametersToModel = false;
+                //}
+                //else if (!string.IsNullOrEmpty(SportId))
+                //{
+                //    if (SelectedSport.SportId != int.Parse(SportId))
+                //    {
+                //        SelectedSport.SportId = int.Parse(SportId);
+                //    }
+
+                //    PassParametersToModel = false;
+                //}
+            }
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

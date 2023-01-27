@@ -245,6 +245,37 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 PageTitle = $"{Fixture.SportName} - {Fixture.SegmentName} - {Fixture.LeagueName}";
                 IconClass = $"iconfont iconfont-{Fixture.SportName.ToLower().Replace(" ", "-")}";
+
+                Breadcrumbs.Add(new BreadcrumbModel
+                {
+                    Name = "Monitoring",
+                    Url = $"odds-engine/monitoring",
+                    IsCurrentPage = false
+                });
+
+                Breadcrumbs.Add(new BreadcrumbModel
+                {
+                    Name = Fixture.SportName,
+                    //Url = $"odds-engine/monitoring/{Fixture.SportId}",
+                    Url = "",
+                    IsCurrentPage = false
+                });
+
+                Breadcrumbs.Add(new BreadcrumbModel
+                {
+                    Name = Fixture.SegmentName,
+                    //Url = $"odds-engine/monitoring/{Fixture.SportId}/{Fixture.SegmentId}",
+                    Url = "",
+                    IsCurrentPage = false
+                });
+
+                Breadcrumbs.Add(new BreadcrumbModel
+                {
+                    Name = Fixture.LeagueName,
+                    //Url = $"odds-engine/monitoring/{Fixture.SportId}/{Fixture.SegmentId}/{Fixture.LeagueId}",
+                    Url = "",
+                    IsCurrentPage = true
+                });
             }
         }
 
