@@ -4,7 +4,7 @@
     </td>
     <td>
         <div class="d-flex justify-content-center">
-            <div class="odds-container odds-bg-default me-2 py-1">
+            <div class="odds-container @GetClientColor() me-2 py-1">
                 <span class="d-block text-center">@GetClientOdds(null)</span>
             </div>
         </div>
@@ -13,7 +13,7 @@
     {
         <td>
             <div class="d-flex justify-content-center">
-                <div class="odds-container me-2 py-1">
+                <div class="odds-container @GetClientColor(client.ClientCode) me-2 py-1">
                     @if (HasClientConfig(client.ClientCode, Market.ClientCode, Market.ClientCodeMargin))
                     {
                         <span class="d-block text-center">@GetClientOdds(client.ClientCode)</span>

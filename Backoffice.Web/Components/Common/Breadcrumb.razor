@@ -23,7 +23,7 @@
             }
             else
             {
-                <span class="me-1">
+                <span class="me-1 @(model.IsCurrentPage ? "link-page" : string.Empty)">
                     @model.Name
                 </span>
             }

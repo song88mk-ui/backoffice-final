@@ -15,6 +15,26 @@
     width: 50px;
 }
 
+.odds-bg-inactive {
+    background: #e2e2e2;
+    color: #9f9f9f;
+    border: 2px solid #eb3422 !important;
+}
+
+.odds-bg-betstop {
+    border: 2px #e2e2e2 solid;
+}
+
+.odds-bg-danger-active {
+    -webkit-animation: odds-danger 10s ease-in-out forwards;
+    animation: odds-danger 10s ease-in-out forwards;
+}
+
+.odds-bg-success-active {
+    -webkit-animation: odds-success 10s ease-in-out forwards;
+    animation: odds-success 10s ease-in-out forwards;
+}
+
 .selection-name-container {
     white-space: nowrap;
 }
