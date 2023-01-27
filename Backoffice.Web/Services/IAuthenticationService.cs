@@ -21,7 +21,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<PermissionResponse>> GetPermissionList(bool isSubUser);
         Task<BaseResponse<UserGroupListResponse>> GetUserGroupList(UserGroupListRequest request);
         Task<BaseResponse<UserListResponse>> GetUserGroupUsers(UserGroupRequest request);
-        Task<BaseResponse<bool>> AddOrUpdateUserGroup(UserGroupRequest request);
+        Task<BaseResponse<UserGroupResponse>> AddOrUpdateUserGroup(UserGroupRequest request);
         Task<BaseResponse<bool>> DeleteUserGroup(UserGroupRequest request);
     }
 }

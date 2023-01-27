@@ -42,7 +42,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             {
                 OnActivityLogMessage ActivityLog = new OnActivityLogMessage()
                 {
-                    Page = Page.OE_Administration_ManualSettlement.ToString().Replace('_','.'),
+                    Page = Page.Administration_Settlement_Bet.ToString().Replace('_','.'),
                     Activity = Activity.ManualSettlement.ToString(),
                     Payload = $"{bet.ClientCode}.{bet.Selections.FirstOrDefault().SportId}.{bet.BetId}",
                     From = "-",

@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -16,7 +17,7 @@ namespace Backoffice.Web.Pages.Administration
         public MetaData MetaData { get; set; }
         public ManualBetSettlementFilterModel FilterModel { get; set; }
         public ManualSettlementBetHistoryModel ManualSettlementBetHistoryModel { get; set; }
-
+        private int CurrentPage { get; set; } = 1;
         #endregion
 
         #region Methods
@@ -57,10 +58,17 @@ namespace Backoffice.Web.Pages.Administration
             //    SettledBy = FilterModel.SettledBy
             //})).Result;
 
-            //if (response != null) 
+            //if (response != null)
             //{
 
             //}
+
+            //var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
+            //{
+            //    Page = Page.Administration_Settlement_Bet.ToString().Replace('_','.'),
+            //    Payload = BuildPayload(),
+            //    MetaData = MetaData
+            //}));
         }
 
         public async Task OnSearchButtonClicked()
@@ -77,6 +85,13 @@ namespace Backoffice.Web.Pages.Administration
         {
         }
 
+        #endregion
+
+        #region Utilities
+        private string BuildPayload()
+        {
+            return "";
+        }
         #endregion
     }
 }

@@ -58,7 +58,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpPost("reports/manualbet/history")]
-        public async Task<IActionResult> GetManualBetHistory([FromBody] ManualBetDetailHistoryRequest request)
+        public async Task<IActionResult> GetManualBetSettlementHistory([FromBody] ManualBetDetailHistoryRequest request)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 

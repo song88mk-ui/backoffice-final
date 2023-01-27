@@ -285,7 +285,7 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpPost("usergroup/post")]
         public async Task<IActionResult> AddOrUpdateUserGroup([FromBody] UserGroupRequest request)
         {
-            var result = new BaseResponse<bool>()
+            var result = new BaseResponse<UserGroupResponse>()
             {
                 StatusCode = Shared.Enums.StatusCode.Unauthorized,
                 Message = "Missing authorization"

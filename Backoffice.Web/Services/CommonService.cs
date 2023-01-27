@@ -667,12 +667,24 @@ namespace Backoffice.Web.Services
                         }
                         else if (claim.ClaimValue != check.ClaimValue)
                         {
-                            if (claim.ClaimValue == "1")
-                                result = result + $"{claim.ClaimType} -  <div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>|";
-                            else if (claim.ClaimValue == "2")
-                                result = result + $"{claim.ClaimType} ReadOnly - <div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>|";
+                            if(claim.ClaimType == SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_","."))
+                            {
+                                var clients = claim.ClaimValue.Split(',');
+                                var checkClients = check.ClaimValue.Split(',');
+                                var uniqueClient = clients.Where(c => !checkClients.Contains(c));
+
+                                result = result + $"Client Access:|{string.Join(",", uniqueClient)}||";
+                            }
                             else
-                                result = result + $"{claim.ClaimType} - <div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled></div>|";
+                            {
+                                if (claim.ClaimValue == "1")
+                                    result = result + $"{claim.ClaimType} -  <div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>|";
+                                else if (claim.ClaimValue == "2")
+                                    result = result + $"{claim.ClaimType} ReadOnly - <div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>|";
+                                else
+                                    result = result + $"{claim.ClaimType} - <div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled></div>|";
+                            }
+
                         }
                     }
                 }
