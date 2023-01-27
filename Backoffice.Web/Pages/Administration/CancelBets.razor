@@ -1,4 +1,4 @@
-﻿@using Backoffice.Web.Components.CancelBets
+﻿@using Backoffice.Web.Components.Administration.CancelBets
 
 @page "/admin/cancel-bets"
 
@@ -9,8 +9,17 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter />
+                <Filter OnAddBetReferenceIdCallback="OnAddBetReferenceIdCallbackEvent" OnCancelBetCallback="OnCancelBetCallbackEvent" OnResetCallback="OnResetCallbackEvent" />
             </div>
+            @if (Alerts != null && Alerts.Any())
+            {
+                <div class="col-md-12">
+                    @foreach (var alert in Alerts)
+                    {
+                        <AlertMessage AlertStatus="@alert.AlertStatus" AlertMessageStr="@alert.AltertMessage" Opacity="@alert.Opacity" />
+                    }
+                </div>
+            }
             <div class="col-md-12">
                 <div class="content mx-3">
                     <div class="information-container">
@@ -24,18 +33,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="text-center">1</td>
-                                <td>
-                                    <input type="text" class="form-control" value="4FA62488-A950-402D-6994-08DAF20143E0" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">2</td>
-                                <td>
-                                    <input type="text" class="form-control" />
-                                </td>
-                            </tr>
+                            @if(CancelBetModel != null && CancelBetModel.BetReferenceIds.Any())
+                            {
+                                foreach(var bet in CancelBetModel.BetReferenceIds)
+                                {
+                                    <tr>
+                                        <td class="text-center">@bet.Num</td>
+                                        <td>
+                                            <input type="text" class="form-control" @bind-value="bet.BetReferenceId" />
+                                        </td>
+                                    </tr>
+                                }
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -52,7 +61,10 @@
                             <tr>
                                 <td>
                                     <div class="form-floating">
-                                        <textarea class="form-control input-reason">Market Suspended</textarea>
+                                        @if(CancelBetModel != null)
+                                        {
+                                            <textarea class="form-control input-reason" @bind="CancelBetModel.Reason" />
+                                        }
                                     </div>
                                 </td>
                             </tr>
@@ -62,4 +74,7 @@
             </div>
         </div>
     </div>
+</div>
+<div>
+    <CustomModal OnSaveClickCallback="OnResetCallbackEvent" />
 </div>
