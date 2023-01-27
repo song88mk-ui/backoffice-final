@@ -46,49 +46,7 @@ namespace Backoffice.Web.Pages.Administration
         }
         public async Task OnCancelBetCallbackEvent()
         {
-            Alerts.Clear();
-            var count = 0;
-            foreach (var bet in CancelBetModel.BetReferenceIds)
-            {
-                if(!string.IsNullOrEmpty(bet.BetReferenceId.Trim()))
-                {
-                    var isValid = Guid.TryParse(bet.BetReferenceId.Trim(), out var betId);
-                    if (!isValid)
-                    {
-                        Alerts.Add(new AlertModel
-                        {
-                            AlertStatus = "Error",
-                            AltertMessage = $"Invalid Bet Reference Id {bet.BetReferenceId.Trim()}",
-                            Opacity = 1.0m
-                        });
-                    }
-
-                    var existingBet = CancelBetModel.BetReferenceIds.FirstOrDefault(b => b.Num != bet.Num && b.BetReferenceId.Trim() == bet.BetReferenceId.Trim());
-                    if(existingBet != null)
-                    {
-                        Alerts.Add(new AlertModel
-                        {
-                            AlertStatus = "Error",
-                            AltertMessage = $"Duplicate Bet Reference Id found. {bet.BetReferenceId.Trim()}",
-                            Opacity = 1.0m
-                        });
-                    }
-
-                    count++;
-                }
-            }
-
-            if(count== 0)
-            {
-                Alerts.Add(new AlertModel
-                {
-                    AlertStatus = "Error",
-                    AltertMessage = $"At least 1 Bet Reference Id is required.",
-                    Opacity = 1.0m
-                });
-            }
-
-            if (Alerts.Any())
+            if (!Validate())
                 return;
 
             var parameters = new ModalParameters();
@@ -115,6 +73,70 @@ namespace Backoffice.Web.Pages.Administration
         {
         }
 
+        #endregion
+
+        #region Utilities
+        private bool Validate()
+        {
+            Alerts.Clear();
+
+            var count = 0;
+            foreach (var bet in CancelBetModel.BetReferenceIds)
+            {
+                if (!string.IsNullOrEmpty(bet.BetReferenceId.Trim()))
+                {
+                    var isValid = Guid.TryParse(bet.BetReferenceId.Trim(), out var betId);
+                    if (!isValid)
+                    {
+                        Alerts.Add(new AlertModel
+                        {
+                            AlertStatus = "Error",
+                            AltertMessage = $"Invalid Bet Reference Id {bet.BetReferenceId.Trim()}",
+                            Opacity = 1.0m
+                        });
+                    }
+
+                    var existingBet = CancelBetModel.BetReferenceIds.FirstOrDefault(b => b.Num != bet.Num && b.BetReferenceId.Trim() == bet.BetReferenceId.Trim());
+                    if (existingBet != null)
+                    {
+                        Alerts.Add(new AlertModel
+                        {
+                            AlertStatus = "Error",
+                            AltertMessage = $"Duplicate Bet Reference Id found. {bet.BetReferenceId.Trim()}",
+                            Opacity = 1.0m
+                        });
+                    }
+
+                    count++;
+                }
+            }
+
+            if (count == 0)
+            {
+                Alerts.Add(new AlertModel
+                {
+                    AlertStatus = "Error",
+                    AltertMessage = $"At least 1 Bet Reference Id is required.",
+                    Opacity = 1.0m
+                });
+            }
+
+            if (string.IsNullOrEmpty(CancelBetModel.Reason))
+            {
+                Alerts.Add(new AlertModel
+                {
+                    AlertStatus = "Error",
+                    AltertMessage = $"Please specify reason for canceling bet/s.",
+                    Opacity = 1.0m
+                });
+            }
+
+            if (Alerts.Any())
+                return false;
+
+            return true;
+
+        }
         #endregion
     }
 }

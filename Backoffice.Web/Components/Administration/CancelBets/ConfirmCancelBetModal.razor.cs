@@ -1,5 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
@@ -14,7 +15,6 @@ namespace Backoffice.Web.Components.Administration.CancelBets
     {
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
@@ -41,51 +41,79 @@ namespace Backoffice.Web.Components.Administration.CancelBets
             try
             {
                 Alerts.Clear();
-                
-                //var response = (await AuthenticationService.DeleteUserGroup(new Backoffice.Shared.Models.Requests.UserGroupRequest
-                //{
-                //    UserGroupId = UserGroup.UserGroupId,
-                //    UserGroupName = UserGroup.UserGroupName,
-                //}));
 
-                //if (response.Result)
-                //{
-                //    //activity log
-                //    await BackOfficeService.AddActivityLog(new ActivityLogModel
-                //    {
-                //        Page = Page.Admin_ManageUserGroups.ToString().Replace("_", "."),
-                //        Payload = $"{UserGroup.UserGroupId}",
-                //        Activity = Activity.Delete.ToString(),
-                //        From = JsonSerializer.Serialize(UserGroup),
-                //        To = "-",
-                //        UserId = UserModel.Id,
-                //        UserName = UserModel.UserName,
-                //    });
+                var request = new BetModifyRequest
+                {
+                    BetIds = CancelBetModel.BetReferenceIds.Select(s => s.BetReferenceId).ToList(),
+                    NewStatus = BetStatus.Cancelled,
+                    Reason = CancelBetModel.Reason,
+                    ModifiedByUserId = 0,
+                };
 
 
-                //    Alerts.Add(new AlertModel
-                //    {
-                //        AlertStatus = "Success",
-                //        AltertMessage = "User Group successfully deleted",
-                //        Opacity = 1.0m
-                //    });
+                var response = (await BackOfficeService.CancelBet(request));
 
-                //    await InvokeAsync(StateHasChanged);
-                //    await Task.Delay(3500);
+                if (response.StatusCode == StatusCode.Success)
+                {
+                    //TODO: fetch details of each bet and save into activity log payload
 
-                //    ModalService.Cancel();
+                    //activity log
+                    foreach(var data in response.Result.Data)
+                    {
+                        await BackOfficeService.AddActivityLog(new ActivityLogModel
+                        {
+                            Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
+                            Payload = $"{data.BetId}",
+                            Activity = Activity.Delete.ToString(),
+                            From = data.OldBetStatus,
+                            To = BetStatus.Cancelled.ToString(),
+                            UserId = UserModel.Id,
+                            UserName = UserModel.UserName,
+                        });
+                    }
+                    
+                    Alerts.Add(new AlertModel
+                    {
+                        AlertStatus = "Success",
+                        AltertMessage = "User Group successfully deleted",
+                        Opacity = 1.0m
+                    });
 
-                //    await Modal.OnSaveClickCallback.InvokeAsync();
-                //}
-                //else
-                //{
-                //    Alerts.Add(new AlertModel
-                //    {
-                //        AlertStatus = "Error",
-                //        AltertMessage = $"{response.Message}",
-                //        Opacity = 1.0m
-                //    });
-                //}
+                    await InvokeAsync(StateHasChanged);
+                    await Task.Delay(3500);
+
+                    ModalService.Cancel();
+
+                    await Modal.OnSaveClickCallback.InvokeAsync();
+                }
+                else
+                {
+                    if(response.Result != null && response.Result.Data != null)
+                    {
+                        foreach(var data in response.Result.Data)
+                        {
+                            if(data.IsSuccess == false)
+                            {
+                                Alerts.Add(new AlertModel
+                                {
+                                    AlertStatus = "Error",
+                                    AltertMessage = $"{data.Message}",
+                                    Opacity = 1.0m
+                                });
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        Alerts.Add(new AlertModel
+                        {
+                            AlertStatus = "Error",
+                            AltertMessage = $"{response.Message}",
+                            Opacity = 1.0m
+                        });
+                    }
+                }
             }
             catch (Exception)
             {

@@ -12,6 +12,7 @@ namespace Backoffice.Shared.Enums
         Copy = 3,
         ChangedPassword = 4,
         ManualSettlement = 5,
-        PriceBoostChangedSelection = 6
+        PriceBoostChangedSelection = 6,
+        CancelBet = 7,
     }
 }
