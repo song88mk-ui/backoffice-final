@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
+using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
 using Page = Backoffice.Shared.Enums.Page;
@@ -11,10 +12,12 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
     public partial class ViewAllLogsFilter : IDisposable
     {
         #region Properties
+        [Inject] public ITradingService TradingService { get; set; }
         [Parameter] public Page SelectedPage { get; set; }
         [Parameter] public EventCallback<PriceBoostLogFilterModel> OnFilterChangedEventCallback { get; set; }
-        [Parameter] public PriceBoostLogFilterModel FilterModel { get; set; }
+        [Parameter] public PriceBoostLogFilterModel FilterModel { get; set; } = new PriceBoostLogFilterModel();
         [Parameter] public EventCallback<PriceBoostLogFilterModel> FilterModelChanged { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public Dictionary<Page, string> Pages { get; set; }
         #endregion
 
@@ -23,9 +26,10 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             Pages = new Dictionary<Page, string>() { { Page.OE_PriceBoost_Manage, "Manage Boost" }, { Page.OE_PriceBoost_Settings, "Boosted Setting" } };
 
+            var client = await GetClients();
             FilterModel = new PriceBoostLogFilterModel()
             {
-                Clients = new List<KeyValuePair<string, string>>(),
+                Clients = client,
                 Tab = SelectedPage,
                 ClientCode = "ALL",
                 Sports = new SportsLookupResponse(),
@@ -38,6 +42,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 DateFrom = DateTime.Now.AddDays(-7).Date,
                 DateTo = DateTime.Now.Date
             };
+            await OnFilterChangedEventCallback.InvokeAsync(FilterModel);
         }
         #endregion
 
@@ -100,5 +105,29 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         public void Dispose()
         {
         }
+
+        #region Utilities
+        private async Task<List<KeyValuePair<string, string>>> GetClients()
+        {
+            var response = await TradingService.GetClientList();
+
+            List<KeyValuePair<string, string>> Clients = new List<KeyValuePair<string, string>>();
+
+            if (response != null)
+            {
+                foreach (var client in response.Result)
+                {
+                    if (UserModel.ClientCodes.Contains(client.ClientCode, StringComparer.OrdinalIgnoreCase))
+                    {
+                        KeyValuePair<string, string> Client = new KeyValuePair<string, string>(client.ClientCode, client.ClientName);
+
+                        Clients.Add(Client);
+                    }
+                }
+            }
+
+            return Clients;
+        }
+        #endregion
     }
 }

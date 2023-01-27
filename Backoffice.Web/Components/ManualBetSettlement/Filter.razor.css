@@ -10,3 +10,13 @@
 .btn-filter {
     background-color: #232323;
 }
+
+button.form-select {
+    background-color: #fff;
+    text-align: left;
+    border: 1px solid #ced4da;    
+}
+
+.dropdown-toggle::after {
+    display: none;
+}

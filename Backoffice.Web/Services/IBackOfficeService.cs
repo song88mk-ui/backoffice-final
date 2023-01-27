@@ -35,5 +35,8 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<List<MarketTemplatePlayerPropsResponse>>> GetMarketTemplatePlayerProps(MarketTemplatePlayerPropsRequest request);
         Task<BaseResponse<ManualBetDetailsResponse>> GetManualBetDetails(ManualBetDetailsRequest request);
         Task<BaseResponse<ManualBetSettlementResponse>> ManualSettlement(ManualBetSettlementRequest request);
+        Task<BaseResponse<ManualBetHistoryResponse>> GetManualBetSettlmentHistory(ManualBetDetailHistoryRequest request);
+        Task<BaseResponse<ResendSettlementBetDetailModel>> GetResendSettlementBetDetails(ResendSettlementBetDetailRequest request);
+        Task<BaseResponse<ResendSettlementResponse>> ResendSettlement(ResendSettlementRequest request);
     }
 }

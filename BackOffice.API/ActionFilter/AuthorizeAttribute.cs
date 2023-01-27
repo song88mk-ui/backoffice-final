@@ -29,33 +29,43 @@ namespace Backoffice.API.ActionFilter
 
         public async void OnAuthorization(AuthorizationFilterContext context)
         {
-            if (!context.HttpContext.Request.Headers.ContainsKey("Authorization"))
+            try
             {
-                context.Result = new JsonResult(new { title = "Unauthorized", message = "Missing authorization" }) { StatusCode = StatusCodes.Status401Unauthorized };
-                return;
+                if (!context.HttpContext.Request.Headers.ContainsKey("Authorization"))
+                {
+                    context.Result = new JsonResult(new { title = "Unauthorized", message = "Missing authorization" }) { StatusCode = StatusCodes.Status401Unauthorized };
+                    return;
+                }
+
+                var token = context.HttpContext.Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer", "").Trim();
+
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadToken(token);
+
+                if (jwtToken == null)
+                {
+                    context.Result = new JsonResult(new { title = "Unauthorized", message = "Invalid token." }) { StatusCode = StatusCodes.Status401Unauthorized };
+                    return;
+                }
+
+                // Invalid Isuer
+                if (jwtToken.Issuer != _configuration["API:AuthenticationAPI:JWT:Issuer"])
+                {
+                    context.Result = new JsonResult(new { title = "Unauthorized", message = "Invalid Issuer." }) { StatusCode = StatusCodes.Status401Unauthorized };
+                    return;
+                }
+
+                if (jwtToken.ValidTo < DateTime.UtcNow)
+                {
+                    context.Result = new JsonResult(new { title = "Unauthorized", message = "Expired Token." }) { StatusCode = StatusCodes.Status401Unauthorized };
+                    return;
+                }
+
             }
-
-            var token = context.HttpContext.Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
-
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadToken(token);
-
-            if (jwtToken == null)
+            catch(Exception ex)
             {
-                context.Result = new JsonResult(new { title = "Unauthorized", message = "Invalid token." }) { StatusCode = StatusCodes.Status401Unauthorized };
-                return;
-            }
 
-            // Invalid Isuer
-            if (jwtToken.Issuer != _configuration["API:AuthenticationAPI:JWT:Issuer"])
-            {
-                context.Result = new JsonResult(new { title = "Unauthorized", message = "Invalid Issuer." }) { StatusCode = StatusCodes.Status401Unauthorized };
-                return;
-            }
-
-            if (jwtToken.ValidTo < DateTime.UtcNow)
-            {
-                context.Result = new JsonResult(new { title = "Unauthorized", message = "" }) { StatusCode = StatusCodes.Status401Unauthorized };
+                context.Result = new JsonResult(new { title = "Unauthorized", message = ex.Message }) { StatusCode = StatusCodes.Status401Unauthorized };
                 return;
             }
         }

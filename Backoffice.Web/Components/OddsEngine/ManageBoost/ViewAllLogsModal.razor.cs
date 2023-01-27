@@ -26,7 +26,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         public Page CurrentPage { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
         public List<string> UserClients { get; set; }
-        public PriceBoostLogFilterModel PriceBoostLogFilterModel { get; set; }
+        public PriceBoostLogFilterModel PriceBoostLogFilterModel { get; set; } = new PriceBoostLogFilterModel();
         public List<PriceBoostActivityLog> PriceBoostActivityLogs { get; set; }
         public List<ActivityLogModel> BoostedSettingsActivityLogs { get; set; }
         public bool WithAdministrationPagesAccess { get; set; }
@@ -36,26 +36,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             IsPreLoader = true;
             CurrentPage = ModalParameters.TryGet<Page>("SelectedPage");
-            UserClients = await GetUserClients();
-            var clients = GetClients().Result;
+            UserClients = UserModel.ClientCodes;
             WithAdministrationPagesAccess = false;
             BoostedSettingsActivityLogs = new List<ActivityLogModel>();
-
-            PriceBoostLogFilterModel = new PriceBoostLogFilterModel()
-            {
-                Clients = clients,
-                Tab = CurrentPage,
-                ClientCode = "ALL",
-                Sports = await GetSports(),
-                SportId = 0,
-                Segments = null,
-                SegmentId = 0,
-                Leagues = null,
-                LeagueId = 0,
-                SearchText = string.Empty,
-                DateFrom = DateTime.Now.AddDays(-7).Date,
-                DateTo = DateTime.Now
-            };
 
             MetaData = new MetaData()
             {
@@ -66,6 +49,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             };
 
             await GetContent();
+            StateHasChanged();
         }
         #region Methods
         public async Task GetContent()
@@ -193,11 +177,11 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 //    response.MetaData.TotalCount = BoostedSettingsActivityLogs.Count();
                 //}
 
-                IsPreLoader = false;
                 MetaData = response.MetaData;
             }
 
-            await InvokeAsync(StateHasChanged);
+            IsPreLoader = false;
+            StateHasChanged();
         }
         private async Task<List<KeyValuePair<string, string>>> GetClients()
         {
@@ -343,7 +327,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         }
         public void Dispose()
         {
-
+            Task.WhenAll();
         }
         #endregion
         #region Utilities
@@ -400,10 +384,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             return PriceBoostLogFilterModel.Clients
                 .Where(x => x.Key == payloadSplit[0]).FirstOrDefault()
                 .Value;
-        }
-        private async Task<List<string>> GetUserClients()
-        {
-            return UserModel.ClientCodes;
         }
 
         private async Task<SportsLookupResponse> GetSports()

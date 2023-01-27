@@ -37,6 +37,8 @@ namespace Backoffice.API.Repositories
         #region Manual Settlement
         Task<BaseResponse<ManualBetDetailsResponse>> GetManualBetDetails(ManualBetDetailsRequest request, string region);
         Task<BaseResponse<ManualBetSettlementResponse>> ManualSettlement(ManualBetSettlementRequest request, string region);
+        Task<BaseResponse<ResendSettlementBetDetailResponse>> GetResendSettlementBetDetails(ResendSettlementBetDetailRequest request, string region);
+        Task<BaseResponse<ResendSettlementResponse>> ResendSettlement(ResendSettlementRequest request, string region);
         #endregion
     }
 }

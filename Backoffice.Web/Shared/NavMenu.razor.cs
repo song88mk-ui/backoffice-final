@@ -65,6 +65,7 @@ namespace Backoffice.Web.Shared
                 }
 
                 await OnSportClickCallback.InvokeAsync(SelectedSport);
+                StateHasChanged();
             }
 
             if (UserModel != null)

@@ -12,19 +12,21 @@
 <div class="col-md-12">
     <div class="mx-3 mt-4">
 
-        <TableContent>
-            <TableHeaderContent>
-                <th><strong>Client Name</strong></th>
-                <th><strong>% Cap of Current Odds from Boosted Odds</strong></th>
-                <th><strong>Manage</strong></th>
-            </TableHeaderContent>
-            <TableBodyContent>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th><strong>Client Name</strong></th>
+                    <th><strong>% Cap of Current Odds from Boosted Odds</strong></th>
+                    <th><strong>Manage</strong></th>
+                </tr>
+            </thead>
+            <tbody>
                 @foreach (var client in ClientsView)
                 {
                     <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" />
                 }
-            </TableBodyContent>
-        </TableContent>
+            </tbody>
+        </table>
     </div>
 </div>
 <Backoffice.Web.Components.Common.CustomModal OnSaveClickCallback="OnSaveSettingClickEvent" />
