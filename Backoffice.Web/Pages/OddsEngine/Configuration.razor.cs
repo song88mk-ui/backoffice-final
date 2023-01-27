@@ -17,7 +17,7 @@ using System.Security.Policy;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class Configuration : IDisposable
+    public partial class Configuration : IAsyncDisposable, IDisposable
     {
         #region Properties
         [Inject] private IHttpContextAccessor _httpContextAccessor { get; set; }
@@ -64,23 +64,18 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        public async ValueTask DisposeAsync()
         {
-            if (firstRender)
-            {
-                await Subscribe();
-            }
         }
-
         public void Dispose()
         {
-            
         }
         #endregion
 
         #region Utilities
         private async Task GetContents()
-        {   
+        {
+            await Subscribe();
             if (ConfigFilterModel.MarketTemplateGroupId == 0)
                 ConfigFilterModel.MarketTemplateGroupId = ConfigFilterModel.MarketTemplates.FirstOrDefault(m => m.IsSelected).MarketTemplateGroupId;
 
@@ -93,7 +88,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             SelectedContents= result.ToList();
             IsPreloader = false;
-            StateHasChanged();
         }
 
         private void GetNewSettings(MarketLookupNavigationModel market)
@@ -642,6 +636,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                 //{
                 //    await ProcessOnConfigChange(message);
                 //});
+                HubConnection.Closed += async (error) =>
+                {
+                    await Task.Delay(new Random().Next(0, 5) * 1000);
+                    await HubConnection.StartAsync();
+                };
 
                 HubConnection.On<NotificationsModel>("onnewnotification", async message =>
                 {

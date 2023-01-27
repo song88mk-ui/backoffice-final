@@ -1,10 +1,14 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.Components.MessageSettlement;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.JSInterop;
 using System.Text.Json;
 
 namespace Backoffice.Web.Pages.Administration
@@ -12,9 +16,13 @@ namespace Backoffice.Web.Pages.Administration
     public partial class MessageSettlement : IDisposable
     {
         #region Properties
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] IModalService ModalService { get; set; }
         [Inject] ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         public MarketSettlementFilterModel MarketSettlementFilterModel { get; set; } = new MarketSettlementFilterModel();
         public List<MessageSettlementModel> MessageSettlementModel { get; set; }
         public string PageTitle { get; set; }
@@ -63,7 +71,6 @@ namespace Backoffice.Web.Pages.Administration
 
             await GetContents();
         }
-
         public void Dispose()
         {
         }
