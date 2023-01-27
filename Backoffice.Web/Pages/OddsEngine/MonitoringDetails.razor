@@ -27,10 +27,10 @@
                 <tr>
                     <th class="th-start-date py-3"></th>
                     <th class="th-fixture-name py-3"></th>
-                    <th>BR CTRL</th>
+                    <th class="th-master py-3">BR CTRL</th>
                     @foreach (var client in ClientModel.Clients)
                     {
-                        <th>@client.ClientName</th>
+                        <th class="th-client py-3">@client.ClientName</th>
                     }
                 </tr>
             </thead>
@@ -53,8 +53,10 @@
     <div class="d-flex mx-3 mt-4">
         @if (MarketTemplateNavigation.Any())
         {
+            var filteredMarketTemplateNavigation = !string.IsNullOrEmpty(Search) ? MarketTemplateNavigation.Where(c => c.MarketName.ToLower().Contains(Search)).ToList() : MarketTemplateNavigation;
+
             <div class="market-template-container">
-                <MarketFilter MarketTemplates="MarketTemplateNavigation" OnMarketTemplateClickCallback="OnMarketTemplateClickEvent" />
+                <MarketFilter MarketTemplates="filteredMarketTemplateNavigation" OnMarketTemplateClickCallback="OnMarketTemplateClickEvent" />
             </div>
             <div class="market-template-fixture-container align-self-start">
                 @if (FixtureMarketTemplates.Any())
@@ -63,10 +65,10 @@
                         <thead class="table-head">
                             <tr>
                                 <th></th>
-                                <th>BR CTRL</th>
+                                <th class="th-master">BR CTRL</th>
                                 @foreach (var client in ClientModel.Clients)
                                 {
-                                    <th>@client.ClientName</th>
+                                    <th class="th-client py-3">@client.ClientName</th>
                                 }
                             </tr>
                         </thead>

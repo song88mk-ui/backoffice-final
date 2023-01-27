@@ -8,7 +8,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace Backoffice.Web.Pages
+namespace Backoffice.Web.Pages.SBC
 {
     public partial class ParlayBonus : IDisposable
     {

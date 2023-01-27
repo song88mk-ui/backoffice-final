@@ -29,6 +29,7 @@ table thead th:last-child {
 
 .table-head th {
     border-width: 1px 0;
+    white-space: nowrap;
 }
 
 .odds-container {
