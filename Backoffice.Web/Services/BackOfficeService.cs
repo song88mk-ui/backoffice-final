@@ -48,7 +48,7 @@ namespace Backoffice.Web.Services
                 var userToken = await _authenticationService.AuthenticateToken();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
 
-                var response = await _httpClient.PostAsync($"sportsbook/settings/activitylog/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"api/config/activitylog/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<ActivityLogResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -136,7 +136,7 @@ namespace Backoffice.Web.Services
                 var userToken = await _authenticationService.AuthenticateToken();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
 
-                var response = await _httpClient.PostAsync($"sportsbook/settings/activitylog/priceboostlist", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"api/config/activitylog/priceboostlist", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<ActivityLogResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
