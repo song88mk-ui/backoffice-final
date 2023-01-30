@@ -277,7 +277,7 @@ namespace Backoffice.Web.Components.ManageUser
                     {
                         IsValidPassword = false;
                     }
-                    var regex = new Regex("^(?=.*[a-zA-Z])(?=.*[0-9]).+$");
+                    var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).+$");
 
                     if (!regex.IsMatch(UserRegister.Password))
                     {
@@ -299,7 +299,7 @@ namespace Backoffice.Web.Components.ManageUser
                         {
                             IsValidPassword = false;
                         }
-                        var regex = new Regex("^(?=.*[a-zA-Z])(?=.*[0-9]).+$");
+                        var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).+$");
 
                         if (!regex.IsMatch(UserRegister.Password))
                         {
