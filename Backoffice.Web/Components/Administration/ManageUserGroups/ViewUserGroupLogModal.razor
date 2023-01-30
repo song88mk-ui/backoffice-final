@@ -31,8 +31,8 @@
                                 <tr>
                                     <td>@logs.TimeStamp.ToLocalTime().ToString("dd/MM/yy") @logs.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
                                     <td>@logs.Activity</td>
-                                    <td>@((MarkupString)CommonService.GetActivity(logs.From, logs.To, Page.Admin_ManageUserGroups, logs.Activity, true))</td>
-                                    <td>@((MarkupString)CommonService.GetActivity(logs.From, logs.To, Page.Admin_ManageUserGroups, logs.Activity, false))</td>
+                                    <td class="td-left">@((MarkupString)CommonService.GetActivity(logs.From, logs.To, Page.Admin_ManageUserGroups, logs.Activity, true))</td>
+                                    <td class="td-left">@((MarkupString)CommonService.GetActivity(logs.From, logs.To, Page.Admin_ManageUserGroups, logs.Activity, false))</td>
                                     <td>@logs.UserName</td>
                                 </tr>
                             }
