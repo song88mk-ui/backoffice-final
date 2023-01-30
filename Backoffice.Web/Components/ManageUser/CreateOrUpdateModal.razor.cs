@@ -6,6 +6,8 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace Backoffice.Web.Components.ManageUser
@@ -19,13 +21,16 @@ namespace Backoffice.Web.Components.ManageUser
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        public Permission PermissionComponent { get; set; }
 
+        public EditContext EditContext { get; set; }
+        public Permission PermissionComponent { get; set; }
         public PermissionResponse Permissions { get; set; }
         public ClientModel ClientModel { get; set; }
         public List<UserGroupResponse> UserGroupList { get; set; }
         public UserRegisterModel UserRegister { get; set; }
         public string OldPassword { get; set; }
+        public bool IsValidUsername { get; set; }
+        public bool IsValidEmail { get; set; }
         public bool IsValidPassword { get; set; }
         public bool IsEdit { get; set; }
         public string PasswordErrorMessage { get; set; }
@@ -38,6 +43,8 @@ namespace Backoffice.Web.Components.ManageUser
             UserRegister = new UserRegisterModel();
             UserGroupList = new List<UserGroupResponse>();
             IsValidPassword = true;
+            IsValidUsername = true;
+            IsValidEmail = true;
             IsPreLoader = true;
             Permissions = ModalParameters.TryGet<PermissionResponse>("Permissions");
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
@@ -249,10 +256,17 @@ namespace Backoffice.Web.Components.ManageUser
         }
         private bool IsValid(UserRegisterModel userModel)
         {
-            if (string.IsNullOrWhiteSpace(userModel.UserName) ||
-                string.IsNullOrWhiteSpace(userModel.Email))
+            IsValidPassword = true;
+            IsValidUsername = true;
+            IsValidEmail = true;
+
+            if (string.IsNullOrWhiteSpace(userModel.UserName))
             {
-                return false;
+                IsValidUsername = false;
+            }
+            if (string.IsNullOrWhiteSpace(userModel.Email))
+            {
+                IsValidEmail = false;
             }
 
             if (IsEdit)
@@ -275,16 +289,32 @@ namespace Backoffice.Web.Components.ManageUser
             {
                 if (string.IsNullOrWhiteSpace(userModel.Password))
                 {
-                    return false;
+                    IsValidPassword = false;
                 }
-
-                if (!IsValidPassword)
+                else
                 {
-                    return false;
+                    if (!string.IsNullOrWhiteSpace(UserRegister.Password))
+                    {
+                        if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
+                        {
+                            IsValidPassword = false;
+                        }
+                        var regex = new Regex("^(?=.*[a-zA-Z])(?=.*[0-9]).+$");
+
+                        if (!regex.IsMatch(UserRegister.Password))
+                        {
+                            IsValidPassword = false;
+                        }
+                    }
                 }
             }
 
-            return true;
+            if (IsValidPassword && IsValidUsername && IsValidEmail && IsValidPassword)
+            {
+                return true;
+            }
+
+            return false;
         }
         #endregion
     }

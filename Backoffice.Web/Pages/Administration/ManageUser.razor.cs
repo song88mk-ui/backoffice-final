@@ -146,7 +146,16 @@ namespace Backoffice.Web.Pages.Administration
                 MetaData = userResponse.Result.MetaData;
                 UserList = userResponse.Result.Users;
             }
-
+            if(MetaData == null)
+            {
+                MetaData = new MetaData()
+                {
+                    PageSize = 10,
+                    CurrentPage = 1,
+                    TotalPages = 0,
+                    TotalCount = 0
+                };
+            }
             IsPreLoader = false;
             StateHasChanged();
         }

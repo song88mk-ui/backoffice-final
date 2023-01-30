@@ -14,11 +14,11 @@
             <div class="row">
                 <div class="col-md-4">
                     <label class="form-label">Business Name</label>
-                    <input type="text" class="form-control" placeholder="Enter Username" @bind-value="UserRegister.UserName" disabled="@IsEdit" />
+                    <input type="text" class="form-control @(IsValidUsername ? "valid" : "invalid")" placeholder="Enter Username" @bind-value="UserRegister.UserName" disabled="@IsEdit" />
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Email Address</label>
-                    <input type="text" class="form-control" placeholder="Enter Email Address" @bind-value="UserRegister.Email" />
+                    <input type="text" class="form-control @(IsValidEmail ? "valid" : "invalid")" placeholder="Enter Email Address" @bind-value="UserRegister.Email" />
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Password</label>
@@ -59,11 +59,11 @@
                 </div>
             </div>
         </div>
-        <Permission Permissions="Permissions.Permissions" IsReadOnly="true" ClientModel="ClientModel" @ref="PermissionComponent"/>
+        <Permission Permissions="Permissions.Permissions" IsReadOnly="true" ClientModel="ClientModel" @ref="PermissionComponent" />
     }
 </div>
 <div class="modal-footer mx-4">
     <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCloseClickEvent">Cancel</button>
-    <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickedEvent" disabled="@IsPreLoader">Save</button>
+    <button type="submit" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickedEvent" disabled="@IsPreLoader">Save</button>
 </div>
 
