@@ -19,6 +19,7 @@ namespace Backoffice.Web.Components.MessageSettlement
         [Inject] public ITradingService TradingService { get; set; }
         [Parameter] public EventCallback OnInitializeCallback { get; set; }
         [Parameter] public EventCallback OnAddCallback { get; set; }
+        [Parameter] public EventCallback OnExportCallback { get; set; }
         [Parameter] public EventCallback<MarketSettlementFilterModel> MarketSettlementFilterModelChanged { get; set; }
         [Parameter] public MarketSettlementFilterModel MarketSettlementFilterModel { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
@@ -209,7 +210,9 @@ namespace Backoffice.Web.Components.MessageSettlement
                 UserId = UserModel.Id
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetManualMessageSettlementHistory", "r.oe.web.config.ongetmanualmessagesettlementhistory", Guid.NewGuid().ToString());
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMessageSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+
+            await OnExportCallback.InvokeAsync();
         }
         public void Dispose()
         {

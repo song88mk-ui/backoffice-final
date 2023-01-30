@@ -4,21 +4,24 @@ using Backoffice.Web.Services;
 using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Shared
 {
     public class MainLayoutBase : LayoutComponentBase, IDisposable
     {
         #region Properties
-
+        [Inject] private IHttpContextAccessor _httpContextAccessor { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-
+        [Inject] public IJSRuntime JSRuntime { get; set; }
         [Parameter] public SportClickCallbackModel SelectedSport { get; set; }
 
+        private HubConnection HubConnection { get; set; }
         public HeaderNavMenu HeaderNavMenuReference { get; set; }
 
         public UserModel UserModel { get; set; } = new UserModel();
@@ -28,7 +31,8 @@ namespace Backoffice.Web.Shared
         //public bool IsPreLoader { get; set; } = true;
         public bool IsPreLoader { get; set; }
         public string InlineSpinnerCss { get; set; }
-
+        public string ToastTitle { get; set; }
+        public string ToastMessage { get; set; }
         #endregion
 
         #region Methods
@@ -71,12 +75,27 @@ namespace Backoffice.Web.Shared
                     UserModel.MainUserId = userClaims.Where(x => x.Type.ToUpper() == "MAINUSERID").FirstOrDefault()?.Value ?? "";
                     UserModel.Claims = userClaims.Where(x => !permissions.Contains(x.Type.ToUpper())).ToList();
                 }
-
                 IsPreLoader = false;
             }
             catch (Exception)
             {
                 NavigationManager.NavigateTo("login", true);
+            }
+        }
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                try
+                {
+                    await Subscribe();
+                }
+                catch (Exception ex)
+                {
+                    ToastTitle = "Config";
+                    ToastMessage = $"{ex.Message}";
+                    await ShowToast();
+                }
             }
         }
 
@@ -85,11 +104,59 @@ namespace Backoffice.Web.Shared
             SelectedSport = model;
             HeaderNavMenuReference.ActivateMenu("monitoring");
         }
-
         public void Dispose()
         {
         }
 
+        #endregion
+
+        #region Utilities
+        private async Task Subscribe()
+        {
+            try
+            {
+                var request = _httpContextAccessor.HttpContext?.Request;
+
+                HubConnection = new HubConnectionBuilder()
+                    .WithUrl(new Uri(Configuration["API:HubAPI"]))
+                    .Build();
+
+                //HubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
+                //{
+                //    await ProcessOnConfigChange(message);
+                //});
+                HubConnection.Closed += async (error) =>
+                {
+                    await Task.Delay(new Random().Next(0, 5) * 1000);
+                    await HubConnection.StartAsync();
+                };
+
+                HubConnection.On<NotificationsModel>("onnewnotification", async message =>
+                {
+                    await ProcessNotification(message);
+                });
+
+
+                await HubConnection.StartAsync();
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+        private async Task ProcessNotification(NotificationsModel message)
+        {
+            if (message != null)
+            {
+                ToastTitle = message.Page;
+                ToastMessage = $"{message.Details}";
+                await ShowToast();
+            }
+        }
+        private async Task ShowToast()
+        {
+            await InvokeAsync(StateHasChanged);
+            await JSRuntime.InvokeVoidAsync("showToast", false);
+        }
         #endregion
     }
 }

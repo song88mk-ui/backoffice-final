@@ -11,6 +11,7 @@ namespace Backoffice.Shared.Models.Requests
         public string From { get; set; }
         public string To { get; set; }
         public string UserId { get; set; }
+        public string UserName { get; set; }
         public DateTime DateFrom { get; set; }
         public DateTime DateTo { get; set; }
         public DateTime TimeStamp { get; set; }

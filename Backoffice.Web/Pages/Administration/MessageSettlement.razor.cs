@@ -31,7 +31,8 @@ namespace Backoffice.Web.Pages.Administration
         private long CursorId { get; set; }
         private int PreviousPage { get; set; }
         public MetaData MetaData { get; set; }
-
+        public string ToastTitle { get; set; }
+        public string ToastMessage { get; set; }
         #endregion
 
         #region Methods
@@ -63,6 +64,14 @@ namespace Backoffice.Web.Pages.Administration
         {
             IsPreLoader = true;
             await GetContents();
+        }
+        public async Task OnExportClickedEvent()
+        {
+            ToastTitle = "Message Settlement";
+            ToastMessage = $"Success! Excel file is being generated system will notify once done.";
+
+            await InvokeAsync(StateHasChanged);
+            await JSRuntime.InvokeVoidAsync("showToast", true);
         }
         public async Task SelectPage(int page)
         {

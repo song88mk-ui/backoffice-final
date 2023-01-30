@@ -61,6 +61,10 @@ namespace Backoffice.Utility
                         var activityLogList = JsonSerializer.Deserialize<OnActivityLogListMessage>(payload);
                         _backofficeRepository.ProcessActivityLog(activityLogList);
                         break;
+                    case "ExportMessageSettlementHistory":
+                        var manualMessageSettlementHistory = JsonSerializer.Deserialize<OnGetManualMarketSettlementHistoryMessage>(payload);
+                        _backofficeRepository.ProcessOnGetManualMessageSettlementHistory(manualMessageSettlementHistory, _messageBroker);
+                        break;
                 }
             }
             catch (Exception ex)
