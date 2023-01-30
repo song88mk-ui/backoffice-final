@@ -15,6 +15,8 @@
 
 table thead th {
     text-align: center;
+    border-style: unset;
+    border: 0px;
 }
 
 table thead th:first-child {
@@ -36,4 +38,8 @@ table tfoot td:last-child {
 .input-reason {
     height: 8em;
     resize: none;
+}
+
+.th-reason {
+    text-align: left;
 }
