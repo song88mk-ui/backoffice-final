@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -41,7 +42,7 @@ namespace Backoffice.Web.Pages.Administration
                 TotalPages = 1,
             };
 
-            //await GetContents();
+            await GetContents();
         }        
 
         private async Task OnSearchButtonClicked()
@@ -63,24 +64,40 @@ namespace Backoffice.Web.Pages.Administration
         #region Utilities
         private async Task OnInitEvent(ManualBetSettlementCallbackModel callbackModel)
         {
-            CallbackModel = callbackModel;
+            CallbackModel = callbackModel;                        
         }
 
 
         private async Task GetContents()
         {
-            var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
+            try
             {
-                Page = Page.Admin_Settlement_Bet.ToString().Replace('_', '.'),                
-                MetaData = MetaData
-            }));
-
-            if (response.StatusCode == StatusCode.Success)
-            {
-                if (response.Result != null && response.Result.ActivityLogs.Any())
+                var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
                 {
+                    Page = Page.Admin_Settlement_Bet.ToString().Replace('_', '.'),
+                    DateFrom = CallbackModel != null ? CallbackModel.DateFrom.Add(new TimeSpan(0, 0, 0)) : DateTime.UtcNow.AddDays(-1).Date.Add(new TimeSpan(0, 0, 0)),
+                    DateTo = CallbackModel != null ? CallbackModel.DateTo.Add(new TimeSpan(23, 59, 59)) : DateTime.UtcNow.Date.Add(new TimeSpan(23, 59, 59)),
+                    MetaData = MetaData
+                }));
 
+                if (response.StatusCode == StatusCode.Success)
+                {
+                    if (response.Result != null && response.Result.ActivityLogs.Any())
+                    {
+
+                        if (CallbackModel != null)
+                        {
+                            FilterLogs(response);
+                        }
+
+                        ActivityLogs = response.Result.ActivityLogs;
+                        MetaData = response.Result.MetaData;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+
             }
         }
 
@@ -97,6 +114,81 @@ namespace Backoffice.Web.Pages.Administration
 
 
             return builder.ToString();
+        }
+
+        private void FilterLogs(BaseResponse<ActivityLogResponse> response)
+        {
+            string[] clientIds = null;
+            string[] sportIds = null;
+            string[] currencyCodes = null;
+            string[] fromStatusesIds = null;
+            string[] toStatusesIds = null;
+
+            if (!string.IsNullOrEmpty(CallbackModel.MemberName))
+            {
+                response.Result.ActivityLogs = response.Result.ActivityLogs
+                .Where(x => x.To.Contains(CallbackModel.MemberName, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(CallbackModel.SettledBy))
+            {
+                response.Result.ActivityLogs = response.Result.ActivityLogs
+                .Where(x => x.To.Contains(CallbackModel.SettledBy, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(CallbackModel.BetId))
+            {
+                response.Result.ActivityLogs = response.Result.ActivityLogs
+                .Where(x => x.To.Contains(CallbackModel.BetId, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (CallbackModel.Clients.Any())
+            {
+                clientIds = string.Join(",", CallbackModel.Clients.Select(client => client.ClientId)).Split(',');
+
+                response.Result.ActivityLogs = response.Result.ActivityLogs
+                .Where(x => clientIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).ClientIdRef.ToString())).ToList();
+            }
+
+            if (CallbackModel.Sports.Any())
+            {
+                sportIds = string.Join(",", CallbackModel.Sports.Select(sport => sport.SportId)).Split(',');
+
+                response.Result.ActivityLogs = response.Result.ActivityLogs
+                .Where(x => sportIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).Selections.FirstOrDefault().SportId.ToString())).ToList();
+            }
+
+            if (CallbackModel.Currencies.Any())
+            {
+                currencyCodes = string.Join(",", CallbackModel.Currencies.Select(currency => currency.CurrencyCode)).Split(',');
+
+                response.Result.ActivityLogs = response.Result.ActivityLogs
+                .Where(x => currencyCodes.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).CurrencyCode)).ToList();
+            }
+
+            if (CallbackModel.FromBetStatuses.Any())
+            {
+                fromStatusesIds = string.Join(",", CallbackModel.FromBetStatuses.Select(status => status.BetStatusId)).Split(',');
+
+                response.Result.ActivityLogs = response.Result.ActivityLogs
+                .Where(x => fromStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).BetStatusId.ToString())).ToList();
+            }
+
+            if (CallbackModel.ToBetStatuses.Any())
+            {
+                toStatusesIds = string.Join(",", CallbackModel.ToBetStatuses.Select(status => status.BetStatusId)).Split(',');
+
+                response.Result.ActivityLogs = response.Result.ActivityLogs
+                .Where(x => toStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).NewBetStatusId.ToString())).ToList();
+            }
+
+            response.Result.MetaData = new MetaData()
+            {
+                CurrentPage = CurrentPage,
+                TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize))),
+                PageSize = MetaData.PageSize,
+                TotalCount = response.Result.ActivityLogs.Count
+            };
         }
         #endregion
     }

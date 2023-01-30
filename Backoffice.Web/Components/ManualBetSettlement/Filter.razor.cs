@@ -58,6 +58,8 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             await LoadCurrencies();
             await LoadFromStatus();
             await LoadToStatus();
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
         }
 
         public async Task OnAddReferenceClickEvent()
@@ -78,6 +80,14 @@ namespace Backoffice.Web.Components.ManualBetSettlement
 
         public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
         {
+            SelectedClientName = string.Empty;
+            SelectedClientCount = items.Count;
+
+            if (SelectedClientCount == 1)
+            {
+                SelectedClientName = items.FirstOrDefault().Value;
+            }
+
             CallbackModel.Clients = Clients.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.Client
             {
                 ClientId = long.Parse(s.Value),
@@ -88,7 +98,15 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         }
 
         public async Task OnSportCheckboxClickEvent(Dictionary<string, string> items)
-        {            
+        {
+            SelectedSportName = string.Empty;
+            SelectedSportCount = items.Count;
+
+            if (SelectedSportCount == 1)
+            {
+                SelectedSportName = items.FirstOrDefault().Value;
+            }
+
             CallbackModel.Sports = Sports.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.Sport
             {
                 SportId = long.Parse(s.Value),
@@ -99,7 +117,15 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         }
 
         public async Task OnCurrencyCheckboxClickEvent(Dictionary<string, string> items)
-        {            
+        {
+            SelectedCurrencyName = string.Empty;
+            SelectedCurrencyCount = items.Count;
+
+            if (SelectedCurrencyCount == 1)
+            {
+                SelectedCurrencyName = items.FirstOrDefault().Value;
+            }
+
             CallbackModel.Currencies = Currencies.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.Currency
             {
                 CurrencyId = int.Parse(s.Value),
@@ -110,7 +136,15 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         }
 
         public async Task OnFromStatusCheckboxClickEvent(Dictionary<string, string> items)
-        {            
+        {
+            SelectedFromStatusName = string.Empty;
+            SelectedFromStatusCount = items.Count;
+
+            if (SelectedFromStatusCount == 1)
+            {
+                SelectedFromStatusName = items.FirstOrDefault().Value;
+            }
+
             CallbackModel.FromBetStatuses = FromStatuses.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.BetStatus
             {
                 BetStatusId = int.Parse(s.Value),
@@ -121,7 +155,15 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         }
 
         public async Task OnToStatusCheckboxClickEvent(Dictionary<string, string> items)
-        {            
+        {
+            SelectedToStatusName = string.Empty;
+            SelectedToStatusCount = items.Count;
+
+            if (SelectedToStatusCount == 1)
+            {
+                SelectedToStatusName = items.FirstOrDefault().Value;
+            }
+
             CallbackModel.ToBetStatuses = ToStatuses.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.BetStatus
             {
                 BetStatusId = int.Parse(s.Value),
@@ -198,6 +240,12 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
                 SelectedClientCount = selectedClients.Count;
                 SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+
+                CallbackModel.Clients = Clients.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.Client
+                {
+                    ClientId = long.Parse(s.Value),
+                    ClientName = s.Name
+                }).ToList();
             }
         }
 
@@ -222,6 +270,12 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             var selectedSports = Sports.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
             SelectedSportCount = selectedSports.Count;
             SelectedSportName = SelectedSportCount > 0 ? string.Empty : Sports.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+
+            CallbackModel.Sports = Sports.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.Sport
+            {
+                SportId = long.Parse(s.Value),
+                SportName = s.Name
+            }).ToList();
         }
 
         private async Task LoadCurrencies()
@@ -234,7 +288,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                     Currencies.Add(new SelectListItemWithCheckboxModel<string>()
                     {                        
                         IsChecked = true,
-                        Value = ((int)currency).ToString(),
+                        Value = "all",
                         Name = "All Currencies"
                     });
                 }
@@ -252,6 +306,12 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             var selectedCurrencies = Currencies.Where(c => c.Value != "All" && c.IsChecked).Select(s => s.Value).ToList();
             SelectedCurrencyCount = selectedCurrencies.Count;
             SelectedCurrencyName = SelectedCurrencyCount > 0 ? string.Empty : Currencies.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
+
+            CallbackModel.Currencies = Currencies.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.Currency
+            {
+                CurrencyId = int.Parse(s.Value),
+                CurrencyCode = s.Name
+            }).ToList();
         }
 
         private async Task LoadFromStatus()
@@ -289,6 +349,12 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             var selectedFromStatuses = FromStatuses.Where(c => c.Value != "All" && c.IsChecked).Select(s => s.Value).ToList();
             SelectedFromStatusCount = selectedFromStatuses.Count;
             SelectedFromStatusName = SelectedFromStatusCount > 0 ? string.Empty : FromStatuses.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
+
+            CallbackModel.FromBetStatuses = FromStatuses.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.BetStatus
+            {
+                BetStatusId = int.Parse(s.Value),
+                BetStatusName = s.Name
+            }).ToList();
         }
 
         private async Task LoadToStatus()
@@ -325,6 +391,12 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             var selectedToStatuses = ToStatuses.Where(c => c.Value != "All" && c.IsChecked).Select(s => s.Value).ToList();
             SelectedToStatusCount = selectedToStatuses.Count;
             SelectedToStatusName = SelectedToStatusCount > 0 ? string.Empty : ToStatuses.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
+
+            CallbackModel.ToBetStatuses = ToStatuses.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.BetStatus
+            {
+                BetStatusId = int.Parse(s.Value),
+                BetStatusName = s.Name
+            }).ToList();
         }
         #endregion
     }

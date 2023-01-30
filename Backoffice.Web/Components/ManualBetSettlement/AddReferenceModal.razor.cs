@@ -5,7 +5,9 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using System.Text;
+using System.Text.Json;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
 
 namespace Backoffice.Web.Components.ManualBetSettlement
@@ -15,18 +17,22 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        private List<string> BetIds { get; set; }
+
         private ManualBetSettlementModel ManualBetSettlementModel { get; set; }
         private ManualBetDetailsModel ManualBetDetailsModel { get; set; }
+
+        public bool IsAddDisabled { get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            BetIds = new List<string>();
             ManualBetSettlementModel = new ManualBetSettlementModel();
+            IsAddDisabled = true;
+
             ManualBetDetailsModel = ModalParameters.TryGet<ManualBetDetailsModel>("ManualBetDetailsModel");
 
             if (ManualBetDetailsModel == null)
@@ -39,33 +45,30 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         public async Task OnAddReferenceIdClickedEvent()
         {
             ManualBetDetailsModel.Bets.Add(new ManualBetDetails());
+            IsAddDisabled = true;
         }
 
-        public async Task OnReferenceIdOnChangeEvent(ChangeEventArgs e)
+        public async Task OnReferenceIdOnChangeEvent(ChangeEventArgs args, ManualBetDetails bet, int index)
         {
             Guid betId;
 
-            bool isGuid = Guid.TryParse(e.Value.ToString(), out betId);
+            string betIdString = args.Value.ToString();
+
+            bool isGuid = Guid.TryParse(betIdString, out betId);
 
             if (isGuid)
-            {
-                BetIds.Add(betId.ToString());
-
+            {                
                 var response = (await BackOfficeService.GetManualBetDetails(new ManualBetDetailsRequest()
                 {
-                    BetIds = BetIds
+                    BetIds = new List<string> { betIdString }
                 })).Result;
 
                 if (response.Bets.Any())
                 {
-                    ManualBetDetailsModel = new ManualBetDetailsModel();
+                    bet = JsonSerializer.Deserialize<ManualBetDetails>(JsonSerializer.Serialize(response.Bets.FirstOrDefault()));
 
-                    foreach (var bet in response.Bets)
-                    {
-                        ManualBetDetails BetDetails = AssignBetDetailsProperties(bet);
-
-                        ManualBetDetailsModel.Bets.Add(BetDetails);
-                    }
+                    ManualBetDetailsModel.Bets[index] = bet;
+                    IsAddDisabled = false;
                 }
             }
         }
@@ -142,100 +145,8 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         }
         #endregion
 
-        #region Utilities
-        private ManualBetDetails AssignBetDetailsProperties(ManualBetDetailsResponse.ManualBetDetails bet)
-        {
-            return new ManualBetDetails()
-            {
-                BetId = bet.BetId,
-                UserId = bet.UserId,
-                Stake = bet.Stake,
-                TrueStake = bet.TrueStake,
-                Odds = bet.Odds,
-                OddsTypeId = bet.OddsTypeId,
-                OddsTypeName = bet.OddsTypeName,
-                Payout = bet.Payout,
-                WinLoss = bet.WinLoss,
-                BetStatusId = bet.BetStatusId,
-                BetStatusName = bet.BetStatusName,
-                Reason = bet.Reason,
-                CurrencyCode = bet.CurrencyCode,
-                LanguageCode = bet.LanguageCode,
-                ExchangeRate = bet.ExchangeRate,
-                IPAddress = bet.IPAddress,
-                Channel = bet.Channel,
-                ClientId = bet.ClientId,
-                ClientIdRef = bet.ClientIdRef,
-                ClientCode = bet.ClientCode,
-                ClientName = bet.ClientName,
-                LimitId = bet.LimitId,
-                Endpoint = bet.Endpoint,
-                OperatorToken = bet.OperatorToken,
-                CompanyShare = bet.CompanyShare,
-                IsResettled = bet.IsResettled,
-                IsCashout = bet.IsCashout,
-                BetDate = bet.BetDate,
-                BetDateOffset = bet.BetDateOffset,
-                SettlementDate = bet.SettlementDate,
-                SettlementDateOffset = bet.SettlementDateOffset,
-                StakeTax = bet.StakeTax,
-                WinningsTax = bet.WinningsTax,
-                TaxedStake = bet.TaxedStake,
-                TaxedWinnings = bet.TaxedWinnings,
-                ParlayBonus = bet.ParlayBonus,
-                ParlayBonusWinnings = bet.ParlayBonusWinnings,
-                StakeReal = bet.StakeReal,
-                StakeBonus = bet.StakeBonus,
-                StakeRealPayout = bet.StakeRealPayout,
-                StakeBonusPayout = bet.StakeBonusPayout,
-                IsFreeBet = bet.IsFreeBet,
-                IsBoosted = bet.IsBoosted,
-                Selections = bet.Selections.Select(betSelection => new BetSelectionDetails()
-                {
-                    BetId = betSelection.BetId,
-                    BetSelectionId = betSelection.BetSelectionId,
-                    SportId = betSelection.SportId,
-                    SportName = betSelection.SportName,
-                    SegmentId = betSelection.SegmentId,
-                    SegmentName = betSelection.SegmentName,
-                    LeagueId = betSelection.LeagueId,
-                    LeagueName = betSelection.LeagueName,
-                    FixtureId = betSelection.FixtureId,
-                    FixtureName = betSelection.FixtureName,
-                    FixtureTypeId = betSelection.FixtureTypeId,
-                    FixtureTypeName = betSelection.FixtureTypeName,
-                    MarketTemplateId = betSelection.MarketTemplateId,
-                    MarketId = betSelection.MarketId,
-                    MarketName = betSelection.MarketName,
-                    SelectionTemplateId = betSelection.SelectionTemplateId,
-                    SelectionId = betSelection.SelectionId,
-                    SelectionName = betSelection.SelectionName,
-                    FixtureStatusId = betSelection.FixtureStatusId,
-                    FixtureStatusName = betSelection.FixtureStatusName,
-                    Line = betSelection.Line,
-                    Odds = betSelection.Odds,
-                    BetSelectionStatusId = betSelection.BetSelectionStatusId,
-                    BetSelectionStatusName = betSelection.BetSelectionStatusName,
-                    IsSettled = betSelection.IsSettled,
-                    IsResettled = betSelection.IsResettled,
-                    FixtureSpecifier = betSelection.FixtureSpecifier,
-                    SelectionSpecifier = betSelection.SelectionSpecifier,
-                    FixtureStartDate = betSelection.FixtureStartDate,
-                    BetScore = betSelection.BetScore,
-                    SettlementScore = betSelection.SettlementScore,
-                    Probability = betSelection.Probability,
-                    WonProbability = betSelection.WonProbability,
-                    LostProbability = betSelection.LostProbability,
-                    VoidProbability = betSelection.VoidProbability,
-                    HalfWonProbability = betSelection.HalfWonProbability,
-                    HalfLostProbability = betSelection.HalfLostProbability,
-                    CorrelationId = betSelection.CorrelationId,
-                    DeadHeatFactor = betSelection.DeadHeatFactor,
-                    UserId = betSelection.UserId
-                }).ToList()
-            };
-        }
-        private string BuildEventDetails(BetSelectionDetails betSelectionDetails, string oddsFormat)
+        #region Utilities        
+        public string BuildEventDetails(BetSelectionDetails betSelectionDetails, string oddsFormat)
         {
             StringBuilder builder = new StringBuilder();
 
@@ -257,7 +168,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             return builder.ToString();
         }
 
-        private string BuildBetDate(ManualBetDetails bet)
+        public string BuildBetDate(ManualBetDetails bet)
         {
             StringBuilder builder = new StringBuilder();
 

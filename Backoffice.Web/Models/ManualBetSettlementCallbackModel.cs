@@ -21,9 +21,9 @@
         public DateTime DateFrom { get; set; } = DateTime.Now.AddDays(-7).Date;
         public DateTime DateTo { get; set; } = DateTime.Now.Date;
 
-        public string BetId { get; set; }
-        public string MemberName { get; set; }
-        public string SettledBy { get; set; }
+        public string BetId { get; set; } = "";
+        public string MemberName { get; set; } = "";
+        public string SettledBy { get; set; } = "";
 
         #region Nested Class
         public class Client
