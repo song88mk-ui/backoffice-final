@@ -15,6 +15,21 @@ namespace Backoffice.Web.Components.MonitoringDetails
 
         #region Methods
 
+        protected override async Task OnParametersSetAsync()
+        {
+            if (MarketTemplates != null && MarketTemplates.Any())
+            {
+                if (!MarketTemplates.Any(c => c.IsSelected))
+                {
+                    var model = MarketTemplates.FirstOrDefault();
+
+                    model.IsSelected = true;
+
+                    await OnMarketTemplateClickCallback.InvokeAsync(model.MarketTemplateId);
+                }
+            }
+        }
+
         public async Task OnMarketTemplateClickEvent(MarketNavigationModel2 model)
         {
             if (model.IsSelected)

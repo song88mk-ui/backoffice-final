@@ -101,3 +101,7 @@ main {
 .header-container {
     background-color: #354156;
 }
+
+.preload-container {
+    height: 100vh;
+}

@@ -254,25 +254,25 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             var filteredMarkets = Fixture.Markets.Where(c => c.MarketTemplateId == marketTemplateId);
 
-            if (!string.IsNullOrEmpty(Search))
-            {
-                filteredMarkets = filteredMarkets.Select(s => new MarketModel
-                {
-                    ProviderFixtureId = s.ProviderFixtureId,
-                    MarketTemplateId = s.MarketTemplateId,
-                    MarketId = s.MarketId,
-                    ProviderMarketId = s.ProviderMarketId,
-                    MarketName = s.MarketName,
-                    Line = s.Line,
-                    MarketStatusId = s.MarketStatusId,
-                    MarketStatusName = s.MarketStatusName,
-                    MarketSpecifier = s.MarketSpecifier,
-                    ClientCode = s.ClientCode,
-                    ClientCodeMargin = s.ClientCodeMargin,
-                    IsBoosted = s.IsBoosted,
-                    Selections = s.Selections.Where(se => se.SelectionName.ToLower().Contains(Search.ToLower())).ToList(),
-                }).Where(c => c.Selections.Any());
-            }
+            //if (!string.IsNullOrEmpty(Search))
+            //{
+            //    filteredMarkets = filteredMarkets.Select(s => new MarketModel
+            //    {
+            //        ProviderFixtureId = s.ProviderFixtureId,
+            //        MarketTemplateId = s.MarketTemplateId,
+            //        MarketId = s.MarketId,
+            //        ProviderMarketId = s.ProviderMarketId,
+            //        MarketName = s.MarketName,
+            //        Line = s.Line,
+            //        MarketStatusId = s.MarketStatusId,
+            //        MarketStatusName = s.MarketStatusName,
+            //        MarketSpecifier = s.MarketSpecifier,
+            //        ClientCode = s.ClientCode,
+            //        ClientCodeMargin = s.ClientCodeMargin,
+            //        IsBoosted = s.IsBoosted,
+            //        Selections = s.Selections.Where(se => se.SelectionName.ToLower().Contains(Search.ToLower())).ToList(),
+            //    }).Where(c => c.Selections.Any());
+            //}
 
             MarginMarket = filteredMarkets.FirstOrDefault();
 

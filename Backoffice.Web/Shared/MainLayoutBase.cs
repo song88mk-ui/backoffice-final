@@ -1,10 +1,9 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
+using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Backoffice.Web.Shared
 {
@@ -20,11 +19,15 @@ namespace Backoffice.Web.Shared
 
         [Parameter] public SportClickCallbackModel SelectedSport { get; set; }
 
+        public HeaderNavMenu HeaderNavMenuReference { get; set; }
+
         public UserModel UserModel { get; set; } = new UserModel();
         public LogInModel Model { get; set; }
 
         public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
-        public bool IsPreLoader { get; set; } = true;
+        //public bool IsPreLoader { get; set; } = true;
+        public bool IsPreLoader { get; set; }
+        public string InlineSpinnerCss { get; set; }
 
         #endregion
 
@@ -34,6 +37,10 @@ namespace Backoffice.Web.Shared
         {
             try
             {
+                IsPreLoader = true;
+
+                InlineSpinnerCss = "width:10rem;height:10rem;";
+
                 if (HttpContextAccessor?.HttpContext?.Session.GetString("UserToken") == null)
                 {
                     NavigationManager.NavigateTo("login", true);
@@ -64,17 +71,19 @@ namespace Backoffice.Web.Shared
                     UserModel.MainUserId = userClaims.Where(x => x.Type.ToUpper() == "MAINUSERID").FirstOrDefault()?.Value ?? "";
                     UserModel.Claims = userClaims.Where(x => !permissions.Contains(x.Type.ToUpper())).ToList();
                 }
+
                 IsPreLoader = false;
-                StateHasChanged();
             }
             catch (Exception)
             {
                 NavigationManager.NavigateTo("login", true);
             }
         }
+
         public void OnSportClickEvent(SportClickCallbackModel model)
         {
             SelectedSport = model;
+            HeaderNavMenuReference.ActivateMenu("monitoring");
         }
 
         public void Dispose()

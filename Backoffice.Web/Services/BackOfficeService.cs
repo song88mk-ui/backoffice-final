@@ -1,7 +1,10 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Data.Backoffice.Entities;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using System.Net;
 using System.Net.Http.Headers;
@@ -15,15 +18,18 @@ namespace Backoffice.Web.Services
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly IAuthenticationService _authenticationService;
+        private readonly IMessageBroker _messageBroker;
         #endregion
 
         #region Ctor
         public BackOfficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor, IMessageBroker messageBroker)
         {
             _configuration = configuration;
             _httpClient = httpClient;
             _authenticationService = authenticationService;
+            _messageBroker = messageBroker;
+            _messageBroker.Connect();
 
             //var userToken = httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
 
@@ -73,34 +79,50 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request)
+        public async Task<BaseResponse<MessageResponse>> AddActivityLog(ActivityLogModel request)
         {
             try
             {
-                var userToken = await _authenticationService.AuthenticateToken();
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+                _messageBroker.Publish(JsonSerializer.Serialize(request), "LogActivity", "r.bo.util.logs", Guid.NewGuid().ToString());
 
-                var response = await _httpClient.PostAsync($"api/config/activitylog", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
+                return new BaseResponse<MessageResponse>
                 {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
+                    StatusCode = StatusCode.Success,
+                    Message = $"{StatusCode.Success}",
+                    Result = new MessageResponse
                     {
-                        return new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
+                        IsSuccess = true
                     }
-                }
+                };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<bool>
+                return new BaseResponse<MessageResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+        public async Task<BaseResponse<MessageResponse>> AddActivityLogList(OnActivityLogListMessage request)
+        {
+            try
+            {
+                _messageBroker.Publish(JsonSerializer.Serialize(request), "LogActivityList", "r.bo.util.logs", Guid.NewGuid().ToString());
+
+                return new BaseResponse<MessageResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = $"{StatusCode.Success}",
+                    Result = new MessageResponse
+                    {
+                        IsSuccess = true
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<MessageResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
