@@ -15,12 +15,12 @@
         </div>
 
         <EditForm Model="@AddMessageSettlementModel" OnValidSubmit="OnSettleClickEvent">
-            <table class="table align-middle">
-                <thead class="text-center thead-sticky">
+            <table class="table table-bordered mt-4">
+                <thead class="table-head thead-sticky">
                     <tr>
                         <th valign="middle" align="left" style="width:5%"></th>
-                        <th valign="middle" align="left" style="width:30%"><strong>Fixture</strong></th>
-                        <th valign="middle" align="left" style="width:25%"><strong>Reason</strong></th>
+                        <th valign="middle" align="left" style="width:30%" class="text-start"><strong>Fixture</strong></th>
+                        <th valign="middle" align="left" style="width:25%" class="text-start"><strong>Reason</strong></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,8 +54,8 @@
             @if (AddMessageSettlementModel.BetSelections != null && AddMessageSettlementModel.BetSelections.Any())
             {
                 <div align="right">
-                    <button type="button" class="btn btn-danger" @onclick="_ => OnCloseClickEvent()">Cancel</button>
-                    <button type="submit" class="btn btn-success" data-type="inverse" data-from="top" data-align="right" data-dismiss="modal" @ref="SaveButton">Settle</button>
+                    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCloseClickEvent">Cancel</button>
+                    <button type="button" class="btn modal-btn btn-settle" @ref="SaveButton">Settle</button>
                 </div>
             }
         </EditForm>

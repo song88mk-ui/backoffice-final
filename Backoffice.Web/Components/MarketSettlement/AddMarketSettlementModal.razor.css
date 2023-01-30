@@ -4,10 +4,16 @@
     opacity: 1;
 }
 
-    .btn-cancel {
-        background: #9AA0AB;
-    }
+.btn-cancel {
+    color: white;
+    border-radius: 2px;
+    opacity: 1;
+    background: #9AA0AB;
+}
 
-    .btn-settle {
-        background: transparent linear-gradient(268deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
-    }
+.btn-settle {
+    color: white;
+    border-radius: 2px;
+    opacity: 1;
+    background: transparent linear-gradient(268deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
