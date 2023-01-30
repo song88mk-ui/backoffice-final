@@ -1359,11 +1359,6 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<ManualBetHistoryResponse>> GetManualBetSettlementHistory(ManualBetDetailHistoryRequest request, string region)
-        {
-            return null;
-        }
-
         #region Utilities
 
         private string GetFEDisplayValue(string currency)

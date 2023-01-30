@@ -5,6 +5,9 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using RabbitMQ.Client.Apigen.Attributes;
+using System.Text;
+using System.Text.Json;
+using static Backoffice.Shared.Models.ManualBetDetailsModel;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -12,11 +15,14 @@ namespace Backoffice.Web.Pages.Administration
     {
         #region Properties
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        
+        public MetaData MetaData { get; set; }        
+        public List<ActivityLogModel> ActivityLogs { get; set; }
+        public ManualBetSettlementCallbackModel CallbackModel { get; set; }
+        
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-        public MetaData MetaData { get; set; }
-        public ManualBetSettlementFilterModel FilterModel { get; set; }
-        public ManualSettlementBetHistoryModel ManualSettlementBetHistoryModel { get; set; }
         private int CurrentPage { get; set; } = 1;
         #endregion
 
@@ -25,9 +31,7 @@ namespace Backoffice.Web.Pages.Administration
         protected override async Task OnInitializedAsync()
         {
             PageTitle = "Manual Bet Settlement";
-            IconClass = "ico ico-manual-bet-settlement";
-
-            FilterModel = new ManualBetSettlementFilterModel();
+            IconClass = "ico ico-manual-bet-settlement";            
 
             MetaData = new MetaData
             {
@@ -37,46 +41,15 @@ namespace Backoffice.Web.Pages.Administration
                 TotalPages = 1,
             };
 
-            await GetContents();
-        }
+            //await GetContents();
+        }        
 
-        public async Task GetContents()
-        {
-            //var response = (await BackOfficeService.GetManualBetSettlmentHistory(new ManualBetDetailHistoryRequest()
-            //{
-            //    Page = MetaData.CurrentPage,
-            //    PageSize = MetaData.PageSize,
-            //    ClientIdRefs = string.Join(',', FilterModel.Clients.Select(x => x.Value)),
-            //    SportIds = string.Join(',', FilterModel.Sports.Select(x => x.Value)),
-            //    Currencies = string.Join(',', FilterModel.Currencies.Select(x => x.Value)),
-            //    FromStatus = string.Join(',', FilterModel.FromStatuses.Select(x => x.Value)),
-            //    ToStatus = string.Join(',', FilterModel.ToStatuses.Select(x => x.Value)),
-            //    ReferenceIds = FilterModel.BetId,
-            //    FromSettleDate = FilterModel.DateFrom,
-            //    ToSettleDate = FilterModel.DateTo,
-            //    MemberName = FilterModel.MemberName,
-            //    SettledBy = FilterModel.SettledBy
-            //})).Result;
-
-            //if (response != null)
-            //{
-
-            //}
-
-            //var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
-            //{
-            //    Page = Page.Administration_Settlement_Bet.ToString().Replace('_','.'),
-            //    Payload = BuildPayload(),
-            //    MetaData = MetaData
-            //}));
-        }
-
-        public async Task OnSearchButtonClicked()
+        private async Task OnSearchButtonClicked()
         {
             await GetContents();
         }
 
-        public async Task SelectPage(int page)
+        private async Task SelectPage(int page)
         {
             MetaData.CurrentPage = page;
         }
@@ -88,9 +61,42 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         #region Utilities
-        private string BuildPayload()
+        private async Task OnInitEvent(ManualBetSettlementCallbackModel callbackModel)
         {
-            return "";
+            CallbackModel = callbackModel;
+        }
+
+
+        private async Task GetContents()
+        {
+            var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
+            {
+                Page = Page.Admin_Settlement_Bet.ToString().Replace('_', '.'),                
+                MetaData = MetaData
+            }));
+
+            if (response.StatusCode == StatusCode.Success)
+            {
+                if (response.Result != null && response.Result.ActivityLogs.Any())
+                {
+
+                }
+            }
+        }
+
+        private string BuildEventDetails(BetSelectionDetails betSelectionDetails, string oddsFormat)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append($"<span class=\"segment-league d-block\">{betSelectionDetails.LeagueName}</span>");
+            builder.Append($"<span class=\"fixture d-block\">{betSelectionDetails.FixtureName}</span>");
+            builder.Append($"<span class=\"start-date d-block\">{betSelectionDetails.FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()}</span>");
+            builder.Append($"<span class=\"selection-details d-block\">{betSelectionDetails.SelectionName}</span>");
+            builder.Append($"<span class=\"market-name d-block\">{betSelectionDetails.MarketName} @ {betSelectionDetails.Odds} ({oddsFormat})</span>");
+            builder.Append($"<span class=\"score d-block\">{betSelectionDetails.BetScore}, Final Score: {betSelectionDetails.SettlementScore}</span>");
+
+
+            return builder.ToString();
         }
         #endregion
     }

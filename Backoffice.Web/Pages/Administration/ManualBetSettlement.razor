@@ -1,4 +1,6 @@
 ﻿@using Backoffice.Web.Components.ManualBetSettlement
+@using System.Text.Json;
+@using static Backoffice.Shared.Models.ManualBetDetailsModel;
 
 @page "/admin/manual-bet-settlement"
 
@@ -9,141 +11,79 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter @bind-FilterModel="FilterModel" OnSearchButtonCallback="OnSearchButtonClicked" />
+                <Filter OnSearchButtonCallback="OnSearchButtonClicked" OnInitCallback="OnInitEvent"/>
             </div>
             <div class="col-md-12">
                 <div class="content mx-3">
-                    <table class="table table-bordered mt-4">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="th-number py-3">#</th>
-                                <th class="th-date-settled py-3">Date Settled</th>
-                                <th class="th-reference-id py-3">Reference ID</th>
-                                <th class="th-sports py-3">Sports</th>
-                                <th class="th-bet-date py-3">Bet Date</th>
-                                <th class="th-event-details py-3">Event Details</th>
-                                <th class="th-from-status py-3">From Status</th>
-                                <th class="th-to-status py-3">To Status</th>
-                                <th class="th-member-name py-3">Member Name</th>
-                                <th class="th-settled-by py-3">Settled By</th>
-                                <th class="th-reason py-3">Reason</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>
-                                    <span class="settled-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="settled-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    1D2FA746-1047- 425B-3047-08DA C21AEEB9
-                                </td>
-                                <td>Basketball</td>
-                                <td>
-                                    <span class="bet-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="bet-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    <div class="information-container">
-                                        <span class="segment-league d-block">ITF Estonia 01A, Women Singles Papadakis,</span>
-                                        <span class="fixture d-block">Lena vs. Cengiz, Berfu</span>
-                                        <span class="start-date d-block">01/12/2023 9:00:00 AM </span>
-                                        <span class="selection-details d-block">Papadakis, Lena x 50 @("@") 5.83(DEC)</span>
-                                        <span class="score d-block">(Bet Result: 0 - 0, Final Score: 0 - 0)</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    Running
-                                </td>
-                                <td>
-                                    Won
-                                </td>
-                                <td>
-                                    1000170-USD
-                                </td>
-                                <td>
-                                    FCI-Kim
-                                </td>
-                                <td>Won</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>
-                                    <span class="settled-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="settled-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    1D2FA746-1047- 425B-3047-08DA C21AEEB9
-                                </td>
-                                <td>Basketball</td>
-                                <td>
-                                    <span class="bet-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="bet-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    <div class="information-container">
-                                        <span class="segment-league d-block">ITF Estonia 01A, Women Singles Papadakis,</span>
-                                        <span class="fixture d-block">Lena vs. Cengiz, Berfu</span>
-                                        <span class="start-date d-block">01/12/2023 9:00:00 AM </span>
-                                        <span class="selection-details d-block">Papadakis, Lena x 50 @("@") 5.83(DEC)</span>
-                                        <span class="score d-block">(Bet Result: 0 - 0, Final Score: 0 - 0)</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    Running
-                                </td>
-                                <td>
-                                    Won
-                                </td>
-                                <td>
-                                    1000170-USD
-                                </td>
-                                <td>
-                                    FCI-Kim
-                                </td>
-                                <td>Won</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>
-                                    <span class="settled-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="settled-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    1D2FA746-1047- 425B-3047-08DA C21AEEB9
-                                </td>
-                                <td>Basketball</td>
-                                <td>
-                                    <span class="bet-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="bet-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    <div class="information-container">
-                                        <span class="segment-league d-block">ITF Estonia 01A, Women Singles Papadakis,</span>
-                                        <span class="fixture d-block">Lena vs. Cengiz, Berfu</span>
-                                        <span class="start-date d-block">01/12/2023 9:00:00 AM </span>
-                                        <span class="selection-details d-block">Papadakis, Lena x 50 @("@") 5.83(DEC)</span>
-                                        <span class="score d-block">(Bet Result: 0 - 0, Final Score: 0 - 0)</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    Running
-                                </td>
-                                <td>
-                                    Won
-                                </td>
-                                <td>
-                                    1000170-USD
-                                </td>
-                                <td>
-                                    FCI-Kim
-                                </td>
-                                <td>Won</td>
-                            </tr>
-                        </tbody>
-                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="9" />
-                    </table>
+                    @if (ActivityLogs != null && ActivityLogs.Any())
+                    {
+                        <table class="table table-bordered mt-4">
+                            <thead class="table-head">
+                                <tr>
+                                    <th class="th-number py-3">#</th>
+                                    <th class="th-date-settled py-3">Date Settled</th>
+                                    <th class="th-reference-id py-3">Reference ID</th>
+                                    <th class="th-sports py-3">Sports</th>
+                                    <th class="th-bet-date py-3">Bet Date</th>
+                                    <th class="th-event-details py-3">Event Details</th>
+                                    <th class="th-from-status py-3">From Status</th>
+                                    <th class="th-to-status py-3">To Status</th>
+                                    <th class="th-member-name py-3">Member Name</th>
+                                    <th class="th-settled-by py-3">Settled By</th>
+                                    <th class="th-reason py-3">Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var log in ActivityLogs)
+                                {
+                                    int RowCount = (ActivityLogs.IndexOf(log) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                                    ManualBetDetails betDetails = JsonSerializer.Deserialize<ManualBetDetails>(log.To);
+                                    <tr>
+                                        <td>RowCount</td>
+                                        <td>
+                                            <span class="settle-date d-block">@(betDetails.SettlementDate.ToString("MM/dd/yyyy"))</span>
+                                            <span class="settle-time d-block">@(betDetails.SettlementDate.ToString("hh:mm:ss tt").ToUpper())</span>
+                                        </td>
+                                        <td>
+                                            @betDetails.BetId
+                                        </td>
+                                        <td>
+                                            @(betDetails.Selections.FirstOrDefault().SportName)
+                                        </td>
+                                        <td>
+                                            <span class="bet-date d-block">@(betDetails.BetDate.ToString("MM/dd/yyyy"))</span>
+                                            <span class="bet-time d-block">@(betDetails.BetDate.ToString("hh:mm:ss tt").ToUpper())</span>
+                                        </td>
+                                        <td>
+                                            <div class="information-container">
+                                                @((MarkupString)BuildEventDetails(betDetails.Selections.FirstOrDefault(), betDetails.OddsTypeName))
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @betDetails.BetStatusName
+                                        </td>
+                                        <td>
+                                            @betDetails.NewBetStatusName
+                                        </td>
+                                        <td>
+                                            @betDetails.UserId
+                                        </td>
+                                        <td>
+                                            @log.UserName
+                                        </td>
+                                        <td>
+                                            @betDetails.Reason
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="9" />
+                        </table>
+                    }
+                    else
+                    {
+                        <NoRecordFound/>
+                    }
                 </div>
             </div>
         </div>

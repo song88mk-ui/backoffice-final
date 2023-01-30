@@ -12,12 +12,29 @@ namespace Backoffice.Web.Components.ManualBetSettlement
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        [Parameter] public ManualBetSettlementFilterModel FilterModel { get; set; }
-        [Parameter] public EventCallback<ManualBetSettlementFilterModel> FilterModelChanged { get; set; }
+        [Inject] private IBackOfficeService BackOfficeService { get; set; }                
         [Parameter] public EventCallback OnSearchButtonCallback { get; set; }
+        [Parameter] public EventCallback<ManualBetSettlementCallbackModel> OnInitCallback { get; set; }
 
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }        
+
+        public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
+        public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
+        public List<SelectListItemWithCheckboxModel<string>> Currencies { get; set; }
+        public List<SelectListItemWithCheckboxModel<string>> FromStatuses { get; set; }
+        public List<SelectListItemWithCheckboxModel<string>> ToStatuses { get; set; }
+        public ManualBetSettlementCallbackModel CallbackModel { get; set; }
+
+        public string SelectedClientName { get; set; }
+        public int SelectedClientCount { get; set; }
+        public string SelectedSportName { get; set; }
+        public int SelectedSportCount { get; set; }
+        public string SelectedCurrencyName { get; set; }
+        public int SelectedCurrencyCount { get; set; }
+        public string SelectedFromStatusName { get; set; }
+        public int SelectedFromStatusCount { get; set; }
+        public string SelectedToStatusName { get; set; }
+        public int SelectedToStatusCount { get; set; }
         public bool ShowFilter { get; set; }
 
         #endregion
@@ -27,6 +44,14 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         protected override async Task OnInitializedAsync()
         {
             ShowFilter = false;
+
+            CallbackModel = new ManualBetSettlementCallbackModel();
+
+            Clients = new List<SelectListItemWithCheckboxModel<string>>();
+            Sports = new List<SelectListItemWithCheckboxModel<string>>();
+            Currencies = new List<SelectListItemWithCheckboxModel<string>>();
+            FromStatuses = new List<SelectListItemWithCheckboxModel<string>>();
+            ToStatuses = new List<SelectListItemWithCheckboxModel<string>>();
 
             await LoadClients();
             await LoadSports();
@@ -53,67 +78,90 @@ namespace Backoffice.Web.Components.ManualBetSettlement
 
         public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
         {
-            FilterModel.SelectedClientName = string.Empty;
-            FilterModel.SelectedClientCount = items.Count;
-
-            if (FilterModel.SelectedClientCount == 1)
+            CallbackModel.Clients = Clients.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.Client
             {
-                FilterModel.SelectedClientName = items.FirstOrDefault().Value;
-            }
+                ClientId = long.Parse(s.Value),
+                ClientName = s.Name
+            }).ToList();
+
+            await OnInitCallback.InvokeAsync(CallbackModel);           
         }
 
         public async Task OnSportCheckboxClickEvent(Dictionary<string, string> items)
-        {
-            FilterModel.SelectedSportName = string.Empty;
-            FilterModel.SelectedSportCount = items.Count;
-
-            if (FilterModel.SelectedSportCount == 1)
+        {            
+            CallbackModel.Sports = Sports.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.Sport
             {
-                FilterModel.SelectedSportName = items.FirstOrDefault().Value;
-            }
+                SportId = long.Parse(s.Value),
+                SportName = s.Name
+            }).ToList();
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
         }
 
         public async Task OnCurrencyCheckboxClickEvent(Dictionary<string, string> items)
-        {
-            FilterModel.SelectedCurrencyName = string.Empty;
-            FilterModel.SelectedCurrencyCount = items.Count;
-
-            if (FilterModel.SelectedCurrencyCount == 1)
+        {            
+            CallbackModel.Currencies = Currencies.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.Currency
             {
-                FilterModel.SelectedCurrencyName = items.FirstOrDefault().Value;
-            }
+                CurrencyId = int.Parse(s.Value),
+                CurrencyCode = s.Name
+            }).ToList();
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
         }
 
         public async Task OnFromStatusCheckboxClickEvent(Dictionary<string, string> items)
-        {
-            FilterModel.FromSelectedStatusName = string.Empty;
-            FilterModel.FromSelectedStatusCount = items.Count;
-
-            if (FilterModel.FromSelectedStatusCount == 1)
+        {            
+            CallbackModel.FromBetStatuses = FromStatuses.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.BetStatus
             {
-                FilterModel.FromSelectedStatusName = items.FirstOrDefault().Value;
-            }
+                BetStatusId = int.Parse(s.Value),
+                BetStatusName = s.Name
+            }).ToList();
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
         }
 
         public async Task OnToStatusCheckboxClickEvent(Dictionary<string, string> items)
-        {
-            FilterModel.ToSelectedStatusName = string.Empty;
-            FilterModel.ToSelectedStatusCount = items.Count;
-
-            if (FilterModel.ToSelectedStatusCount == 1)
+        {            
+            CallbackModel.ToBetStatuses = ToStatuses.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.BetStatus
             {
-                FilterModel.ToSelectedStatusName = items.FirstOrDefault().Value;
-            }
+                BetStatusId = int.Parse(s.Value),
+                BetStatusName = s.Name
+            }).ToList();
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
+        }
+
+        public async Task OnReferenceIdChangedEvent(ChangeEventArgs e)
+        {
+            CallbackModel.BetId = e.Value.ToString();
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
         }
 
         public async Task OnDateRangeChangedEvent(DateRange range)
         {
-            FilterModel.DateFrom = DateTime.Parse(range.Start.ToString()).Date.Add(new TimeSpan(0, 0, 0));
-            FilterModel.DateTo = DateTime.Parse(range.End.ToString()).Date.Add(new TimeSpan(23, 59, 59));
+            CallbackModel.DateFrom = DateTime.Parse(range.Start.ToString()).Date.Add(new TimeSpan(0, 0, 0));
+            CallbackModel.DateTo = DateTime.Parse(range.End.ToString()).Date.Add(new TimeSpan(23, 59, 59));
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
+        }
+
+        public async Task OnMemberNameChangedEvent(ChangeEventArgs e)
+        {
+            CallbackModel.MemberName = e.Value.ToString();
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
+        }
+
+        public async Task OnSettledByChangedEvent(ChangeEventArgs e)
+        {
+            CallbackModel.SettledBy = e.Value.ToString();
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
         }
 
         public async Task OnSearchButtonClickedEvent()
-        {
+        {            
             await OnSearchButtonCallback.InvokeAsync();
         }
 
@@ -133,24 +181,23 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 if (UserModel.ClientCodes.Any())
                     clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
-                FilterModel.Clients = clients.Clients.Select(s => new SelectListItemWithCheckboxModel<string>
+                Clients = clients.Clients.Select(s => new SelectListItemWithCheckboxModel<string>
                 {
                     IsChecked = true,
                     Value = s.ClientId.ToString(),
                     Name = s.ClientName
                 }).ToList();
 
-                FilterModel.Clients.Insert(0, new SelectListItemWithCheckboxModel<string>
+                Clients.Insert(0, new SelectListItemWithCheckboxModel<string>
                 {
                     IsChecked = true,
                     Value = "all",
                     Name = "All Clients"
                 });
 
-                var selectedClients = FilterModel.Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
-
-                FilterModel.SelectedClientCount = selectedClients.Count;
-                FilterModel.SelectedClientName = FilterModel.SelectedClientCount > 0 ? string.Empty : FilterModel.Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+                var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
+                SelectedClientCount = selectedClients.Count;
+                SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
             }
         }
 
@@ -158,34 +205,33 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         {
             var sports = (await BackOfficeService.GetSportsAsync()).Result;
 
-            FilterModel.Sports = sports.SportLookup.Select(s => new SelectListItemWithCheckboxModel<string>
+            Sports = sports.SportLookup.Select(s => new SelectListItemWithCheckboxModel<string>
             {
                 IsChecked = true,
                 Value = s.SportId.ToString(),
                 Name = s.SportName
             }).ToList();
 
-            FilterModel.Sports.Insert(0, new SelectListItemWithCheckboxModel<string>
+            Sports.Insert(0, new SelectListItemWithCheckboxModel<string>
             {
                 IsChecked = true,
                 Value = "all",
                 Name = "All Sports"
             });
 
-            var selectedSports = FilterModel.Sports.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
-
-            FilterModel.SelectedSportCount = selectedSports.Count;
-            FilterModel.SelectedSportName = FilterModel.SelectedSportCount > 0 ? string.Empty : FilterModel.Sports.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+            var selectedSports = Sports.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
+            SelectedSportCount = selectedSports.Count;
+            SelectedSportName = SelectedSportCount > 0 ? string.Empty : Sports.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
         }
 
         private async Task LoadCurrencies()
         {
-            FilterModel.Currencies = new List<SelectListItemWithCheckboxModel<string>>();
+            Currencies = new List<SelectListItemWithCheckboxModel<string>>();
             foreach (Currency currency in (Currency[])Enum.GetValues(typeof(Currency)))
             {
                 if (currency == 0)
                 {
-                    FilterModel.Currencies.Add(new SelectListItemWithCheckboxModel<string>()
+                    Currencies.Add(new SelectListItemWithCheckboxModel<string>()
                     {                        
                         IsChecked = true,
                         Value = ((int)currency).ToString(),
@@ -194,7 +240,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 }
                 else
                 {
-                    FilterModel.Currencies.Add(new SelectListItemWithCheckboxModel<string>()
+                    Currencies.Add(new SelectListItemWithCheckboxModel<string>()
                     {
                         IsChecked = true,
                         Value = ((int)currency).ToString(),
@@ -203,19 +249,28 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 }
             }
 
-            var selectedCurrencies = FilterModel.Currencies.Where(c => c.Value != "All" && c.IsChecked).Select(s => s.Value).ToList();
-            FilterModel.SelectedCurrencyCount = selectedCurrencies.Count;
-            FilterModel.SelectedCurrencyName = FilterModel.SelectedCurrencyCount > 0 ? string.Empty : FilterModel.Currencies.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
+            var selectedCurrencies = Currencies.Where(c => c.Value != "All" && c.IsChecked).Select(s => s.Value).ToList();
+            SelectedCurrencyCount = selectedCurrencies.Count;
+            SelectedCurrencyName = SelectedCurrencyCount > 0 ? string.Empty : Currencies.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
         }
 
         private async Task LoadFromStatus()
         {
-            FilterModel.FromStatuses = new List<SelectListItemWithCheckboxModel<string>>();
-            foreach (BetStatus betStatus in (BetStatus[])Enum.GetValues(typeof(BetStatus)))
+            //running, won, lost, halfwon,halflost, void
+            FromStatuses = new List<SelectListItemWithCheckboxModel<string>>();
+            var betStatusList = (BetStatus[])Enum.GetValues(typeof(BetStatus));
+
+            foreach (BetStatus betStatus in betStatusList)
             {
-                if ((int)betStatus != 1000 || (int)betStatus != 6000 || (int)betStatus != 7000)
+                int betStatusCasted = (int)betStatus;
+
+                if (betStatusCasted == 1000 || betStatusCasted == 6000 || betStatusCasted == 7000)
                 {
-                    FilterModel.FromStatuses.Add(new SelectListItemWithCheckboxModel<string>()
+                    continue;
+                }
+                else
+                {
+                    FromStatuses.Add(new SelectListItemWithCheckboxModel<string>()
                     {
                         IsChecked = true,
                         Value = ((int)betStatus).ToString(),
@@ -224,26 +279,34 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 }
             }
 
-            FilterModel.FromStatuses.Insert(0, new SelectListItemWithCheckboxModel<string>
+            FromStatuses.Insert(0, new SelectListItemWithCheckboxModel<string>
             {
                 IsChecked = true,
                 Value = "all",
                 Name = "All From Status"
             });
 
-            var selectedFromStatuses = FilterModel.FromStatuses.Where(c => c.Value != "All" && c.IsChecked).Select(s => s.Value).ToList();
-            FilterModel.FromSelectedStatusCount = selectedFromStatuses.Count;
-            FilterModel.FromSelectedStatusName = FilterModel.FromSelectedStatusCount > 0 ? string.Empty : FilterModel.FromStatuses.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
+            var selectedFromStatuses = FromStatuses.Where(c => c.Value != "All" && c.IsChecked).Select(s => s.Value).ToList();
+            SelectedFromStatusCount = selectedFromStatuses.Count;
+            SelectedFromStatusName = SelectedFromStatusCount > 0 ? string.Empty : FromStatuses.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
         }
 
         private async Task LoadToStatus()
         {
-            FilterModel.ToStatuses = new List<SelectListItemWithCheckboxModel<string>>();
-            foreach (BetStatus betStatus in (BetStatus[])Enum.GetValues(typeof(BetStatus)))
+            ToStatuses = new List<SelectListItemWithCheckboxModel<string>>();
+            var betStatusList = (BetStatus[])Enum.GetValues(typeof(BetStatus));
+
+            foreach (BetStatus betStatus in betStatusList)
             {
-                if ((int)betStatus != 1000 || (int)betStatus != 6000 || (int)betStatus != 7000)
+                int betStatusCasted = (int)betStatus;
+
+                if (betStatusCasted == 1000 || betStatusCasted == 6000 || betStatusCasted == 7000)
                 {
-                    FilterModel.ToStatuses.Add(new SelectListItemWithCheckboxModel<string>()
+                    continue;
+                }
+                else
+                {
+                    ToStatuses.Add(new SelectListItemWithCheckboxModel<string>()
                     {
                         IsChecked = true,
                         Value = ((int)betStatus).ToString(),
@@ -252,16 +315,16 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 }
             }
 
-            FilterModel.ToStatuses.Insert(0, new SelectListItemWithCheckboxModel<string>
+            ToStatuses.Insert(0, new SelectListItemWithCheckboxModel<string>
             {
                 IsChecked = true,
                 Value = "all",
                 Name = "All From Status"
             });
 
-            var selectedToStatuses = FilterModel.ToStatuses.Where(c => c.Value != "All" && c.IsChecked).Select(s => s.Value).ToList();
-            FilterModel.ToSelectedStatusCount = selectedToStatuses.Count;
-            FilterModel.ToSelectedStatusName = FilterModel.ToSelectedStatusCount > 0 ? string.Empty : FilterModel.ToStatuses.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
+            var selectedToStatuses = ToStatuses.Where(c => c.Value != "All" && c.IsChecked).Select(s => s.Value).ToList();
+            SelectedToStatusCount = selectedToStatuses.Count;
+            SelectedToStatusName = SelectedToStatusCount > 0 ? string.Empty : ToStatuses.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
         }
         #endregion
     }

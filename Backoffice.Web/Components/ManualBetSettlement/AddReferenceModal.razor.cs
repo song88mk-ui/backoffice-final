@@ -72,33 +72,33 @@ namespace Backoffice.Web.Components.ManualBetSettlement
 
         public async Task OnBetStatusChangedEvent(ChangeEventArgs e, ManualBetDetails bet)
         {
-            bet.BetStatusId = int.Parse(e.Value.ToString());
+            bet.NewBetStatusId = int.Parse(e.Value.ToString());
 
-            switch ((BetStatus)bet.BetStatusId)
+            switch ((BetStatus)bet.NewBetStatusId)
             {
                 case BetStatus.Won:
                     {
-                        bet.BetStatusName = BetStatus.Won.ToString();
+                        bet.NewBetStatusName = BetStatus.Won.ToString();
                         break;
                     }
                 case BetStatus.Lost:
                     {
-                        bet.BetStatusName = BetStatus.Lost.ToString();
+                        bet.NewBetStatusName = BetStatus.Lost.ToString();
                         break;
                     }
                 case BetStatus.HalfWon:
                     {
-                        bet.BetStatusName = BetStatus.HalfWon.ToString();
+                        bet.NewBetStatusName = BetStatus.HalfWon.ToString();
                         break;
                     }
                 case BetStatus.HalfLost:
                     {
-                        bet.BetStatusName = BetStatus.HalfLost.ToString();
+                        bet.NewBetStatusName = BetStatus.HalfLost.ToString();
                         break;
                     }
                 case BetStatus.Void:
                     {
-                        bet.BetStatusName = BetStatus.Void.ToString();
+                        bet.NewBetStatusName = BetStatus.Void.ToString();
                         break;
                     }
                 default: break;
