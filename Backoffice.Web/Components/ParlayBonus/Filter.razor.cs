@@ -9,48 +9,39 @@ namespace Backoffice.Web.Components.ParlayBonus
     public partial class Filter : IDisposable
     {
         #region Properties
+
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         [Parameter] public ClientParlayBonusModel ClientParlayBonusResponse { get; set; }
         [Parameter] public EventCallback<bool> OnUpdateClickCallback { get; set; }
         [Parameter] public EventCallback OnAddClickCallback { get; set; }
         [Parameter] public EventCallback<long> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }        
+        [Parameter] public EventCallback<bool> IsUpdatingChanged { get; set; }
         [Parameter] public List<SelectListItemModel<ClientModel.Client>> Clients { get; set; }
-        [Parameter] public MetaData MetaData { get; set; }
+        [Parameter] public bool IsUpdating { get; set; }
+
         public ElementReference ParlayBonusMinOddsElementReference { get; set; }
         public ElementReference FilterAddButtonElementReference { get; set; }
+
         public string ClientId { get; set; }
-        [Parameter] public bool IsUpdating { get; set; }
-        [Parameter] public EventCallback<bool> IsUpdatingChanged { get; set; }
         public decimal OriginalMinOdds { get; set; }
-
         public static bool IsFormValid { get; set; }
-        private static Filter filter;
         private int InvalidCount { get; set; }
-        public static bool IsSaveDisabled { get; set; }
-        #endregion
+        public bool IsSaveDisabled { get; set; }
 
-        #region Ctor
-        public Filter()
-        {
-            filter = this;
-        }
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            ClientId = "0";                        
-        }
-
-        public void Dispose()
-        {
-            
-        }        
+            ClientId = "0";
+        } 
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
@@ -67,8 +58,6 @@ namespace Backoffice.Web.Components.ParlayBonus
             IsFormValid = ClientParlayBonusResponse.ParlayBonusMinOdds < 1.20m ? true : false;
 
             await OnUpdateClickCallback.InvokeAsync(IsUpdating);
-
-            await InvokeAsync(StateHasChanged);
         }
 
         public async Task OnSaveClickEvent()
@@ -81,7 +70,7 @@ namespace Backoffice.Web.Components.ParlayBonus
         {
             ClientParlayBonusResponse.ParlayBonusMinOdds = OriginalMinOdds;
             IsUpdating = !IsUpdating;
-            await InvokeAsync(StateHasChanged);
+
             await OnCancelClickCallback.InvokeAsync();            
         }
 
@@ -89,7 +78,6 @@ namespace Backoffice.Web.Components.ParlayBonus
         {
             IsSaveDisabled = true;
             await OnAddClickCallback.InvokeAsync();
-            await InvokeAsync(StateHasChanged);
         }
 
         public async Task FilterAddBtnOnMouseover()
@@ -97,33 +85,22 @@ namespace Backoffice.Web.Components.ParlayBonus
             FilterAddButtonElementReference.FocusAsync();
         }
 
-        [JSInvokable("DisableSaveButton")]
-        public static async Task DisableSaveButton(bool isDisabled)
-        {
-            IsFormValid = isDisabled;            
-            filter.CheckForInvalidData();
-            filter.StateHasChanged();
-        }
-
-        [JSInvokable("DisableSaveButtonOnInput")]
-        public static async Task DisableSaveButtonOnInput(bool isDisabled)
-        {
-            IsSaveDisabled = isDisabled;            
-            filter.CheckForInvalidData();
-            filter.StateHasChanged();
-        }
-        #endregion
-
-        #region Utilities
-        private async Task ValidateParlayBonusMinOdds(ChangeEventArgs e)
+        public async Task ValidateParlayBonusMinOdds(ChangeEventArgs e)
         {
             await JSRuntime.InvokeVoidAsync("ValidateParlayBonusMinOdds", ParlayBonusMinOddsElementReference);
         }
 
-        private async Task CheckForInvalidData()
-        {            
-            InvalidCount = ClientParlayBonusResponse.ParlayBonusConfig.Where(x => x.ParlayBonus < 0 || x.ParlayBonus > 5000 || x.ParlayBonus == 0).Count();
+        [JSInvokable("DisableSaveButton")]
+        public static async Task DisableSaveButton(bool isDisabled)
+        {
+            IsFormValid = isDisabled;
         }
+
+        public void Dispose()
+        {
+
+        }
+
         #endregion
     }
 }

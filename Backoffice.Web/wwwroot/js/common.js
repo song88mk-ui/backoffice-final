@@ -162,16 +162,22 @@ window.enforceNumberValidation = (ele, limit) => {
                 $('#filterAddBtn').prop('disabled', true);
             }
 
-            if ($('.parlay-bonus-input.border-danger').length > 0 || $('#invalidCount').val() > 0) {
-                $('#saveChangesBtn').prop('disabled', true);                  
-                DotNet.invokeMethodAsync('Backoffice.Web', 'DisableSaveButtonOnInput', true);
-            }
-            else {
-                $('#saveChangesBtn').prop('disabled', false);                            
-                DotNet.invokeMethodAsync('Backoffice.Web', 'DisableSaveButtonOnInput', false);
-            }
+            DotNet.invokeMethodAsync('Backoffice.Web', 'DisableSaveButtonOnInput', val, $(ele).attr('id'));
+
+            //if ($('.parlay-bonus-input.border-danger').length > 0 || $('#invalidCount').val() > 0) {
+            //    //$('#saveChangesBtn').prop('disabled', true);                  
+            //    //DotNet.invokeMethodAsync('Backoffice.Web', 'DisableSaveButtonOnInput', true);
+            //}
+            //else {
+            //    //$('#saveChangesBtn').prop('disabled', false);                            
+            //    //DotNet.invokeMethodAsync('Backoffice.Web', 'DisableSaveButtonOnInput', false);
+            //}
         }
     }
+}
+
+window.disableSaveButton = (value) => {
+    $('#saveChangesBtn').prop('disabled', value);
 }
 
 function password_show_hide() {

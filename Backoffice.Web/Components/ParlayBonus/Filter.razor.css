@@ -4,24 +4,24 @@
 }
 
 .odds-container div {
-    padding-top: 6px;
-    padding-bottom: 6px;
+    /*padding-top: 6px;
+    padding-bottom: 6px;*/
     border: 1px solid #707070;
 }
 .min-odds, .min-odds-text {
-    font-size: 14px;
+    font-size: 0.8rem;
 }
 
 .min-odds-input {
     border-radius: 0px 3px 3px 0px;
 }
 
-    .min-odds-input:focus {
-        z-index:0;
-    }
+.min-odds-input:focus {
+    z-index:0;
+}
 
 .form-label {
-    font-size: 13px;
+    font-size: 0.8rem;
 }
 
 .fa-info-circle {
@@ -31,7 +31,7 @@
 
 .btn-update, .btn-save, .btn-cancel, .btn-add {
     color: #FFFFFF;
-    font-size: 15px;
+    font-size: 0.8rem;
 }
 
 .btn-update, .btn-save {
@@ -45,12 +45,6 @@
 .btn-add {
     background: #232323 0% 0% no-repeat padding-box;
     border-radius: 5px;
-}
-
-.clientBtn {
-    border: 1px solid #C7C1C1;
-    text-align: left;
-    width: 14rem;
 }
 
 .dropdown-toggle::after {
@@ -70,31 +64,31 @@
     top: 0.6rem;
 }
 
-    .tooltip2 .tooltiptext {
-        visibility: hidden;
-        width: 10rem;
-        background-color: black;
-        color: #fff;
-        text-align: center;
-        border-radius: 6px;
-        padding: 5px 0;
-        position: absolute;
-        z-index: 1;
-        top: -5px;
-        left: 2rem;
-    }
+.tooltip2 .tooltiptext {
+    visibility: hidden;
+    width: 10rem;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: 2rem;
+}
 
-        .tooltip2 .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            right: 100%;
-            margin-top: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: transparent black transparent transparent;
-        }
+.tooltip2 .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent black transparent transparent;
+}
 
-    .tooltip2:hover .tooltiptext {
-        visibility: visible;
-    }
+.tooltip2:hover .tooltiptext {
+    visibility: visible;
+}
