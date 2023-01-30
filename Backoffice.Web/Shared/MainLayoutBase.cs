@@ -1,10 +1,9 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
+using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Backoffice.Web.Shared
 {
@@ -19,6 +18,8 @@ namespace Backoffice.Web.Shared
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
         [Parameter] public SportClickCallbackModel SelectedSport { get; set; }
+
+        public HeaderNavMenu HeaderNavMenuReference { get; set; }
 
         public UserModel UserModel { get; set; } = new UserModel();
         public LogInModel Model { get; set; }
@@ -64,6 +65,7 @@ namespace Backoffice.Web.Shared
                     UserModel.MainUserId = userClaims.Where(x => x.Type.ToUpper() == "MAINUSERID").FirstOrDefault()?.Value ?? "";
                     UserModel.Claims = userClaims.Where(x => !permissions.Contains(x.Type.ToUpper())).ToList();
                 }
+
                 IsPreLoader = false;
                 StateHasChanged();
             }
@@ -72,9 +74,11 @@ namespace Backoffice.Web.Shared
                 NavigationManager.NavigateTo("login", true);
             }
         }
+
         public void OnSportClickEvent(SportClickCallbackModel model)
         {
             SelectedSport = model;
+            HeaderNavMenuReference.ActivateMenu("monitoring");
         }
 
         public void Dispose()
