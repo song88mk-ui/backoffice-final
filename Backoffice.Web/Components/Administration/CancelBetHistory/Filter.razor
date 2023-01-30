@@ -1,4 +1,6 @@
-﻿<div class="row">
+﻿@using BlazorDateRangePicker
+
+<div class="row">
     <div class="col-md-12">
         <div class="content-filter mx-3 d-flex justify-content-between">
             <div class="input-container d-flex">
@@ -33,7 +35,7 @@
             </div>
             <div class="me-4">
                 <label class="form-label d-block">Date</label>
-                <input type="text" placeholder="Enter Date" class="form-control" />
+                <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="FilterModel.DateFrom" EndDate="FilterModel.DateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDateRangeChangedEvent"></DateRangePicker>
             </div>
             <div class="me-4">
                 <button type="button" class="btn btn-search px-4 py-2">
