@@ -31,9 +31,9 @@ namespace Backoffice.Web.Pages.Administration
         private long CursorId { get; set; }
         private int PreviousPage { get; set; }
         public MetaData MetaData { get; set; }
-        [CascadingParameter] public string ToastTitle { get; set; }
-        [CascadingParameter] public string ToastMessage { get; set; }
-        [CascadingParameter] public bool IsMessageMarkup { get; set; }
+        public string ToastTitle { get; set; }
+        public string ToastMessage { get; set; }
+        public string ToastId { get; set; }
         #endregion
 
         #region Methods
@@ -68,11 +68,11 @@ namespace Backoffice.Web.Pages.Administration
         }
         public async Task OnExportClickedEvent()
         {
+            ToastId = Guid.NewGuid().ToString();
             ToastTitle = "Message Settlement";
             ToastMessage = $"Success! Excel file is being generated system will notify once done.";
 
-            await InvokeAsync(StateHasChanged);
-            await JSRuntime.InvokeVoidAsync("showToast", true);
+            await ShowToast();
         }
         public async Task SelectPage(int page)
         {
@@ -152,6 +152,11 @@ namespace Backoffice.Web.Pages.Administration
                 new SelectListItemModel<int> { Value = 15, Name = "Virtual Baseball" },
                 new SelectListItemModel<int> { Value = 17, Name = "Virtual Cricket" },
             };
+        }
+        private async Task ShowToast()
+        {
+            await InvokeAsync(StateHasChanged);
+            await JSRuntime.InvokeVoidAsync("showToast", ToastId, false);
         }
         #endregion
     }

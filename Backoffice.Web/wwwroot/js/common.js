@@ -110,14 +110,24 @@ window.getSortOrder = (className) => {
 }
 
 
-window.showToast = (isAutoHide) => {
+window.showToast = (className, isAutoHide) => {
     if (isAutoHide !== undefined) {
         $('.toast').toast({
             autohide: isAutoHide
         });
     }
-    
-    $('.toast').toast('show');
+
+    $('.toast-container').prepend($('.' + className));
+
+    //$('.toast').on('shown.bs.toast', (evt) => {                
+    //    console.log('toast is shown');
+    //});
+
+    $('.' + className).on('hidden.bs.toast', (evt) => {
+        $('.toast-container').remove($('.' + className));
+    });
+
+    $('.' + className).toast('show');
 }
 
 window.enforceNumberValidation = (ele, limit) => {

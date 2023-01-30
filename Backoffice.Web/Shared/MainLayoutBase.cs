@@ -33,7 +33,7 @@ namespace Backoffice.Web.Shared
         public string InlineSpinnerCss { get; set; }
         public string ToastTitle { get; set; }
         public string ToastMessage { get; set; }
-        public bool IsMessageMarkup { get; set; }
+        public string ToastId { get; set; }
         #endregion
 
         #region Methods
@@ -148,6 +148,7 @@ namespace Backoffice.Web.Shared
         {
             if (message != null)
             {
+                ToastId = Guid.NewGuid().ToString();
                 ToastTitle = message.Page;
                 ToastMessage = $"{message.Details}";
                 await ShowToast();
@@ -156,7 +157,7 @@ namespace Backoffice.Web.Shared
         private async Task ShowToast()
         {
             await InvokeAsync(StateHasChanged);
-            await JSRuntime.InvokeVoidAsync("showToast", false);
+            await JSRuntime.InvokeVoidAsync("showToast", ToastId, false);
         }
         #endregion
     }
