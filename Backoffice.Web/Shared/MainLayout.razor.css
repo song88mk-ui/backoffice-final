@@ -93,3 +93,7 @@ main {
         padding-right: 1.5rem !important;
     }
 }
+
+.preload-container {
+    height: 100vh;
+}
