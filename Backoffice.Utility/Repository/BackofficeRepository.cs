@@ -38,7 +38,6 @@ namespace Backoffice.Utility.Repository
         {
             try
             {
-                Console.WriteLine(message.Activity);
                 var optionsBuilder = new DbContextOptionsBuilder<BackofficeContext>().UseSqlServer(_configuration["ConnectionStrings:Backoffice"]);
 
                 using (var context = new BackofficeContext(optionsBuilder.Options))
@@ -75,7 +74,7 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
             }
         }
         public async Task ProcessActivityLog(OnActivityLogListMessage message)
@@ -86,7 +85,6 @@ namespace Backoffice.Utility.Repository
 
                 foreach (var item in message.OnActivityLogMessages)
                 {
-                    Console.WriteLine(item.Activity);
                     var timeStamp = item.TimeStamp;
                     if (item.TimeStamp == DateTime.MinValue)
                     {
@@ -120,85 +118,93 @@ namespace Backoffice.Utility.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
             }
         }
         public async Task ProcessOnGetManualMessageSettlementHistory(OnGetManualMarketSettlementHistoryMessage request, IMessageBroker messageBroker)
         {
-            var result = GetActivityLogs(new ActivityLogRequest()
-            {
-                Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
-                Payload = BuildPayload(request.SportId, request.SegmentId, request.LeagueId, request.FixtureId),
-                DateFrom = request.FromDate,
-                DateTo = request.ToDate,
-                MetaData = null
-            }).Result;
-
-            if (result == null)
-                return;
-
             // If you use EPPlus in a noncommercial context
             // according to the Polyform Noncommercial license:
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
             var excel = new ExcelPackage();
-
-            #region Initialize Spreadsheet
-
-            var workSheet = excel.Workbook.Worksheets.Add($"Message Settlement History");
-            InitManualMessageSettlementHistoryWorksheet(workSheet);
-
-            var row = 2;
-            int count = 1;
-            #endregion
-
-            #region Generate Data
-
-            foreach (var log in result.ActivityLogs)
+            try
             {
-                MessageSettlementTo toData = JsonSerializer.Deserialize<MessageSettlementTo>(log.To);
-                workSheet.Cells[row, 1].Value = count;
-                workSheet.Cells[row, 2].Value = $"{toData.BetDate.ToLocalTime().ToString("MM/dd/yyyy hh:mm:ss tt")}";
-                workSheet.Cells[row, 3].Value = toData.BetId.ToString();
-                workSheet.Cells[row, 4].Value = toData.BetSelectionId.ToString();
-                workSheet.Cells[row, 5].Value = toData.SportName;
-                workSheet.Cells[row, 6].Value = toData.FixtureName;
-                workSheet.Cells[row, 7].Value = log.UserName;
-                workSheet.Cells[row, 8].Value = $"{log.TimeStamp.ToLocalTime().ToString("MM/dd/yyyy hh:mm:ss tt")}";
-                workSheet.Cells[row, 9].Value = toData.Reason;
-                row++;
-                count++;
-            }
-            #endregion
-
-            #region Upload File to Azure
-
-            var fileName = $"MessageSettlementHistory_{DateTime.UtcNow:MMddyyyyHHmm}.xlsx";
-            var downloadUrl = UploadToAzure(excel, fileName);
-
-            if (!string.IsNullOrEmpty(downloadUrl))
-            {
-
-                var notificationsModel = new NotificationsDetailsModel
+                var result = GetActivityLogs(new ActivityLogRequest()
                 {
-                    Id = Guid.NewGuid(),
-                    Page = "Administration",
-                    ClientCode = string.Empty,
-                    SportsId = 0,
-                    Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",
-                    PageRedirect = "/admin/message-settlement",
-                    UserId = Guid.Parse(request.UserId),
-                    ClaimType = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
-                    Type = (int)NotificationType.General
-                };
+                    Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
+                    Payload = BuildPayload(request.SportId, request.SegmentId, request.LeagueId, request.FixtureId),
+                    DateFrom = request.FromDate,
+                    DateTo = request.ToDate,
+                    MetaData = null
+                }).Result;
 
-                messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
+                if (result == null)
+                    return;
+
+
+                #region Initialize Spreadsheet
+
+                var workSheet = excel.Workbook.Worksheets.Add($"Message Settlement History");
+                InitManualMessageSettlementHistoryWorksheet(workSheet);
+
+                var row = 2;
+                int count = 1;
+                #endregion
+
+                #region Generate Data
+
+                foreach (var log in result.ActivityLogs)
+                {
+                    MessageSettlementTo toData = JsonSerializer.Deserialize<MessageSettlementTo>(log.To);
+                    workSheet.Cells[row, 1].Value = count;
+                    workSheet.Cells[row, 2].Value = $"{toData.BetDate.ToLocalTime().ToString("MM/dd/yyyy hh:mm:ss tt")}";
+                    workSheet.Cells[row, 3].Value = toData.BetId.ToString();
+                    workSheet.Cells[row, 4].Value = toData.BetSelectionId.ToString();
+                    workSheet.Cells[row, 5].Value = toData.SportName;
+                    workSheet.Cells[row, 6].Value = toData.FixtureName;
+                    workSheet.Cells[row, 7].Value = log.UserName;
+                    workSheet.Cells[row, 8].Value = $"{log.TimeStamp.ToLocalTime().ToString("MM/dd/yyyy hh:mm:ss tt")}";
+                    workSheet.Cells[row, 9].Value = toData.Reason;
+                    row++;
+                    count++;
+                }
+                #endregion
+
+                #region Upload File to Azure
+
+                var fileName = $"MessageSettlementHistory_{DateTime.UtcNow:MMddyyyyHHmm}.xlsx";
+                var downloadUrl = UploadToAzure(excel, fileName);
+
+                if (!string.IsNullOrEmpty(downloadUrl))
+                {
+
+                    var notificationsModel = new NotificationsDetailsModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Page = "Administration",
+                        ClientCode = string.Empty,
+                        SportsId = 0,
+                        Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",
+                        PageRedirect = "/admin/message-settlement",
+                        UserId = Guid.Parse(request.UserId),
+                        ClaimType = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
+                        Type = (int)NotificationType.General
+                    };
+
+                    messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
+                }
+
+                #endregion
             }
-
-            #endregion
-
-            //Close Excel package
-            excel.Dispose();
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
+            }
+            finally
+            {
+                //Close Excel package
+                excel.Dispose();
+            }
         }
 
         #region Utilities

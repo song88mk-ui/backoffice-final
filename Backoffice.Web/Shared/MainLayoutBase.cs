@@ -33,6 +33,7 @@ namespace Backoffice.Web.Shared
         public string InlineSpinnerCss { get; set; }
         public string ToastTitle { get; set; }
         public string ToastMessage { get; set; }
+        public bool IsMessageMarkup { get; set; }
         #endregion
 
         #region Methods

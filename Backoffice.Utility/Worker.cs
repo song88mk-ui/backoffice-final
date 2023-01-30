@@ -50,7 +50,6 @@ namespace Backoffice.Utility
 
             try
             {
-                Console.WriteLine($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")} Received {messageType}");
                 switch (messageType)
                 {
                     case "LogActivity":

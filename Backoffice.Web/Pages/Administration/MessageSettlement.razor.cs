@@ -31,8 +31,9 @@ namespace Backoffice.Web.Pages.Administration
         private long CursorId { get; set; }
         private int PreviousPage { get; set; }
         public MetaData MetaData { get; set; }
-        public string ToastTitle { get; set; }
-        public string ToastMessage { get; set; }
+        [CascadingParameter] public string ToastTitle { get; set; }
+        [CascadingParameter] public string ToastMessage { get; set; }
+        [CascadingParameter] public bool IsMessageMarkup { get; set; }
         #endregion
 
         #region Methods

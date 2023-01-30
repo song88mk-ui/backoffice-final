@@ -28,7 +28,7 @@ namespace Backoffice.Web.Components.MessageSettlement
         public bool IsPreloader { get; set; }
         #endregion
 
-        #region Fieldsx
+        #region Fields
 
         private string message = string.Empty;
         private string divStyles = "display:none";

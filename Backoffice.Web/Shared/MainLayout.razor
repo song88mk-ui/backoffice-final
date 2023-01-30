@@ -14,21 +14,24 @@
     else
     {
         <div class="page">
-                <div class="sidebar">
-                    @if (NavigationManager.Uri.Contains("/admin"))
-                    {
-                        <NavMenu NavMenuAccess="NavMenuAccess.Admin" />
-                    }
-                    else
-                    {
-                        <NavMenu NavMenuAccess="NavMenuAccess.SBC" />
-                    }
-                </div>
-                <main>
-                    <article class="content px-4">
-                        @Body
-                    </article>
-                </main>
+            <div class="sidebar">
+                @if (NavigationManager.Uri.Contains("/admin"))
+                {
+                    <NavMenu NavMenuAccess="NavMenuAccess.Admin" />
+                }
+                else
+                {
+                    <NavMenu NavMenuAccess="NavMenuAccess.SBC" />
+                }
+            </div>
+            <main>
+                <article class="content px-4">
+                    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                        <Toast ToastMessage="@ToastMessage" ToastTitle="@ToastTitle" IsMessageMarkup="true" />
+                    </div>
+                    @Body
+                </article>
+            </main>
         </div>
     }
 </CascadingValue> 

@@ -215,20 +215,6 @@ table .fa-chevron-down {
     top: 0;
 }
 
-.table {
-    text-align: center;
-}
-
-    .table thead {
-        background: #404E67 0% 0% no-repeat padding-box;
-        border-radius: 3px 3px 0px 0px;
-        color: white;
-    }
-
-    .table tr:nth-child(2n+2) {
-        background-color: #F5F5F5;
-    }
-
 .btn-cancel {
     background: #9AA0AB;
 }
