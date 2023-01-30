@@ -25,7 +25,9 @@ namespace Backoffice.Web.Shared
         public LogInModel Model { get; set; }
 
         public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
-        public bool IsPreLoader { get; set; } = true;
+        //public bool IsPreLoader { get; set; } = true;
+        public bool IsPreLoader { get; set; }
+        public string InlineSpinnerCss { get; set; }
 
         #endregion
 
@@ -35,6 +37,10 @@ namespace Backoffice.Web.Shared
         {
             try
             {
+                IsPreLoader = true;
+
+                InlineSpinnerCss = "width:10rem;height:10rem;";
+
                 if (HttpContextAccessor?.HttpContext?.Session.GetString("UserToken") == null)
                 {
                     NavigationManager.NavigateTo("login", true);
@@ -67,7 +73,6 @@ namespace Backoffice.Web.Shared
                 }
 
                 IsPreLoader = false;
-                StateHasChanged();
             }
             catch (Exception)
             {

@@ -1,9 +1,10 @@
 ﻿@code{
     [Parameter] public string InlineCss { get; set; }
+    [Parameter] public string InlineSpinnerCss { get; set; }
 }
 
 <div class="text-center" style="@InlineCss">
-    <div class="spinner-border" role="status">
+    <div class="spinner-border" role="status" style="@InlineSpinnerCss">
         <span class="sr-only">Loading...</span>
     </div>
 </div>
