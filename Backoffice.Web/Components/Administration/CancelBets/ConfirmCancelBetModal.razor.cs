@@ -43,24 +43,38 @@ namespace Backoffice.Web.Components.Administration.CancelBets
             {
                 Alerts.Clear();
 
+                var betIds = CancelBetModel.BetReferenceIds.Where(b => !string.IsNullOrEmpty(b.BetReferenceId)).Select(s => s.BetReferenceId).ToList();
+
+                var betDetails = (await BackOfficeService.GetManualBetDetails(new ManualBetDetailsRequest
+                {
+                    BetIds = betIds,
+                })).Result;
+
+
+                if(betDetails.Bets.Any(b => b.BetStatusId != (int)BetStatus.Running))
+                {
+                    Alerts.Add(new AlertModel
+                    {
+                        AlertStatus = "Error",
+                        AltertMessage = $"Only Running Status should be settled as Cancelled",
+                        Opacity = 1.0m
+                    });
+                    return;
+                }
+
                 var request = new BetModifyRequest
                 {
-                    BetIds = CancelBetModel.BetReferenceIds.Select(s => s.BetReferenceId).ToList(),
+                    BetIds = betIds,
                     NewStatus = BetStatus.Cancelled,
                     Reason = CancelBetModel.Reason,
                     ModifiedByUserId = 0,
                 };
 
-
                 var response = (await BackOfficeService.CancelBet(request));
 
                 if (response.StatusCode == StatusCode.Success)
                 {
-                    var betDetails = (await BackOfficeService.GetManualBetDetails(new ManualBetDetailsRequest
-                    {
-                        BetIds = response.Result.Data.Select(s => s.BetId).ToList(),
-                    })).Result;
-
+                    
                     //activity log
                     var message = new OnActivityLogListMessage();
                     foreach (var data in response.Result.Data)
