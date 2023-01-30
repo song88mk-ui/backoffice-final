@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -55,27 +56,44 @@ namespace Backoffice.Web.Components.Administration.CancelBets
 
                 if (response.StatusCode == StatusCode.Success)
                 {
-                    //TODO: fetch details of each bet and save into activity log payload
+                    var betDetails = (await BackOfficeService.GetManualBetDetails(new ManualBetDetailsRequest
+                    {
+                        BetIds = response.Result.Data.Select(s => s.BetId).ToList(),
+                    })).Result;
 
                     //activity log
-                    foreach(var data in response.Result.Data)
+                    var message = new OnActivityLogListMessage();
+                    foreach (var data in response.Result.Data)
                     {
-                        await BackOfficeService.AddActivityLog(new ActivityLogModel
+                        var betData = betDetails.Bets.FirstOrDefault(b => b.BetId == Guid.Parse(data.BetId));
+
+                        if (betData != null)
                         {
-                            Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
-                            Payload = $"{data.BetId}",
-                            Activity = Activity.Delete.ToString(),
-                            From = data.OldBetStatus,
-                            To = BetStatus.Cancelled.ToString(),
-                            UserId = UserModel.Id,
-                            UserName = UserModel.UserName,
-                        });
+                            if(betData.Selections.Any())
+                            {
+                                foreach(var selection in betData.Selections)
+                                {
+                                    message.OnActivityLogMessages.Add(new OnActivityLogMessage
+                                    {
+                                        Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
+                                        Payload = $"{data.BetId}.{selection.BetSelectionId}",
+                                        Activity = Activity.CancelBet.ToString(),
+                                        From = JsonSerializer.Serialize(betData),
+                                        To = JsonSerializer.Serialize(selection),
+                                        UserId = UserModel.Id,
+                                        UserName = UserModel.UserName,
+                                    });
+                                }
+                            }
+                        }
                     }
-                    
+
+                    await BackOfficeService.AddActivityLogList(message);
+
                     Alerts.Add(new AlertModel
                     {
                         AlertStatus = "Success",
-                        AltertMessage = "User Group successfully deleted",
+                        AltertMessage = "Bet has been successfully cancelled",
                         Opacity = 1.0m
                     });
 
