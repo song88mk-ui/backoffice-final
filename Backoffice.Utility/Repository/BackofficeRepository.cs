@@ -21,6 +21,7 @@ using System.Text.Json;
 using System.IO;
 using Microsoft.WindowsAzure.Storage;
 using Backoffice.Shared.Utilities;
+using System.Text;
 
 namespace Backoffice.Utility.Repository
 {
@@ -207,6 +208,75 @@ namespace Backoffice.Utility.Repository
             }
         }
 
+        public async Task ProcessOnGetManualBetSettlementHistory(OnGetManualBetSettlementHistoryMessage request, IMessageBroker messageBroker)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var excel = new ExcelPackage();
+            try
+            {
+                #region Initialize Spreadsheet
+                var worksheet = excel.Workbook.Worksheets.Add("Manual Bet Settlement History");
+                InitManualBetSettlementHistoryWorksheet(worksheet);
+                #endregion
+
+                #region Generate Data
+                for (int i = 0; i < request.ActivityLogs.Count; i++)
+                {
+                    var log = request.ActivityLogs[i];
+
+                    int cellIndex = i + 1;
+
+                    ManualBetDetailsModel.ManualBetDetails betDetails = JsonSerializer.Deserialize<ManualBetDetailsModel.ManualBetDetails>(log.To);
+                    worksheet.Cells[cellIndex, 1].Value = i + 1;
+                    worksheet.Cells[cellIndex, 2].Value = betDetails.SettlementDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
+                    worksheet.Cells[cellIndex, 3].Value = betDetails.BetId;
+                    worksheet.Cells[cellIndex, 4].Value = betDetails.Selections.FirstOrDefault().SportName;
+                    worksheet.Cells[cellIndex, 5].Value = betDetails.BetDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
+                    worksheet.Cells[cellIndex, 6].Value = BuildEventDetails(betDetails.Selections.FirstOrDefault(), betDetails.OddsTypeName);
+                    worksheet.Cells[cellIndex, 7].Value = betDetails.BetStatusName;
+                    worksheet.Cells[cellIndex, 8].Value = betDetails.NewBetStatusName;
+                    worksheet.Cells[cellIndex, 9].Value = betDetails.UserId;
+                    worksheet.Cells[cellIndex, 10].Value = log.UserName;
+                    worksheet.Cells[cellIndex, 11].Value = betDetails.Reason;
+                }
+                #endregion
+
+                #region Upload File to Azure
+
+                var fileName = $"ManualBetSettlementHistory_{DateTime.UtcNow:MMddyyyyHHmm}.xlsx";
+                var downloadUrl = UploadToAzure(excel, fileName);
+
+                if (!string.IsNullOrEmpty(downloadUrl))
+                {
+
+                    var notificationsModel = new NotificationsDetailsModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Page = "Administration",
+                        ClientCode = string.Empty,
+                        SportsId = 0,
+                        Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",
+                        PageRedirect = "/admin/message-settlement",
+                        UserId = Guid.Parse(request.ActivityLogs.FirstOrDefault().UserId),
+                        ClaimType = AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace("_", "."),
+                        Type = (int)NotificationType.General
+                    };
+
+                    messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
+                }
+                #endregion
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
+            }
+            finally
+            {
+                excel.Dispose();
+            }
+        }
+
         #region Utilities
         private async Task<ActivityLogResponse> GetActivityLogs(ActivityLogRequest request)
         {
@@ -279,6 +349,21 @@ namespace Backoffice.Utility.Repository
                 return null;
             }
         }
+
+        private string BuildEventDetails(ManualBetDetailsModel.BetSelectionDetails betSelectionDetails, string oddsFormat)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append($"{betSelectionDetails.LeagueName}\n");
+            builder.Append($"{betSelectionDetails.FixtureName}\n");
+            builder.Append($"{betSelectionDetails.FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()}\n");
+            builder.Append($"{betSelectionDetails.SelectionName} \n");
+            builder.Append($"{betSelectionDetails.MarketName} @ {betSelectionDetails.Odds} ({oddsFormat})\n");
+            builder.Append($"{betSelectionDetails.BetScore}, Final Score: {betSelectionDetails.SettlementScore}\n");
+
+            return builder.ToString();
+        }
+
         private string BuildPayload(string SportId, string SegmentId, string LeagueId, string FixtureId)
         {
             return $"{(!string.IsNullOrEmpty(SportId) || SportId != "0" ? SportId : "%")}." +
@@ -309,6 +394,29 @@ namespace Backoffice.Utility.Repository
             worksheet.Cells[1, 8].Value = "Date Settled";
             worksheet.Cells[1, 9].Value = "Reason";
         }
+
+        private void InitManualBetSettlementHistoryWorksheet(ExcelWorksheet worksheet)
+        {
+            worksheet.DefaultRowHeight = 12;
+
+            worksheet.Row(1).Height = 20;
+            worksheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Row(1).Style.Font.Bold = true;
+
+            // Header of the Excel sheet
+            worksheet.Cells[1, 1].Value = "#";
+            worksheet.Cells[1, 2].Value = "Date Settled";
+            worksheet.Cells[1, 3].Value = "Reference ID";
+            worksheet.Cells[1, 4].Value = "Sport";
+            worksheet.Cells[1, 5].Value = "Bet Date";
+            worksheet.Cells[1, 6].Value = "Event Details";
+            worksheet.Cells[1, 7].Value = "From Status";
+            worksheet.Cells[1, 8].Value = "To Status";
+            worksheet.Cells[1, 9].Value = "Member Name";
+            worksheet.Cells[1, 10].Value = "Settled By";
+            worksheet.Cells[1, 11].Value = "Reason";
+        }
+
         private string UploadToAzure(ExcelPackage excel, string fileName)
         {
             var storageAccount = CloudStorageAccount.Parse(_configuration["Custom:AzureStorage"]);

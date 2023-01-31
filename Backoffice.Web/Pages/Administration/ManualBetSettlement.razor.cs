@@ -2,6 +2,8 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -16,15 +18,22 @@ namespace Backoffice.Web.Pages.Administration
     {
         #region Properties
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
-        
-        public MetaData MetaData { get; set; }        
+        [Inject] private IMessageBroker MessageBroker { get; set; }
+        [Inject] private ToastService? _toasterService { get; set; }
+
         public List<ActivityLogModel> ActivityLogs { get; set; }
+        public List<AlertModel> Alerts { get; set; }
+
+        public MetaData MetaData { get; set; }
         public ManualBetSettlementCallbackModel CallbackModel { get; set; }
         
-
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         private int CurrentPage { get; set; } = 1;
+        #endregion
+
+        #region Fields
+        private ToastService toasterService => _toasterService!;
         #endregion
 
         #region Methods
@@ -32,12 +41,14 @@ namespace Backoffice.Web.Pages.Administration
         protected override async Task OnInitializedAsync()
         {
             PageTitle = "Manual Bet Settlement";
-            IconClass = "ico ico-manual-bet-settlement";            
+            IconClass = "ico ico-manual-bet-settlement";
+
+            Alerts = new List<AlertModel>();            
 
             MetaData = new MetaData
             {
                 CurrentPage = 1,
-                PageSize = 100,
+                PageSize = 10,
                 TotalCount = 0,
                 TotalPages = 1,
             };
@@ -45,14 +56,57 @@ namespace Backoffice.Web.Pages.Administration
             await GetContents();
         }        
 
-        private async Task OnSearchButtonClicked()
+        public async Task OnSearchButtonClicked()
         {
             await GetContents();
         }
 
-        private async Task SelectPage(int page)
+        public async Task OnConfirmBetSettlement(object responseObj)
+        {
+            var response = (BaseResponse<ManualBetSettlementResponse>)responseObj;
+            Alerts = new List<AlertModel>();
+
+            if (response.StatusCode == StatusCode.Success)
+            {
+                Alerts.Add(new AlertModel()
+                {
+                    AlertStatus = response.StatusCode.ToString(),
+                    AltertMessage = "BetId's have been successfully settled",
+                    Opacity = 1.0m
+                });
+            }
+            else
+            {
+                Alerts.Add(new AlertModel()
+                {
+                    AlertStatus = response.StatusCode.ToString(),
+                    AltertMessage = response.Message,
+                    Opacity = 1.0m
+                });
+            }                    
+
+            await GetContents();
+        }
+
+        public async Task OnExportExcel()
+        {
+            var payload = new OnGetManualBetSettlementHistoryMessage()
+            {
+                ActivityLogs = ActivityLogs
+            };
+
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportManualBetSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+
+            toasterService.AddToast(Toast.NewToast
+                    ("Manual Bet Settlement",
+                    $"Success! Excel file is being generated system will notify once done."));
+        }
+
+        public async Task SelectPage(int page)
         {
             MetaData.CurrentPage = page;
+
+            await GetContents();
         }
 
         public void Dispose()

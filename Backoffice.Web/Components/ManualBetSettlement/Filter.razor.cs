@@ -15,6 +15,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         [Inject] private IBackOfficeService BackOfficeService { get; set; }                
         [Parameter] public EventCallback OnSearchButtonCallback { get; set; }
         [Parameter] public EventCallback<ManualBetSettlementCallbackModel> OnInitCallback { get; set; }
+        [Parameter] public EventCallback OnExportToExcelCallback { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }        
 
@@ -71,6 +72,11 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             ModalOptions options = new ModalOptions();
 
             ModalService.Open<AddReferenceModal>("Add Reference ID", parameters, options);
+        }
+
+        public async Task OnExportToExcelClickEvent()
+        {
+            await OnExportToExcelCallback.InvokeAsync();
         }
 
         public async Task OnFilterClickEvent()
