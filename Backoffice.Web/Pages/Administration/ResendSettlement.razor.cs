@@ -75,8 +75,8 @@ namespace Backoffice.Web.Pages.Administration
 
                         Alerts.Add(new AlertModel()
                         {
-                            AlertStatus = "Error",
-                            AltertMessage = "Duplicate BetId's are not allowed",
+                            Status = "Error",
+                            Message = "Duplicate BetId's are not allowed",
                             Opacity = 1.0m
                         });
                     }
@@ -119,8 +119,8 @@ namespace Backoffice.Web.Pages.Administration
                 {
                     Alerts.Add(new AlertModel()
                     {
-                        AlertStatus = StatusCode.Error.ToString(),
-                        AltertMessage = "Rejected bet are not allowed to be resent to Operator",
+                        Status = StatusCode.Error.ToString(),
+                        Message = "Rejected bet are not allowed to be resent to Operator",
                         Opacity = 1.0m
                     });
                 }
@@ -164,8 +164,8 @@ namespace Backoffice.Web.Pages.Administration
             {
                 Alerts.Add(new AlertModel()
                 {
-                    AlertStatus = StatusCode.Error.ToString(),
-                    AltertMessage = StatusCode.Resend_Attempt_Not_Successful_Please_Try_Again.ToString().Replace('_', ' '),
+                    Status = StatusCode.Error.ToString(),
+                    Message = StatusCode.Resend_Attempt_Not_Successful_Please_Try_Again.ToString().Replace('_', ' '),
                     Opacity = 1.0m
                 });
             }
@@ -173,8 +173,8 @@ namespace Backoffice.Web.Pages.Administration
             {
                 Alerts.Add(new AlertModel()
                 {
-                    AlertStatus = response.StatusCode.ToString(),
-                    AltertMessage = response.Result.Data.FirstOrDefault().Message,
+                    Status = response.StatusCode.ToString(),
+                    Message = response.Result.Data.FirstOrDefault().Message,
                     Opacity = 1.0m
                 });                
             }
@@ -182,8 +182,8 @@ namespace Backoffice.Web.Pages.Administration
             {
                 Alerts.Add(new AlertModel()
                 {
-                    AlertStatus = response.StatusCode.ToString(),
-                    AltertMessage = "Resend to operator of bet settlement, cashout, and/or cancellation successful",
+                    Status = response.StatusCode.ToString(),
+                    Message = "Resend to operator of bet settlement, cashout, and/or cancellation successful",
                     Opacity = 1.0m
                 });
             }
