@@ -224,18 +224,20 @@ namespace Backoffice.Utility.Repository
                 {
                     var log = request.ActivityLogs[i];
 
+                    int cellIndex = i + 1;
+
                     ManualBetDetailsModel.ManualBetDetails betDetails = JsonSerializer.Deserialize<ManualBetDetailsModel.ManualBetDetails>(log.To);
-                    worksheet.Cells[i, 1].Value = i + 1;
-                    worksheet.Cells[i, 2].Value = betDetails.SettlementDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
-                    worksheet.Cells[i, 3].Value = betDetails.BetId;
-                    worksheet.Cells[i, 4].Value = betDetails.Selections.FirstOrDefault().SportName;
-                    worksheet.Cells[i, 5].Value = betDetails.BetDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
-                    worksheet.Cells[i, 6].Value = BuildEventDetails(betDetails.Selections.FirstOrDefault(), betDetails.OddsTypeName);
-                    worksheet.Cells[i, 7].Value = betDetails.BetStatusName;
-                    worksheet.Cells[i, 8].Value = betDetails.NewBetStatusName;
-                    worksheet.Cells[i, 9].Value = betDetails.UserId;
-                    worksheet.Cells[i, 10].Value = log.UserName;
-                    worksheet.Cells[i, 11].Value = betDetails.Reason;
+                    worksheet.Cells[cellIndex, 1].Value = i + 1;
+                    worksheet.Cells[cellIndex, 2].Value = betDetails.SettlementDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
+                    worksheet.Cells[cellIndex, 3].Value = betDetails.BetId;
+                    worksheet.Cells[cellIndex, 4].Value = betDetails.Selections.FirstOrDefault().SportName;
+                    worksheet.Cells[cellIndex, 5].Value = betDetails.BetDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
+                    worksheet.Cells[cellIndex, 6].Value = BuildEventDetails(betDetails.Selections.FirstOrDefault(), betDetails.OddsTypeName);
+                    worksheet.Cells[cellIndex, 7].Value = betDetails.BetStatusName;
+                    worksheet.Cells[cellIndex, 8].Value = betDetails.NewBetStatusName;
+                    worksheet.Cells[cellIndex, 9].Value = betDetails.UserId;
+                    worksheet.Cells[cellIndex, 10].Value = log.UserName;
+                    worksheet.Cells[cellIndex, 11].Value = betDetails.Reason;
                 }
                 #endregion
 
