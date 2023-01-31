@@ -27,8 +27,5 @@
     <ProjectReference Include="..\Backoffice.Shared\Backoffice.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <EditorConfigFiles Remove="C:\Users\chris\source\repos\FlyingCockatoo\backoffice-final\Backoffice.Web\Models\.editorconfig" />
-  </ItemGroup>
 
 </Project>
