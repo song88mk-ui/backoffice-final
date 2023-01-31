@@ -706,8 +706,16 @@ namespace Backoffice.Web.Services
                             result = result + $"{claim.ClaimType.Replace(".", " ")}<br/><div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}\" disabled checked></div><br/>";
                         else if (claim.ClaimValue == "2")
                             result = result + $"{claim.ClaimType.Replace(".", " ")} ReadOnly<br/><div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div><br/>";
-
-                    }
+                        else if (claim.ClaimType == SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
+                        {
+                            var clients = claim.ClaimValue.Split(',');
+                            var clientStr = string.Join(", ", clients);
+                            if (string.IsNullOrEmpty(clientStr))
+                                result = result + $"Client Access: N/A<br/>";
+                            else
+                                result = result + $"Client Access:<br/>{clientStr}<br/>";
+                        }
+                     }
                 }
             }
             else
