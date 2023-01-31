@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -21,17 +22,22 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
+        public List<AlertModel> Alerts { get; set; }
+
         private ManualBetSettlementModel ManualBetSettlementModel { get; set; }
         private ManualBetDetailsModel ManualBetDetailsModel { get; set; }
 
         public bool IsAddDisabled { get; set; }
+        public bool IsActionDisabled { get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
             ManualBetSettlementModel = new ManualBetSettlementModel();
+            Alerts = new List<AlertModel>();
             IsAddDisabled = true;
+            IsActionDisabled = false;
 
             ManualBetDetailsModel = ModalParameters.TryGet<ManualBetDetailsModel>("ManualBetDetailsModel");
 
@@ -57,20 +63,41 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             bool isGuid = Guid.TryParse(betIdString, out betId);
 
             if (isGuid)
-            {                
-                var response = (await BackOfficeService.GetManualBetDetails(new ManualBetDetailsRequest()
-                {
-                    BetIds = new List<string> { betIdString }
-                })).Result;
+            {
+                IsActionDisabled = true;
 
-                if (response.Bets.Any())
-                {
-                    bet = JsonSerializer.Deserialize<ManualBetDetails>(JsonSerializer.Serialize(response.Bets.FirstOrDefault()));
+                await InvokeAsync(StateHasChanged);
 
-                    ManualBetDetailsModel.Bets[index] = bet;
-                    IsAddDisabled = false;
+                if (ManualBetDetailsModel != null && ManualBetDetailsModel.Bets.Any() && ManualBetDetailsModel.Bets.Any(bet => bet.BetId == betId))
+                {
+                    Alerts = new List<AlertModel>();
+
+                    Alerts.Add(new AlertModel()
+                    {
+                        AlertStatus = "Error",
+                        AltertMessage = "Duplicate BetId's are not allowerd",
+                        Opacity = 1.0m
+                    });
                 }
+                else
+                {
+                    var response = (await BackOfficeService.GetManualBetDetails(new ManualBetDetailsRequest()
+                    {
+                        BetIds = new List<string> { betIdString }
+                    })).Result;
+
+                    if (response.Bets.Any())
+                    {
+                        bet = JsonSerializer.Deserialize<ManualBetDetails>(JsonSerializer.Serialize(response.Bets.FirstOrDefault()));
+
+                        ManualBetDetailsModel.Bets[index] = bet;
+
+                        IsAddDisabled = false;
+                    }
+                }                
             }
+
+            IsActionDisabled = false;
         }
 
         public async Task OnBetStatusChangedEvent(ChangeEventArgs e, ManualBetDetails bet)

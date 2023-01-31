@@ -64,6 +64,10 @@ namespace Backoffice.Utility
                         var manualMessageSettlementHistory = JsonSerializer.Deserialize<OnGetManualMarketSettlementHistoryMessage>(payload);
                         _backofficeRepository.ProcessOnGetManualMessageSettlementHistory(manualMessageSettlementHistory, _messageBroker);
                         break;
+                    case "ExportManualBetSettlementHistory":
+                        var manualBetSettlementHistory = JsonSerializer.Deserialize<OnGetManualBetSettlementHistoryMessage>(payload);
+                        _backofficeRepository.ProcessOnGetManualBetSettlementHistory(manualBetSettlementHistory, _messageBroker);
+                        break;
                 }
             }
             catch (Exception ex)

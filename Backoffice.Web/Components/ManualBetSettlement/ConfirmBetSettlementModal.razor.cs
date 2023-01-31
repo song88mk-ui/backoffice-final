@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -14,8 +15,11 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter] private CustomModal Modal { get; set; }
+
         private ManualBetDetailsModel ManualBetDetailsModel { get; set; }
         #endregion
         #region Methods
@@ -64,7 +68,9 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                     Reason = bet.Reason,
                 }).ToList(),
                 ActivityLogs = ActivityLogs
-            })).Result;
+            }));
+
+            await Modal.OnSaveClickCallback.InvokeAsync(response);
 
             ModalService.Cancel();
         }
