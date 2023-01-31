@@ -54,6 +54,7 @@
             public bool IsFreeBet { get; set; }
             public bool IsBoosted { get; set; }
             public BetSelectionDetails Selections { get; set; }
+            public string CancelledBy { get; set; }
 
         }
         public class BetSelectionDetails

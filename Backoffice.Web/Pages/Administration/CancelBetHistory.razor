@@ -9,7 +9,7 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter OnInitCallback="OnInitEvent"/>
+                <Filter OnInitCallback="OnInitEvent" OnExportCallback="OnExportEvent"/>
             </div>
             <div class="col-md-12">
                 <div class="content mx-3">
@@ -28,109 +28,61 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>
-                                    <span class="cancelled-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="cancelled-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    1D2FA746-1047- 425B-3047-08DA C21AEEB9
-                                </td>
-                                <td>
-                                    <span class="bet-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="bet-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    <span class="sport d-block">Virtual Cricket In-Play</span>
-                                    <span class="fixture d-block">Punjab vs. Hyderabad</span>
-                                    <span class="start-date d-block">2022/11/08 11:10:07 PM</span>
-                                    <span class="selection-details d-block">Caught x 0 2nd Innings - 8th Dismissal Method 0 @("@") 2.15 (Decimal)</span>
-                                    <span class="bet-score d-block">Bet Result: 156/7 - 179/6 (19.4 ov)</span>
-                                    <span class="final-score d-block">Final Result: 156/8 - 179/6 (19.5 ov)</span>
-                                </td>
-                                <td>
-                                    5F5F5097-8467- 40B9-1A9B-08D9 E484781D
-                                </td>
-                                <td>
-                                    QAWSTAKET
-                                </td>
-                                <td>
-                                    FCI-Judi
-                                </td>
-                                <td>
-                                    103 - Test Cancelled
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>
-                                    <span class="cancelled-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="cancelled-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    1D2FA746-1047- 425B-3047-08DA C21AEEB9
-                                </td>
-                                <td>
-                                    <span class="bet-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="bet-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    <span class="sport d-block">Virtual Cricket In-Play</span>
-                                    <span class="fixture d-block">Punjab vs. Hyderabad</span>
-                                    <span class="start-date d-block">2022/11/08 11:10:07 PM</span>
-                                    <span class="selection-details d-block">Caught x 0 2nd Innings - 8th Dismissal Method 0 @("@") 2.15 (Decimal)</span>
-                                    <span class="bet-score d-block">Bet Result: 156/7 - 179/6 (19.4 ov)</span>
-                                    <span class="final-score d-block">Final Result: 156/8 - 179/6 (19.5 ov)</span>
-                                </td>
-                                <td>
-                                    5F5F5097-8467- 40B9-1A9B-08D9 E484781D
-                                </td>
-                                <td>
-                                    QAWSTAKET
-                                </td>
-                                <td>
-                                    FCI-Judi
-                                </td>
-                                <td>
-                                    103 - Test Cancelled
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>
-                                    <span class="cancelled-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="cancelled-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    1D2FA746-1047- 425B-3047-08DA C21AEEB9
-                                </td>
-                                <td>
-                                    <span class="bet-date d-block">2021/10/27 10:31:02 PM</span>
-                                    <span class="bet-time d-block">10:31:02 PM</span>
-                                </td>
-                                <td>
-                                    <span class="sport d-block">Virtual Cricket In-Play</span>
-                                    <span class="fixture d-block">Punjab vs. Hyderabad</span>
-                                    <span class="start-date d-block">2022/11/08 11:10:07 PM</span>
-                                    <span class="selection-details d-block">Caught x 0 2nd Innings - 8th Dismissal Method 0 @("@") 2.15 (Decimal)</span>
-                                    <span class="bet-score d-block">Bet Result: 156/7 - 179/6 (19.4 ov)</span>
-                                    <span class="final-score d-block">Final Result: 156/8 - 179/6 (19.5 ov)</span>
-                                </td>
-                                <td>
-                                    5F5F5097-8467- 40B9-1A9B-08D9 E484781D
-                                </td>
-                                <td>
-                                    QAWSTAKET
-                                </td>
-                                <td>
-                                    FCI-Judi
-                                </td>
-                                <td>
-                                    103 - Test Cancelled
-                                </td>
-                            </tr>
+                            @if(CancelBets != null && CancelBets.CancelBets.Any())
+                            {
+                                var ctr = 0;
+                                foreach(var bet in CancelBets.CancelBets)
+                                {
+                                    ctr++;
+                                    <tr>
+                                        <td>@ctr</td>
+                                        <td>
+                                            <span class="cancelled-date d-block">@bet.SettlementDate.ToString("yyyy/MM/dd")</span>
+                                            <span class="cancelled-time d-block">@bet.SettlementDate.ToString("hh:mm:ss TT")</span>
+                                        </td>
+                                        <td>
+                                            @bet.BetId
+                                        </td>
+                                        <td>
+                                            <span class="bet-date d-block">@bet.BetDate.ToString("yyyy/MM/dd")</span>
+                                            <span class="bet-time d-block">@bet.BetDate.ToString("hh:mm:ss TT")</span>
+                                        </td>
+                                        <td>
+                                            <span class="sport d-block">@bet.Selections.SportName</span>
+                                            <span class="fixture d-block">@bet.Selections.FixtureName</span>
+                                            <span class="start-date d-block">@bet.Selections.FixtureStartDate</span>
+                                            <span class="selection-details d-block">Caught x 0 2nd Innings - 8th Dismissal Method 0 @("@") 2.15 (Decimal)</span>
+                                            <span class="bet-score d-block">Bet Result: @bet.Selections.BetScore</span>
+                                            <span class="final-score d-block">Final Result: @bet.Selections.SettlementScore</span>
+                                        </td>
+                                        <td>
+                                            @bet.UserId
+                                        </td>
+                                        <td>
+                                            @bet.ClientName
+                                        </td>
+                                        <td>
+                                            @bet.CancelledBy
+                                        </td>
+                                        <td>
+                                            @bet.Reason
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                if(CancelBets == null)
+                                {
+                                    <Preloader />
+                                }
+                                else if(!CancelBets.CancelBets.Any())
+                                {
+                                    <NoRecordFound />
+                                }
+                            }
                         </tbody>
+                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
                     </table>
                 </div>
             </div>

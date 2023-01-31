@@ -9,6 +9,7 @@ namespace Backoffice.Web.Components.Administration.CancelBetHistory
     {
         #region Properties
         [Parameter] public EventCallback<CancelBetHistoryCallbackModel> OnInitCallback { get; set; }
+        [Parameter] public EventCallback<CancelBetHistoryCallbackModel> OnExportCallback { get; set; }
         protected CancelBetHistoryCallbackModel FilterModel { get; set; }
         #endregion
 
@@ -23,6 +24,16 @@ namespace Backoffice.Web.Components.Administration.CancelBetHistory
 
             await OnInitCallback.InvokeAsync(FilterModel);
         }
+        public async Task OnSearchClickEvent()
+        {
+            await OnInitCallback.InvokeAsync(FilterModel);
+        }
+
+        public async Task OnExportToExcelClickEvent()
+        {
+            await OnExportCallback.InvokeAsync(FilterModel);
+        }
+
         public async Task OnDateRangeChangedEvent(DateRange range)
         {
             FilterModel.DateFrom = DateTime.Parse(range.Start.ToString()).Date.Add(new TimeSpan(0, 0, 0));
