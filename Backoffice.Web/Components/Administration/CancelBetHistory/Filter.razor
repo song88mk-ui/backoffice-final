@@ -6,19 +6,19 @@
             <div class="input-container d-flex">
                 <div class="me-4">
                     <label class="form-label d-block">Cancelled By</label>
-                    <input type="text" placeholder="Enter Name or Username" class="form-control" />
+                    <input type="text" placeholder="Enter Name or Username" class="form-control" @bind-value="FilterModel.CancelledBy" />
                 </div>
                 <div class="me-4">
                     <label class="form-label d-block">Bet/Reference ID</label>
-                    <input type="text" placeholder="Enter Bet/Reference ID" class="form-control" />
+                    <input type="text" placeholder="Enter Bet/Reference ID" class="form-control" @bind-value="FilterModel.BetReferenceId" />
                 </div>
                 <div class="me-4">
                     <label class="form-label d-block">Member Name</label>
-                    <input type="text" placeholder="Enter Member Name" class="form-control" />
+                    <input type="text" placeholder="Enter Member Name" class="form-control" @bind-value="FilterModel.MemberName" />
                 </div>
             </div>
             <div class="button-container d-flex flex-row-reverse align-items-end">
-                <button type="button" class="btn btn-export px-4 py-2">
+                <button type="button" class="btn btn-export px-4 py-2" @onclick="OnExportToExcelClickEvent">
                     <i class="fa fa-file-excel-o me-3"></i>
                     Export To Excel
                 </button>
@@ -31,14 +31,14 @@
         <div class="content-filter mx-3 d-flex align-items-end mt-3">
             <div class="me-4">
                 <label class="form-label d-block">Partner/SB Client Name</label>
-                <input type="text" placeholder="Enter Partner/SB Client Name" class="form-control" />
+                <input type="text" placeholder="Enter Partner/SB Client Name" class="form-control" @bind-value="FilterModel.ClientName" />
             </div>
             <div class="me-4">
                 <label class="form-label d-block">Date</label>
                 <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="FilterModel.DateFrom" EndDate="FilterModel.DateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDateRangeChangedEvent"></DateRangePicker>
             </div>
             <div class="me-4">
-                <button type="button" class="btn btn-search px-4 py-2">
+                <button type="button" class="btn btn-search px-4 py-2" @onclick="OnSearchClickEvent">
                     Search
                 </button>
             </div>

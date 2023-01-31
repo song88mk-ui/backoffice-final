@@ -83,6 +83,9 @@ namespace Backoffice.Web.Components.Administration.CancelBets
 
                         if (betData != null)
                         {
+                            betData.Reason = request.Reason;
+                            betData.SettlementDate = DateTime.UtcNow;
+
                             if(betData.Selections.Any())
                             {
                                 foreach(var selection in betData.Selections)

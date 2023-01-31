@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -45,6 +46,19 @@ namespace Backoffice.Web.Pages.Administration
 
             CancelBets = await GetActivityLogList(request);
         }
+        public async Task OnExportEvent(CancelBetHistoryCallbackModel request)
+        {
+            CallbackModel = request;
+
+            //TODO: export data to excel file
+            //CancelBets = await GetActivityLogList(request);
+        }
+        public async Task SelectPage(int page)
+        {
+            MetaData.CurrentPage = page;
+
+            CancelBets = await GetActivityLogList(CallbackModel);
+        }
 
         public void Dispose()
         {
@@ -75,6 +89,8 @@ namespace Backoffice.Web.Pages.Administration
                     var betDetails = JsonSerializer.Deserialize<CancelBetHistoryModel.BetDetails>(item.From);
                     if(betDetails != null)
                     {
+                        betDetails.CancelledBy = item.UserId;
+
                         var betSelectionDetails = JsonSerializer.Deserialize<CancelBetHistoryModel.BetSelectionDetails>(item.To);
                         betDetails.Selections = betSelectionDetails ?? new CancelBetHistoryModel.BetSelectionDetails();
 
