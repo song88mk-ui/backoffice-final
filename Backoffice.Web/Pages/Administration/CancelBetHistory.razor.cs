@@ -72,7 +72,7 @@ namespace Backoffice.Web.Pages.Administration
             var request = new ActivityLogRequest
             {
                 Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
-                Payload = $"",
+                Payload = $"%",
                 MetaData = MetaData
             };
 
@@ -89,10 +89,13 @@ namespace Backoffice.Web.Pages.Administration
                     var betDetails = JsonSerializer.Deserialize<CancelBetHistoryModel.BetDetails>(item.From);
                     if(betDetails != null)
                     {
-                        betDetails.CancelledBy = item.UserId;
+                        betDetails.CancelledBy = item.UserName;
 
                         var betSelectionDetails = JsonSerializer.Deserialize<CancelBetHistoryModel.BetSelectionDetails>(item.To);
-                        betDetails.Selections = betSelectionDetails ?? new CancelBetHistoryModel.BetSelectionDetails();
+                        betDetails.Selections = new List<CancelBetHistoryModel.BetSelectionDetails>();
+
+                        if(betSelectionDetails != null)
+                            betDetails.Selections.Add(betSelectionDetails);
 
                         cancelBets.CancelBets.Add(betDetails);
                     }
