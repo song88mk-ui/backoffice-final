@@ -56,7 +56,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 },
                 new BreadcrumbModel
                 {
-                    Name = "Boosted Settings",
+                    Name = "Market Groups",
                     Url = "odds-engine/market-groups",
                     IsCurrentPage = true
                 }
