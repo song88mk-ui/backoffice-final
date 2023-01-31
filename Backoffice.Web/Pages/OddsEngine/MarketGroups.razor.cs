@@ -45,12 +45,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     Name = "Market Settings",
                     Url = string.Empty,
-                    IsCurrentPage = true
+                    IsCurrentPage = false
                 },
                 new BreadcrumbModel
                 {
                     Name = "Market Groups",
-                    Url = "odds-engine/market-groups",
+                    Url = string.Empty,
                     IsCurrentPage = true
                 }
             };
