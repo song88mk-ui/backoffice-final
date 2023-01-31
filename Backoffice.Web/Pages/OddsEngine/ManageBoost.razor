@@ -1,5 +1,5 @@
 ﻿@using Backoffice.Shared.Enums;
-@using Backoffice.Web.Components.OddsEngine.ManageBoost
+@using Backoffice.Web.Components.ManageBoost
 
 @layout OEMonitoringLayout
 
@@ -32,19 +32,19 @@
                 <table class="table table-hover table-bordered">
                     <thead class="table-head">
                         <tr>
-                            <th>Client Name</th>
-                            <th>Sports</th>
-                            <th>Details</th>
-                            <th>BR Ctrl</th>
-                            <th>Current Odds</th>
-                            <th>Boosted Odds</th>
-                            <th>Manage</th>
+                            <th class="th-client-name py-3">Client Name</th>
+                            <th class="th-sports py-3">Sports</th>
+                            <th class="th-details py-3">Details</th>
+                            <th class="th-br-ctrl py-3">BR Ctrl</th>
+                            <th class="th-current-odds py-3">Current Odds</th>
+                            <th class="th-boosted-odds py-3">Boosted Odds</th>
+                            <th class="th-manage py-3">Manage</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var priceboost in PriceBoostList)
                         {
-                            <tr class="@(priceboost.FixtureStatusId >= 1 ? "boost-expired" : "")">
+                            <tr class="@(priceboost.FixtureStatusId >= (int)FixtureStatus.Live ? "disabled" : "")">
                                 <td>@priceboost.ClientName</td>
                                 <td>@priceboost.SportName</td>
                                 <td>
@@ -80,8 +80,28 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
-                                    @if (priceboost.FixtureStatusId < (int)FixtureStatus.Live)
+                                <td class="action">
+                                    <div class="d-flex justify-content-center">
+                                        @if (priceboost.FixtureStatusId < (int)FixtureStatus.Live)
+                                        {
+                                            <a class="link-edit me-3" @onclick="_ => OnEdit(priceboost)" href="javascript:(0)">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a class="link-edit me-3" href="javascript:(0)" disabled>
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                        }
+                                        <a class="link-logs me-3" @onclick="_ => OnViewLog(priceboost)" href="javascript:(0)">
+                                            <i class="fa fa-list"></i>
+                                        </a>
+                                        <a class="link-delete me-3" @onclick="_ => OnDelete(priceboost)" href="javascript:(0)">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </div>
+                                    @*@if (priceboost.FixtureStatusId < (int)FixtureStatus.Live)
                                     {
                                         <div class="d-flex justify-content-center">
                                             <a class="link-edit me-2" @onclick="_ => OnEdit(priceboost)" href="javascript:(0)">
@@ -108,7 +128,7 @@
                                                 <i class="fa fa-trash"></i>
                                             </a>
                                         </div>
-                                    }
+                                    }*@
                                 </td>
                             </tr>
                         }

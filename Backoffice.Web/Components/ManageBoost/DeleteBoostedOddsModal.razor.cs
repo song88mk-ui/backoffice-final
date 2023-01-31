@@ -7,7 +7,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
 
-namespace Backoffice.Web.Components.OddsEngine.ManageBoost
+namespace Backoffice.Web.Components.ManageBoost
 {
     public partial class DeleteBoostedOddsModal : IDisposable
     {

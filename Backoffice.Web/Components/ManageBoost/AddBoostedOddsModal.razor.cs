@@ -1,13 +1,11 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace Backoffice.Web.Components.OddsEngine.ManageBoost
+namespace Backoffice.Web.Components.ManageBoost
 {
     public partial class AddBoostedOddsModal : IDisposable
     {
@@ -65,10 +63,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 string.IsNullOrEmpty(AddPriceBoostFilterModel.MarketTemplateId) ||
                 string.IsNullOrEmpty($"{AddPriceBoostFilterModel.SelectionTemplateId}{AddPriceBoostFilterModel.SelectionSpecifier}"))
             {
-                //ShowErrorMessage = true;
-                //AlertMessage = "Please select all options.";
-                //AlertStatus = "Error!";
-                //Opacity = 1.0m;
                 return;
             }
 
@@ -79,7 +73,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             if (!string.IsNullOrEmpty(AddPriceBoostFilterModel.ClientCode))
                 clientModel.Clients = clientModel.Clients.Where(c => c.ClientCode == AddPriceBoostFilterModel.ClientCode).ToList();
 
-            var priceBoostList = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest()
+            var priceBoostList = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
             {
                 ClientCode = AddPriceBoostFilterModel.ClientCode,
                 SportId = AddPriceBoostFilterModel.SportId.ToString(),
@@ -95,7 +89,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             foreach (var client in clientModel.Clients)
             {
-                var priceboostConfig = new Backoffice.Shared.Models.PriceBoostConfigModel()
+                var priceboostConfig = new Backoffice.Shared.Models.PriceBoostConfigModel
                 {
                     ClientCode = client.ClientCode,
                     ClientId = client.ClientId.ToString(),
@@ -116,7 +110,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
                 if (priceBoostList != null)
                 {
-                    var priceBoost = priceBoostList.Where(p => p.ClientCode == client.ClientCode).FirstOrDefault();
+                    var priceBoost = priceBoostList.FirstOrDefault(c => c.ClientCode == client.ClientCode);
                     if (priceBoost != null)
                     {
                         priceboostConfig.FixtureName = priceBoost.FixtureName;

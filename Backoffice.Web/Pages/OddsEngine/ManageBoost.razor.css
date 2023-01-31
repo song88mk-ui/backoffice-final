@@ -12,9 +12,12 @@
     background-color: #F5F5F5;
 }
 
-.table thead th, .table tbody td, ::deep .table tfoot td {
+table thead th, table tbody tr {
     font-size: 0.8rem;
     font-weight: inherit;
+}
+
+.table thead th, ::deep .table tfoot td {
     vertical-align: middle;
 }
 
@@ -49,4 +52,41 @@ table tfoot td:last-child {
 
 .link-edit, .link-logs, .link-delete {
     color: #404E67;
+    font-size: 14px;
+}
+
+.th-client-name {
+    width: 20%;
+}
+
+.th-sports {
+    width: 20%;
+}
+
+.th-details {
+    width: 20%;
+}
+
+.th-br-ctrl {
+    width: 10%;
+}
+
+.th-current-odds {
+    width: 10%;
+}
+
+.th-boosted-odds {
+    width: 10%;
+}
+
+.th-manage {
+    width: 10%;
+}
+
+table tbody tr.disabled td.action {
+    opacity: 100%;
+}
+
+table tbody tr.disabled td, table tbody tr.disabled td.action .link-edit {
+    opacity: 30%;
 }

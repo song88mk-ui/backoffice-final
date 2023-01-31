@@ -2,20 +2,13 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.Utilities;
-using Backoffice.Web.Components.Common;
-using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Components.OddsEngine.MarketGroups;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Security.Claims;
-using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Text.Json;
-using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {

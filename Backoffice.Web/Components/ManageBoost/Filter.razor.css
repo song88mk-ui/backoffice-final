@@ -2,6 +2,13 @@
     background-color: #fff;
 }
 
+.client-container {
+    width: 15%;
+}
+
+.sport-container, .segment-container, .league-container {
+    width: 20%;
+}
 
 .btn-boosted-odds, .btn-logs {
     color: #FFFFFF;

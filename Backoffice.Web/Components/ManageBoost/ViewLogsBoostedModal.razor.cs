@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 using System.Text;
 
-namespace Backoffice.Web.Components.OddsEngine.ManageBoost
+namespace Backoffice.Web.Components.ManageBoost
 {
     public partial class ViewLogsBoostedModal : IDisposable
     {

@@ -7,7 +7,7 @@ using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
 using Page = Backoffice.Shared.Enums.Page;
 
-namespace Backoffice.Web.Components.OddsEngine.ManageBoost
+namespace Backoffice.Web.Components.ManageBoost
 {
     public partial class ViewAllLogsFilter : IDisposable
     {

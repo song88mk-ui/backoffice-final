@@ -1,5 +1,5 @@
 ﻿using Backoffice.Shared.Models;
-using Backoffice.Web.Components.OddsEngine.ManageBoost;
+using Backoffice.Web.Components.ManageBoost;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;

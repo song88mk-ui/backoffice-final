@@ -4,7 +4,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace Backoffice.Web.Components.OddsEngine.ManageBoost
+namespace Backoffice.Web.Components.ManageBoost
 {
     public partial class Filter : IDisposable
     {
@@ -12,6 +12,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
+
         [Parameter] public PriceboostFilterModel PriceboostFilterModel { get; set; }
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback<int> OnSportChangedCallback { get; set; }
@@ -19,9 +22,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [Parameter] public EventCallback OnLeagueChangedCallback { get; set; }        
         [Parameter] public EventCallback<PriceboostFilterModel> PriceboostFilterModelChanged { get; set; }
         [Parameter] public EventCallback OnInitCallback { get; set; }
-        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
         public SearchFormModel SearchForm { get; set; }
+
         #endregion
 
         #region Methods
@@ -94,6 +97,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         public async Task OnAddBoostedOdds()
         {
             var parameters = new ModalParameters();
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);            
@@ -105,6 +109,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         public async Task OnViewAllLogs()
         {
             var parameters = new ModalParameters();
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle","max-width: 85rem;");
@@ -152,26 +157,28 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         }
 
         #endregion
+
         #region Utilities
+
         private async Task<List<SelectListItemModel<string>>> LoadClients()
         {
-            ClientModel clients = new ClientModel();
-            clients = (await BackOfficeService.GetClients()).Result;
+            var clients = (await TradingService.GetClientList()).Result;
+
             if (clients != null)
             {
-
                 if (UserModel.ClientCodes.Any())
                 {
-                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                    clients = clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                 }
             }
 
-            return clients.Clients.Select(x => new SelectListItemModel<string>()
+            return clients.Select(s => new SelectListItemModel<string>
             {
-                Name = x.ClientName,
-                Value = x.ClientCode
+                Name = s.ClientName,
+                Value = s.ClientCode
             }).ToList();
         }
+
         #endregion
     }
 }
