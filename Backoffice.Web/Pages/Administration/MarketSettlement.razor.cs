@@ -15,7 +15,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        public MarketSettlementModalFilterModel ModalFilter { get; set; }
+        public MarketSettlementModalFilterModel ModalFilter { get; set; } = new MarketSettlementModalFilterModel();
         public List<ManualMarketSettlementAuditModel> ManualMarketSettlements { get; set; }
         public MetaData MetaData { get; set; }
         public string PageTitle { get; set; }

@@ -67,7 +67,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             Breadcrumbs.Add(new BreadcrumbModel
             {
                 Name = "Market Sort Order",
-                Url = "odds-engine/market-sort-order",
+                Url = string.Empty,
                 IsCurrentPage = true
             });
         }

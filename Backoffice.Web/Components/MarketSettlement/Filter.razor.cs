@@ -1,10 +1,12 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
+using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.FixtureModel;
 
 namespace Backoffice.Web.Components.MarketSettlement
 {
@@ -29,15 +31,26 @@ namespace Backoffice.Web.Components.MarketSettlement
 
             ModalFilter = new MarketSettlementModalFilterModel()
             {
-                Sports = new List<SelectListItemModel<int>>(),
-                Segments = new List<SelectListItemModel<int>>(),
-                Leagues = new List<SelectListItemModel<int>>(),
-                Fixtures = new List<SelectListItemModel<string>>(),
-                Markets = new List<SelectListItemModel<string>>(),
-                Selections = new List<SelectListItemModel<string>>(),
+                Sports = await GetSports(),
+                Segments = await GetSegments(0),
+                Leagues = await GetLeagues(0, 0),
+                Fixtures = await GetFixtures(0, 0, 0),
+                Markets = await GetMarkets(""),
+                Selections = await GetSelections("" , ""),
                 Statuses = new List<SelectListItemModel<int>>(),
                 FromDate = DateTime.Now.Date,
                 ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
+            };
+            await ModalFilterChanged.InvokeAsync();
+
+            MarketFixtureResponse = new MarketFixtureResponse()
+            {
+                Fixtures = new List<FixtureModel>(),
+            };
+
+            MarketFixtureOutrightResponse = new MarketFixtureResponse()
+            {
+                Fixtures = new List<FixtureModel>(),
             };
         }
 
@@ -59,7 +72,7 @@ namespace Backoffice.Web.Components.MarketSettlement
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("DialogStyle","max-width: 100rem");
+            parameters.Add("DialogStyle", "max-width: 100rem");
 
             var options = new ModalOptions();
             ModalService.Open<AddMarketSettlementModal>($"Add Market Settlement", parameters, options);
@@ -86,7 +99,7 @@ namespace Backoffice.Web.Components.MarketSettlement
                 ModalFilter.Segments = await GetSegments(ModalFilter.SportId);
                 ModalFilter.Leagues = await GetLeagues(ModalFilter.SportId, ModalFilter.SegmentId);
             }
-        }    
+        }
 
         public async Task OnSegmentChangedEvent(ChangeEventArgs e)
         {
@@ -182,7 +195,7 @@ namespace Backoffice.Web.Components.MarketSettlement
 
         public void Dispose()
         {
-            
+
         }
         #endregion
 
