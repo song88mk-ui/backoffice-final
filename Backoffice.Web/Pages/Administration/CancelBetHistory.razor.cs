@@ -31,7 +31,7 @@ namespace Backoffice.Web.Pages.Administration
 
             MetaData = new MetaData
             {
-                CurrentPage = 1,
+                CurrentPage = 0,
                 PageSize = 20,
                 TotalCount = 0,
                 TotalPages = 1,
@@ -72,7 +72,9 @@ namespace Backoffice.Web.Pages.Administration
             var request = new ActivityLogRequest
             {
                 Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
-                Payload = $"%",
+                Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
+                DateFrom = model.DateFrom,
+                DateTo = model.DateTo,
                 MetaData = MetaData
             };
 
@@ -99,9 +101,7 @@ namespace Backoffice.Web.Pages.Administration
 
                         cancelBets.CancelBets.Add(betDetails);
                     }
-
                 }
-
             }
 
             return cancelBets;

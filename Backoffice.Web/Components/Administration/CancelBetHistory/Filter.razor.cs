@@ -18,8 +18,8 @@ namespace Backoffice.Web.Components.Administration.CancelBetHistory
         {
             FilterModel = new CancelBetHistoryCallbackModel
             {
-                DateFrom = DateTime.UtcNow.Date,
-                DateTo = DateTime.UtcNow,
+                DateFrom = DateTime.Now.Date,
+                DateTo = DateTime.Now,
             };
 
             await OnInitCallback.InvokeAsync(FilterModel);
