@@ -160,6 +160,38 @@ a, .btn-link {
     content: "\110D";
 }
 
+.ico-manage-user:before {
+    content: "\1117";
+}
+
+.ico-manage-user-group:before {
+    content: "\1116";
+}
+
+.ico-settlements:before {
+    content: "\1121";
+}
+
+.ico-manual-bet-settlement:before, .ico-market-settlement:before, .ico-message-settlement:before {
+    content: "\1118";
+}
+
+.ico-resend-settlement:before {
+    content: "\1120";
+}
+
+.ico-cancel-bet-history:before {
+    content: "\1111";
+}
+
+.ico-cancel-bets:before {
+    content: "\1112";
+}
+
+.ico-maintenance:before {
+    content: "\1115";
+}
+
 iframe {
     width: 100% !important;
 }
