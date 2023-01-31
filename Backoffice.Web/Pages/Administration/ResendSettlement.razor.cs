@@ -32,7 +32,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             PageTitle = "Resend Settlement";
             IconClass = "ico ico-resend-settlement";
-            IsAddDisabled = false;
+            IsAddDisabled = true;
             IsActionDisabled = false;
             
             ResendSettlementModel = new List<ResendSettlementBetDetailModel>();
@@ -52,7 +52,7 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task OnReferenceIdOnChangeEvent(ChangeEventArgs e, ResendSettlementBetDetailModel betDetailModel, int index)
         {
-            Guid betId;
+            Guid betId;           
 
             if (string.IsNullOrEmpty(e.Value.ToString()))
             {                
@@ -61,6 +61,8 @@ namespace Backoffice.Web.Pages.Administration
             else
             {
                 IsActionDisabled = true;
+
+                IsAddDisabled = true;
 
                 bool isGuid = Guid.TryParse(e.Value.ToString(), out betId);
 
