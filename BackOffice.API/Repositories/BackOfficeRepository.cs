@@ -168,8 +168,8 @@ namespace Backoffice.API.Repositories
                 if (request.DateTo == DateTime.MinValue)
                     request.DateTo = DateTime.UtcNow.Date;
 
-                var fromUTC = request.DateFrom.Date.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
-                var toUTC = request.DateTo.Date.AddDays(1).AddSeconds(-1).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
+                var fromUTC = request.DateFrom.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
+                var toUTC = request.DateTo.AddDays(1).AddSeconds(-1).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
 
                 var activityLogs = (await _backofficeContext.ReadActivityLog
                         .FromSqlRaw($"GetActivityLogs '{request.Page}', '{request.Payload}', '{fromUTC}', '{toUTC}'")
@@ -186,8 +186,6 @@ namespace Backoffice.API.Repositories
                         UserName = s.UserName,
                         TimeStamp = s.TimeStamp,
                     }).ToList();
-
-                //TODO: get username from Authentication Repository
 
                 if (metaData == null)
                 {

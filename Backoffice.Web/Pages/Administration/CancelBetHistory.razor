@@ -9,7 +9,7 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter OnInitCallback="OnInitEvent" OnExportCallback="OnExportEvent"/>
+                <Filter OnInitCallback="OnInitEvent" OnExportCallback="OnExportEvent" />
             </div>
             <div class="col-md-12">
                 <div class="content mx-3">
@@ -28,32 +28,32 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if(CancelBets != null && CancelBets.CancelBets.Any())
+                            @if (CancelBets != null && CancelBets.CancelBets.Any())
                             {
                                 var ctr = 0;
-                                foreach(var bet in CancelBets.CancelBets)
+                                foreach (var bet in CancelBets.CancelBets)
                                 {
                                     ctr++;
                                     <tr>
                                         <td>@ctr</td>
                                         <td>
                                             <span class="cancelled-date d-block">@bet.SettlementDate.ToString("yyyy/MM/dd")</span>
-                                            <span class="cancelled-time d-block">@bet.SettlementDate.ToString("hh:mm:ss TT")</span>
+                                            <span class="cancelled-time d-block">@bet.SettlementDate.ToString("hh:mm:ss tt")</span>
                                         </td>
                                         <td>
                                             @bet.BetId
                                         </td>
                                         <td>
                                             <span class="bet-date d-block">@bet.BetDate.ToString("yyyy/MM/dd")</span>
-                                            <span class="bet-time d-block">@bet.BetDate.ToString("hh:mm:ss TT")</span>
+                                            <span class="bet-time d-block">@bet.BetDate.ToString("hh:mm:ss tt")</span>
                                         </td>
                                         <td>
-                                            <span class="sport d-block">@bet.Selections.SportName</span>
-                                            <span class="fixture d-block">@bet.Selections.FixtureName</span>
-                                            <span class="start-date d-block">@bet.Selections.FixtureStartDate</span>
-                                            <span class="selection-details d-block">Caught x 0 2nd Innings - 8th Dismissal Method 0 @("@") 2.15 (Decimal)</span>
-                                            <span class="bet-score d-block">Bet Result: @bet.Selections.BetScore</span>
-                                            <span class="final-score d-block">Final Result: @bet.Selections.SettlementScore</span>
+                                            <span class="sport d-block">@bet.Selections.FirstOrDefault().SportName</span>
+                                            <span class="fixture d-block">@bet.Selections.FirstOrDefault().FixtureName</span>
+                                            <span class="start-date d-block">@bet.Selections.FirstOrDefault().FixtureStartDate</span>
+                                            <span class="selection-details d-block">@bet.Selections.FirstOrDefault().MarketName - @bet.Selections.FirstOrDefault().SelectionName @("@") @bet.Selections.FirstOrDefault().Odds (Decimal)</span>
+                                            <span class="bet-score d-block">Bet Result: @bet.Selections.FirstOrDefault().BetScore</span>
+                                            <span class="final-score d-block">Final Result: @bet.Selections.FirstOrDefault().SettlementScore</span>
                                         </td>
                                         <td>
                                             @bet.UserId
@@ -72,17 +72,21 @@
                             }
                             else
                             {
-                                if(CancelBets == null)
+                                if (CancelBets == null)
                                 {
                                     <Preloader />
                                 }
-                                else if(!CancelBets.CancelBets.Any())
+                                else if (!CancelBets.CancelBets.Any())
                                 {
-                                    <NoRecordFound />
+                                    <tr>
+                                        <td colspan="9">
+                                            <NoRecordFound />
+                                        </td>
+                                    </tr>
                                 }
                             }
                         </tbody>
-                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="6" />
+                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="9" />
                     </table>
                 </div>
             </div>

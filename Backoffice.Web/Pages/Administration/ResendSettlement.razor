@@ -25,9 +25,9 @@
                                 <th class="th-status py-3">Status</th>
                                 <th class="th-reason py-3">Reason</th>
                                 <th class="th-action py-3">
-                                    <a href="javascript:void(0);" class="link-add-row" @onclick="OnAddRow">
+                                    <button type="button" class="btn link-add-row" @onclick="OnAddRowClickEvent" disabled="@IsAddDisabled">
                                         <i class="fa fa-plus-circle"></i>
-                                    </a>
+                                    </button>
                                 </th>
                             </tr>
                         </thead>
@@ -38,7 +38,7 @@
                                 <tr>
                                     <td>@(ResendSettlementModel.IndexOf(item) + 1)</td>
                                     <td>
-                                        <input type="text" class="form-control text-uppercase" @bind="item.Bet.BetId" @oninput="(ChangeEventArgs e) => OnReferenceIdOnChangeEvent(e,ResendSettlementModel.IndexOf(item))" />
+                                        <input type="text" class="form-control text-uppercase" @bind="item.Bet.BetId" @oninput="(ChangeEventArgs e) => OnReferenceIdOnChangeEvent(e, item,ResendSettlementModel.IndexOf(item))" disabled="@IsActionDisabled"/>
                                     </td>
                                     <td>
                                         @((MarkupString) BuildEventDetails(item))
@@ -58,7 +58,7 @@
                                     </td>
                                     <td>
                                         <div class="form-floating">
-                                            <textarea class="form-control input-reason" placeholder="Reason" @bind="@item.Bet.Reason"></textarea>
+                                            <textarea class="form-control input-reason" placeholder="Reason" @bind="@item.Bet.Reason" disabled="@IsActionDisabled"></textarea>
                                         </div>
                                     </td>
                                     <td>
@@ -74,8 +74,8 @@
             </div>
             <div class="col-md-12">
                 <div class="d-flex flex-row-reverse mx-3 pt-4 border-top">
-                    <button type="button" class="btn btn-settlement px-4 py-2" @onclick="OnResendSettlement" disabled="@(BetIds.Count == 0 ? true : false)">Resend Settlement</button>
-                    <button type="button" class="btn btn-reset me-3 px-4 py-2" @onclick="OnResetSettlement">Reset</button>
+                    <button type="button" class="btn btn-settlement px-4 py-2" @onclick="OnResendSettlementClickEvent" disabled="@(ResendSettlementModel.Any() ? false : true)">Resend Settlement</button>
+                    <button type="button" class="btn btn-reset me-3 px-4 py-2" @onclick="OnResetSettlementClickEvent">Reset</button>
                 </div>
             </div>
         </div>
