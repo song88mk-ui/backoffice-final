@@ -39,7 +39,7 @@
                                     int RowCount = (ActivityLogs.IndexOf(log) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
                                     ManualBetDetails betDetails = JsonSerializer.Deserialize<ManualBetDetails>(log.To);
                                     <tr>
-                                        <td>RowCount</td>
+                                        <td>@RowCount</td>
                                         <td>
                                             <span class="settle-date d-block">@(betDetails.SettlementDate.ToString("MM/dd/yyyy"))</span>
                                             <span class="settle-time d-block">@(betDetails.SettlementDate.ToString("hh:mm:ss tt").ToUpper())</span>

@@ -1,6 +1,6 @@
 ﻿@using Backoffice.Shared.Enums;
 @using static Backoffice.Shared.Models.ManualBetDetailsModel;
-<div class="modal-body">    
+<div class="modal-body">
     <table class="table">
         <thead class="align-middle">
             <tr>
@@ -11,8 +11,8 @@
                 <th scope="col">Status</th>
                 <th scope="col">Reason</th>
                 <th scope="col">
-                    <button type="button" class="btn" @onclick="OnAddReferenceIdClickedEvent">
-                        <i class="fa fa-plus-circle" aria-hidden="true"/>
+                    <button type="button" class="btn" @onclick="OnAddReferenceIdClickedEvent" disabled="@IsAddDisabled">
+                        <i class="fa fa-plus-circle" aria-hidden="true" />
                     </button>
                 </th>
             </tr>
@@ -26,7 +26,7 @@
                     </th>
 
                     <td>
-                        <textarea class="form-control" placeholder="Reference ID" @oninput="OnReferenceIdOnChangeEvent"></textarea>
+                        <textarea class="form-control" placeholder="Reference ID" @oninput="(ChangeEventArgs args) => OnReferenceIdOnChangeEvent(args, bet, ManualBetDetailsModel.Bets.IndexOf(bet))"></textarea>
                     </td>
 
                     <td class="fw-bold">
@@ -56,11 +56,11 @@
                     </td>
                     <td>
                         <button type="button" class="btn" @onclick="() => OnDeleteClickEvent(bet)" disabled="@(ManualBetDetailsModel.Bets.Count == 1 ? true: false)">
-                            <i class="fa fa-trash"/>
+                            <i class="fa fa-trash" />
                         </button>
                     </td>
                 </tr>
-            }           
+            }
         </tbody>
     </table>
 </div>

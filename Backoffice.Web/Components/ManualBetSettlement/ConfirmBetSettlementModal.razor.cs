@@ -60,7 +60,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 BetData = ManualBetDetailsModel.Bets.Select(bet => new ManualBetRequest()
                 {
                     BetId = bet.BetId.ToString(),
-                    NewStatus = (BetStatus) bet.BetStatusId,
+                    NewStatus = (BetStatus) bet.NewBetStatusId,
                     Reason = bet.Reason,
                 }).ToList(),
                 ActivityLogs = ActivityLogs
