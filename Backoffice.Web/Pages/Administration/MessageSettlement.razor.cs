@@ -1,13 +1,11 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Components.MessageSettlement;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.JSInterop;
 using System.Text.Json;
 
@@ -16,12 +14,13 @@ namespace Backoffice.Web.Pages.Administration
     public partial class MessageSettlement : IDisposable
     {
         #region Properties
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] IModalService ModalService { get; set; }
-        [Inject] ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [Inject] private ToastService? _toasterService { get; set; }
+        private ToastService toasterService => _toasterService!;
 
         public MarketSettlementFilterModel MarketSettlementFilterModel { get; set; } = new MarketSettlementFilterModel();
         public List<MessageSettlementModel> MessageSettlementModel { get; set; }
@@ -31,9 +30,6 @@ namespace Backoffice.Web.Pages.Administration
         private long CursorId { get; set; }
         private int PreviousPage { get; set; }
         public MetaData MetaData { get; set; }
-        public string ToastTitle { get; set; }
-        public string ToastMessage { get; set; }
-        public string ToastId { get; set; }
         #endregion
 
         #region Methods
@@ -68,11 +64,9 @@ namespace Backoffice.Web.Pages.Administration
         }
         public async Task OnExportClickedEvent()
         {
-            ToastId = Guid.NewGuid().ToString();
-            ToastTitle = "Message Settlement";
-            ToastMessage = $"Success! Excel file is being generated system will notify once done.";
-
-            await ShowToast();
+            toasterService.AddToast(Toast.NewToast
+                    ("Message Settlement", 
+                    $"Success! Excel file is being generated system will notify once done."));
         }
         public async Task SelectPage(int page)
         {
@@ -152,11 +146,6 @@ namespace Backoffice.Web.Pages.Administration
                 new SelectListItemModel<int> { Value = 15, Name = "Virtual Baseball" },
                 new SelectListItemModel<int> { Value = 17, Name = "Virtual Cricket" },
             };
-        }
-        private async Task ShowToast()
-        {
-            await InvokeAsync(StateHasChanged);
-            await JSRuntime.InvokeVoidAsync("showToast", ToastId, false);
         }
         #endregion
     }

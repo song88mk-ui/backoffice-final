@@ -12,6 +12,7 @@ namespace Backoffice.Web.Shared
     public class MainLayoutBase : LayoutComponentBase, IDisposable
     {
         #region Properties
+        [Inject] private ToastService? _toasterService { get; set; }
         [Inject] private IHttpContextAccessor _httpContextAccessor { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
@@ -20,6 +21,7 @@ namespace Backoffice.Web.Shared
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Parameter] public SportClickCallbackModel SelectedSport { get; set; }
+        private ToastService toasterService => _toasterService!;
 
         private HubConnection HubConnection { get; set; }
         public HeaderNavMenu HeaderNavMenuReference { get; set; }
@@ -93,9 +95,8 @@ namespace Backoffice.Web.Shared
                 }
                 catch (Exception ex)
                 {
-                    ToastTitle = "Config";
-                    ToastMessage = $"{ex.Message}";
-                    await ShowToast();
+                    toasterService.AddToast(Toast.NewToast
+                            ("Error", ex.Message));
                 }
             }
         }
@@ -148,16 +149,9 @@ namespace Backoffice.Web.Shared
         {
             if (message != null)
             {
-                ToastId = Guid.NewGuid().ToString();
-                ToastTitle = message.Page;
-                ToastMessage = $"{message.Details}";
-                await ShowToast();
+                toasterService.AddToast(Toast.NewToast
+                        (message.Page, message.Details, true));
             }
-        }
-        private async Task ShowToast()
-        {
-            await InvokeAsync(StateHasChanged);
-            await JSRuntime.InvokeVoidAsync("showToast", ToastId, false);
         }
         #endregion
     }

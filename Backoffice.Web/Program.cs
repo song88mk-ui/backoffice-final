@@ -74,6 +74,7 @@ builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>();
 builder.Services.AddScoped<ICommonService, CommonService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
+builder.Services.AddScoped<ToastService>();
 
 builder.Services.AddScoped<IExcelService, ExcelService>();
 

@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backoffice.Shared", "Backof
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backoffice.Web", "Backoffice.Web\Backoffice.Web.csproj", "{08731752-A74E-47CF-9B8C-B2437D93A41B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backoffice.Utility", "Backoffice.Utility\Backoffice.Utility.csproj", "{1F732B70-81BC-45CC-B61F-9C3B85B39726}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backoffice.Utility", "Backoffice.Utility\Backoffice.Utility.csproj", "{1F732B70-81BC-45CC-B61F-9C3B85B39726}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -51,7 +51,7 @@ window.destroySort = (className) => {
 // initialize select2
 window.initSelect2 = (className, event, closeOnSelect) => {
     if (closeOnSelect) {
-        $(className).select2({closeOnSelect: false});
+        $(className).select2({ closeOnSelect: false });
     }
     else {
         $(className).select2();
@@ -110,18 +110,12 @@ window.getSortOrder = (className) => {
 }
 
 
-window.showToast = (className, isAutoHide) => {
-    if (isAutoHide !== undefined) {
-        $('.toast').toast({
-            autohide: isAutoHide
-        });
-    }
+window.showToast = (className) => {
+    $('.' + className).toast({
+        autohide: false
+    });
 
     $('.toast-container').prepend($('.' + className));
-
-    //$('.toast').on('shown.bs.toast', (evt) => {                
-    //    console.log('toast is shown');
-    //});
 
     $('.' + className).on('hidden.bs.toast', (evt) => {
         $('.toast-container').remove($('.' + className));
@@ -164,10 +158,10 @@ window.enforceNumberValidation = (ele, limit) => {
         }
 
         //for parlay bonus only        
-        if ($('#filterAddBtn').length == 1) {            
+        if ($('#filterAddBtn').length == 1) {
             if ($(ele).val() > 0 && $('#totalCount').val() < 50) {
                 $('#filterAddBtn').prop('disabled', false);
-            }            
+            }
             else {
                 $('#filterAddBtn').prop('disabled', true);
             }
@@ -207,7 +201,7 @@ function password_show_hide() {
 }
 
 window.ValidateParlayBonusMinOdds = (refEl) => {
-    var element = $(refEl);    
+    var element = $(refEl);
     var isDisabled = false;
 
     if (element.val() < 1.20) {

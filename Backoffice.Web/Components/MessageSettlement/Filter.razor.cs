@@ -43,7 +43,7 @@ namespace Backoffice.Web.Components.MessageSettlement
                 Markets = new List<SelectListItemModel<string>>(),
                 Selections = new List<SelectListItemModel<string>>(),
                 Statuses = new List<SelectListItemModel<int>>(),
-                FromDate = DateTime.Now.Date,
+                FromDate = DateTime.Now.Date.AddDays(-1),
                 ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
             };
 

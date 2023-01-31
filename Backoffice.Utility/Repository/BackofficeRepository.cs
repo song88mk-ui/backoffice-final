@@ -133,8 +133,8 @@ namespace Backoffice.Utility.Repository
                 {
                     Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
                     Payload = BuildPayload(request.SportId, request.SegmentId, request.LeagueId, request.FixtureId),
-                    DateFrom = request.FromDate,
-                    DateTo = request.ToDate,
+                    DateFrom = request.FromDate.ToUniversalTime(),
+                    DateTo = request.ToDate.ToUniversalTime(),
                     MetaData = null
                 }).Result;
 
@@ -220,9 +220,9 @@ namespace Backoffice.Utility.Repository
                 else
                     request.DateFrom = request.DateFrom.ToUniversalTime();
                 if (request.DateTo == DateTime.MinValue)
-                    request.DateTo = DateTime.UtcNow.Date;
+                    request.DateTo = DateTime.UtcNow.Date.AddTicks(-1);
                 else
-                    request.DateFrom = request.DateTo.ToUniversalTime();
+                    request.DateTo = request.DateTo.ToUniversalTime();
 
                 if (request.TimeStamp == DateTime.MinValue)
                 {
