@@ -32,9 +32,9 @@
                         <optgroup label="Sport">
                             <option value="0" selected>All Sports</option>
                         </optgroup>
-                        @if (MarketSettlementFilterModel.Sports != null && MarketSettlementFilterModel.Sports.Any())
+                        @if (Sports != null && Sports.Any())
                         {
-                            @foreach (var item in MarketSettlementFilterModel.Sports)
+                            @foreach (var item in Sports)
                             {
                                 if (item.Value == MarketSettlementFilterModel.SportId)
                                 {
@@ -53,9 +53,9 @@
                         <optgroup label="Segment">
                             <option value="0" selected>All Segments</option>
                         </optgroup>
-                        @if (MarketSettlementFilterModel.Segments != null && MarketSettlementFilterModel.Segments.Any())
+                        @if (Segments != null && Segments.Any())
                         {
-                            @foreach (var item in MarketSettlementFilterModel.Segments)
+                            @foreach (var item in Segments)
                             {
                                 if (item.Value == MarketSettlementFilterModel.SegmentId)
                                 {
@@ -74,9 +74,9 @@
                         <optgroup label="League">
                             <option value="0" selected>All Leagues</option>
                         </optgroup>
-                        @if (MarketSettlementFilterModel.Leagues != null && MarketSettlementFilterModel.Leagues.Any())
+                        @if (Leagues != null && Leagues.Any())
                         {
-                            @foreach (var item in MarketSettlementFilterModel.Leagues)
+                            @foreach (var item in Leagues)
                             {
                                 if (item.Value == MarketSettlementFilterModel.LeagueId)
                                 {
@@ -95,9 +95,9 @@
                         <optgroup label="Fixture">
                             <option value="0" selected>All Fixtures</option>
                         </optgroup>
-                        @if (MarketSettlementFilterModel.Fixtures != null && MarketSettlementFilterModel.Fixtures.Any())
+                        @if (Fixtures != null && Fixtures.Any())
                         {
-                            @foreach (var item in MarketSettlementFilterModel.Fixtures)
+                            @foreach (var item in Fixtures)
                             {
                                 if (item.Value == MarketSettlementFilterModel.FixtureId)
                                 {
@@ -115,7 +115,7 @@
                     <select class="form-select d-block" @onchange="OnStatusChangedEvent">
                         <optgroup label="Status">
                             <option value="0" selected>All Status</option>
-                            @foreach (var item in MarketSettlementFilterModel.Statuses)
+                            @foreach (var item in Statuses)
                             {
                                 if (item.Value == MarketSettlementFilterModel.ToStatus)
                                 {
@@ -135,9 +135,9 @@
                     <select class="form-select d-block" @onchange="OnMarketChangedEvent">
                         <optgroup label="Market">
                             <option value="0" selected>All Markets</option>
-                            @if (MarketSettlementFilterModel.Markets != null && MarketSettlementFilterModel.Markets.Any())
+                            @if (Markets != null && Markets.Any())
                             {
-                                @foreach (var item in MarketSettlementFilterModel.Markets)
+                                @foreach (var item in Markets)
                                 {
                                     if (item.Value == MarketSettlementFilterModel.MarketId)
                                     {
@@ -156,9 +156,9 @@
                     <select class="form-select d-block" @onchange="OnSelectionChangedEvent">
                         <optgroup label="Market">
                             <option value="0" selected>All Selections</option>
-                            @if (MarketSettlementFilterModel.Selections != null && MarketSettlementFilterModel.Selections.Any())
+                            @if (Selections != null && Selections.Any())
                             {
-                                @foreach (var item in MarketSettlementFilterModel.Selections)
+                                @foreach (var item in Selections)
                                 {
                                     if (item.Value == MarketSettlementFilterModel.SelectionId)
                                     {

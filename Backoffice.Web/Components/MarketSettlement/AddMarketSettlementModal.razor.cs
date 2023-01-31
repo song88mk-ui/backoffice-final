@@ -26,7 +26,7 @@ namespace Backoffice.Web.Components.MarketSettlement
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-
+            AddMarketSettlement = null;
         }
 
         public async Task OnAddStatusChange(ChangeEventArgs e, int rowCount)

@@ -39,11 +39,11 @@ namespace Backoffice.Web.Pages.Administration
 
             PageTitle = "Market Settlement";
             IconClass = "ico ico-market-settlement";
+            IsPreLoader = true;
         }
 
         public async Task GetContent()
         {
-            IsPreLoader = true;
 
             var fromDate = Convert.ToDateTime(ModalFilter.FromDate.ToString("yyyy-MM-dd 00:00:00"));
             var toDate = Convert.ToDateTime(ModalFilter.ToDate.ToString("yyyy-MM-dd 23:59:59"));

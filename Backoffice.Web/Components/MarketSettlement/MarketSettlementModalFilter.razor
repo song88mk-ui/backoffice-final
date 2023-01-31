@@ -3,9 +3,9 @@
         <select class="form-select" @onchange="OnSportChangedEvent">
             <optgroup label="Sports">
                 <option value="0">Select Sport</option>
-                @if (AddMarketSettlement != null && AddMarketSettlement.Sports.Any())
+                @if (Sports != null && Sports.Any())
                 {
-                    @foreach (var item in AddMarketSettlement.Sports)
+                    @foreach (var item in Sports)
                     {
                         @if (item.Value == AddMarketSettlement.SportId)
                         {
@@ -25,9 +25,9 @@
         <select class="form-select" @onchange="OnSegmentChangedEvent">
             <optgroup label="Segments">
                 <option value="0">Select Segment</option>
-                @if (AddMarketSettlement != null && AddMarketSettlement.Segments.Any())
+                @if (Segments != null && Segments.Any())
                 {
-                    @foreach (var item in AddMarketSettlement.Segments)
+                    @foreach (var item in Segments)
                     {
                         @if (item.Value == AddMarketSettlement.SegmentId)
                         {
@@ -48,9 +48,9 @@
         <select class="form-select" @onchange="OnLeagueChangedEvent">
             <optgroup label="Leagues">
                 <option value="0">Select League</option>
-                @if (AddMarketSettlement != null && AddMarketSettlement.Leagues.Any())
+                @if (Leagues != null && Leagues.Any())
                 {
-                    @foreach (var item in AddMarketSettlement.Leagues)
+                    @foreach (var item in Leagues)
                     {
                         @if (item.Value == AddMarketSettlement.LeagueId)
                         {
@@ -70,9 +70,9 @@
         <select class="form-select" @onchange="OnFixtureChangedEvent">
             <optgroup label="Fixtures">
                 <option value="0">Select Fixture</option>
-                @if (AddMarketSettlement != null && AddMarketSettlement.Fixtures.Any())
+                @if (Fixtures != null && Fixtures.Any())
                 {
-                    @foreach (var item in AddMarketSettlement.Fixtures)
+                    @foreach (var item in Fixtures)
                     {
                         @if (item.Value == AddMarketSettlement.FixtureId)
                         {
@@ -94,9 +94,9 @@
                 <select class="form-select" @onchange="OnMarketChangedEvent">
                     <optgroup label="Markets">
                         <option value="0">Select Market</option>
-                        @if (AddMarketSettlement != null && AddMarketSettlement.Markets.Any())
+                        @if (Markets != null && Markets.Any())
                         {
-                            @foreach (var item in AddMarketSettlement.Markets)
+                            @foreach (var item in Markets)
                             {
                                 @if (item.Value == AddMarketSettlement.MarketId)
                                 {

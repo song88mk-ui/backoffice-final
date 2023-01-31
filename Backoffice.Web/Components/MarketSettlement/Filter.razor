@@ -30,7 +30,7 @@
                 <div class="me-4 select-container">
                     <select class="form-select d-block" @onchange="OnSportChangedEvent">
                         <option value="0">All Sports</option>
-                        @foreach(var item in ModalFilter.Sports)
+                        @foreach(var item in Sports)
                         {
                             if (item.Value == ModalFilter.SportId)
                             {
@@ -46,7 +46,7 @@
                 <div class="me-4 select-container">
                     <select class="form-select d-block" @onchange="OnSegmentChangedEvent">
                         <option value="0">All Segments</option>
-                        @foreach (var item in ModalFilter.Segments)
+                        @foreach (var item in Segments)
                         {
                             if (item.Value == ModalFilter.SegmentId)
                             {
@@ -62,7 +62,7 @@
                 <div class="me-4 select-container">
                     <select class="form-select d-block" @onchange="OnLeagueChangedEvent">
                         <option value="0">All Leagues</option>
-                        @foreach (var item in ModalFilter.Leagues)
+                        @foreach (var item in Leagues)
                         {
                             if (item.Value == ModalFilter.LeagueId)
                             {
@@ -78,7 +78,7 @@
                 <div class="me-4 select-container">
                     <select class="form-select d-block" @onchange="OnFixtureChangedEvent">
                         <option value="0">All Fixtures</option>
-                        @foreach (var item in ModalFilter.Fixtures)
+                        @foreach (var item in Fixtures)
                         {
                             if (item.Value == ModalFilter.FixtureId)
                             {
@@ -94,7 +94,7 @@
                 <div class="me-4 select-container">
                     <select class="form-select d-block" @onchange="OnStatusChangedEvent">
                         <option value="0">All Status</option>
-                        @foreach (var item in ModalFilter.Statuses)
+                        @foreach (var item in Statuses)
                         {
                             <option value="@item.Value">@item.Name</option>
                         }
@@ -107,7 +107,7 @@
                 <div class="me-4 select-container">
                     <select class="form-select d-block" @onchange="OnMarketChangedEvent">
                         <option value="0" selected>All Markets</option>
-                        @foreach (var item in ModalFilter.Markets)
+                        @foreach (var item in Markets)
                         {
                             if (item.Value == ModalFilter.MarketId)
                             {
@@ -123,7 +123,7 @@
                 <div class="me-4 select-container">
                     <select class="form-select d-block" @onchange="OnSelectionChangedEvent">
                         <option value="0" selected>All Selections</option>
-                        @foreach (var item in ModalFilter.Selections)
+                        @foreach (var item in Selections)
                         {
                             if (item.Value == ModalFilter.SelectionId)
                             {

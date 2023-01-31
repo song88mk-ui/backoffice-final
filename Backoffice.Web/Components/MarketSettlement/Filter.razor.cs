@@ -6,6 +6,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.FixtureModel;
 
 namespace Backoffice.Web.Components.MarketSettlement
@@ -22,6 +23,13 @@ namespace Backoffice.Web.Components.MarketSettlement
         public bool ShowFilter { get; set; }
         public MarketFixtureResponse MarketFixtureResponse { get; set; }
         public MarketFixtureResponse MarketFixtureOutrightResponse { get; set; }
+        public List<SelectListItemModel<int>> Sports { get; set; }
+        public List<SelectListItemModel<int>> Segments { get; set; }
+        public List<SelectListItemModel<int>> Leagues { get; set; }
+        public List<SelectListItemModel<string>> Fixtures { get; set; }
+        public List<SelectListItemModel<string>> Markets { get; set; }
+        public List<SelectListItemModel<int>> Statuses { get; set; }
+        public List<SelectListItemModel<string>> Selections { get; set; }
         #endregion
 
         #region Methods
@@ -29,15 +37,16 @@ namespace Backoffice.Web.Components.MarketSettlement
         {
             ShowFilter = false;
 
+            Sports = new List<SelectListItemModel<int>>();
+            Segments = new List<SelectListItemModel<int>>();
+            Leagues = new List<SelectListItemModel<int>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
+            Statuses = new List<SelectListItemModel<int>>();
+
             ModalFilter = new MarketSettlementModalFilterModel()
             {
-                Sports = await GetSports(),
-                Segments = await GetSegments(0),
-                Leagues = await GetLeagues(0, 0),
-                Fixtures = await GetFixtures(0, 0, 0),
-                Markets = await GetMarkets(""),
-                Selections = await GetSelections("" , ""),
-                Statuses = new List<SelectListItemModel<int>>(),
                 FromDate = DateTime.Now.Date,
                 ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
             };
@@ -88,16 +97,16 @@ namespace Backoffice.Web.Components.MarketSettlement
             ModalFilter.MarketId = string.Empty;
             ModalFilter.SelectionId = string.Empty;
 
-            ModalFilter.Segments = new List<SelectListItemModel<int>>();
-            ModalFilter.Leagues = new List<SelectListItemModel<int>>();
-            ModalFilter.Fixtures = new List<SelectListItemModel<string>>();
-            ModalFilter.Markets = new List<SelectListItemModel<string>>();
-            ModalFilter.Selections = new List<SelectListItemModel<string>>();
+            Segments = new List<SelectListItemModel<int>>();
+            Leagues = new List<SelectListItemModel<int>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
 
             if (ModalFilter.SportId != 0)
             {
-                ModalFilter.Segments = await GetSegments(ModalFilter.SportId);
-                ModalFilter.Leagues = await GetLeagues(ModalFilter.SportId, ModalFilter.SegmentId);
+                Segments = await GetSegments(ModalFilter.SportId);
+                Leagues = await GetLeagues(ModalFilter.SportId, ModalFilter.SegmentId);
             }
         }
 
@@ -110,15 +119,15 @@ namespace Backoffice.Web.Components.MarketSettlement
             ModalFilter.MarketId = string.Empty;
             ModalFilter.SelectionId = string.Empty;
 
-            ModalFilter.Leagues = new List<SelectListItemModel<int>>();
-            ModalFilter.Fixtures = new List<SelectListItemModel<string>>();
-            ModalFilter.Markets = new List<SelectListItemModel<string>>();
-            ModalFilter.Selections = new List<SelectListItemModel<string>>();
+            Leagues = new List<SelectListItemModel<int>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
 
 
             if (ModalFilter.SegmentId != 0)
             {
-                ModalFilter.Leagues = await GetLeagues(ModalFilter.SportId, ModalFilter.SegmentId);
+                Leagues = await GetLeagues(ModalFilter.SportId, ModalFilter.SegmentId);
             }
         }
 
@@ -130,13 +139,13 @@ namespace Backoffice.Web.Components.MarketSettlement
             ModalFilter.MarketId = string.Empty;
             ModalFilter.SelectionId = string.Empty;
 
-            ModalFilter.Fixtures = new List<SelectListItemModel<string>>();
-            ModalFilter.Markets = new List<SelectListItemModel<string>>();
-            ModalFilter.Selections = new List<SelectListItemModel<string>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
 
             if (ModalFilter.LeagueId != 0)
             {
-                ModalFilter.Fixtures = await GetFixtures(ModalFilter.SportId, ModalFilter.SegmentId, ModalFilter.LeagueId);
+                Fixtures = await GetFixtures(ModalFilter.SportId, ModalFilter.SegmentId, ModalFilter.LeagueId);
             }
         }
 
@@ -147,12 +156,12 @@ namespace Backoffice.Web.Components.MarketSettlement
             ModalFilter.MarketId = string.Empty;
             ModalFilter.SelectionId = string.Empty;
 
-            ModalFilter.Markets = new List<SelectListItemModel<string>>();
-            ModalFilter.Selections = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
 
             if (!string.IsNullOrEmpty(ModalFilter.FixtureId))
             {
-                ModalFilter.Markets = await GetMarkets(ModalFilter.FixtureId);
+                Markets = await GetMarkets(ModalFilter.FixtureId);
             }
         }
 
@@ -167,10 +176,10 @@ namespace Backoffice.Web.Components.MarketSettlement
 
             ModalFilter.SelectionId = string.Empty;
 
-            ModalFilter.Selections = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
             if (!string.IsNullOrEmpty(ModalFilter.MarketId))
             {
-                ModalFilter.Selections = await GetSelections(ModalFilter.FixtureId, ModalFilter.MarketId);
+                Selections = await GetSelections(ModalFilter.FixtureId, ModalFilter.MarketId);
             }
         }
 
@@ -207,15 +216,16 @@ namespace Backoffice.Web.Components.MarketSettlement
                 var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
                 var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
+                Sports = new List<SelectListItemModel<int>>();
+                Segments = new List<SelectListItemModel<int>>();
+                Leagues = new List<SelectListItemModel<int>>();
+                Fixtures = new List<SelectListItemModel<string>>();
+                    Markets = new List<SelectListItemModel<string>>();
+                Selections = new List<SelectListItemModel<string>>();
+                Statuses = new List<SelectListItemModel<int>>();
+
                 ModalFilter = new MarketSettlementModalFilterModel()
                 {
-                    Sports = new List<SelectListItemModel<int>>(),
-                    Segments = new List<SelectListItemModel<int>>(),
-                    Leagues = new List<SelectListItemModel<int>>(),
-                    Fixtures = new List<SelectListItemModel<string>>(),
-                    Markets = new List<SelectListItemModel<string>>(),
-                    Selections = new List<SelectListItemModel<string>>(),
-                    Statuses = new List<SelectListItemModel<int>>(),
                     FromDate = DateTime.Now.Date,
                     ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
                     DateRangeFilter = $"{firstDayOfMonth.ToString("MM/dd/yyyy")} - {lastDayOfMonth.ToString("MM/dd/yyyy")}",
@@ -223,17 +233,17 @@ namespace Backoffice.Web.Components.MarketSettlement
 
                 var sports = await GetSports();
                 if (sports != null && sports.Any())
-                    ModalFilter.Sports.AddRange(sports);
+                    Sports.AddRange(sports);
                 ModalFilter.SportId = 0;
 
                 var segments = await GetSegments(ModalFilter.SportId);
                 if (segments != null && segments.Any())
-                    ModalFilter.Segments.AddRange(segments);
+                    Segments.AddRange(segments);
                 ModalFilter.SegmentId = 0;
 
                 var leagues = await GetLeagues(ModalFilter.SportId, ModalFilter.SegmentId);
                 if (leagues != null && leagues.Any())
-                    ModalFilter.Leagues.AddRange(segments);
+                    Leagues.AddRange(segments);
                 ModalFilter.LeagueId = 0;
 
                 ModalFilter.FixtureId = string.Empty;
@@ -242,7 +252,7 @@ namespace Backoffice.Web.Components.MarketSettlement
 
                 var statuses = await GetStatuses();
                 if (statuses != null && statuses.Any())
-                    ModalFilter.Statuses.AddRange(statuses);
+                    Statuses.AddRange(statuses);
                 ModalFilter.ToStatus = 0;
 
                 await ModalFilterChanged.InvokeAsync(ModalFilter);

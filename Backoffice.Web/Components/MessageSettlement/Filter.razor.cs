@@ -22,6 +22,13 @@ namespace Backoffice.Web.Components.MessageSettlement
         [Parameter] public EventCallback OnExportCallback { get; set; }
         [Parameter] public EventCallback<MarketSettlementFilterModel> MarketSettlementFilterModelChanged { get; set; }
         [Parameter] public MarketSettlementFilterModel MarketSettlementFilterModel { get; set; }
+        public List<SelectListItemModel<int>> Sports { get; set; }
+        public List<SelectListItemModel<int>> Segments { get; set; }
+        public List<SelectListItemModel<int>> Leagues { get; set; }
+        public List<SelectListItemModel<string>> Fixtures { get; set; }
+        public List<SelectListItemModel<string>> Markets { get; set; }
+        public List<SelectListItemModel<string>> Selections { get; set; }
+        public List<SelectListItemModel<int>> Statuses { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public MarketFixtureResponse MarketFixtures { get; set; }
@@ -34,15 +41,15 @@ namespace Backoffice.Web.Components.MessageSettlement
         protected override async Task OnInitializedAsync()
         {
             ShowFilter = false;
+            Sports = new List<SelectListItemModel<int>>();
+            Segments = new List<SelectListItemModel<int>>();
+            Leagues = new List<SelectListItemModel<int>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
+
             MarketSettlementFilterModel = new MarketSettlementFilterModel()
             {
-                Sports = new List<SelectListItemModel<int>>(),
-                Segments = new List<SelectListItemModel<int>>(),
-                Leagues = new List<SelectListItemModel<int>>(),
-                Fixtures = new List<SelectListItemModel<string>>(),
-                Markets = new List<SelectListItemModel<string>>(),
-                Selections = new List<SelectListItemModel<string>>(),
-                Statuses = new List<SelectListItemModel<int>>(),
                 FromDate = DateTime.Now.Date.AddDays(-1),
                 ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
             };
@@ -96,16 +103,16 @@ namespace Backoffice.Web.Components.MessageSettlement
             MarketSettlementFilterModel.MarketId = string.Empty;
             MarketSettlementFilterModel.SelectionId = string.Empty;
 
-            MarketSettlementFilterModel.Segments = new List<SelectListItemModel<int>>();
-            MarketSettlementFilterModel.Leagues = new List<SelectListItemModel<int>>();
-            MarketSettlementFilterModel.Fixtures = new List<SelectListItemModel<string>>();
-            MarketSettlementFilterModel.Markets = new List<SelectListItemModel<string>>();
-            MarketSettlementFilterModel.Selections = new List<SelectListItemModel<string>>();
+            Segments = new List<SelectListItemModel<int>>();
+            Leagues = new List<SelectListItemModel<int>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
 
             if (MarketSettlementFilterModel.SportId != 0)
             {
-                MarketSettlementFilterModel.Segments = await GetSegments(MarketSettlementFilterModel.SportId);
-                MarketSettlementFilterModel.Leagues = await GetLeagues(MarketSettlementFilterModel.SportId, MarketSettlementFilterModel.SegmentId);
+                Segments = await GetSegments(MarketSettlementFilterModel.SportId);
+                Leagues = await GetLeagues(MarketSettlementFilterModel.SportId, MarketSettlementFilterModel.SegmentId);
             }
         }
         public async Task OnSegmentChangedEvent(ChangeEventArgs e)
@@ -117,15 +124,15 @@ namespace Backoffice.Web.Components.MessageSettlement
             MarketSettlementFilterModel.MarketId = string.Empty;
             MarketSettlementFilterModel.SelectionId = string.Empty;
 
-            MarketSettlementFilterModel.Leagues = new List<SelectListItemModel<int>>();
-            MarketSettlementFilterModel.Fixtures = new List<SelectListItemModel<string>>();
-            MarketSettlementFilterModel.Markets = new List<SelectListItemModel<string>>();
-            MarketSettlementFilterModel.Selections = new List<SelectListItemModel<string>>();
+            Leagues = new List<SelectListItemModel<int>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
 
 
             if (MarketSettlementFilterModel.SegmentId != 0)
             {
-                MarketSettlementFilterModel.Leagues = await GetLeagues(MarketSettlementFilterModel.SportId, MarketSettlementFilterModel.SegmentId);
+                Leagues = await GetLeagues(MarketSettlementFilterModel.SportId, MarketSettlementFilterModel.SegmentId);
             }
 
         }
@@ -137,13 +144,13 @@ namespace Backoffice.Web.Components.MessageSettlement
             MarketSettlementFilterModel.MarketId = string.Empty;
             MarketSettlementFilterModel.SelectionId = string.Empty;
 
-            MarketSettlementFilterModel.Fixtures = new List<SelectListItemModel<string>>();
-            MarketSettlementFilterModel.Markets = new List<SelectListItemModel<string>>();
-            MarketSettlementFilterModel.Selections = new List<SelectListItemModel<string>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
 
             if (MarketSettlementFilterModel.LeagueId != 0)
             {
-                MarketSettlementFilterModel.Fixtures = await GetFixtures(MarketSettlementFilterModel.SportId, MarketSettlementFilterModel.SegmentId, MarketSettlementFilterModel.LeagueId);
+                Fixtures = await GetFixtures(MarketSettlementFilterModel.SportId, MarketSettlementFilterModel.SegmentId, MarketSettlementFilterModel.LeagueId);
             }
 
 
@@ -155,12 +162,12 @@ namespace Backoffice.Web.Components.MessageSettlement
             MarketSettlementFilterModel.MarketId = string.Empty;
             MarketSettlementFilterModel.SelectionId = string.Empty;
 
-            MarketSettlementFilterModel.Markets = new List<SelectListItemModel<string>>();
-            MarketSettlementFilterModel.Selections = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
 
             if (!string.IsNullOrEmpty(MarketSettlementFilterModel.FixtureId))
             {
-                MarketSettlementFilterModel.Markets = await GetMarkets(MarketSettlementFilterModel.FixtureId);
+                Markets = await GetMarkets(MarketSettlementFilterModel.FixtureId);
             }
 
         }
@@ -174,10 +181,10 @@ namespace Backoffice.Web.Components.MessageSettlement
 
             MarketSettlementFilterModel.SelectionId = string.Empty;
 
-            MarketSettlementFilterModel.Selections = new List<SelectListItemModel<string>>();
+            Selections = new List<SelectListItemModel<string>>();
             if (!string.IsNullOrEmpty(MarketSettlementFilterModel.MarketId))
             {
-                MarketSettlementFilterModel.Selections = await GetSelections(MarketSettlementFilterModel.FixtureId, MarketSettlementFilterModel.MarketId);
+                Selections = await GetSelections(MarketSettlementFilterModel.FixtureId, MarketSettlementFilterModel.MarketId);
             }
         }
         public async Task OnSelectionChangedEvent(ChangeEventArgs e)
@@ -227,15 +234,16 @@ namespace Backoffice.Web.Components.MessageSettlement
                 var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
                 var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
+                Sports = new List<SelectListItemModel<int>>();
+                Segments = new List<SelectListItemModel<int>>();
+                Leagues = new List<SelectListItemModel<int>>();
+                Fixtures = new List<SelectListItemModel<string>>();
+                Markets = new List<SelectListItemModel<string>>();
+                Selections = new List<SelectListItemModel<string>>();
+                Statuses = new List<SelectListItemModel<int>>();
+
                 MarketSettlementFilterModel = new MarketSettlementFilterModel()
                 {
-                    Sports = new List<SelectListItemModel<int>>(),
-                    Segments = new List<SelectListItemModel<int>>(),
-                    Leagues = new List<SelectListItemModel<int>>(),
-                    Fixtures = new List<SelectListItemModel<string>>(),
-                    Markets = new List<SelectListItemModel<string>>(),
-                    Selections = new List<SelectListItemModel<string>>(),
-                    Statuses = new List<SelectListItemModel<int>>(),
                     FromDate = DateTime.Now.Date,
                     ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
                     DateRangeFilter = $"{firstDayOfMonth.ToString("MM/dd/yyyy")} - {lastDayOfMonth.ToString("MM/dd/yyyy")}",
@@ -243,12 +251,12 @@ namespace Backoffice.Web.Components.MessageSettlement
 
                 var sports = await GetSports();
                 if (sports != null && sports.Any())
-                    MarketSettlementFilterModel.Sports.AddRange(sports);
+                    Sports.AddRange(sports);
                 MarketSettlementFilterModel.SportId = 0;
 
                 var segments = await GetSegments(MarketSettlementFilterModel.SportId);
                 if (segments != null && segments.Any())
-                    MarketSettlementFilterModel.Segments.AddRange(segments);
+                    Segments.AddRange(segments);
                 MarketSettlementFilterModel.SegmentId = 0;
 
                 //var leagues = await GetLeagues(MarketSettlementFilterModel.SportId, MarketSettlementFilterModel.SegmentId);
@@ -267,7 +275,7 @@ namespace Backoffice.Web.Components.MessageSettlement
 
                 var statuses = await GetStatuses();
                 if (statuses != null && statuses.Any())
-                    MarketSettlementFilterModel.Statuses.AddRange(statuses);
+                    Statuses.AddRange(statuses);
                 MarketSettlementFilterModel.ToStatus = 0;
 
                 await MarketSettlementFilterModelChanged.InvokeAsync(MarketSettlementFilterModel);

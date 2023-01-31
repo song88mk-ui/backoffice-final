@@ -15,39 +15,50 @@ namespace Backoffice.Web.Components.MarketSettlement
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [Parameter] public EventCallback<AddMarketSettlementModel> OnUpdateRowCallback { get; set; }
-        [Parameter] public EventCallback<AddMarketSettlementModel> AddMarketSettlementChanged { get; set; }
         [Parameter] public AddMarketSettlementModel AddMarketSettlement { get; set; }
         [Parameter] public EventCallback<Tuple<MarketFixtureResponse, MarketFixtureResponse>> OnLeagueChangedCallback { get; set; }
         public MarketFixtureResponse MarketFixtures { get; set; }
         public MarketFixtureResponse MarketOutrightFixtures { get; set; }
+        public List<SelectListItemModel<int>> Sports { get; set; }
+        public List<SelectListItemModel<int>> Segments { get; set; }
+        public List<SelectListItemModel<int>> Leagues { get; set; }
+        public List<SelectListItemModel<string>> Fixtures { get; set; }
+        public List<SelectListItemModel<string>> Markets { get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            AddMarketSettlement = new AddMarketSettlementModel();
-            AddMarketSettlement.AddMarketSettlementSelections.Add(new AddMarketSettlementSelectionModel()
-            {
-                RowCount = AddMarketSettlement.AddMarketSettlementSelections.Count + 1,
-                FixtureId = string.Empty,
-                MarketId = string.Empty,
-                SelectionId = string.Empty,
-                Statuses = await GetStatuses()
-            });
-
-            AddMarketSettlement.SportId = 0;
-            var sports = await GetSports();
-            if (sports != null && sports.Any())
-            {
-                AddMarketSettlement.Sports.AddRange(sports);
-            }
-
-            AddMarketSettlement.SegmentId = 0;
-            AddMarketSettlement.LeagueId = 0;
-            AddMarketSettlement.FixtureId = string.Empty;
-            AddMarketSettlement.MarketId = string.Empty;
+            AddMarketSettlement = null;
         }
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                Sports = new List<SelectListItemModel<int>>();
+                Segments = new List<SelectListItemModel<int>>();
+                Leagues = new List<SelectListItemModel<int>>();
+                Fixtures = new List<SelectListItemModel<string>>();
+                Markets = new List<SelectListItemModel<string>>();
+                Sports = await GetSports();
 
+                AddMarketSettlement = new AddMarketSettlementModel();
+                AddMarketSettlement.AddMarketSettlementSelections.Add(new AddMarketSettlementSelectionModel()
+                {
+                    RowCount = AddMarketSettlement.AddMarketSettlementSelections.Count + 1,
+                    FixtureId = string.Empty,
+                    MarketId = string.Empty,
+                    SelectionId = string.Empty,
+                    Statuses = await GetStatuses()
+                });
+                AddMarketSettlement.SportId = 0;
+                AddMarketSettlement.SegmentId = 0;
+                AddMarketSettlement.LeagueId = 0;
+                AddMarketSettlement.FixtureId = string.Empty;
+                AddMarketSettlement.MarketId = string.Empty;
+                StateHasChanged();
+            }
+        }
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {
             if (string.IsNullOrEmpty(e.Value.ToString()))
@@ -59,14 +70,14 @@ namespace Backoffice.Web.Components.MarketSettlement
             AddMarketSettlement.FixtureId = string.Empty;
             AddMarketSettlement.MarketId = string.Empty;
 
-            AddMarketSettlement.Segments = new List<SelectListItemModel<int>>();
-            AddMarketSettlement.Leagues = new List<SelectListItemModel<int>>();
-            AddMarketSettlement.Fixtures = new List<SelectListItemModel<string>>();
-            AddMarketSettlement.Markets = new List<SelectListItemModel<string>>();
+            Segments = new List<SelectListItemModel<int>>();
+            Leagues = new List<SelectListItemModel<int>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
 
             if (AddMarketSettlement.SportId > 0)
-            {                
-                AddMarketSettlement.Segments = await GetSegments(AddMarketSettlement.SportId);
+            {
+                Segments = await GetSegments(AddMarketSettlement.SportId);
             }
 
             await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
@@ -81,13 +92,13 @@ namespace Backoffice.Web.Components.MarketSettlement
             AddMarketSettlement.LeagueId = 0;
             AddMarketSettlement.FixtureId = string.Empty;
             AddMarketSettlement.MarketId = string.Empty;
-            AddMarketSettlement.Leagues = new List<SelectListItemModel<int>>();
-            AddMarketSettlement.Fixtures = new List<SelectListItemModel<string>>();
-            AddMarketSettlement.Markets = new List<SelectListItemModel<string>>();
+            Leagues = new List<SelectListItemModel<int>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
 
             if (AddMarketSettlement.SegmentId > 0)
             {
-                AddMarketSettlement.Leagues = await GetLeagues(AddMarketSettlement.SportId, AddMarketSettlement.SegmentId);
+                Leagues = await GetLeagues(AddMarketSettlement.SportId, AddMarketSettlement.SegmentId);
             }
 
             await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
@@ -102,16 +113,16 @@ namespace Backoffice.Web.Components.MarketSettlement
 
             AddMarketSettlement.FixtureId = string.Empty;
             AddMarketSettlement.MarketId = string.Empty;
-            AddMarketSettlement.Fixtures = new List<SelectListItemModel<string>>();
-            AddMarketSettlement.Markets = new List<SelectListItemModel<string>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
 
             if (AddMarketSettlement.LeagueId > 0)
             {
-                AddMarketSettlement.Fixtures = await GetFixtures(AddMarketSettlement.SportId, AddMarketSettlement.SegmentId, AddMarketSettlement.LeagueId);                
+                Fixtures = await GetFixtures(AddMarketSettlement.SportId, AddMarketSettlement.SegmentId, AddMarketSettlement.LeagueId);
             }
 
             await OnLeagueChangedCallback.InvokeAsync(new Tuple<MarketFixtureResponse, MarketFixtureResponse>(MarketFixtures, MarketOutrightFixtures));
-            await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);            
+            await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
         }
 
         public async Task OnFixtureChangedEvent(ChangeEventArgs e)
@@ -122,10 +133,10 @@ namespace Backoffice.Web.Components.MarketSettlement
                 AddMarketSettlement.FixtureId = e.Value.ToString();
 
             AddMarketSettlement.MarketId = string.Empty;
-            AddMarketSettlement.Markets = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
 
             if (!string.IsNullOrEmpty(AddMarketSettlement.FixtureId))
-                AddMarketSettlement.Markets = await GetMarkets(AddMarketSettlement.FixtureId);
+                Markets = await GetMarkets(AddMarketSettlement.FixtureId);
 
             await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
         }
@@ -147,19 +158,19 @@ namespace Backoffice.Web.Components.MarketSettlement
 
         public void Dispose()
         {
-            
+
         }
         #endregion
 
         #region Utilities
         private async Task<List<SelectListItemModel<int>>> GetSports()
         {
-            var result = (await TradingService.GetSportLookup()).Result;
+            var result = await TradingService.GetSportLookup();
 
-            if (result == null)
+            if (result.Result == null)
                 return new List<SelectListItemModel<int>>();
 
-            var sports = result.SportLookup?.Select(s => new SelectListItemModel<int>()
+            var sports = result.Result.SportLookup?.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.SportId,
                 Name = s.SportName

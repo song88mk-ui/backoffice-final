@@ -82,7 +82,7 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         #region Utulities
-        public async Task GetContents()
+        public async Task GetContents() 
         {
             var request = new ActivityLogRequest()
             {
