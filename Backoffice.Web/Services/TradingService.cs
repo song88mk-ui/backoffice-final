@@ -14,16 +14,19 @@ namespace Backoffice.Web.Services
         private readonly IAuthenticationService _authenticationService;
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
+
         public TradingService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService)
         {
             _httpClient = httpClient;
             _configuration = configuration;
 
             _httpClient.BaseAddress = new Uri(_configuration["API:Backoffice:Uri"]);
+
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:Backoffice:Security:APIKey"]);
             _httpClient.DefaultRequestHeaders.Add("x-region", _configuration["API:Region"]);
+
             _authenticationService = authenticationService;
-            _httpClient.DefaultRequestHeaders.Add("x-region", _configuration["API:Region"]);
+            //_httpClient.DefaultRequestHeaders.Add("x-region", _configuration["API:Region"]);
         }
 
         public async Task<BaseResponse<Models.SportsTreeModel>> GetSports(int fixtureTypeId)
@@ -1336,7 +1339,7 @@ namespace Backoffice.Web.Services
                 var userToken = await _authenticationService.AuthenticateToken();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
 
-                var response = await _httpClient.PostAsync($"api/v1/trading/publish", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"api/trading/publish", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

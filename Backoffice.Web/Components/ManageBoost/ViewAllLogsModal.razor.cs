@@ -11,7 +11,7 @@ using Activity = Backoffice.Shared.Enums.Activity;
 using Page = Backoffice.Shared.Enums.Page;
 using PriceBoostLogModel = Backoffice.Web.Models.PriceBoostLogModel;
 
-namespace Backoffice.Web.Components.OddsEngine.ManageBoost
+namespace Backoffice.Web.Components.ManageBoost
 {
     public partial class ViewAllLogsModal : IDisposable
     {

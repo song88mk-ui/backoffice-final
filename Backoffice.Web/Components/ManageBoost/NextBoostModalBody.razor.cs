@@ -7,7 +7,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
 
-namespace Backoffice.Web.Components.OddsEngine.ManageBoost
+namespace Backoffice.Web.Components.ManageBoost
 {
     public partial class NextBoostModalBody : IDisposable
     {
@@ -36,12 +36,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public async Task OnSaveModalClick()
         {
-            if (AddPriceBoostFilterModel.SportId == 0 ||
-                AddPriceBoostFilterModel.SegmentId == 0 ||
-                AddPriceBoostFilterModel.LeagueId == 0 ||
-                string.IsNullOrEmpty(AddPriceBoostFilterModel.ProviderFixtureId) ||
-                string.IsNullOrEmpty(AddPriceBoostFilterModel.MarketTemplateId) ||
-                string.IsNullOrEmpty($"{AddPriceBoostFilterModel.SelectionTemplateId}{AddPriceBoostFilterModel.SelectionSpecifier}"))
+            if (AddPriceBoostFilterModel.SportId == 0 || AddPriceBoostFilterModel.SegmentId == 0 || AddPriceBoostFilterModel.LeagueId == 0 ||
+                string.IsNullOrEmpty(AddPriceBoostFilterModel.ProviderFixtureId) || string.IsNullOrEmpty(AddPriceBoostFilterModel.MarketTemplateId) || string.IsNullOrEmpty($"{AddPriceBoostFilterModel.SelectionTemplateId}{AddPriceBoostFilterModel.SelectionSpecifier}"))
             {
                 return;
             }
@@ -74,6 +70,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     }
                 }
             }
+
             IsPreLoader = true;
             await InvokeAsync(StateHasChanged);
 

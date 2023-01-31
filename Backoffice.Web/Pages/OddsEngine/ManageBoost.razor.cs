@@ -1,9 +1,6 @@
-﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Components.Common;
-using Backoffice.Web.Components.OddsEngine.ManageBoost;
+using Backoffice.Web.Components.ManageBoost;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -14,19 +11,21 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class ManageBoost : IDisposable
     {
         #region Properties
+
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
+
         public MetaData MetaData { get; set; }
         public PriceboostFilterModel PriceBoostFilterModel { get; set; } = new PriceboostFilterModel();
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public List<PriceBoostConfigModel> PriceBoostList { get; set; }
         public LanguagesModel Languages { get; set; }
-        private PriceBoostConfigModel TempConfig { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public bool IsPreLoader { get; set; }
+
         #endregion
 
         #region Methods
@@ -43,7 +42,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     Name = "Price Boost",
                     Url = string.Empty,
-                    IsCurrentPage = true
+                    IsCurrentPage = false
                 },
                 new BreadcrumbModel
                 {
@@ -53,13 +52,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
 
-            MetaData = new MetaData()
-            {
-                CurrentPage = 1,
-                PageSize = 10,
-                TotalCount = 10000,
-                TotalPages = 100
-            };
+            MetaData = new MetaData();
         }
 
         public async Task OnEdit(PriceBoostConfigModel priceboost)

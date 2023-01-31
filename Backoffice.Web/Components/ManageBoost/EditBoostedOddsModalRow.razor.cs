@@ -1,7 +1,7 @@
 ﻿using Backoffice.Shared.Models;
 using Microsoft.AspNetCore.Components;
 
-namespace Backoffice.Web.Components.OddsEngine.ManageBoost
+namespace Backoffice.Web.Components.ManageBoost
 {
     public partial class EditBoostedOddsModalRow : IDisposable
     {

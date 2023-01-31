@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <div class="content-filter mx-3 d-flex justify-content-between">
             <div class="select-container d-flex">
-                <div class="me-4">
+                <div class="client-container me-4">
                     <label class="form-label d-block">Clients</label>
                     @if (PriceboostFilterModel.Clients.Any())
                     {
@@ -22,7 +22,7 @@
                         </select>
                     }
                 </div>
-                <div class="me-4">
+                <div class="sport-container me-4">
                     <label class="form-label d-block">Sport</label>
                     <select class="form-select d-block" @onchange="OnSportChangedEvent">
                         @if (PriceboostFilterModel.Sports.Any())
@@ -46,7 +46,7 @@
                         }
                     </select>
                 </div>
-                <div class="me-4">
+                <div class="segment-container me-4">
                     <label class="form-label d-block">Segment</label>
                     <select class="form-select d-block" @onchange="OnSegmentChangedEvent">
                         @if (PriceboostFilterModel.Segments.Any())
@@ -70,7 +70,7 @@
                         }
                     </select>
                 </div>
-                <div class="me-4">
+                <div class="league-container me-4">
                     <label class="form-label d-block">League</label>
                     <select class="form-select d-block" @onchange="OnLeagueChangedEvent">
                         @if (PriceboostFilterModel.Leagues.Any())
