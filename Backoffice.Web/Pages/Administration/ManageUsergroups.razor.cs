@@ -55,7 +55,7 @@ namespace Backoffice.Web.Pages.Administration
             }
 
             PageTitle = "Manage User Group";
-            IconClass = string.Empty;
+            IconClass = "ico ico-manage-user-group";
         }
 
         public async Task OnInitEvent(UserGroupCallbackModel request)
