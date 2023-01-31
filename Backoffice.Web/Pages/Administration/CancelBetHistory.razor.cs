@@ -1,6 +1,8 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -12,14 +14,19 @@ namespace Backoffice.Web.Pages.Administration
     public partial class CancelBetHistory : IDisposable
     {
         #region Properties
-
+        [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private ToastService? _toasterService { get; set; }
         public CancelBetHistoryCallbackModel CallbackModel { get; set; }
         public CancelBetHistoryModel CancelBets { get; set; }
         public MetaData MetaData { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
 
+        #endregion
+
+        #region Fields
+        private ToastService toasterService => _toasterService!;
         #endregion
 
         #region Methods
@@ -31,7 +38,7 @@ namespace Backoffice.Web.Pages.Administration
 
             MetaData = new MetaData
             {
-                CurrentPage = 0,
+                CurrentPage = 1,
                 PageSize = 20,
                 TotalCount = 0,
                 TotalPages = 1,
@@ -46,12 +53,26 @@ namespace Backoffice.Web.Pages.Administration
 
             CancelBets = await GetActivityLogList(request);
         }
-        public async Task OnExportEvent(CancelBetHistoryCallbackModel request)
+        public async Task OnExportEvent(CancelBetHistoryCallbackModel model)
         {
-            CallbackModel = request;
+            if (model == null)
+                return;
 
-            //TODO: export data to excel file
-            //CancelBets = await GetActivityLogList(request);
+            var request = new ActivityLogRequest
+            {
+                Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
+                Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
+                DateFrom = model.DateFrom,
+                DateTo = model.DateTo,
+                MetaData = MetaData
+            };
+
+            MessageBroker.Publish(JsonSerializer.Serialize(request), "ExportCancelBetHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+
+
+            toasterService.AddToast(Toast.NewToast
+                    ("Cancel Bet History",
+                    $"Success! Excel file is being generated system will notify once done."));
         }
         public async Task SelectPage(int page)
         {
