@@ -22,9 +22,9 @@
             <label for="sportSelect" class="form-label">Sports</label>
             <select class="form-select" id="sportSelect" @onchange="OnSportSelectChanged">
                 <option value="0">Select Sport</option>
-                @foreach (var item in AddPriceBoostFilterModel.Sports)
+                @foreach (var item in Model.Sports)
                 {
-                    if (AddPriceBoostFilterModel.SportId == item.Value)
+                    if (Model.SportId == item.Value)
                     {
                         <option value="@item.Value" selected>@item.Name</option>
                     }
@@ -39,9 +39,9 @@
             <label for="segmentSelect" class="form-label">Segment</label>
             <select class="form-select" id="segmentSelect" @onchange="OnSegmentSelectChanged">
                 <option value="0">Select Segment</option>
-                @foreach (var item in AddPriceBoostFilterModel.Segments)
+                @foreach (var item in Model.Segments)
                 {
-                    if (AddPriceBoostFilterModel.SegmentId == item.Value)
+                    if (Model.SegmentId == item.Value)
                     {
                         <option value="@item.Value" selected>@item.Name</option>
                     }
@@ -59,9 +59,9 @@
             <label for="leagueSelect" class="form-label">League</label>
             <select class="form-select" id="LeagueSelect" @onchange="OnLeagueSelectChanged">
                 <option value="0">Select League</option>
-                @foreach (var item in AddPriceBoostFilterModel.Leagues)
+                @foreach (var item in Model.Leagues)
                 {
-                    if (AddPriceBoostFilterModel.LeagueId == item.Value)
+                    if (Model.LeagueId == item.Value)
                     {
                         <option value="@item.Value" selected>@item.Name</option>
                     }
@@ -76,9 +76,9 @@
             <label for="fixtureSelect" class="form-label">Fixture</label>
             <select class="form-select" id="fixtureSelect" @onchange="OnFixtureSelectChanged">
                 <option value="">Select Fixture</option>
-                @foreach(var item in AddPriceBoostFilterModel.Fixtures)
+                @foreach(var item in Model.Fixtures)
                 {
-                    if (AddPriceBoostFilterModel.ProviderFixtureId == item.Value)
+                    if (Model.ProviderFixtureId == item.Value)
                     {
                         <option value="@item.Value" selected>@item.Name</option>
                     }
@@ -96,9 +96,9 @@
             <label for="marketSelect" class="form-label">Market</label>
             <select class="form-select" id="marketSelect" @onchange="OnMarketSelectChanged">                
                 <option value="">Select Market</option>
-                @foreach (var item in AddPriceBoostFilterModel.Markets)
+                @foreach (var item in Model.Markets)
                 {
-                    if (AddPriceBoostFilterModel.MarketName == item.Name)
+                    if (Model.MarketName == item.Name)
                     {
                                 <option value="@item.Value" selected>@item.Name</option>
                     }
@@ -113,9 +113,9 @@
             <label for="selectionSelect" class="form-label">Selection</label>
             <select class="form-select" id="selectionSelect" @onchange="OnSelectionSelectChanged">
                 <option value="">Select Selection</option>
-                @foreach (var item in AddPriceBoostFilterModel.Selections)
+                @foreach (var item in Model.Selections)
                 {
-                    if (AddPriceBoostFilterModel.SelectionName == item.Name)
+                    if (Model.SelectionName == item.Name)
                     {
                         <option value="@item.Value" selected>@item.Name</option>
                     }

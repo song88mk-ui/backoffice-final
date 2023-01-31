@@ -5,7 +5,6 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Security.Claims;
 using System.Text.Json;
 
 namespace Backoffice.Web.Components.ManageBoost
@@ -13,17 +12,29 @@ namespace Backoffice.Web.Components.ManageBoost
     public partial class EditBoostedOddsModal : IDisposable
     {
         #region Properties
+
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
+
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         public LanguagesModel Languages { get; set; }
-        public PriceBoostConfigModel PriceBoostConfigModel { get; set; }        
+        public PriceBoostConfigModel PriceBoostConfigModel { get; set; }  
+        
         public bool IsPreloader { get; set; }
-        public const string InlineCss = "top:50%";
+
         #endregion
+
+        #region Fields
+
+        public const string InlineCss = "top:50%";
+
+        #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             IsPreloader = true;            
@@ -204,10 +215,12 @@ namespace Backoffice.Web.Components.ManageBoost
 
             ModalService.Cancel();
         }
+
         public void Dispose()
         {
             
         }
+
         #endregion
     }
 }

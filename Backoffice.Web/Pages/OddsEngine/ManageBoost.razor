@@ -12,12 +12,7 @@
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
 <div class="col-md-12">
-    <Filter @bind-PriceboostFilterModel="PriceBoostFilterModel"
-            OnClientChangedCallback="OnClientChangedEvent"
-            OnSportChangedCallback="OnSportChangedEvent"
-            OnSegmentChangedCallback="OnSegmentChangedEvent"
-            OnLeagueChangedCallback="OnLeagueChangedEvent"
-            OnInitCallback="GetContents" />
+    <Filter @ref="FilterReference" OnClientChangedCallback="OnClientChangedEvent" OnSportChangedCallback="OnSportChangedEvent" OnSegmentChangedCallback="OnSegmentChangedEvent" OnLeagueChangedCallback="OnLeagueChangedEvent" OnInitCallback="OnInitCallback" OnInputSearchCallback="OnInputSearchEvent" />
 </div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">
@@ -84,7 +79,7 @@
                                     <div class="d-flex justify-content-center">
                                         @if (priceboost.FixtureStatusId < (int)FixtureStatus.Live)
                                         {
-                                            <a class="link-edit me-3" @onclick="_ => OnEdit(priceboost)" href="javascript:(0)">
+                                            <a class="link-edit me-3" @onclick="_ => OnEditClickEvent(priceboost)" href="javascript:(0)">
                                                 <i class="fa fa-edit"></i>
                                             </a>
                                         }
@@ -94,41 +89,13 @@
                                                 <i class="fa fa-edit"></i>
                                             </a>
                                         }
-                                        <a class="link-logs me-3" @onclick="_ => OnViewLog(priceboost)" href="javascript:(0)">
+                                        <a class="link-logs me-3" @onclick="_ => OnViewLogClickEvent(priceboost)" href="javascript:(0)">
                                             <i class="fa fa-list"></i>
                                         </a>
-                                        <a class="link-delete me-3" @onclick="_ => OnDelete(priceboost)" href="javascript:(0)">
+                                        <a class="link-delete me-3" @onclick="_ => OnDeleteClickEvent(priceboost)" href="javascript:(0)">
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     </div>
-                                    @*@if (priceboost.FixtureStatusId < (int)FixtureStatus.Live)
-                                    {
-                                        <div class="d-flex justify-content-center">
-                                            <a class="link-edit me-2" @onclick="_ => OnEdit(priceboost)" href="javascript:(0)">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                            <a class="link-logs me-2" @onclick="_ => OnViewLog(priceboost)" href="javascript:(0)">
-                                                <i class="fa fa-list"></i>
-                                            </a>
-                                            <a class="link-delete me-2" @onclick="_ => OnDelete(priceboost)" href="javascript:(0)">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="d-flex justify-content-center">
-                                            <a class="link-edit me-2" @onclick="_ => OnEdit(priceboost)" href="javascript:(0)" disabled>
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                            <a class="link-logs me-2" @onclick="_ => OnViewLog(priceboost)" href="javascript:(0)">
-                                                <i class="fa fa-list"></i>
-                                            </a>
-                                            <a class="link-delete me-2" @onclick="_ => OnDelete(priceboost)" href="javascript:(0)">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
-                                        </div>
-                                    }*@
                                 </td>
                             </tr>
                         }
@@ -142,4 +109,6 @@
         }
     </div>
 </div>
-<Backoffice.Web.Components.Common.CustomModal OnSaveClickCallback="OnModalSave" OnCancelClickCallback="OnModalBack" />
+<div>
+    <CustomModal OnSaveClickCallback="OnModalSave" OnCancelClickCallback="OnModalBack" />
+</div>

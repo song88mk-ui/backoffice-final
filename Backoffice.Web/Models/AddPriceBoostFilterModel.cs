@@ -12,8 +12,8 @@ namespace Backoffice.Web.Models
             Fixtures = new List<SelectListItemModel<string>>();
             Markets = new List<SelectListItemModel<string>>();
             Selections = new List<SelectListItemModel<string>>();
-            PriceBoostConfigList = new List<Backoffice.Shared.Models.PriceBoostConfigModel>();
-            PriceBoostConfigAuditList = new List<Backoffice.Shared.Models.PriceBoostConfigAuditModel>();
+            PriceBoostConfigList = new List<PriceBoostConfigModel>();
+            PriceBoostConfigAuditList = new List<PriceBoostConfigAuditModel>();
         }
         public string ClientCode { get; set; }
         public int SportId { get; set; }
@@ -37,7 +37,7 @@ namespace Backoffice.Web.Models
         public string SelectionSpecifier { get; set; }
         public string SelectionName { get; set; }
         public List<SelectListItemModel<string>> Selections { get; set; }
-        public List<Backoffice.Shared.Models.PriceBoostConfigModel> PriceBoostConfigList { get; set; }
-        public List<Backoffice.Shared.Models.PriceBoostConfigAuditModel> PriceBoostConfigAuditList { get; set; }
+        public List<PriceBoostConfigModel> PriceBoostConfigList { get; set; }
+        public List<PriceBoostConfigAuditModel> PriceBoostConfigAuditList { get; set; }
     }
 }

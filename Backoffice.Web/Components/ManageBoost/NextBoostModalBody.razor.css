@@ -10,6 +10,10 @@
     background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
 
+.modal-save.disabled {
+    opacity: 50%;
+}
+
 table {
     font-size: 0.85rem;
 }

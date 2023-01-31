@@ -12,23 +12,33 @@ namespace Backoffice.Web.Components.ManageBoost
     public partial class NextBoostModalBody : IDisposable
     {
         #region Properties
+
         [Inject] ITradingService TradingService { get; set; }
         [Inject] IModalService ModalService { get; set; }
+
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] ModalParameters ModalParameters { get; set; }
+
         public AddPriceBoostFilterModel AddPriceBoostFilterModel { get; set; }
 
         public bool IsPreLoader { get; set; }
-        public const string InlineCss = "top:50%;z-index:1";
-        public string placeholder { get; set; }
+        public string Placeholder { get; set; }
+
         #endregion
+
+        #region Fields
+
+        public const string InlineCss = "top:50%;z-index:1";
+
+        #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
-            IsPreLoader = true;
             AddPriceBoostFilterModel = ModalParameters.TryGet<AddPriceBoostFilterModel>("AddPriceBoostFilterModel");
-            IsPreLoader = false;
         }
+
         public async Task OnCancelModalClick()
         {
             ModalService.Cancel();
@@ -36,8 +46,13 @@ namespace Backoffice.Web.Components.ManageBoost
 
         public async Task OnSaveModalClick()
         {
+            if (!AddPriceBoostFilterModel.PriceBoostConfigList.Any(c => !string.IsNullOrEmpty(c.BoostedOddsStr)))
+            {
+                return;
+            }
+
             if (AddPriceBoostFilterModel.SportId == 0 || AddPriceBoostFilterModel.SegmentId == 0 || AddPriceBoostFilterModel.LeagueId == 0 ||
-                string.IsNullOrEmpty(AddPriceBoostFilterModel.ProviderFixtureId) || string.IsNullOrEmpty(AddPriceBoostFilterModel.MarketTemplateId) || string.IsNullOrEmpty($"{AddPriceBoostFilterModel.SelectionTemplateId}{AddPriceBoostFilterModel.SelectionSpecifier}"))
+            string.IsNullOrEmpty(AddPriceBoostFilterModel.ProviderFixtureId) || string.IsNullOrEmpty(AddPriceBoostFilterModel.MarketTemplateId) || string.IsNullOrEmpty($"{AddPriceBoostFilterModel.SelectionTemplateId}{AddPriceBoostFilterModel.SelectionSpecifier}"))
             {
                 return;
             }
@@ -72,7 +87,6 @@ namespace Backoffice.Web.Components.ManageBoost
             }
 
             IsPreLoader = true;
-            await InvokeAsync(StateHasChanged);
 
             var result = await TradingService.AddOrUpdatePriceBoost(AddPriceBoostFilterModel);
 
@@ -188,6 +202,7 @@ namespace Backoffice.Web.Components.ManageBoost
         {
             
         }
+
         #endregion
     }
 }

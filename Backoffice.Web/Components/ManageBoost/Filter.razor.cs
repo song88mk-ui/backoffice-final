@@ -9,89 +9,66 @@ namespace Backoffice.Web.Components.ManageBoost
     public partial class Filter : IDisposable
     {
         #region Properties
+
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
-        [Parameter] public PriceboostFilterModel PriceboostFilterModel { get; set; }
+        [Parameter] public EventCallback OnInitCallback { get; set; }
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback<int> OnSportChangedCallback { get; set; }
-        [Parameter] public EventCallback<Tuple<int,int>> OnSegmentChangedCallback { get; set; }
-        [Parameter] public EventCallback OnLeagueChangedCallback { get; set; }        
-        [Parameter] public EventCallback<PriceboostFilterModel> PriceboostFilterModelChanged { get; set; }
-        [Parameter] public EventCallback OnInitCallback { get; set; }
+        [Parameter] public EventCallback<int> OnSegmentChangedCallback { get; set; }
+        [Parameter] public EventCallback<int> OnLeagueChangedCallback { get; set; }
+        [Parameter] public EventCallback<string> OnInputSearchCallback { get; set; }
+
+        public List<SelectListItemModel<string>> Clients { get; set; }
+        public string SelectedClientCode { get; set; }
+        public List<SelectListItemModel<int>> Sports { get; set; }
+        public int SelectedSportId { get; set; }
+        public List<SelectListItemModel<int>> Segments { get; set; }
+        public int SelectedSegmentId { get; set; }
+        public List<SelectListItemModel<int>> Leagues { get; set; }
+        public int SelectedLeagueId { get; set; }
 
         public SearchFormModel SearchForm { get; set; }
 
         #endregion
 
+        //#region Fields
+
+        //public string _clientCode;
+        //public int _sportId;
+        //public int _segmentId;
+        //public int _leagueId;
+
+        //#endregion
+
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            Clients = new List<SelectListItemModel<string>>();
+            Sports = new List<SelectListItemModel<int>>();
+            Segments = new List<SelectListItemModel<int>>();
+            Leagues = new List<SelectListItemModel<int>>();
+
             SearchForm = new SearchFormModel();
 
-            PriceboostFilterModel.Clients = await LoadClients();
-            PriceboostFilterModel.Sports = await LoadSports();
-            PriceboostFilterModel.Segments = await LoadSegments(PriceboostFilterModel.SportId);
-            PriceboostFilterModel.Leagues = await LoadLeagues(PriceboostFilterModel.SportId, PriceboostFilterModel.SegmentId);
+            Clients = await LoadClients();
+            SelectedClientCode = Clients.FirstOrDefault().Value;
 
-            await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
+            Sports = await LoadSports();
+            SelectedSportId = 0;
+
+            Segments = await LoadSegments(SelectedSportId);
+            SelectedSegmentId = 0;
+
+            Leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
+            SelectedLeagueId = 0;
+
+            //await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
             await OnInitCallback.InvokeAsync();
-        }
-
-        public async Task OnInputSearchEvent()
-        {
-        }
-
-        public async Task<List<SelectListItemModel<int>>> LoadSports()
-        {
-            var result = (await TradingService.GetSportLookup()).Result;
-
-            if (result == null)
-                return new List<SelectListItemModel<int>>();
-
-            var sports = result.SportLookup.Select(s => new SelectListItemModel<int>()
-            {
-                Value = s.SportId,
-                Name = s.SportName
-            }).ToList();
-
-            return sports;      
-        }
-
-        public async Task<List<SelectListItemModel<int>>> LoadSegments(int sportId)
-        {
-            var result = (await TradingService.GetSegmentLookup(sportId)).Result;
-
-            if (result == null)
-                return new List<SelectListItemModel<int>>();
-
-            var segments = result.SegmentLookup.Select(s => new SelectListItemModel<int>()
-            {
-                Value = s.SegmentId,
-                Name = s.SegmentName
-            }).ToList();
-
-            return segments;
-        }
-
-        public async Task<List<SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
-        {
-            var result = (await TradingService.GetLeagueLookup(sportId, segmentId)).Result;
-
-            if (result == null)
-                return new List<SelectListItemModel<int>>();
-
-            var leagues = result.LeagueLookup.Select(s => new SelectListItemModel<int>()
-            {
-                Value = s.LeagueId,
-                Name = s.LeagueName
-            }).ToList();
-
-            return leagues;
         }
 
         public async Task OnAddBoostedOdds()
@@ -100,7 +77,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);            
+            //parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);            
 
             var options = new ModalOptions();
             ModalService.Open<AddBoostedOddsModal>($"Add Boosted Odds", parameters, options);
@@ -113,7 +90,7 @@ namespace Backoffice.Web.Components.ManageBoost
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle","max-width: 85rem;");
-            parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);
+            //parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);
             parameters.Add("SelectedPage", Page.OE_PriceBoost_Manage);
 
             var options = new ModalOptions();
@@ -122,34 +99,44 @@ namespace Backoffice.Web.Components.ManageBoost
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
-            PriceboostFilterModel.ClientCode = e.Value.ToString();
+            SelectedClientCode = e.Value.ToString();
 
-            await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
-            await OnClientChangedCallback.InvokeAsync(PriceboostFilterModel.ClientCode);
+            await OnClientChangedCallback.InvokeAsync(SelectedClientCode);
         }
 
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {
-            PriceboostFilterModel.SportId = int.Parse(e.Value.ToString());
+            SelectedSportId = int.Parse(e.Value.ToString());
 
-            await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
-            await OnSportChangedCallback.InvokeAsync(PriceboostFilterModel.SportId);
+            Segments = await LoadSegments(SelectedSportId);
+            SelectedSegmentId = 0;
+
+            Leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
+            SelectedLeagueId = 0;
+
+            await OnSportChangedCallback.InvokeAsync(SelectedSportId);
         }
 
         public async Task OnSegmentChangedEvent(ChangeEventArgs e)
         {
-            PriceboostFilterModel.SegmentId = int.Parse(e.Value.ToString());
+            SelectedSegmentId = int.Parse(e.Value.ToString());
 
-            await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
-            await OnSegmentChangedCallback.InvokeAsync(new Tuple<int, int>(PriceboostFilterModel.SportId, PriceboostFilterModel.SegmentId));
+            Leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
+            SelectedLeagueId = 0;
+
+            await OnSegmentChangedCallback.InvokeAsync(SelectedSegmentId);
         }
 
         public async Task OnLeagueChangedEvent(ChangeEventArgs e)
         {
-            PriceboostFilterModel.LeagueId = int.Parse(e.Value.ToString());
+            SelectedLeagueId = int.Parse(e.Value.ToString());
 
-            await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
-            await OnLeagueChangedCallback.InvokeAsync();
+            await OnLeagueChangedCallback.InvokeAsync(SelectedLeagueId);
+        }
+
+        public async Task OnInputSearchEvent()
+        {
+            await OnInputSearchCallback.InvokeAsync(SearchForm.SearchText);
         }
 
         public void Dispose()
@@ -162,21 +149,95 @@ namespace Backoffice.Web.Components.ManageBoost
 
         private async Task<List<SelectListItemModel<string>>> LoadClients()
         {
-            var clients = (await TradingService.GetClientList()).Result;
+            var result = (await TradingService.GetClientList()).Result;
 
-            if (clients != null)
+            if (result != null)
             {
                 if (UserModel.ClientCodes.Any())
                 {
-                    clients = clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                    result = result.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                 }
             }
-
-            return clients.Select(s => new SelectListItemModel<string>
+            var clients = result.Select(s => new SelectListItemModel<string>
             {
                 Name = s.ClientName,
                 Value = s.ClientCode
             }).ToList();
+
+            clients.Insert(0, new SelectListItemModel<string>
+            {
+                Value = string.Empty,
+                Name = "All Clients"
+            });
+
+
+            return clients;
+        }
+
+        private async Task<List<SelectListItemModel<int>>> LoadSports()
+        {
+            var result = (await TradingService.GetSportLookup()).Result;
+
+            if (result == null)
+                return new List<SelectListItemModel<int>>();
+
+            var sports = result.SportLookup.Select(s => new SelectListItemModel<int>()
+            {
+                Value = s.SportId,
+                Name = s.SportName
+            }).ToList();
+
+            sports.Insert(0, new SelectListItemModel<int> 
+            { 
+                Value = 0,
+                Name = "All Sports"
+            });
+
+            return sports;
+        }
+
+        private async Task<List<SelectListItemModel<int>>> LoadSegments(int sportId)
+        {
+            var result = (await TradingService.GetSegmentLookup(sportId)).Result;
+
+            if (result == null)
+                return new List<SelectListItemModel<int>>();
+
+            var segments = result.SegmentLookup.Select(s => new SelectListItemModel<int>()
+            {
+                Value = s.SegmentId,
+                Name = s.SegmentName
+            }).ToList();
+
+            segments.Insert(0, new SelectListItemModel<int>
+            {
+                Value = 0,
+                Name = "All Segments"
+            });
+
+            return segments;
+        }
+
+        private async Task<List<SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
+        {
+            var result = (await TradingService.GetLeagueLookup(sportId, segmentId)).Result;
+
+            if (result == null)
+                return new List<SelectListItemModel<int>>();
+
+            var leagues = result.LeagueLookup.Select(s => new SelectListItemModel<int>()
+            {
+                Value = s.LeagueId,
+                Name = s.LeagueName
+            }).ToList();
+
+            leagues.Insert(0, new SelectListItemModel<int>
+            {
+                Value = 0,
+                Name = "All Leagues"
+            });
+
+            return leagues;
         }
 
         #endregion

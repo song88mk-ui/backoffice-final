@@ -4,13 +4,12 @@
             <div class="select-container d-flex">
                 <div class="client-container me-4">
                     <label class="form-label d-block">Clients</label>
-                    @if (PriceboostFilterModel.Clients.Any())
-                    {
-                        <select class="form-select d-block" @onchange="OnClientChangedEvent">
-                            <option value="">All Clients</option>
-                            @foreach (var item in PriceboostFilterModel.Clients)
+                    <select class="form-select d-block" @onchange="OnClientChangedEvent">                       
+                        @if (Clients.Any())
+                        {
+                            @foreach (var item in Clients)
                             {
-                                if (item.Name == PriceboostFilterModel.ClientCode)
+                                if (item.Value == SelectedClientCode)
                                 {
                                     <option value="@item.Value" selected>@item.Name</option>
                                 }
@@ -19,18 +18,21 @@
                                     <option value="@item.Value">@item.Name</option>
                                 }
                             }
-                        </select>
-                    }
+                        }
+                        else
+                        {
+                            <option value="0">--</option>
+                        }
+                    </select>
                 </div>
                 <div class="sport-container me-4">
                     <label class="form-label d-block">Sport</label>
                     <select class="form-select d-block" @onchange="OnSportChangedEvent">
-                        @if (PriceboostFilterModel.Sports.Any())
+                        @if (Sports.Any())
                         {
-                            <option value="0">All Sports</option>
-                            @foreach (var item in PriceboostFilterModel.Sports)
+                            @foreach (var item in Sports)
                             {
-                                if (item.Value == PriceboostFilterModel.SportId)
+                                if (item.Value == SelectedSportId)
                                 {
                                     <option value="@item.Value" selected>@item.Name</option>
                                 }
@@ -49,12 +51,11 @@
                 <div class="segment-container me-4">
                     <label class="form-label d-block">Segment</label>
                     <select class="form-select d-block" @onchange="OnSegmentChangedEvent">
-                        @if (PriceboostFilterModel.Segments.Any())
+                        @if (Segments.Any())
                         {
-                            <option value="0">All Segments</option>
-                            @foreach (var item in PriceboostFilterModel.Segments)
+                            @foreach (var item in Segments)
                             {
-                                if (item.Value == PriceboostFilterModel.SegmentId)
+                                if (item.Value == SelectedSegmentId)
                                 {
                                     <option value="@item.Value" selected>@item.Name</option>
                                 }
@@ -73,12 +74,11 @@
                 <div class="league-container me-4">
                     <label class="form-label d-block">League</label>
                     <select class="form-select d-block" @onchange="OnLeagueChangedEvent">
-                        @if (PriceboostFilterModel.Leagues.Any())
+                        @if (Leagues.Any())
                         {
-                            <option value="0">All Leagues</option>
-                            @foreach (var item in PriceboostFilterModel.Leagues)
+                            @foreach (var item in Leagues)
                             {
-                                if (item.Value == PriceboostFilterModel.LeagueId)
+                                if (item.Value == SelectedLeagueId)
                                 {
                                     <option value="@item.Value" selected>@item.Name</option>
                                 }

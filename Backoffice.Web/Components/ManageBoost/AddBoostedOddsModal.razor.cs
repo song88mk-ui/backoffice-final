@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
@@ -10,45 +11,54 @@ namespace Backoffice.Web.Components.ManageBoost
     public partial class AddBoostedOddsModal : IDisposable
     {
         #region Properties
+
         [Inject] IModalService ModalService { get; set; }
         [Inject] ITradingService TradingService { get; set; }
         [Inject] IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
+
         public FixtureType SelectedFixtureType { get; set; }
-        public AddPriceBoostFilterModel AddPriceBoostFilterModel { get; set; }
+        public AddPriceBoostFilterModel Model { get; set; }
         public SportsTreeModel Sports { get; set; }        
-        public MarketFixtureResponse marketFixtureresponse { get; set; }
+        public MarketFixtureResponse MarketFixtureResponse { get; set; }
+
         public bool IsPreloader { get; set; }
-        public const string PreloaderInlineCss = "top:50%;transform:unset!important";        
+
         #endregion
+
+        #region Fields
+
+        public const string PreloaderInlineCss = "top:50%;transform:unset!important";
+
+        #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             IsPreloader = true;
             SelectedFixtureType = FixtureType.Match;
 
-            AddPriceBoostFilterModel = ModalParameters.TryGet<AddPriceBoostFilterModel>("AddPriceBoostFilterModel");            
+            Model = new AddPriceBoostFilterModel();            
 
-            if (AddPriceBoostFilterModel == null)
-            {
-                AddPriceBoostFilterModel = new AddPriceBoostFilterModel();
-                AddPriceBoostFilterModel.Sports = await GetSports(SelectedFixtureType);
-            }
+            Model.Sports = await GetSports(SelectedFixtureType);
 
             IsPreloader = false;
         }
+
         public async Task OnMatchTypeChanged(FixtureType fixtureType)
         {
             IsPreloader = true;
             SelectedFixtureType = fixtureType;
 
-            AddPriceBoostFilterModel = new AddPriceBoostFilterModel();
-            AddPriceBoostFilterModel.Sports = await GetSports(SelectedFixtureType);
+            Model = new AddPriceBoostFilterModel();
+            Model.Sports = await GetSports(SelectedFixtureType);
 
             IsPreloader = false;
-            await InvokeAsync(StateHasChanged);
         }
+
         public async Task OnCancelModalClick()
         {
             ModalService.Cancel();
@@ -56,152 +66,153 @@ namespace Backoffice.Web.Components.ManageBoost
 
         public async Task OnNextModalClick()
         {
-            if (AddPriceBoostFilterModel.SportId == 0 ||
-                AddPriceBoostFilterModel.SegmentId == 0 ||
-                AddPriceBoostFilterModel.LeagueId == 0 ||
-                string.IsNullOrEmpty(AddPriceBoostFilterModel.ProviderFixtureId) ||
-                string.IsNullOrEmpty(AddPriceBoostFilterModel.MarketTemplateId) ||
-                string.IsNullOrEmpty($"{AddPriceBoostFilterModel.SelectionTemplateId}{AddPriceBoostFilterModel.SelectionSpecifier}"))
+            if (Model.SportId == 0 ||
+                Model.SegmentId == 0 ||
+                Model.LeagueId == 0 ||
+                string.IsNullOrEmpty(Model.ProviderFixtureId) ||
+                string.IsNullOrEmpty(Model.MarketTemplateId) ||
+                string.IsNullOrEmpty($"{Model.SelectionTemplateId}{Model.SelectionSpecifier}"))
             {
                 return;
             }
 
-            AddPriceBoostFilterModel.PriceBoostConfigList = new List<Backoffice.Shared.Models.PriceBoostConfigModel>();
-            var clientModel = await GetClients();
-            clientModel.Clients = clientModel.Clients.Where(x => UserModel.ClientCodes.Contains(x.ClientCode)).ToList();
+            Model.PriceBoostConfigList = new List<PriceBoostConfigModel>();
 
-            if (!string.IsNullOrEmpty(AddPriceBoostFilterModel.ClientCode))
-                clientModel.Clients = clientModel.Clients.Where(c => c.ClientCode == AddPriceBoostFilterModel.ClientCode).ToList();
+            var clients = await GetClients();
 
-            var priceBoostList = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
+            var priceBoosts = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
             {
-                ClientCode = AddPriceBoostFilterModel.ClientCode,
-                SportId = AddPriceBoostFilterModel.SportId.ToString(),
-                SegmentId = AddPriceBoostFilterModel.SegmentId.ToString(),
-                LeagueId = AddPriceBoostFilterModel.LeagueId.ToString(),
-                ProviderFixtureId = AddPriceBoostFilterModel.ProviderFixtureId.ToString(),
-                MarketTemplateId = AddPriceBoostFilterModel.MarketTemplateId.ToString(),
-                SelectionTemplateId = AddPriceBoostFilterModel.SelectionTemplateId.ToString(),
-                SelectionSpecifier = AddPriceBoostFilterModel.SelectionSpecifier,
+                ClientCode = Model.ClientCode,
+                SportId = Model.SportId.ToString(),
+                SegmentId = Model.SegmentId.ToString(),
+                LeagueId = Model.LeagueId.ToString(),
+                ProviderFixtureId = Model.ProviderFixtureId.ToString(),
+                MarketTemplateId = Model.MarketTemplateId.ToString(),
+                SelectionTemplateId = Model.SelectionTemplateId.ToString(),
+                SelectionSpecifier = Model.SelectionSpecifier,
                 FixtureTypeId = (int)SelectedFixtureType,
-                MarketSpecifier = AddPriceBoostFilterModel.MarketSpecifier
+                MarketSpecifier = Model.MarketSpecifier
             })).Result;
 
-            foreach (var client in clientModel.Clients)
+            foreach (var client in clients)
             {
-                var priceboostConfig = new Backoffice.Shared.Models.PriceBoostConfigModel
+                var config = new PriceBoostConfigModel
                 {
                     ClientCode = client.ClientCode,
                     ClientId = client.ClientId.ToString(),
                     ClientName = client.ClientName,
-                    SportId = AddPriceBoostFilterModel.SportId,
-                    LeagueId = AddPriceBoostFilterModel.LeagueId,
-                    SegmentId = AddPriceBoostFilterModel.SegmentId,
+                    SportId = Model.SportId,
+                    LeagueId = Model.LeagueId,
+                    SegmentId = Model.SegmentId,
                     FixtureTypeId = (int) SelectedFixtureType,
-                    ProviderFixtureId = AddPriceBoostFilterModel.ProviderFixtureId,
-                    MarketTemplateId = AddPriceBoostFilterModel.MarketTemplateId,
-                    SelectionTemplateId = AddPriceBoostFilterModel.SelectionTemplateId,
-                    SelectionSpecifier = AddPriceBoostFilterModel.SelectionSpecifier,
+                    ProviderFixtureId = Model.ProviderFixtureId,
+                    MarketTemplateId = Model.MarketTemplateId,
+                    SelectionTemplateId = Model.SelectionTemplateId,
+                    SelectionSpecifier = Model.SelectionSpecifier,
                     UserId = UserModel.Id,
                     UserName = UserModel.UserName,
                     TimeStamp = DateTime.Now,
-                    MarketSpecifier = AddPriceBoostFilterModel.MarketSpecifier
+                    MarketSpecifier = Model.MarketSpecifier
                 };
 
-                if (priceBoostList != null)
+                if (priceBoosts != null)
                 {
-                    var priceBoost = priceBoostList.FirstOrDefault(c => c.ClientCode == client.ClientCode);
+                    var priceBoost = priceBoosts.FirstOrDefault(c => c.ClientCode == client.ClientCode);
+
                     if (priceBoost != null)
                     {
-                        priceboostConfig.FixtureName = priceBoost.FixtureName;
-                        priceboostConfig.SportId = priceBoost.SportId;
-                        priceboostConfig.SportName = priceBoost.SportName;
-                        priceboostConfig.SegmentId = priceBoost.SegmentId;
-                        priceboostConfig.SegmentName = priceBoost.SegmentName;
-                        priceboostConfig.LeagueId = priceBoost.LeagueId;
-                        priceboostConfig.LeagueName = priceBoost.LeagueName;
-                        priceboostConfig.SelectionTemplateId = priceBoost.SelectionTemplateId;
-                        priceboostConfig.SelectionSpecifier = priceBoost.SelectionSpecifier;
-                        priceboostConfig.SelectionName = priceBoost.SelectionName;
-                        priceboostConfig.MarketName = priceBoost.MarketName;
-                        priceboostConfig.MarketTemplateId = priceBoost.MarketTemplateId;
-                        priceboostConfig.CurrentPeriod = priceBoost.CurrentPeriod;
-                        priceboostConfig.CurrentMinute = priceBoost.CurrentMinute;
-                        priceboostConfig.FixtureStartDate = priceBoost.FixtureStartDate;
-                        priceboostConfig.FixtureStatusId = priceBoost.FixtureStatusId;
-                        priceboostConfig.Score = priceBoost.Score;
+                        config.FixtureName = priceBoost.FixtureName;
+                        config.SportId = priceBoost.SportId;
+                        config.SportName = priceBoost.SportName;
+                        config.SegmentId = priceBoost.SegmentId;
+                        config.SegmentName = priceBoost.SegmentName;
+                        config.LeagueId = priceBoost.LeagueId;
+                        config.LeagueName = priceBoost.LeagueName;
+                        config.SelectionTemplateId = priceBoost.SelectionTemplateId;
+                        config.SelectionSpecifier = priceBoost.SelectionSpecifier;
+                        config.SelectionName = priceBoost.SelectionName;
+                        config.MarketName = priceBoost.MarketName;
+                        config.MarketTemplateId = priceBoost.MarketTemplateId;
+                        config.CurrentPeriod = priceBoost.CurrentPeriod;
+                        config.CurrentMinute = priceBoost.CurrentMinute;
+                        config.FixtureStartDate = priceBoost.FixtureStartDate;
+                        config.FixtureStatusId = priceBoost.FixtureStatusId;
+                        config.Score = priceBoost.Score;
 
-                        priceboostConfig.BROdds = priceBoost.BROdds;
-                        priceboostConfig.ClientOdds = priceBoost.ClientOdds;
-                        priceboostConfig.BoostedOdds = priceBoost.BoostedOdds;
+                        config.BROdds = priceBoost.BROdds;
+                        config.ClientOdds = priceBoost.ClientOdds;
+                        config.BoostedOdds = priceBoost.BoostedOdds;
+
                         if (priceBoost.BoostedOdds != 0)
-                            priceboostConfig.BoostedOddsStr = priceBoost.BoostedOdds.ToString("0.00");
+                            config.BoostedOddsStr = priceBoost.BoostedOdds.ToString("0.00");
 
-                        priceboostConfig.BoostedSelectionName = priceBoost.BoostedSelectionName;
-                        priceboostConfig.BoostedSelectionTranslations = priceBoost.BoostedSelectionTranslations;
+                        config.BoostedSelectionName = priceBoost.BoostedSelectionName;
+                        config.BoostedSelectionTranslations = priceBoost.BoostedSelectionTranslations;
                     }
                 }
 
-                AddPriceBoostFilterModel.PriceBoostConfigList.Add(priceboostConfig);
+                Model.PriceBoostConfigList.Add(config);
             }
 
             var parameters = new ModalParameters();
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("AddPriceBoostFilterModel", AddPriceBoostFilterModel);
+            parameters.Add("AddPriceBoostFilterModel", Model);
 
             var options = new ModalOptions();
+
             options.HasHeaderBackButton = true;
-            options.CallbackObject = AddPriceBoostFilterModel;
-            //ModalService.Open<NextBoostModalBody>($"Add Boosted Odds - {(AddPriceBoostFilterModel.ShowMatchTypeMenu ? "Match Type" : "Outright")}", parameters, options);
+            options.CallbackObject = Model;
+
             ModalService.Open<NextBoostModalBody>("Add Boosted Odds", parameters, options);
         }
 
-        public async Task OnSportSelectChanged(ChangeEventArgs e)        
+        public async Task OnSportSelectChanged(ChangeEventArgs e)
         {
             IsPreloader = true;
-            AddPriceBoostFilterModel.SportId = int.Parse(e.Value.ToString());
-            AddPriceBoostFilterModel.SportName = AddPriceBoostFilterModel.Sports.Where(s => s.Value == AddPriceBoostFilterModel.SportId).FirstOrDefault().Name;
+            Model.SportId = int.Parse(e.Value.ToString());
+            Model.SportName = Model.Sports.Where(s => s.Value == Model.SportId).FirstOrDefault().Name;
 
-            AddPriceBoostFilterModel.Segments = new List<SelectListItemModel<int>>();
-            AddPriceBoostFilterModel.Leagues = new List<SelectListItemModel<int>>();
+            Model.Segments = new List<SelectListItemModel<int>>();
+            Model.Leagues = new List<SelectListItemModel<int>>();
 
-            AddPriceBoostFilterModel.Segments = await GetSegments(AddPriceBoostFilterModel.SportId);
-            if (AddPriceBoostFilterModel.Segments.Count > 0)
+            Model.Segments = await GetSegments(Model.SportId);
+            if (Model.Segments.Count > 0)
             {
-                AddPriceBoostFilterModel.SegmentId = AddPriceBoostFilterModel.Segments.FirstOrDefault()?.Value ?? 0;
-                AddPriceBoostFilterModel.SegmentName = AddPriceBoostFilterModel.Segments.Where(s => s.Value == AddPriceBoostFilterModel.SegmentId).FirstOrDefault().Name;
+                Model.SegmentId = Model.Segments.FirstOrDefault()?.Value ?? 0;
+                Model.SegmentName = Model.Segments.Where(s => s.Value == Model.SegmentId).FirstOrDefault().Name;
             }
 
-            AddPriceBoostFilterModel.Leagues = await GetLeagues(AddPriceBoostFilterModel.SportId, AddPriceBoostFilterModel.SegmentId);
-            if (AddPriceBoostFilterModel.Leagues.Count > 0)
+            Model.Leagues = await GetLeagues(Model.SportId, Model.SegmentId);
+            if (Model.Leagues.Count > 0)
             {
-                AddPriceBoostFilterModel.LeagueId = AddPriceBoostFilterModel.Leagues.FirstOrDefault()?.Value ?? 0;
-                AddPriceBoostFilterModel.LeagueName = AddPriceBoostFilterModel.Leagues.Where(s => s.Value == AddPriceBoostFilterModel.LeagueId).FirstOrDefault().Name;
+                Model.LeagueId = Model.Leagues.FirstOrDefault()?.Value ?? 0;
+                Model.LeagueName = Model.Leagues.Where(s => s.Value == Model.LeagueId).FirstOrDefault().Name;
             }
 
-            AddPriceBoostFilterModel.Fixtures = await GetFixtures(AddPriceBoostFilterModel.SportId, AddPriceBoostFilterModel.SegmentId, AddPriceBoostFilterModel.LeagueId);
-            if (AddPriceBoostFilterModel.Fixtures.Count > 0)
+            Model.Fixtures = await GetFixtures(Model.SportId, Model.SegmentId, Model.LeagueId);
+            if (Model.Fixtures.Count > 0)
             {
-                AddPriceBoostFilterModel.ProviderFixtureId = AddPriceBoostFilterModel.Fixtures.FirstOrDefault()?.Value ?? string.Empty;
-                AddPriceBoostFilterModel.FixtureName = string.IsNullOrEmpty(AddPriceBoostFilterModel.ProviderFixtureId) ? "" : AddPriceBoostFilterModel.Fixtures.Where(s => s.Value == AddPriceBoostFilterModel.ProviderFixtureId).FirstOrDefault().Name;
+                Model.ProviderFixtureId = Model.Fixtures.FirstOrDefault()?.Value ?? string.Empty;
+                Model.FixtureName = string.IsNullOrEmpty(Model.ProviderFixtureId) ? "" : Model.Fixtures.Where(s => s.Value == Model.ProviderFixtureId).FirstOrDefault().Name;
             }
 
-            AddPriceBoostFilterModel.Markets = await GetMarkets(AddPriceBoostFilterModel.ProviderFixtureId);
-            if (AddPriceBoostFilterModel.Markets.Count > 0)
+            Model.Markets = await GetMarkets(Model.ProviderFixtureId);
+            if (Model.Markets.Count > 0)
             {
-                AddPriceBoostFilterModel.MarketTemplateId = AddPriceBoostFilterModel.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
-                AddPriceBoostFilterModel.MarketSpecifier = AddPriceBoostFilterModel.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-                AddPriceBoostFilterModel.MarketName = string.IsNullOrEmpty(AddPriceBoostFilterModel.MarketTemplateId) ? "" : AddPriceBoostFilterModel.Markets.Where(s => s.Value == $"{AddPriceBoostFilterModel.MarketTemplateId}|{AddPriceBoostFilterModel.MarketSpecifier}").FirstOrDefault().Name;
-                AddPriceBoostFilterModel.MarketName = GetMarketName(AddPriceBoostFilterModel.MarketName, AddPriceBoostFilterModel.MarketSpecifier);
+                Model.MarketTemplateId = Model.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
+                Model.MarketSpecifier = Model.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
+                Model.MarketName = string.IsNullOrEmpty(Model.MarketTemplateId) ? "" : Model.Markets.Where(s => s.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}").FirstOrDefault().Name;
+                Model.MarketName = GetMarketName(Model.MarketName, Model.MarketSpecifier);
             }
 
-            AddPriceBoostFilterModel.Selections = await GetSelections(AddPriceBoostFilterModel.ProviderFixtureId, AddPriceBoostFilterModel.MarketTemplateId, AddPriceBoostFilterModel.MarketSpecifier);
-            if (AddPriceBoostFilterModel.Selections.Count > 0)
+            Model.Selections = await GetSelections(Model.ProviderFixtureId, Model.MarketTemplateId, Model.MarketSpecifier);
+            if (Model.Selections.Count > 0)
             {
-                AddPriceBoostFilterModel.SelectionTemplateId = AddPriceBoostFilterModel.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
-                AddPriceBoostFilterModel.SelectionSpecifier = AddPriceBoostFilterModel.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-                AddPriceBoostFilterModel.SelectionName = string.IsNullOrEmpty(AddPriceBoostFilterModel.SelectionTemplateId) ? "" : AddPriceBoostFilterModel.Selections.Where(s => s.Value == $"{AddPriceBoostFilterModel.SelectionTemplateId}|{AddPriceBoostFilterModel.SelectionSpecifier}").FirstOrDefault().Name;
+                Model.SelectionTemplateId = Model.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
+                Model.SelectionSpecifier = Model.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
+                Model.SelectionName = string.IsNullOrEmpty(Model.SelectionTemplateId) ? "" : Model.Selections.Where(s => s.Value == $"{Model.SelectionTemplateId}|{Model.SelectionSpecifier}").FirstOrDefault().Name;
             }
 
             IsPreloader = false;
@@ -211,29 +222,29 @@ namespace Backoffice.Web.Components.ManageBoost
         public async Task OnSegmentSelectChanged(ChangeEventArgs e)
         {
             IsPreloader = true;
-            AddPriceBoostFilterModel.SegmentId = int.Parse(e.Value.ToString());
-            AddPriceBoostFilterModel.SegmentName = AddPriceBoostFilterModel.Segments.Where(s => s.Value == AddPriceBoostFilterModel.SegmentId).FirstOrDefault().Name;
+            Model.SegmentId = int.Parse(e.Value.ToString());
+            Model.SegmentName = Model.Segments.Where(s => s.Value == Model.SegmentId).FirstOrDefault().Name;
 
-            AddPriceBoostFilterModel.Leagues = new List<SelectListItemModel<int>>();
+            Model.Leagues = new List<SelectListItemModel<int>>();
 
-            AddPriceBoostFilterModel.Leagues = await GetLeagues(AddPriceBoostFilterModel.SportId, AddPriceBoostFilterModel.SegmentId);
-            AddPriceBoostFilterModel.LeagueId = AddPriceBoostFilterModel.Leagues.FirstOrDefault()?.Value ?? 0;
-            AddPriceBoostFilterModel.LeagueName = AddPriceBoostFilterModel.Leagues.Where(s => s.Value == AddPriceBoostFilterModel.LeagueId).FirstOrDefault().Name;
+            Model.Leagues = await GetLeagues(Model.SportId, Model.SegmentId);
+            Model.LeagueId = Model.Leagues.FirstOrDefault()?.Value ?? 0;
+            Model.LeagueName = Model.Leagues.Where(s => s.Value == Model.LeagueId).FirstOrDefault().Name;
 
-            AddPriceBoostFilterModel.Fixtures = await GetFixtures(AddPriceBoostFilterModel.SportId, AddPriceBoostFilterModel.SegmentId, AddPriceBoostFilterModel.LeagueId);
-            AddPriceBoostFilterModel.ProviderFixtureId = AddPriceBoostFilterModel.Fixtures.FirstOrDefault()?.Value ?? string.Empty;
-            AddPriceBoostFilterModel.FixtureName = string.IsNullOrEmpty(AddPriceBoostFilterModel.ProviderFixtureId) ? "" : AddPriceBoostFilterModel.Fixtures.Where(s => s.Value == AddPriceBoostFilterModel.ProviderFixtureId).FirstOrDefault().Name;
+            Model.Fixtures = await GetFixtures(Model.SportId, Model.SegmentId, Model.LeagueId);
+            Model.ProviderFixtureId = Model.Fixtures.FirstOrDefault()?.Value ?? string.Empty;
+            Model.FixtureName = string.IsNullOrEmpty(Model.ProviderFixtureId) ? "" : Model.Fixtures.Where(s => s.Value == Model.ProviderFixtureId).FirstOrDefault().Name;
 
-            AddPriceBoostFilterModel.Markets = await GetMarkets(AddPriceBoostFilterModel.ProviderFixtureId);
-            AddPriceBoostFilterModel.MarketTemplateId = AddPriceBoostFilterModel.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
-            AddPriceBoostFilterModel.MarketSpecifier = AddPriceBoostFilterModel.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-            AddPriceBoostFilterModel.MarketName = string.IsNullOrEmpty(AddPriceBoostFilterModel.MarketTemplateId) ? "" : AddPriceBoostFilterModel.Markets.Where(s => s.Value == $"{AddPriceBoostFilterModel.MarketTemplateId}|{AddPriceBoostFilterModel.MarketSpecifier}").FirstOrDefault().Name;
-            AddPriceBoostFilterModel.MarketName = GetMarketName(AddPriceBoostFilterModel.MarketName, AddPriceBoostFilterModel.MarketSpecifier);
+            Model.Markets = await GetMarkets(Model.ProviderFixtureId);
+            Model.MarketTemplateId = Model.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
+            Model.MarketSpecifier = Model.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
+            Model.MarketName = string.IsNullOrEmpty(Model.MarketTemplateId) ? "" : Model.Markets.Where(s => s.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}").FirstOrDefault().Name;
+            Model.MarketName = GetMarketName(Model.MarketName, Model.MarketSpecifier);
 
-            AddPriceBoostFilterModel.Selections = await GetSelections(AddPriceBoostFilterModel.ProviderFixtureId, AddPriceBoostFilterModel.MarketTemplateId, AddPriceBoostFilterModel.MarketSpecifier);
-            AddPriceBoostFilterModel.SelectionTemplateId = AddPriceBoostFilterModel.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
-            AddPriceBoostFilterModel.SelectionSpecifier = AddPriceBoostFilterModel.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-            AddPriceBoostFilterModel.SelectionName = string.IsNullOrEmpty(AddPriceBoostFilterModel.SelectionTemplateId) ? "" : AddPriceBoostFilterModel.Selections.Where(s => s.Value == $"{AddPriceBoostFilterModel.SelectionTemplateId}|{AddPriceBoostFilterModel.SelectionSpecifier}").FirstOrDefault().Name;
+            Model.Selections = await GetSelections(Model.ProviderFixtureId, Model.MarketTemplateId, Model.MarketSpecifier);
+            Model.SelectionTemplateId = Model.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
+            Model.SelectionSpecifier = Model.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
+            Model.SelectionName = string.IsNullOrEmpty(Model.SelectionTemplateId) ? "" : Model.Selections.Where(s => s.Value == $"{Model.SelectionTemplateId}|{Model.SelectionSpecifier}").FirstOrDefault().Name;
 
             IsPreloader = false;
             await InvokeAsync(StateHasChanged);
@@ -242,23 +253,23 @@ namespace Backoffice.Web.Components.ManageBoost
         public async Task OnLeagueSelectChanged(ChangeEventArgs e)
         {
             IsPreloader = true;
-            AddPriceBoostFilterModel.LeagueId = int.Parse(e.Value.ToString());
-            AddPriceBoostFilterModel.LeagueName = AddPriceBoostFilterModel.Leagues.Where(s => s.Value == AddPriceBoostFilterModel.LeagueId).FirstOrDefault().Name;
+            Model.LeagueId = int.Parse(e.Value.ToString());
+            Model.LeagueName = Model.Leagues.Where(s => s.Value == Model.LeagueId).FirstOrDefault().Name;
 
-            AddPriceBoostFilterModel.Fixtures = await GetFixtures(AddPriceBoostFilterModel.SportId, AddPriceBoostFilterModel.SegmentId, AddPriceBoostFilterModel.LeagueId);
-            AddPriceBoostFilterModel.ProviderFixtureId = AddPriceBoostFilterModel.Fixtures.FirstOrDefault()?.Value ?? string.Empty;
-            AddPriceBoostFilterModel.FixtureName = string.IsNullOrEmpty(AddPriceBoostFilterModel.ProviderFixtureId) ? "" : AddPriceBoostFilterModel.Fixtures.Where(s => s.Value == AddPriceBoostFilterModel.ProviderFixtureId).FirstOrDefault().Name;
+            Model.Fixtures = await GetFixtures(Model.SportId, Model.SegmentId, Model.LeagueId);
+            Model.ProviderFixtureId = Model.Fixtures.FirstOrDefault()?.Value ?? string.Empty;
+            Model.FixtureName = string.IsNullOrEmpty(Model.ProviderFixtureId) ? "" : Model.Fixtures.Where(s => s.Value == Model.ProviderFixtureId).FirstOrDefault().Name;
 
-            AddPriceBoostFilterModel.Markets = await GetMarkets(AddPriceBoostFilterModel.ProviderFixtureId);
-            AddPriceBoostFilterModel.MarketTemplateId = AddPriceBoostFilterModel.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
-            AddPriceBoostFilterModel.MarketSpecifier = AddPriceBoostFilterModel.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-            AddPriceBoostFilterModel.MarketName = string.IsNullOrEmpty(AddPriceBoostFilterModel.MarketTemplateId) ? "" : AddPriceBoostFilterModel.Markets.Where(s => s.Value == $"{AddPriceBoostFilterModel.MarketTemplateId}|{AddPriceBoostFilterModel.MarketSpecifier}").FirstOrDefault().Name;
-            AddPriceBoostFilterModel.MarketName = GetMarketName(AddPriceBoostFilterModel.MarketName, AddPriceBoostFilterModel.MarketSpecifier);
+            Model.Markets = await GetMarkets(Model.ProviderFixtureId);
+            Model.MarketTemplateId = Model.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
+            Model.MarketSpecifier = Model.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
+            Model.MarketName = string.IsNullOrEmpty(Model.MarketTemplateId) ? "" : Model.Markets.Where(s => s.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}").FirstOrDefault().Name;
+            Model.MarketName = GetMarketName(Model.MarketName, Model.MarketSpecifier);
 
-            AddPriceBoostFilterModel.Selections = await GetSelections(AddPriceBoostFilterModel.ProviderFixtureId, AddPriceBoostFilterModel.MarketTemplateId, AddPriceBoostFilterModel.MarketSpecifier);
-            AddPriceBoostFilterModel.SelectionTemplateId = AddPriceBoostFilterModel.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
-            AddPriceBoostFilterModel.SelectionSpecifier = AddPriceBoostFilterModel.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-            AddPriceBoostFilterModel.SelectionName = string.IsNullOrEmpty(AddPriceBoostFilterModel.SelectionTemplateId) ? "" : AddPriceBoostFilterModel.Selections.Where(s => s.Value == $"{AddPriceBoostFilterModel.SelectionTemplateId}|{AddPriceBoostFilterModel.SelectionSpecifier}").FirstOrDefault().Name;
+            Model.Selections = await GetSelections(Model.ProviderFixtureId, Model.MarketTemplateId, Model.MarketSpecifier);
+            Model.SelectionTemplateId = Model.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
+            Model.SelectionSpecifier = Model.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
+            Model.SelectionName = string.IsNullOrEmpty(Model.SelectionTemplateId) ? "" : Model.Selections.Where(s => s.Value == $"{Model.SelectionTemplateId}|{Model.SelectionSpecifier}").FirstOrDefault().Name;
 
             IsPreloader = false;
             await InvokeAsync(StateHasChanged);
@@ -267,19 +278,19 @@ namespace Backoffice.Web.Components.ManageBoost
         public async Task OnFixtureSelectChanged(ChangeEventArgs e)
         {
             IsPreloader = true;
-            AddPriceBoostFilterModel.ProviderFixtureId = e.Value.ToString();
-            AddPriceBoostFilterModel.FixtureName = string.IsNullOrEmpty(AddPriceBoostFilterModel.ProviderFixtureId) ? "" : AddPriceBoostFilterModel.Fixtures.Where(s => s.Value == AddPriceBoostFilterModel.ProviderFixtureId).FirstOrDefault().Name;
+            Model.ProviderFixtureId = e.Value.ToString();
+            Model.FixtureName = string.IsNullOrEmpty(Model.ProviderFixtureId) ? "" : Model.Fixtures.Where(s => s.Value == Model.ProviderFixtureId).FirstOrDefault().Name;
 
-            AddPriceBoostFilterModel.Markets = await GetMarkets(AddPriceBoostFilterModel.ProviderFixtureId);
-            AddPriceBoostFilterModel.MarketTemplateId = AddPriceBoostFilterModel.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
-            AddPriceBoostFilterModel.MarketSpecifier = AddPriceBoostFilterModel.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-            AddPriceBoostFilterModel.MarketName = string.IsNullOrEmpty(AddPriceBoostFilterModel.MarketTemplateId) ? "" : AddPriceBoostFilterModel.Markets.Where(s => s.Value == $"{AddPriceBoostFilterModel.MarketTemplateId}|{AddPriceBoostFilterModel.MarketSpecifier}").FirstOrDefault().Name;
-            AddPriceBoostFilterModel.MarketName = GetMarketName(AddPriceBoostFilterModel.MarketName, AddPriceBoostFilterModel.MarketSpecifier);
+            Model.Markets = await GetMarkets(Model.ProviderFixtureId);
+            Model.MarketTemplateId = Model.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
+            Model.MarketSpecifier = Model.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
+            Model.MarketName = string.IsNullOrEmpty(Model.MarketTemplateId) ? "" : Model.Markets.Where(s => s.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}").FirstOrDefault().Name;
+            Model.MarketName = GetMarketName(Model.MarketName, Model.MarketSpecifier);
 
-            AddPriceBoostFilterModel.Selections = await GetSelections(AddPriceBoostFilterModel.ProviderFixtureId, AddPriceBoostFilterModel.MarketTemplateId, AddPriceBoostFilterModel.MarketSpecifier);
-            AddPriceBoostFilterModel.SelectionTemplateId = AddPriceBoostFilterModel.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
-            AddPriceBoostFilterModel.SelectionSpecifier = AddPriceBoostFilterModel.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-            AddPriceBoostFilterModel.SelectionName = string.IsNullOrEmpty(AddPriceBoostFilterModel.SelectionTemplateId) ? "" : AddPriceBoostFilterModel.Selections.Where(s => s.Value == $"{AddPriceBoostFilterModel.SelectionTemplateId}|{AddPriceBoostFilterModel.SelectionSpecifier}").FirstOrDefault().Name;
+            Model.Selections = await GetSelections(Model.ProviderFixtureId, Model.MarketTemplateId, Model.MarketSpecifier);
+            Model.SelectionTemplateId = Model.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
+            Model.SelectionSpecifier = Model.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
+            Model.SelectionName = string.IsNullOrEmpty(Model.SelectionTemplateId) ? "" : Model.Selections.Where(s => s.Value == $"{Model.SelectionTemplateId}|{Model.SelectionSpecifier}").FirstOrDefault().Name;
 
             IsPreloader = false;
             await InvokeAsync(StateHasChanged);
@@ -289,15 +300,15 @@ namespace Backoffice.Web.Components.ManageBoost
         {
             IsPreloader = true;
 
-            AddPriceBoostFilterModel.MarketTemplateId = e.Value.ToString().Split('|')[0] ?? string.Empty;
-            AddPriceBoostFilterModel.MarketSpecifier = e.Value.ToString().Split('|')[1] ?? string.Empty;
-            AddPriceBoostFilterModel.MarketName = string.IsNullOrEmpty(AddPriceBoostFilterModel.MarketTemplateId) ? "" : AddPriceBoostFilterModel.Markets.Where(s => s.Value == $"{AddPriceBoostFilterModel.MarketTemplateId}|{AddPriceBoostFilterModel.MarketSpecifier}").FirstOrDefault().Name;
-            AddPriceBoostFilterModel.MarketName = GetMarketName(AddPriceBoostFilterModel.MarketName, AddPriceBoostFilterModel.MarketSpecifier);
+            Model.MarketTemplateId = e.Value.ToString().Split('|')[0] ?? string.Empty;
+            Model.MarketSpecifier = e.Value.ToString().Split('|')[1] ?? string.Empty;
+            Model.MarketName = string.IsNullOrEmpty(Model.MarketTemplateId) ? "" : Model.Markets.Where(s => s.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}").FirstOrDefault().Name;
+            Model.MarketName = GetMarketName(Model.MarketName, Model.MarketSpecifier);
 
-            AddPriceBoostFilterModel.Selections = await GetSelections(AddPriceBoostFilterModel.ProviderFixtureId, AddPriceBoostFilterModel.MarketTemplateId, AddPriceBoostFilterModel.MarketSpecifier);
-            AddPriceBoostFilterModel.SelectionTemplateId = AddPriceBoostFilterModel.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
-            AddPriceBoostFilterModel.SelectionSpecifier = AddPriceBoostFilterModel.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-            AddPriceBoostFilterModel.SelectionName = string.IsNullOrEmpty(AddPriceBoostFilterModel.SelectionTemplateId) ? "" : AddPriceBoostFilterModel.Selections.Where(s => s.Value == $"{AddPriceBoostFilterModel.SelectionTemplateId}|{AddPriceBoostFilterModel.SelectionSpecifier}").FirstOrDefault().Name;
+            Model.Selections = await GetSelections(Model.ProviderFixtureId, Model.MarketTemplateId, Model.MarketSpecifier);
+            Model.SelectionTemplateId = Model.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
+            Model.SelectionSpecifier = Model.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
+            Model.SelectionName = string.IsNullOrEmpty(Model.SelectionTemplateId) ? "" : Model.Selections.Where(s => s.Value == $"{Model.SelectionTemplateId}|{Model.SelectionSpecifier}").FirstOrDefault().Name;
 
             IsPreloader = false;
             await InvokeAsync(StateHasChanged);
@@ -305,27 +316,24 @@ namespace Backoffice.Web.Components.ManageBoost
 
         public async Task OnSelectionSelectChanged(ChangeEventArgs e)
         {
-            IsPreloader = true;
-
             if (!string.IsNullOrEmpty(e.Value.ToString()))
             {
-                AddPriceBoostFilterModel.SelectionTemplateId = e.Value.ToString();
-                AddPriceBoostFilterModel.SelectionTemplateId = e.Value.ToString().Split('|')[0] ?? string.Empty;
-                AddPriceBoostFilterModel.SelectionSpecifier = e.Value.ToString().Split('|')[1] ?? string.Empty;
-                AddPriceBoostFilterModel.SelectionName = string.IsNullOrEmpty(AddPriceBoostFilterModel.SelectionTemplateId) ? "" : AddPriceBoostFilterModel.Selections.Where(s => s.Value == $"{AddPriceBoostFilterModel.SelectionTemplateId}|{AddPriceBoostFilterModel.SelectionSpecifier}").FirstOrDefault().Name;
+                Model.SelectionTemplateId = e.Value.ToString();
+                Model.SelectionTemplateId = e.Value.ToString().Split('|')[0] ?? string.Empty;
+                Model.SelectionSpecifier = e.Value.ToString().Split('|')[1] ?? string.Empty;
+                Model.SelectionName = string.IsNullOrEmpty(Model.SelectionTemplateId) ? "" : Model.Selections.Where(c => c.Value == $"{Model.SelectionTemplateId}|{Model.SelectionSpecifier}").FirstOrDefault().Name;
             }
-
-            IsPreloader = false;
-            await InvokeAsync(StateHasChanged);
         }
 
         public void Dispose()
         {
             
         }
+
         #endregion
 
         #region Utilities
+
         private async Task<List<SelectListItemModel<int>>> GetSports(FixtureType fixtureType)
         {
             Sports = new SportsTreeModel();
@@ -388,7 +396,7 @@ namespace Backoffice.Web.Components.ManageBoost
         {            
             if (SelectedFixtureType == FixtureType.Match)
             {
-                marketFixtureresponse = (await TradingService.GetSportsBookFixtures(new MarketFixtureRequest
+                MarketFixtureResponse = (await TradingService.GetSportsBookFixtures(new MarketFixtureRequest
                 {
                     FixtureTypeId = (int)SelectedFixtureType,
                     LeagueId = leagueId,
@@ -399,7 +407,7 @@ namespace Backoffice.Web.Components.ManageBoost
             }
             else
             {
-                marketFixtureresponse = (await TradingService.GetSportsBookOutrightFixtures(new MarketFixtureRequest
+                MarketFixtureResponse = (await TradingService.GetSportsBookOutrightFixtures(new MarketFixtureRequest
                 {
                     FixtureTypeId = (int)SelectedFixtureType,
                     LeagueId = leagueId,
@@ -409,30 +417,31 @@ namespace Backoffice.Web.Components.ManageBoost
 
             }
 
-            if (marketFixtureresponse == null)
+            if (MarketFixtureResponse == null)
                 return new List<SelectListItemModel<string>>();
 
-            if (marketFixtureresponse.Fixtures.Count > 0)
-                marketFixtureresponse.Fixtures = marketFixtureresponse.Fixtures.Where(f => f.FixtureStatusId < 1).ToList();
+            if (MarketFixtureResponse.Fixtures.Count > 0)
+                MarketFixtureResponse.Fixtures = MarketFixtureResponse.Fixtures.Where(f => f.FixtureStatusId < 1).ToList();
 
-            if (marketFixtureresponse.Fixtures.Count == 0)
+            if (MarketFixtureResponse.Fixtures.Count == 0)
                 return new List<SelectListItemModel<string>>();
 
-            var fixtures = marketFixtureresponse.Fixtures.Select(s => new SelectListItemModel<string>()
+            var fixtures = MarketFixtureResponse.Fixtures.Select(s => new SelectListItemModel<string>
             {
                 Value = s.ProviderFixtureId,
                 Name = s.FixtureName
-            }).Distinct().ToList();
+            }).Distinct()
+            .ToList();
 
             return fixtures.OrderBy(o => o.Name).ToList();
         }
 
         private async Task<List<SelectListItemModel<string>>> GetMarkets(string providerFixtureId)
         {
-            if (marketFixtureresponse == null)
+            if (MarketFixtureResponse == null)
                 return new List<SelectListItemModel<string>>();
 
-            var fixture = marketFixtureresponse.Fixtures.Where(f => f.ProviderFixtureId == providerFixtureId).FirstOrDefault();
+            var fixture = MarketFixtureResponse.Fixtures.Where(f => f.ProviderFixtureId == providerFixtureId).FirstOrDefault();
             if (fixture == null)
                 return new List<SelectListItemModel<string>>();
 
@@ -447,10 +456,10 @@ namespace Backoffice.Web.Components.ManageBoost
 
         private async Task<List<SelectListItemModel<string>>> GetSelections(string providerFixtureId, string marketTemplateId, string marketSpecifier)
         {
-            if (marketFixtureresponse == null)
+            if (MarketFixtureResponse == null)
                 return new List<SelectListItemModel<string>>();
 
-            var fixture = marketFixtureresponse.Fixtures.Where(f => f.ProviderFixtureId == providerFixtureId).FirstOrDefault();
+            var fixture = MarketFixtureResponse.Fixtures.Where(f => f.ProviderFixtureId == providerFixtureId).FirstOrDefault();
             if (fixture == null)
                 return new List<SelectListItemModel<string>>();
 
@@ -474,10 +483,14 @@ namespace Backoffice.Web.Components.ManageBoost
             return selections.OrderBy(m => m.Name).ToList();
         }
 
-        private async Task<ClientModel> GetClients()
+        private async Task<List<ClientInformationModel>> GetClients()
         {
-            ClientModel clients = new ClientModel();
-            clients = (await BackOfficeService.GetClients()).Result;
+            var clients = (await TradingService.GetClientList()).Result;
+
+            clients = clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode)).ToList();
+
+            if (!string.IsNullOrEmpty(Model.ClientCode))
+                clients = clients.Where(c => c.ClientCode == Model.ClientCode).ToList();
 
             return clients;
         }
@@ -500,6 +513,7 @@ namespace Backoffice.Web.Components.ManageBoost
             else
                 return marketName;
         }
+
         #endregion
     }
 }
