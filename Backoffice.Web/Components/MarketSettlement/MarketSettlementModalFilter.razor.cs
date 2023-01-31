@@ -15,7 +15,8 @@ namespace Backoffice.Web.Components.MarketSettlement
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [Parameter] public EventCallback<AddMarketSettlementModel> OnUpdateRowCallback { get; set; }
-        [Parameter] public AddMarketSettlementModel AddMarketSettlement { get; set; }
+        [Parameter] public AddMarketSettlementModel AddMarketSettlement { get; set; } = new AddMarketSettlementModel();
+        [Parameter] public EventCallback<AddMarketSettlementModel> FilterChanged { get; set; }
         [Parameter] public EventCallback<Tuple<MarketFixtureResponse, MarketFixtureResponse>> OnLeagueChangedCallback { get; set; }
         public MarketFixtureResponse MarketFixtures { get; set; }
         public MarketFixtureResponse MarketOutrightFixtures { get; set; }
@@ -29,7 +30,7 @@ namespace Backoffice.Web.Components.MarketSettlement
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            AddMarketSettlement = null;
+            AddMarketSettlement = new AddMarketSettlementModel();
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -56,7 +57,7 @@ namespace Backoffice.Web.Components.MarketSettlement
                 AddMarketSettlement.LeagueId = 0;
                 AddMarketSettlement.FixtureId = string.Empty;
                 AddMarketSettlement.MarketId = string.Empty;
-                StateHasChanged();
+                await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
             }
         }
         public async Task OnSportChangedEvent(ChangeEventArgs e)
@@ -151,7 +152,7 @@ namespace Backoffice.Web.Components.MarketSettlement
             await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
         }
 
-        public async Task OnBetIdChangedEvent(ChangeEventArgs e)
+        public async Task OnBetIdChangedEvent()
         {
             await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
         }

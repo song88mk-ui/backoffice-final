@@ -16,7 +16,7 @@
                 <div class="col-md-12">
                     @foreach (var alert in Alerts)
                     {
-                        <AlertMessage AlertStatus="@alert.AlertStatus" AlertMessageStr="@alert.AltertMessage" Opacity="@alert.Opacity" />
+                        <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" />
                     }
                 </div>
             }

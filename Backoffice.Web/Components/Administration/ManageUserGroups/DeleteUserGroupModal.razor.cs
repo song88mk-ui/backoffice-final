@@ -43,8 +43,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = "Cannot delete this user group",
+                        Status = "Error",
+                        Message = "Cannot delete this user group",
                         Opacity = 1.0m
                     });
                     return;
@@ -73,8 +73,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Success",
-                        AltertMessage = "User Group successfully deleted",
+                        Status = "Success",
+                        Message = "User Group successfully deleted",
                         Opacity = 1.0m
                     });
 
@@ -89,8 +89,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = $"{response.Message}",
+                        Status = "Error",
+                        Message = $"{response.Message}",
                         Opacity = 1.0m
                     });
                 }

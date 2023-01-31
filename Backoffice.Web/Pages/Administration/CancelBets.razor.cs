@@ -90,8 +90,8 @@ namespace Backoffice.Web.Pages.Administration
                     {
                         Alerts.Add(new AlertModel
                         {
-                            AlertStatus = "Error",
-                            AltertMessage = $"Invalid Bet Reference Id {bet.BetReferenceId.Trim()}",
+                            Status = "Error",
+                            Message = $"Invalid Bet Reference Id {bet.BetReferenceId.Trim()}",
                             Opacity = 1.0m
                         });
                     }
@@ -101,8 +101,8 @@ namespace Backoffice.Web.Pages.Administration
                     {
                         Alerts.Add(new AlertModel
                         {
-                            AlertStatus = "Error",
-                            AltertMessage = $"Duplicate Bet Reference Id found. {bet.BetReferenceId.Trim()}",
+                            Status = "Error",
+                            Message = $"Duplicate Bet Reference Id found. {bet.BetReferenceId.Trim()}",
                             Opacity = 1.0m
                         });
                     }
@@ -115,8 +115,8 @@ namespace Backoffice.Web.Pages.Administration
             {
                 Alerts.Add(new AlertModel
                 {
-                    AlertStatus = "Error",
-                    AltertMessage = $"At least 1 Bet Reference Id is required.",
+                    Status = "Error",
+                    Message = $"At least 1 Bet Reference Id is required.",
                     Opacity = 1.0m
                 });
             }
@@ -125,8 +125,8 @@ namespace Backoffice.Web.Pages.Administration
             {
                 Alerts.Add(new AlertModel
                 {
-                    AlertStatus = "Error",
-                    AltertMessage = $"Please specify reason for canceling bet/s.",
+                    Status = "Error",
+                    Message = $"Please specify reason for canceling bet/s.",
                     Opacity = 1.0m
                 });
             }

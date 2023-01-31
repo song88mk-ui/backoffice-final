@@ -2,3 +2,41 @@
     background-color: #FFFFFF;
     border-radius: 3px;
 }
+.table-head {
+    background-color: #354156;
+    color: #fff;
+}
+
+.table > tbody > tr:nth-child(2n) > td, .table > tbody > tr:nth-child(2n) > th {
+    background-color: #F5F5F5;
+}
+
+.table thead th, .table tbody td, ::deep .table tfoot td {
+    font-size: 0.8rem;
+    font-weight: inherit;
+    vertical-align: middle;
+}
+
+table thead th {
+    text-align: center;
+}
+
+    table thead th:first-child {
+        border-top-left-radius: 3px;
+    }
+
+    table thead th:last-child {
+        border-top-right-radius: 3px;
+    }
+
+table tfoot td:first-child {
+    border-bottom-left-radius: 3px;
+}
+
+table tfoot td:last-child {
+    border-bottom-right-radius: 3px;
+}
+
+.table-head th, ::deep .table tfoot td {
+    border-width: 1px 0;
+}

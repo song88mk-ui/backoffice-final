@@ -266,12 +266,12 @@ namespace Backoffice.Web.Components.Clients
                 {
                     foreach(var message in EditContext.GetValidationMessages().ToList())
                     {
-                        if(!Alerts.Any(a => a.AltertMessage == message))
+                        if(!Alerts.Any(a => a.Message == message))
                         {
                             Alerts.Add(new AlertModel
                             {
-                                AlertStatus = "Error",
-                                AltertMessage = $"{message}",
+                                Status = "Error",
+                                Message = $"{message}",
                                 Opacity = 1.0m
                             });
                         }
@@ -283,8 +283,8 @@ namespace Backoffice.Web.Components.Clients
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = "Business Name is required",
+                        Status = "Error",
+                        Message = "Business Name is required",
                         Opacity = 1.0m
                     });
                 }
@@ -293,8 +293,8 @@ namespace Backoffice.Web.Components.Clients
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = "Brand Name is required",
+                        Status = "Error",
+                        Message = "Brand Name is required",
                         Opacity = 1.0m
                     });
                 }
@@ -307,12 +307,12 @@ namespace Backoffice.Web.Components.Clients
                     if(setting.BetSettingSoccer.MaxPerGame > 0 && setting.BetSettingSoccer.MaxPerGame < setting.BetSettingSoccer.MaxPerTicket)
                     {
                         var message = $"MaxPerGame must be greater than or equal {setting.BetSettingSoccer.MaxPerTicket}";
-                        if (!Alerts.Any(a => a.AltertMessage == message))
+                        if (!Alerts.Any(a => a.Message == message))
                         {
                             Alerts.Add(new AlertModel
                             {
-                                AlertStatus = "Error",
-                                AltertMessage = message,
+                                Status = "Error",
+                                Message = message,
                                 Opacity = 1.0m
                             });
                         }
@@ -321,12 +321,12 @@ namespace Backoffice.Web.Components.Clients
                     if (setting.BetSettingAllSports.MaxPerGame > 0 && setting.BetSettingAllSports.MaxPerGame < setting.BetSettingAllSports.MaxPerTicket)
                     {
                         var message = $"MaxPerGame must be greater than or equal {setting.BetSettingAllSports.MaxPerTicket}";
-                        if (!Alerts.Any(a => a.AltertMessage == message))
+                        if (!Alerts.Any(a => a.Message == message))
                         {
                             Alerts.Add(new AlertModel
                             {
-                                AlertStatus = "Error",
-                                AltertMessage = message,
+                                Status = "Error",
+                                Message = message,
                                 Opacity = 1.0m
                             });
                         }
@@ -335,12 +335,12 @@ namespace Backoffice.Web.Components.Clients
                     if (setting.BetSettingCricket.MaxPerGame > 0 && setting.BetSettingCricket.MaxPerGame < setting.BetSettingCricket.MaxPerTicket)
                     {
                         var message = $"MaxPerGame must be greater than or equal {setting.BetSettingCricket.MaxPerTicket}";
-                        if (!Alerts.Any(a => a.AltertMessage == message))
+                        if (!Alerts.Any(a => a.Message == message))
                         {
                             Alerts.Add(new AlertModel
                             {
-                                AlertStatus = "Error",
-                                AltertMessage = message,
+                                Status = "Error",
+                                Message = message,
                                 Opacity = 1.0m
                             });
                         }
@@ -470,8 +470,8 @@ namespace Backoffice.Web.Components.Clients
                     {
                         Alerts.Add(new AlertModel
                         {
-                            AlertStatus = "Success",
-                            AltertMessage = "Client successfully updated",
+                            Status = "Success",
+                            Message = "Client successfully updated",
                             Opacity = 1.0m
                         });
                     }
@@ -479,8 +479,8 @@ namespace Backoffice.Web.Components.Clients
                     {
                         Alerts.Add(new AlertModel
                         {
-                            AlertStatus = "Success",
-                            AltertMessage = "Client successfully created",
+                            Status = "Success",
+                            Message = "Client successfully created",
                             Opacity = 1.0m
                         });
                     }
@@ -497,8 +497,8 @@ namespace Backoffice.Web.Components.Clients
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = $"{response.Message}",
+                        Status = "Error",
+                        Message = $"{response.Message}",
                         Opacity = 1.0m
                     });
                 }

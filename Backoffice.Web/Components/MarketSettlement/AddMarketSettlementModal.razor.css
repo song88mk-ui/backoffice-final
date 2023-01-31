@@ -17,3 +17,37 @@
     opacity: 1;
     background: transparent linear-gradient(268deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
+.table > tbody > tr:nth-child(2n) > td, .table > tbody > tr:nth-child(2n) > th {
+    background-color: #F5F5F5;
+}
+
+.table-head {
+    background-color: #354156;
+    color: #fff;
+}
+
+.table thead th, .table tbody td, ::deep .table tfoot td {
+    font-size: 0.9rem;
+    font-weight: inherit;
+    vertical-align: middle;
+}
+
+table thead th, table tbody tr {
+    text-align: center;
+}
+
+    table thead th:first-child {
+        border-top-left-radius: 3px;
+    }
+
+    table thead th:last-child {
+        border-top-right-radius: 3px;
+    }
+
+table tfoot td:first-child {
+    border-bottom-left-radius: 3px;
+}
+
+table tfoot td:last-child {
+    border-bottom-right-radius: 3px;
+}

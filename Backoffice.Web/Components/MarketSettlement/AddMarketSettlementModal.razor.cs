@@ -22,11 +22,13 @@ namespace Backoffice.Web.Components.MarketSettlement
         public bool IsPreLoader { get; set; }
         public MarketFixtureResponse MarketFixtures { get; set; }
         public MarketFixtureResponse MarketOutrightFixtures { get; set; }
+        private AlertModel _alertModel { get; set; }
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
         {
             AddMarketSettlement = null;
+            _alertModel = new AlertModel();
         }
 
         public async Task OnAddStatusChange(ChangeEventArgs e, int rowCount)
@@ -51,6 +53,8 @@ namespace Backoffice.Web.Components.MarketSettlement
 
         public async Task UpdateRowDetails(AddMarketSettlementModel AddMarketSettlement)
         {
+
+            _alertModel = new AlertModel();
             this.AddMarketSettlement = AddMarketSettlement;
             AddMarketSettlement.AddMarketSettlementSelections = new List<AddMarketSettlementSelectionModel>();
 
@@ -284,6 +288,13 @@ namespace Backoffice.Web.Components.MarketSettlement
                 if (string.IsNullOrEmpty(row.FixtureId) || string.IsNullOrEmpty(row.MarketId) || string.IsNullOrEmpty(row.SelectionId)
                     || string.IsNullOrEmpty(row.FixtureName) || row.ToStatus == 0 || string.IsNullOrEmpty(row.Reason))
                 {
+                    _alertModel = new AlertModel()
+                    {
+                        Status = "Error",
+                        Message = "Error! All fields cannot be empty. Please fill in accordingly or remove the empty row",
+                        Opacity = 1.0m,
+                    };
+                    StateHasChanged();
                     return;
                 }
 
@@ -388,9 +399,12 @@ namespace Backoffice.Web.Components.MarketSettlement
             }
             else
             {
-                //AlertStatus = string.Empty;
-                //AlertMessages = "Market Settlement Failed!";
-                //Opacity = 1.0m;
+                _alertModel = new AlertModel()
+                {
+                    Status = "Error",
+                    Message = "Market Settlement Failed!",
+                    Opacity = 1.0m,
+                };
             }
             //await Notification();
 

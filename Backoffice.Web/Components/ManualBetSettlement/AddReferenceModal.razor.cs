@@ -74,8 +74,8 @@ namespace Backoffice.Web.Components.ManualBetSettlement
 
                     Alerts.Add(new AlertModel()
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = "Duplicate BetId's are not allowerd",
+                        Status = "Error",
+                        Message = "Duplicate BetId's are not allowerd",
                         Opacity = 1.0m
                     });
                 }

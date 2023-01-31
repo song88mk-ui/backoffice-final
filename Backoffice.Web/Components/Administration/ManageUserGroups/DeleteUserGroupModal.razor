@@ -13,12 +13,12 @@
 <div class="modal-footer">
     @if (Alerts != null && Alerts.Any())
     {
-            <div class="col-md-8">
+        <div class="col-md-8">
             @foreach (var alert in Alerts)
             {
-                        <AlertMessage AlertStatus="@alert.AlertStatus" AlertMessageStr="@alert.AltertMessage" Opacity="@alert.Opacity" />
+                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" />
             }
-            </div>
+        </div>
     }
     <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent">Close</button>
     <button type="button" class="btn modal-btn modal-apply" @onclick="OnDeleteClickEvent">Apply</button>

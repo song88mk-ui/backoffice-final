@@ -152,8 +152,8 @@ namespace Backoffice.Web.Components.SubUser
             {
                 Alerts.Add(new AlertModel
                 {
-                    AlertStatus = "Error",
-                    AltertMessage = "Sub Username is required",
+                    Status = "Error",
+                    Message = "Sub Username is required",
                     Opacity = 1.0m
                 });
             }
@@ -162,8 +162,8 @@ namespace Backoffice.Web.Components.SubUser
             {
                 Alerts.Add(new AlertModel
                 {
-                    AlertStatus = "Error",
-                    AltertMessage = "Nickname is required",
+                    Status = "Error",
+                    Message = "Nickname is required",
                     Opacity = 1.0m
                 });
             }
@@ -172,8 +172,8 @@ namespace Backoffice.Web.Components.SubUser
             {
                 Alerts.Add(new AlertModel
                 {
-                    AlertStatus = "Error",
-                    AltertMessage = "Password is required",
+                    Status = "Error",
+                    Message = "Password is required",
                     Opacity = 1.0m
                 });
             }
@@ -181,8 +181,8 @@ namespace Backoffice.Web.Components.SubUser
             {
                 Alerts.Add(new AlertModel
                 {
-                    AlertStatus = "Error",
-                    AltertMessage = "Password length must be between 8 to 15",
+                    Status = "Error",
+                    Message = "Password length must be between 8 to 15",
                     Opacity = 1.0m
 
                 });
@@ -225,8 +225,8 @@ namespace Backoffice.Web.Components.SubUser
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Success",
-                        AltertMessage = "Sub user successfully updated",
+                        Status = "Success",
+                        Message = "Sub user successfully updated",
                         Opacity = 1.0m
 
                     });
@@ -241,8 +241,8 @@ namespace Backoffice.Web.Components.SubUser
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = $"{response.Message}",
+                        Status = "Error",
+                        Message = $"{response.Message}",
                         Opacity = 1.0m
                     });
                 }
@@ -256,8 +256,8 @@ namespace Backoffice.Web.Components.SubUser
 
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Success",
-                        AltertMessage = "Sub user successfully created",
+                        Status = "Success",
+                        Message = "Sub user successfully created",
                         Opacity = 1.0m
 
                     });
@@ -272,8 +272,8 @@ namespace Backoffice.Web.Components.SubUser
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = $"{response.Message}",
+                        Status = "Error",
+                        Message = $"{response.Message}",
                         Opacity = 1.0m
                     });
                 }

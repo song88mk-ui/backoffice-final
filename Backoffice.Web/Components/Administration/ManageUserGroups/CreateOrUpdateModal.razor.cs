@@ -88,8 +88,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = "User Group Name is required",
+                        Status = "Error",
+                        Message = "User Group Name is required",
                         Opacity = 1.0m
                     });
                 }
@@ -98,8 +98,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = "Invalid User Group Name ",
+                        Status = "Error",
+                        Message = "Invalid User Group Name ",
                         Opacity = 1.0m
                     });
                 }
@@ -151,8 +151,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                     {
                         Alerts.Add(new AlertModel
                         {
-                            AlertStatus = "Success",
-                            AltertMessage = "User Group successfully updated",
+                            Status = "Success",
+                            Message = "User Group successfully updated",
                             Opacity = 1.0m
                         });
                     }
@@ -160,8 +160,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                     {
                         Alerts.Add(new AlertModel
                         {
-                            AlertStatus = "Success",
-                            AltertMessage = "User Group successfully created",
+                            Status = "Success",
+                            Message = "User Group successfully created",
                             Opacity = 1.0m
                         });
                     }
@@ -178,8 +178,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = $"{response.Message}",
+                        Status = "Error",
+                        Message = $"{response.Message}",
                         Opacity = 1.0m
                     });
                 }

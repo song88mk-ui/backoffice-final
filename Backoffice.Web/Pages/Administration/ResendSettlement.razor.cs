@@ -133,8 +133,8 @@ namespace Backoffice.Web.Pages.Administration
         {
             Alerts.Add(new AlertModel()
             {
-                AlertStatus = response.StatusCode.ToString(),
-                AltertMessage = response.Message,
+                Status = response.StatusCode.ToString(),
+                Message = response.Message,
                 Opacity = 1.0m
             });
 

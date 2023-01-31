@@ -55,8 +55,8 @@ namespace Backoffice.Web.Components.Administration.CancelBets
                 {
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Error",
-                        AltertMessage = $"Only Running Status should be settled as Cancelled",
+                        Status = "Error",
+                        Message = $"Only Running Status should be settled as Cancelled",
                         Opacity = 1.0m
                     });
                     return;
@@ -109,8 +109,8 @@ namespace Backoffice.Web.Components.Administration.CancelBets
 
                     Alerts.Add(new AlertModel
                     {
-                        AlertStatus = "Success",
-                        AltertMessage = "Bet has been successfully cancelled",
+                        Status = "Success",
+                        Message = "Bet has been successfully cancelled",
                         Opacity = 1.0m
                     });
 
@@ -131,8 +131,8 @@ namespace Backoffice.Web.Components.Administration.CancelBets
                             {
                                 Alerts.Add(new AlertModel
                                 {
-                                    AlertStatus = "Error",
-                                    AltertMessage = $"{data.Message}",
+                                    Status = "Error",
+                                    Message = $"{data.Message}",
                                     Opacity = 1.0m
                                 });
                             }
@@ -143,8 +143,8 @@ namespace Backoffice.Web.Components.Administration.CancelBets
                     {
                         Alerts.Add(new AlertModel
                         {
-                            AlertStatus = "Error",
-                            AltertMessage = $"{response.Message}",
+                            Status = "Error",
+                            Message = $"{response.Message}",
                             Opacity = 1.0m
                         });
                     }

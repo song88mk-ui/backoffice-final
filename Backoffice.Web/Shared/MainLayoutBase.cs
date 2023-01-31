@@ -143,6 +143,8 @@ namespace Backoffice.Web.Shared
             }
             catch (Exception ex)
             {
+                toasterService.AddToast(Toast.NewToast
+                        ("Error Connecting to hub", ex.Message));
             }
         }
         private async Task ProcessNotification(NotificationsModel message)
