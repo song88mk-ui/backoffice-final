@@ -2,13 +2,21 @@
 <div class="modal-body">
     <div class="business-container">
         <div class="row">
+            @if (IsPreload)
+            {
+                <div class="col-md-12">
+                    <div class="mt-4 mx-3">
+                        <Preloader />
+                    </div>
+                </div>
+            }
             <div class="col-md-10">
                 <h6 class="title fw-bold ps-2 py-1">Sub-User Information</h6>
             </div>
             <div class="col-md-2">
                 @if (!IsEdit)
                 {
-                    <button type="button" class="btn btn-dark pull-right" @onclick="OnResetClickEvent">Reset</button>
+                    <button type="button" class="btn btn-dark pull-right" @onclick="OnResetClickEvent" disabled="@IsPreload">Reset</button>
                 }
             </div>
 
@@ -96,7 +104,7 @@
                             </div>
 
                             <div class="col-md-12">
-                                <Permission IsReadOnly="false" IsSubUser="true" Permissions="@Permissions" ClientModel="@ClientModel" />
+                                <Permission IsReadOnly="@IsPreload" IsSubUser="true" Permissions="@Permissions" ClientModel="@ClientModel" />
                             </div>
                         </div>
                     </div>
@@ -111,8 +119,8 @@
                             </div>
                         }
 
-                        <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
-                        <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">Save</button>
+                        <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
+                        <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Save</button>
                     </div>
                 </form>
             </div>

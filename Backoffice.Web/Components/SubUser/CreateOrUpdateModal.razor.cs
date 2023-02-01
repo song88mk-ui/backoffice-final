@@ -22,12 +22,15 @@ namespace Backoffice.Web.Components.SubUser
         public List<PermissionModel> Permissions { get; set; }
         public ClientModel ClientModel { get; set; }
         public bool IsTogglePassword { get; set; }
+        public bool IsPreload { get; set; }
+        public decimal Opacity { get; set; }
 
         #endregion
         protected override async Task OnInitializedAsync()
         {
             try
             {
+                IsPreload = false;
                 IsTogglePassword = false;
                 Permissions = new List<PermissionModel>();
                 SubUserClaims = ModalParameters.TryGet<SubUserClaimsModel>("SubUserClaims");
@@ -78,6 +81,10 @@ namespace Backoffice.Web.Components.SubUser
 
         public async Task OnResetClickEvent()
         {
+            if (IsPreload)
+                return;
+
+            IsPreload = false;
             SubUser = new UserResponse();
             SubUser.Status = "Normal";
 
@@ -139,6 +146,9 @@ namespace Backoffice.Web.Components.SubUser
 
         public async Task OnCancelClickEvent()
         {
+            if (IsPreload)
+                return;
+
             if (IsEdit)
                 SubUser.UserName = $"{SubUserClaims.MainUserName}{SubUser.UserName}";
 
@@ -146,7 +156,13 @@ namespace Backoffice.Web.Components.SubUser
         }
         public async Task OnSaveClickEvent()
         {
+            if (IsPreload)
+                return;
+
+            IsPreload = true;
             Alerts.Clear();
+
+            Opacity = Opacity == 1m ? 0.99m : 1m;
 
             if (string.IsNullOrEmpty(SubUser.UserName))
             {
@@ -154,7 +170,7 @@ namespace Backoffice.Web.Components.SubUser
                 {
                     Status = "Error",
                     Message = "Sub Username is required",
-                    Opacity = 1.0m
+                    Opacity = Opacity
                 });
             }
 
@@ -164,7 +180,7 @@ namespace Backoffice.Web.Components.SubUser
                 {
                     Status = "Error",
                     Message = "Nickname is required",
-                    Opacity = 1.0m
+                    Opacity = Opacity
                 });
             }
 
@@ -174,7 +190,7 @@ namespace Backoffice.Web.Components.SubUser
                 {
                     Status = "Error",
                     Message = "Password is required",
-                    Opacity = 1.0m
+                    Opacity = Opacity
                 });
             }
             else if (!IsEdit && (SubUser.Password.Length < 8 || SubUser.Password.Length > 15))
@@ -183,13 +199,16 @@ namespace Backoffice.Web.Components.SubUser
                 {
                     Status = "Error",
                     Message = "Password length must be between 8 to 15",
-                    Opacity = 1.0m
+                    Opacity = Opacity
 
                 });
             }
 
             if (Alerts.Any())
+            {
+                IsPreload = false;
                 return;
+            }
 
             var request = new UserRegisterRequest()
             {
@@ -223,19 +242,8 @@ namespace Backoffice.Web.Components.SubUser
 
                 if (response.Result)
                 {
-                    Alerts.Add(new AlertModel
-                    {
-                        Status = "Success",
-                        Message = "Sub user successfully updated",
-                        Opacity = 1.0m
-
-                    });
-
-                    await InvokeAsync(StateHasChanged);
-                    await Task.Delay(3500);
-
                     ModalService.Cancel();
-                    await Modal.OnSaveClickCallback.InvokeAsync();
+                    await Modal.OnSaveClickCallback.InvokeAsync(true);
                 }
                 else
                 {
@@ -243,7 +251,7 @@ namespace Backoffice.Web.Components.SubUser
                     {
                         Status = "Error",
                         Message = $"{response.Message}",
-                        Opacity = 1.0m
+                        Opacity = Opacity
                     });
                 }
             }
@@ -253,20 +261,9 @@ namespace Backoffice.Web.Components.SubUser
 
                 if (response.Result)
                 {
-
-                    Alerts.Add(new AlertModel
-                    {
-                        Status = "Success",
-                        Message = "Sub user successfully created",
-                        Opacity = 1.0m
-
-                    });
-
-                    await InvokeAsync(StateHasChanged);
-                    await Task.Delay(3500);
                     ModalService.Cancel();
 
-                    await Modal.OnSaveClickCallback.InvokeAsync();
+                    await Modal.OnSaveClickCallback.InvokeAsync(false);
                 }
                 else
                 {
@@ -274,10 +271,11 @@ namespace Backoffice.Web.Components.SubUser
                     {
                         Status = "Error",
                         Message = $"{response.Message}",
-                        Opacity = 1.0m
+                        Opacity = Opacity
                     });
                 }
             }
+            IsPreload = false;
 
         }
         public void Dispose()
