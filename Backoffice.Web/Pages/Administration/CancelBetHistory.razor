@@ -49,9 +49,11 @@
                                         </td>
                                         <td>
                                             <span class="sport d-block">@bet.Selections.FirstOrDefault().SportName</span>
+                                            <span class="league d-block">@bet.Selections.FirstOrDefault().LeagueName</span>
                                             <span class="fixture d-block">@bet.Selections.FirstOrDefault().FixtureName</span>
-                                            <span class="start-date d-block">@bet.Selections.FirstOrDefault().FixtureStartDate</span>
-                                            <span class="selection-details d-block">@bet.Selections.FirstOrDefault().MarketName - @bet.Selections.FirstOrDefault().SelectionName @("@") @bet.Selections.FirstOrDefault().Odds (Decimal)</span>
+                                            <span class="start-date d-block">@bet.Selections.FirstOrDefault().FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()</span>
+                                            <span class="selection-details d-block">@bet.Selections.FirstOrDefault().SelectionName</span>
+                                            <span class="selection-details d-block">@bet.Selections.FirstOrDefault().MarketName @("@") @bet.Selections.FirstOrDefault().Odds.ToString("N2") (@bet.OddsTypeName)</span>
                                             <span class="bet-score d-block">Bet Result: @bet.Selections.FirstOrDefault().BetScore</span>
                                             <span class="final-score d-block">Final Result: @bet.Selections.FirstOrDefault().SettlementScore</span>
                                         </td>

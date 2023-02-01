@@ -11,9 +11,20 @@
 <div class="col-md-12">
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
+
+@if (!string.IsNullOrEmpty(AlertMessage))
+{
+    <div class="col-md-12 mb-3">
+        <div class="mt-4 mx-3">
+            <Alert Message="@AlertMessage" AlertStatus="AlertStatus" />
+        </div>
+    </div>
+}
+
 <div class="col-md-12">
     <Filter @ref="FilterReference" OnClientChangedCallback="OnClientChangedEvent" OnSportChangedCallback="OnSportChangedEvent" OnSegmentChangedCallback="OnSegmentChangedEvent" OnLeagueChangedCallback="OnLeagueChangedEvent" OnInitCallback="OnInitCallback" OnInputSearchCallback="OnInputSearchEvent" />
 </div>
+
 <div class="col-md-12">
     <div class="mx-3 mt-4">
         @if (IsPreLoader)

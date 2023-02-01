@@ -162,7 +162,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsOpen = s.IsOpen
                 }).ToList();
 
-                AlertMessage = "Succesfully saved Sport - Segment - League ordering.";
+                AlertMessage = "Successfully saved Sport - Segment - League ordering.";
                 AlertStatus = AlertStatus.Success;
             }
             else

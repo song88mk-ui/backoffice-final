@@ -325,7 +325,7 @@ namespace Backoffice.Utility.Repository
                 {
                     var log = cancelBets[i];
 
-                    int cellIndex = i + 1;
+                    int cellIndex = (i + 1) + 1;
 
                     worksheet.Cells[cellIndex, 1].Value = cellIndex;
                     worksheet.Cells[cellIndex, 2].Value = log.SettlementDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
@@ -350,7 +350,7 @@ namespace Backoffice.Utility.Repository
                     var notificationsModel = new NotificationsDetailsModel
                     {
                         Id = Guid.NewGuid(),
-                        Page = Page.Admin_CancelBets.ToString().Replace("_","."),
+                        Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
                         ClientCode = string.Empty,
                         SportsId = 0,
                         Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",

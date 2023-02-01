@@ -34,6 +34,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string Search { get; set; }
 
         public bool IsPreLoader { get; set; }
+        public string AlertMessage { get; set; }
+        public AlertStatus AlertStatus { get; set; }
 
         #endregion
 
@@ -79,7 +81,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("DialogStyle", "max-width: 90rem;top:50%;transform:translateY(-50%)");
             //parameters.Add("PriceBoostConfigModel", JsonSerializer.Deserialize<PriceBoostConfigModel>(obj));
             parameters.Add("PriceBoostConfigModel", priceboost);
-            parameters.Add("Languages", LanguagesModel);
+            parameters.Add("Languages", LanguagesModel);            
 
             var options = new ModalOptions();
 
@@ -106,7 +108,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "max-width: 80rem;top:50%;transform:translateY(-50%)");
-            parameters.Add("PriceBoostConfigModel", priceboost);
+            parameters.Add("PriceBoostConfigModel", priceboost);            
 
             var options = new ModalOptions();
 
@@ -165,7 +167,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             await GetContents();
         }
 
-        public async Task OnModalSave()
+        public async Task OnModalSave(object message)
         {
             ClientCode = string.Empty;
             SportId = 0;
@@ -178,6 +180,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             FilterReference.SelectedSegmentId = SegmentId;
             FilterReference.SelectedLeagueId = LeagueId;
             FilterReference.SearchForm.SearchText = Search;
+
+            AlertMessage = $"Price Boost has been {(string)message}!";
+            AlertStatus = AlertStatus.Success;
 
             await GetContents();
         }

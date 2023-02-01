@@ -1,0 +1,21 @@
+﻿.access-denied {
+    background-color: white;    
+    position: relative;
+    height: 63rem;    
+}
+
+.access-details {
+    position: absolute;
+    top:50%;
+    transform: translateY(-50%);
+}
+
+.back-dashboard {
+}
+
+.forbidden-img {
+    position: absolute;
+    right: 15%;
+    top: 50%;
+    transform: translateY(-50%);
+}

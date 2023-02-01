@@ -229,7 +229,7 @@ namespace Backoffice.Web.Components.ManageBoost
             {
                 Value = s.LeagueId,
                 Name = s.LeagueName
-            }).ToList();
+            }).Take(100).ToList();
 
             leagues.Insert(0, new SelectListItemModel<int>
             {
