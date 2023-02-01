@@ -10,6 +10,7 @@ namespace Backoffice.Web.Components.Administration.CancelBetHistory
         #region Properties
         [Parameter] public EventCallback<CancelBetHistoryCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<CancelBetHistoryCallbackModel> OnExportCallback { get; set; }
+        [Parameter] public bool IsPreload { get; set; }
         protected CancelBetHistoryCallbackModel FilterModel { get; set; }
         #endregion
 
@@ -26,11 +27,17 @@ namespace Backoffice.Web.Components.Administration.CancelBetHistory
         }
         public async Task OnSearchClickEvent()
         {
+            if (IsPreload)
+                return;
+
             await OnInitCallback.InvokeAsync(FilterModel);
         }
 
         public async Task OnExportToExcelClickEvent()
         {
+            if (IsPreload)
+                return;
+
             await OnExportCallback.InvokeAsync(FilterModel);
         }
 
