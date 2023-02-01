@@ -277,6 +277,104 @@ namespace Backoffice.Utility.Repository
             }
         }
 
+        public async Task ProcessOnGetCancelBetHistory(OnGetCancelBetHistoryMessage request, IMessageBroker messageBroker)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var excel = new ExcelPackage();
+            try
+            {
+                var response = (await GetActivityLogs(new ActivityLogRequest()
+                {
+                    Page = request.Page,
+                    Payload = request.Payload,
+                    DateFrom = request.DateFrom,
+                    DateTo = request.DateTo,
+                    MetaData = null
+                }));
+
+                if (response == null)
+                    return;
+
+                var cancelBets = new List<OnGetCancelBetHistoryMessage.BetDetails>(); ;
+
+                foreach (var item in response.ActivityLogs)
+                {
+                    var betDetails = JsonSerializer.Deserialize<OnGetCancelBetHistoryMessage.BetDetails>(item.From);
+                    if (betDetails != null)
+                    {
+                        betDetails.CancelledBy = item.UserName;
+
+                        var betSelectionDetails = JsonSerializer.Deserialize<OnGetCancelBetHistoryMessage.BetSelectionDetails>(item.To);
+                        betDetails.Selections = new List<OnGetCancelBetHistoryMessage.BetSelectionDetails>();
+
+                        if (betSelectionDetails != null)
+                            betDetails.Selections.Add(betSelectionDetails);
+
+                        cancelBets.Add(betDetails);
+                    }
+                }
+
+
+                #region Initialize Spreadsheet
+                var worksheet = excel.Workbook.Worksheets.Add("Cancel Bet History");
+                InitCancelBetHistoryWorksheet(worksheet);
+                #endregion
+
+                #region Generate Data
+                for (int i = 0; i < cancelBets.Count; i++)
+                {
+                    var log = cancelBets[i];
+
+                    int cellIndex = i + 1;
+
+                    worksheet.Cells[cellIndex, 1].Value = cellIndex;
+                    worksheet.Cells[cellIndex, 2].Value = log.SettlementDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
+                    worksheet.Cells[cellIndex, 3].Value = log.BetId;
+                    worksheet.Cells[cellIndex, 4].Value = log.BetDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
+                    worksheet.Cells[cellIndex, 5].Value = BuildEventDetails(log.Selections.FirstOrDefault(), log.OddsTypeName);
+                    worksheet.Cells[cellIndex, 6].Value = log.UserId;
+                    worksheet.Cells[cellIndex, 7].Value = log.ClientName;
+                    worksheet.Cells[cellIndex, 8].Value = log.CancelledBy;
+                    worksheet.Cells[cellIndex, 9].Value = log.Reason;
+                }
+                #endregion
+
+                #region Upload File to Azure
+
+                var fileName = $"CancelBetHistory_{DateTime.UtcNow:MMddyyyyHHmm}.xlsx";
+                var downloadUrl = UploadToAzure(excel, fileName);
+
+                if (!string.IsNullOrEmpty(downloadUrl))
+                {
+
+                    var notificationsModel = new NotificationsDetailsModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Page = Page.Admin_CancelBets.ToString().Replace("_","."),
+                        ClientCode = string.Empty,
+                        SportsId = 0,
+                        Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",
+                        PageRedirect = "/admin/cancel-bet-history",
+                        UserId = Guid.Parse(response.ActivityLogs.FirstOrDefault().UserId),
+                        ClaimType = AdminPermission.Admin_Bet_Cancel.ToString().Replace("_", "."),
+                        Type = (int)NotificationType.General
+                    };
+
+                    messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
+                }
+                #endregion
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
+            }
+            finally
+            {
+                excel.Dispose();
+            }
+        }
+
         #region Utilities
         private async Task<ActivityLogResponse> GetActivityLogs(ActivityLogRequest request)
         {
@@ -364,6 +462,20 @@ namespace Backoffice.Utility.Repository
             return builder.ToString();
         }
 
+        private string BuildEventDetails(OnGetCancelBetHistoryMessage.BetSelectionDetails betSelectionDetails, string oddsFormat)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append($"{betSelectionDetails.LeagueName}\n");
+            builder.Append($"{betSelectionDetails.FixtureName}\n");
+            builder.Append($"{betSelectionDetails.FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()}\n");
+            builder.Append($"{betSelectionDetails.SelectionName} \n");
+            builder.Append($"{betSelectionDetails.MarketName} @ {betSelectionDetails.Odds} ({oddsFormat})\n");
+            builder.Append($"{betSelectionDetails.BetScore}, Final Score: {betSelectionDetails.SettlementScore}\n");
+
+            return builder.ToString();
+        }
+
         private string BuildPayload(string SportId, string SegmentId, string LeagueId, string FixtureId)
         {
             return $"{(!string.IsNullOrEmpty(SportId) || SportId != "0" ? SportId : "%")}." +
@@ -415,6 +527,26 @@ namespace Backoffice.Utility.Repository
             worksheet.Cells[1, 9].Value = "Member Name";
             worksheet.Cells[1, 10].Value = "Settled By";
             worksheet.Cells[1, 11].Value = "Reason";
+        }
+
+        private void InitCancelBetHistoryWorksheet(ExcelWorksheet worksheet)
+        {
+            worksheet.DefaultRowHeight = 12;
+
+            worksheet.Row(1).Height = 20;
+            worksheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Row(1).Style.Font.Bold = true;
+
+            // Header of the Excel sheet
+            worksheet.Cells[1, 1].Value = "No.";
+            worksheet.Cells[1, 2].Value = "Date Cancelled";
+            worksheet.Cells[1, 3].Value = "Reference ID";
+            worksheet.Cells[1, 4].Value = "Bet Date";
+            worksheet.Cells[1, 5].Value = "Selection Cancelled";
+            worksheet.Cells[1, 6].Value = "Member Name";
+            worksheet.Cells[1, 7].Value = "Partner/SB Client Name";
+            worksheet.Cells[1, 8].Value = "Cancelled By";
+            worksheet.Cells[1, 9].Value = "Reason";
         }
 
         private string UploadToAzure(ExcelPackage excel, string fileName)

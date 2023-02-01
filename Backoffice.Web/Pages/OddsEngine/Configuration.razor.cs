@@ -26,7 +26,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private IMessageBroker MessageBroker { get; set; }
         [Inject] public IConfiguration AppConfiguration { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] public ToastService? ToastService { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+
+        private ToastService toasterService => ToastService!;
         public Configuration ConfigComponent { get; set; }
         public ConfigFilterModel ConfigFilterModel { get; set; } = new ConfigFilterModel();
         public List<MarketLookupNavigationModel> SelectedContents;
@@ -62,6 +65,22 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                try
+                {
+                    await Subscribe();
+                }
+                catch (Exception ex)
+                {
+                    toasterService.AddToast(Toast.NewToast
+                            ("Error", ex.Message));
+                }
+            }
         }
 
         public async ValueTask DisposeAsync()
@@ -623,35 +642,29 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task Subscribe()
         {
-            try
+            var request = _httpContextAccessor.HttpContext?.Request;
+
+            HubConnection = new HubConnectionBuilder()
+                .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
+                .Build();
+
+            //HubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
+            //{
+            //    await ProcessOnConfigChange(message);
+            //});
+            HubConnection.Closed += async (error) =>
             {
-                var request = _httpContextAccessor.HttpContext?.Request;
-
-                HubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
-                    .Build();
-
-                //HubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
-                //{
-                //    await ProcessOnConfigChange(message);
-                //});
-                HubConnection.Closed += async (error) =>
-                {
-                    await Task.Delay(new Random().Next(0, 5) * 1000);
-                    await HubConnection.StartAsync();
-                };
-
-                HubConnection.On<NotificationsModel>("onnewnotification", async message =>
-                {
-                    await ProcessNotification(message);
-                });
-
-
+                await Task.Delay(new Random().Next(0, 5) * 1000);
                 await HubConnection.StartAsync();
-            }
-            catch (Exception ex)
+            };
+
+            HubConnection.On<NotificationsModel>("onnewnotification", async message =>
             {
-            }
+                await ProcessNotification(message);
+            });
+
+
+            await HubConnection.StartAsync();            
         }
 
         private async Task ProcessOnConfigChange(ConfigSettingsModel message)

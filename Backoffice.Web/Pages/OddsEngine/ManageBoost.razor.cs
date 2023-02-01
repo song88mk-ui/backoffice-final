@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.ManageBoost;
 using Backoffice.Web.Models;
@@ -17,13 +18,21 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
-        public MetaData MetaData { get; set; }
-        public PriceboostFilterModel PriceBoostFilterModel { get; set; } = new PriceboostFilterModel();
+        public Filter FilterReference { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
+
+        public MetaData MetaData { get; set; }
         public List<PriceBoostConfigModel> PriceBoostList { get; set; }
-        public LanguagesModel Languages { get; set; }
+        public LanguagesModel LanguagesModel { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
+        public string ClientCode { get; set; }
+        public int SportId { get; set; }
+        public int SegmentId { get; set; }
+        public int LeagueId { get; set; }
+        public string Search { get; set; }
+
         public bool IsPreLoader { get; set; }
 
         #endregion
@@ -32,7 +41,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            IsPreLoader = true;
             PageTitle = "Manage Boost";
             IconClass = string.Empty;
 
@@ -55,113 +63,121 @@ namespace Backoffice.Web.Pages.OddsEngine
             MetaData = new MetaData();
         }
 
-        public async Task OnEdit(PriceBoostConfigModel priceboost)
+        public async Task OnEditClickEvent(PriceBoostConfigModel priceboost)
         {
-            Languages = new LanguagesModel();
+            LanguagesModel = new LanguagesModel();
 
-            Languages.Languages = Languages.Languages.Where(x => !priceboost.BoostedSelectionTranslations
-            .Select(y => y.Language.LanguageCode).ToList().Contains(x.LanguageCode)).ToList();
+            LanguagesModel.Languages = LanguagesModel.Languages.Where(c => !priceboost.BoostedSelectionTranslations
+            .Select(s => s.Language.LanguageCode).ToList().Contains(c.LanguageCode)).ToList();
 
-            string obj = JsonSerializer.Serialize(priceboost);
+            //string obj = JsonSerializer.Serialize(priceboost);
 
             var parameters = new ModalParameters();
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "max-width: 90rem;top:50%;transform:translateY(-50%)");
-            parameters.Add("PriceBoostConfigModel", JsonSerializer.Deserialize<PriceBoostConfigModel>(obj));
-            parameters.Add("Languages", Languages);
+            //parameters.Add("PriceBoostConfigModel", JsonSerializer.Deserialize<PriceBoostConfigModel>(obj));
+            parameters.Add("PriceBoostConfigModel", priceboost);
+            parameters.Add("Languages", LanguagesModel);
 
             var options = new ModalOptions();
+
             ModalService.Open<EditBoostedOddsModal>($"Edit Boosted Odds", parameters, options);
         }
 
-        public async Task OnViewLog(PriceBoostConfigModel priceboost)
+        public async Task OnViewLogClickEvent(PriceBoostConfigModel priceboost)
         {
             var parameters = new ModalParameters();
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("PriceBoostConfigModel", priceboost);
 
             var options = new ModalOptions();
+
             ModalService.Open<ViewLogsBoostedModal>($"View Logs", parameters, options);
         }
 
-        public async Task OnDelete(PriceBoostConfigModel priceboost)
+        public async Task OnDeleteClickEvent(PriceBoostConfigModel priceboost)
         {
             var parameters = new ModalParameters();
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "max-width: 80rem;top:50%;transform:translateY(-50%)");
             parameters.Add("PriceBoostConfigModel", priceboost);
 
             var options = new ModalOptions();
+
             ModalService.Open<DeleteBoostedOddsModal>($"Delete Boosted Odds", parameters, options);
         }
 
-        public async Task GetContents()
+        public async Task OnInitCallback()
         {
-            var priceBoostList = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
-            {
-                ClientCode = !string.IsNullOrEmpty(PriceBoostFilterModel.ClientCode) ? PriceBoostFilterModel.ClientCode : "",
-                SportId = PriceBoostFilterModel.SportId > 0 ? PriceBoostFilterModel.SportId.ToString() : "",
-                SegmentId = PriceBoostFilterModel.SegmentId > 0 ? PriceBoostFilterModel.SegmentId.ToString() : "",
-                LeagueId = PriceBoostFilterModel.LeagueId > 0 ? PriceBoostFilterModel.LeagueId.ToString() : "",
-                ProviderFixtureId = "",
-                MarketTemplateId = "",
-                SelectionTemplateId = "",
-                SelectionSpecifier = "",
-                MarketSpecifier = ""
-            })).Result;
-
-            if (priceBoostList != null && priceBoostList.Any())
-            {
-                priceBoostList = priceBoostList.Where(x => UserModel.ClientCodes.Contains(x.ClientCode)).ToList();
-            }
-
-            PriceBoostList = priceBoostList;
-            IsPreLoader = false;
-            StateHasChanged();
+            await GetContents();
         }
-
+        
         public async Task OnClientChangedEvent(string clientCode)
         {
+            ClientCode = clientCode;
+
             await GetContents();
         }
 
         public async Task OnSportChangedEvent(int sportId)
         {
-            PriceBoostFilterModel.SegmentId = 0;
-            PriceBoostFilterModel.LeagueId = 0;
+            SportId = sportId;
+            SegmentId = 0;
+            LeagueId = 0;
 
-            PriceBoostFilterModel.Segments = await LoadSegments(sportId);
-            PriceBoostFilterModel.Leagues = await LoadLeagues(sportId, PriceBoostFilterModel.SegmentId);
+            //PriceBoostFilterModel.SegmentId = 0;
+            //PriceBoostFilterModel.LeagueId = 0;
+
+            //PriceBoostFilterModel.Segments = await LoadSegments(sportId);
+            //PriceBoostFilterModel.Leagues = await LoadLeagues(sportId, PriceBoostFilterModel.SegmentId);
 
             await GetContents();
         }
 
-        public async Task OnSegmentChangedEvent(Tuple<int, int> param)
+        public async Task OnSegmentChangedEvent(int segmentId)
         {
-            PriceBoostFilterModel.LeagueId = 0;
+            SegmentId = segmentId;
+            LeagueId = 0;
+            //PriceBoostFilterModel.LeagueId = 0;
 
-            PriceBoostFilterModel.Leagues = await LoadLeagues(param.Item1, param.Item2);
+            //PriceBoostFilterModel.Leagues = await LoadLeagues(param.Item1, param.Item2);
 
             await GetContents();
-            await InvokeAsync(StateHasChanged);
         }
 
-        public async Task OnLeagueChangedEvent()
+        public async Task OnLeagueChangedEvent(int leagueId)
         {
+            LeagueId = leagueId;
+
             await GetContents();
-            await InvokeAsync(StateHasChanged);
+        }
+
+        public async Task OnInputSearchEvent(string search)
+        {
+            Search = search;
+
+            await GetContents();
         }
 
         public async Task OnModalSave()
         {
-            PriceBoostList = new List<PriceBoostConfigModel>();
-            PriceBoostFilterModel.ClientCode = string.Empty;
-            PriceBoostFilterModel.SportId = 0;
-            PriceBoostFilterModel.SegmentId = 0;
-            PriceBoostFilterModel.LeagueId = 0;
+            ClientCode = string.Empty;
+            SportId = 0;
+            SegmentId = 0;
+            LeagueId = 0;
+            Search = string.Empty;
+
+            FilterReference.SelectedClientCode = ClientCode;
+            FilterReference.SelectedSportId = SportId;
+            FilterReference.SelectedSegmentId = SegmentId;
+            FilterReference.SelectedLeagueId = LeagueId;
+            FilterReference.SearchForm.SearchText = Search;
 
             await GetContents();
         }
@@ -169,11 +185,13 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnModalBack(object addPriceBoostFilterModel)
         {
             var parameters = new ModalParameters();
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("AddPriceBoostFilterModel", (AddPriceBoostFilterModel)addPriceBoostFilterModel);
 
             var options = new ModalOptions();
+
             ModalService.Open<AddBoostedOddsModal>($"Add Boosted Odds", parameters, options);
         }
 
@@ -184,53 +202,52 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-        private async Task<List<SelectListItemModel<int>>> LoadSports()
+
+        private async Task GetContents()
         {
-            var result = (await TradingService.GetSportLookup()).Result;
+            IsPreLoader = true;
 
-            if (result == null)
-                return new List<SelectListItemModel<int>>();
-
-            var sports = result.SportLookup.Select(s => new SelectListItemModel<int>()
+            var priceBoostConfigResponse = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
             {
-                Value = s.SportId,
-                Name = s.SportName
-            }).ToList();
+                ClientCode = !string.IsNullOrEmpty(ClientCode) ? ClientCode : string.Empty,
+                SportId = SportId > 0 ? SportId.ToString() : string.Empty,
+                SegmentId = SegmentId > 0 ? SegmentId.ToString() : string.Empty,
+                LeagueId = LeagueId > 0 ? LeagueId.ToString() : string.Empty,
+                ProviderFixtureId = string.Empty,
+                MarketTemplateId = string.Empty,
+                SelectionTemplateId = string.Empty,
+                SelectionSpecifier = string.Empty,
+                MarketSpecifier = string.Empty
+            }));
 
-            return sports;
+            if (priceBoostConfigResponse.StatusCode == StatusCode.Success)
+            {
+                if (priceBoostConfigResponse.Result == null || !priceBoostConfigResponse.Result.Any())
+                {
+                    PriceBoostList = new List<PriceBoostConfigModel>();
+                }
+                else
+                {
+                    var query = priceBoostConfigResponse.Result.AsQueryable();
+
+                    query = query.Where(c => UserModel.ClientCodes.Contains(c.ClientCode));
+
+                    if (!string.IsNullOrEmpty(Search))
+                    {
+                        var search = Search.ToLower();
+
+                        query = query.Where(c => c.ClientName.ToLower().Contains(search) || c.SportName.ToLower().Contains(search)
+                        || c.SegmentName.ToLower().Contains(search) || c.LeagueName.ToLower().Contains(search)
+                        || c.SelectionName.ToLower().Contains(search));
+                    }
+
+                    PriceBoostList = query.ToList();
+                }
+            }
+
+            IsPreLoader = false;
         }
 
-        private async Task<List<SelectListItemModel<int>>> LoadSegments(int sportId)
-        {
-            var result = (await TradingService.GetSegmentLookup(sportId)).Result;
-
-            if (result == null)
-                return new List<SelectListItemModel<int>>();
-
-            var segments = result.SegmentLookup.Select(s => new SelectListItemModel<int>()
-            {
-                Value = s.SegmentId,
-                Name = s.SegmentName
-            }).ToList();
-
-            return segments;
-        }
-
-        private async Task<List<SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
-        {
-            var result = (await TradingService.GetLeagueLookup(sportId, segmentId)).Result;
-
-            if (result == null)
-                return new List<SelectListItemModel<int>>();
-
-            var leagues = result.LeagueLookup.Select(s => new SelectListItemModel<int>()
-            {
-                Value = s.LeagueId,
-                Name = s.LeagueName
-            }).ToList();
-
-            return leagues;
-        }
         #endregion
     }
 }

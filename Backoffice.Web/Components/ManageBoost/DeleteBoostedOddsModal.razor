@@ -1,20 +1,25 @@
-﻿@if (IsPreLoader)
-{
-    <Preloader InlineCss="@InlineCss"/>   
-}
+﻿
 <div class="modal-body">
     <div class="d-flex flex-column justify-content-center p-5">
-        <div class="text-center">
-            <img src="icons/svg/warning-icon.svg" />
+        <div>
+            <div class="text-center mb-4">
+                <img src="icons/svg/warning-icon.svg" />
+            </div>
+            <div class="text-center">
+                You are about to delete "<span class="fw-bold">Boosted Odds for @(DisplayMessage())</span>".
+                <br />
+                Please be certain as this cannot be undone
+            </div>
         </div>
-        <div class="text-center">
-            You are about to delete "<span class="fw-bold">Boosted Odds for @(DisplayMessage())</span>".
-            <br />
-            Please be certain as this cannot be undone
-        </div>
+        @if (IsPreLoader)
+        {
+            <div class="mt-4">
+                <Preloader InlineCss="@InlineCss"/>   
+            </div>
+        }
     </div>
 </div>
-<div class="modal-footer">
+<div class="modal-footer mx-4 pe-0">
     <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Cancel</button>
     <button type="button" class="btn modal-btn modal-save waves-effect" data-bs-dismiss="modal" @onclick="OnDeleteModalClick">Delete</button>
 </div>

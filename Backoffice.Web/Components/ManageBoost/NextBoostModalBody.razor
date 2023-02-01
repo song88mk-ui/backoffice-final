@@ -37,15 +37,16 @@
                     <td>@config.ClientOdds.ToString("0.00")</td>
                     <td>                        
                         @{
-                            placeholder = config.BoostedOdds == 0 ? "-.-" : config.BoostedOdds.ToString("0.00");
+                            Placeholder = config.BoostedOdds == 0 ? "-.-" : config.BoostedOdds.ToString("0.00");
                         }
+
                         @if (config.ClientOdds == 0)
                         {
-                            <input type="number" class="form-control" @bind-value="@config.BoostedOddsStr" placeholder="@placeholder" disabled/>
+                            <input type="number" class="form-control" @bind-value="@config.BoostedOddsStr" placeholder="@Placeholder" disabled/>
                         }
                         else
                         {
-                            <input type="number" class="form-control" @bind-value="@config.BoostedOddsStr" placeholder="@placeholder"/>
+                            <input type="number" class="form-control" @bind-value="@config.BoostedOddsStr" placeholder="@Placeholder" />
                         }
                     </td>
                 </tr>
@@ -55,5 +56,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Cancel</button>
-    <button type="button" class="btn modal-btn modal-save waves-effect" data-bs-dismiss="modal" @onclick="OnSaveModalClick">Save</button>
+    <button type="button" class="btn modal-btn modal-save" data-bs-dismiss="modal" @onclick="OnSaveModalClick">Save</button>
 </div>

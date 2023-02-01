@@ -12,49 +12,40 @@ namespace Backoffice.Web.Components.ManageBoost
     public partial class DeleteBoostedOddsModal : IDisposable
     {
         #region Properties
+
         [Inject] IModalService ModalService { get; set; }
         [Inject] ITradingService TradingService { get; set; }
+
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        private PriceBoostConfigModel PriceBoost { get; set; }
+
+        public PriceBoostConfigModel PriceBoost { get; set; }
         public bool IsPreLoader { get; set; }
-        public const string InlineCss = "top:50%";
+
         #endregion
+
+        #region Fields
+
+        public const string InlineCss = "top:50%";
+
+        #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
-            IsPreLoader = true;
             PriceBoost = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
-            IsPreLoader = false;
         }
+
         public async Task OnCancelModalClick()
         {
             ModalService.Cancel();
         }
+
         public async Task OnDeleteModalClick()
         {
             IsPreLoader = true;
-            await InvokeAsync(StateHasChanged);
-
-            //var priceBoostConfig = AddPriceBoostFilterModel.PriceBoostConfigList.Where(x => x.ClientCode == AddPriceBoostFilterModel.ClientCode &&
-            //x.SportId == AddPriceBoostFilterModel.SportId &&
-            //x.LeagueId == AddPriceBoostFilterModel.LeagueId &&
-            //x.SegmentId == AddPriceBoostFilterModel.SegmentId).FirstOrDefault();
-
-            //priceBoostConfig.FixtureTypeId = AddPriceBoostFilterModel.ShowMatchTypeMenu ? (int)FixtureType.Match : (int)FixtureType.Outright;
-            //priceBoostConfig.ProviderFixtureId = AddPriceBoostFilterModel.ProviderFixtureId;
-            //priceBoostConfig.MarketTemplateId = AddPriceBoostFilterModel.MarketTemplateId;
-            //priceBoostConfig.SelectionTemplateId = AddPriceBoostFilterModel.SelectionTemplateId;
-            //priceBoostConfig.SelectionSpecifier = AddPriceBoostFilterModel.SelectionSpecifier;
-            //priceBoostConfig.UserId = UserModel.User.Id;
-            //priceBoostConfig.UserName = UserModel.User.UserName;
-            //priceBoostConfig.TimeStamp = DateTime.Now;
-            //priceBoostConfig.BoostedOddsStr = "0";
-            //priceBoostConfig.BoostedOdds = 0;
-
-            //AddPriceBoostFilterModel.PriceBoostConfigList = new List<PriceBoostConfigModel>();
-            //AddPriceBoostFilterModel.PriceBoostConfigList.Add(priceBoostConfig);
 
             PriceBoost.BoostedOdds = 0;
             PriceBoost.BoostedOddsStr = "0";
@@ -63,9 +54,9 @@ namespace Backoffice.Web.Components.ManageBoost
             PriceBoost.UserName = UserModel.UserName;
 
             var result = await TradingService.AddOrUpdatePriceBoost(new List<PriceBoostConfigModel>() { PriceBoost });
+
             if (result.StatusCode == StatusCode.Success)
             {
-
                 var payload = new OnPriceBoostMessage
                 {
                     ClientCode = PriceBoost.ClientCode,
@@ -93,16 +84,17 @@ namespace Backoffice.Web.Components.ManageBoost
             }
 
             IsPreLoader = false;
-            await InvokeAsync(StateHasChanged);
 
             await Modal.OnSaveClickCallback.InvokeAsync();
 
             ModalService.Cancel();
         }
+
         public void Dispose()
         {
 
         }
+
         #endregion
 
         #region Utilities

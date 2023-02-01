@@ -114,15 +114,13 @@ namespace Backoffice.Web.Pages.Administration
         public async Task OnResendSettlementClickEvent()
         {
             if (ResendSettlementModel != null && ResendSettlementModel.Any())
-            {
-                var statusList = new List<int>() { (int)BetStatus.Cancelled, (int)BetStatus.Rejected, (int)BetStatus.Waiting, 8000 };
-
-                if (ResendSettlementModel.Any(x => statusList.Contains(x.Bet.BetStatusId)))
+            {                
+                if (ResendSettlementModel.Any(x => x.Bet.BetStatusId == (int)BetStatus.Rejected))
                 {
                     Alerts.Add(new AlertModel()
                     {
                         Status = StatusCode.Error.ToString(),
-                        Message = "Bets under Cancelled, Rejected, Waiting, and Cashout status is not allowed",
+                        Message = "Rejected bet are not allowed to be resent to Operator",
                         Opacity = 1.0m
                     });
                 }
@@ -160,12 +158,35 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task OnResendSettlementCallback(BaseResponse<ResendSettlementResponse> response)
         {
-            Alerts.Add(new AlertModel()
+            Alerts = new List<AlertModel>();
+
+            if (!response.Result.Data.Any())
             {
-                Status = response.StatusCode.ToString(),
-                Message = response.Message,
-                Opacity = 1.0m
-            });
+                Alerts.Add(new AlertModel()
+                {
+                    Status = StatusCode.Error.ToString(),
+                    Message = StatusCode.Resend_Attempt_Not_Successful_Please_Try_Again.ToString().Replace('_', ' '),
+                    Opacity = 1.0m
+                });
+            }
+            else if (response.StatusCode == StatusCode.Error)
+            {
+                Alerts.Add(new AlertModel()
+                {
+                    Status = response.StatusCode.ToString(),
+                    Message = response.Result.Data.FirstOrDefault().Message,
+                    Opacity = 1.0m
+                });                
+            }
+            else
+            {
+                Alerts.Add(new AlertModel()
+                {
+                    Status = response.StatusCode.ToString(),
+                    Message = "Resend to operator of bet settlement, cashout, and/or cancellation successful",
+                    Opacity = 1.0m
+                });
+            }
 
             await InvokeAsync(StateHasChanged);
             await Task.Delay(3500);
