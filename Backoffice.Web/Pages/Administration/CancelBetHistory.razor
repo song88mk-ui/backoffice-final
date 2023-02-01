@@ -30,7 +30,7 @@
                         <tbody>
                             @if (CancelBets != null && CancelBets.CancelBets.Any())
                             {
-                                var ctr = 0;
+                                var ctr = 0 + ((MetaData.CurrentPage-1) * MetaData.PageSize);
                                 foreach (var bet in CancelBets.CancelBets)
                                 {
                                     ctr++;
