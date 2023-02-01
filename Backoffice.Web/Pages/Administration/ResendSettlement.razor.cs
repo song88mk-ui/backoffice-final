@@ -75,8 +75,8 @@ namespace Backoffice.Web.Pages.Administration
 
                         Alerts.Add(new AlertModel()
                         {
-                            AlertStatus = "Error",
-                            AltertMessage = "Duplicate BetId's are not allowed",
+                            Status = "Error",
+                            Message = "Duplicate BetId's are not allowed",
                             Opacity = 1.0m
                         });
                     }
@@ -121,8 +121,8 @@ namespace Backoffice.Web.Pages.Administration
                 {
                     Alerts.Add(new AlertModel()
                     {
-                        AlertStatus = StatusCode.Error.ToString(),
-                        AltertMessage = "Bets under Cancelled, Rejected, Waiting, and Cashout status is not allowed",
+                        Status = StatusCode.Error.ToString(),
+                        Message = "Bets under Cancelled, Rejected, Waiting, and Cashout status is not allowed",
                         Opacity = 1.0m
                     });
                 }

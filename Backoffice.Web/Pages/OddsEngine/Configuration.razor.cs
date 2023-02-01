@@ -75,7 +75,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Utilities
         private async Task GetContents()
         {
-            await Subscribe();
             if (ConfigFilterModel.MarketTemplateGroupId == 0)
                 ConfigFilterModel.MarketTemplateGroupId = ConfigFilterModel.MarketTemplates.FirstOrDefault(m => m.IsSelected).MarketTemplateGroupId;
 
