@@ -8,9 +8,18 @@
     position: absolute;
     top:50%;
     transform: translateY(-50%);
+    width: 35%;
+    left: 5%;
 }
 
+    .access-details h1 {
+        color: #E64E35
+    }
+
 .back-dashboard {
+    color: white;
+    background-color: black;
+    font-weight: bold;
 }
 
 .forbidden-img {
@@ -18,4 +27,5 @@
     right: 15%;
     top: 50%;
     transform: translateY(-50%);
+    width: 50%;
 }
