@@ -8,6 +8,7 @@ namespace Backoffice.Web.Components.Administration.CancelBets
         [Parameter] public EventCallback OnAddBetReferenceIdCallback { get; set; }
         [Parameter] public EventCallback OnCancelBetCallback { get; set; }
         [Parameter] public EventCallback OnResetCallback { get; set; }
+        [Parameter] public bool IsPreload { get; set; }
         #endregion
 
         #region Methods
@@ -18,14 +19,23 @@ namespace Backoffice.Web.Components.Administration.CancelBets
 
         public async Task OnAddBetReferenceIdCallbackEvent()
         {
+            if (IsPreload)
+                return;
+
             await OnAddBetReferenceIdCallback.InvokeAsync();
         }
         public async Task OnCancelBetCallbackEvent()
         {
+            if (IsPreload)
+                return;
+
             await OnCancelBetCallback.InvokeAsync();
         }
         public async Task OnResetCallbackEvent()
         {
+            if (IsPreload)
+                return;
+
             await OnResetCallback.InvokeAsync();
         }
         #endregion
