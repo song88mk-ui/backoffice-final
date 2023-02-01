@@ -18,7 +18,7 @@
 }
 
 table thead th {
-    text-align: center;
+    text-align: left;
 }
 
     table thead th:first-child {
