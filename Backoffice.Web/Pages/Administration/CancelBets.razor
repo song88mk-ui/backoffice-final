@@ -52,7 +52,7 @@
                                     <tr>
                                         <td class="text-center">@bet.Num</td>
                                         <td>
-                                            <input type="text" class="@(!IsPreload && (string.IsNullOrEmpty(bet.BetReferenceId) || Alerts.Any(a => a.Control == count.ToString())) ? "form-control border-danger" : "form-control")" @bind-value="bet.BetReferenceId" />
+                                            <input type="text" class="@(!IsPreload && Alerts.Any(a => a.Control == count.ToString()) ? "form-control border-danger" : "form-control")" @bind-value="bet.BetReferenceId" />
                                         </td>
                                     </tr>
                                 }
@@ -75,7 +75,7 @@
                                     <div class="form-floating">
                                         @if (CancelBetModel != null)
                                         {
-                                            <textarea class="@(!IsPreload && string.IsNullOrEmpty(CancelBetModel.Reason) ? "form-control input-reason border-danger" : "form-control input-reason")" @bind="CancelBetModel.Reason" />
+                                            <textarea class="@(!IsPreload && IsReasonRequired ? "form-control input-reason border-danger" : "form-control input-reason")" @bind="CancelBetModel.Reason" />
                                         }
                                     </div>
                                 </td>

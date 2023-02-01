@@ -22,6 +22,7 @@ namespace Backoffice.Web.Pages.Administration
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreload { get; set; }
+        public bool IsReasonRequired { get; set; }
 
         #endregion
 
@@ -74,6 +75,8 @@ namespace Backoffice.Web.Pages.Administration
         public async Task OnResetCallbackEvent()
         {
             IsPreload = false;
+            IsReasonRequired = false;
+
             Alerts.Clear();
             CancelBetModel = new CancelBetModel();
             CancelBetModel.BetReferenceIds.Clear();
@@ -223,7 +226,7 @@ namespace Backoffice.Web.Pages.Administration
         private bool Validate()
         {
             Alerts.Clear();
-
+            IsReasonRequired = false;
             var count = 0;
             foreach (var bet in CancelBetModel.BetReferenceIds)
             {
@@ -278,7 +281,8 @@ namespace Backoffice.Web.Pages.Administration
                         Control = count == 0? $"1" : ""
                     });
                 }
-
+                if (string.IsNullOrEmpty(CancelBetModel.Reason))
+                    IsReasonRequired = true;
             }
 
             if (Alerts.Any())
