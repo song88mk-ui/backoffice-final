@@ -73,6 +73,8 @@ namespace Backoffice.Web.Pages.Administration
         }
         public async Task OnResetCallbackEvent()
         {
+            IsPreload = false;
+            Alerts.Clear();
             CancelBetModel = new CancelBetModel();
             CancelBetModel.BetReferenceIds.Clear();
             CancelBetModel.BetReferenceIds.Add(new CancelBetModel.BetReferenceModel
@@ -97,17 +99,30 @@ namespace Backoffice.Web.Pages.Administration
                     BetIds = betIds,
                 })).Result;
 
-                if (betDetails.Bets.Any(b => b.BetStatusId != (int)BetStatus.Running))
+                var notRunningBets = betDetails.Bets.Where(b => b.BetStatusId != (int)BetStatus.Running).ToList();
+
+                var ctr = 0;
+                foreach(var bet in CancelBetModel.BetReferenceIds)
                 {
-                    Alerts.Add(new AlertModel
+                    ctr++;
+                    if (string.IsNullOrEmpty(bet.BetReferenceId))
+                        continue;
+
+                    if(notRunningBets.Any(b => b.BetId == Guid.Parse(bet.BetReferenceId)))
                     {
-                        Status = AlertStatus.Error.ToString(),
-                        Message = $"Your request to cancel this Bet Reference ID did not proceed. Only 'Running' bets can be settled as 'Cancelled'.",
-                        Opacity = 1.0m
-                    });
-                    IsPreload = false;
-                    return;
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = AlertStatus.Error.ToString(),
+                            Message = $"Your request to cancel this Bet Reference ID did not proceed. Only 'Running' bets can be settled as 'Cancelled'.",
+                            Opacity = 1.0m,
+                            Control = $"{ctr}"
+                        });
+                        IsPreload = false;
+                    }
                 }
+
+                if (Alerts.Any())
+                    return;
 
                 var request = new BetModifyRequest
                 {
@@ -221,7 +236,8 @@ namespace Backoffice.Web.Pages.Administration
                         {
                             Status = AlertStatus.Error.ToString(),
                             Message = $"Invalid Bet Reference Id {bet.BetReferenceId.Trim()}",
-                            Opacity = 1.0m
+                            Opacity = 1.0m,
+                            Control = $"{count+1}"
                         });
                     }
 
@@ -233,7 +249,8 @@ namespace Backoffice.Web.Pages.Administration
                             {
                                 Status = AlertStatus.Error.ToString(),
                                 Message = $"Duplicate Bet Reference Id found. {bet.BetReferenceId.Trim()}",
-                                Opacity = 1.0m
+                                Opacity = 1.0m,
+                                Control = $"{count + 1}"
                             });
                     }
 
@@ -257,7 +274,8 @@ namespace Backoffice.Web.Pages.Administration
                     {
                         Status = AlertStatus.Error.ToString(),
                         Message = message,
-                        Opacity = 1.0m
+                        Opacity = 1.0m,
+                        Control = count == 0? $"1" : ""
                     });
                 }
 

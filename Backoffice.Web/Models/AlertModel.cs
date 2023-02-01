@@ -8,5 +8,6 @@ namespace Backoffice.Web.Models
         public string Status { get; set; }
         public decimal Opacity { get; set; } = 0.0m;
         public string Message { get; set; }
+        public string Control { get; set; }
     }
 }
