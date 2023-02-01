@@ -46,7 +46,7 @@
                         }
                         else
                         {
-                            <input type="number" class="form-control" @bind-value="@config.BoostedOddsStr" placeholder="@Placeholder" />
+                            <input type="number" class="form-control" @bind:event="oninput" @bind="@config.BoostedOddsStr" placeholder="@Placeholder" @onkeyup="OnConfigBoostedInputChangedEvent" />
                         }
                     </td>
                 </tr>
@@ -56,5 +56,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Cancel</button>
-    <button type="button" class="btn modal-btn modal-save" data-bs-dismiss="modal" @onclick="OnSaveModalClick">Save</button>
+    <button type="button" class="btn modal-btn modal-save" data-bs-dismiss="modal" @onclick="OnSaveModalClick" disabled="@IsSaveDisabled">Save</button>
 </div>

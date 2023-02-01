@@ -5,6 +5,7 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using System.Text.Json;
 
 namespace Backoffice.Web.Components.ManageBoost
@@ -23,6 +24,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
         public bool IsPreLoader { get; set; }
         public string Placeholder { get; set; }
+        public bool IsSaveDisabled { get; set; }
 
         #endregion
 
@@ -37,6 +39,19 @@ namespace Backoffice.Web.Components.ManageBoost
         protected override async Task OnInitializedAsync()
         {
             AddPriceBoostFilterModel = ModalParameters.TryGet<AddPriceBoostFilterModel>("AddPriceBoostFilterModel");
+            IsSaveDisabled = true;
+        }
+
+        public async Task OnConfigBoostedInputChangedEvent(KeyboardEventArgs args)
+        {
+            if (!AddPriceBoostFilterModel.PriceBoostConfigList.Any(c => !string.IsNullOrEmpty(c.BoostedOddsStr)))
+            {
+                IsSaveDisabled = true;
+            }
+            else
+            {
+                IsSaveDisabled = false;
+            }
         }
 
         public async Task OnCancelModalClick()
