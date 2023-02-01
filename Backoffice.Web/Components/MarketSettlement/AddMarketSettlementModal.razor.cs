@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -53,8 +54,6 @@ namespace Backoffice.Web.Components.MarketSettlement
 
         public async Task UpdateRowDetails(AddMarketSettlementModel AddMarketSettlement)
         {
-
-            _alertModel = new AlertModel();
             this.AddMarketSettlement = AddMarketSettlement;
             AddMarketSettlement.AddMarketSettlementSelections = new List<AddMarketSettlementSelectionModel>();
 
@@ -389,16 +388,40 @@ namespace Backoffice.Web.Components.MarketSettlement
                             Payload = JsonSerializer.Serialize(payload)
                         });
                     }
-                }
-                //AlertStatus = "Success!";
-                //AlertMessages = $"Markets {string.Join(",", request.Select(x => x.MarketName).ToList())} has been successfully settled.";
-                //Opacity = 1.0m;
 
-                await InvokeAsync(StateHasChanged);
+                    //OnActivityLogListMessage ActivityLogs = new OnActivityLogListMessage();
+                    //foreach (var bet in ManualBetDetailsModel.Bets)
+                    //{
+                    //    OnActivityLogMessage ActivityLog = new OnActivityLogMessage()
+                    //    {
+                    //        Page = Page.Admin_Settlement_Bet.ToString().Replace('_', '.'),
+                    //        Activity = Activity.ManualSettlement.ToString(),
+                    //        Payload = "",
+                    //        From = "-",
+                    //        To = JsonSerializer.Serialize(bet),
+                    //        UserId = UserModel.Id,
+                    //        UserName = UserModel.UserName,
+                    //        TimeStamp = DateTime.Now
+                    //    };
+
+                    //    ActivityLogs.OnActivityLogMessages.Add(ActivityLog);
+                    //}
+                }
+                IsPreLoader = false;
+                _alertModel = new AlertModel()
+                {
+                    Status = "Success",
+                    Message = $"Markets {string.Join(",", request.Select(x => x.MarketName).ToList())} has been successfully settled.",
+                    Opacity = 1.0m
+                };
+                StateHasChanged();
                 await Task.Delay(3500);
+                await Modal.OnSaveClickCallback.InvokeAsync();
+                ModalService.Cancel();
             }
             else
             {
+                IsPreLoader = false;
                 _alertModel = new AlertModel()
                 {
                     Status = "Error",
@@ -406,16 +429,6 @@ namespace Backoffice.Web.Components.MarketSettlement
                     Opacity = 1.0m,
                 };
             }
-            //await Notification();
-
-            IsPreLoader = false;
-            await Modal.OnSaveClickCallback.InvokeAsync();
-            ModalService.Cancel();
-            //if (!string.IsNullOrEmpty(AlertStatus))
-            //{
-            //    await Modal.OnSaveClickCallback.InvokeAsync();
-            //    ModalService.Cancel();
-            //}
         }
 
         public async Task OnCancelModal()

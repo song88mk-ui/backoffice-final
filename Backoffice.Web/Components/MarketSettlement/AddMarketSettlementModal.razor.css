@@ -33,7 +33,7 @@
 }
 
 table thead th, table tbody tr {
-    text-align: center;
+    text-align: left;
 }
 
     table thead th:first-child {

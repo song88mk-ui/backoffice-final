@@ -44,7 +44,6 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task GetContent()
         {
-
             var fromDate = Convert.ToDateTime(ModalFilter.FromDate.ToString("yyyy-MM-dd 00:00:00"));
             var toDate = Convert.ToDateTime(ModalFilter.ToDate.ToString("yyyy-MM-dd 23:59:59"));
             var filterSportsId = ModalFilter.SportId == 0 ? "%" : ModalFilter.SportId.ToString();
@@ -54,7 +53,7 @@ namespace Backoffice.Web.Pages.Administration
             
             var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
-                Page = Page.Administration_Settlement_Market.ToString().Replace("_", "."),
+                Page = Page.Admin_Settlement_Market.ToString().Replace("_", "."),
                 Payload = $"{filterSportsId}.{filterSegmentId}.{filterLeagueId}.{filterFixtureId}",
                 MetaData = MetaData,
                 DateFrom = Convert.ToDateTime(fromDate).Date,
