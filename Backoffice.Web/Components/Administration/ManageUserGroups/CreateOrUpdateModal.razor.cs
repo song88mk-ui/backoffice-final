@@ -27,11 +27,14 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         public ClientModel ClientModel { get; set; }
         public bool IsEdit { get; set; }
         public List<AlertModel> Alerts { get; set; }
+        public decimal Opacity { get; set; }
+        public bool IsPreload { get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            Opacity = 0m;
             Alerts = new List<AlertModel>();
             UserGroup = ModalParameters.TryGet<UserGroupResponse>("UserGroup");
             Permissions = ModalParameters.TryGet<PermissionResponse>("Permissions");
@@ -67,6 +70,9 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
         public async Task OnCancelClickEvent()
         {
+            if (IsPreload)
+                return;
+
             UserGroup = new UserGroupResponse
             {
                 Num = OldUserGroup.Num,
@@ -82,7 +88,11 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         {
             try
             {
+                if (IsPreload)
+                    return;
+
                 Alerts.Clear();
+                Opacity = Opacity == 1m ? 0.99m : 1m;
 
                 if (string.IsNullOrEmpty(UserGroup.UserGroupName))
                 {
@@ -90,22 +100,23 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                     {
                         Status = "Error",
                         Message = "User Group Name is required",
-                        Opacity = 1.0m
+                        Opacity = Opacity
                     });
                 }
-
-                if (UserGroup.UserGroupName.ToLower().Equals("super admin") || UserGroup.UserGroupName.ToLower().Equals("superadmin"))
+                else if (UserGroup.UserGroupName.ToLower().Equals("super admin") || UserGroup.UserGroupName.ToLower().Equals("superadmin"))
                 {
                     Alerts.Add(new AlertModel
                     {
                         Status = "Error",
                         Message = "Invalid User Group Name ",
-                        Opacity = 1.0m
+                        Opacity = Opacity
                     });
                 }
 
                 if (Alerts.Any())
                     return;
+
+                IsPreload = true;
 
                 var claims = new List<ClaimModel>();
 
@@ -147,32 +158,9 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                         UserName = UserModel.UserName
                     });
 
-                    if (IsEdit)
-                    {
-                        Alerts.Add(new AlertModel
-                        {
-                            Status = "Success",
-                            Message = "User Group successfully updated",
-                            Opacity = 1.0m
-                        });
-                    }
-                    else
-                    {
-                        Alerts.Add(new AlertModel
-                        {
-                            Status = "Success",
-                            Message = "User Group successfully created",
-                            Opacity = 1.0m
-                        });
-                    }
-
-
-                    await InvokeAsync(StateHasChanged);
-                    await Task.Delay(3500);
-
                     ModalService.Cancel();
 
-                    await Modal.OnSaveClickCallback.InvokeAsync();
+                    await Modal.OnSaveClickCallback.InvokeAsync(IsEdit ? "EDIT" : "ADD");
                 }
                 else
                 {
@@ -180,7 +168,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                     {
                         Status = "Error",
                         Message = $"{response.Message}",
-                        Opacity = 1.0m
+                        Opacity = Opacity
                     });
                 }
             }
@@ -188,6 +176,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
             {
 
             }
+
+            IsPreload = false; 
         }
 
 

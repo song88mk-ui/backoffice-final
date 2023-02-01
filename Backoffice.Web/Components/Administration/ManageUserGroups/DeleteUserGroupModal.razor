@@ -20,6 +20,6 @@
             }
         </div>
     }
-    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent">Close</button>
-    <button type="button" class="btn modal-btn modal-apply" @onclick="OnDeleteClickEvent">Apply</button>
+    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent" disabled="@IsPreload">Close</button>
+    <button type="button" class="btn modal-btn modal-apply" @onclick="OnDeleteClickEvent" disabled="@IsPreload">Apply</button>
 </div>

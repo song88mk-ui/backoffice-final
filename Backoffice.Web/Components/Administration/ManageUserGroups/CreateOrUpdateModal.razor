@@ -1,5 +1,15 @@
 ﻿<div class="modal-body">
     <div class="information-container mb-3">
+        @if (IsPreload)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mt-4 mx-3">
+                        <Preloader />
+                    </div>
+                </div>
+            </div>
+        }
         <div class="row">
             <div class="col-md-12 mb-1">
                 <h6 class="title fw-bold ps-2 py-1">Group Information</h6>
@@ -14,7 +24,7 @@
             </div>
         </div>
     </div>
-    <Permission IsReadOnly="false" Permissions="@Permissions.Permissions" ClientModel="@ClientModel" />
+    <Permission IsReadOnly="@IsPreload" Permissions="@Permissions.Permissions" ClientModel="@ClientModel" />
 </div>
 <div class="modal-footer mx-4">
     @if (Alerts != null && Alerts.Any())
@@ -26,6 +36,6 @@
             }
         </div>
     }
-    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
-    <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">Save</button>
+    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
+    <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Save</button>
 </div>

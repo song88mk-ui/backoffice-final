@@ -7,6 +7,17 @@
 <div class="col-md-12">
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
+@if (Alerts != null && Alerts.Any())
+{
+    foreach (var alert in Alerts)
+    {
+        <div class="col-md-12 mt-4 ">
+            <div class="mx-3">
+                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" />
+            </div>
+        </div>
+    }
+}
 <div class="col-md-12">
     <Filter OnInitCallback="OnInitEvent" OnCreateUserGroupCallback="OnCreateUserGroupClickEvent" />
 </div>
