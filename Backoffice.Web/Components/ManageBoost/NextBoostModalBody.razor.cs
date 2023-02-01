@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -16,9 +17,11 @@ namespace Backoffice.Web.Components.ManageBoost
 
         [Inject] ITradingService TradingService { get; set; }
         [Inject] IModalService ModalService { get; set; }
+        [Inject] IBackOfficeService BackOfficeService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] ModalParameters ModalParameters { get; set; }
+        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
         public AddPriceBoostFilterModel AddPriceBoostFilterModel { get; set; }
 
@@ -153,9 +156,11 @@ namespace Backoffice.Web.Components.ManageBoost
                             MessageType = "OnPriceBoost",
                             RoutingKey = $"r.uof.onpriceboost",
                             Payload = JsonSerializer.Serialize(payload)
-                        });
+                        });                        
                     }
                 }
+
+                var activityLogList = new OnActivityLogListMessage();
 
                 foreach (var priceboost in AddPriceBoostFilterModel.PriceBoostConfigList)
                 {
@@ -201,7 +206,43 @@ namespace Backoffice.Web.Components.ManageBoost
                         RoutingKey = $"r.uof.onpriceboost",
                         Payload = JsonSerializer.Serialize(payload)
                     });
-                }
+
+                    if (!string.IsNullOrEmpty(priceboost.BoostedOddsStr))
+                    {
+                        Backoffice.Shared.Models.PriceBoostLogModel priceBoostLogModel = new Backoffice.Shared.Models.PriceBoostLogModel()
+                        {
+                            ClientName = priceboost.ClientName,
+                            ClientCode = priceboost.ClientCode,
+                            SelectionName = priceboost.BoostedSelectionName,
+                            MarketName = priceboost.MarketName,
+                            SportName = priceboost.SportName,
+                            SegmentName = priceboost.SegmentName,
+                            LeagueName = priceboost.LeagueName,
+                            Odds = decimal.Parse(priceboost.BoostedOddsStr),
+                            FixtureName = priceboost.FixtureName,
+                            UserName = priceboost.UserName,
+                            SelectionTemplateId = priceboost.SelectionTemplateId,
+                            MarketSpecifier = priceboost.MarketSpecifier,
+                            Translations = priceboost.BoostedSelectionTranslations
+                        };
+
+                        OnActivityLogMessage onActivityLogMessage = new OnActivityLogMessage()
+                        {
+                            Page = Page.OE_PriceBoost_Manage.ToString().Replace('_', '.'),
+                            Payload = $"{priceboost.ClientCode}.{priceboost.SportId}.{priceboost.SegmentId}.{priceboost.LeagueId}",
+                            Activity = Activity.Create.ToString(),
+                            From = "-",
+                            To = JsonSerializer.Serialize(priceBoostLogModel),
+                            UserId = UserModel.Id,
+                            UserName = UserModel.UserName,
+                            TimeStamp = DateTime.UtcNow
+                        };
+
+                        activityLogList.OnActivityLogMessages.Add(onActivityLogMessage);
+                    }
+                }                
+
+                var addLogResponse = await BackOfficeService.AddActivityLogList(activityLogList);
 
                 //await JsRuntime.InvokeVoidAsync("ShowNotication", SaveButton, "Priceboost has been updated");
 

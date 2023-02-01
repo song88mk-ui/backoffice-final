@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -15,6 +16,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
+        [Inject] private IBackOfficeService BackOfficeService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
@@ -112,6 +114,8 @@ namespace Backoffice.Web.Components.ManageBoost
             PriceBoostConfigModel.UserId = UserModel.Id;
             PriceBoostConfigModel.UserName = UserModel.UserName;
 
+            string currentPriceBoostString = ModalParameters.TryGet<string>("PriceBoostConfigModelSerialized");
+
             var result = await TradingService.AddOrUpdatePriceBoost(new List<PriceBoostConfigModel>() { PriceBoostConfigModel });
             if (result.StatusCode == StatusCode.Success)
             {
@@ -206,6 +210,54 @@ namespace Backoffice.Web.Components.ManageBoost
                     MessageType = "OnPriceBoost",
                     RoutingKey = $"r.uof.onpriceboost",
                     Payload = JsonSerializer.Serialize(payload2)
+                });
+
+                var currentPriceBoost = JsonSerializer.Deserialize<PriceBoostConfigModel>(currentPriceBoostString);
+
+                Backoffice.Shared.Models.PriceBoostLogModel priceBoostLogModelFrom = new Backoffice.Shared.Models.PriceBoostLogModel()
+                {
+                    ClientName = currentPriceBoost.ClientName,
+                    ClientCode = currentPriceBoost.ClientCode,
+                    SelectionName = currentPriceBoost.BoostedSelectionName,
+                    MarketName = currentPriceBoost.MarketName,
+                    SportName = currentPriceBoost.SportName,
+                    SegmentName = currentPriceBoost.SegmentName,
+                    LeagueName = currentPriceBoost.LeagueName,
+                    Odds = currentPriceBoost.BoostedOdds,
+                    FixtureName = currentPriceBoost.FixtureName,
+                    UserName = currentPriceBoost.UserName,
+                    SelectionTemplateId = currentPriceBoost.SelectionTemplateId,
+                    MarketSpecifier = currentPriceBoost.MarketSpecifier,
+                    Translations = currentPriceBoost.BoostedSelectionTranslations
+                };
+
+                Backoffice.Shared.Models.PriceBoostLogModel priceBoostLogModelTo = new Backoffice.Shared.Models.PriceBoostLogModel()
+                {
+                    ClientName = PriceBoostConfigModel.ClientName,
+                    ClientCode = PriceBoostConfigModel.ClientCode,
+                    SelectionName = PriceBoostConfigModel.BoostedSelectionName,
+                    MarketName = PriceBoostConfigModel.MarketName,
+                    SportName = PriceBoostConfigModel.SportName,
+                    SegmentName = PriceBoostConfigModel.SegmentName,
+                    LeagueName = PriceBoostConfigModel.LeagueName,
+                    Odds = decimal.Parse(PriceBoostConfigModel.BoostedOddsStr),
+                    FixtureName = PriceBoostConfigModel.FixtureName,
+                    UserName = PriceBoostConfigModel.UserName,
+                    SelectionTemplateId = PriceBoostConfigModel.SelectionTemplateId,
+                    MarketSpecifier = PriceBoostConfigModel.MarketSpecifier,
+                    Translations = PriceBoostConfigModel.BoostedSelectionTranslations
+                };
+
+                var updateLogResponse = await BackOfficeService.AddActivityLog(new ActivityLogModel()
+                {
+                    Page = Page.OE_PriceBoost_Manage.ToString().Replace('_','.'),
+                    Payload = $"{PriceBoostConfigModel.ClientCode}.{PriceBoostConfigModel.SportId}.{PriceBoostConfigModel.SegmentId}.{PriceBoostConfigModel.LeagueId}",
+                    Activity = Activity.Update.ToString(),
+                    From = JsonSerializer.Serialize(priceBoostLogModelFrom),
+                    To = JsonSerializer.Serialize(priceBoostLogModelTo),
+                    UserId = UserModel.Id,
+                    UserName = UserModel.UserName,
+                    TimeStamp = DateTime.UtcNow
                 });
             }
 
