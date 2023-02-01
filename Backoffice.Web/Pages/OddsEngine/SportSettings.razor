@@ -10,9 +10,6 @@
 <div class="col-md-12">
     <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
 </div>
-<div class="col-md-12">
-    <Filter OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickCallback="OnCancelClickEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyClickCallback="OnCopyClickEvent" OnViewLogsCallback="OnViewLogsClickEvent" IsPreload="IsPreload" />
-</div>
 
 @if (!string.IsNullOrEmpty(AlertMessage))
 {
@@ -23,6 +20,9 @@
     </div>
 }
 
+<div class="col-md-12">
+    <Filter OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickCallback="OnCancelClickEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyClickCallback="OnCopyClickEvent" OnViewLogsCallback="OnViewLogsClickEvent" IsPreload="IsPreload" />
+</div>
 <div class="col-md-12">
     <div class="mx-3 mt-4">
         @if (IsPreload)
