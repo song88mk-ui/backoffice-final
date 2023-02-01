@@ -85,7 +85,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
             IsPreLoader = false;
 
-            await Modal.OnSaveClickCallback.InvokeAsync();
+            await Modal.OnSaveClickCallback.InvokeAsync("deleted");
 
             ModalService.Cancel();
         }

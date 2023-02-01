@@ -211,7 +211,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
             IsPreloader = false;
 
-            await Modal.OnSaveClickCallback.InvokeAsync();
+            await Modal.OnSaveClickCallback.InvokeAsync("updated");
 
             ModalService.Cancel();
         }

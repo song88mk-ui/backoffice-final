@@ -190,7 +190,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
                 //await JsRuntime.InvokeVoidAsync("ShowNotication", SaveButton, "Priceboost has been updated");
 
-                await Modal.OnSaveClickCallback.InvokeAsync();
+                await Modal.OnSaveClickCallback.InvokeAsync("updated");
 
                 ModalService.Cancel();
             }
