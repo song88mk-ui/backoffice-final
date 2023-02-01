@@ -30,6 +30,15 @@
                                     <td>@user.UserName</td>
                                 </tr>
                             }
+
+                            if (!Users.Any())
+                            {
+                                <tr>
+                                    <td colspan="2">
+                                        <NoRecordFound />
+                                    </td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
