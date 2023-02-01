@@ -327,7 +327,7 @@ namespace Backoffice.Utility.Repository
 
                     int cellIndex = (i + 1) + 1;
 
-                    worksheet.Cells[cellIndex, 1].Value = cellIndex;
+                    worksheet.Cells[cellIndex, 1].Value = (cellIndex-1);
                     worksheet.Cells[cellIndex, 2].Value = log.SettlementDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
                     worksheet.Cells[cellIndex, 3].Value = log.BetId;
                     worksheet.Cells[cellIndex, 4].Value = log.BetDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();

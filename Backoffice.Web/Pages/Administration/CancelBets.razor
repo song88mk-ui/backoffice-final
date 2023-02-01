@@ -8,18 +8,28 @@
             <div class="col-md-12">
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
-            <div class="col-md-12">
-                <Filter OnAddBetReferenceIdCallback="OnAddBetReferenceIdCallbackEvent" OnCancelBetCallback="OnCancelBetCallbackEvent" OnResetCallback="OnResetCallbackEvent" />
-            </div>
             @if (Alerts != null && Alerts.Any())
             {
+                foreach (var alert in Alerts)
+                {
+                    <div class="col-md-12 mt-4 ">
+                        <div class="mx-3">
+                            <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" AlwaysShow="true" />
+                        </div>
+                    </div>
+                }
+            }
+            @if (IsPreload)
+            {
                 <div class="col-md-12">
-                    @foreach (var alert in Alerts)
-                    {
-                        <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" />
-                    }
+                    <div class="mt-4 mx-3">
+                        <Preloader />
+                    </div>
                 </div>
             }
+            <div class="col-md-12 mt-4">
+                <Filter OnAddBetReferenceIdCallback="OnAddBetReferenceIdCallbackEvent" OnCancelBetCallback="OnCancelBetCallbackEvent" OnResetCallback="OnResetCallbackEvent" IsPreload="IsPreload" />
+            </div>
             <div class="col-md-12">
                 <div class="content mx-3">
                     <div class="information-container">
@@ -33,14 +43,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if(CancelBetModel != null && CancelBetModel.BetReferenceIds.Any())
+                            @if (CancelBetModel != null && CancelBetModel.BetReferenceIds.Any())
                             {
-                                foreach(var bet in CancelBetModel.BetReferenceIds)
+                                var count = 0;
+                                foreach (var bet in CancelBetModel.BetReferenceIds)
                                 {
+                                    count++;
                                     <tr>
                                         <td class="text-center">@bet.Num</td>
                                         <td>
-                                            <input type="text" class="form-control" @bind-value="bet.BetReferenceId" />
+                                            <input type="text" class="@(!IsPreload && (string.IsNullOrEmpty(bet.BetReferenceId) || Alerts.Any(a => a.Control == count.ToString())) ? "form-control border-danger" : "form-control")" @bind-value="bet.BetReferenceId" />
                                         </td>
                                     </tr>
                                 }
@@ -61,9 +73,9 @@
                             <tr>
                                 <td>
                                     <div class="form-floating">
-                                        @if(CancelBetModel != null)
+                                        @if (CancelBetModel != null)
                                         {
-                                            <textarea class="form-control input-reason" @bind="CancelBetModel.Reason" />
+                                            <textarea class="@(!IsPreload && string.IsNullOrEmpty(CancelBetModel.Reason) ? "form-control input-reason border-danger" : "form-control input-reason")" @bind="CancelBetModel.Reason" />
                                         }
                                     </div>
                                 </td>
@@ -76,5 +88,5 @@
     </div>
 </div>
 <div>
-    <CustomModal OnSaveClickCallback="OnResetCallbackEvent" />
+    <CustomModal OnSaveClickCallback="OnConfirmCancelBetEvent" />
 </div>

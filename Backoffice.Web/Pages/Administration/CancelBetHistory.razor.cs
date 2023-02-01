@@ -39,7 +39,7 @@ namespace Backoffice.Web.Pages.Administration
             MetaData = new MetaData
             {
                 CurrentPage = 1,
-                PageSize = 20,
+                PageSize = 10,
                 TotalCount = 0,
                 TotalPages = 1,
             };
