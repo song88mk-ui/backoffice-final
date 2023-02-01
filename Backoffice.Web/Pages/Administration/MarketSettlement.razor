@@ -16,31 +16,35 @@
                 <span class="fs-6">Manual Market Settlement History</span>
             </div>
             <div class="col-md-12">
-                @if (ManualMarketSettlements != null && ManualMarketSettlements.Any())
-                {
-                    @if (IsPreLoader)
-                    {
-                        <Preloader />
-                    }
-                    <div class="mx-3 mt-4">
-                        <table class="table table-hover table-bordered">
-                            <thead class="table-head">
+                <div class="mx-3 mt-4">
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-head">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Fixture</th>
+                                <th scope="col">Market Name</th>
+                                <th scope="col">Sport</th>
+                                <th scope="col">Event Details</th>
+                                <th scope="col">Selection</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Settled By</th>
+                                <th scope="col">Date Settled</th>
+                                <th scope="col">Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (IsPreLoader)
+                            {
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Fixture</th>
-                                    <th scope="col">Market Name</th>
-                                    <th scope="col">Sport</th>
-                                    <th scope="col">Event Details</th>
-                                    <th scope="col">Selection</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Settled By</th>
-                                    <th scope="col">Date Settled</th>
-                                    <th scope="col">Reason</th>
+                                    <td colspan="10">
+                                        <Preloader />
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
+                            }
+                            else if (ManualMarketSettlements != null && ManualMarketSettlements.Any())
+                            {
                                 @foreach (var item in ManualMarketSettlements)
-                                {                        
+                                {
                                     int rowCount = (ManualMarketSettlements.IndexOf(item) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
                                     <tr>
                                         <th scope="row">
@@ -65,7 +69,7 @@
                                         <td>
                                             <span>@item.SegmentName</span> <br>
                                             <span>@item.LeagueName</span> <br>
-                                            <strong><span>@item.FixtureName</span></strong>
+                                            <strong><span>@item.FixtureName</span></strong><br>
                                             <span>@item.FixtureStartDate.ToLocalTime().ToString("yyyy/MM/dd hh:mm:ss tt")</span><br>
                                             <span>@item.MarketName @(GetMarketLine(item.MarketName, item.Line))</span>
                                         </td>
@@ -85,21 +89,25 @@
                                         <td>
                                             <span>@item.Reason</span>
                                         </td>
-                                    </tr>                        
-                                }                    
-                            </tbody>
-                            <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="10" />
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <NoRecordFound/>
-                }
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="10">
+                                        <NoRecordFound />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="10" />
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
 <div>
-    <CustomModal OnSaveClickCallback="GetContent"/>
+    <CustomModal OnSaveClickCallback="GetContent" />
 </div>

@@ -81,7 +81,6 @@ namespace Backoffice.Web.Pages.Administration
 
 
             IsPreLoader = false;
-            await InvokeAsync(StateHasChanged);
         }
 
         public async Task SelectPage()

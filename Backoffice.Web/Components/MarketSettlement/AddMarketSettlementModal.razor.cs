@@ -14,6 +14,7 @@ namespace Backoffice.Web.Components.MarketSettlement
     public partial class AddMarketSettlementModal : IDisposable
     {
         #region Properties
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -362,6 +363,24 @@ namespace Backoffice.Web.Components.MarketSettlement
             IsPreLoader = true;
             await InvokeAsync(StateHasChanged);
 
+            OnActivityLogListMessage ActivityLogs = new OnActivityLogListMessage();
+            foreach (var item in request)
+            {
+                OnActivityLogMessage ActivityLog = new OnActivityLogMessage()
+                {
+                    Page = Page.Admin_Settlement_Market.ToString().Replace('_', '.'),
+                    Activity = Activity.ManualSettlement.ToString(),
+                    Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
+                    From = "-",
+                    To = JsonSerializer.Serialize(item),
+                    UserId = UserModel.Id,
+                    UserName = UserModel.UserName,
+                    TimeStamp = DateTime.Now
+                };
+
+                ActivityLogs.OnActivityLogMessages.Add(ActivityLog);
+            }
+
             var response = (await TradingService.AddOrUpdateManualMarketSettlement(request, UserModel.Id)).Result;
 
             if (response.StatusCode == StatusCode.Success)
@@ -389,23 +408,7 @@ namespace Backoffice.Web.Components.MarketSettlement
                         });
                     }
 
-                    //OnActivityLogListMessage ActivityLogs = new OnActivityLogListMessage();
-                    //foreach (var bet in ManualBetDetailsModel.Bets)
-                    //{
-                    //    OnActivityLogMessage ActivityLog = new OnActivityLogMessage()
-                    //    {
-                    //        Page = Page.Admin_Settlement_Bet.ToString().Replace('_', '.'),
-                    //        Activity = Activity.ManualSettlement.ToString(),
-                    //        Payload = "",
-                    //        From = "-",
-                    //        To = JsonSerializer.Serialize(bet),
-                    //        UserId = UserModel.Id,
-                    //        UserName = UserModel.UserName,
-                    //        TimeStamp = DateTime.Now
-                    //    };
-
-                    //    ActivityLogs.OnActivityLogMessages.Add(ActivityLog);
-                    //}
+                    await BackOfficeService.AddActivityLogList(ActivityLogs);
                 }
                 IsPreLoader = false;
                 _alertModel = new AlertModel()

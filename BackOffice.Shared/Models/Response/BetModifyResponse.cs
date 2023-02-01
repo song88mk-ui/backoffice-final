@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Backoffice.Shared.Models.Requests
+namespace Backoffice.Shared.Models.Response
 {
     public class BetModifyResponse
     {
