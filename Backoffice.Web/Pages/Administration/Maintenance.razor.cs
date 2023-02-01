@@ -29,6 +29,7 @@ namespace Backoffice.Web.Pages.Administration
             if ((bool)value)
             {
                 var parameters = new ModalParameters();
+                parameters.Add("ModalDialogClass", "modal-dialog-centered");
                 var options = new ModalOptions();
 
                 ModalService.Open<ConfirmationModal>("Maintenance", parameters, options);
