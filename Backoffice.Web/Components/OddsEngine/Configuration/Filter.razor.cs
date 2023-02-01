@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
-        [Parameter] public ConfigFilterModel ConfigFilterModel { get; set; }
+        [Parameter] public ConfigFilterModel ConfigFilterModel { get; set; } = new ConfigFilterModel();
         [Parameter] public EventCallback<ConfigFilterModel> ConfigFilterModelChanged { get; set; }
         [Parameter] public FixtureType FixtureType { get; set; }
         [Parameter] public EventCallback OnInitCallBack { get; set; }

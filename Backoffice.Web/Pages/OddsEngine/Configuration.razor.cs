@@ -31,7 +31,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private ToastService toasterService => ToastService!;
         public Configuration ConfigComponent { get; set; }
-        public ConfigFilterModel ConfigFilterModel { get; set; } = new ConfigFilterModel();
+        public ConfigFilterModel ConfigFilterModel { get; set; }
         public List<MarketLookupNavigationModel> SelectedContents;
         public FixtureType FixtureType { get; set; }
         private HubConnection HubConnection { get; set; }
@@ -39,6 +39,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string IconClass { get; set; }
         public int? AllMarketStatus { get; set; }
         public string AllMarketStatusName { get; set; } = "Deactivate All";
+        public bool SaveBarVisible { get; set; } = false;
         public string ToastTitle { get; set; }
         public string ToastMessage { get; set; }
         public bool IsToastMessageMarkup { get; set; }
@@ -53,9 +54,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         {            
             PageTitle = "Config";
             IconClass = "";
-            ConfigFilterModel = new ConfigFilterModel();
             IsToastMessageMarkup = true;
-
+            ConfigFilterModel = null;
             Breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
@@ -92,20 +92,19 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-        private async Task GetContents()
+        public List<MarketLookupNavigationModel> GetContents()
         {
             if (ConfigFilterModel.MarketTemplateGroupId == 0)
                 ConfigFilterModel.MarketTemplateGroupId = ConfigFilterModel.MarketTemplates.FirstOrDefault(m => m.IsSelected).MarketTemplateGroupId;
 
-            var result = ConfigFilterModel.MarketTemplates.Where(c => c.MarketTemplateGroupId == ConfigFilterModel.MarketTemplateGroupId);
+            var query = ConfigFilterModel.MarketTemplates.Where(c => c.MarketTemplateGroupId == ConfigFilterModel.MarketTemplateGroupId);
 
             if (!string.IsNullOrEmpty(ConfigFilterModel.SearchText))
             {
-                result = result.Where(c => c.MarketLookup.MarketTemplateName.ToUpper().Contains(ConfigFilterModel.SearchText.ToUpper()));
+                query = query.Where(c => c.MarketLookup.MarketTemplateName.ToUpper().Contains(ConfigFilterModel.SearchText.ToUpper()));
             }
 
-            SelectedContents= result.ToList();
-            IsPreloader = false;
+            return query.ToList();
         }
 
         private void GetNewSettings(MarketLookupNavigationModel market)
@@ -435,7 +434,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     if (IsConnected) await HubConnection.SendAsync("OnConfigChange", data);
 
-                    //SaveBarVisible = false;
+                    SaveBarVisible = false;
                 }
 
             }

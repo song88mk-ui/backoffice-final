@@ -13,7 +13,7 @@
 </div>
 
 <div class="col-md-12">
-    <Filter @bind-ConfigFilterModel="ConfigFilterModel" OnInitCallBack="@GetContents" />
+    <Filter @bind-ConfigFilterModel="ConfigFilterModel" FixtureType="FixtureType" />
 </div>
 
 <div class="col-md-12 mb-2">
@@ -21,36 +21,40 @@
 </div>
 
 <div class="col-md-12">
-    <Toast ToastMessage="@ToastMessage" ToastTitle="@ToastTitle" IsMessageMarkup=@IsToastMessageMarkup />
-    @if (IsPreloader)
+    @if (ConfigFilterModel != null && ConfigFilterModel.MarketTemplates != null)
     {
-        <Preloader />
-    }
-    else
-    {
-        @if (SelectedContents.Any())
+        SelectedContents = null;
+        if (!string.IsNullOrEmpty(ConfigFilterModel.ClientCode) && ConfigFilterModel.MarketTemplates.Any())
         {
-            var marketCount = 0;
-            foreach (var market in SelectedContents)
+            SelectedContents = GetContents();
+
+            if (SelectedContents.Any())
             {
-
-                if (market.NewMarketLookup == null)
-                    market.IsSelected = marketCount >= 3 ? true : false;
-
-                GetNewSettings(market);
-                var configStatus = market.MarketLookup.IsActive ? 1 : 0;
-
-                if (ConfigFilterModel.FilterConfigStatus == -99 || configStatus == ConfigFilterModel.FilterConfigStatus)
+                var marketCount = 0;
+                foreach (var market in SelectedContents)
                 {
-                    if (AllMarketStatus != null)
+
+                    if (market.NewMarketLookup == null)
+                        market.IsSelected = marketCount >= 3 ? true : false;
+
+                    GetNewSettings(market);
+                    var configStatus = market.MarketLookup.IsActive ? 1 : 0;
+
+                    if (ConfigFilterModel.FilterConfigStatus == -99 || configStatus == ConfigFilterModel.FilterConfigStatus)
                     {
-                        market.NewMarketLookup.IsActive = (int)AllMarketStatus == 1 ? true : false;
+                        if (AllMarketStatus != null)
+                        {
+                            market.NewMarketLookup.IsActive = (int)AllMarketStatus == 1 ? true : false;
+                        }
+                        marketCount++;
                     }
-                    marketCount++;
                 }
 
                 if (marketCount > 0)
                 {
+                    SaveBarVisible = false;
+                    AllMarketStatus = null;
+
                     if (ConfigFilterModel.FilterConfigStatus == 0)
                         AllMarketStatusName = "Activate All";
                     if (ConfigFilterModel.FilterConfigStatus == 1)
@@ -105,14 +109,25 @@
                             </div>
                         </ItemContent>
                     </Virtualize>
-
                 }
                 else
                 {
                     <NoRecordFound />
                 }
             }
+            else
+            {
+                <NoRecordFound />
+            }
         }
+        else
+        {
+            <NoRecordFound />
+        }
+    }
+    else
+    {
+        <Preloader />
     }
 </div>
 <CustomModal />
