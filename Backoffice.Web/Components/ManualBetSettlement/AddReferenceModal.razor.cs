@@ -7,6 +7,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System.Text;
 using System.Text.Json;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
@@ -18,6 +19,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        //[Inject] private IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -28,7 +30,10 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         private ManualBetDetailsModel ManualBetDetailsModel { get; set; }
 
         public bool IsAddDisabled { get; set; }
-        public bool IsActionDisabled { get; set; }
+        public bool IsActionDisabled { get; set; }       
+        public bool IsBetSelectDisabled { get; set; }
+        public bool IsReasonDisabled { get; set; }
+        public bool IsSettleDisabled { get; set; }        
         #endregion
 
         #region Methods
@@ -37,7 +42,8 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             ManualBetSettlementModel = new ManualBetSettlementModel();
             Alerts = new List<AlertModel>();
             IsAddDisabled = true;
-            IsActionDisabled = false;
+            IsActionDisabled = false;                        
+            IsSettleDisabled = true;
 
             ManualBetDetailsModel = ModalParameters.TryGet<ManualBetDetailsModel>("ManualBetDetailsModel");
 
@@ -45,13 +51,14 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             {
                 ManualBetDetailsModel = new ManualBetDetailsModel();
                 ManualBetDetailsModel.Bets.Add(new ManualBetDetails());
-            }
+            }            
         }
 
         public async Task OnAddReferenceIdClickedEvent()
         {
             ManualBetDetailsModel.Bets.Add(new ManualBetDetails());
-            IsAddDisabled = true;
+            IsAddDisabled = true;            
+            IsSettleDisabled = true;
         }
 
         public async Task OnReferenceIdOnChangeEvent(ChangeEventArgs args, ManualBetDetails bet, int index)
@@ -65,79 +72,83 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             if (isGuid)
             {
                 IsActionDisabled = true;
+                IsBetSelectDisabled = true;
+                IsReasonDisabled = true;
+                IsSettleDisabled = true;
 
                 await InvokeAsync(StateHasChanged);
 
-                if (ManualBetDetailsModel != null && ManualBetDetailsModel.Bets.Any() && ManualBetDetailsModel.Bets.Any(bet => bet.BetId == betId))
+                var response = (await BackOfficeService.GetManualBetDetails(new ManualBetDetailsRequest()
                 {
-                    Alerts = new List<AlertModel>();
+                    BetIds = new List<string> { betIdString }
+                })).Result;
 
-                    Alerts.Add(new AlertModel()
-                    {
-                        Status = "Error",
-                        Message = "Duplicate BetId's are not allowerd",
-                        Opacity = 1.0m
-                    });
+                if (response.Bets.Any())
+                {
+                    bet = JsonSerializer.Deserialize<ManualBetDetails>(JsonSerializer.Serialize(response.Bets.FirstOrDefault()));
+
+                    ManualBetDetailsModel.Bets[index] = bet;
+
+                    IsAddDisabled = false;
+                    IsActionDisabled = false;
+                    IsBetSelectDisabled = false;
+                    IsReasonDisabled = false;                    
                 }
-                else
-                {
-                    var response = (await BackOfficeService.GetManualBetDetails(new ManualBetDetailsRequest()
-                    {
-                        BetIds = new List<string> { betIdString }
-                    })).Result;
-
-                    if (response.Bets.Any())
-                    {
-                        bet = JsonSerializer.Deserialize<ManualBetDetails>(JsonSerializer.Serialize(response.Bets.FirstOrDefault()));
-
-                        ManualBetDetailsModel.Bets[index] = bet;
-
-                        IsAddDisabled = false;
-                    }
-                }                
+            }
+            else
+            {
+                ManualBetDetailsModel.Bets[index] = new ManualBetDetails();
+                //IsSettleDisabled = true;
+                //await JSRuntime.InvokeVoidAsync("resetManualBetSettlementInputs", index);
             }
 
-            IsActionDisabled = false;
+            IsReasonDisabled = false;            
         }
 
         public async Task OnBetStatusChangedEvent(ChangeEventArgs e, ManualBetDetails bet)
-        {
+        {            
             bet.NewBetStatusId = int.Parse(e.Value.ToString());
 
             switch ((BetStatus)bet.NewBetStatusId)
             {
                 case BetStatus.Won:
                     {
-                        bet.NewBetStatusName = BetStatus.Won.ToString();
+                        bet.NewBetStatusName = BetStatus.Won.ToString();                        
                         break;
                     }
                 case BetStatus.Lost:
                     {
-                        bet.NewBetStatusName = BetStatus.Lost.ToString();
+                        bet.NewBetStatusName = BetStatus.Lost.ToString();                        
                         break;
                     }
                 case BetStatus.HalfWon:
                     {
-                        bet.NewBetStatusName = BetStatus.HalfWon.ToString();
+                        bet.NewBetStatusName = BetStatus.HalfWon.ToString();                        
                         break;
                     }
                 case BetStatus.HalfLost:
                     {
-                        bet.NewBetStatusName = BetStatus.HalfLost.ToString();
+                        bet.NewBetStatusName = BetStatus.HalfLost.ToString();                        
                         break;
                     }
                 case BetStatus.Void:
                     {
-                        bet.NewBetStatusName = BetStatus.Void.ToString();
+                        bet.NewBetStatusName = BetStatus.Void.ToString();                        
                         break;
                     }
-                default: break;
+                default:
+                    IsSettleDisabled = true;
+                    break;
             }
+
+            //await JSRuntime.InvokeVoidAsync("validateManualBetSettlementData");
         }
 
         public async Task OnReasonChangedEvent(ChangeEventArgs e, ManualBetDetails bet)
         {
             bet.Reason = e.Value.ToString();
+
+            //await JSRuntime.InvokeVoidAsync("validateManualBetSettlementData");
         }
 
         public async Task OnDeleteClickEvent(ManualBetDetails bet)
@@ -158,13 +169,45 @@ namespace Backoffice.Web.Components.ManualBetSettlement
 
         public async Task OnModalSettleClickEvent()
         {
-            ModalParameters parameters = new ModalParameters();
-            parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("ManualBetDetailsModel", ManualBetDetailsModel);
+            if (ManualBetDetailsModel != null && ManualBetDetailsModel.Bets.Any())
+            {
+                //8000 is cashedout
+                List<int> invalidStatusList = new List<int>() { (int)BetStatus.Rejected, (int)BetStatus.Cancelled, 8000};
 
-            ModalOptions options = new ModalOptions();
+                if (ManualBetDetailsModel.Bets.Any(betDetails => invalidStatusList.Contains(betDetails.BetStatusId)))
+                {
+                    Alerts.Clear();
 
-            ModalService.Open<ConfirmBetSettlementModal>("Manual Bet Settlement", parameters, options);
+                    Alerts.Add(new AlertModel()
+                    {
+                        Status = AlertStatus.Error.ToString(),
+                        Message = "Rejected, Cancelled and Cashout bets cannot be resettled!",
+                        Opacity = 1.0m
+                    });                    
+                }
+                else if (ManualBetDetailsModel != null && ManualBetDetailsModel.Bets.Any() &&
+                    ManualBetDetailsModel.Bets.GroupBy(x => x.BetId).Any(g => g.Count() > 1))
+                {
+                    Alerts.Clear();
+
+                    Alerts.Add(new AlertModel()
+                    {
+                        Status = AlertStatus.Error.ToString(),
+                        Message = "Duplicate BetId's are not allowed",
+                        Opacity = 1.0m
+                    });
+                }
+                else
+                {
+                    ModalParameters parameters = new ModalParameters();
+                    parameters.Add("ModalDialogClass", "modal-lg");
+                    parameters.Add("ManualBetDetailsModel", ManualBetDetailsModel);
+
+                    ModalOptions options = new ModalOptions();
+
+                    ModalService.Open<ConfirmBetSettlementModal>("Manual Bet Settlement", parameters, options);
+                }
+            }
         }
         public void Dispose()
         {

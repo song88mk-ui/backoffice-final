@@ -1,6 +1,7 @@
-﻿@if (!string.IsNullOrEmpty(AlertStatus) && !string.IsNullOrEmpty(AlertMessageStr) && Opacity > 0)
+﻿@using Backoffice.Web.Models;
+@if (!string.IsNullOrEmpty(AlertStatus) && !string.IsNullOrEmpty(AlertMessageStr) && Opacity > 0)
 {
-    <div>        
+    <div>
         <div class=@($"alert {(AlertStatus.Contains("Success") ? "alert-success" : AlertStatus.Contains("Error") || AlertStatus.Contains("Danger") ? "alert-danger" : "alert-primary")} text-left") role="alert" style="@(Opacity == 0 ? $"display: none; opacity: {Opacity}" : $"display: block; opacity: {Opacity}")">
             @AlertMessageStr
         </div>
@@ -15,6 +16,7 @@
     [Parameter] public string AlertStatus { get; set; }
     [Parameter] public string AlertMessageStr { get; set; }
     [Parameter] public bool AlwaysShow { get; set; } = false;
+    [Parameter] public AlertModel AlertModel { get; set; }
 
     #region Methods
 

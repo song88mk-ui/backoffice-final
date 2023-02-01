@@ -5,7 +5,7 @@
     {
         foreach (var alert in Alerts)
         {
-            <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" />
+            <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" AlertModel="Alerts.FirstOrDefault()"/>
         }
     }
     <table class="table">
@@ -33,7 +33,7 @@
                     </th>
 
                     <td>
-                        <textarea class="form-control" placeholder="Reference ID" @oninput="(ChangeEventArgs args) => OnReferenceIdOnChangeEvent(args, bet, ManualBetDetailsModel.Bets.IndexOf(bet))" disabled="@IsActionDisabled"></textarea>
+                        <textarea class="ref-id form-control" placeholder="Reference ID" @oninput="(ChangeEventArgs args) => OnReferenceIdOnChangeEvent(args, bet, ManualBetDetailsModel.Bets.IndexOf(bet))" disabled="@IsActionDisabled"></textarea>
                     </td>
 
                     <td class="fw-bold">
@@ -49,7 +49,7 @@
                     </td>
 
                     <td>
-                        <select class="form-select" @onchange="(ChangeEventArgs e) => OnBetStatusChangedEvent(e, bet)" disabled="@IsActionDisabled">
+                        <select class="form-select" @onchange="(ChangeEventArgs e) => OnBetStatusChangedEvent(e, bet)" disabled="@IsBetSelectDisabled">
                             <option value="0">None</option>
                             <option value="@((int)BetStatus.Won)">Won</option>
                             <option value="@((int)BetStatus.Lost)">Lost</option>
@@ -59,7 +59,7 @@
                         </select>
                     </td>
                     <td>
-                        <textarea class="form-control" placeholder="Reason" @oninput="(ChangeEventArgs e) => OnReasonChangedEvent(e, bet)" disabled="@IsActionDisabled"></textarea>
+                        <textarea class="reason form-control" placeholder="Reason" @oninput="(ChangeEventArgs e) => OnReasonChangedEvent(e, bet)" disabled="@IsReasonDisabled"></textarea>
                     </td>
                     <td>
                         <button type="button" class="btn" @onclick="() => OnDeleteClickEvent(bet)" disabled="@((ManualBetDetailsModel.Bets.Count == 1 ? true: false) || @IsActionDisabled)">
