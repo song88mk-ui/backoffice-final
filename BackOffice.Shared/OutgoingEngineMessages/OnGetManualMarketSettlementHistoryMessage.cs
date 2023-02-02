@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Backoffice.Shared.OutgoingEngineMessages
 {
-    public class OnGetManualMarketSettlementHistoryMessage
+    public class OnGetMarketSettlementHistoryMessage
     {
         public string UserId { get; set; }
         public DateTime FromDate { get; set; }

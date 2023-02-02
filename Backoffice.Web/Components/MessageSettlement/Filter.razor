@@ -24,7 +24,7 @@
 
 @if (ShowFilter)
 {
-    <EditForm Model="MarketSettlementFilterModel" OnValidSubmit="OnSubmitClickEvent" Context="FormContext">
+    <EditForm Model="FilterModel" OnValidSubmit="OnSubmitClickEvent" Context="FormContext">
         <div class="row">
             <div class="d-flex col-md-12 mx-3 mt-4">
                 <div class="col-2 me-2">
@@ -36,7 +36,7 @@
                         {
                             @foreach (var item in Sports)
                             {
-                                if (item.Value == MarketSettlementFilterModel.SportId)
+                                if (item.Value == FilterModel.SportId)
                                 {
                                     <option value="@item.Value" selected>@item.Name</option>
                                 }
@@ -57,7 +57,7 @@
                         {
                             @foreach (var item in Segments)
                             {
-                                if (item.Value == MarketSettlementFilterModel.SegmentId)
+                                if (item.Value == FilterModel.SegmentId)
                                 {
                                     <option value="@item.Value" selected>@item.Name</option>
                                 }
@@ -78,7 +78,7 @@
                         {
                             @foreach (var item in Leagues)
                             {
-                                if (item.Value == MarketSettlementFilterModel.LeagueId)
+                                if (item.Value == FilterModel.LeagueId)
                                 {
                                     <option value="@item.Value" selected>@item.Name</option>
                                 }
@@ -99,7 +99,7 @@
                         {
                             @foreach (var item in Fixtures)
                             {
-                                if (item.Value == MarketSettlementFilterModel.FixtureId)
+                                if (item.Value == FilterModel.FixtureId)
                                 {
                                     <option value="@item.Value" selected>@item.Name</option>
                                 }
@@ -117,7 +117,7 @@
                             <option value="0" selected>All Status</option>
                             @foreach (var item in Statuses)
                             {
-                                if (item.Value == MarketSettlementFilterModel.ToStatus)
+                                if (item.Value == FilterModel.ToStatus)
                                 {
                                     <option value="@item.Value" selected>@item.Name</option>
                                 }
@@ -139,7 +139,7 @@
                             {
                                 @foreach (var item in Markets)
                                 {
-                                    if (item.Value == MarketSettlementFilterModel.MarketId)
+                                    if (item.Value == FilterModel.MarketId)
                                     {
                                         <option value="@item.Value" selected>@item.Name</option>
                                     }
@@ -160,7 +160,7 @@
                             {
                                 @foreach (var item in Selections)
                                 {
-                                    if (item.Value == MarketSettlementFilterModel.SelectionId)
+                                    if (item.Value == FilterModel.SelectionId)
                                     {
                                         <option value="@item.Value" selected>@item.Name</option>
                                     }
@@ -174,10 +174,10 @@
                     </select>
                 </div>
                 <div class="col-2 me-2 form-group">
-                    <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="MarketSettlementFilterModel.FromDate" EndDate="MarketSettlementFilterModel.ToDate" MaxDate="@DateTime.Today" OnRangeSelect="OnRangeSelect" />
+                    <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="FilterModel.FromDate" EndDate="FilterModel.ToDate" MaxDate="@DateTime.Today" OnRangeSelect="OnRangeSelect" />
                 </div>
                 <div class="col-2 me-2">
-                    <input type="text" class="form-control" placeholder="Settled By" @bind-value="MarketSettlementFilterModel.SettledBy" />
+                    <input type="text" class="form-control" placeholder="Settled By" @bind-value="FilterModel.SettledBy" />
                 </div>
                 <div class="col-2 me-2">
                     <button class="btn btn-search">Search</button>

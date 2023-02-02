@@ -1,3 +1,4 @@
+using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Utility.Repository;
@@ -5,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client.Events;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -61,12 +63,16 @@ namespace Backoffice.Utility
                         _backofficeRepository.ProcessActivityLog(activityLogList);
                         break;
                     case "ExportMessageSettlementHistory":
-                        var manualMessageSettlementHistory = JsonSerializer.Deserialize<OnGetManualMarketSettlementHistoryMessage>(payload);
-                        _backofficeRepository.ProcessOnGetManualMessageSettlementHistory(manualMessageSettlementHistory, _messageBroker);
+                        var manualMessageSettlementHistory = JsonSerializer.Deserialize<OnGetMessageSettlementHistoryMessage>(payload);
+                        _backofficeRepository.ProcessOnGetMessageSettlementHistory(manualMessageSettlementHistory, _messageBroker);
                         break;
                     case "ExportManualBetSettlementHistory":
                         var manualBetSettlementHistory = JsonSerializer.Deserialize<OnGetManualBetSettlementHistoryMessage>(payload);
                         _backofficeRepository.ProcessOnGetManualBetSettlementHistory(manualBetSettlementHistory, _messageBroker);
+                        break;
+                    case "ExportMarketSettlementHistory":
+                        var marketSettlementHistory = JsonSerializer.Deserialize<OnGetMarketSettlementHistoryMessage>(payload);
+                        _backofficeRepository.ProcessOnGetMarketSettlementHistory(marketSettlementHistory, _messageBroker);
                         break;
                     case "ExportCancelBetHistory":
                         var cancelBetHistory = JsonSerializer.Deserialize<OnGetCancelBetHistoryMessage>(payload);

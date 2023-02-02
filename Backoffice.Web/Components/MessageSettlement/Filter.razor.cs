@@ -7,6 +7,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using System.Text.Json;
 using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.FixtureModel;
 
@@ -20,8 +21,8 @@ namespace Backoffice.Web.Components.MessageSettlement
         [Parameter] public EventCallback OnInitializeCallback { get; set; }
         [Parameter] public EventCallback OnAddCallback { get; set; }
         [Parameter] public EventCallback OnExportCallback { get; set; }
-        [Parameter] public EventCallback<MarketSettlementFilterModel> MarketSettlementFilterModelChanged { get; set; }
-        [Parameter] public MarketSettlementFilterModel MarketSettlementFilterModel { get; set; }
+        [Parameter] public EventCallback<MarketSettlementFilterModel> FilterModelChanged { get; set; }
+        [Parameter] public MarketSettlementFilterModel FilterModel { get; set; }
         public List<SelectListItemModel<int>> Sports { get; set; }
         public List<SelectListItemModel<int>> Segments { get; set; }
         public List<SelectListItemModel<int>> Leagues { get; set; }
@@ -48,7 +49,7 @@ namespace Backoffice.Web.Components.MessageSettlement
             Markets = new List<SelectListItemModel<string>>();
             Selections = new List<SelectListItemModel<string>>();
 
-            MarketSettlementFilterModel = new MarketSettlementFilterModel()
+            FilterModel = new MarketSettlementFilterModel()
             {
                 FromDate = DateTime.Now.Date.AddDays(-1),
                 ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
@@ -64,7 +65,7 @@ namespace Backoffice.Web.Components.MessageSettlement
                 Fixtures = new List<FixtureModel>(),
             };
 
-            await MarketSettlementFilterModelChanged.InvokeAsync(MarketSettlementFilterModel);
+            await FilterModelChanged.InvokeAsync(FilterModel);
             await Initialize();
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -76,7 +77,7 @@ namespace Backoffice.Web.Components.MessageSettlement
         }
         public async Task OnAddMessageSettlement()
         {
-            await MarketSettlementFilterModelChanged.InvokeAsync(MarketSettlementFilterModel);
+            await FilterModelChanged.InvokeAsync(FilterModel);
 
             await OnAddCallback.InvokeAsync();
         }
@@ -89,19 +90,18 @@ namespace Backoffice.Web.Components.MessageSettlement
         }
         public void OnRangeSelect(DateRange range)
         {
-            MarketSettlementFilterModel.DateRangeFilter = $"{range.Start.ToString("MM/dd/yyyy")} - {range.End.ToString("MM/dd/yyyy")}";
-            MarketSettlementFilterModel.FromDate = Convert.ToDateTime(range.Start.ToString("yyyy-MM-dd 00:00:00"));
-            MarketSettlementFilterModel.ToDate = Convert.ToDateTime(range.End.ToString("yyyy-MM-dd 23:59:59"));
+            FilterModel.FromDate = Convert.ToDateTime(range.Start.ToString("yyyy-MM-dd 00:00:00"));
+            FilterModel.ToDate = Convert.ToDateTime(range.End.ToString("yyyy-MM-dd 23:59:59"));
         }
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {
-            MarketSettlementFilterModel.SportId = int.Parse(e.Value.ToString());
+            FilterModel.SportId = int.Parse(e.Value.ToString());
 
-            MarketSettlementFilterModel.SegmentId = 0;
-            MarketSettlementFilterModel.LeagueId = 0;
-            MarketSettlementFilterModel.FixtureId = string.Empty;
-            MarketSettlementFilterModel.MarketId = string.Empty;
-            MarketSettlementFilterModel.SelectionId = string.Empty;
+            FilterModel.SegmentId = 0;
+            FilterModel.LeagueId = 0;
+            FilterModel.FixtureId = string.Empty;
+            FilterModel.MarketId = string.Empty;
+            FilterModel.SelectionId = string.Empty;
 
             Segments = new List<SelectListItemModel<int>>();
             Leagues = new List<SelectListItemModel<int>>();
@@ -109,20 +109,20 @@ namespace Backoffice.Web.Components.MessageSettlement
             Markets = new List<SelectListItemModel<string>>();
             Selections = new List<SelectListItemModel<string>>();
 
-            if (MarketSettlementFilterModel.SportId != 0)
+            if (FilterModel.SportId != 0)
             {
-                Segments = await GetSegments(MarketSettlementFilterModel.SportId);
-                Leagues = await GetLeagues(MarketSettlementFilterModel.SportId, MarketSettlementFilterModel.SegmentId);
+                Segments = await GetSegments(FilterModel.SportId);
+                Leagues = await GetLeagues(FilterModel.SportId, FilterModel.SegmentId);
             }
         }
         public async Task OnSegmentChangedEvent(ChangeEventArgs e)
         {
-            MarketSettlementFilterModel.SegmentId = int.Parse(e.Value.ToString());
+            FilterModel.SegmentId = int.Parse(e.Value.ToString());
 
-            MarketSettlementFilterModel.LeagueId = 0;
-            MarketSettlementFilterModel.FixtureId = string.Empty;
-            MarketSettlementFilterModel.MarketId = string.Empty;
-            MarketSettlementFilterModel.SelectionId = string.Empty;
+            FilterModel.LeagueId = 0;
+            FilterModel.FixtureId = string.Empty;
+            FilterModel.MarketId = string.Empty;
+            FilterModel.SelectionId = string.Empty;
 
             Leagues = new List<SelectListItemModel<int>>();
             Fixtures = new List<SelectListItemModel<string>>();
@@ -130,91 +130,92 @@ namespace Backoffice.Web.Components.MessageSettlement
             Selections = new List<SelectListItemModel<string>>();
 
 
-            if (MarketSettlementFilterModel.SegmentId != 0)
+            if (FilterModel.SegmentId != 0)
             {
-                Leagues = await GetLeagues(MarketSettlementFilterModel.SportId, MarketSettlementFilterModel.SegmentId);
+                Leagues = await GetLeagues(FilterModel.SportId, FilterModel.SegmentId);
             }
 
         }
         public async Task OnLeagueChangedEvent(ChangeEventArgs e)
         {
-            MarketSettlementFilterModel.LeagueId = int.Parse(e.Value.ToString());
+            FilterModel.LeagueId = int.Parse(e.Value.ToString());
 
-            MarketSettlementFilterModel.FixtureId = string.Empty;
-            MarketSettlementFilterModel.MarketId = string.Empty;
-            MarketSettlementFilterModel.SelectionId = string.Empty;
+            FilterModel.FixtureId = string.Empty;
+            FilterModel.MarketId = string.Empty;
+            FilterModel.SelectionId = string.Empty;
 
             Fixtures = new List<SelectListItemModel<string>>();
             Markets = new List<SelectListItemModel<string>>();
             Selections = new List<SelectListItemModel<string>>();
 
-            if (MarketSettlementFilterModel.LeagueId != 0)
+            if (FilterModel.LeagueId != 0)
             {
-                Fixtures = await GetFixtures(MarketSettlementFilterModel.SportId, MarketSettlementFilterModel.SegmentId, MarketSettlementFilterModel.LeagueId);
+                Fixtures = await GetFixtures(FilterModel.SportId, FilterModel.SegmentId, FilterModel.LeagueId);
             }
 
 
         }
         public async Task OnFixtureChangedEvent(ChangeEventArgs e)
         {
-            MarketSettlementFilterModel.FixtureId = e.Value.ToString();
+            FilterModel.FixtureId = e.Value.ToString();
 
-            MarketSettlementFilterModel.MarketId = string.Empty;
-            MarketSettlementFilterModel.SelectionId = string.Empty;
+            FilterModel.MarketId = string.Empty;
+            FilterModel.SelectionId = string.Empty;
 
             Markets = new List<SelectListItemModel<string>>();
             Selections = new List<SelectListItemModel<string>>();
 
-            if (!string.IsNullOrEmpty(MarketSettlementFilterModel.FixtureId))
+            if (!string.IsNullOrEmpty(FilterModel.FixtureId))
             {
-                Markets = await GetMarkets(MarketSettlementFilterModel.FixtureId);
+                Markets = await GetMarkets(FilterModel.FixtureId);
             }
 
         }
         public async Task OnStatusChangedEvent(ChangeEventArgs e)
         {
-            MarketSettlementFilterModel.ToStatus = int.Parse(e.Value.ToString());
+            FilterModel.ToStatus = int.Parse(e.Value.ToString());
         }
         public async Task OnMarketChangedEvent(ChangeEventArgs e)
         {
-            MarketSettlementFilterModel.MarketId = e.Value.ToString();
+            FilterModel.MarketId = e.Value.ToString();
 
-            MarketSettlementFilterModel.SelectionId = string.Empty;
+            FilterModel.SelectionId = string.Empty;
 
             Selections = new List<SelectListItemModel<string>>();
-            if (!string.IsNullOrEmpty(MarketSettlementFilterModel.MarketId))
+            if (!string.IsNullOrEmpty(FilterModel.MarketId))
             {
-                Selections = await GetSelections(MarketSettlementFilterModel.FixtureId, MarketSettlementFilterModel.MarketId);
+                Selections = await GetSelections(FilterModel.FixtureId, FilterModel.MarketId);
             }
         }
         public async Task OnSelectionChangedEvent(ChangeEventArgs e)
         {
-            MarketSettlementFilterModel.SelectionId = e.Value.ToString();
+            FilterModel.SelectionId = e.Value.ToString();
         }
         public async Task OnSubmitClickEvent()
         {
-            await MarketSettlementFilterModelChanged.InvokeAsync(MarketSettlementFilterModel);
+            await FilterModelChanged.InvokeAsync(FilterModel);
 
             await OnInitializeCallback.InvokeAsync();
         }
         public async Task OnExportClickEvent()
         {
 
-            if (MarketSettlementFilterModel == null)
+            if (FilterModel == null)
                 return;
 
-            var payload = new OnGetManualMarketSettlementHistoryMessage
+            var payload = new OnGetMessageSettlementHistoryMessage()
             {
-                FixtureId = string.IsNullOrWhiteSpace(MarketSettlementFilterModel.FixtureId) ? "%" : MarketSettlementFilterModel.FixtureId,
-                MarketId = string.IsNullOrWhiteSpace(MarketSettlementFilterModel.MarketId) ? "0" : MarketSettlementFilterModel.MarketId,
-                SelectionId = string.IsNullOrWhiteSpace(MarketSettlementFilterModel.SelectionId) ? "0" : MarketSettlementFilterModel.SelectionId,
-                SportId = MarketSettlementFilterModel.SportId == 0 ? "%" : MarketSettlementFilterModel.SportId.ToString(),
-                SegmentId = MarketSettlementFilterModel.SegmentId == 0 ? "%" : MarketSettlementFilterModel.SegmentId.ToString(),
-                LeagueId = MarketSettlementFilterModel.LeagueId == 0 ? "%" : MarketSettlementFilterModel.LeagueId.ToString(),
-                ManualSettledBy = MarketSettlementFilterModel.SettledBy,
-                FromDate = MarketSettlementFilterModel.FromDate.ToUniversalTime(),
-                ToDate = MarketSettlementFilterModel.ToDate.ToUniversalTime(),
-                UserId = UserModel.Id
+                UserId = UserModel.Id,
+                SportId = FilterModel.SportId,
+                SegmentId = FilterModel.SegmentId,
+                LeagueId = FilterModel.LeagueId,
+                FixtureId = FilterModel.FixtureId,
+                MarketId = FilterModel.MarketId,
+                SelectionId = FilterModel.SelectionId,
+                Status = FilterModel.ToStatus,
+                FromDate = FilterModel.FromDate,
+                ToDate = FilterModel.ToDate,
+                SettledBy = FilterModel.SettledBy
             };
 
             MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMessageSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
@@ -242,22 +243,21 @@ namespace Backoffice.Web.Components.MessageSettlement
                 Selections = new List<SelectListItemModel<string>>();
                 Statuses = new List<SelectListItemModel<int>>();
 
-                MarketSettlementFilterModel = new MarketSettlementFilterModel()
+                FilterModel = new MarketSettlementFilterModel()
                 {
-                    FromDate = DateTime.Now.Date,
+                    FromDate = DateTime.Now.Date.AddDays(-1),
                     ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
-                    DateRangeFilter = $"{firstDayOfMonth.ToString("MM/dd/yyyy")} - {lastDayOfMonth.ToString("MM/dd/yyyy")}",
                 };
 
                 var sports = await GetSports();
                 if (sports != null && sports.Any())
                     Sports.AddRange(sports);
-                MarketSettlementFilterModel.SportId = 0;
+                FilterModel.SportId = 0;
 
-                var segments = await GetSegments(MarketSettlementFilterModel.SportId);
+                var segments = await GetSegments(FilterModel.SportId);
                 if (segments != null && segments.Any())
                     Segments.AddRange(segments);
-                MarketSettlementFilterModel.SegmentId = 0;
+                FilterModel.SegmentId = 0;
 
                 //var leagues = await GetLeagues(MarketSettlementFilterModel.SportId, MarketSettlementFilterModel.SegmentId);
                 //if (leagues != null && leagues.Any())
@@ -269,16 +269,16 @@ namespace Backoffice.Web.Components.MessageSettlement
                 //    MarketSettlementFilterModel.Fixtures.AddRange(fixtures);
                 //MarketSettlementFilterModel.FixtureId = "";
 
-                MarketSettlementFilterModel.FixtureId = string.Empty;
-                MarketSettlementFilterModel.MarketId = string.Empty;
-                MarketSettlementFilterModel.SelectionId = string.Empty;
+                FilterModel.FixtureId = string.Empty;
+                FilterModel.MarketId = string.Empty;
+                FilterModel.SelectionId = string.Empty;
 
                 var statuses = await GetStatuses();
                 if (statuses != null && statuses.Any())
                     Statuses.AddRange(statuses);
-                MarketSettlementFilterModel.ToStatus = 0;
+                FilterModel.ToStatus = 0;
 
-                await MarketSettlementFilterModelChanged.InvokeAsync(MarketSettlementFilterModel);
+                await FilterModelChanged.InvokeAsync(FilterModel);
 
                 await OnInitializeCallback.InvokeAsync();
             }

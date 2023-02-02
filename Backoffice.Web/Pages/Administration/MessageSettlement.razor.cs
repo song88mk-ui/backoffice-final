@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Components.MessageSettlement;
 using Backoffice.Web.Models;
@@ -8,6 +9,8 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Text.Json;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -22,7 +25,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] private ToastService? _toasterService { get; set; }
         private ToastService toasterService => _toasterService!;
 
-        public MarketSettlementFilterModel MarketSettlementFilterModel { get; set; } = new MarketSettlementFilterModel();
+        public MarketSettlementFilterModel FilterModel { get; set; } = new MarketSettlementFilterModel();
         public List<MessageSettlementModel> MessageSettlementModel { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -86,11 +89,11 @@ namespace Backoffice.Web.Pages.Administration
         {
             var request = new ActivityLogRequest()
             {
-                Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
+                Page = Page.Admin_Settlement_Message.ToString().Replace("_", "."),
                 Payload = BuildPayload(),
                 MetaData = MetaData,
-                DateFrom = MarketSettlementFilterModel.FromDate.Date.Add(new TimeSpan(0, 0, 0)),
-                DateTo = MarketSettlementFilterModel.ToDate.Date.Add(new TimeSpan(23, 59, 59))
+                DateFrom = FilterModel.FromDate.Date.Add(new TimeSpan(0, 0, 0)),
+                DateTo = FilterModel.ToDate.Date.Add(new TimeSpan(23, 59, 59))
             };
 
             var logs = await BackOfficeService.GetActivityLogs(request);
@@ -122,10 +125,10 @@ namespace Backoffice.Web.Pages.Administration
         }
         private string BuildPayload()
         {
-            return $"{(MarketSettlementFilterModel.SportId > 0 ? MarketSettlementFilterModel.SportId : "%")}." +
-                $"{(MarketSettlementFilterModel.SegmentId > 0 ? MarketSettlementFilterModel.SegmentId : "%")}." +
-                $"{(MarketSettlementFilterModel.LeagueId > 0 ? MarketSettlementFilterModel.LeagueId : "%")}." +
-                $"{(!string.IsNullOrEmpty(MarketSettlementFilterModel.FixtureId) ? MarketSettlementFilterModel.FixtureId : "%")}";
+            return $"{(FilterModel.SportId > 0 ? FilterModel.SportId : "%")}." +
+                $"{(FilterModel.SegmentId > 0 ? FilterModel.SegmentId : "%")}." +
+                $"{(FilterModel.LeagueId > 0 ? FilterModel.LeagueId : "%")}." +
+                $"{(!string.IsNullOrEmpty(FilterModel.FixtureId) ? FilterModel.FixtureId : "%")}";
         }
         private List<SelectListItemModel<int>> GetProducts()
         {

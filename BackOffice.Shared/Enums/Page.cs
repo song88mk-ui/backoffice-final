@@ -17,7 +17,6 @@ namespace Backoffice.Shared.Enums
         Admin_Settlement_Resend,
         Admin_Settlement_Market,
         Admin_Settlement_Message,
-        OE_Administration_MessageSettlement,
         OE_Administration_SportsSettings,
         OE_Administration_MarketSortOrder,
         OE_Administration_MarketGroup,

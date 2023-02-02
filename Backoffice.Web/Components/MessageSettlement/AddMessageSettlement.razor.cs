@@ -108,7 +108,7 @@ namespace Backoffice.Web.Components.MessageSettlement
                         int requestId = 318;
                         var activityLog = new OnActivityLogMessage()
                         {
-                            Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
+                            Page = Page.Admin_Settlement_Message.ToString().Replace("_", "."),
                             Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
                             Activity = Activity.Create.ToString(),
                             From = "-",
@@ -160,7 +160,7 @@ namespace Backoffice.Web.Components.MessageSettlement
 
                             var activityLog2 = new OnActivityLogMessage()
                             {
-                                Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
+                                Page = Page.Admin_Settlement_Message.ToString().Replace("_", "."),
                                 Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
                                 Activity = Activity.Create.ToString(),
                                 From = "-",

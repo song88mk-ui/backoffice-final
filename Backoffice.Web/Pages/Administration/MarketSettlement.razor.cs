@@ -15,6 +15,8 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private ToastService? _toasterService { get; set; }
+        private ToastService toasterService => _toasterService!;
         public MarketSettlementModalFilterModel ModalFilter { get; set; } = new MarketSettlementModalFilterModel();
         public List<ManualMarketSettlementAuditModel> ManualMarketSettlements { get; set; }
         public MetaData MetaData { get; set; }
@@ -36,6 +38,11 @@ namespace Backoffice.Web.Pages.Administration
             };
 
             ManualMarketSettlements = new List<ManualMarketSettlementAuditModel>();
+            ModalFilter = new MarketSettlementModalFilterModel()
+            {
+                FromDate = DateTime.Now.Date.AddDays(-1),
+                ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
+            };
 
             PageTitle = "Market Settlement";
             IconClass = "ico ico-market-settlement";
@@ -82,7 +89,12 @@ namespace Backoffice.Web.Pages.Administration
 
             IsPreLoader = false;
         }
-
+        public async Task OnExportClickedEvent()
+        {
+            toasterService.AddToast(Toast.NewToast
+                    ("Market Settlement",
+                    $"Success! Excel file is being generated system will notify once done."));
+        }
         public async Task SelectPage()
         {
 

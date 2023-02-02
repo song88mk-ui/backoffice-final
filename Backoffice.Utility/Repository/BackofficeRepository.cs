@@ -122,7 +122,7 @@ namespace Backoffice.Utility.Repository
                 Console.WriteLine($"{DateTime.Now} : " + ex.Message);
             }
         }
-        public async Task ProcessOnGetManualMessageSettlementHistory(OnGetManualMarketSettlementHistoryMessage request, IMessageBroker messageBroker)
+        public async Task ProcessOnGetMessageSettlementHistory(OnGetMessageSettlementHistoryMessage request, IMessageBroker messageBroker)
         {
             // If you use EPPlus in a noncommercial context
             // according to the Polyform Noncommercial license:
@@ -132,8 +132,8 @@ namespace Backoffice.Utility.Repository
             {
                 var result = GetActivityLogs(new ActivityLogRequest()
                 {
-                    Page = Page.OE_Administration_MessageSettlement.ToString().Replace("_", "."),
-                    Payload = BuildPayload(request.SportId, request.SegmentId, request.LeagueId, request.FixtureId),
+                    Page = Page.Admin_Settlement_Message.ToString().Replace("_", "."),
+                    Payload = BuildPayload(request.SportId.ToString(), request.SegmentId.ToString(), request.LeagueId.ToString(), request.FixtureId),
                     DateFrom = request.FromDate.ToUniversalTime(),
                     DateTo = request.ToDate.ToUniversalTime(),
                     MetaData = null
@@ -207,7 +207,95 @@ namespace Backoffice.Utility.Repository
                 excel.Dispose();
             }
         }
+        public async Task ProcessOnGetMarketSettlementHistory(OnGetMarketSettlementHistoryMessage request, IMessageBroker messageBroker)
+        {
+            // If you use EPPlus in a noncommercial context
+            // according to the Polyform Noncommercial license:
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var excel = new ExcelPackage();
+            try
+            {
+                var result = GetActivityLogs(new ActivityLogRequest()
+                {
+                    Page = Page.Admin_Settlement_Market.ToString().Replace("_", "."),
+                    Payload = BuildPayload(request.SportId, request.SegmentId, request.LeagueId, request.FixtureId),
+                    DateFrom = request.FromDate.ToUniversalTime(),
+                    DateTo = request.ToDate.ToUniversalTime(),
+                    MetaData = null
+                }).Result;
 
+                if (result == null)
+                    return;
+
+
+                #region Initialize Spreadsheet
+
+                var workSheet = excel.Workbook.Worksheets.Add($"Market Settlement History");
+                InitManualMessageSettlementHistoryWorksheet(workSheet);
+
+                var row = 2;
+                int count = 1;
+                #endregion
+
+                #region Generate Data
+
+                foreach (var log in result.ActivityLogs)
+                {
+
+                    var manual = JsonSerializer.Deserialize<ManualMarketSettlementRequest>(log.To);
+                    if (manual != null)
+                    {
+                        var eventDetails = $"{manual.LeagueName}\n{manual.FixtureName}\n{manual.FixtureStartDate.ToLocalTime().ToString("yyyy/MM/dd hh:mm:ss tt")}\n{manual.MarketName}";
+                        var dateSettled = $"{log.TimeStamp.ToLocalTime().ToString("MM/dd/yyyy hh:mm:ss tt")}";
+
+                        workSheet.Cells[row, 1].Value = count;
+                        workSheet.Cells[row, 2].Value = manual.FixtureName;
+                        workSheet.Cells[row, 3].Value = manual.MarketName;
+                        workSheet.Cells[row, 4].Value = manual.SportName;
+                        workSheet.Cells[row, 5].Value = eventDetails;
+                        workSheet.Cells[row, 6].Value = manual.SelectionName;
+                        workSheet.Cells[row, 7].Value = manual.FixtureStatusName;
+                        workSheet.Cells[row, 8].Value = manual.ManualSettledBy;
+                        workSheet.Cells[row, 9].Value = dateSettled;
+                        workSheet.Cells[row, 10].Value = manual.Reason;
+                        row++;
+                        count++;
+                    }
+                }
+                #endregion
+
+                #region Upload File to Azure
+                var fileName = $"MessageSettlementHistory_{DateTime.UtcNow:MMddyyyyHHmm}.xlsx";
+                var downloadUrl = UploadToAzure(excel, fileName);
+                if (!string.IsNullOrEmpty(downloadUrl))
+                {
+                    var notificationsModel = new NotificationsDetailsModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Page = "Administration",
+                        ClientCode = string.Empty,
+                        SportsId = 0,
+                        Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",
+                        PageRedirect = "/admin/message-settlement",
+                        UserId = Guid.Parse(request.UserId),
+                        ClaimType = AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace("_", "."),
+                        Type = (int)NotificationType.General
+                    };
+
+                    messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
+                }
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
+            }
+            finally
+            {
+                //Close Excel package
+                excel.Dispose();
+            }
+        }
         public async Task ProcessOnGetManualBetSettlementHistory(OnGetManualBetSettlementHistoryMessage request, IMessageBroker messageBroker)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -327,7 +415,7 @@ namespace Backoffice.Utility.Repository
 
                     int cellIndex = (i + 1) + 1;
 
-                    worksheet.Cells[cellIndex, 1].Value = (cellIndex-1);
+                    worksheet.Cells[cellIndex, 1].Value = (cellIndex - 1);
                     worksheet.Cells[cellIndex, 2].Value = log.SettlementDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
                     worksheet.Cells[cellIndex, 3].Value = log.BetId;
                     worksheet.Cells[cellIndex, 4].Value = log.BetDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
@@ -478,10 +566,34 @@ namespace Backoffice.Utility.Repository
 
         private string BuildPayload(string SportId, string SegmentId, string LeagueId, string FixtureId)
         {
-            return $"{(!string.IsNullOrEmpty(SportId) || SportId != "0" ? SportId : "%")}." +
-                $"{(!string.IsNullOrEmpty(SegmentId) || SegmentId != "0" ? SegmentId : "%")}." +
-                $"{(!string.IsNullOrEmpty(LeagueId) || LeagueId != "0" ? LeagueId : "%")}." +
-                $"{(!string.IsNullOrEmpty(FixtureId) || FixtureId != "0" ? FixtureId : "%")}";
+            return $"{(!string.IsNullOrEmpty(SportId) && SportId != "0" ? SportId : "%")}." +
+                $"{(!string.IsNullOrEmpty(SegmentId) && SegmentId != "0" ? SegmentId : "%")}." +
+                $"{(!string.IsNullOrEmpty(LeagueId) && LeagueId != "0" ? LeagueId : "%")}." +
+                $"{(!string.IsNullOrEmpty(FixtureId) && FixtureId != "0" ? FixtureId : "%")}";
+        }
+        private void InitMarketSettlementHistoryWorksheet(ExcelWorksheet worksheet)
+        {
+            // setting the properties
+            // of the work sheet 
+            worksheet.DefaultRowHeight = 12;
+
+            // Setting the properties
+            // of the first row
+            worksheet.Row(1).Height = 20;
+            worksheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Row(1).Style.Font.Bold = true;
+
+            // Header of the Excel sheet
+            worksheet.Cells[1, 1].Value = "#";
+            worksheet.Cells[1, 2].Value = "Fixture";
+            worksheet.Cells[1, 3].Value = "Market Name";
+            worksheet.Cells[1, 4].Value = "Sport";
+            worksheet.Cells[1, 5].Value = "Event Details";
+            worksheet.Cells[1, 6].Value = "Selection";
+            worksheet.Cells[1, 7].Value = "Status";
+            worksheet.Cells[1, 8].Value = "Settled By";
+            worksheet.Cells[1, 9].Value = "Date Settled";
+            worksheet.Cells[1, 10].Value = "Reason";
         }
         private void InitManualMessageSettlementHistoryWorksheet(ExcelWorksheet worksheet)
         {

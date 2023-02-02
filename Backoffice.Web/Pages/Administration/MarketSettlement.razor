@@ -10,7 +10,7 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter @bind-ModalFilter="ModalFilter" OnInitializeCallback="GetContent" />
+                <Filter @bind-FilterModel="ModalFilter" OnInitializeCallback="GetContent" OnExportCallback="OnExportClickedEvent"/>
             </div>
             <div class="col-md-12 mt-3 ms-3">
                 <span class="fs-6">Manual Market Settlement History</span>

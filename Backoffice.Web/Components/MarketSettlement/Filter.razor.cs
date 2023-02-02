@@ -2,10 +2,14 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using System.Text.Json;
 using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.FixtureModel;
 
@@ -14,12 +18,15 @@ namespace Backoffice.Web.Components.MarketSettlement
     public partial class Filter : IDisposable
     {
         #region Properties
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IMessageBroker MessageBroker { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
-        [Parameter] public MarketSettlementModalFilterModel ModalFilter { get; set; }
-        [Parameter] public EventCallback<MarketSettlementModalFilterModel> ModalFilterChanged { get; set; }
+        [Parameter] public MarketSettlementModalFilterModel FilterModel { get; set; }
+        [Parameter] public EventCallback<MarketSettlementModalFilterModel> FilterModelChanged { get; set; }
         [Parameter] public EventCallback OnInitializeCallback { get; set; }
+        [Parameter] public EventCallback OnExportCallback { get; set; }
         public bool ShowFilter { get; set; }
         public MarketFixtureResponse MarketFixtureResponse { get; set; }
         public MarketFixtureResponse MarketFixtureOutrightResponse { get; set; }
@@ -45,12 +52,11 @@ namespace Backoffice.Web.Components.MarketSettlement
             Selections = new List<SelectListItemModel<string>>();
             Statuses = new List<SelectListItemModel<int>>();
 
-            ModalFilter = new MarketSettlementModalFilterModel()
+            FilterModel = new MarketSettlementModalFilterModel()
             {
-                FromDate = DateTime.Now.Date,
+                FromDate = DateTime.Now.Date.AddDays(-1),
                 ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
             };
-            await ModalFilterChanged.InvokeAsync();
 
             MarketFixtureResponse = new MarketFixtureResponse()
             {
@@ -61,14 +67,7 @@ namespace Backoffice.Web.Components.MarketSettlement
             {
                 Fixtures = new List<FixtureModel>(),
             };
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                await Initialize();
-            }
+            await Initialize();
         }
 
         public async Task OnFilterClickEvent()
@@ -89,13 +88,13 @@ namespace Backoffice.Web.Components.MarketSettlement
 
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {
-            ModalFilter.SportId = int.Parse(e.Value.ToString());
+            FilterModel.SportId = int.Parse(e.Value.ToString());
 
-            ModalFilter.SegmentId = 0;
-            ModalFilter.LeagueId = 0;
-            ModalFilter.FixtureId = string.Empty;
-            ModalFilter.MarketId = string.Empty;
-            ModalFilter.SelectionId = string.Empty;
+            FilterModel.SegmentId = 0;
+            FilterModel.LeagueId = 0;
+            FilterModel.FixtureId = string.Empty;
+            FilterModel.MarketId = string.Empty;
+            FilterModel.SelectionId = string.Empty;
 
             Segments = new List<SelectListItemModel<int>>();
             Leagues = new List<SelectListItemModel<int>>();
@@ -103,21 +102,21 @@ namespace Backoffice.Web.Components.MarketSettlement
             Markets = new List<SelectListItemModel<string>>();
             Selections = new List<SelectListItemModel<string>>();
 
-            if (ModalFilter.SportId != 0)
+            if (FilterModel.SportId != 0)
             {
-                Segments = await GetSegments(ModalFilter.SportId);
-                Leagues = await GetLeagues(ModalFilter.SportId, ModalFilter.SegmentId);
+                Segments = await GetSegments(FilterModel.SportId);
+                Leagues = await GetLeagues(FilterModel.SportId, FilterModel.SegmentId);
             }
         }
 
         public async Task OnSegmentChangedEvent(ChangeEventArgs e)
         {
-            ModalFilter.SegmentId = int.Parse(e.Value.ToString());
+            FilterModel.SegmentId = int.Parse(e.Value.ToString());
 
-            ModalFilter.LeagueId = 0;
-            ModalFilter.FixtureId = string.Empty;
-            ModalFilter.MarketId = string.Empty;
-            ModalFilter.SelectionId = string.Empty;
+            FilterModel.LeagueId = 0;
+            FilterModel.FixtureId = string.Empty;
+            FilterModel.MarketId = string.Empty;
+            FilterModel.SelectionId = string.Empty;
 
             Leagues = new List<SelectListItemModel<int>>();
             Fixtures = new List<SelectListItemModel<string>>();
@@ -125,79 +124,101 @@ namespace Backoffice.Web.Components.MarketSettlement
             Selections = new List<SelectListItemModel<string>>();
 
 
-            if (ModalFilter.SegmentId != 0)
+            if (FilterModel.SegmentId != 0)
             {
-                Leagues = await GetLeagues(ModalFilter.SportId, ModalFilter.SegmentId);
+                Leagues = await GetLeagues(FilterModel.SportId, FilterModel.SegmentId);
             }
         }
 
         public async Task OnLeagueChangedEvent(ChangeEventArgs e)
         {
-            ModalFilter.LeagueId = int.Parse(e.Value.ToString());
+            FilterModel.LeagueId = int.Parse(e.Value.ToString());
 
-            ModalFilter.FixtureId = string.Empty;
-            ModalFilter.MarketId = string.Empty;
-            ModalFilter.SelectionId = string.Empty;
+            FilterModel.FixtureId = string.Empty;
+            FilterModel.MarketId = string.Empty;
+            FilterModel.SelectionId = string.Empty;
 
             Fixtures = new List<SelectListItemModel<string>>();
             Markets = new List<SelectListItemModel<string>>();
             Selections = new List<SelectListItemModel<string>>();
 
-            if (ModalFilter.LeagueId != 0)
+            if (FilterModel.LeagueId != 0)
             {
-                Fixtures = await GetFixtures(ModalFilter.SportId, ModalFilter.SegmentId, ModalFilter.LeagueId);
+                Fixtures = await GetFixtures(FilterModel.SportId, FilterModel.SegmentId, FilterModel.LeagueId);
             }
         }
 
         public async Task OnFixtureChangedEvent(ChangeEventArgs e)
         {
-            ModalFilter.FixtureId = e.Value.ToString();
+            FilterModel.FixtureId = e.Value.ToString();
 
-            ModalFilter.MarketId = string.Empty;
-            ModalFilter.SelectionId = string.Empty;
+            FilterModel.MarketId = string.Empty;
+            FilterModel.SelectionId = string.Empty;
 
             Markets = new List<SelectListItemModel<string>>();
             Selections = new List<SelectListItemModel<string>>();
 
-            if (!string.IsNullOrEmpty(ModalFilter.FixtureId))
+            if (!string.IsNullOrEmpty(FilterModel.FixtureId))
             {
-                Markets = await GetMarkets(ModalFilter.FixtureId);
+                Markets = await GetMarkets(FilterModel.FixtureId);
             }
         }
 
         public async Task OnStatusChangedEvent(ChangeEventArgs e)
         {
-            ModalFilter.ToStatus = int.Parse(e.Value.ToString());
+            FilterModel.ToStatus = int.Parse(e.Value.ToString());
         }
 
         public async Task OnMarketChangedEvent(ChangeEventArgs e)
         {
-            ModalFilter.MarketId = e.Value.ToString();
+            FilterModel.MarketId = e.Value.ToString();
 
-            ModalFilter.SelectionId = string.Empty;
+            FilterModel.SelectionId = string.Empty;
 
             Selections = new List<SelectListItemModel<string>>();
-            if (!string.IsNullOrEmpty(ModalFilter.MarketId))
+            if (!string.IsNullOrEmpty(FilterModel.MarketId))
             {
-                Selections = await GetSelections(ModalFilter.FixtureId, ModalFilter.MarketId);
+                Selections = await GetSelections(FilterModel.FixtureId, FilterModel.MarketId);
             }
         }
 
         public async Task OnSelectionChangedEvent(ChangeEventArgs e)
         {
-            ModalFilter.SelectionId = e.Value.ToString();
+            FilterModel.SelectionId = e.Value.ToString();
         }
 
         public void OnRangeSelect(DateRange range)
         {
-            ModalFilter.DateRangeFilter = $"{range.Start.ToString("MM/dd/yyyy")} - {range.End.ToString("MM/dd/yyyy")}";
-            ModalFilter.FromDate = Convert.ToDateTime(range.Start.ToString("yyyy-MM-dd 00:00:00"));
-            ModalFilter.ToDate = Convert.ToDateTime(range.End.ToString("yyyy-MM-dd 23:59:59"));
+            FilterModel.FromDate = Convert.ToDateTime(range.Start.ToString("yyyy-MM-dd 00:00:00"));
+            FilterModel.ToDate = Convert.ToDateTime(range.End.ToString("yyyy-MM-dd 23:59:59"));
         }
 
+        public async Task OnExportClickEvent()
+        {
+            if (FilterModel == null)
+                return;
+
+            var payload = new OnGetMarketSettlementHistoryMessage
+            {
+                SegmentId = FilterModel.SegmentId == 0 ? String.Empty : FilterModel.SegmentId.ToString(),
+                LeagueId = FilterModel.LeagueId == 0 ? String.Empty : FilterModel.LeagueId.ToString(),
+                FixtureId = FilterModel.FixtureId,
+                MarketId = FilterModel.MarketId,
+                SelectionId = FilterModel.SelectionId,
+                SportId = FilterModel.SportId == 0 ? string.Empty : FilterModel.SportId.ToString(),
+                SelectionStatus = FilterModel.ToStatus == 0 ? string.Empty : FilterModel.ToStatus.ToString(),
+                ManualSettledBy = FilterModel.SettledBy,
+                FromDate = FilterModel.FromDate,
+                ToDate = FilterModel.ToDate,
+                UserId = UserModel.Id,
+            };
+
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMarketSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+            await OnExportCallback.InvokeAsync();
+        }
         public async Task OnSearchClickEvent()
         {
-            await ModalFilterChanged.InvokeAsync(ModalFilter);
+            await FilterModelChanged.InvokeAsync(FilterModel);
 
             await OnInitializeCallback.InvokeAsync();
         }
@@ -213,53 +234,48 @@ namespace Backoffice.Web.Components.MarketSettlement
         {
             try
             {
-                var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-
                 Sports = new List<SelectListItemModel<int>>();
                 Segments = new List<SelectListItemModel<int>>();
                 Leagues = new List<SelectListItemModel<int>>();
                 Fixtures = new List<SelectListItemModel<string>>();
-                    Markets = new List<SelectListItemModel<string>>();
+                Markets = new List<SelectListItemModel<string>>();
                 Selections = new List<SelectListItemModel<string>>();
                 Statuses = new List<SelectListItemModel<int>>();
 
-                ModalFilter = new MarketSettlementModalFilterModel()
+                FilterModel = new MarketSettlementModalFilterModel()
                 {
-                    FromDate = DateTime.Now.Date,
+                    FromDate = DateTime.Now.Date.AddDays(-1),
                     ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
-                    DateRangeFilter = $"{firstDayOfMonth.ToString("MM/dd/yyyy")} - {lastDayOfMonth.ToString("MM/dd/yyyy")}",
                 };
 
                 var sports = await GetSports();
                 if (sports != null && sports.Any())
                     Sports.AddRange(sports);
-                ModalFilter.SportId = 0;
+                FilterModel.SportId = 0;
 
-                var segments = await GetSegments(ModalFilter.SportId);
+                var segments = await GetSegments(FilterModel.SportId);
                 if (segments != null && segments.Any())
                     Segments.AddRange(segments);
-                ModalFilter.SegmentId = 0;
+                FilterModel.SegmentId = 0;
 
-                var leagues = await GetLeagues(ModalFilter.SportId, ModalFilter.SegmentId);
+                var leagues = await GetLeagues(FilterModel.SportId, FilterModel.SegmentId);
                 if (leagues != null && leagues.Any())
                     Leagues.AddRange(segments);
-                ModalFilter.LeagueId = 0;
+                FilterModel.LeagueId = 0;
 
-                ModalFilter.FixtureId = string.Empty;
-                ModalFilter.MarketId = string.Empty;
-                ModalFilter.SelectionId = string.Empty;
+                FilterModel.FixtureId = string.Empty;
+                FilterModel.MarketId = string.Empty;
+                FilterModel.SelectionId = string.Empty;
 
                 var statuses = await GetStatuses();
                 if (statuses != null && statuses.Any())
                     Statuses.AddRange(statuses);
-                ModalFilter.ToStatus = 0;
+                FilterModel.ToStatus = 0;
 
-                await ModalFilterChanged.InvokeAsync(ModalFilter);
-
+                await FilterModelChanged.InvokeAsync(FilterModel);
                 await OnInitializeCallback.InvokeAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
 

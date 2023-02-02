@@ -11,7 +11,6 @@ namespace Backoffice.Web.Models
         public string MarketId { get; set; }
         public string SelectionId { get; set; }
         public int ToStatus { get; set; }
-        public string DateRangeFilter { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
         public string SettledBy { get; set; }
