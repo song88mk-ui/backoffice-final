@@ -56,8 +56,12 @@ table td:last-child {
     max-width: 100px;
 }
 
-td .fa{
+td .fa {
     font-size: 1.3rem;
+}
+
+.fa-trash {
+    color: #404E67;
 }
 
 .form-clear {
@@ -65,4 +69,5 @@ td .fa{
     pointer-events: auto;
     cursor: pointer;
     border-left: none;
+    color: #BDBBBB;
 }
