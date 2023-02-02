@@ -1,4 +1,7 @@
-﻿
+﻿.py-2 {
+    border-width: 1px 0;
+}
+
 tfoot td {
     background-color: #232323;
     color: #fff;

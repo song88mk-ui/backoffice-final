@@ -3,9 +3,11 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Administration.ManageUserGroups;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -21,9 +23,11 @@ namespace Backoffice.Web.Pages.Administration
         public UserGroupCallbackModel UserGroupCallbackModel { get; set; }
         public PermissionResponse Permissions { get; set; }
         public ClientModel ClientModel { get; set; }
+        public List<AlertModel> Alerts { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
+        public decimal Opacity { get; set; }
 
         #endregion
 
@@ -31,6 +35,8 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
+            Opacity = 0m;
+            Alerts = new List<AlertModel>();
             UserGroupListModel = new UserGroupListResponse();
             UserGroupCallbackModel = new UserGroupCallbackModel();
             Permissions = new PermissionResponse();
@@ -152,6 +158,22 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task OnSaveClickEvent(object item)
         {
+            Opacity = Opacity == 1m ? 0.99m : 1m;
+
+            var message = "User Group successfully created";
+            if(item.ToString() == "EDIT")
+                message = "User Group successfully updated";
+            else if (item.ToString() == "DELETE")
+                message = "User Group successfully deleted";
+
+            Alerts.Clear();
+            Alerts.Add(new AlertModel
+            {
+                Status = "Success",
+                Message = message,
+                Opacity = Opacity
+            });
+
             UserGroupListModel = await GetUserGroupList(UserGroupCallbackModel.SearchText, UserGroupCallbackModel.SortBy, MetaData.CurrentPage);
         }
 

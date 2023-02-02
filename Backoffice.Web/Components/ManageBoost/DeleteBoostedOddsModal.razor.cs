@@ -15,6 +15,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
         [Inject] IModalService ModalService { get; set; }
         [Inject] ITradingService TradingService { get; set; }
+        [Inject] IBackOfficeService BackOfficeService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
@@ -80,6 +81,35 @@ namespace Backoffice.Web.Components.ManageBoost
                     MessageType = "OnPriceBoost",
                     RoutingKey = $"r.uof.onpriceboost",
                     Payload = JsonSerializer.Serialize(payload)
+                });
+
+                Backoffice.Shared.Models.PriceBoostLogModel priceBoostLogModelFrom = new Backoffice.Shared.Models.PriceBoostLogModel()
+                {
+                    ClientName = PriceBoost.ClientName,
+                    ClientCode = PriceBoost.ClientCode,
+                    SelectionName = PriceBoost.BoostedSelectionName,
+                    MarketName = PriceBoost.MarketName,
+                    SportName = PriceBoost.SportName,
+                    SegmentName = PriceBoost.SegmentName,
+                    LeagueName = PriceBoost.LeagueName,
+                    Odds = PriceBoost.BoostedOdds,
+                    FixtureName = PriceBoost.FixtureName,
+                    UserName = PriceBoost.UserName,
+                    SelectionTemplateId = PriceBoost.SelectionTemplateId,
+                    MarketSpecifier = PriceBoost.MarketSpecifier,
+                    Translations = PriceBoost.BoostedSelectionTranslations
+                };
+
+                var deleteLogResponse = await BackOfficeService.AddActivityLog(new ActivityLogModel()
+                {
+                    Page = Page.OE_PriceBoost_Manage.ToString().Replace('_', '.'),
+                    Payload = $"{PriceBoost.ClientCode}.{PriceBoost.SportId}.{PriceBoost.SegmentId}.{PriceBoost.LeagueId}",
+                    Activity = Activity.Delete.ToString(),
+                    From = JsonSerializer.Serialize(priceBoostLogModelFrom),
+                    To = "-",
+                    UserId = UserModel.Id,
+                    UserName = UserModel.UserName,
+                    TimeStamp = DateTime.UtcNow
                 });
             }
 

@@ -15,7 +15,7 @@
 {
     <div class="col-md-12">
         <div class="mt-4 mx-3">
-            <Alert Message="@AlertMessage" AlertStatus="AlertStatus" />
+            <AlertMessage AlertMessageStr="@AlertMessage" AlertStatus="@(AlertStatus.ToString())" AlwaysShow="true" />
         </div>
     </div>
 }

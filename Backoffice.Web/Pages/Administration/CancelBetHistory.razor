@@ -8,6 +8,14 @@
             <div class="col-md-12">
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
+            @if (IsPreload)
+            {
+                <div class="col-md-12">
+                    <div class="mt-4 mx-3">
+                        <Preloader />
+                    </div>
+                </div>
+            }
             <div class="col-md-12">
                 <Filter OnInitCallback="OnInitEvent" OnExportCallback="OnExportEvent" />
             </div>
@@ -74,11 +82,7 @@
                             }
                             else
                             {
-                                if (CancelBets == null)
-                                {
-                                    <Preloader />
-                                }
-                                else if (!CancelBets.CancelBets.Any())
+                                if (!CancelBets.CancelBets.Any())
                                 {
                                     <tr>
                                         <td colspan="9">

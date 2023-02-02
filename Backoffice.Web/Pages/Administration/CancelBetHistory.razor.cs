@@ -22,6 +22,7 @@ namespace Backoffice.Web.Pages.Administration
         public MetaData MetaData { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
+        public bool IsPreload { get; set; }
 
         #endregion
 
@@ -49,9 +50,11 @@ namespace Backoffice.Web.Pages.Administration
         }
         public async Task OnInitEvent(CancelBetHistoryCallbackModel request)
         {
+            IsPreload = true;
             CallbackModel = request;
 
             CancelBets = await GetActivityLogList(request);
+            IsPreload = false;
         }
         public async Task OnExportEvent(CancelBetHistoryCallbackModel model)
         {
@@ -76,9 +79,10 @@ namespace Backoffice.Web.Pages.Administration
         }
         public async Task SelectPage(int page)
         {
+            IsPreload = true;
             MetaData.CurrentPage = page;
-
             CancelBets = await GetActivityLogList(CallbackModel);
+            IsPreload = false;
         }
 
         public void Dispose()
@@ -86,6 +90,7 @@ namespace Backoffice.Web.Pages.Administration
         }
 
         #endregion
+
         #region Utilities
         private async Task<CancelBetHistoryModel> GetActivityLogList(CancelBetHistoryCallbackModel model)
         {

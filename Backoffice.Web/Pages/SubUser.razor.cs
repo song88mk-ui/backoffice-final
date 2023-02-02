@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.SubUser;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -25,6 +26,9 @@ namespace Backoffice.Web.Pages
         public SubUserClaimsModel SubUserClaims { get; set; }
         public UserListResponse SubUsers { get; set; }
         public MetaData MetaData { get; set; }
+        public List<AlertModel> Alerts { get; set; }
+        public bool IsPreload { get; set; }
+        public decimal Opacity { get; set; }
 
         #endregion
 
@@ -32,6 +36,8 @@ namespace Backoffice.Web.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            Opacity = 0m;
+            Alerts = new List<AlertModel>();
             Permissions = new PermissionResponse();
             SubUserClaims = new SubUserClaimsModel();
             SubUsers = new UserListResponse();
@@ -77,6 +83,7 @@ namespace Backoffice.Web.Pages
 
         public async Task OnCreateSubUserClickEvent()
         {
+            Alerts.Clear();
             SubUserClaims.SubUserClaims.Clear();
             SubUserClaims.SubUserClaims = GetSubUserClaims(null);
             var parameters = new ModalParameters();
@@ -109,6 +116,16 @@ namespace Backoffice.Web.Pages
 
         public async Task OnSaveClickEvent(object item)
         {
+            Opacity = Opacity == 1m ? 0.99m : 1m;
+
+            Alerts.Clear();
+            Alerts.Add(new AlertModel
+            {
+                Status = "Success",
+                Message = (bool)item ? "Sub user successfully updated" : "Sub user successfully created",
+                Opacity = Opacity
+            });
+
             SubUsers = await GetSubUsers(1, CallbackModel.SearchText);
         }
 

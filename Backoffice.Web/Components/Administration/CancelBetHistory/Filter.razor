@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="button-container d-flex flex-row-reverse align-items-end">
-                <button type="button" class="btn btn-export px-4 py-2" @onclick="OnExportToExcelClickEvent">
+                <button type="button" class="btn btn-export px-4 py-2" @onclick="OnExportToExcelClickEvent" disabled="@IsPreload">
                     <i class="fa fa-file-excel-o me-3"></i>
                     Export To Excel
                 </button>
@@ -38,7 +38,7 @@
                 <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="FilterModel.DateFrom" EndDate="FilterModel.DateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDateRangeChangedEvent"></DateRangePicker>
             </div>
             <div class="me-4">
-                <button type="button" class="btn btn-search px-4 py-2" @onclick="OnSearchClickEvent">
+                <button type="button" class="btn btn-search px-4 py-2" @onclick="OnSearchClickEvent" disabled="@IsPreload">
                     Search
                 </button>
             </div>

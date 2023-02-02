@@ -359,3 +359,34 @@ window.collapseButton = (selector) => {
 
     $(classSelector).addClass('fa-chevron-down');
 }
+
+window.validateManualBetSettlementData = () => {
+    var invalidSelectCount = 0;
+    var invalidReasonCount = 0;
+
+    $('td .form-select').each(function (index) {
+        if ($(this).val() == '0') {
+            $('.modal-settle-bets').prop("disabled", true);            
+            invalidSelectCount += 1;
+        }
+    });
+
+    $('td .reason').each(function (index) {
+        if ($(this).val() == '') {
+            $('.modal-settle-bets').prop("disabled", true);      
+            invalidReasonCount += 1;
+        }
+    });
+
+    if ((invalidReasonCount == 0 && invalidSelectCount == 0)) {
+        $('.modal-settle-bets').prop("disabled", false);
+    }    
+}
+
+window.resetManualBetSettlementInputs = (index) => {
+    $($('td .form-select')[index]).val('0');    
+
+    $($('td .reason')[index]).val('');
+
+    $('.modal-settle-bets').prop("disabled", true);
+}

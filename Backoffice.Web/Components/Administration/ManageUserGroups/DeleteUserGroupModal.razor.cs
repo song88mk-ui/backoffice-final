@@ -21,16 +21,23 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public UserGroupResponse UserGroup { get; set; }
         public List<AlertModel> Alerts { get; set; }
+        public decimal Opacity { get; set; }
+        public bool IsPreload { get; set; }
         #endregion
+
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            Opacity = 0m;
             Alerts = new List<AlertModel>();
             UserGroup = ModalParameters.TryGet<UserGroupResponse>("UserGroup");
         }
 
         public async Task OnCloseModalClickEvent()
         {
+            if (IsPreload)
+                return;
+
             ModalService.Cancel();
         }
 
@@ -38,6 +45,11 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         {
             try
             {
+                if (IsPreload)
+                    return;
+
+                Opacity = Opacity == 1m ? 0.99m : 1m;
+
                 Alerts.Clear();
                 if (UserGroup.UserGroupName.ToLower().Equals("default"))
                 {
@@ -45,7 +57,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                     {
                         Status = "Error",
                         Message = "Cannot delete this user group",
-                        Opacity = 1.0m
+                        Opacity = Opacity
                     });
                     return;
                 }
@@ -70,20 +82,9 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                         UserName = UserModel.UserName,
                     });
 
-
-                    Alerts.Add(new AlertModel
-                    {
-                        Status = "Success",
-                        Message = "User Group successfully deleted",
-                        Opacity = 1.0m
-                    });
-
-                    await InvokeAsync(StateHasChanged);
-                    await Task.Delay(3500);
-
                     ModalService.Cancel();
 
-                    await Modal.OnSaveClickCallback.InvokeAsync();
+                    await Modal.OnSaveClickCallback.InvokeAsync("DELETE");
                 }
                 else
                 {
@@ -91,7 +92,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                     {
                         Status = "Error",
                         Message = $"{response.Message}",
-                        Opacity = 1.0m
+                        Opacity = Opacity
                     });
                 }
             }

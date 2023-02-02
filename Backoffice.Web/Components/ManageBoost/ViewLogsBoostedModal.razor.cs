@@ -34,9 +34,7 @@ namespace Backoffice.Web.Components.ManageBoost
             var result = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
             {
                 Page = Page.OE_PriceBoost_Manage.ToString().Replace("_", "."),
-                Payload = payload,
-                DateFrom = DateTime.Parse("1/1/2020"),
-                DateTo = DateTime.Now,
+                Payload = payload,                
                 MetaData = new MetaData() { PageSize = 10 }
             })).Result;
 
