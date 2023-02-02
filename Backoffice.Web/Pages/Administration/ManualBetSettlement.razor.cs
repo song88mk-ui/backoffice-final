@@ -30,6 +30,7 @@ namespace Backoffice.Web.Pages.Administration
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         private int CurrentPage { get; set; } = 1;
+        private bool IsPreloader { get; set; }
         #endregion
 
         #region Fields
@@ -43,7 +44,9 @@ namespace Backoffice.Web.Pages.Administration
             PageTitle = "Manual Bet Settlement";
             IconClass = "ico ico-manual-bet-settlement";
 
-            Alerts = new List<AlertModel>();            
+            Alerts = new List<AlertModel>();
+            IsPreloader = true;
+            StateHasChanged();
 
             MetaData = new MetaData
             {
@@ -58,6 +61,8 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task OnSearchButtonClicked()
         {
+            IsPreloader = true;
+            StateHasChanged();
             await GetContents();
         }
 
@@ -124,6 +129,12 @@ namespace Backoffice.Web.Pages.Administration
 
         private async Task GetContents()
         {
+            if(IsPreloader == false)
+            {
+                IsPreloader = true;
+                StateHasChanged();
+            }
+
             try
             {
                 var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
@@ -143,9 +154,11 @@ namespace Backoffice.Web.Pages.Administration
                         {
                             FilterLogs(response);
                         }
-
+                        else
+                        {
+                            MetaData = response.Result.MetaData;
+                        }
                         ActivityLogs = response.Result.ActivityLogs;
-                        MetaData = response.Result.MetaData;
                     }
                 }
             }
@@ -153,6 +166,8 @@ namespace Backoffice.Web.Pages.Administration
             {
 
             }
+
+            IsPreloader = false;
         }
 
         private string BuildEventDetails(BetSelectionDetails betSelectionDetails, string oddsFormat)
@@ -236,7 +251,13 @@ namespace Backoffice.Web.Pages.Administration
                 .Where(x => toStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).NewBetStatusId.ToString())).ToList();
             }
 
-            MetaData = response.Result.MetaData;
+            MetaData = new MetaData()
+            {
+                CurrentPage = MetaData.CurrentPage,
+                TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize))),
+                PageSize = MetaData.PageSize,
+                TotalCount = response.Result.ActivityLogs.Count
+            };
         }
         #endregion
     }
