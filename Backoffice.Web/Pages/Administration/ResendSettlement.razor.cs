@@ -24,6 +24,7 @@ namespace Backoffice.Web.Pages.Administration
         public string IconClass { get; set; }        
         public bool IsAddDisabled { get; set; }
         public bool IsActionDisabled { get; set; }
+        public Guid Guid { get; set; }
         #endregion
 
         #region Methods
@@ -34,6 +35,7 @@ namespace Backoffice.Web.Pages.Administration
             IconClass = "ico ico-resend-settlement";
             IsAddDisabled = true;
             IsActionDisabled = false;
+            Guid = new Guid();
             
             ResendSettlementModel = new List<ResendSettlementBetDetailModel>();
             Alerts = new List<AlertModel>();
@@ -79,6 +81,8 @@ namespace Backoffice.Web.Pages.Administration
                             Message = "Duplicate BetId's are not allowed",
                             Opacity = 1.0m
                         });
+
+                        Guid = Guid.NewGuid();
                     }
                     else
                     {
@@ -123,6 +127,8 @@ namespace Backoffice.Web.Pages.Administration
                         Message = "Rejected bet are not allowed to be resent to Operator",
                         Opacity = 1.0m
                     });
+
+                    Guid = Guid.NewGuid();
                 }
                 else
                 {
@@ -168,6 +174,8 @@ namespace Backoffice.Web.Pages.Administration
                     Message = StatusCode.Resend_Attempt_Not_Successful_Please_Try_Again.ToString().Replace('_', ' '),
                     Opacity = 1.0m
                 });
+
+                Guid = Guid.NewGuid();
             }
             else if (response.StatusCode == StatusCode.Error)
             {
@@ -176,7 +184,9 @@ namespace Backoffice.Web.Pages.Administration
                     Status = response.StatusCode.ToString(),
                     Message = response.Result.Data.FirstOrDefault().Message,
                     Opacity = 1.0m
-                });                
+                });
+
+                Guid = Guid.NewGuid();
             }
             else
             {
@@ -186,6 +196,8 @@ namespace Backoffice.Web.Pages.Administration
                     Message = "Resend to operator of bet settlement, cashout, and/or cancellation successful",
                     Opacity = 1.0m
                 });
+
+                Guid = Guid.NewGuid();
             }
 
             await InvokeAsync(StateHasChanged);
