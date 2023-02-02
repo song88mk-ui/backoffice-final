@@ -10,7 +10,7 @@
         {
             foreach (var alert in Alerts)
             {
-                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" AlertModel="Alerts.FirstOrDefault()" />
+                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" />
             }
         }
         <div class="row">

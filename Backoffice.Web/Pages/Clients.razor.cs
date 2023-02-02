@@ -6,6 +6,7 @@ using Backoffice.Web.Components.Clients;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
 
 namespace Backoffice.Web.Pages
 {
@@ -19,9 +20,12 @@ namespace Backoffice.Web.Pages
         public MetaData MetaData { get; set; }
         public ClientListResponse ClientListModel { get; set; }
         public ClientListCallbackModel ClientListCallbackModel { get; set; }
+        public List<AlertModel> Alerts { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
+        public bool IsPreload { get; set; }
+        public decimal Opacity { get; set; }
 
         #endregion
 
@@ -29,6 +33,8 @@ namespace Backoffice.Web.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            Opacity = 0m;
+            Alerts = new List<AlertModel>();
             ClientListModel = new ClientListResponse();
             ClientListCallbackModel = new ClientListCallbackModel();
 
@@ -58,6 +64,7 @@ namespace Backoffice.Web.Pages
 
         public async Task OnCreateClientClickEvent()
         {
+            Alerts.Clear();
             var sports = (await BackOfficeService.GetSportsAsync()).Result;
             var realSports = new SportsLookupModel();
             var virtualSports = new SportsLookupModel();
@@ -102,6 +109,7 @@ namespace Backoffice.Web.Pages
 
         public async Task OnEditClientClickEvent(ClientListResponse.Client client)
         {
+            Alerts.Clear();
             var sports = (await BackOfficeService.GetSportsAsync()).Result;
             var realSports = new SportsLookupModel();
             var virtualSports = new SportsLookupModel();
@@ -170,6 +178,16 @@ namespace Backoffice.Web.Pages
 
         public async Task OnSaveClickEvent(object item)
         {
+            Opacity = Opacity == 1m ? 0.99m : 1m;
+
+            Alerts.Clear();
+            Alerts.Add(new AlertModel
+            {
+                Status = "Success",
+                Message = (bool)item ? "Client successfully updated" : "Client successfully created",
+                Opacity = Opacity
+            });
+
             ClientListModel = await GetClientList(ClientListCallbackModel.SearchText, ClientListCallbackModel.SortBy, MetaData.CurrentPage);
         }
 
@@ -211,7 +229,7 @@ namespace Backoffice.Web.Pages
                     TotalPage = response.Result.TotalPage,
                     Clients = response.Result.Clients.Select((s, index) => new ClientListResponse.Client
                     {
-                        Num = index + 1,
+                        Num = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
                         ClientId = s.ClientId,
                         Name = s.Name,
                         StatusId = s.StatusId,

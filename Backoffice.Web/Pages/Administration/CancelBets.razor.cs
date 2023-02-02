@@ -216,6 +216,18 @@ namespace Backoffice.Web.Pages.Administration
 
             }
         }
+
+        public async Task OnClearBetReferenceClickEvent(CancelBetModel.BetReferenceModel model)
+        {
+            model.BetReferenceId = string.Empty;
+        }
+
+        public async Task OnDeleteBetReferenceClickEvent(CancelBetModel.BetReferenceModel model)
+        {
+            if(CancelBetModel.BetReferenceIds.Count > 1)
+                CancelBetModel.BetReferenceIds.Remove(model);
+        }
+
         public void Dispose()
         {
         }

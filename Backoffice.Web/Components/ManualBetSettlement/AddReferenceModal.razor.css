@@ -37,3 +37,7 @@
 textarea.form-control {
     height:10rem;
 }
+
+.ref-id {
+    text-transform: uppercase;
+}

@@ -5,6 +5,14 @@
 
         <div class="business-container">
             <div class="row">
+                @if (IsPreload)
+                {
+                    <div class="col-md-12">
+                        <div class="mt-4 mx-3">
+                            <Preloader />
+                        </div>
+                    </div>
+                }
                 <div class="col-md-12">
                     <!-- title here -->
                     <h6 class="title fw-bold ps-2 py-1">Business Information</h6>
@@ -633,7 +641,7 @@
                                             Max Per Ticket
                                         </label>
                                         <InputDecimal class="form-control" id="@($"{SelectedCurrency}.soccerMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerTicket" />
-                                        
+
                                     </div>
                                 </div>
                                 <div class="ps-2 pb-2 padRight">
@@ -791,6 +799,6 @@
             }
         </div>
     }
-    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
-    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">Save</button>
+    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
+    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent"disabled="@IsPreload">Save</button>
 </div>

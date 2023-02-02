@@ -5,7 +5,7 @@
     {
         foreach (var alert in Alerts)
         {
-            <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" AlertModel="Alerts.FirstOrDefault()"/>
+            <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" Guid="Guid"/>
         }
     }
     <table class="table">
@@ -25,15 +25,17 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var bet in ManualBetDetailsModel.Bets)
+            @for(int i = 0; i<ManualBetDetailsModel.Bets.Count; i++)
             {
+                ManualBetDetails bet = ManualBetDetailsModel.Bets[i];
+            
                 <tr>
                     <th scope="row">
-                        <span>@(ManualBetDetailsModel.Bets.IndexOf(bet) + 1)</span>
+                        <span>@(i + 1)</span>
                     </th>
 
                     <td>
-                        <textarea class="ref-id form-control" placeholder="Reference ID" @oninput="(ChangeEventArgs args) => OnReferenceIdOnChangeEvent(args, bet, ManualBetDetailsModel.Bets.IndexOf(bet))" disabled="@IsActionDisabled"></textarea>
+                        <textarea class="ref-id form-control" @bind="bet.BetId" placeholder="Reference ID" @oninput="(ChangeEventArgs args) => OnReferenceIdOnChangeEvent(args, bet, ManualBetDetailsModel.Bets.IndexOf(bet))" disabled="@IsActionDisabled"></textarea>
                     </td>
 
                     <td class="fw-bold">
@@ -49,8 +51,8 @@
                     </td>
 
                     <td>
-                        <select class="form-select" @onchange="(ChangeEventArgs e) => OnBetStatusChangedEvent(e, bet)" disabled="@IsBetSelectDisabled">
-                            <option value="0">None</option>
+                        <select class="form-select" @bind="bet.NewBetStatusId" @bind:event="onchange" disabled="@IsBetSelectDisabled">
+                            <option value="0" selected>None</option>
                             <option value="@((int)BetStatus.Won)">Won</option>
                             <option value="@((int)BetStatus.Lost)">Lost</option>
                             <option value="@((int)BetStatus.HalfWon)">Half Won</option>
@@ -59,7 +61,7 @@
                         </select>
                     </td>
                     <td>
-                        <textarea class="reason form-control" placeholder="Reason" @oninput="(ChangeEventArgs e) => OnReasonChangedEvent(e, bet)" disabled="@IsReasonDisabled"></textarea>
+                        <textarea class="reason form-control" placeholder="Reason" @bind="bet.NewReason" @bind:event="oninput" disabled="@IsReasonDisabled"></textarea>
                     </td>
                     <td>
                         <button type="button" class="btn" @onclick="() => OnDeleteClickEvent(bet)" disabled="@((ManualBetDetailsModel.Bets.Count == 1 ? true: false) || @IsActionDisabled)">
@@ -67,11 +69,11 @@
                         </button>
                     </td>
                 </tr>
-            }
+            }            
         </tbody>
     </table>
 </div>
 <div class="modal-footer">
     <button type="button" class="btn modal-btn modal-reset" @onclick="OnModalResetClickEvent">Reset</button>
-    <button type="button" class="btn modal-btn modal-settle-bets" @onclick="OnModalSettleClickEvent">Settle Bets</button>
+    <button type="button" class="btn modal-btn modal-settle-bets" @onclick="OnModalSettleClickEvent" disabled=@(ManualBetDetailsModel.Bets.Any(x => x.BetId == null || x.NewBetStatusId == 0 || (string.IsNullOrEmpty(x.NewReason) || x.NewReason == "")) ? true : false)>Settle Bets</button>
 </div>
