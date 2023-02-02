@@ -100,6 +100,7 @@ namespace Backoffice.Web.Pages
 
         public async Task OnEditSubUserClickEvent(UserResponse user)
         {
+            Alerts.Clear();
             SubUserClaims.SubUserClaims.Clear();
             SubUserClaims.SubUserClaims = GetSubUserClaims(user.Claims);
             var parameters = new ModalParameters();

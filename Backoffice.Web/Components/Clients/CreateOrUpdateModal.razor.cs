@@ -35,6 +35,8 @@ namespace Backoffice.Web.Components.Clients
         public ClientListResponse.BetSetting SelectedBetSetting { get; set; }
         public List<AlertModel> Alerts { get; set; }
         private EditContext EditContext { get; set; }
+        public bool IsPreload { get; set; }
+        public decimal Opacity { get; set; }
 
         #endregion
 
@@ -52,6 +54,7 @@ namespace Backoffice.Web.Components.Clients
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            IsPreload = false;
             monthlyFeeToggle = false;
             SportsbookTierOption = true;
 
@@ -251,6 +254,8 @@ namespace Backoffice.Web.Components.Clients
 
         public async Task OnCancelClickEvent()
         {
+            if (IsPreload)
+                return;
 
             ModalService.Cancel();
         }
@@ -259,8 +264,14 @@ namespace Backoffice.Web.Components.Clients
         {
             try
             {
+                if (IsPreload)
+                    return;
+
+                IsPreload = true;
 
                 Alerts.Clear();
+
+                Opacity = Opacity == 1m ? 0.99m : 1m;
 
                 if (!EditContext.Validate())
                 {
@@ -272,10 +283,11 @@ namespace Backoffice.Web.Components.Clients
                             {
                                 Status = "Error",
                                 Message = $"{message}",
-                                Opacity = 1.0m
+                                Opacity = Opacity
                             });
                         }
                     }
+                    IsPreload = false;
                     return;
                 }
 
@@ -285,7 +297,7 @@ namespace Backoffice.Web.Components.Clients
                     {
                         Status = "Error",
                         Message = "Business Name is required",
-                        Opacity = 1.0m
+                        Opacity = Opacity
                     });
                 }
 
@@ -295,14 +307,17 @@ namespace Backoffice.Web.Components.Clients
                     {
                         Status = "Error",
                         Message = "Brand Name is required",
-                        Opacity = 1.0m
+                        Opacity = Opacity
                     });
                 }
 
                 if (Alerts.Any())
+                {
+                    IsPreload = false;
                     return;
+                }
 
-                foreach(var setting in Client.BetSettings)
+                foreach (var setting in Client.BetSettings)
                 {
                     if(setting.BetSettingSoccer.MaxPerGame > 0 && setting.BetSettingSoccer.MaxPerGame < setting.BetSettingSoccer.MaxPerTicket)
                     {
@@ -313,7 +328,7 @@ namespace Backoffice.Web.Components.Clients
                             {
                                 Status = "Error",
                                 Message = message,
-                                Opacity = 1.0m
+                                Opacity = Opacity
                             });
                         }
                     }
@@ -327,7 +342,7 @@ namespace Backoffice.Web.Components.Clients
                             {
                                 Status = "Error",
                                 Message = message,
-                                Opacity = 1.0m
+                                Opacity = Opacity
                             });
                         }
                     }
@@ -341,7 +356,7 @@ namespace Backoffice.Web.Components.Clients
                             {
                                 Status = "Error",
                                 Message = message,
-                                Opacity = 1.0m
+                                Opacity = Opacity
                             });
                         }
                     }
@@ -349,7 +364,10 @@ namespace Backoffice.Web.Components.Clients
                 }
 
                 if (Alerts.Any())
+                {
+                    IsPreload = false;
                     return;
+                }
 
                 var clientRequest = new ClientListResponse.Client()
                 {
@@ -466,32 +484,10 @@ namespace Backoffice.Web.Components.Clients
 
                 if (response.Result)
                 {
-                    if (IsEdit)
-                    {
-                        Alerts.Add(new AlertModel
-                        {
-                            Status = "Success",
-                            Message = "Client successfully updated",
-                            Opacity = 1.0m
-                        });
-                    }
-                    else
-                    {
-                        Alerts.Add(new AlertModel
-                        {
-                            Status = "Success",
-                            Message = "Client successfully created",
-                            Opacity = 1.0m
-                        });
-                    }
-
-
-                    await InvokeAsync(StateHasChanged);
-                    await Task.Delay(3500);
-
+                    
                     ModalService.Cancel();
 
-                    await Modal.OnSaveClickCallback.InvokeAsync();
+                    await Modal.OnSaveClickCallback.InvokeAsync(IsEdit);
                 }
                 else
                 {
@@ -499,7 +495,7 @@ namespace Backoffice.Web.Components.Clients
                     {
                         Status = "Error",
                         Message = $"{response.Message}",
-                        Opacity = 1.0m
+                        Opacity = Opacity
                     });
                 }
             }
@@ -507,11 +503,15 @@ namespace Backoffice.Web.Components.Clients
             {
 
             }
+            IsPreload = false;
 
         }
 
         public async Task OnEmailNotifClicked(ChangeEventArgs e)
         {
+            if (IsPreload)
+                return;
+
             if (Convert.ToBoolean(e.Value) == true)
                 Client.IsEmailNotification = true;
             else
@@ -520,6 +520,9 @@ namespace Backoffice.Web.Components.Clients
 
         public async Task OnMonthlyFeeClicked(ChangeEventArgs e)
         {
+            if (IsPreload)
+                return;
+
             if (Convert.ToBoolean(e.Value) == true)
                 monthlyFeeToggle = true;
             else
@@ -531,6 +534,9 @@ namespace Backoffice.Web.Components.Clients
 
         public async Task OnRealSportsClicked(ChangeEventArgs e, int sportId, bool isLabel = false)
         {
+            if (IsPreload)
+                return;
+
             if ((isLabel && !SelectedRealSportsWin.Contains(sportId)) || (e != null && Convert.ToBoolean(e.Value) == true))
             {
                 if (sportId == 0)
@@ -558,6 +564,9 @@ namespace Backoffice.Web.Components.Clients
         }
         public async Task OnVirtualSportsClicked(ChangeEventArgs e, int sportId, bool isLabel = false)
         {
+            if (IsPreload)
+                return;
+
             if ((isLabel && !SelectedVirtualSports.Contains(sportId)) || (e != null && Convert.ToBoolean(e.Value) == true))
             {
                 if (sportId == 0)
@@ -585,6 +594,9 @@ namespace Backoffice.Web.Components.Clients
         }
         public async Task OnRealSportsWinClicked(ChangeEventArgs e, int sportId, bool isLabel = false)
         {
+            if (IsPreload)
+                return;
+
             if ((isLabel && !SelectedRealSportsWin.Contains(sportId)) || (e != null && Convert.ToBoolean(e.Value) == true))
             {
                 if (sportId == 0)
@@ -612,6 +624,9 @@ namespace Backoffice.Web.Components.Clients
         }
         public async Task OnVirtualSportsWinClicked(ChangeEventArgs e, int sportId, bool isLabel = false)
         {
+            if (IsPreload)
+                return;
+
             if ((isLabel && !SelectedRealSportsWin.Contains(sportId)) || (e != null && Convert.ToBoolean(e.Value) == true))
             {
                 if (sportId == 0)
@@ -640,27 +655,42 @@ namespace Backoffice.Web.Components.Clients
 
         public async Task OnRegionHKClicked(ChangeEventArgs e)
         {
+            if (IsPreload)
+                return;
+
             Client.Region = "HK";
         }
 
         public async Task OnRegionAFClicked(ChangeEventArgs e)
         {
+            if (IsPreload)
+                return;
+
             Client.Region = "SA";
         }
         public async Task OnStatusNormalClicked(ChangeEventArgs e)
         {
+            if (IsPreload)
+                return;
+
             Client.StatusId = (int)ClientStatus.Normal;
             Client.StatusName = ClientStatus.Normal.ToString();
         }
 
         public async Task OnStatusLockedClicked(ChangeEventArgs e)
         {
+            if (IsPreload)
+                return;
+
             Client.StatusId = (int)ClientStatus.Locked;
             Client.StatusName = ClientStatus.Locked.ToString();
         }
 
         public async Task ToggleCompanyRevenueSwitch()
         {
+            if (IsPreload)
+                return;
+
             //false = fixed
             //true = tier
             Client.IsTierRevenue = !Client.IsTierRevenue;
@@ -683,25 +713,40 @@ namespace Backoffice.Web.Components.Clients
 
         public async Task OnRevenueSportsbookClicked(ChangeEventArgs e)
         {
+            if (IsPreload)
+                return;
+
             Client.RevenueShare.SportsbookShare = Convert.ToDecimal(e.Value.ToString());
         }
         public async Task OnRevenueJackpotClicked(ChangeEventArgs e)
         {
+            if (IsPreload)
+                return;
+
             Client.RevenueShare.JackpotShare = Convert.ToDecimal(e.Value.ToString());
         }
 
         public async Task OnSportsbookTierOptionClicked(ChangeEventArgs e)
         {
+            if (IsPreload)
+                return;
+
             SportsbookTierOption = true;
         }
 
         public async Task OnJackpotTierOptionClicked(ChangeEventArgs e)
         {
+            if (IsPreload)
+                return;
+
             SportsbookTierOption = false;
         }
 
         public async Task OnAddTierClicked()
         {
+            if (IsPreload)
+                return;
+
             if (SportsbookTierOption)
             {
                 var fromTier = 0.01m;
@@ -747,6 +792,9 @@ namespace Backoffice.Web.Components.Clients
 
         public async Task OnRemoveTierClicked(TierRevenueShareModel.TierModel tier)
         {
+            if (IsPreload)
+                return;
+
             var num = tier.Tier;
 
             if (SportsbookTierOption)
@@ -772,10 +820,16 @@ namespace Backoffice.Web.Components.Clients
 
         public async Task OnTierSelect(ChangeEventArgs e, TierRevenueShareModel.TierModel tier)
         {
+            if (IsPreload)
+                return;
+
             tier.Percentage = Convert.ToDecimal(e.Value.ToString());
         }
         public async Task OnAboveTierSelect(ChangeEventArgs e)
         {
+            if (IsPreload)
+                return;
+
             if (SportsbookTierOption)
             {
                 SportsbookTier.AboveTierPercentage = Convert.ToDecimal(e.Value.ToString());
@@ -787,6 +841,9 @@ namespace Backoffice.Web.Components.Clients
         }
         public async Task OnCurrencyClicked(string currency)
         {
+            if (IsPreload)
+                return;
+
             SelectedCurrency = currency;
             SelectedBetSetting = Client.BetSettings.FirstOrDefault(b => b.CurrencyCode == SelectedCurrency);
         }
