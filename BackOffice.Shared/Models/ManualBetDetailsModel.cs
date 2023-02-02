@@ -35,9 +35,10 @@ namespace Backoffice.Shared.Models
             public decimal WinLoss { get; set; }
             public int BetStatusId { get; set; }
             public string BetStatusName { get; set; }
-            public int NewBetStatusId { get; set; }
+            public int NewBetStatusId { get; set; } = 0;
             public string NewBetStatusName { get; set; }
             public string Reason { get; set; }
+            public string NewReason { get; set; }
             public string CurrencyCode { get; set; }
             public string LanguageCode { get; set; }
             public decimal ExchangeRate { get; set; }

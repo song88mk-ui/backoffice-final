@@ -56,6 +56,20 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             }            
         }
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (ManualBetDetailsModel.Bets.Any(x => x.BetId == null || x.NewBetStatusId == 0 || (string.IsNullOrEmpty(x.NewReason) || x.NewReason == "")))
+            {
+                await Task.Yield();
+                IsSettleDisabled = true;
+            }
+            else
+            {
+                await Task.Yield();
+                IsSettleDisabled = false;
+            }
+        }
+
         public async Task OnAddReferenceIdClickedEvent()
         {
             ManualBetDetailsModel.Bets.Add(new ManualBetDetails());
@@ -108,7 +122,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         }
 
         public async Task OnBetStatusChangedEvent(ChangeEventArgs e, ManualBetDetails bet)
-        {            
+        {
             bet.NewBetStatusId = int.Parse(e.Value.ToString());
 
             switch ((BetStatus)bet.NewBetStatusId)
@@ -148,7 +162,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
 
         public async Task OnReasonChangedEvent(ChangeEventArgs e, ManualBetDetails bet)
         {
-            bet.Reason = e.Value.ToString();
+            bet.NewReason = e.Value.ToString();
 
             //await JSRuntime.InvokeVoidAsync("validateManualBetSettlementData");
         }

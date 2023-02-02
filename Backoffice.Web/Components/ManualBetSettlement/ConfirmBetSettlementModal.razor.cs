@@ -65,7 +65,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 {
                     BetId = bet.BetId.ToString(),
                     NewStatus = (BetStatus) bet.NewBetStatusId,
-                    Reason = bet.Reason,
+                    Reason = bet.NewReason,
                 }).ToList(),
                 ActivityLogs = ActivityLogs
             }));
