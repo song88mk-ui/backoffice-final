@@ -236,13 +236,7 @@ namespace Backoffice.Web.Pages.Administration
                 .Where(x => toStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).NewBetStatusId.ToString())).ToList();
             }
 
-            response.Result.MetaData = new MetaData()
-            {
-                CurrentPage = CurrentPage,
-                TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize))),
-                PageSize = MetaData.PageSize,
-                TotalCount = response.Result.ActivityLogs.Count
-            };
+            MetaData = response.Result.MetaData;
         }
         #endregion
     }
