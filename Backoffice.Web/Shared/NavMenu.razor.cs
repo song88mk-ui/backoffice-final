@@ -66,8 +66,13 @@ namespace Backoffice.Web.Shared
                     }
                 }
 
-                await OnSportClickCallback.InvokeAsync(SelectedSport);
-                StateHasChanged();
+                var page = NavigationManager.Uri.Replace($"{NavigationManager.BaseUri}odds-engine/", "");
+
+                if (page.ToLower() == "monitoring")
+                {
+                    await OnSportClickCallback.InvokeAsync(SelectedSport);
+                }
+                //StateHasChanged();
             }
 
             if (UserModel != null)
