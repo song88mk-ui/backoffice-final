@@ -34,6 +34,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         public bool IsBetSelectDisabled { get; set; }
         public bool IsReasonDisabled { get; set; }
         public bool IsSettleDisabled { get; set; }        
+        public Guid Guid { get; set; }
         #endregion
 
         #region Methods
@@ -44,6 +45,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             IsAddDisabled = true;
             IsActionDisabled = false;                        
             IsSettleDisabled = true;
+            Guid = new Guid();
 
             ManualBetDetailsModel = ModalParameters.TryGet<ManualBetDetailsModel>("ManualBetDetailsModel");
 
@@ -152,8 +154,8 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         }
 
         public async Task OnDeleteClickEvent(ManualBetDetails bet)
-        {
-            ManualBetDetailsModel.Bets.Remove(bet);
+        {                        
+            ManualBetDetailsModel.Bets.Remove(bet);            
         }
 
         public async Task OnModalResetClickEvent()
@@ -183,7 +185,9 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                         Status = AlertStatus.Error.ToString(),
                         Message = "Rejected, Cancelled and Cashout bets cannot be resettled!",
                         Opacity = 1.0m
-                    });                    
+                    });
+
+                    Guid = Guid.NewGuid();
                 }
                 else if (ManualBetDetailsModel != null && ManualBetDetailsModel.Bets.Any() &&
                     ManualBetDetailsModel.Bets.GroupBy(x => x.BetId).Any(g => g.Count() > 1))
@@ -196,6 +200,8 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                         Message = "Duplicate BetId's are not allowed",
                         Opacity = 1.0m
                     });
+
+                    Guid = Guid.NewGuid();
                 }
                 else
                 {
@@ -230,7 +236,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 builder.Append($"<span>{betSelectionDetails.FixtureName}</span>");
                 builder.Append($"<span>{betSelectionDetails.FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()}</span>");
                 builder.Append($"<span>{betSelectionDetails.SelectionName}</span>");
-                builder.Append($"<span>{betSelectionDetails.MarketName} @ {betSelectionDetails.Odds} ({oddsFormat})</span>");
+                builder.Append($"<span>{betSelectionDetails.MarketName} @ {betSelectionDetails.Odds.ToString("#.00")} ({oddsFormat})</span>");
                 builder.Append($"<span>(Bet Result: {betSelectionDetails.BetScore}, Final Score: {betSelectionDetails.SettlementScore})</span>");
                 builder.Append($"<span>{betSelectionDetails.BetSelectionStatusName}</span>");
             }
