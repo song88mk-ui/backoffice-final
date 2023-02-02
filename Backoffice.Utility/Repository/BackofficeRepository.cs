@@ -126,6 +126,7 @@ namespace Backoffice.Utility.Repository
         {
             // If you use EPPlus in a noncommercial context
             // according to the Polyform Noncommercial license:
+            var title = "Message Settlement History";
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             var excel = new ExcelPackage();
             try
@@ -145,7 +146,7 @@ namespace Backoffice.Utility.Repository
 
                 #region Initialize Spreadsheet
 
-                var workSheet = excel.Workbook.Worksheets.Add($"Message Settlement History");
+                var workSheet = excel.Workbook.Worksheets.Add($"{title}");
                 InitManualMessageSettlementHistoryWorksheet(workSheet);
 
                 var row = 2;
@@ -173,7 +174,7 @@ namespace Backoffice.Utility.Repository
 
                 #region Upload File to Azure
 
-                var fileName = $"MessageSettlementHistory_{DateTime.UtcNow:MMddyyyyHHmm}.xlsx";
+                var fileName = $"{title.Trim()}_{DateTime.UtcNow:MMddyyyyHHmm}.xlsx";
                 var downloadUrl = UploadToAzure(excel, fileName);
 
                 if (!string.IsNullOrEmpty(downloadUrl))
@@ -211,6 +212,7 @@ namespace Backoffice.Utility.Repository
         {
             // If you use EPPlus in a noncommercial context
             // according to the Polyform Noncommercial license:
+            var title = "Market Settlement History";
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             var excel = new ExcelPackage();
             try
@@ -230,7 +232,7 @@ namespace Backoffice.Utility.Repository
 
                 #region Initialize Spreadsheet
 
-                var workSheet = excel.Workbook.Worksheets.Add($"Market Settlement History");
+                var workSheet = excel.Workbook.Worksheets.Add($"{title}");
                 InitManualMessageSettlementHistoryWorksheet(workSheet);
 
                 var row = 2;
@@ -265,7 +267,7 @@ namespace Backoffice.Utility.Repository
                 #endregion
 
                 #region Upload File to Azure
-                var fileName = $"MessageSettlementHistory_{DateTime.UtcNow:MMddyyyyHHmm}.xlsx";
+                var fileName = $"{title.Trim()}_{DateTime.UtcNow:MMddyyyyHHmm}.xlsx";
                 var downloadUrl = UploadToAzure(excel, fileName);
                 if (!string.IsNullOrEmpty(downloadUrl))
                 {
@@ -276,7 +278,7 @@ namespace Backoffice.Utility.Repository
                         ClientCode = string.Empty,
                         SportsId = 0,
                         Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",
-                        PageRedirect = "/admin/message-settlement",
+                        PageRedirect = "/admin/market-settlement",
                         UserId = Guid.Parse(request.UserId),
                         ClaimType = AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace("_", "."),
                         Type = (int)NotificationType.General
@@ -298,12 +300,13 @@ namespace Backoffice.Utility.Repository
         }
         public async Task ProcessOnGetManualBetSettlementHistory(OnGetManualBetSettlementHistoryMessage request, IMessageBroker messageBroker)
         {
+            var title = "Manual Bet Settlement History";
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             var excel = new ExcelPackage();
             try
             {
                 #region Initialize Spreadsheet
-                var worksheet = excel.Workbook.Worksheets.Add("Manual Bet Settlement History");
+                var worksheet = excel.Workbook.Worksheets.Add($"{title}");
                 InitManualBetSettlementHistoryWorksheet(worksheet);
                 #endregion
 
@@ -331,7 +334,7 @@ namespace Backoffice.Utility.Repository
 
                 #region Upload File to Azure
 
-                var fileName = $"ManualBetSettlementHistory_{DateTime.UtcNow:MMddyyyyHHmm}.xlsx";
+                var fileName = $"{title}_{DateTime.UtcNow:MMddyyyyHHmm}.xlsx";
                 var downloadUrl = UploadToAzure(excel, fileName);
 
                 if (!string.IsNullOrEmpty(downloadUrl))
@@ -344,7 +347,7 @@ namespace Backoffice.Utility.Repository
                         ClientCode = string.Empty,
                         SportsId = 0,
                         Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",
-                        PageRedirect = "/admin/message-settlement",
+                        PageRedirect = "/admin/manual-bet-settlement",
                         UserId = Guid.Parse(request.ActivityLogs.FirstOrDefault().UserId),
                         ClaimType = AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace("_", "."),
                         Type = (int)NotificationType.General
