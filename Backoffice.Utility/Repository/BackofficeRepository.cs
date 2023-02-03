@@ -458,7 +458,7 @@ namespace Backoffice.Utility.Repository
                         Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",
                         PageRedirect = "/admin/cancel-bet-history",
                         UserId = Guid.Parse(response.ActivityLogs.FirstOrDefault().UserId),
-                        ClaimType = AdminPermission.Admin_Bet_Cancel.ToString().Replace("_", "."),
+                        ClaimType = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                         Type = (int)NotificationType.General
                     };
 

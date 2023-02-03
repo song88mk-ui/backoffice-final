@@ -1,5 +1,6 @@
 ﻿<div class="modal-body">
     <div class="d-flex flex-column justify-content-center p-5">
+
         <div class="text-center">
             <img src="icons/svg/question-circle.svg" />
         </div>
@@ -8,9 +9,18 @@
             <br />
             Please confirm to settle all reference IDs added.
         </div>
+        @if (IsPreload)
+        {
+                <div class="col-md-12">
+                    <div class="mt-4 mx-3">
+                        <Preloader />
+                    </div>
+                </div>
+        }
+
     </div>
 </div>
 <div class="modal-footer">
-    <button class="btn modal-btn modal-cancel" type="button" @onclick="OnModalCancel">Cancel</button>
-    <button class="btn modal-btn modal-confirm" type="button" @onclick="OnModalConfirm">Confirm</button>
+    <button class="btn modal-btn modal-cancel" type="button" @onclick="OnModalCancel" disabled="@IsPreload">Cancel</button>
+    <button class="btn modal-btn modal-confirm" type="button" @onclick="OnModalConfirm" disabled="@IsPreload">Confirm</button>
 </div>

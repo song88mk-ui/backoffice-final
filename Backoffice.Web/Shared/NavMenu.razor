@@ -97,12 +97,16 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         </NavLink>
                     </div>
                 }
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="clients">
-                        <span class="ico ico-clients" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Clients</span>
-                    </NavLink>
-                </div>
+
+                @if (UserModel.Claims.Where(x => x.Type == $"{SportsbookClientPermission.SBC_Clients.ToString().Replace("_", ".")}").Count() > 0)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="clients">
+                            <span class="ico ico-clients" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Clients</span>
+                        </NavLink>
+                    </div>
+                }
 
                 @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.SBC)}.{nameof(PermissionCategoryAcronym.OE)}")).Count() > 0)
                 {
@@ -196,29 +200,40 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                     </div>
 
                 }
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#cancel-bets" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
-                        <span class="ico ico-cancel-bets" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Cancel Bets</span>
-                        <span class="fa fa-chevron-right"></span>
-                    </NavLink>
-                    <div class="sub-menu collapse" id="cancel-bets">
-                        <nav class="flex-column">
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="admin/cancel-bets">
-                                    <span class="ico ico-cancel-bets" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">Cancel Bets</span>
-                                </NavLink>
-                            </div>
-                            <div class="nav-item">
-                                <NavLink class="nav-link" href="admin/cancel-bet-history">
-                                    <span class="ico ico-cancel-bet-history" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">Cancel Bet History</span>
-                                </NavLink>
-                            </div>
-                        </nav>
+
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{AdminPermission.Admin_CancelBets.ToString().Replace("_", ".")}")).Count() > 0)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#cancel-bets" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
+                            <span class="ico ico-cancel-bets" aria-hidden="true"></span>
+                            <span class="nav-menu-text">Cancel Bets</span>
+                            <span class="fa fa-chevron-right"></span>
+                        </NavLink>
+                        <div class="sub-menu collapse" id="cancel-bets">
+                            <nav class="flex-column">
+                                @if (UserModel.Claims.Where(x => x.Type == $"{AdminPermission.Admin_CancelBets.ToString().Replace("_", ".")}").Count() > 0)
+                                {
+                                    <div class="nav-item">
+                                        <NavLink class="nav-link" href="admin/cancel-bets">
+                                            <span class="ico ico-cancel-bets" aria-hidden="true"></span>
+                                            <span class="nav-menu-text">Cancel Bets</span>
+                                        </NavLink>
+                                    </div>
+                                }
+                                @if (UserModel.Claims.Where(x => x.Type == $"{AdminPermission.Admin_CancelBetsHistory.ToString().Replace("_", ".")}").Count() > 0)
+                                {
+                                    <div class="nav-item">
+                                        <NavLink class="nav-link" href="admin/cancel-bet-history">
+                                            <span class="ico ico-cancel-bet-history" aria-hidden="true"></span>
+                                            <span class="nav-menu-text">Cancel Bet History</span>
+                                        </NavLink>
+                                    </div>
+                                }
+                            </nav>
+                        </div>
                     </div>
-                </div>
+                }
+
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="admin/maintenance">
                         <span class="ico ico-maintenance" aria-hidden="true"></span>
