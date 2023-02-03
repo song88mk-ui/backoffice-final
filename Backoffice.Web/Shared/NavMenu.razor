@@ -50,12 +50,12 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                 @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.SBC)}.Settings")).Count() > 0)
                 {
                     <div class="nav-item px-3">
-                        <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-setting" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
+                        <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-setting" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
                             <span class="ico ico-settings" aria-hidden="true"></span>
                             <span class="nav-menu-text">Settings</span>
-                            <span class="fa fa-chevron-down"></span>
+                            <span class="fa fa-chevron-right"></span>
                         </NavLink>
-                        <div class="sub-menu collapse show" id="sub-menu-setting">
+                        <div class="sub-menu collapse" id="sub-menu-setting">
                             <nav class="flex-column">
                                 @if (UserModel?.Claims.Where(c => c.Type.Contains(SportsbookClientPermission.SBC_Settings_TopLeagues.ToString().Replace('_', '.')) && c.Value != "0").ToList().Count > 0)
                                 {
@@ -148,7 +148,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                 @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.Admin)}.Settlements")).Count() > 0)
                 {
                     <div class="nav-item px-3">
-                        <NavLink class="nav-link" data-bs-toggle="collapse" href="#sub-menu-settlements" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
+                        <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-settlements" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
                             <span class="ico ico-settlements" aria-hidden="true"></span>
                             <span class="nav-menu-text">Settlements</span>
                             <span class="fa fa-chevron-right"></span>
@@ -197,7 +197,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
 
                 }
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" data-bs-toggle="collapse" href="#cancel-bets" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
+                    <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#cancel-bets" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
                         <span class="ico ico-cancel-bets" aria-hidden="true"></span>
                         <span class="nav-menu-text">Cancel Bets</span>
                         <span class="fa fa-chevron-right"></span>
