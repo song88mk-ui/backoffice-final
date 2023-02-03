@@ -131,11 +131,7 @@ namespace Backoffice.Web.Pages.Administration
 
         private async Task GetContents()
         {
-            if(IsPreloader == false)
-            {
-                IsPreloader = true;
-                StateHasChanged();
-            }
+            IsPreloader = true;
 
             var response = await BackOfficeService.GetManualBetSettlementActivityLogs(new ManualBetSettlementActivityLogRequest()
             {
@@ -145,6 +141,8 @@ namespace Backoffice.Web.Pages.Administration
 
             ActivityLogs = response.Result.ActivityLogs;
             MetaData = response.Result.MetaData;
+
+            IsPreloader = false;
             #region old get activitylog
             //try
             //{
