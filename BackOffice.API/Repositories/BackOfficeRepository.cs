@@ -188,7 +188,7 @@ namespace Backoffice.API.Repositories
                         UserId = s.UserId,
                         UserName = s.UserName,
                         TimeStamp = s.TimeStamp,
-                    }).ToList();
+                    }).OrderByDescending(x => x.TimeStamp).ToList();
 
                 if (request.ManualBetSettlementCallbackModel != null)
                 {

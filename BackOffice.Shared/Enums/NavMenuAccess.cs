@@ -1,4 +1,5 @@
-﻿namespace Backoffice.Shared.Enums
+﻿using System;
+namespace Backoffice.Shared.Enums
 {
     public enum NavMenuAccess
     {

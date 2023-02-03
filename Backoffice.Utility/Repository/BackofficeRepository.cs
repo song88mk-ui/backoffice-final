@@ -22,6 +22,7 @@ using System.IO;
 using Microsoft.WindowsAzure.Storage;
 using Backoffice.Shared.Utilities;
 using System.Text;
+using static Backoffice.Shared.Models.ManualBetDetailsModel;
 
 namespace Backoffice.Utility.Repository
 {
@@ -305,19 +306,29 @@ namespace Backoffice.Utility.Repository
             var excel = new ExcelPackage();
             try
             {
+                var result = GetManualBetSettlementActivityLogs(new ManualBetSettlementActivityLogRequest()
+                {
+                    ManualBetSettlementCallbackModel = request.ManualBetSettlementCallbackModel
+                }).Result;
+
+                if (result == null) {
+                    return;
+                }
+
+
                 #region Initialize Spreadsheet
                 var worksheet = excel.Workbook.Worksheets.Add($"{title}");
                 InitManualBetSettlementHistoryWorksheet(worksheet);
                 #endregion
 
                 #region Generate Data
-                for (int i = 0; i < request.ActivityLogs.Count; i++)
+                for (int i = 0; i < result.ActivityLogs.Count; i++)
                 {
-                    var log = request.ActivityLogs[i];
+                    var log = result.ActivityLogs[i];
 
                     int cellIndex = i + 1;
 
-                    ManualBetDetailsModel.ManualBetDetails betDetails = JsonSerializer.Deserialize<ManualBetDetailsModel.ManualBetDetails>(log.To);
+                    ManualBetDetails betDetails = JsonSerializer.Deserialize<ManualBetDetails>(log.To);
                     worksheet.Cells[cellIndex, 1].Value = i + 1;
                     worksheet.Cells[cellIndex, 2].Value = betDetails.SettlementDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
                     worksheet.Cells[cellIndex, 3].Value = betDetails.BetId;
@@ -348,7 +359,7 @@ namespace Backoffice.Utility.Repository
                         SportsId = 0,
                         Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",
                         PageRedirect = "/admin/manual-bet-settlement",
-                        UserId = Guid.Parse(request.ActivityLogs.FirstOrDefault().UserId),
+                        UserId = Guid.Parse(result.ActivityLogs.FirstOrDefault().UserId),
                         ClaimType = AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace("_", "."),
                         Type = (int)NotificationType.General
                     };
@@ -539,6 +550,59 @@ namespace Backoffice.Utility.Repository
             }
         }
 
+        private async Task<ActivityLogResponse> GetManualBetSettlementActivityLogs(ManualBetSettlementActivityLogRequest request)
+        {
+            var metaData = request.MetaData;
+            if (metaData == null)
+                metaData = new MetaData()
+                {
+                    CurrentPage = 0,
+                    PageSize = 10,
+                };
+            if (request.ManualBetSettlementCallbackModel.DateFrom == DateTime.MinValue)
+                request.ManualBetSettlementCallbackModel.DateFrom = DateTime.UtcNow.AddDays(-1).Date;
+            if (request.ManualBetSettlementCallbackModel.DateTo == DateTime.MinValue)
+                request.ManualBetSettlementCallbackModel.DateTo = DateTime.UtcNow.Date;
+
+            request.ManualBetSettlementCallbackModel.DateFrom = request.ManualBetSettlementCallbackModel.DateFrom.Date.Add(new TimeSpan(0, 0, 0));
+            request.ManualBetSettlementCallbackModel.DateTo = request.ManualBetSettlementCallbackModel.DateTo.Date.Add(new TimeSpan(23, 59, 59));
+
+            var activityLogs = (await _backofficeContext.ReadActivityLog
+                    .FromSqlRaw($"GetActivityLogs '{Page.Admin_Settlement_Bet.ToString().Replace('_', '.')}', '', '{request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
+                .ToListAsync())
+                .Select(s => new ActivityLogModel
+                {
+                    Id = s.Id,
+                    Page = s.Page,
+                    Payload = s.Payload,
+                    Activity = s.Activity,
+                    From = s.From,
+                    To = s.To,
+                    UserId = s.UserId,
+                    UserName = s.UserName,
+                    TimeStamp = s.TimeStamp,
+                }).OrderByDescending(x => x.TimeStamp).ToList();
+
+            if (request.ManualBetSettlementCallbackModel != null)
+            {
+                activityLogs = FilterManualSettlementLogs(activityLogs, request.ManualBetSettlementCallbackModel);
+            }
+
+            metaData.TotalCount = activityLogs.Count();
+            metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
+
+            var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
+
+            if (metaData.CurrentPage > 0)
+                activityLogs = activityLogs.Skip(skip).Take(metaData.PageSize).ToList();
+
+            return new ActivityLogResponse()
+            {
+                ActivityLogs = activityLogs,
+                MetaData = metaData
+            };
+        }
+
         private string BuildEventDetails(ManualBetDetailsModel.BetSelectionDetails betSelectionDetails, string oddsFormat)
         {
             StringBuilder builder = new StringBuilder();
@@ -680,6 +744,75 @@ namespace Backoffice.Utility.Repository
             }
 
             return $"https://prodstoragecdn.blob.core.windows.net/reports/{fileName}";
+        }
+
+        private List<ActivityLogModel> FilterManualSettlementLogs(List<ActivityLogModel> activityLogs, ManualBetSettlementCallbackModel callbackModel)
+        {
+            string[] clientIds = null;
+            string[] sportIds = null;
+            string[] currencyCodes = null;
+            string[] fromStatusesIds = null;
+            string[] toStatusesIds = null;
+
+            if (!string.IsNullOrEmpty(callbackModel.MemberName)) //
+            {
+                activityLogs = activityLogs
+                .Where(x => x.To.Contains($"\"UserId\":\"{callbackModel.MemberName}\"", StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(callbackModel.SettledBy))
+            {
+                activityLogs = activityLogs
+                .Where(x => x.UserName.ToLower() == callbackModel.SettledBy.ToLower()).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(callbackModel.BetId))
+            {
+                activityLogs = activityLogs
+                .Where(x => x.To.Contains($"BetId\":\"{callbackModel.BetId}\",", StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (callbackModel.Clients != null && callbackModel.Clients.Any())
+            {
+                clientIds = string.Join(",", callbackModel.Clients.Select(client => client.ClientId)).Split(',');
+
+                activityLogs = activityLogs
+                .Where(x => clientIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).ClientIdRef.ToString())).ToList();
+            }
+
+            if (callbackModel.Sports != null && callbackModel.Sports.Any())
+            {
+                sportIds = string.Join(",", callbackModel.Sports.Select(sport => sport.SportId)).Split(',');
+
+                activityLogs = activityLogs
+                .Where(x => sportIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).Selections.FirstOrDefault().SportId.ToString())).ToList();
+            }
+
+            if (callbackModel.Currencies != null && callbackModel.Currencies.Any())
+            {
+                currencyCodes = string.Join(",", callbackModel.Currencies.Select(currency => currency.CurrencyCode)).Split(',');
+
+                activityLogs = activityLogs
+                .Where(x => currencyCodes.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).CurrencyCode)).ToList();
+            }
+
+            if (callbackModel.FromBetStatuses.Any())
+            {
+                fromStatusesIds = string.Join(",", callbackModel.FromBetStatuses.Select(status => status.BetStatusId)).Split(',');
+
+                activityLogs = activityLogs
+                .Where(x => fromStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).BetStatusId.ToString())).ToList();
+            }
+
+            if (callbackModel.ToBetStatuses != null && callbackModel.ToBetStatuses.Any())
+            {
+                toStatusesIds = string.Join(",", callbackModel.ToBetStatuses.Select(status => status.BetStatusId)).Split(',');
+
+                activityLogs = activityLogs
+                .Where(x => toStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).NewBetStatusId.ToString())).ToList();
+            }
+
+            return activityLogs;
         }
         #endregion
     }

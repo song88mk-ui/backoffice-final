@@ -26,7 +26,7 @@ namespace Backoffice.Web.Pages.Administration
 
         public MetaData MetaData { get; set; }
         public ManualBetSettlementCallbackModel CallbackModel { get; set; }
-        
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         private int CurrentPage { get; set; } = 1;
@@ -59,7 +59,7 @@ namespace Backoffice.Web.Pages.Administration
             };
 
             await GetContents();
-        }        
+        }
 
         public async Task OnSearchButtonClicked()
         {
@@ -90,7 +90,7 @@ namespace Backoffice.Web.Pages.Administration
                     Message = response.Message,
                     Opacity = 1.0m
                 });
-            }                    
+            }
 
             await GetContents();
         }
@@ -99,7 +99,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             var payload = new OnGetManualBetSettlementHistoryMessage()
             {
-                ActivityLogs = ActivityLogs
+                ManualBetSettlementCallbackModel = CallbackModel
             };
 
             MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportManualBetSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
@@ -125,7 +125,7 @@ namespace Backoffice.Web.Pages.Administration
         #region Utilities
         private async Task OnInitEvent(ManualBetSettlementCallbackModel callbackModel)
         {
-            CallbackModel = callbackModel;                        
+            CallbackModel = callbackModel;
         }
 
 
@@ -139,7 +139,7 @@ namespace Backoffice.Web.Pages.Administration
                 MetaData = MetaData
             });
 
-            ActivityLogs = response.Result.ActivityLogs;
+            ActivityLogs = response.Result.ActivityLogs.ToList();
             MetaData = response.Result.MetaData;
 
             IsPreloader = false;
@@ -159,7 +159,19 @@ namespace Backoffice.Web.Pages.Administration
 
 
             return builder.ToString();
-        }        
+        }
+
+        public string GetBetStatusName(ManualBetDetails betDetails)
+        {
+            if (string.IsNullOrEmpty(betDetails.NewBetStatusName))
+            {
+                return ((BetStatus)betDetails.NewBetStatusId).ToString();
+            }
+            else
+            {
+                return betDetails.NewBetStatusName;
+            }
+        }
         #endregion
     }
 }
