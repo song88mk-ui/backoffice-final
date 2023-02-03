@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Backoffice.Shared.Enums
+﻿namespace Backoffice.Shared.Enums
 {
     public enum AlertStatus
     {
-        Success,
-        Error
+        Success = 1,
+        Error = 2
     }
 }
