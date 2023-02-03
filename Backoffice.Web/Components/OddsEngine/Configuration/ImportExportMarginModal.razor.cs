@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Components.Common;
@@ -15,26 +16,34 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class ImportExportMarginModal : IDisposable
     {
         #region Properties
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IModalService ModalService { get; set; }        
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
         [Inject] private IExcelService ExcelService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
+
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+
+        public EventCallback OnExportMarginCallback { get; set; }
+        public EventCallback<string> OnImportMarginCallback { get; set; }
+
+        public List<AlertModel> Alerts { get; set; }
         public List<SelectListItemModel<string>> Clients { get; set; }
         public List<SelectListItemModel<int>> Sports { get; set; }
+
         public static HashSet<string> SelectedClientsSet { get; set; }
         public static HashSet<string> SelectedSportsSet { get; set; }
+
         public bool IsImportTab { get; set; }
         public bool IsUploading { get; set; }        
 
         public string SelectedClient { get; set; }
-        public string ToastTitle { get; set; }
-        public string ToastMessage { get; set; }
 
         public const string ImportSelect = "import-select";
         public const string ExportSelect = "export-select";
+
+        public Guid Guid { get; set; }
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
@@ -43,9 +52,15 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             IsUploading = false;
             Clients = new List<SelectListItemModel<string>>();
             Sports = new List<SelectListItemModel<int>>();
+            Alerts = new List<AlertModel>();
 
             SelectedClientsSet = new HashSet<string>();
             SelectedSportsSet = new HashSet<string>();
+
+            OnExportMarginCallback = ModalParameters.TryGet<EventCallback>("OnExportMarginCallback");
+            OnImportMarginCallback = ModalParameters.TryGet<EventCallback<string>>("OnImportMarginCallback");
+
+            Guid = new Guid();
 
             Clients = await LoadClients();
             
@@ -54,14 +69,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             if (IsImportTab)
             {
-                await JSRuntime.InvokeVoidAsync("initSelect2", $".{ImportSelect}", "OnImportSelectChanged", true);
-                ToastTitle = "Import Margins";
+                await JSRuntime.InvokeVoidAsync("initSelect2", $".{ImportSelect}", "OnImportSelectChanged", true);                
             }
             else
             {
                 SelectedClient = Clients.FirstOrDefault().Value;
-                await JSRuntime.InvokeVoidAsync("initSelect2", $".{ExportSelect}", "OnExportSelectChanged", true);
-                ToastTitle = "Export Margins";
+                await JSRuntime.InvokeVoidAsync("initSelect2", $".{ExportSelect}", "OnExportSelectChanged", true);                
             }
         }
         public async Task OnImportRadioClickEvent()
@@ -82,82 +95,113 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnImportInputFileChanged(InputFileChangeEventArgs e)
         {
-            IsUploading = true;
-
-            await InvokeAsync(StateHasChanged);
-
-            if (e.File.Name.Contains(".xlsx"))
+            try
             {
-                var stream = new MemoryStream();
-                await e.File.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+                IsUploading = true;
 
-                var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(stream, e.File.Name, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
+                await InvokeAsync(StateHasChanged);
 
-                IsUploading = false;
-
-                if (payload.StatusCode == StatusCode.Error)
+                if (e.File.Name.Contains(".xlsx"))
                 {
-                    ToastMessage = payload.Message;
-                    await ShowToast();
-                    return;
-                }
-            }
-            else if (e.File.Name.Contains(".zip"))
-            {
-                var inputStream = new MemoryStream();
-                await e.File.OpenReadStream(long.MaxValue).CopyToAsync(inputStream);
+                    var stream = new MemoryStream();
+                    await e.File.OpenReadStream(long.MaxValue).CopyToAsync(stream);
 
-                var files = GetFilesFromZipped(inputStream.ToArray());
+                    var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(stream, e.File.Name, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
 
-                if (!files.Any())
-                {
                     IsUploading = false;
-                    ToastMessage = "Error! No Files found from zip";
-                    await ShowToast();
-                    return;
-                }
 
-                if (files.Any(f => !f.Key.Contains(".xlsx")))
-                {
-                    IsUploading = false;
-                    ToastMessage = "Error! Please zip an excel file only";
-                    return;
-                }
-
-                var processCount = 0;
-                foreach (var fileStream in files)
-                {
-                    processCount++;
-                    //AlertStatus = $"Processing {fileStream.Key}";
-                    //AlertMessage = $"Processing {processCount} of {files.Count} file/s..";
-
-                    await InvokeAsync(StateHasChanged);
-
-                    using (MemoryStream ms = new MemoryStream(fileStream.Value))
+                    if (payload.StatusCode == StatusCode.Error)
                     {
-                        var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(ms, fileStream.Key, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
-
-                        if (payload.StatusCode == StatusCode.Error)
-                        {
-                            IsUploading = false;
-                            ToastMessage = payload.Message;
-                            await ShowToast();
-                            return;
-                        }
+                        await OnImportMarginCallback.InvokeAsync(payload.Message);
+                        return;
                     }
                 }
+                else if (e.File.Name.Contains(".zip"))
+                {
+                    var inputStream = new MemoryStream();
+                    await e.File.OpenReadStream(long.MaxValue).CopyToAsync(inputStream);
+
+                    var files = GetFilesFromZipped(inputStream.ToArray());
+
+                    if (!files.Any())
+                    {
+                        IsUploading = false;
+
+                        return;
+                    }
+
+                    if (files.Any(f => !f.Key.Contains(".xlsx")))
+                    {
+                        IsUploading = false;
+                        Alerts.Clear();
+
+                        Alerts.Add(new AlertModel()
+                        {
+                            Status = AlertStatus.Error.ToString(),
+                            Message = "Error! Please zip an excel file only",
+                            Opacity = 1.0m
+                        });
+
+                        Guid = Guid.NewGuid();
+
+                        return;
+                    }
+
+                    var processCount = 0;
+                    foreach (var fileStream in files)
+                    {
+                        processCount++;
+                        //AlertStatus = $"Processing {fileStream.Key}";
+                        //AlertMessage = $"Processing {processCount} of {files.Count} file/s..";
+
+                        await InvokeAsync(StateHasChanged);
+
+                        using (MemoryStream ms = new MemoryStream(fileStream.Value))
+                        {
+                            var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(ms, fileStream.Key, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
+
+                            if (payload.StatusCode == StatusCode.Error)
+                            {
+                                IsUploading = false;
+
+
+                                return;
+                            }
+                        }
+                    }
+
+                    IsUploading = false;
+
+                }
+                else
+                {
+                    Alerts.Clear();
+
+                    Alerts.Add(new AlertModel()
+                    {
+                        Status = AlertStatus.Error.ToString(),
+                        Message = $"Invalid file type",
+                        Opacity = 1.0m
+                    });
+
+                    Guid = Guid.NewGuid();
+                }
 
                 IsUploading = false;
-                ToastMessage = "Success! Excel file is being imported. System will notify once done";
-                await ShowToast();
             }
-            else
+            catch (Exception ex)
             {
-                ToastMessage = "Error! Please select an excel file";
-                await ShowToast();
-            }
+                Alerts.Clear();
 
-            IsUploading = false;
+                Alerts.Add(new AlertModel()
+                {
+                    Status = AlertStatus.Error.ToString(),
+                    Message = $"{ex.Message}",
+                    Opacity = 1.0m
+                });
+
+                Guid = Guid.NewGuid();
+            }
         }
 
         public async Task OnClientSelectChanged(ChangeEventArgs e)
@@ -170,7 +214,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             IsUploading = true;
             await InvokeAsync(StateHasChanged);
 
-            var payload = new OnGetMarginSpreadsheetMessage()
+            var payload = new OnExportConfigMarginMessage()
             {
                 UserId = UserModel.Id,
                 ClientCode = SelectedClient,
@@ -180,9 +224,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet2", "r.oe.web.config.ongetmarginspreadsheet2", Guid.NewGuid().ToString());
 
             IsUploading = false;
-            ToastMessage = "Success! Margin configurations are being generated, system will notify once done";
-            await ShowToast();
+            
             ModalService.Cancel();
+
+            await OnExportMarginCallback.InvokeAsync();
         }
 
         [JSInvokable("OnImportSelectChanged")]
@@ -257,18 +302,18 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Utilities
         private async Task<List<SelectListItemModel<string>>> LoadClients()
         {
-            ClientModel clients = new ClientModel();
-            clients = (await BackOfficeService.GetClients()).Result;
+            var clients = new List<ClientInformationModel>();
+            clients = (await TradingService.GetClientList()).Result;
             if (clients != null)
             {
 
                 if (UserModel.ClientCodes.Any())
                 {
-                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                    clients = clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                 }
             }
 
-            return clients.Clients.Select(x => new SelectListItemModel<string>()
+            return clients.Select(x => new SelectListItemModel<string>()
             {
                 Name = x.ClientName,
                 Value = x.ClientCode
@@ -307,13 +352,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 stream.CopyTo(ms);
                 return ms.ToArray();
             }
-        }
-
-        private async Task ShowToast()
-        {
-            await InvokeAsync(StateHasChanged);
-            await JSRuntime.InvokeVoidAsync("showToast");
-            await Task.Delay(1000);
         }
         #endregion
     }

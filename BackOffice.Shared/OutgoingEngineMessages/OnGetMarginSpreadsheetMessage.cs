@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Backoffice.Shared.OutgoingEngineMessages
 {
-    public class OnGetMarginSpreadsheetMessage
+    public class OnExportConfigMarginMessage
     {
         public string SportIds { get; set; }
         public string ClientCode { get; set; }

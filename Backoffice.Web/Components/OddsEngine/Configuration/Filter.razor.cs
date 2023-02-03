@@ -139,7 +139,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.MarketTemplates = null;
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
 
-            //await Task.Delay(100);
+            await Task.Delay(100);
 
             ConfigFilterModel.MarketTemplates = await GetMarketTemplate(ConfigFilterModel.MarketTemplateGroups);
 
@@ -171,7 +171,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.MarketTemplates = null;
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
 
-            //await Task.Delay(100);
+            await Task.Delay(100);
 
             ConfigFilterModel.MarketTemplates = await GetMarketTemplate(ConfigFilterModel.MarketTemplateGroups);
 
@@ -200,7 +200,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.MarketTemplates = null;
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
 
-            //await Task.Delay(100);
+            await Task.Delay(100);
 
             ConfigFilterModel.Scope = int.Parse(e.Value.ToString());  //int.Parse(((SelectListItemModel<string>)item).Value.ToString());
             ConfigFilterModel.MarketTemplateGroups = await GetMarketTemplateGroup(ConfigFilterModel.Scope, ConfigFilterModel.SportId);
@@ -219,7 +219,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.MarketTemplates = null;
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
 
-            //await Task.Delay(100);
+            await Task.Delay(100);
 
             ConfigFilterModel.MarketTemplates = await GetMarketTemplate(ConfigFilterModel.MarketTemplateGroups);
 
@@ -258,7 +258,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.MarketTemplates = null;
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
 
-            //await Task.Delay(100);
+            await Task.Delay(100);
 
             ConfigFilterModel.MarketTemplateGroupId = int.Parse(e.Value.ToString());
             ConfigFilterModel.MarketTemplateGroupName = ConfigFilterModel.MarketTemplateGroups.FirstOrDefault(c => c.MarketTemplateGroup.MarketTemplateGroupId == ConfigFilterModel.MarketTemplateGroupId).MarketTemplateGroup.MarketTemplateGroupName;

@@ -1,4 +1,5 @@
-﻿using Backoffice.Web.Models;
+﻿using Backoffice.Shared.Models;
+using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -79,18 +80,18 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Utilities
         private async Task<List<SelectListItemModel<string>>> LoadClients()
         {
-            ClientModel clients = new ClientModel();
-            clients = (await BackOfficeService.GetClients()).Result;
+            var clients = new List<ClientInformationModel>();
+            clients = (await TradingService.GetClientList()).Result;
             if (clients != null)
             {
 
                 if (UserModel.ClientCodes.Any())
                 {
-                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                    clients = clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                 }
             }
 
-            return clients.Clients.Select(x => new SelectListItemModel<string>()
+            return clients.Select(x => new SelectListItemModel<string>()
             {
                 Name = x.ClientName,
                 Value = x.ClientCode
