@@ -27,8 +27,8 @@ namespace Backoffice.Shared.Enums
         Admin_Settlements_ResendSettlement,
         Admin_Settlements_MarketSettlement,
         Admin_Settlements_MessageSettlement,
-        Admin_Bet_Cancel,
-        Admin_Bet_History,
+        Admin_CancelBets,
+        Admin_CancelBetsHistory,
         Admin_Maintenance
     }
     public enum PartnerManagementPermission

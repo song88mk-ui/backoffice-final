@@ -21,14 +21,19 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         [CascadingParameter] private CustomModal Modal { get; set; }
 
         private ManualBetDetailsModel ManualBetDetailsModel { get; set; }
+        public bool IsPreload { get; set; }
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            IsPreload = false;
             ManualBetDetailsModel = ModalParameters.TryGet<ManualBetDetailsModel>("ManualBetDetailsModel");
         }
         public async Task OnModalCancel()
         {
+            if (IsPreload)
+                return;
+
             ModalParameters parameters = new ModalParameters();
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "max-width: 80rem");
@@ -41,6 +46,11 @@ namespace Backoffice.Web.Components.ManualBetSettlement
 
         public async Task OnModalConfirm()
         {
+            if (IsPreload)
+                return;
+
+            IsPreload = true;
+
             OnActivityLogListMessage ActivityLogs = new OnActivityLogListMessage();
             foreach (var bet in ManualBetDetailsModel.Bets)
             {
@@ -73,6 +83,8 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             await Modal.OnSaveClickCallback.InvokeAsync(response);
 
             ModalService.Cancel();
+
+            IsPreload = false;
         }
 
         public void Dispose()
