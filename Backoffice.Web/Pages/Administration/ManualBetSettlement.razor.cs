@@ -46,7 +46,9 @@ namespace Backoffice.Web.Pages.Administration
 
             Alerts = new List<AlertModel>();
             IsPreloader = true;
-            StateHasChanged();
+            //StateHasChanged();
+
+            CallbackModel = new ManualBetSettlementCallbackModel();
 
             MetaData = new MetaData
             {
@@ -135,39 +137,46 @@ namespace Backoffice.Web.Pages.Administration
                 StateHasChanged();
             }
 
-            try
+            var response = await BackOfficeService.GetManualBetSettlementActivityLogs(new ManualBetSettlementActivityLogRequest()
             {
-                var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
-                {
-                    Page = Page.Admin_Settlement_Bet.ToString().Replace('_', '.'),
-                    DateFrom = CallbackModel != null ? CallbackModel.DateFrom.Add(new TimeSpan(0, 0, 0)) : DateTime.UtcNow.AddDays(-1).Date.Add(new TimeSpan(0, 0, 0)),
-                    DateTo = CallbackModel != null ? CallbackModel.DateTo.Add(new TimeSpan(23, 59, 59)) : DateTime.UtcNow.Date.Add(new TimeSpan(23, 59, 59)),
-                    MetaData = MetaData
-                }));
+                ManualBetSettlementCallbackModel = CallbackModel,
+                MetaData = MetaData
+            });
 
-                if (response.StatusCode == StatusCode.Success)
-                {
-                    if (response.Result != null && response.Result.ActivityLogs.Any())
-                    {
+            ActivityLogs = response.Result.ActivityLogs;
+            MetaData = response.Result.MetaData;
+            #region old get activitylog
+            //try
+            //{
+            //    var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
+            //    {
+            //        Page = Page.Admin_Settlement_Bet.ToString().Replace('_', '.'),
+            //        DateFrom = CallbackModel != null ? CallbackModel.DateFrom.Add(new TimeSpan(0, 0, 0)) : DateTime.UtcNow.AddDays(-1).Date.Add(new TimeSpan(0, 0, 0)),
+            //        DateTo = CallbackModel != null ? CallbackModel.DateTo.Add(new TimeSpan(23, 59, 59)) : DateTime.UtcNow.Date.Add(new TimeSpan(23, 59, 59)),
+            //        MetaData = MetaData
+            //    }));
 
-                        if (CallbackModel != null)
-                        {
-                            FilterLogs(response);
-                        }
-                        else
-                        {
-                            MetaData = response.Result.MetaData;
-                        }
-                        ActivityLogs = response.Result.ActivityLogs;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
+            //    if (response.StatusCode == StatusCode.Success)
+            //    {
+            //        if (response.Result != null && response.Result.ActivityLogs.Any())
+            //        {
 
-            }
+            //            if (CallbackModel != null)
+            //            {
+            //                FilterLogs(response);
+            //            }
 
-            IsPreloader = false;
+            //            ActivityLogs = response.Result.ActivityLogs;
+            //            MetaData = response.Result.MetaData;
+            //        }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+
+            //}
+            #endregion
+
         }
 
         private string BuildEventDetails(BetSelectionDetails betSelectionDetails, string oddsFormat)
@@ -183,82 +192,7 @@ namespace Backoffice.Web.Pages.Administration
 
 
             return builder.ToString();
-        }
-
-        private void FilterLogs(BaseResponse<ActivityLogResponse> response)
-        {
-            string[] clientIds = null;
-            string[] sportIds = null;
-            string[] currencyCodes = null;
-            string[] fromStatusesIds = null;
-            string[] toStatusesIds = null;
-
-            if (!string.IsNullOrEmpty(CallbackModel.MemberName))
-            {
-                response.Result.ActivityLogs = response.Result.ActivityLogs
-                .Where(x => x.To.Contains(CallbackModel.MemberName, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-
-            if (!string.IsNullOrEmpty(CallbackModel.SettledBy))
-            {
-                response.Result.ActivityLogs = response.Result.ActivityLogs
-                .Where(x => x.To.Contains(CallbackModel.SettledBy, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-
-            if (!string.IsNullOrEmpty(CallbackModel.BetId))
-            {
-                response.Result.ActivityLogs = response.Result.ActivityLogs
-                .Where(x => x.To.Contains(CallbackModel.BetId, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-
-            if (CallbackModel.Clients.Any())
-            {
-                clientIds = string.Join(",", CallbackModel.Clients.Select(client => client.ClientId)).Split(',');
-
-                response.Result.ActivityLogs = response.Result.ActivityLogs
-                .Where(x => clientIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).ClientIdRef.ToString())).ToList();
-            }
-
-            if (CallbackModel.Sports.Any())
-            {
-                sportIds = string.Join(",", CallbackModel.Sports.Select(sport => sport.SportId)).Split(',');
-
-                response.Result.ActivityLogs = response.Result.ActivityLogs
-                .Where(x => sportIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).Selections.FirstOrDefault().SportId.ToString())).ToList();
-            }
-
-            if (CallbackModel.Currencies.Any())
-            {
-                currencyCodes = string.Join(",", CallbackModel.Currencies.Select(currency => currency.CurrencyCode)).Split(',');
-
-                response.Result.ActivityLogs = response.Result.ActivityLogs
-                .Where(x => currencyCodes.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).CurrencyCode)).ToList();
-            }
-
-            if (CallbackModel.FromBetStatuses.Any())
-            {
-                fromStatusesIds = string.Join(",", CallbackModel.FromBetStatuses.Select(status => status.BetStatusId)).Split(',');
-
-                response.Result.ActivityLogs = response.Result.ActivityLogs
-                .Where(x => fromStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).BetStatusId.ToString())).ToList();
-            }
-
-            if (CallbackModel.ToBetStatuses.Any())
-            {
-                toStatusesIds = string.Join(",", CallbackModel.ToBetStatuses.Select(status => status.BetStatusId)).Split(',');
-
-                response.Result.ActivityLogs = response.Result.ActivityLogs
-                .Where(x => toStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).NewBetStatusId.ToString())).ToList();
-            }
-
-            MetaData = new MetaData()
-            {
-                CurrentPage = MetaData.CurrentPage,
-                TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize))),
-                PageSize = MetaData.PageSize,
-                TotalCount = response.Result.ActivityLogs.Count
-            };
-        }
+        }        
         #endregion
     }
 }

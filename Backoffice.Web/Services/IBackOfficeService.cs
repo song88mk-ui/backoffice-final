@@ -14,6 +14,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<MessageResponse>> AddActivityLog(ActivityLogModel request);
         Task<BaseResponse<MessageResponse>> AddActivityLogList(OnActivityLogListMessage request);
         Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request);
+        Task<BaseResponse<ActivityLogResponse>> GetManualBetSettlementActivityLogs(ManualBetSettlementActivityLogRequest request);
         Task<BaseResponse<ClientModel>> GetClients();
         Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);

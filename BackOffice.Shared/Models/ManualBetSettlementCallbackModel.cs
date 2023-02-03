@@ -1,4 +1,8 @@
-﻿namespace Backoffice.Web.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Backoffice.Shared.Models
 {
     public class ManualBetSettlementCallbackModel
     {
@@ -38,7 +42,7 @@
             public string SportName { get; set; }
         }
 
-        public class Currency 
+        public class Currency
         {
             public int CurrencyId { get; set; }
             public string CurrencyCode { get; set; }
@@ -47,7 +51,7 @@
         public class BetStatus
         {
             public int BetStatusId { get; set; }
-            public string BetStatusName { get; set;}
+            public string BetStatusName { get; set; }
         }
         #endregion
     }

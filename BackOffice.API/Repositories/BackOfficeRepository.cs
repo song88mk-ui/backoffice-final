@@ -19,6 +19,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Transactions;
+using static Backoffice.Shared.Models.ManualBetDetailsModel;
 using static Backoffice.Shared.Models.Requests.AddOrUpdateBetConfigRequest;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
 
@@ -148,6 +149,75 @@ namespace Backoffice.API.Repositories
                 };
             }
             catch (Exception ex)
+            {
+                return new BaseResponse<ActivityLogResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ActivityLogResponse>> GetManualBetSettlementHistoryLogs(ManualBetSettlementActivityLogRequest request)
+        {
+            try
+            {
+                var metaData = request.MetaData;
+                if (metaData == null)
+                    metaData = new MetaData()
+                    {
+                        CurrentPage = 0,
+                        PageSize = 10,
+                    };
+                if (request.ManualBetSettlementCallbackModel.DateFrom == DateTime.MinValue)
+                    request.ManualBetSettlementCallbackModel.DateFrom = DateTime.UtcNow.AddDays(-1).Date;
+                if (request.ManualBetSettlementCallbackModel.DateTo == DateTime.MinValue)
+                    request.ManualBetSettlementCallbackModel.DateTo = DateTime.UtcNow.Date;
+
+                request.ManualBetSettlementCallbackModel.DateFrom = request.ManualBetSettlementCallbackModel.DateFrom.Date.Add(new TimeSpan(0, 0, 0));
+                request.ManualBetSettlementCallbackModel.DateTo = request.ManualBetSettlementCallbackModel.DateTo.Date.Add(new TimeSpan(23, 59, 59));
+
+                var activityLogs = (await _backofficeContext.ReadActivityLog
+                        .FromSqlRaw($"GetActivityLogs '{Page.Admin_Settlement_Bet.ToString().Replace('_', '.')}', '', '{request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
+                    .ToListAsync())
+                    .Select(s => new ActivityLogModel
+                    {
+                        Id = s.Id,
+                        Page = s.Page,
+                        Payload = s.Payload,
+                        Activity = s.Activity,
+                        From = s.From,
+                        To = s.To,
+                        UserId = s.UserId,
+                        UserName = s.UserName,
+                        TimeStamp = s.TimeStamp,
+                    }).ToList();
+
+                if (request.ManualBetSettlementCallbackModel != null)
+                {
+                    activityLogs = FilterManualSettlementLogs(activityLogs, request.ManualBetSettlementCallbackModel);
+                }
+
+                metaData.TotalCount = activityLogs.Count();
+                metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
+
+                var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
+
+                if (metaData.CurrentPage > 0)
+                    activityLogs = activityLogs.Skip(skip).Take(metaData.PageSize).ToList();
+
+                return new BaseResponse<ActivityLogResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new ActivityLogResponse
+                    {
+                        ActivityLogs = activityLogs,
+                        MetaData = metaData
+                    }
+                };
+            }
+            catch (Exception ex) 
             {
                 return new BaseResponse<ActivityLogResponse>
                 {
@@ -1427,6 +1497,75 @@ namespace Backoffice.API.Repositories
             }
 
             return suggestedMinimumBet;
+        }
+
+        private List<ActivityLogModel> FilterManualSettlementLogs(List<ActivityLogModel> activityLogs, ManualBetSettlementCallbackModel callbackModel)
+        {
+            string[] clientIds = null;
+            string[] sportIds = null;
+            string[] currencyCodes = null;
+            string[] fromStatusesIds = null;
+            string[] toStatusesIds = null;
+
+            if (!string.IsNullOrEmpty(callbackModel.MemberName))
+            {
+                activityLogs = activityLogs
+                .Where(x => x.To.Contains(callbackModel.MemberName, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(callbackModel.SettledBy))
+            {
+                activityLogs = activityLogs
+                .Where(x => x.To.Contains(callbackModel.SettledBy, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(callbackModel.BetId))
+            {
+                activityLogs = activityLogs
+                .Where(x => x.To.Contains(callbackModel.BetId, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (callbackModel.Clients != null && callbackModel.Clients.Any())
+            {
+                clientIds = string.Join(",", callbackModel.Clients.Select(client => client.ClientId)).Split(',');
+
+                activityLogs = activityLogs
+                .Where(x => clientIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).ClientIdRef.ToString())).ToList();
+            }
+
+            if (callbackModel.Sports != null && callbackModel.Sports.Any())
+            {
+                sportIds = string.Join(",", callbackModel.Sports.Select(sport => sport.SportId)).Split(',');
+
+                activityLogs = activityLogs
+                .Where(x => sportIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).Selections.FirstOrDefault().SportId.ToString())).ToList();
+            }
+
+            if (callbackModel.Currencies != null && callbackModel.Currencies.Any())
+            {
+                currencyCodes = string.Join(",", callbackModel.Currencies.Select(currency => currency.CurrencyCode)).Split(',');
+
+                activityLogs = activityLogs
+                .Where(x => currencyCodes.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).CurrencyCode)).ToList();
+            }
+
+            if (callbackModel.FromBetStatuses.Any())
+            {
+                fromStatusesIds = string.Join(",", callbackModel.FromBetStatuses.Select(status => status.BetStatusId)).Split(',');
+
+                activityLogs = activityLogs
+                .Where(x => fromStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).BetStatusId.ToString())).ToList();
+            }
+
+            if (callbackModel.ToBetStatuses != null && callbackModel.ToBetStatuses.Any())
+            {
+                toStatusesIds = string.Join(",", callbackModel.ToBetStatuses.Select(status => status.BetStatusId)).Split(',');
+
+                activityLogs = activityLogs
+                .Where(x => toStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).NewBetStatusId.ToString())).ToList();
+            }
+
+            return activityLogs;
         }
         #endregion
     }

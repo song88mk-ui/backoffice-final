@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
@@ -42,25 +43,28 @@ namespace Backoffice.Web.Components.ManualBetSettlement
 
         #region Methods
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            ShowFilter = false;
+            if (firstRender)
+            {
+                ShowFilter = false;
 
-            CallbackModel = new ManualBetSettlementCallbackModel();
+                CallbackModel = new ManualBetSettlementCallbackModel();
 
-            Clients = new List<SelectListItemWithCheckboxModel<string>>();
-            Sports = new List<SelectListItemWithCheckboxModel<string>>();
-            Currencies = new List<SelectListItemWithCheckboxModel<string>>();
-            FromStatuses = new List<SelectListItemWithCheckboxModel<string>>();
-            ToStatuses = new List<SelectListItemWithCheckboxModel<string>>();
+                Clients = new List<SelectListItemWithCheckboxModel<string>>();
+                Sports = new List<SelectListItemWithCheckboxModel<string>>();
+                Currencies = new List<SelectListItemWithCheckboxModel<string>>();
+                FromStatuses = new List<SelectListItemWithCheckboxModel<string>>();
+                ToStatuses = new List<SelectListItemWithCheckboxModel<string>>();
 
-            await LoadClients();
-            await LoadSports();
-            await LoadCurrencies();
-            await LoadFromStatus();
-            await LoadToStatus();
+                await LoadClients();
+                await LoadSports();
+                await LoadCurrencies();
+                await LoadFromStatus();
+                await LoadToStatus();
 
-            await OnInitCallback.InvokeAsync(CallbackModel);
+                await OnInitCallback.InvokeAsync(CallbackModel);
+            }
         }
 
         public async Task OnAddReferenceClickEvent()

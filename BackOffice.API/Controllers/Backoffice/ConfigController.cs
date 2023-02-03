@@ -79,6 +79,20 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
+
+        [HttpPost("activitylog/manualbetsettlementlist")]
+        public async Task<IActionResult> GetManualBetSettlementHistoryLogs([FromBody] ManualBetSettlementActivityLogRequest request)
+        {
+            var result = await _backofficeRepository.GetManualBetSettlementHistoryLogs(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         #endregion
     }
 }

@@ -10,6 +10,7 @@ namespace Backoffice.API.Repositories
     {
         Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);
         Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request);
+        Task<BaseResponse<ActivityLogResponse>> GetManualBetSettlementHistoryLogs(ManualBetSettlementActivityLogRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<ClientResponse>> GetClients();
         Task<BaseResponse<string>> GetClientRegion(int clientId);
