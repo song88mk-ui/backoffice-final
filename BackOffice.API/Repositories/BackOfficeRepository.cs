@@ -1516,7 +1516,7 @@ namespace Backoffice.API.Repositories
             if (!string.IsNullOrEmpty(callbackModel.SettledBy))
             {
                 activityLogs = activityLogs
-                .Where(x => x.UserName.Contains(callbackModel.SettledBy, StringComparison.OrdinalIgnoreCase)).ToList();
+                .Where(x => x.UserName.ToLower() == callbackModel.SettledBy.ToLower()).ToList();
             }
 
             if (!string.IsNullOrEmpty(callbackModel.BetId))
