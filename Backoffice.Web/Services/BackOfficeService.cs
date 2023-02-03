@@ -7,6 +7,7 @@ using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -76,12 +77,19 @@ namespace Backoffice.Web.Services
         }
         public async Task<BaseResponse<bool>> SetMaintenance(bool request)
         {
+            var httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri(_configuration["API:Backoffice:Uri"]);
+            httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:Backoffice:Security:APIKey"]);
+            httpClient.DefaultRequestHeaders.Add("x-region", _configuration["API:Region"]);
+
             try
             {
                 var userToken = await _authenticationService.AuthenticateToken();
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
 
-                var response = await _httpClient.PostAsync($"api/config/maintenance/{request}", null);
+                httpClient.Timeout = TimeSpan.FromMinutes(3);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken.AccessToken);
+
+                var response = await httpClient.PostAsync($"api/config/maintenance/{request}", null);
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

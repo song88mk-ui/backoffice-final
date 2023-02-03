@@ -17,7 +17,7 @@
                         <div>
                             <i class="ico ico-maintenance d-block text-center"></i>
                             <div class="form-switch mb-3 d-flex justify-content-center">
-                                <input class="form-check-input me-3" type="checkbox" checked="@IsMaintenance" value="" id="maitenance-mode" @onchange="e => OnMaintenanceClickEvent(e.Value)">
+                                <input class="form-check-input me-3" type="checkbox" @bind="@IsMaintenance" id="maitenance-mode">
                                 <label class="form-check-label fw-bold" for="maitenance-mode">Song88 Maintenance Mode</label>
                             </div>
                             <p class="text-center">
@@ -25,6 +25,7 @@
                                 <br />
                                 Disabling maintenance mode will allow members to sign in.
                             </p>
+                            <AlertMessage AlertStatus="@AlertModel.Status" AlertMessageStr="@AlertModel.Message" Opacity="@AlertModel.Opacity" />
                         </div>
                     </div>
                 }
@@ -35,4 +36,3 @@
 <div>
     <CustomModal OnSaveClickCallback="OnSaveClickedEvent"/>
 </div>
-<AlertMessage AlertStatus="@AlertModel.Status" AlertMessageStr="@AlertModel.Message" Opacity="@AlertModel.Opacity" />
