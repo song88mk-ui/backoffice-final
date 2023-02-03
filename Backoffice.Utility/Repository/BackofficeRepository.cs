@@ -328,7 +328,7 @@ namespace Backoffice.Utility.Repository
 
                     int cellIndex = i + 1;
 
-                    ManualBetDetails betDetails = JsonSerializer.Deserialize<ManualBetDetailsModel.ManualBetDetails>(log.To);
+                    ManualBetDetails betDetails = JsonSerializer.Deserialize<ManualBetDetails>(log.To);
                     worksheet.Cells[cellIndex, 1].Value = i + 1;
                     worksheet.Cells[cellIndex, 2].Value = betDetails.SettlementDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
                     worksheet.Cells[cellIndex, 3].Value = betDetails.BetId;
