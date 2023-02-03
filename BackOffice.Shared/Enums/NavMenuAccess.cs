@@ -6,6 +6,8 @@ namespace Backoffice.Shared.Enums
 {
     public enum NavMenuAccess
     {
-
+        OE,
+        SBC,
+        Admin
     }
 }
