@@ -7,6 +7,6 @@ namespace Backoffice.Shared.OutgoingEngineMessages
 {
     public class OnGetManualBetSettlementHistoryMessage
     {
-        public List<ActivityLogModel> ActivityLogs { get; set; }
+        public ManualBetSettlementCallbackModel ManualBetSettlementCallbackModel { get; set; }
     }
 }

@@ -76,7 +76,7 @@
                                                 @betDetails.BetStatusName
                                             </td>
                                             <td>
-                                                @betDetails.NewBetStatusName
+                                                @GetBetStatusName(betDetails)
                                             </td>
                                             <td>
                                                 @betDetails.UserId
@@ -85,7 +85,7 @@
                                                 @log.UserName
                                             </td>
                                             <td>
-                                                @betDetails.Reason
+                                                @betDetails.NewReason
                                             </td>
                                         </tr>
                                     }
