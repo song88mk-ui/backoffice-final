@@ -9,18 +9,18 @@ namespace Backoffice.Shared.Models
         #region Ctor
         public ManualBetSettlementCallbackModel()
         {
-            Sports = new List<Sport>();
-            Currencies = new List<Currency>();
-            FromBetStatuses = new List<BetStatus>();
-            ToBetStatuses = new List<BetStatus>();
+            Sports = new List<SettlementSport>();
+            Currencies = new List<SettlementCurrency>();
+            FromBetStatuses = new List<SettlementBetStatus>();
+            ToBetStatuses = new List<SettlementBetStatus>();
         }
         #endregion        
 
-        public List<Client> Clients { get; set; }
-        public List<Sport> Sports { get; set; }
-        public List<Currency> Currencies { get; set; }
-        public List<BetStatus> FromBetStatuses { get; set; }
-        public List<BetStatus> ToBetStatuses { get; set; }
+        public List<SettlementClient> Clients { get; set; }
+        public List<SettlementSport> Sports { get; set; }
+        public List<SettlementCurrency> Currencies { get; set; }
+        public List<SettlementBetStatus> FromBetStatuses { get; set; }
+        public List<SettlementBetStatus> ToBetStatuses { get; set; }
 
         public DateTime DateFrom { get; set; } = DateTime.Now.AddDays(-7).Date;
         public DateTime DateTo { get; set; } = DateTime.Now.Date;
@@ -30,25 +30,25 @@ namespace Backoffice.Shared.Models
         public string SettledBy { get; set; } = "";
 
         #region Nested Class
-        public class Client
+        public class SettlementClient
         {
             public long ClientId { get; set; }
             public string ClientCode { get; set; }
             public string ClientName { get; set; }
         }
-        public class Sport
+        public class SettlementSport
         {
             public long SportId { get; set; }
             public string SportName { get; set; }
         }
 
-        public class Currency
+        public class SettlementCurrency
         {
             public int CurrencyId { get; set; }
             public string CurrencyCode { get; set; }
         }
 
-        public class BetStatus
+        public class SettlementBetStatus
         {
             public int BetStatusId { get; set; }
             public string BetStatusName { get; set; }

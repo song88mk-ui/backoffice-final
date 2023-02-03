@@ -143,37 +143,6 @@ namespace Backoffice.Web.Pages.Administration
             MetaData = response.Result.MetaData;
 
             IsPreloader = false;
-            #region old get activitylog
-            //try
-            //{
-            //    var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
-            //    {
-            //        Page = Page.Admin_Settlement_Bet.ToString().Replace('_', '.'),
-            //        DateFrom = CallbackModel != null ? CallbackModel.DateFrom.Add(new TimeSpan(0, 0, 0)) : DateTime.UtcNow.AddDays(-1).Date.Add(new TimeSpan(0, 0, 0)),
-            //        DateTo = CallbackModel != null ? CallbackModel.DateTo.Add(new TimeSpan(23, 59, 59)) : DateTime.UtcNow.Date.Add(new TimeSpan(23, 59, 59)),
-            //        MetaData = MetaData
-            //    }));
-
-            //    if (response.StatusCode == StatusCode.Success)
-            //    {
-            //        if (response.Result != null && response.Result.ActivityLogs.Any())
-            //        {
-
-            //            if (CallbackModel != null)
-            //            {
-            //                FilterLogs(response);
-            //            }
-
-            //            ActivityLogs = response.Result.ActivityLogs;
-            //            MetaData = response.Result.MetaData;
-            //        }
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-
-            //}
-            #endregion
 
         }
 

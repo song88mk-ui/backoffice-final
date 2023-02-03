@@ -1507,22 +1507,22 @@ namespace Backoffice.API.Repositories
             string[] fromStatusesIds = null;
             string[] toStatusesIds = null;
 
-            if (!string.IsNullOrEmpty(callbackModel.MemberName))
+            if (!string.IsNullOrEmpty(callbackModel.MemberName)) //
             {
                 activityLogs = activityLogs
-                .Where(x => x.To.Contains(callbackModel.MemberName, StringComparison.OrdinalIgnoreCase)).ToList();
+                .Where(x => x.To.Contains($"\"UserId\":\"{callbackModel.MemberName}\"", StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             if (!string.IsNullOrEmpty(callbackModel.SettledBy))
             {
                 activityLogs = activityLogs
-                .Where(x => x.To.Contains(callbackModel.SettledBy, StringComparison.OrdinalIgnoreCase)).ToList();
+                .Where(x => x.UserName.Contains(callbackModel.SettledBy, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             if (!string.IsNullOrEmpty(callbackModel.BetId))
             {
                 activityLogs = activityLogs
-                .Where(x => x.To.Contains(callbackModel.BetId, StringComparison.OrdinalIgnoreCase)).ToList();
+                .Where(x => x.To.Contains($"BetId\":\"{callbackModel.BetId}\",", StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             if (callbackModel.Clients != null && callbackModel.Clients.Any())
