@@ -7,24 +7,32 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <div class="maintenance-container d-flex justify-content-center align-items-center border rounded mx-3">
-                    <div>
-                        <i class="ico ico-dashboard d-block text-center"></i>
-                        <div class="form-switch mb-3 d-flex justify-content-center">
-                            <input class="form-check-input me-3" type="checkbox" value="" id="maitenance-mode" @onchange="e => OnMaintenanceClickEvent(e.Value)">
-                            <label class="form-check-label fw-bold" for="maitenance-mode">Song88 Maintenance Mode</label>
+                @if (IsPreLoader)
+                {
+                    <Preloader />
+                }
+                else
+                {
+                    <div class="maintenance-container d-flex justify-content-center align-items-center border rounded mx-3">
+                        <div>
+                            <i class="ico ico-maintenance d-block text-center"></i>
+                            <div class="form-switch mb-3 d-flex justify-content-center">
+                                <input class="form-check-input me-3" type="checkbox" checked="@IsMaintenance" value="" id="maitenance-mode" @onchange="e => OnMaintenanceClickEvent(e.Value)">
+                                <label class="form-check-label fw-bold" for="maitenance-mode">Song88 Maintenance Mode</label>
+                            </div>
+                            <p class="text-center">
+                                Maintenance mode is currently enabled on Song88.
+                                <br />
+                                Disabling maintenance mode will allow members to sign in.
+                            </p>
                         </div>
-                        <p class="text-center">
-                            Maintenance mode is currently enabled on Song88.
-                            <br />
-                            Disabling maintenance mode will allow members to sign in.
-                        </p>
                     </div>
-                </div>
+                }
             </div>
         </div>
     </div>
 </div>
 <div>
-    <CustomModal />
+    <CustomModal OnSaveClickCallback="OnSaveClickedEvent"/>
 </div>
+<AlertMessage AlertStatus="@AlertModel.Status" AlertMessageStr="@AlertModel.Message" Opacity="@AlertModel.Opacity" />

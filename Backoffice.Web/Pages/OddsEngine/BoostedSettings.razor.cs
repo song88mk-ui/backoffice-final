@@ -38,12 +38,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     Name = "Price Boost",
                     Url = string.Empty,
-                    IsCurrentPage = true
+                    IsCurrentPage = false
                 },
                 new BreadcrumbModel
                 {
                     Name = "Boosted Settings",
-                    Url = "odds-engine/boosted-settings",
+                    Url = string.Empty,
                     IsCurrentPage = true
                 }
             };
@@ -67,6 +67,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     Search = SearchForm.SearchText
                 });
                 ClientsView = result.Result;
+                IsPreLoader = false;
                 StateHasChanged();
             }
             catch (Exception)

@@ -10,6 +10,8 @@ namespace Backoffice.Web.Services
 {
     public interface IBackOfficeService
     {
+        Task<BaseResponse<bool>> GetMaintenance();
+        Task<BaseResponse<bool>> SetMaintenance(bool request);
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<MessageResponse>> AddActivityLog(ActivityLogModel request);
         Task<BaseResponse<MessageResponse>> AddActivityLogList(OnActivityLogListMessage request);

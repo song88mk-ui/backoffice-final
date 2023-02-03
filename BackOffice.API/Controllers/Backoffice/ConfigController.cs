@@ -17,28 +17,41 @@ namespace Backoffice.API.Controllers.Backoffice
     public class ConfigController : ControllerBase
     {
         private readonly IBackofficeRepository _backofficeRepository;
-        public ConfigController(IBackofficeRepository backofficeRepository)
+        private readonly IMaintenanceRepository _maintenanceRepository;
+        public ConfigController(IBackofficeRepository backofficeRepository, IMaintenanceRepository maintenanceRepository)
         {
             _backofficeRepository = backofficeRepository;
+            _maintenanceRepository = maintenanceRepository;
         }
 
-        //[Authorize()]
-        //[HttpPost("maintenance")]
-        //public async Task<IActionResult> SetMaintenance([FromBody] ConfigurationRequest request)
-        //{
-        //    var response = await _configRepository.SetMaintenance(request);
+        [HttpPost("maintenance/{isMaintenance}")]
+        public async Task<IActionResult> SetMaintenance([FromRoute] bool isMaintenance)
+        {
+            var result = await _maintenanceRepository.SetMaintenance(isMaintenance);
 
-        //    return Ok(response);
-        //}
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
 
-        //[Authorize()]
-        //[HttpGet("maintenance")]
-        //public async Task<IActionResult> GetMaintenance()
-        //{
-        //    var response = await _configRepository.GetMaintenance();
+        [HttpGet("maintenance")]
+        public async Task<IActionResult> GetMaintenance()
+        {
+            var result = await _maintenanceRepository.GetMaintenance();
 
-        //    return Ok(response);
-        //}
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         #region ActivityLog
         [HttpPost("activitylog")]
         public async Task<IActionResult> ActivityLog([FromBody] ActivityLogModel request)

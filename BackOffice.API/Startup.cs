@@ -79,6 +79,7 @@ namespace Backoffice.API
             services.AddDbContext<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"]));
             services.AddHttpClient<IRabbitMqRepository, RabbitMqRepository>();
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
+            services.AddScoped<IMaintenanceRepository, MaintenanceRepository>();
             services.AddScoped<IPlatformRepository, PlatformRepository>();
             services.AddScoped<ITradingRepository, TradingRepository>();
             services.AddScoped<IBackofficeActivityLogRepository, BackofficeActivityLogRepository>();

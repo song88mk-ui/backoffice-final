@@ -7,14 +7,11 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Net.Mail;
-using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -1397,7 +1394,6 @@ namespace Backoffice.API.Repositories
             }
         }
         #endregion
-
         public async Task<BaseResponse<List<CurrenciesResponse>>> GetCurrencies()
         {
             try
@@ -1428,7 +1424,6 @@ namespace Backoffice.API.Repositories
         }
 
         #region Utilities
-
         private string GetFEDisplayValue(string currency)
         {
             var newCurrency = currency;
@@ -1443,12 +1438,10 @@ namespace Backoffice.API.Repositories
 
             return newCurrency;
         }
-
         private List<ClientInformation> GetClientInformation()
         {
             return _memCache.GetCache("boci", () => _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24) ?? new List<ClientInformation>();
         }
-
         private long InsertClientRecord(ClientInformation client)
         {
             _backofficeContext.ClientInformation.Add(client);
@@ -1456,14 +1449,12 @@ namespace Backoffice.API.Repositories
 
             return client.ClientId;
         }
-
         private long UpdateClientRecord(ClientInformation client)
         {
             var entity = _backofficeContext.ClientInformation.Update(client).Entity;
             _backofficeContext.SaveChanges();
             return client.ClientId;
         }
-
         private async Task<decimal> GetSuggestedMinimumBet(string currencyCode)
         {
             var currency = (Currency)Enum.Parse(typeof(Currency), currencyCode);
@@ -1498,7 +1489,6 @@ namespace Backoffice.API.Repositories
 
             return suggestedMinimumBet;
         }
-
         private List<ActivityLogModel> FilterManualSettlementLogs(List<ActivityLogModel> activityLogs, ManualBetSettlementCallbackModel callbackModel)
         {
             string[] clientIds = null;
@@ -1567,6 +1557,7 @@ namespace Backoffice.API.Repositories
 
             return activityLogs;
         }
+
         #endregion
     }
 }
