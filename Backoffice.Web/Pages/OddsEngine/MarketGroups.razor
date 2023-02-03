@@ -73,10 +73,10 @@
                                 </td>
                                 <td class="text-center">
                                     <a class="link-edit me-2">
-                                        <button class="fa fa-edit" @onclick="async () => await OnEditClickedEvent(MarketTemplateGroup.MarketTemplateGroupId)"></button>
+                                        <button class="fa fa-edit" @onclick="async () => await OnEditClickedEvent(MarketTemplateGroup.MarketTemplateGroupId)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
                                     </a>
                                     <a class="link-delete me-2">
-                                        <button class="fa fa-trash" @onclick="async () => await OnDeleteClickedEvent(MarketTemplateGroup)"></button>
+                                        <button class="fa fa-trash" @onclick="async () => await OnDeleteClickedEvent(MarketTemplateGroup)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
                                     </a>
                                 </td>
                                 <td class="text-center actions">
