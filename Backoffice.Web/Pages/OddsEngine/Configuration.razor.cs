@@ -69,18 +69,17 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender)
+            try 
             {
-                try
+                if (firstRender)
                 {
                     await Subscribe();
                 }
-                catch (Exception ex)
-                {
-                    toasterService.AddToast(Toast.NewToast
-                            ("Error", ex.Message));
-                }
             }
+            catch(Exception ex) 
+            {
+
+            }            
         }
 
         public async ValueTask DisposeAsync()
@@ -714,16 +713,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 if (message.Page.Contains("Config"))
                 {
-                    ToastTitle = "Config";
-                    ToastMessage = $"{message.Details}";
-                    await ShowToast();
+                    toasterService.AddToast(Toast.NewToast("Export Margins", message.Details, true));
                 }
             }
-        }
-        private async Task ShowToast()
-        {
-            await InvokeAsync(StateHasChanged);
-            await JSRuntime.InvokeVoidAsync("showToast", false);
         }
         #endregion
     }

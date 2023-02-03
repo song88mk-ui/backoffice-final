@@ -5,3 +5,7 @@
 .toast-header img {
     width: 32px;
 }
+
+.toast-container {
+    z-index: 1;
+}
