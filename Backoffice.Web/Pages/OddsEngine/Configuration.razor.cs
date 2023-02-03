@@ -646,15 +646,15 @@ namespace Backoffice.Web.Pages.OddsEngine
                 .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
                 .Build();
 
-            //HubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
-            //{
-            //    await ProcessOnConfigChange(message);
-            //});
             HubConnection.Closed += async (error) =>
             {
                 await Task.Delay(new Random().Next(0, 5) * 1000);
                 await HubConnection.StartAsync();
             };
+            HubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
+            {
+                await ProcessOnConfigChange(message);
+            });
 
             HubConnection.On<NotificationsModel>("onnewnotification", async message =>
             {
