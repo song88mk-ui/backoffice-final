@@ -17,6 +17,8 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         [Parameter] public EventCallback OnSearchButtonCallback { get; set; }
         [Parameter] public EventCallback<ManualBetSettlementCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback OnExportToExcelCallback { get; set; }
+        [Parameter] public bool IsExportDisabled { get; set; }
+        [Parameter] public EventCallback<bool> IsExportDisabledChanged { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }        
 
@@ -26,7 +28,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         public List<SelectListItemWithCheckboxModel<string>> FromStatuses { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> ToStatuses { get; set; }
         public ManualBetSettlementCallbackModel CallbackModel { get; set; }
-
+        
         public string SelectedClientName { get; set; }
         public int SelectedClientCount { get; set; }
         public string SelectedSportName { get; set; }

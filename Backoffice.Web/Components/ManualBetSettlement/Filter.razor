@@ -9,7 +9,7 @@
                 </button>
             </div>
             <div class="button-container d-flex flex-row-reverse align-items-end">
-                <button type="button" class="btn btn-export px-4 py-2" @onclick="OnExportToExcelClickEvent">
+                <button type="button" class="btn btn-export px-4 py-2" @onclick="OnExportToExcelClickEvent" disabled="@IsExportDisabled">
                     <i class="fa fa-file-excel-o"></i>
                     Export To Excel
                 </button>

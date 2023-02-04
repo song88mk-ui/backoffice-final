@@ -1525,7 +1525,7 @@ namespace Backoffice.API.Repositories
 
             if (callbackModel.Sports != null && callbackModel.Sports.Any())
             {
-                sportIds = string.Join(",", callbackModel.Sports.Select(sport => sport.SportId)).Split(',');
+                sportIds = string.Join(",", callbackModel.Sports.Select(sport => sport.SportId)).Split(',');                
 
                 activityLogs = activityLogs
                 .Where(x => sportIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).Selections.FirstOrDefault().SportId.ToString())).ToList();
@@ -1550,7 +1550,7 @@ namespace Backoffice.API.Repositories
             if (callbackModel.ToBetStatuses != null && callbackModel.ToBetStatuses.Any())
             {
                 toStatusesIds = string.Join(",", callbackModel.ToBetStatuses.Select(status => status.BetStatusId)).Split(',');
-
+                
                 activityLogs = activityLogs
                 .Where(x => toStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).NewBetStatusId.ToString())).ToList();
             }

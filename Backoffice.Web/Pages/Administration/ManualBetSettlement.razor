@@ -18,7 +18,7 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                <Filter OnSearchButtonCallback="OnSearchButtonClicked" OnInitCallback="OnInitEvent" OnExportToExcelCallback="OnExportExcel" />
+                <Filter OnSearchButtonCallback="OnSearchButtonClicked" OnInitCallback="OnInitEvent" OnExportToExcelCallback="OnExportExcel" @bind-IsExportDisabled="IsExportDisabled"/>
             </div>
             <div class="col-md-12">
                 <div class="content mx-3">

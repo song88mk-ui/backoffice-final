@@ -326,7 +326,7 @@ namespace Backoffice.Utility.Repository
                 {
                     var log = result.ActivityLogs[i];
 
-                    int cellIndex = i + 1;
+                    int cellIndex = i + 2;
 
                     ManualBetDetails betDetails = JsonSerializer.Deserialize<ManualBetDetails>(log.To);
                     worksheet.Cells[cellIndex, 1].Value = i + 1;
@@ -336,7 +336,7 @@ namespace Backoffice.Utility.Repository
                     worksheet.Cells[cellIndex, 5].Value = betDetails.BetDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper();
                     worksheet.Cells[cellIndex, 6].Value = BuildEventDetails(betDetails.Selections.FirstOrDefault(), betDetails.OddsTypeName);
                     worksheet.Cells[cellIndex, 7].Value = betDetails.BetStatusName;
-                    worksheet.Cells[cellIndex, 8].Value = betDetails.NewBetStatusName;
+                    worksheet.Cells[cellIndex, 8].Value = GetNewBetStatusName(betDetails);
                     worksheet.Cells[cellIndex, 9].Value = betDetails.UserId;
                     worksheet.Cells[cellIndex, 10].Value = log.UserName;
                     worksheet.Cells[cellIndex, 11].Value = betDetails.Reason;
@@ -813,6 +813,18 @@ namespace Backoffice.Utility.Repository
             }
 
             return activityLogs;
+        }
+
+        private string GetNewBetStatusName(ManualBetDetails betDetails)
+        {
+            if (string.IsNullOrEmpty(betDetails.NewBetStatusName))
+            {
+                return ((BetStatus)betDetails.NewBetStatusId).ToString();
+            }
+            else
+            {
+                return betDetails.NewBetStatusName;
+            }
         }
         #endregion
     }

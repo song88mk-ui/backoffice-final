@@ -28,9 +28,9 @@ namespace Backoffice.Web.Pages.Administration
         public ManualBetSettlementCallbackModel CallbackModel { get; set; }
 
         public string PageTitle { get; set; }
-        public string IconClass { get; set; }
-        private int CurrentPage { get; set; } = 1;
+        public string IconClass { get; set; }        
         private bool IsPreloader { get; set; }
+        private bool IsExportDisabled { get; set; }
         #endregion
 
         #region Fields
@@ -46,7 +46,7 @@ namespace Backoffice.Web.Pages.Administration
 
             Alerts = new List<AlertModel>();
             IsPreloader = true;
-            //StateHasChanged();
+            IsExportDisabled = true;
 
             CallbackModel = new ManualBetSettlementCallbackModel();
 
@@ -132,12 +132,18 @@ namespace Backoffice.Web.Pages.Administration
         private async Task GetContents()
         {
             IsPreloader = true;
+            IsExportDisabled = true;
 
             var response = await BackOfficeService.GetManualBetSettlementActivityLogs(new ManualBetSettlementActivityLogRequest()
             {
                 ManualBetSettlementCallbackModel = CallbackModel,
                 MetaData = MetaData
             });
+
+            if (response.Result.ActivityLogs.Any())
+            {               
+                IsExportDisabled = false;
+            }
 
             ActivityLogs = response.Result.ActivityLogs.ToList();
             MetaData = response.Result.MetaData;
