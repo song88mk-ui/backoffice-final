@@ -13,14 +13,14 @@ namespace Backoffice.Web.Components.ManualBetSettlement
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }                
+        [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Parameter] public EventCallback OnSearchButtonCallback { get; set; }
         [Parameter] public EventCallback<ManualBetSettlementCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback OnExportToExcelCallback { get; set; }
         [Parameter] public bool IsExportDisabled { get; set; }
         [Parameter] public EventCallback<bool> IsExportDisabledChanged { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }        
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
@@ -28,7 +28,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         public List<SelectListItemWithCheckboxModel<string>> FromStatuses { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> ToStatuses { get; set; }
         public ManualBetSettlementCallbackModel CallbackModel { get; set; }
-        
+
         public string SelectedClientName { get; set; }
         public int SelectedClientCount { get; set; }
         public string SelectedSportName { get; set; }
@@ -106,7 +106,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 ClientName = s.Name
             }).ToList();
 
-            await OnInitCallback.InvokeAsync(CallbackModel);           
+            await OnInitCallback.InvokeAsync(CallbackModel);
         }
 
         public async Task OnSportCheckboxClickEvent(Dictionary<string, string> items)
@@ -215,7 +215,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         }
 
         public async Task OnSearchButtonClickedEvent()
-        {            
+        {
             await OnSearchButtonCallback.InvokeAsync();
         }
 
@@ -272,6 +272,55 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 Name = s.SportName
             }).ToList();
 
+            //temporarily add virtual sports since it is not handled in API
+            List<SelectListItemWithCheckboxModel<string>> virtualSports = new List<SelectListItemWithCheckboxModel<string>>()
+            {
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1001.ToString(),
+                    Name = "Virtual Soccer"
+                },
+                new SelectListItemWithCheckboxModel<string> 
+                {
+                    IsChecked = true,
+                    Value = 1002.ToString(),
+                    Name = "Virtual Basketball"
+                },
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1003.ToString(),
+                    Name = "Virtual Baseball"
+                },
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1005.ToString(),
+                    Name = "Virtual Tennis"
+                },
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1021.ToString(),
+                    Name = "Virtual Cricket"
+                },
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1055.ToString(),
+                    Name = "Virtual Horse Racing"
+                },
+                new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = 1058.ToString(),
+                    Name = "Virtual Dog Racing"
+                }
+            };
+
+            Sports.AddRange(virtualSports);
+
             Sports.Insert(0, new SelectListItemWithCheckboxModel<string>
             {
                 IsChecked = true,
@@ -298,7 +347,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 if (currency == 0)
                 {
                     Currencies.Add(new SelectListItemWithCheckboxModel<string>()
-                    {                        
+                    {
                         IsChecked = true,
                         Value = "all",
                         Name = "All Currencies"
