@@ -13,19 +13,22 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
-        [Inject] private IJSRuntime JSRuntime { get; set; }
+        
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }        
+
+        private EventCallback OnCopyClientSettingsCallback { get; set; }
+
         private KeyValuePair<string, string> SelectedFromClient { get; set; }
-        private KeyValuePair<string, string> SelectedToClient { get; set; }
-        private const string ToastTitle = "Copy Client Settings";
-        private const string ToastMessage = "Success! copy client settings is being generated system will notify once done";
+        private KeyValuePair<string, string> SelectedToClient { get; set; }        
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
         {
             SelectedFromClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedFromClient");
             SelectedToClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedToClient");
+
+            OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback>("OnCopyClientSettingsCallback");
         }
         public async Task OnCancelModalClickEvent()
         {
@@ -48,22 +51,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnCopyClientSettings", "r.oe.web.config.oncopyclientsettings", Guid.NewGuid().ToString());
 
-            await ShowToast();
-
             ModalService.Cancel();
+
+            await OnCopyClientSettingsCallback.InvokeAsync();
         }
         public void Dispose()
         {
             
         }
-        #endregion
-
-        #region Utilities
-        public async Task ShowToast()
-        {
-            await JSRuntime.InvokeVoidAsync("showToast");
-            await Task.Delay(500);
-        }
-        #endregion
+        #endregion        
     }
 }

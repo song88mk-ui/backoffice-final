@@ -1,4 +1,5 @@
-﻿using Backoffice.Web.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -9,6 +10,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ToastService? _toasterService { get; set; }
+
+        public List<AlertModel> Alerts { get; set; }
+        
+        private Guid Guid { get; set; }        
         #endregion
 
         #region Fields
@@ -16,6 +21,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #endregion
 
         #region Methods
+        protected override async Task OnInitializedAsync()
+        {
+            Guid = new Guid();
+            Alerts = new List<AlertModel>();
+        }
+
         public async Task OnImportExportMarginsClickEvent()
         {
             var parameters = new ModalParameters();
@@ -44,27 +55,44 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
-            parameters.Add("ModalDialogClass", "modal-md");            
+            parameters.Add("ModalDialogClass", "modal-md");
+            parameters.Add("OnCopyClientSettingsCallback", EventCallback.Factory.Create(this, OnCopyClientSettingsAlert));
 
             var options = new ModalOptions();
             ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
-        }
+        }        
 
+        public void Dispose()
+        {
+            
+        }
+        #endregion
+
+        #region Utilities
         public async Task ShowExportToast()
         {
-            toasterService.AddToast(Toast.NewToast("Export Margins", 
+            toasterService.AddToast(Toast.NewToast("Export Margins",
                 $"Success! Excel file is being generated. System will notify once done"));
         }
 
         public async Task ShowImportToast(string message)
         {
-            toasterService.AddToast(Toast.NewToast("Import Margins", 
+            toasterService.AddToast(Toast.NewToast("Import Margins",
                 $"{message}"));
         }
 
-        public void Dispose()
+        public async Task OnCopyClientSettingsAlert()
         {
-            
+            Alerts.Clear();            
+
+            Alerts.Add(new AlertModel()
+            {
+                Status = AlertStatus.Success.ToString(),
+                Message = "Success! Copy Client Settings is being generated. System will notify once done.",
+                Opacity = 1.0m
+            });            
+
+            Guid = Guid.NewGuid();
         }
         #endregion
     }

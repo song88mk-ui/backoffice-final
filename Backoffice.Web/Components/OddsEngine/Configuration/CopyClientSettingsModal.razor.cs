@@ -11,7 +11,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+
+        private EventCallback OnCopyClientSettingsCallback { get; set; }
+
         private List<SelectListItemModel<string>> Clients { get; set; }
         private List<SelectListItemModel<string>> FromClients { get; set; }
         private List<SelectListItemModel<string>> ToClients { get; set; }
@@ -25,6 +30,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             Clients = new List<SelectListItemModel<string>>();
             FromClients = new List<SelectListItemModel<string>>();
             ToClients = new List<SelectListItemModel<string>>();
+
+            OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback>("OnCopyClientSettingsCallback");
 
             await Initialize();
         }
@@ -67,6 +74,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             parameters.Add("ModalDialogClass", "modal-md");
             parameters.Add("SelectedFromClient", SelectedFromClient);
             parameters.Add("SelectedToClient", SelectedToClient);
+            parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);
 
             var options = new ModalOptions();
             ModalService.Open<ConfirmCopyClientSettingsModal>($"Copy Client Settings", parameters);

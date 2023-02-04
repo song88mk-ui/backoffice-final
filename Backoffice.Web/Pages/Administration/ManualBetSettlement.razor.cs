@@ -31,6 +31,7 @@ namespace Backoffice.Web.Pages.Administration
         public string IconClass { get; set; }        
         private bool IsPreloader { get; set; }
         private bool IsExportDisabled { get; set; }
+        private Guid Guid { get; set; }
         #endregion
 
         #region Fields
@@ -47,6 +48,7 @@ namespace Backoffice.Web.Pages.Administration
             Alerts = new List<AlertModel>();
             IsPreloader = true;
             IsExportDisabled = true;
+            Guid = new Guid();
 
             CallbackModel = new ManualBetSettlementCallbackModel();
 
@@ -81,6 +83,8 @@ namespace Backoffice.Web.Pages.Administration
                     Message = "BetId's have been successfully settled",
                     Opacity = 1.0m
                 });
+
+                Guid = Guid.NewGuid();
             }
             else
             {
@@ -90,6 +94,8 @@ namespace Backoffice.Web.Pages.Administration
                     Message = response.Message,
                     Opacity = 1.0m
                 });
+
+                Guid = Guid.NewGuid();
             }
 
             await GetContents();

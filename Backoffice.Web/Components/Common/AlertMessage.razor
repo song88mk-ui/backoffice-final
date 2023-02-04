@@ -19,12 +19,6 @@
     [Parameter] public Guid Guid { get; set; }
 
     #region Methods
-
-    protected override void OnInitialized()
-    {
-
-    }
-
     protected override async Task OnParametersSetAsync()
     {
         if (!AlwaysShow)
