@@ -14,6 +14,8 @@ using Backoffice.Shared.OutgoingEngineMessages;
 using System.Runtime.CompilerServices;
 using Backoffice.Web.Components.Common;
 using System.Security.Policy;
+using Blazored.LocalStorage;
+using Backoffice.Web.Components.OddsEngine.Configuration;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -29,24 +31,33 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public ToastService? ToastService { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
+        public List<MarketLookupNavigationModel> SelectedContents;
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
+        public List<MarketLookupNavigationModel> MarketLookupNavigationModelsTemp { get; set; }
+
         private ToastService toasterService => ToastService!;
         public Configuration ConfigComponent { get; set; }
-        public ConfigFilterModel ConfigFilterModel { get; set; }
-        public List<MarketLookupNavigationModel> SelectedContents;
-        public FixtureType FixtureType { get; set; }
+        public ConfigFilterModel ConfigFilterModel { get; set; }                
         private HubConnection HubConnection { get; set; }
+
+        public Virtualize<MarketLookupNavigationModel> MarketVirtualizeReference { get; set; }
+        public Filter FilterReference { get; set; }
+
+        public FixtureType FixtureType { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public int? AllMarketStatus { get; set; }
         public string AllMarketStatusName { get; set; } = "Deactivate All";
-        public bool SaveBarVisible { get; set; } = false;
+        //public bool SaveBarVisible { get; set; } = false;
         public string ToastTitle { get; set; }
         public string ToastMessage { get; set; }
         public bool IsToastMessageMarkup { get; set; }
-        public bool isSaving { get; set; }
+        //public bool isSaving { get; set; }
         public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
         public bool IsPreloader { get; set; } = true;
-        public List<BreadcrumbModel> Breadcrumbs { get; set; }
+        public bool IsMarketEditing { get; set; }        
+        
         #endregion
 
         #region Methods
@@ -56,6 +67,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             IconClass = "";
             IsToastMessageMarkup = true;
             ConfigFilterModel = null;
+            IsMarketEditing = false;
+
+            MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
+
             Breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
@@ -71,6 +86,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             try 
             {
+                //if (!MarketLookupNavigationModelsTemp.Any() && ConfigFilterModel != null)
+                //{
+                //    await OnModalClear();
+                //}
+
                 if (firstRender)
                 {
                     await Subscribe();
@@ -82,8 +102,62 @@ namespace Backoffice.Web.Pages.OddsEngine
             }            
         }
 
+        public async Task OnMarketActiveChangedEvent(ChangeEventArgs args, MarketLookupNavigationModel market)
+        {             
+            market.MarketLookup.IsActive = !market.MarketLookup.IsActive;
+
+            if (!MarketLookupNavigationModelsTemp.Contains(market))
+            {
+                MarketLookupNavigationModelsTemp.Add(market);                
+            }
+            else
+            {
+                MarketLookupNavigationModelsTemp.Remove(market);                
+            }
+
+
+            if (MarketLookupNavigationModelsTemp.Any())
+            {
+                IsMarketEditing = true;
+            }
+            else
+            {
+                IsMarketEditing = false;
+            }
+        }
+
+        public async Task OnMarketEditingCancelClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");            
+            parameters.Add("MarketChangedCount", MarketLookupNavigationModelsTemp.Count);
+            parameters.Add("OnCancelCallback", EventCallback.Factory.Create(this, UndoEditedMarkets));
+
+            var options = new ModalOptions();
+            ModalService.Open<UpdateActiveMarketModal>("Clear changes?", parameters, options);
+        }
+
+        public async Task OnMarketSaveClickEvent()
+        {
+            await OnSaveAllSettings();
+        }
+
+        public async Task UndoEditedMarkets()
+        {            
+            MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
+            IsMarketEditing = false;
+
+            //await OnModalClear();
+            //SelectedContents = GetContents();
+            //await MarketVirtualizeReference.RefreshDataAsync();            
+            //StateHasChanged();
+        }
+
         public async ValueTask DisposeAsync()
         {
+
         }
         public void Dispose()
         {
@@ -257,7 +331,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnSaveAllSettings()
         {
-            isSaving = true;
+            //isSaving = true;
 
             await InvokeAsync(StateHasChanged);
 
@@ -433,20 +507,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     if (IsConnected) await HubConnection.SendAsync("OnConfigChange", data);
 
-                    SaveBarVisible = false;
+                    //SaveBarVisible = false;
                 }
 
             }
 
-            isSaving = false;
-        }
-
-        public async Task OnCancel()
-        {
-            var parameters = new ModalParameters();
-            var options = new ModalOptions();
-
-            //ModalService.Open<ClearChangesModalBody>("Clear changes?", parameters, options);
+            //isSaving = false;
         }
 
         public async Task OnModalClear()
@@ -471,7 +537,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             var contents = SelectedContents.Skip(request.StartIndex).Take(request.Count);
 
-            return new ItemsProviderResult<MarketLookupNavigationModel>(contents, SelectedContents.Count());
+             return new ItemsProviderResult<MarketLookupNavigationModel>(contents, SelectedContents.Count());
         }
 
         private string GetFirstKey(ClientMarketConfig config, bool isPrematch)

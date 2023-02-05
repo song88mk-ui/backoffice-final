@@ -85,7 +85,7 @@
                                                 @log.UserName
                                             </td>
                                             <td>
-                                                @betDetails.NewReason
+                                                @(!string.IsNullOrEmpty(betDetails.NewReason) ? betDetails.NewReason : betDetails.Reason)
                                             </td>
                                         </tr>
                                     }

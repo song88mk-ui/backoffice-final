@@ -1,0 +1,10 @@
+﻿<div class="modal-body">
+    <div class="text-center">
+        <span>You have made changes to @(MarketChangedCount > 1 ? $"{MarketChangedCount} markets" : $"{MarketChangedCount} market")</span>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn modal-back" @onclick="OnBackClickedEvent">Go Back</button>
+    <button type="button" class="btn modal-btn modal-clear" @onclick="OnClearClickedEvent">Clear</button>
+</div>

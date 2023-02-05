@@ -339,7 +339,7 @@ namespace Backoffice.Utility.Repository
                     worksheet.Cells[cellIndex, 8].Value = GetNewBetStatusName(betDetails);
                     worksheet.Cells[cellIndex, 9].Value = betDetails.UserId;
                     worksheet.Cells[cellIndex, 10].Value = log.UserName;
-                    worksheet.Cells[cellIndex, 11].Value = betDetails.Reason;
+                    worksheet.Cells[cellIndex, 11].Value = !string.IsNullOrEmpty(betDetails.NewReason) ? betDetails.NewReason : betDetails.Reason;
                 }
                 #endregion
 

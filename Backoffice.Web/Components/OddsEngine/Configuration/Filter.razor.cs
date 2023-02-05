@@ -13,26 +13,40 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private ITradingService TradingService { get; set; }
+        [Inject] private ITradingService TradingService { get; set; }        
+
         [Parameter] public ConfigFilterModel ConfigFilterModel { get; set; } = new ConfigFilterModel();
         [Parameter] public EventCallback<ConfigFilterModel> ConfigFilterModelChanged { get; set; }
-        [Parameter] public FixtureType FixtureType { get; set; }
-        [Parameter] public EventCallback OnInitCallBack { get; set; }
+        [Parameter] public EventCallback IsMarketEditingChanged { get; set; }
+        [Parameter] public FixtureType FixtureType { get; set; }        
 
         public MarketLookupResponse MarketLookup { get; set; }
         private MarketTemplateGroupResponse MarketTemplateGroupResponse { get; set; }
-        private string SportName { get; set; }
-        private bool IsPreloader { get; set; }
-        private const string InlineCss = "position:absolute;top:50%;left:50%;z-index:2;transform:translate(-50%, -50%)";
+        
+        private bool IsPreloader { get; set; }        
+        public bool IsMarketEditing { get; set; }
         #endregion
+
         #region Methods
         protected override async Task OnInitializedAsync()
+        {
+            
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await Initialize();
+            }
+        }
+
+        public async Task Initialize()
         {
             IsPreloader = true;
             var sports = await GetSports();
             var sportId = sports.Any() ? sports.FirstOrDefault().Value : 0;
             var headerTitle = sports.Any() ? sports.FirstOrDefault(c => c.Value == sportId).Name : "";
-            SportName = headerTitle;
 
             var segments = await GetSegments(sportId);
             var segmentId = segments.Any() ? segments.FirstOrDefault().Value : 0;
@@ -96,14 +110,17 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
             IsPreloader = false;
-            StateHasChanged();
-            await OnInitCallBack.InvokeAsync();
+            StateHasChanged();   
         }
+
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {
             IsPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
+            await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+
+            await Task.Delay(100);
 
             ConfigFilterModel.SportId = int.Parse(e.Value.ToString()); //((SelectListItemModel<int>)item).Value;
             ConfigFilterModel.HeaderTitle = ConfigFilterModel.Sports.FirstOrDefault(c => c.Value == ConfigFilterModel.SportId).Name;
@@ -137,6 +154,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             IsPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
+            await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
@@ -169,6 +187,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             IsPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
+            await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
@@ -198,6 +217,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             IsPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
+            await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
@@ -217,6 +237,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             IsPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
+            await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
@@ -246,6 +267,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             IsPreloader = true;
             ConfigFilterModel.FilterConfigStatus = int.Parse(e.Value.ToString());
+            await IsMarketEditingChanged.InvokeAsync();
 
             ConfigFilterModel.SearchText = string.Empty;
 
@@ -256,6 +278,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             IsPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
+            await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);

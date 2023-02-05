@@ -13,7 +13,7 @@
 </div>
 
 <div class="col-md-12">
-    <Filter @bind-ConfigFilterModel="ConfigFilterModel" FixtureType="FixtureType" />
+    <Filter @bind-ConfigFilterModel="ConfigFilterModel" FixtureType="FixtureType" IsMarketEditingChanged="UndoEditedMarkets" @ref="FilterReference"/>
 </div>
 
 <div class="col-md-12 mb-2">
@@ -52,7 +52,7 @@
 
                 if (marketCount > 0)
                 {
-                    SaveBarVisible = false;
+                    @*SaveBarVisible = false;*@
                     AllMarketStatus = null;
 
                     if (ConfigFilterModel.FilterConfigStatus == 0)
@@ -64,8 +64,12 @@
                     if (!SelectedContents.Any(s => s.NewMarketLookup.IsActive == false))
                         AllMarketStatusName = "Deactivate All";
 
-                    <Virtualize Context="market" ItemsProvider="@GetItemProviderContents" OverscanCount="6">
+                    <Virtualize Context="market" Items="ConfigFilterModel.MarketTemplates" OverscanCount="6" @ref="MarketVirtualizeReference">
                         <ItemContent>
+                            @{
+                                string marketActiveLabel = market.MarketLookup.IsActive ? "Market Active" : "Market Inactive";
+                                bool isMarketActive = market.MarketLookup.IsActive;
+                            }
                             <div class="accordion">
                                 <div class="accordion-item">
                                     <div class="accordion-header">
@@ -74,12 +78,12 @@
                                         </button>
 
                                         <div class="d-flex justify-content-around market-toggle">
-                                            <span>Market Active</span>
+                                            <span>@marketActiveLabel</span>
                                             <div class="form-check form-switch">
                                                 <input class="form-check-input" type="checkbox"
-                                       id="@($"market-{market.MarketLookup.MarketTemplateId}Toggle")" role="switch"
-                                       aria-label="@($"{market.MarketLookup.MarketTemplateName} Toggle Switch")"
-                                       @bind="market.MarketLookup.IsActive" />
+                                                    id="@($"market-{market.MarketLookup.MarketTemplateId}Toggle")" role="switch"
+                                                       aria-label="@($"{market.MarketLookup.MarketTemplateName} Toggle Switch")"
+                                       checked="@isMarketActive" @oninput="(ChangeEventArgs e) => OnMarketActiveChangedEvent(e, market)" />
                                             </div>
                                         </div>
                                     </div>
@@ -130,4 +134,22 @@
         <Preloader />
     }
 </div>
-<CustomModal />
+
+@if (IsMarketEditing)
+{
+    <div class="market-save-changes">
+        <div class="row market-save-details">
+            <div class="col">
+                <span>Make sure to save your changes</span>
+            </div>
+            <div class="col"></div>
+            <div class="col">
+                <div class="market-save-actions">
+                    <button type="button" class="btn market-cancel me-2" @onclick="OnMarketEditingCancelClickEvent">Cancel</button>
+                    <button type="button" class="btn market-save" @onclick="OnMarketSaveClickEvent">Save My Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<CustomModal/>
