@@ -5,11 +5,10 @@ using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Shared
 {
-    public class MainLayoutBase : LayoutComponentBase, IDisposable
+    public class MainLayoutBase : LayoutComponentBase, IAsyncDisposable, IDisposable
     {
         #region Properties
         [Inject] private ToastService? _toasterService { get; set; }
@@ -19,8 +18,9 @@ namespace Backoffice.Web.Shared
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-        [Inject] public IJSRuntime JSRuntime { get; set; }
+
         [Parameter] public SportClickCallbackModel SelectedSport { get; set; }
+
         private ToastService toasterService => _toasterService!;
 
         private HubConnection HubConnection { get; set; }
@@ -60,6 +60,7 @@ namespace Backoffice.Web.Shared
                 var isSuperAdmin = !string.IsNullOrEmpty(role) && role.ToUpper().Equals("SUPER ADMIN") ? true : false;
 
                 var clients = new ClientModel();
+
                 if (isSuperAdmin)
                     clients = (await BackOfficeService.GetClients()).Result;
 
@@ -78,6 +79,7 @@ namespace Backoffice.Web.Shared
                     UserModel.MainUserId = userClaims.Where(x => x.Type.ToUpper() == "MAINUSERID").FirstOrDefault()?.Value ?? "";
                     UserModel.Claims = userClaims.Where(x => !permissions.Contains(x.Type.ToUpper())).ToList();
                 }
+
                 IsPreLoader = false;
             }
             catch (Exception)
@@ -106,13 +108,25 @@ namespace Backoffice.Web.Shared
             SelectedSport = model;
             HeaderNavMenuReference.ActivateMenu("monitoring");
         }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (HubConnection != null)
+            {
+                await HubConnection.StopAsync();
+                await HubConnection.DisposeAsync();
+            }
+        }
+
         public void Dispose()
         {
+            BackOfficeService.Dispose();
         }
 
         #endregion
 
         #region Utilities
+
         private async Task Subscribe()
         {
             try
@@ -155,6 +169,7 @@ namespace Backoffice.Web.Shared
                         (message.Page, message.Details, true));
             }
         }
+
         #endregion
     }
 }

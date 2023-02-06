@@ -500,5 +500,11 @@ namespace Backoffice.Web.Services
             }
         }
         #endregion
+
+        public void Dispose()
+        {
+            _httpClient.Dispose();
+        }
+
     }
 }

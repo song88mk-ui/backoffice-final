@@ -12,8 +12,6 @@ namespace Backoffice.Web.Shared.OddsEngine
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public bool ShowPriceBoostMenu { get; set; }
-        //public bool ShowAdministrationMenu { get; set; }
-        //public bool ShowSettlementMenu { get; set; }
         public bool ShowMarketSettingsMenu { get; set; }
 
         public bool IsActiveMonitoring { get; set; }
