@@ -1,17 +1,13 @@
 ﻿using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.SBC
 {
-    public partial class Reporting : IDisposable
+    public partial class SearchBetId : IDisposable
     {
         #region Properties
 
-        [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public ICommonService CommonService { get; set; }
-
-        public ElementReference VizContainer { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -23,8 +19,8 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnInitializedAsync()
         {
-            PageTitle = "Reports";
-            IconClass = "ico ico-reports";
+            PageTitle = "Search Bet Id";
+            IconClass = "ico ico-search-bet";
 
             Token = CommonService.GenerateToken();
         }

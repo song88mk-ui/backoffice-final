@@ -43,5 +43,6 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ResendSettlementBetDetailModel>> GetResendSettlementBetDetails(ResendSettlementBetDetailRequest request);
         Task<BaseResponse<ResendSettlementResponse>> ResendSettlement(ResendSettlementRequest request);
         Task<BaseResponse<BetModifyResponse>> CancelBet(BetModifyRequest request);
+        void Dispose();
     }
 }

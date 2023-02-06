@@ -30,7 +30,7 @@ namespace Backoffice.Web.Services
             _httpClient = httpClient;
             _authenticationService = authenticationService;
             _messageBroker = messageBroker;
-            _messageBroker.Connect();
+            //_messageBroker.Connect();
 
             //var userToken = httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
 
@@ -1187,6 +1187,11 @@ namespace Backoffice.Web.Services
             }
         }
         #endregion
+
+        public void Dispose()
+        {
+            _httpClient.Dispose();
+        }
 
     }
 }

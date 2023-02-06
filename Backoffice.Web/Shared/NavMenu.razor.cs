@@ -81,6 +81,7 @@ namespace Backoffice.Web.Shared
                     Claims = UserModel.Claims;
             }
         }
+
         public void ToggleNavMenu()
         {
             collapseNavMenu = !collapseNavMenu;
@@ -169,6 +170,7 @@ namespace Backoffice.Web.Shared
 
         public void Dispose()
         {
+            BackOfficeService.Dispose();
         }
 
         #endregion
