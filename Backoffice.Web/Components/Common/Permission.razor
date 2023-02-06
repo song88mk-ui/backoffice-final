@@ -53,7 +53,7 @@
                                 {
                                     <label>Create and manage user and user groups, modify, settle, or cancel bets, and view manual bet settlement history</label>
                                 }
-                                else if (category.CategoryId == (int)PermissionCategory.Sportsbook)
+                                else if (category.CategoryId == (int)PermissionCategory.SBC)
                                 {
                                     <label>Create and manage user and user groups, modify, settle, or cancel bets, and view manual bet settlement history</label>
                                 }
@@ -68,7 +68,7 @@
                                             <span class="d-block fw-bold">Permissions</span>
                                             <span class="sub-title-info">Enable the permissions required for this user group</span>
                                         </div>
-                                        @if (category.CategoryId == (int)PermissionCategory.Sportsbook)
+                                        @if (category.CategoryId == (int)PermissionCategory.SBC)
                                         {
                                             <div class="col text-end">
                                                 <div class="dropdown mx-2 w-100">

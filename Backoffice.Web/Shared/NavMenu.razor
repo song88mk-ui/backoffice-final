@@ -35,7 +35,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         </NavLink>
                     </div>
                 }
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{PermissionCategoryAcronym.SBC}.Reports")).Count() > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{PermissionCategory.SBC}.Reports")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-report" role="button" aria-expanded="false" aria-controls="sub-menu-report">
@@ -113,7 +113,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         </NavLink>
                     </div>*@
                 }
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.SBC)}.Settings")).Count() > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategory.SBC)}.Settings")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-setting" role="button" aria-expanded="false" aria-controls="sub-menu-setting">
@@ -174,7 +174,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                     </div>
                 }
 
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.SBC)}.{nameof(PermissionCategoryAcronym.OE)}")).Count() > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategory.SBC)}.{nameof(PermissionCategory.OE)}")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="odds-engine">
@@ -215,7 +215,7 @@ else if (NavMenuAccess == NavMenuAccess.OE)
                         </NavLink>
                     </div>
                 }
-                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategoryAcronym.Admin)}.Settlements")).Count() > 0)
+                @if (UserModel.Claims.Where(x => x.Type.Contains($"{nameof(PermissionCategory.Admin)}.Settlements")).Count() > 0)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="#sub-menu-settlements" role="button" aria-expanded="false" aria-controls="sub-menu-setting">

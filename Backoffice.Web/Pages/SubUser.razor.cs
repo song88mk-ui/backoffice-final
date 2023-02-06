@@ -249,8 +249,8 @@ namespace Backoffice.Web.Pages
             {
                 subUserClaims.Insert(0, new PermissionModel
                 {
-                    CategoryId = (int)PermissionCategory.Sportsbook,
-                    CategoryName = PermissionCategory.Sportsbook.ToString(),
+                    CategoryId = (int)PermissionCategory.SBC,
+                    CategoryName = PermissionCategory.SBC.ToString(),
                     SubCategoryName = "Dashboard",
                     GroupName = string.Empty,
                     IsSubUser = true,
