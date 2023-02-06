@@ -28,6 +28,7 @@ namespace Backoffice.Web.Pages.Administration
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public decimal Opacity { get; set; }
+        public bool IsPreLoader { get; set; }
 
         #endregion
 
@@ -35,6 +36,7 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
+            IsPreLoader = true;
             Opacity = 0m;
             Alerts = new List<AlertModel>();
             UserGroupListModel = new UserGroupListResponse();
@@ -66,6 +68,7 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task OnInitEvent(UserGroupCallbackModel request)
         {
+            IsPreLoader = true;
             UserGroupCallbackModel = request;
             UserGroupListModel = await GetUserGroupList(UserGroupCallbackModel.SearchText, UserGroupCallbackModel.SortBy, 1);
         }
@@ -230,12 +233,16 @@ namespace Backoffice.Web.Pages.Administration
                     Claims = s.Claims
                 }).ToList();
 
+                IsPreLoader = false;
+
                 return new UserGroupListResponse
                 {
                     MetaData = MetaData,
                     UserGroups = userGroupList
                 };
             }
+
+            IsPreLoader = false;
 
             return new UserGroupListResponse();
         }

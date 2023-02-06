@@ -33,8 +33,26 @@
                 </tr>
             </thead>
             <tbody>
+                @if (IsPreLoader)
+                {
+                    <tr>
+                        <td colspan="5">
+                            <Preloader />
+                        </td>
+                    </tr>
+                }
+
                 @if (UserGroupListModel != null && UserGroupListModel.UserGroups.Any())
                 {
+                    if(!UserGroupListModel.UserGroups.Any())
+                    {
+                        <tr>
+                            <td colspan="4">
+                                <NoRecordFound />
+                            </td>
+                        </tr>
+                    }
+
                     foreach (var userGroup in UserGroupListModel.UserGroups)
                     {
                         <tr>
