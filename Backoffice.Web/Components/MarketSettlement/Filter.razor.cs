@@ -211,6 +211,7 @@ namespace Backoffice.Web.Components.MarketSettlement
                 FromDate = FilterModel.FromDate,
                 ToDate = FilterModel.ToDate,
                 UserId = UserModel.Id,
+                ConnectionId = UserModel.ConnectionId
             };
 
             MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMarketSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());

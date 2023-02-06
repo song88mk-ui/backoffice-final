@@ -1,12 +1,18 @@
 using Backoffice.Shared.Data.Backoffice.Entities;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Utility.Repository;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -64,7 +70,7 @@ namespace Backoffice.Utility
                         break;
                     case "ExportMessageSettlementHistory":
                         var manualMessageSettlementHistory = JsonSerializer.Deserialize<OnGetMessageSettlementHistoryMessage>(payload);
-                        _backofficeRepository.ProcessOnGetMessageSettlementHistory(manualMessageSettlementHistory, _messageBroker);
+                        _backofficeRepository.ProcessOnGetMessageSettlementHistory(manualMessageSettlementHistory, _messageBroker, correlationId);
                         break;
                     case "ExportManualBetSettlementHistory":
                         var manualBetSettlementHistory = JsonSerializer.Deserialize<OnGetManualBetSettlementHistoryMessage>(payload);

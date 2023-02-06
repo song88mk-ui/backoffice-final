@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace Backoffice.Web.Shared
 {
@@ -133,13 +134,25 @@ namespace Backoffice.Web.Shared
                     await HubConnection.StartAsync();
                 };
 
-                HubConnection.On<NotificationsModel>("onnewnotification", async message =>
+                await HubConnection.StartAsync().ContinueWith(task =>
                 {
-                    await ProcessNotification(message);
+                    if (task.IsFaulted)
+                    {
+                        toasterService.AddToast(Toast.NewToast
+                                ("Error Connecting to hub", "Fault in connecting."));
+                    }
+                    else if (task.IsCompletedSuccessfully)
+                    {
+                        UserModel.ConnectionId = HubConnection.ConnectionId.ToString();
+                    }
                 });
 
+                HubConnection.On<string>("Notification", async message =>
+                {
+                    var payload = JsonSerializer.Deserialize<NotificationsModel>(message);
+                    await ProcessNotification(payload);
+                });
 
-                await HubConnection.StartAsync();
             }
             catch (Exception ex)
             {

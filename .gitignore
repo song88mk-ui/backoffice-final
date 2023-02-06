@@ -160,3 +160,5 @@ BackOffice.Shared/bin
 /Backoffice.Utility/bin/Release/netcoreapp3.1/Microsoft.IO.RecyclableMemoryStream.dll
 /Backoffice.Utility/bin/Release/netcoreapp3.1/EPPlus.dll
 /Backoffice.Utility/bin/Release/netcoreapp3.1
+/Backoffice.Hub/obj
+/Backoffice.Hub/bin/Debug/net6.0

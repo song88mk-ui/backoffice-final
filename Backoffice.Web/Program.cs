@@ -108,8 +108,8 @@ app.UseSession();
 
 app.UseRouting();
 
-app.MapHub<BoHub>("/bohub");
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+app.MapHub<BoHub>("/bohub");
 
 app.Run();

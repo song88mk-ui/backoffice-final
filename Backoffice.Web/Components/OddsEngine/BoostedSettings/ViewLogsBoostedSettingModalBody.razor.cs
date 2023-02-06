@@ -41,8 +41,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             };
             SearchForm = new SearchFormModel();
 
-            StartDate = DateTime.UtcNow.AddDays(-1).Date;
-            EndDate = DateTime.UtcNow.Date;
+            StartDate = DateTime.Now.AddDays(-1).Date;
+            EndDate = DateTime.Now.Date;
 
             var client = ModalParameters?.TryGet<BoostedSettingsModel>("Client");
             ClientCode = client.ClientCode;

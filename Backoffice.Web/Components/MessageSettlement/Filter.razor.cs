@@ -206,6 +206,7 @@ namespace Backoffice.Web.Components.MessageSettlement
             var payload = new OnGetMessageSettlementHistoryMessage()
             {
                 UserId = UserModel.Id,
+                ConnectionId = UserModel.ConnectionId,
                 SportId = FilterModel.SportId,
                 SegmentId = FilterModel.SegmentId,
                 LeagueId = FilterModel.LeagueId,
@@ -218,7 +219,7 @@ namespace Backoffice.Web.Components.MessageSettlement
                 SettledBy = FilterModel.SettledBy
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMessageSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMessageSettlementHistory", $"r.bo.util.export", Guid.NewGuid().ToString());
 
             await OnExportCallback.InvokeAsync();
         }
