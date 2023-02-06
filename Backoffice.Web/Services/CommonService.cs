@@ -2,15 +2,35 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 
 namespace Backoffice.Web.Services
 {
     public class CommonService : ICommonService
     {
+        #region Fields
+
+        private readonly IConfiguration _configuration;
+
+        #endregion
+
+        #region Ctor
+
+        public CommonService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        #endregion
+
+        #region Methods
+
         public string ToShortName(int currentPeriod)
         {
             var result = string.Empty;
@@ -542,6 +562,41 @@ namespace Backoffice.Web.Services
             return fixtureType == FixtureType.Match ? name.Split(" vs. ").Last().Trim() : string.Empty;
         }
 
+        public string GenerateToken()
+        {
+            var clientId = _configuration["Tableau:ClientId"].ToString();
+            var username = _configuration["Tableau:Username"].ToString();
+            var secretId = _configuration["Tableau:Secret:Id"].ToString();
+            var secretKey = _configuration["Tableau:Secret:Value"].ToString();
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            //secret value
+            var key = Encoding.ASCII.GetBytes(secretKey);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] 
+                { 
+                    new Claim("sub", username), 
+                    new Claim("aud", "tableau"), 
+                    new Claim("jti", DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss.fff tt")), 
+                    new Claim("iss", clientId), 
+                    new Claim("scp", "tableau:views:embed"), 
+                    new Claim("scp", " ")
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(2),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
+
+            token.Header.Add("iss", clientId);
+            token.Header.Add("kid", secretId);
+
+            return tokenHandler.WriteToken(token);
+        }
+
         public static string GetActivity(string dataFrom, string dataTo, Page page, string activity, bool isFrom)
         {
             var strActivity = string.Empty;
@@ -772,5 +827,7 @@ namespace Backoffice.Web.Services
 
             return result.TrimEnd('|').Replace("|", "<br>");
         }
+
+        #endregion
     }
 }
