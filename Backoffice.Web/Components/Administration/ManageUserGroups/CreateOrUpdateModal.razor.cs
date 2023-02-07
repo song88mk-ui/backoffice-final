@@ -127,7 +127,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
                     claims.Add(new ClaimModel
                     {
-                        ClaimType = permission.ClaimType,
+                        ClaimType = permission.Id,
                         ClaimValue = permission.ClaimValue
                     });                    
                 }

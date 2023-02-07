@@ -46,6 +46,7 @@ namespace Backoffice.Web.Components.SubUser
                     {
                         Permissions.Add(new PermissionModel
                         {
+                            Id = claim.Id,
                             CategoryId = claim.CategoryId,
                             CategoryName = claim.CategoryName,
                             SubCategoryName = claim.SubCategoryName,
@@ -95,6 +96,7 @@ namespace Backoffice.Web.Components.SubUser
                 {
                     SubUserClaims.SubUserClaims.Add(new PermissionModel
                     {
+                        Id = claim.Id,
                         CategoryId = claim.CategoryId,
                         CategoryName = claim.CategoryName,
                         SubCategoryName = claim.SubCategoryName,
@@ -232,7 +234,7 @@ namespace Backoffice.Web.Components.SubUser
             {
                 foreach (var subClaim in Permissions)
                 {
-                    request.Claims.Add(new ClaimModel { ClaimType = subClaim.ClaimType, ClaimValue = subClaim.ClaimValue });
+                    request.Claims.Add(new ClaimModel { ClaimType = subClaim.Id, ClaimValue = subClaim.ClaimValue });
                 }
             }
 

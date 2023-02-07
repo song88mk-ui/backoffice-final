@@ -198,11 +198,12 @@ namespace Backoffice.Web.Pages
                 {
                     var subUserClaim = new PermissionModel
                     {
+                        Id = permission.Id,
                         CategoryId = permission.CategoryId,
-                        CategoryName= permission.CategoryName,
-                        GroupName= permission.GroupName,
-                        IsSubUser= permission.IsSubUser,
-                        SortOrder= permission.SortOrder,
+                        CategoryName = permission.CategoryName,
+                        GroupName = permission.GroupName,
+                        IsSubUser = permission.IsSubUser,
+                        SortOrder = permission.SortOrder,
                         SubCategoryName = permission.SubCategoryName,
                         Name = permission.Name,
                         ClaimType = permission.ClaimType,
@@ -245,7 +246,7 @@ namespace Backoffice.Web.Pages
                 }
             }
 
-            if(!hasDashboard)
+            if (!hasDashboard)
             {
                 subUserClaims.Insert(0, new PermissionModel
                 {
@@ -255,7 +256,7 @@ namespace Backoffice.Web.Pages
                     GroupName = string.Empty,
                     IsSubUser = true,
                     Name = "Dashboard",
-                    ClaimType = SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", "."),
+                    ClaimType = Permissions.Permissions.Where(x => x.ClaimType.ToLower() == SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", ".").ToLower()).FirstOrDefault().Id,
                     HasReadOnly = false,
                     ClaimValue = "1",
                     IsEnabled = false
@@ -270,15 +271,12 @@ namespace Backoffice.Web.Pages
             if (claims != null && claims.Any())
             {
                 var claimsList = string.Empty;
-                foreach (var claim in claims)
+                foreach (var claim in claims.Where(x => x.ClaimValue != "0"))
                 {
-                    if (claim.ClaimValue != "0")
+                    var permission = Permissions.Permissions.FirstOrDefault(p => p.Id.ToLower() == claim.ClaimType.ToLower());
+                    if (permission != null)
                     {
-                        var permission = Permissions.Permissions.FirstOrDefault(p => p.ClaimType == claim.ClaimType);
-                        if (permission != null)
-                        {
-                            claimsList = claimsList + (string.IsNullOrEmpty(claimsList) ? string.Empty : ", ") + $"{permission.Name}" + (claim.ClaimValue == "2" ? " (ReadOnly)" : string.Empty);
-                        }
+                        claimsList = claimsList + (string.IsNullOrEmpty(claimsList) ? string.Empty : ", ") + $"{permission.Name}" + (claim.ClaimValue == "2" ? " (ReadOnly)" : string.Empty);
                     }
                 }
                 return claimsList;
