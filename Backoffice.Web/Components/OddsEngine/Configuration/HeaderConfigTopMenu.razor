@@ -1,12 +1,4 @@
-﻿@if (Alerts != null && Alerts.Any())
-{
-    foreach (var alert in Alerts)
-    {
-        <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" Guid="Guid" />
-    }
-}
-
-<div class="top-menu">
+﻿<div class="top-menu float-end">
     <a href="javascript:void(0)" class="p-2" @onclick="OnImportExportMarginsClickEvent">
         <i class="fa fa-exchange"></i>
         Import/Export Margins

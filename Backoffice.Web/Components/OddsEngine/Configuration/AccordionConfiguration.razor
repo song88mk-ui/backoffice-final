@@ -1,0 +1,41 @@
+﻿<div class="accordion">
+    <div class="accordion-item">
+        <div class="accordion-header">
+            <button class="accordion-button ps-5" type="button" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="@($"#Market-{Market.MarketLookup.MarketTemplateId}")">
+                @Market.MarketLookup.MarketTemplateName
+            </button>
+
+            <div class="d-flex justify-content-around market-toggle">
+                <span>@(Market.MarketLookup.IsActive ? "Market Active" : "Market Inactive")&nbsp;</span>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox"
+                           id="@($"Market-{Market.MarketLookup.MarketTemplateId}Toggle")" role="switch"
+                           aria-label="@($"{Market.MarketLookup.MarketTemplateName} Toggle Switch")"                           
+                           @bind="Market.MarketLookup.IsActive" @oninput="OnMarketActiveChangedEvent"/>
+                </div>
+            </div>
+        </div>
+
+        <div id="@($"Market-{Market.MarketLookup.MarketTemplateId}")" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                @{
+                    var configStatus = Market.MarketLookup.IsActive ? 1 : 0;
+                    if ((FilterConfigStatus == -99 || configStatus == FilterConfigStatus))
+                    {
+                        if ((Scope == 99 || Scope == 0))
+                        {
+                            //prematch
+                            <PreMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "prematch") @bind-PrematchSettings="Market.PrematchSettings" />
+                        }
+
+                        if ((Scope == 99 || Scope == 1))
+                        {
+                            //live
+                            <LiveMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "live") @bind-LiveSettings="Market.NewLiveSettings" />
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

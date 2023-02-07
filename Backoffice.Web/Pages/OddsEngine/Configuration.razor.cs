@@ -22,42 +22,39 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class Configuration : IAsyncDisposable, IDisposable
     {
         #region Properties
-        [Inject] private IHttpContextAccessor _httpContextAccessor { get; set; }
+        [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
         [Inject] public IConfiguration AppConfiguration { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public ToastService? ToastService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public List<MarketLookupNavigationModel> SelectedContents;
-        public List<BreadcrumbModel> Breadcrumbs { get; set; }
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }        
         public List<MarketLookupNavigationModel> MarketLookupNavigationModelsTemp { get; set; }
+        public List<AlertModel> Alerts { get; set; }
 
         private ToastService toasterService => ToastService!;
         public Configuration ConfigComponent { get; set; }
         public ConfigFilterModel ConfigFilterModel { get; set; }                
-        private HubConnection HubConnection { get; set; }
-
-        public Virtualize<MarketLookupNavigationModel> MarketVirtualizeReference { get; set; }
-        public Filter FilterReference { get; set; }
+        private HubConnection HubConnection { get; set; }           
 
         public FixtureType FixtureType { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public int? AllMarketStatus { get; set; }
-        public string AllMarketStatusName { get; set; } = "Deactivate All";
-        //public bool SaveBarVisible { get; set; } = false;
+        public string AllMarketStatusName { get; set; }        
         public string ToastTitle { get; set; }
         public string ToastMessage { get; set; }
-        public bool IsToastMessageMarkup { get; set; }
-        //public bool isSaving { get; set; }
-        public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
-        public bool IsPreloader { get; set; } = true;
+        public bool IsToastMessageMarkup { get; set; }        
+        public bool IsConnected => HubConnection.State == HubConnectionState.Connected;        
         public bool IsMarketEditing { get; set; }        
-        
+        private Guid Guid { get; set; }
+
         #endregion
 
         #region Methods
@@ -68,8 +65,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsToastMessageMarkup = true;
             ConfigFilterModel = null;
             IsMarketEditing = false;
+            AllMarketStatusName = "Deactivate All";
+            Guid = new Guid();
 
             MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
+            Alerts = new List<AlertModel>();
 
             Breadcrumbs = new List<BreadcrumbModel>()
             {
@@ -79,18 +79,13 @@ namespace Backoffice.Web.Pages.OddsEngine
                     Url = "odds-engine/config",
                     IsCurrentPage = true
                 }
-            };
+            };            
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             try 
             {
-                //if (!MarketLookupNavigationModelsTemp.Any() && ConfigFilterModel != null)
-                //{
-                //    await OnModalClear();
-                //}
-
                 if (firstRender)
                 {
                     await Subscribe();
@@ -100,19 +95,17 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
 
             }            
-        }
+        }        
 
-        public async Task OnMarketActiveChangedEvent(ChangeEventArgs args, MarketLookupNavigationModel market)
-        {             
-            market.MarketLookup.IsActive = !market.MarketLookup.IsActive;
-
+        public async Task OnMarketChangedEvent(MarketLookupNavigationModel market)
+        {           
             if (!MarketLookupNavigationModelsTemp.Contains(market))
             {
-                MarketLookupNavigationModelsTemp.Add(market);                
+                MarketLookupNavigationModelsTemp.Add(market);
             }
             else
             {
-                MarketLookupNavigationModelsTemp.Remove(market);                
+                MarketLookupNavigationModelsTemp.Remove(market);
             }
 
 
@@ -123,7 +116,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             else
             {
                 IsMarketEditing = false;
-            }
+            }            
         }
 
         public async Task OnMarketEditingCancelClickEvent()
@@ -147,17 +140,16 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task UndoEditedMarkets()
         {            
             MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
-            IsMarketEditing = false;
-
-            //await OnModalClear();
-            //SelectedContents = GetContents();
-            //await MarketVirtualizeReference.RefreshDataAsync();            
-            //StateHasChanged();
+            IsMarketEditing = false;            
         }
 
         public async ValueTask DisposeAsync()
         {
-
+            if (HubConnection != null)
+            {
+                await HubConnection.StopAsync();
+                await HubConnection.DisposeAsync();
+            }
         }
         public void Dispose()
         {
@@ -190,13 +182,18 @@ namespace Backoffice.Web.Pages.OddsEngine
                                                                         && c.SegmentId == ConfigFilterModel.SegmentId
                                                                         && c.LeagueId == ConfigFilterModel.LeagueId
                                                                         && c.MarketTemplateId == market.MarketLookup.MarketTemplateId))
-                    isActive = ConfigFilterModel.ClientConfig.ClientMarket.Where(c => c.ClientCode == ConfigFilterModel.ClientCode
+                {
+                    isActive = ConfigFilterModel.ClientConfig.ClientMarket.FirstOrDefault(c => c.ClientCode == ConfigFilterModel.ClientCode
                                                                         && c.SportId == ConfigFilterModel.SportId
                                                                         && c.SegmentId == ConfigFilterModel.SegmentId
                                                                         && c.LeagueId == ConfigFilterModel.LeagueId
-                                                                        && c.MarketTemplateId == market.MarketLookup.MarketTemplateId).FirstOrDefault().IsActive;
+                                                                        && c.MarketTemplateId == market.MarketLookup.MarketTemplateId).IsActive;
+                }                    
             }
-            market.MarketLookup.IsActive = isActive;
+            if (!MarketLookupNavigationModelsTemp.Contains(market))
+            {
+                market.MarketLookup.IsActive = isActive;
+            }
 
             if (market.NewMarketLookup == null)
                 market.NewMarketLookup = new MarketLookupModel()
@@ -323,18 +320,37 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
 
         public async Task OnAllMarketStatusClickEvent()
-        {
-            AllMarketStatusName = AllMarketStatusName == "Deactivate All" ? "Activate All" : "Deactivate All";
-            AllMarketStatus = AllMarketStatusName == "Deactivate All" ? 1 : 0;
+        {            
+            MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
 
+            SelectedContents = GetContents();
+            SelectedContents.ForEach(market => GetNewSettings(market));
+
+            if (AllMarketStatusName == "Activate All")
+            {
+                var allDisabled = SelectedContents.Where(market => market.MarketLookup.IsActive == false).ToList();
+
+                MarketLookupNavigationModelsTemp.AddRange(allDisabled);
+
+                SelectedContents.ForEach(market => market.MarketLookup.IsActive = true);
+            }
+            else
+            {
+                var allEnabled = SelectedContents.Where(market => market.MarketLookup.IsActive == true).ToList();
+
+                MarketLookupNavigationModelsTemp.AddRange(allEnabled);
+
+                SelectedContents.ForEach(market => market.MarketLookup.IsActive = false);
+            }
+
+            IsMarketEditing = true;
+
+            AllMarketStatusName = AllMarketStatusName == "Deactivate All" ? "Activate All" : "Deactivate All";
+            AllMarketStatus = AllMarketStatusName == "Deactivate All" ? 1 : 0;                  
         }
 
         public async Task OnSaveAllSettings()
         {
-            //isSaving = true;
-
-            await InvokeAsync(StateHasChanged);
-
             if (SelectedContents != null && SelectedContents.Any())
             {
                 ConfigSettingsModel data = new ConfigSettingsModel();
@@ -433,6 +449,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var result = await TradingService.AddOrUpdateConfig(data);
                 if (result.StatusCode == StatusCode.Success)
                 {
+                    await ShowMarketChangedAlert(AlertStatus.Success, "Config has been updated");
                     //if (result?.Result != null && result?.Result?.Notifications.Count != 0)
                     //{
                     //    var notificationsDetailsModel = result?.Result?.Notifications;
@@ -509,10 +526,14 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     //SaveBarVisible = false;
                 }
+                else
+                {
+                    await ShowMarketChangedAlert(AlertStatus.Error, result.Message);
+                }
 
             }
 
-            //isSaving = false;
+            IsMarketEditing = false;
         }
 
         public async Task OnModalClear()
@@ -706,7 +727,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task Subscribe()
         {
-            var request = _httpContextAccessor.HttpContext?.Request;
+            var request = HttpContextAccessor.HttpContext?.Request;
 
             HubConnection = new HubConnectionBuilder()
                 .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
@@ -783,6 +804,37 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             }
         }
+
+        public async Task ShowMarketChangedAlert(AlertStatus status, string message)
+        {
+            Alerts.Clear();
+
+            Alerts.Add(new AlertModel()
+            {
+                Status = status.ToString(),
+                Message = message,
+                Opacity = 1.0m
+            });
+
+            Guid = Guid.NewGuid();
+
+            StateHasChanged();
+        }
+
+        public async Task OnCopyClientSettingsAlert()
+        {
+            Alerts.Clear();
+
+            Alerts.Add(new AlertModel()
+            {
+                Status = AlertStatus.Success.ToString(),
+                Message = "Success! Copy Client Settings is being generated. System will notify once done.",
+                Opacity = 1.0m
+            });
+
+            Guid = Guid.NewGuid();
+        }
+
         #endregion
     }
 }
