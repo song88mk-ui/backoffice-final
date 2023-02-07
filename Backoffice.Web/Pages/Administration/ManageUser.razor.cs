@@ -20,6 +20,7 @@ namespace Backoffice.Web.Pages.Administration
         public PermissionResponse Permissions { get; set; }
         public ManageUserFilterModel FilterModel { get; set; } = new ManageUserFilterModel();
         public List<UserResponse> UserList { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
@@ -44,11 +45,13 @@ namespace Backoffice.Web.Pages.Administration
             UserList = new List<UserResponse>();
             Permissions = await GetPermissionList();
         }
+
         public async Task Init()
         {
-            IsPreLoader = true;
+            //IsPreLoader = true;
             await GetContent();
         }
+
         public async Task OnCreateUserClickEvent()
         {
             var parameters = new ModalParameters();
@@ -62,6 +65,7 @@ namespace Backoffice.Web.Pages.Administration
 
             ModalService.Open<CreateOrUpdateModal>("Create User", parameters, options);
         }
+
         public async Task OnEditClickedEvent(UserResponse user)
         {
             var parameters = new ModalParameters();
@@ -97,27 +101,34 @@ namespace Backoffice.Web.Pages.Administration
 
             ModalService.Open<ViewUserLogModal>("View Logs", parameters, options);
         }
+
         public async Task OnSaveClickedEvent()
         {
-            IsPreLoader = true;
-            StateHasChanged();
+            //IsPreLoader = true;
+            //StateHasChanged();
 
             await GetContent();
         }
+
         protected async Task SelectedPage(int page)
         {
             MetaData.CurrentPage = page;
-            IsPreLoader = true;
-            await InvokeAsync(StateHasChanged);
+
+            //IsPreLoader = true;
+            //await InvokeAsync(StateHasChanged);y
+
             await GetContent();
         }
+
         public void Dispose()
         {
+            AuthenticationService.Dispose();
         }
 
         #endregion
 
         #region Utilities
+
         private async Task<PermissionResponse> GetPermissionList()
         {
             var response = await AuthenticationService.GetPermissionList(false);
@@ -132,8 +143,11 @@ namespace Backoffice.Web.Pages.Administration
 
             return new PermissionResponse();
         }
+
         private async Task GetContent()
         {
+            IsPreLoader = true;
+
             var userResponse = await AuthenticationService.GetUserList(new UserGroupRequest()
             {
                 MetaData = MetaData,
@@ -146,7 +160,8 @@ namespace Backoffice.Web.Pages.Administration
                 MetaData = userResponse.Result.MetaData;
                 UserList = userResponse.Result.Users;
             }
-            if(MetaData == null)
+
+            if (MetaData == null)
             {
                 MetaData = new MetaData()
                 {
@@ -156,9 +171,10 @@ namespace Backoffice.Web.Pages.Administration
                     TotalCount = 0
                 };
             }
+
             IsPreLoader = false;
-            StateHasChanged();
         }
+
         #endregion
     }
 }

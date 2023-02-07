@@ -11,37 +11,48 @@ namespace Backoffice.Web.Pages.Administration
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
-        private bool oldIsMaintenance { get; set; }
+
+        private bool OldIsMaintenance { get; set; }
         public AlertModel AlertModel { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
+        public bool IsMaintenance
+        {
+            get { return _isMaintenance; }
+            set
+            {
+                if (value == _isMaintenance) return;
+                OnMaintenanceClickEvent(value);
+            }
+        }
+
+        #endregion
+
+        #region Fields
+
+        private bool _isMaintenance;
+
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            IsPreLoader = true;
+            //IsPreLoader = true;
             AlertModel = new AlertModel();
+
             PageTitle = "Maintenance";
             IconClass = "ico ico-maintenance";
+
             await GetContent();
         }
-        private bool _isMaintenance;
-        public bool IsMaintenance {
-            get { return _isMaintenance; }
-            set
-            {
-                if (value == _isMaintenance) return;
-                OnMaintenanceClickEvent(value);
-            } }
 
         public async Task OnMaintenanceClickEvent(bool value)
         {
             var parameters = new ModalParameters();
             parameters.Add("IsMaintenance", (bool)value);
-            parameters.Add("OldIsMaintenance", oldIsMaintenance);
+            parameters.Add("OldIsMaintenance", OldIsMaintenance);
             parameters.Add("ModalDialogClass", "modal-dialog-centered");
             var options = new ModalOptions();
 
@@ -49,9 +60,9 @@ namespace Backoffice.Web.Pages.Administration
         }
         public async Task OnSaveClickedEvent()
         {
-            if(_isMaintenance != oldIsMaintenance)
+            if(_isMaintenance != OldIsMaintenance)
             {
-                oldIsMaintenance = _isMaintenance;
+                OldIsMaintenance = _isMaintenance;
             }
             IsPreLoader = false;
         }
@@ -61,20 +72,20 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         #region Utilities
+
         private async Task GetContent()
         {
-            if(!IsPreLoader)
+            if (!IsPreLoader)
             {
                 IsPreLoader = true;
-                StateHasChanged();
-            }    
+            }
 
             var result = await BackOfficeService.GetMaintenance();
 
             if (result.StatusCode == Backoffice.Shared.Enums.StatusCode.Success)
             {
                 _isMaintenance = result.Result;
-                oldIsMaintenance = result.Result;
+                OldIsMaintenance = result.Result;
             }
             else
             {
@@ -88,6 +99,7 @@ namespace Backoffice.Web.Pages.Administration
 
             IsPreLoader = false;
         }
+
         #endregion
     }
 }

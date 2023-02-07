@@ -3,7 +3,6 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
-using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -14,13 +13,17 @@ namespace Backoffice.Web.Pages.Administration
     public partial class CancelBetHistory : IDisposable
     {
         #region Properties
+
         [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [Inject] private ToastService? _toasterService { get; set; }
+        [Inject] private ToastService? ToasterService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+
         public CancelBetHistoryCallbackModel CallbackModel { get; set; }
         public CancelBetHistoryModel CancelBets { get; set; }
         public MetaData MetaData { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreload { get; set; }
@@ -28,7 +31,8 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         #region Fields
-        private ToastService toasterService => _toasterService!;
+        private ToastService toasterService => ToasterService!;
+
         #endregion
 
         #region Methods
@@ -89,6 +93,7 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
+            BackOfficeService.Dispose();
         }
 
         #endregion

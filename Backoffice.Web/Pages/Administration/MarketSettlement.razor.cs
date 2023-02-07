@@ -15,18 +15,26 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [Inject] private ToastService? _toasterService { get; set; }
-        private ToastService toasterService => _toasterService!;
+        [Inject] private ToastService? ToasterService { get; set; }
+
         public MarketSettlementModalFilterModel ModalFilter { get; set; } = new MarketSettlementModalFilterModel();
         public List<ManualMarketSettlementAuditModel> ManualMarketSettlements { get; set; }
         public MetaData MetaData { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
 
         #endregion
 
+        #region Fields
+
+        private ToastService toasterService => ToasterService!;
+
+        #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             MetaData = new MetaData()
@@ -101,8 +109,12 @@ namespace Backoffice.Web.Pages.Administration
         }
         public void Dispose()
         {
-            
+            TradingService.Dispose();
+            BackOfficeService.Dispose();
+            ToasterService.Dispose();
+            toasterService.Dispose();
         }
+
         #endregion
 
         #region Utilities

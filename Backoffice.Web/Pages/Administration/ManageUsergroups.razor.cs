@@ -3,11 +3,9 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Administration.ManageUserGroups;
-using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Collections.Generic;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -182,6 +180,8 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
+            BackOfficeService.Dispose();
+            AuthenticationService.Dispose();
         }
 
         #endregion

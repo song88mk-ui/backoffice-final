@@ -14,6 +14,7 @@ namespace Backoffice.Web.Pages.Administration
     public partial class ResendSettlement : IDisposable
     {
         #region Properties
+
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
 
@@ -25,6 +26,7 @@ namespace Backoffice.Web.Pages.Administration
         public bool IsAddDisabled { get; set; }
         public bool IsActionDisabled { get; set; }
         public Guid Guid { get; set; }
+
         #endregion
 
         #region Methods
@@ -206,11 +208,13 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
+            BackOfficeService.Dispose();
         }
 
         #endregion
 
         #region Utilities
+
         private string BuildEventDetails(ResendSettlementBetDetailModel bet)
         {
             StringBuilder builder = new StringBuilder();
@@ -232,6 +236,7 @@ namespace Backoffice.Web.Pages.Administration
             }
 
             builder.Append("<div/>");
+
             return builder.ToString();
         }
 
@@ -252,5 +257,6 @@ namespace Backoffice.Web.Pages.Administration
             return builder.ToString();
         }
     }
+
     #endregion
 }
