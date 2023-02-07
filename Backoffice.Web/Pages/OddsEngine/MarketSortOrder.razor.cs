@@ -257,12 +257,13 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             DataReference = null;
 
-            GC.SuppressFinalize(this);
+            //GC.SuppressFinalize(this);
         }
 
         public void Dispose()
         {
-            GC.SuppressFinalize(this);
+            TradingService.Dispose();
+            //GC.SuppressFinalize(this);
         }
 
         #endregion
