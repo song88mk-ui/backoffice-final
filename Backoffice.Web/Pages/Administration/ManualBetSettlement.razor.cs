@@ -20,6 +20,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
         [Inject] private ToastService? _toasterService { get; set; }
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public List<ActivityLogModel> ActivityLogs { get; set; }
         public List<AlertModel> Alerts { get; set; }
@@ -105,7 +106,8 @@ namespace Backoffice.Web.Pages.Administration
         {
             var payload = new OnGetManualBetSettlementHistoryMessage()
             {
-                ManualBetSettlementCallbackModel = CallbackModel
+                ManualBetSettlementCallbackModel = CallbackModel,
+                ConnectionId = UserModel.ConnectionId
             };
 
             MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportManualBetSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());

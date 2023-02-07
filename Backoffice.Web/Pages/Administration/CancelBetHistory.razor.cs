@@ -17,6 +17,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] private ToastService? _toasterService { get; set; }
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         public CancelBetHistoryCallbackModel CallbackModel { get; set; }
         public CancelBetHistoryModel CancelBets { get; set; }
         public MetaData MetaData { get; set; }
@@ -61,8 +62,9 @@ namespace Backoffice.Web.Pages.Administration
             if (model == null)
                 return;
 
-            var request = new ActivityLogRequest
+            var request = new OnGetCancelBetHistoryMessage
             {
+                ConnectionId = UserModel.ConnectionId,
                 Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
                 Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
                 DateFrom = model.DateFrom,

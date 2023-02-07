@@ -8,5 +8,6 @@ namespace Backoffice.Shared.OutgoingEngineMessages
     public class OnGetManualBetSettlementHistoryMessage
     {
         public ManualBetSettlementCallbackModel ManualBetSettlementCallbackModel { get; set; }
+        public string ConnectionId { get; set; }
     }
 }

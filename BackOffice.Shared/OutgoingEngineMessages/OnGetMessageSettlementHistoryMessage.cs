@@ -7,6 +7,7 @@ namespace Backoffice.Shared.OutgoingEngineMessages
     public class OnGetMessageSettlementHistoryMessage
     {
         public string UserId { get; set; }
+        public string ConnectionId { get; set; }
         public int SportId { get; set; }
         public int SegmentId { get; set; }
         public int LeagueId { get; set; }

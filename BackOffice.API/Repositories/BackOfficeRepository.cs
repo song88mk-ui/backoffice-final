@@ -232,12 +232,20 @@ namespace Backoffice.API.Repositories
 
                 if (request.DateFrom == DateTime.MinValue)
                     request.DateFrom = DateTime.UtcNow.AddDays(-1).Date;
+                else
+                    request.DateFrom = request.DateFrom.ToUniversalTime();
                 if (request.DateTo == DateTime.MinValue)
-                    request.DateTo = DateTime.UtcNow.Date;
+                    request.DateTo = DateTime.UtcNow.Date.AddTicks(-1);
+                else
+                    request.DateTo = request.DateTo.ToUniversalTime();
 
-                var fromUTC = request.DateFrom.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
-                var toUTC = request.DateTo.AddDays(1).AddSeconds(-1).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
+                if (request.TimeStamp == DateTime.MinValue)
+                {
+                    request.TimeStamp = DateTime.UtcNow;
+                }
 
+                var fromUTC = request.DateFrom.ToString("yyyy-MM-dd HH:mm:ss");
+                var toUTC = request.DateTo.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
                 var activityLogs = (await _backofficeContext.ReadActivityLog
                         .FromSqlRaw($"GetActivityLogs '{request.Page}', '{request.Payload}', '{fromUTC}', '{toUTC}'")
                     .ToListAsync())
