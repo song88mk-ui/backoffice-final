@@ -102,7 +102,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
                 var deleteLogResponse = await BackOfficeService.AddActivityLog(new ActivityLogModel()
                 {
-                    Page = Page.OE_PriceBoost_Manage.ToString().Replace('_', '.'),
+                    Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace('_', '.'),
                     Payload = $"{PriceBoost.ClientCode}.{PriceBoost.SportId}.{PriceBoost.SegmentId}.{PriceBoost.LeagueId}",
                     Activity = Activity.Delete.ToString(),
                     From = JsonSerializer.Serialize(priceBoostLogModelFrom),

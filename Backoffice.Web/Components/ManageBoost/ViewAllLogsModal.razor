@@ -1,4 +1,6 @@
-﻿<div class="modal-body">
+﻿@using Backoffice.Shared.Enums
+
+<div class="modal-body">
     <ViewAllLogsFilter @bind-FilterModel="PriceBoostLogFilterModel" SelectedPage="CurrentPage" OnFilterChangedEventCallback="OnFilterChanged" />
     @if (IsPreLoader)
     {
@@ -6,7 +8,7 @@
     }
     else
     {
-        @if (CurrentPage == Backoffice.Shared.Enums.Page.OE_PriceBoost_Settings)
+        @if (CurrentPage == SportsbookClientPermission.SBC_OE_PriceBoost_Settings)
         {
             @if (BoostedSettingsActivityLogs != null)
             {
@@ -45,7 +47,7 @@
                 <NoRecordFound />
             }
         }
-        @if (CurrentPage == Backoffice.Shared.Enums.Page.OE_PriceBoost_Manage)
+        @if (CurrentPage == SportsbookClientPermission.SBC_OE_PriceBoost_Manage)
         {
             @if (PriceBoostActivityLogs != null)
             {

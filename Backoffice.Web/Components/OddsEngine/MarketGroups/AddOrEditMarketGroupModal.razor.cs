@@ -87,7 +87,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 //activity log
                 await BackOfficeService.AddActivityLog(new ActivityLogModel
                 {
-                    Page = Page.OE_Administration_MarketGroup.ToString().Replace("_", "."),
+                    Page = SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", "."),
                     Payload = $"{MarketGroupModel.ClientCode}.{MarketGroupModel.SportId}.{MarketGroupModel.FixtureStatusId}.{OldMarketTemplateGroup.MarketTemplateGroupId}",
                     Activity = isAdd ? Activity.Create.ToString() : Activity.Update.ToString(),
                     From = isAdd ? "-" : JsonSerializer.Serialize(oldClientMarketTemplateGroup),

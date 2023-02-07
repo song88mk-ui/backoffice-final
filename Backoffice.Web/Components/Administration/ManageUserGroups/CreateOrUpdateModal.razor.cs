@@ -149,7 +149,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
                     await BackOfficeService.AddActivityLog(new ActivityLogModel
                     {
-                        Page = Page.Admin_ManageUserGroups.ToString().Replace("_", "."),
+                        Page = AdminPermission.Admin_ManageUserGroups.ToString().Replace("_", "."),
                         Payload = $"{userGroupId}",
                         Activity = !IsEdit ? Activity.Create.ToString() : Activity.Update.ToString(),
                         From = !IsEdit ? "-" : JsonSerializer.Serialize(OldUserGroup),

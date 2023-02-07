@@ -65,7 +65,7 @@ namespace Backoffice.Web.Pages.Administration
             var request = new OnGetCancelBetHistoryMessage
             {
                 ConnectionId = UserModel.ConnectionId,
-                Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
+                Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                 Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
                 DateFrom = model.DateFrom,
                 DateTo = model.DateTo,
@@ -99,7 +99,7 @@ namespace Backoffice.Web.Pages.Administration
             var cancelBets = new CancelBetHistoryModel();
             var request = new ActivityLogRequest
             {
-                Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
+                Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                 Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
                 DateFrom = model.DateFrom,
                 DateTo = model.DateTo,

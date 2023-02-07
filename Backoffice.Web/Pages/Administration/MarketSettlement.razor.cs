@@ -60,7 +60,7 @@ namespace Backoffice.Web.Pages.Administration
             
             var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
-                Page = Page.Admin_Settlement_Market.ToString().Replace("_", "."),
+                Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
                 Payload = $"{filterSportsId}.{filterSegmentId}.{filterLeagueId}.{filterFixtureId}",
                 MetaData = MetaData,
                 DateFrom = Convert.ToDateTime(fromDate).Date,

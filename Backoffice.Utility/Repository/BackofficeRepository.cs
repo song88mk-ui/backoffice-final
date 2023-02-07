@@ -145,7 +145,7 @@ namespace Backoffice.Utility.Repository
             {
                 var result = GetActivityLogs(new ActivityLogRequest()
                 {
-                    Page = Page.Admin_Settlement_Message.ToString().Replace("_", "."),
+                    Page = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
                     Payload = BuildPayload(request.SportId.ToString(), request.SegmentId.ToString(), request.LeagueId.ToString(), request.FixtureId),
                     DateFrom = request.FromDate.ToUniversalTime(),
                     DateTo = request.ToDate.ToUniversalTime(),
@@ -232,7 +232,7 @@ namespace Backoffice.Utility.Repository
             {
                 var result = GetActivityLogs(new ActivityLogRequest()
                 {
-                    Page = Page.Admin_Settlement_Market.ToString().Replace("_", "."),
+                    Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
                     Payload = BuildPayload(request.SportId, request.SegmentId, request.LeagueId, request.FixtureId),
                     DateFrom = request.FromDate.ToUniversalTime(),
                     DateTo = request.ToDate.ToUniversalTime(),
@@ -466,7 +466,7 @@ namespace Backoffice.Utility.Repository
                     var notificationsModel = new NotificationsDetailsModel
                     {
                         Id = Guid.NewGuid(),
-                        Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
+                        Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                         ClientCode = string.Empty,
                         SportsId = 0,
                         Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",
@@ -637,7 +637,7 @@ namespace Backoffice.Utility.Repository
             request.ManualBetSettlementCallbackModel.DateTo = request.ManualBetSettlementCallbackModel.DateTo.Date.Add(new TimeSpan(23, 59, 59));
 
             var activityLogs = (await _backofficeContext.ReadActivityLog
-                    .FromSqlRaw($"GetActivityLogs '{Page.Admin_Settlement_Bet.ToString().Replace('_', '.')}', '', '{request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
+                    .FromSqlRaw($"GetActivityLogs '{AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_', '.')}', '', '{request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
                 .ToListAsync())
                 .Select(s => new ActivityLogModel
                 {

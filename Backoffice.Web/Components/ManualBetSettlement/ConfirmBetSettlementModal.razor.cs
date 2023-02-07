@@ -56,7 +56,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             {
                 OnActivityLogMessage ActivityLog = new OnActivityLogMessage()
                 {
-                    Page = Page.Admin_Settlement_Bet.ToString().Replace('_','.'),
+                    Page = AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_','.'),
                     Activity = Activity.ManualSettlement.ToString(),
                     Payload = "",
                     From = "-",

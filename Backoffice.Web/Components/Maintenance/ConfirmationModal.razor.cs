@@ -54,7 +54,7 @@ namespace Backoffice.Web.Components.Maintenance
 
                 var activityLog = new ActivityLogModel()
                 {
-                    Page = Page.Admin_Maintenance.ToString().Replace("_", "."),
+                    Page = AdminPermission.Admin_Maintenance.ToString().Replace("_", "."),
                     Payload = "",
                     From = _oldMaintenanceValue.ToString(),
                     To = _isMaintenance.ToString(),

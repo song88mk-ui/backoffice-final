@@ -1,10 +1,10 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Web.Components.ManageBoost;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Page = Backoffice.Shared.Enums.Page;
 
 namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 {
@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         public SearchFormModel SearchForm { get; set; }
-        public Page CurrentPage { get; set; }
+        public SportsbookClientPermission CurrentPage { get; set; }
         public bool ShowManageBoostMenu { get; set; }
         public bool ShowBoostedSettingsMenu { get; set; }
 
@@ -33,12 +33,12 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             if (page.Contains("manage") || page == string.Empty)
             {
                 ShowManageBoostMenu = true;
-                CurrentPage = Page.OE_PriceBoost_Manage;
+                CurrentPage = SportsbookClientPermission.SBC_OE_PriceBoost_Manage;
             }
             else if (page.Contains("settings"))
             {
                 ShowBoostedSettingsMenu = true;
-                CurrentPage = Page.OE_PriceBoost_Settings;
+                CurrentPage = SportsbookClientPermission.SBC_OE_PriceBoost_Settings;
             }
         }
 

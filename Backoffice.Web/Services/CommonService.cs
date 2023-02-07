@@ -597,11 +597,11 @@ namespace Backoffice.Web.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public static string GetActivity(string dataFrom, string dataTo, Page page, string activity, bool isFrom)
+        public static string GetActivity<T>(string dataFrom, string dataTo, object page, string activity, bool isFrom)
         {
             var strActivity = string.Empty;
 
-            if (page == Page.OE_Administration_MarketGroup)
+            if (typeof(T) == typeof(SportsbookClientPermission) && (SportsbookClientPermission)page == SportsbookClientPermission.SBC_OE_MarketSetting_Group)
             {
                 if (activity == Activity.Update.ToString())
                     strActivity = isFrom ? GetDifference(Activity.Update.ToString(), dataFrom, dataTo, typeof(List<ClientMarketTemplateGroupDTO>)) : GetDifference(Activity.Update.ToString(), dataTo, dataFrom, typeof(List<ClientMarketTemplateGroupDTO>));
@@ -614,7 +614,7 @@ namespace Backoffice.Web.Services
                 else
                     strActivity = isFrom ? string.Empty : GetDifference(activity, dataTo, dataFrom, typeof(List<ClientMarketTemplateGroupDTO>));
             }
-            else if (page == Page.Admin_ManageUserGroups)
+            else if (typeof(T) == typeof(AdminPermission) && (AdminPermission)page == AdminPermission.Admin_ManageUserGroups)
             {
                 if (activity == Activity.Update.ToString())
                     strActivity = isFrom ? GetDifference(Activity.Update.ToString(), dataFrom, dataTo, typeof(UserGroupResponse)) : GetDifference(Activity.Update.ToString(), dataTo, dataFrom, typeof(UserGroupResponse));

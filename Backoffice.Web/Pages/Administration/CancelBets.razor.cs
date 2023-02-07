@@ -157,7 +157,7 @@ namespace Backoffice.Web.Pages.Administration
                                 {
                                     message.OnActivityLogMessages.Add(new OnActivityLogMessage
                                     {
-                                        Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
+                                        Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                                         Payload = $"{UserModel.UserName}.{data.BetId}.{selection.BetSelectionId}.{betData.UserId}.{betData.ClientName}",
                                         Activity = Activity.CancelBet.ToString(),
                                         From = JsonSerializer.Serialize(betData),

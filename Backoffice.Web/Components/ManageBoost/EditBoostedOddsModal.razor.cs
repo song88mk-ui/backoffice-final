@@ -250,7 +250,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
                 var updateLogResponse = await BackOfficeService.AddActivityLog(new ActivityLogModel()
                 {
-                    Page = Page.OE_PriceBoost_Manage.ToString().Replace('_','.'),
+                    Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace('_','.'),
                     Payload = $"{PriceBoostConfigModel.ClientCode}.{PriceBoostConfigModel.SportId}.{PriceBoostConfigModel.SegmentId}.{PriceBoostConfigModel.LeagueId}",
                     Activity = Activity.Update.ToString(),
                     From = JsonSerializer.Serialize(priceBoostLogModelFrom),

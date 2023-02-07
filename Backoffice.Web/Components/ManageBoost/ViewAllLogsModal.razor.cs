@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
@@ -8,7 +9,6 @@ using Newtonsoft.Json;
 using System.Globalization;
 using System.Text;
 using Activity = Backoffice.Shared.Enums.Activity;
-using Page = Backoffice.Shared.Enums.Page;
 using PriceBoostLogModel = Backoffice.Web.Models.PriceBoostLogModel;
 
 namespace Backoffice.Web.Components.ManageBoost
@@ -23,7 +23,7 @@ namespace Backoffice.Web.Components.ManageBoost
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         protected bool IsPreLoader { get; set; } = false;
-        public Page CurrentPage { get; set; }
+        public SportsbookClientPermission CurrentPage { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
         public List<string> UserClients { get; set; }
         public PriceBoostLogFilterModel PriceBoostLogFilterModel { get; set; } = new PriceBoostLogFilterModel();
@@ -35,7 +35,7 @@ namespace Backoffice.Web.Components.ManageBoost
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = true;
-            CurrentPage = ModalParameters.TryGet<Page>("SelectedPage");
+            CurrentPage = ModalParameters.TryGet<SportsbookClientPermission>("SelectedPage");
             UserClients = UserModel.ClientCodes;
             WithAdministrationPagesAccess = false;
             BoostedSettingsActivityLogs = new List<ActivityLogModel>();
@@ -77,7 +77,7 @@ namespace Backoffice.Web.Components.ManageBoost
             if (response != null && response.ActivityLogs != null && response.ActivityLogs.Any())
             {
 
-                if (CurrentPage == Page.OE_PriceBoost_Manage)
+                if (CurrentPage == SportsbookClientPermission.SBC_OE_PriceBoost_Manage)
                 {
                     if (response.ActivityLogs != null && response.ActivityLogs.Any())
                     {
@@ -134,49 +134,6 @@ namespace Backoffice.Web.Components.ManageBoost
                     }
                 }
 
-                //filter
-                //if (!string.IsNullOrEmpty(PriceBoostLogFilterModel.SearchText) && CurrentPage == Page.OE_PriceBoost_Manage &&
-                //    PriceBoostActivityLogs != null && PriceBoostActivityLogs.Any())
-                //{
-                //    PriceBoostActivityLogs = PriceBoostActivityLogs.Where(x => x.Payload.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.Activity.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.From.SelectionName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.From.SportName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.From.SegmentName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.From.LeagueName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.TimeStamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm").Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.From.MarketName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.From.FixtureName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.To.SelectionName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.To.MarketName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.To.SportName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.To.SegmentName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.To.LeagueName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.To.FixtureName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.From.ClientCode.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.To.ClientCode.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.From.ClientName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.To.ClientName.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.From.Summary.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.To.Summary.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase))
-                //        .ToList();
-
-                //    response.MetaData.TotalCount = PriceBoostActivityLogs.Count();
-                //}
-                //else if (!string.IsNullOrEmpty(PriceBoostLogFilterModel.SearchText) && CurrentPage == Page.OE_PriceBoost_Settings)
-                //{
-                //    BoostedSettingsActivityLogs = BoostedSettingsActivityLogs.Where(x =>
-                //    x.Payload.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.Activity.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.From.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.To.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.UserId.Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase) ||
-                //    x.TimeStamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm").Contains(PriceBoostLogFilterModel.SearchText, StringComparison.OrdinalIgnoreCase))
-                //        .ToList();
-
-                //    response.MetaData.TotalCount = BoostedSettingsActivityLogs.Count();
-                //}
-
                 MetaData = response.MetaData;
             }
 
@@ -207,7 +164,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
         private string BuildPayload()
         {
-            if (CurrentPage == Page.OE_PriceBoost_Manage)
+            if (CurrentPage == SportsbookClientPermission.SBC_OE_PriceBoost_Manage)
             {
                 return $"{(PriceBoostLogFilterModel.ClientCode != "ALL" ? PriceBoostLogFilterModel.ClientCode : "%")}." +
                 $"{(PriceBoostLogFilterModel.SportId != 0 ? PriceBoostLogFilterModel.SportId : "%")}." +

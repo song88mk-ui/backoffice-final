@@ -89,7 +89,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             var request = new ActivityLogRequest()
             {
-                Page = Page.Admin_Settlement_Message.ToString().Replace("_", "."),
+                Page = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
                 Payload = BuildPayload(),
                 MetaData = MetaData,
                 DateFrom = FilterModel.FromDate.Date.Add(new TimeSpan(0, 0, 0)),
