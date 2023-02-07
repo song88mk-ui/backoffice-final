@@ -368,7 +368,7 @@ namespace Backoffice.Web.Components.MarketSettlement
             {
                 OnActivityLogMessage ActivityLog = new OnActivityLogMessage()
                 {
-                    Page = Page.Admin_Settlement_Market.ToString().Replace('_', '.'),
+                    Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace('_', '.'),
                     Activity = Activity.ManualSettlement.ToString(),
                     Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
                     From = "-",

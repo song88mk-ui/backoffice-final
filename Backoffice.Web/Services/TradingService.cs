@@ -2,7 +2,6 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Pages.OddsEngine;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -1330,7 +1329,6 @@ namespace Backoffice.Web.Services
             }
         }
         #endregion
-
         
         public async Task<BaseResponse<MessageResponse>> Publish(MessageRequest request)
         {
@@ -1365,6 +1363,12 @@ namespace Backoffice.Web.Services
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
                 };
             }
+        }
+
+        public void Dispose()
+        {
+            _httpClient.Dispose();
+            _authenticationService.Dispose();
         }
     }
 }

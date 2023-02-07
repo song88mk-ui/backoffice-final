@@ -228,7 +228,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
                         OnActivityLogMessage onActivityLogMessage = new OnActivityLogMessage()
                         {
-                            Page = Page.OE_PriceBoost_Manage.ToString().Replace('_', '.'),
+                            Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace('_', '.'),
                             Payload = $"{priceboost.ClientCode}.{priceboost.SportId}.{priceboost.SegmentId}.{priceboost.LeagueId}",
                             Activity = Activity.Create.ToString(),
                             From = "-",

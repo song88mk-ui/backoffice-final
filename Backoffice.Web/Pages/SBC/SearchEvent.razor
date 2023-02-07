@@ -1,0 +1,19 @@
+﻿@page "/search-event"
+
+<div class="row">
+    <div class="main-content col-md-12 mb-4 pb-3">
+        <div class="row">
+            <div class="col-md-12">
+                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+            </div>
+            <div class="col-md-12">
+                <tableau-viz id='tableau-viz' 
+                    src='https://tableau.song88.com/t/song88/views/10bet/10_SearchEvent' 
+                    token="@Token"
+                    toolbar='bottom'
+                    hide-tabs>
+                </tableau-viz>
+            </div>
+        </div>
+    </div>
+</div>

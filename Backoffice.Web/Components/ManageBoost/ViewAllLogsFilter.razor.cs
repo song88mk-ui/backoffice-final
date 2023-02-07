@@ -1,11 +1,11 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
-using Page = Backoffice.Shared.Enums.Page;
 
 namespace Backoffice.Web.Components.ManageBoost
 {
@@ -13,18 +13,18 @@ namespace Backoffice.Web.Components.ManageBoost
     {
         #region Properties
         [Inject] public ITradingService TradingService { get; set; }
-        [Parameter] public Page SelectedPage { get; set; }
+        [Parameter] public SportsbookClientPermission SelectedPage { get; set; }
         [Parameter] public EventCallback<PriceBoostLogFilterModel> OnFilterChangedEventCallback { get; set; }
         [Parameter] public PriceBoostLogFilterModel FilterModel { get; set; } = new PriceBoostLogFilterModel();
         [Parameter] public EventCallback<PriceBoostLogFilterModel> FilterModelChanged { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        public Dictionary<Page, string> Pages { get; set; }
+        public Dictionary<SportsbookClientPermission, string> Pages { get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            Pages = new Dictionary<Page, string>() { { Page.OE_PriceBoost_Manage, "Manage Boost" }, { Page.OE_PriceBoost_Settings, "Boosted Setting" } };
+            Pages = new Dictionary<SportsbookClientPermission, string>() { { SportsbookClientPermission.SBC_OE_PriceBoost_Manage, "Manage Boost" }, { SportsbookClientPermission.SBC_OE_PriceBoost_Settings, "Boosted Setting" } };
 
             var client = await GetClients();
             FilterModel = new PriceBoostLogFilterModel()
@@ -49,7 +49,7 @@ namespace Backoffice.Web.Components.ManageBoost
         #region Events
         public async void OnPageSelectionChangedEvent(ChangeEventArgs e)
         {
-            FilterModel.Tab = SelectedPage = (Page)Enum.Parse(typeof(Page), e.Value.ToString());
+            FilterModel.Tab = SelectedPage = (SportsbookClientPermission)Enum.Parse(typeof(SportsbookClientPermission), e.Value.ToString());
 
             await OnFilterChangedEventCallback.InvokeAsync(FilterModel);
             await InvokeAsync(StateHasChanged);

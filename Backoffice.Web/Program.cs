@@ -24,6 +24,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddAuthorization(options =>
 {
     #region SBC
+    //todo: add policy only for permission with readonly access, otherwise it can be handled by hiding the navigation menu itself
     options.AddPolicy("sbc-menu-topleagues", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_TopLeagues.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("sbc-menu-topfixtures", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_TopFixtures.ToString().Replace('_', '.')}",
@@ -53,10 +54,6 @@ builder.Services.AddAuthorization(options =>
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     #endregion
 
-    #region Admin
-    options.AddPolicy("trading-menu-manage-user", policy => policy.RequireClaim($"{AdminPermission.Admin_ManageUsers.ToString().Replace('_', '.')}",
-        $"{(int)Access.Edit}", $"{(int)Access.View}"));
-    #endregion
 });
 
 builder.Services.AddBlazoredLocalStorage();
@@ -108,8 +105,8 @@ app.UseSession();
 
 app.UseRouting();
 
-app.MapHub<BoHub>("/bohub");
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+app.MapHub<BoHub>("/bohub");
 
 app.Run();

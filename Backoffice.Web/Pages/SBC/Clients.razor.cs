@@ -6,9 +6,8 @@ using Backoffice.Web.Components.Clients;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Collections.Generic;
 
-namespace Backoffice.Web.Pages
+namespace Backoffice.Web.Pages.SBC
 {
     public partial class Clients : IDisposable
     {
@@ -193,6 +192,12 @@ namespace Backoffice.Web.Pages
 
         public void Dispose()
         {
+            ClientListModel = null;
+            Alerts = null;
+
+            BackOfficeService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

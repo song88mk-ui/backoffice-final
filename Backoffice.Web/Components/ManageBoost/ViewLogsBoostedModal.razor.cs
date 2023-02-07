@@ -33,7 +33,7 @@ namespace Backoffice.Web.Components.ManageBoost
 
             var result = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest()
             {
-                Page = Page.OE_PriceBoost_Manage.ToString().Replace("_", "."),
+                Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace("_", "."),
                 Payload = payload,                
                 MetaData = new MetaData() { PageSize = 10 }
             })).Result;

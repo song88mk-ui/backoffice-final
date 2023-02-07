@@ -1,7 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Components.MessageSettlement;
 using Backoffice.Web.Models;
@@ -9,33 +8,42 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Text.Json;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Backoffice.Web.Pages.Administration
 {
     public partial class MessageSettlement : IDisposable
     {
         #region Properties
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IMessageBroker MessageBroker { get; set; }
-        [Inject] IModalService ModalService { get; set; }
+        [Inject] public IModalService ModalService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [Inject] private ToastService? _toasterService { get; set; }
-        private ToastService toasterService => _toasterService!;
+        [Inject] private ToastService? ToasterService { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
 
         public MarketSettlementFilterModel FilterModel { get; set; } = new MarketSettlementFilterModel();
         public List<MessageSettlementModel> MessageSettlementModel { get; set; }
+        public MetaData MetaData { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         private bool IsPreLoader { get; set; }
         private long CursorId { get; set; }
         private int PreviousPage { get; set; }
-        public MetaData MetaData { get; set; }
+
+        #endregion
+
+        #region Fields
+
+        private ToastService toasterService => ToasterService!;
+
         #endregion
 
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = true;
@@ -50,6 +58,7 @@ namespace Backoffice.Web.Pages.Administration
                 TotalPages = 1,
             };
         }
+
         public async Task OnAddClickedEvent()
         {
             var parameters = new ModalParameters();
@@ -60,36 +69,44 @@ namespace Backoffice.Web.Pages.Administration
 
             ModalService.Open<AddMessageSettlement>("Add Message Settlement", parameters, options);
         }
+
         public async Task OnSaveClickedEvent()
         {
-            IsPreLoader = true;
             await GetContents();
         }
+
         public async Task OnExportClickedEvent()
         {
             toasterService.AddToast(Toast.NewToast
                     ("Message Settlement", 
                     $"Success! Excel file is being generated system will notify once done."));
         }
+
         public async Task SelectPage(int page)
         {
             MetaData.CurrentPage = page;
-            IsPreLoader = true;
 
             await GetContents();
         }
+
         public void Dispose()
         {
+            BackOfficeService.Dispose();
+            ToasterService.Dispose();
+            toasterService.Dispose();
         }
 
         #endregion
 
         #region Utulities
-        public async Task GetContents() 
+
+        public async Task GetContents()
         {
+            IsPreLoader = true;
+
             var request = new ActivityLogRequest()
             {
-                Page = Page.Admin_Settlement_Message.ToString().Replace("_", "."),
+                Page = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
                 Payload = BuildPayload(),
                 MetaData = MetaData,
                 DateFrom = FilterModel.FromDate.Date.Add(new TimeSpan(0, 0, 0)),
@@ -123,6 +140,7 @@ namespace Backoffice.Web.Pages.Administration
             MessageSettlementModel = result;
             StateHasChanged();
         }
+
         private string BuildPayload()
         {
             return $"{(FilterModel.SportId > 0 ? FilterModel.SportId : "%")}." +
@@ -130,6 +148,7 @@ namespace Backoffice.Web.Pages.Administration
                 $"{(FilterModel.LeagueId > 0 ? FilterModel.LeagueId : "%")}." +
                 $"{(!string.IsNullOrEmpty(FilterModel.FixtureId) ? FilterModel.FixtureId : "%")}";
         }
+
         private List<SelectListItemModel<int>> GetProducts()
         {
             return new List<SelectListItemModel<int>>()
@@ -150,6 +169,7 @@ namespace Backoffice.Web.Pages.Administration
                 new SelectListItemModel<int> { Value = 17, Name = "Virtual Cricket" },
             };
         }
+
         #endregion
     }
 }

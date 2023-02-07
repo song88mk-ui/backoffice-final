@@ -91,7 +91,7 @@ namespace Backoffice.Web.Components.ManageBoost
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle","max-width: 85rem;");
             //parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);
-            parameters.Add("SelectedPage", Page.OE_PriceBoost_Manage);
+            parameters.Add("SelectedPage", SportsbookClientPermission.SBC_OE_PriceBoost_Manage);
 
             var options = new ModalOptions();
             ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);

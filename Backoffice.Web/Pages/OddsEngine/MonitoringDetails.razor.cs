@@ -150,6 +150,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
+            TradingService.Dispose();
+            BackOfficeService.Dispose();
         }
 
         #endregion

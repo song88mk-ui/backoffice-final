@@ -7,7 +7,6 @@ using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using RabbitMQ.Client.Apigen.Attributes;
 using System.Text;
 using System.Text.Json;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
@@ -17,9 +16,12 @@ namespace Backoffice.Web.Pages.Administration
     public partial class ManualBetSettlement : IDisposable
     {
         #region Properties
+
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
-        [Inject] private ToastService? _toasterService { get; set; }
+        [Inject] private ToastService? ToasterService { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public List<ActivityLogModel> ActivityLogs { get; set; }
         public List<AlertModel> Alerts { get; set; }
@@ -32,10 +34,13 @@ namespace Backoffice.Web.Pages.Administration
         private bool IsPreloader { get; set; }
         private bool IsExportDisabled { get; set; }
         private Guid Guid { get; set; }
+
         #endregion
 
         #region Fields
-        private ToastService toasterService => _toasterService!;
+
+        private ToastService toasterService => ToasterService!;
+
         #endregion
 
         #region Methods
@@ -65,8 +70,8 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task OnSearchButtonClicked()
         {
-            IsPreloader = true;
-            StateHasChanged();
+            //IsPreloader = true;
+            //StateHasChanged();
             await GetContents();
         }
 
@@ -105,7 +110,8 @@ namespace Backoffice.Web.Pages.Administration
         {
             var payload = new OnGetManualBetSettlementHistoryMessage()
             {
-                ManualBetSettlementCallbackModel = CallbackModel
+                ManualBetSettlementCallbackModel = CallbackModel,
+                ConnectionId = UserModel.ConnectionId
             };
 
             MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportManualBetSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
@@ -124,6 +130,10 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
+            BackOfficeService.Dispose();
+
+            ToasterService.Dispose();
+            toasterService.Dispose();
         }
 
         #endregion

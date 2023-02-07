@@ -116,6 +116,46 @@ a, .btn-link {
     content: "\1107";
 }
 
+.ico-drill-down-report:before {
+    content: "\111D";
+}
+
+.ico-cltv:before {
+    content: "\111C";
+}
+
+.ico-market-report:before {
+    content: "\111E";
+}
+
+.ico-monitor-users:before {
+    content: "\1120";
+}
+
+.ico-open-bets:before {
+    content: "\1121";
+}
+
+.ico-performance:before {
+    content: "\1122";
+}
+
+.ico-search-event:before {
+    content: "\1124";
+}
+
+.ico-search-bet:before {
+    content: "\1125";
+}
+
+.ico-search-user:before {
+    content: "\1126";
+}
+
+.ico-sports:before {
+    content: "\1127";
+}
+
 .ico-top-fixtures:before {
     content: "\1109";
 }

@@ -11,6 +11,7 @@ namespace Backoffice.Web.Models
             Claims = new List<Claim>();
         }
 
+        public string ConnectionId { get; set; }
         public string Id { get; set; }
         public string UserName { get; set; }
         public string RoleName { get; set; }

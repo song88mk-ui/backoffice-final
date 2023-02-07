@@ -1,7 +1,7 @@
 ﻿@using Backoffice.Shared.Enums;
 
 <div class="d-flex">
-    @if (UserModel.Claims.Where(x => x.Type.Contains($"{PermissionCategoryAcronym.SBC}.{PermissionCategoryAcronym.OE}.Monitoring")).Count() > 0)
+    @if (UserModel.Claims.Where(x => x.Type.Contains($"{PermissionCategory.SBC}.{PermissionCategory.OE}.Monitoring")).Count() > 0)
     {
         <div class="px-2 me-2 py-3 @(IsActiveMonitoring ? "active" : "")">
             <a class="header-link text-decoration-none" href="odds-engine/monitoring" @onclick='() => ActivateMenu("monitoring")'>

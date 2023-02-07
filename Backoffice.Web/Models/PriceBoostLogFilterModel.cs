@@ -1,12 +1,12 @@
-﻿using Backoffice.Shared.Models.Response;
-using Page = Backoffice.Shared.Enums.Page;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Response;
 
 namespace Backoffice.Web.Models
 {
     public class PriceBoostLogFilterModel
     {
         public List<KeyValuePair<string, string>> Clients { get; set; }
-        public Page Tab { get; set; }
+        public SportsbookClientPermission Tab { get; set; }
         public string ClientCode { get; set; }
         public SportsLookupResponse Sports { get; set; }
         public int SportId { get; set; }

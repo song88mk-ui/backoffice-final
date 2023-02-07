@@ -1,4 +1,4 @@
-﻿@page "/dashboard"
+﻿@page "/open-bets"
 
 <div class="row">
     <div class="main-content col-md-12 mb-4 pb-3">
@@ -7,8 +7,12 @@
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
             <div class="col-md-12">
-                @*<div @ref="VizContainer"></div>*@
-                <div style="width:100%; height:850px;" @ref="VizContainer"></div>
+                <tableau-viz id='tableau-viz' 
+                    src='https://tableau.song88.com/t/song88/views/10bet/3_Openbets' 
+                    token="@Token"
+                    toolbar='bottom'
+                    hide-tabs>
+                </tableau-viz>
             </div>
         </div>
     </div>

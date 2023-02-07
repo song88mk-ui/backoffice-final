@@ -8,7 +8,7 @@ namespace Backoffice.Utility.Repository
     {
         Task ProcessActivityLog(OnActivityLogMessage message);
         Task ProcessActivityLog(OnActivityLogListMessage message);
-        Task ProcessOnGetMessageSettlementHistory(OnGetMessageSettlementHistoryMessage request, IMessageBroker messageBroker);
+        Task ProcessOnGetMessageSettlementHistory(OnGetMessageSettlementHistoryMessage request, IMessageBroker messageBroker, string connectionId);
         Task ProcessOnGetManualBetSettlementHistory(OnGetManualBetSettlementHistoryMessage request, IMessageBroker messageBroker);
         Task ProcessOnGetMarketSettlementHistory(OnGetMarketSettlementHistoryMessage request, IMessageBroker messageBroker);
         Task ProcessOnGetCancelBetHistory(OnGetCancelBetHistoryMessage request, IMessageBroker messageBroker);

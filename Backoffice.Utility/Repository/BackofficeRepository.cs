@@ -23,6 +23,8 @@ using Microsoft.WindowsAzure.Storage;
 using Backoffice.Shared.Utilities;
 using System.Text;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 
 namespace Backoffice.Utility.Repository
 {
@@ -30,11 +32,20 @@ namespace Backoffice.Utility.Repository
     {
         private readonly IConfiguration _configuration;
         private BackofficeContext _backofficeContext;
-        public BackofficeRepository(IConfiguration configuration)
+        private HubConnection _hubConnection;
+        private readonly ILogger<Worker> _logger;
+        public BackofficeRepository(IConfiguration configuration, ILogger<Worker> logger)
         {
             _configuration = configuration;
             var optionsBuilder = new DbContextOptionsBuilder<BackofficeContext>().UseSqlServer(_configuration["ConnectionStrings:Backoffice"]);
             _backofficeContext = new BackofficeContext(optionsBuilder.Options);
+
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(new Uri(configuration["Custom:Hub"]))
+                .Build();
+            Subscribe();
+
+            _logger = logger;
         }
         public async Task ProcessActivityLog(OnActivityLogMessage message)
         {
@@ -123,7 +134,7 @@ namespace Backoffice.Utility.Repository
                 Console.WriteLine($"{DateTime.Now} : " + ex.Message);
             }
         }
-        public async Task ProcessOnGetMessageSettlementHistory(OnGetMessageSettlementHistoryMessage request, IMessageBroker messageBroker)
+        public async Task ProcessOnGetMessageSettlementHistory(OnGetMessageSettlementHistoryMessage request, IMessageBroker messageBroker, string connectionId)
         {
             // If you use EPPlus in a noncommercial context
             // according to the Polyform Noncommercial license:
@@ -134,7 +145,7 @@ namespace Backoffice.Utility.Repository
             {
                 var result = GetActivityLogs(new ActivityLogRequest()
                 {
-                    Page = Page.Admin_Settlement_Message.ToString().Replace("_", "."),
+                    Page = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
                     Payload = BuildPayload(request.SportId.ToString(), request.SegmentId.ToString(), request.LeagueId.ToString(), request.FixtureId),
                     DateFrom = request.FromDate.ToUniversalTime(),
                     DateTo = request.ToDate.ToUniversalTime(),
@@ -194,7 +205,8 @@ namespace Backoffice.Utility.Repository
                         Type = (int)NotificationType.General
                     };
 
-                    messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
+                    await _hubConnection.SendAsync("SendMessageToUser", "Notification", request.ConnectionId, JsonSerializer.Serialize(notificationsModel));
+                    //messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
                 }
 
                 #endregion
@@ -220,7 +232,7 @@ namespace Backoffice.Utility.Repository
             {
                 var result = GetActivityLogs(new ActivityLogRequest()
                 {
-                    Page = Page.Admin_Settlement_Market.ToString().Replace("_", "."),
+                    Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
                     Payload = BuildPayload(request.SportId, request.SegmentId, request.LeagueId, request.FixtureId),
                     DateFrom = request.FromDate.ToUniversalTime(),
                     DateTo = request.ToDate.ToUniversalTime(),
@@ -285,7 +297,8 @@ namespace Backoffice.Utility.Repository
                         Type = (int)NotificationType.General
                     };
 
-                    messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
+                    await _hubConnection.SendAsync("SendMessageToUser", "Notification", request.ConnectionId, JsonSerializer.Serialize(notificationsModel));
+                    //messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
                 }
                 #endregion
             }
@@ -311,7 +324,8 @@ namespace Backoffice.Utility.Repository
                     ManualBetSettlementCallbackModel = request.ManualBetSettlementCallbackModel
                 }).Result;
 
-                if (result == null) {
+                if (result == null)
+                {
                     return;
                 }
 
@@ -364,7 +378,8 @@ namespace Backoffice.Utility.Repository
                         Type = (int)NotificationType.General
                     };
 
-                    messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
+                    await _hubConnection.SendAsync("SendMessageToUser", "Notification", request.ConnectionId, JsonSerializer.Serialize(notificationsModel));
+                    //messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
                 }
                 #endregion
 
@@ -378,7 +393,6 @@ namespace Backoffice.Utility.Repository
                 excel.Dispose();
             }
         }
-
         public async Task ProcessOnGetCancelBetHistory(OnGetCancelBetHistoryMessage request, IMessageBroker messageBroker)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -397,17 +411,17 @@ namespace Backoffice.Utility.Repository
                 if (response == null)
                     return;
 
-                var cancelBets = new List<OnGetCancelBetHistoryMessage.BetDetails>(); ;
+                var cancelBets = new List<BetDetails>(); ;
 
                 foreach (var item in response.ActivityLogs)
                 {
-                    var betDetails = JsonSerializer.Deserialize<OnGetCancelBetHistoryMessage.BetDetails>(item.From);
+                    var betDetails = JsonSerializer.Deserialize<BetDetails>(item.From);
                     if (betDetails != null)
                     {
                         betDetails.CancelledBy = item.UserName;
 
-                        var betSelectionDetails = JsonSerializer.Deserialize<OnGetCancelBetHistoryMessage.BetSelectionDetails>(item.To);
-                        betDetails.Selections = new List<OnGetCancelBetHistoryMessage.BetSelectionDetails>();
+                        var betSelectionDetails = JsonSerializer.Deserialize<BetSelectionDetails>(item.To);
+                        betDetails.Selections = new List<BetSelectionDetails>();
 
                         if (betSelectionDetails != null)
                             betDetails.Selections.Add(betSelectionDetails);
@@ -452,7 +466,7 @@ namespace Backoffice.Utility.Repository
                     var notificationsModel = new NotificationsDetailsModel
                     {
                         Id = Guid.NewGuid(),
-                        Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
+                        Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                         ClientCode = string.Empty,
                         SportsId = 0,
                         Details = $"Your excel file is now ready: <a onmouseout=\"this.style.color = '#404E67'\" onmouseover=\"this.style.color = 'blue'\" href=\"{downloadUrl}\">{fileName}</a>",
@@ -462,7 +476,8 @@ namespace Backoffice.Utility.Repository
                         Type = (int)NotificationType.General
                     };
 
-                    messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
+                    await _hubConnection.SendAsync("SendMessageToUser", "Notification", request.ConnectionId, JsonSerializer.Serialize(notificationsModel));
+                    //messageBroker.Publish(JsonSerializer.Serialize(notificationsModel), "OnNewNotification", "r.oe.bm.engine.notifications", Guid.NewGuid().ToString());
                 }
                 #endregion
 
@@ -478,6 +493,60 @@ namespace Backoffice.Utility.Repository
         }
 
         #region Utilities
+        private async Task Subscribe()
+        {
+            try
+            {
+                _hubConnection.Closed += async (error) =>
+                {
+                    while (_hubConnection.State == HubConnectionState.Disconnected)
+                    {
+                        await Task.Delay(5000);
+                        await _hubConnection.StartAsync().ContinueWith(task =>
+                        {
+                            if (task.IsFaulted)
+                            {
+                                _logger.LogError($"Error opening connection: {_configuration["Custom:Hub"]}");
+                            }
+                            else
+                            {
+                                _logger.LogInformation($"Connected to ({_configuration["Custom:Hub"]})");
+                            }
+                        });
+                    }
+                };
+
+                await _hubConnection.StartAsync().ContinueWith(async task =>
+                {
+                    if (task.IsFaulted)
+                    {
+                        while (_hubConnection.State == HubConnectionState.Disconnected)
+                        {
+                            await Task.Delay(5000);
+                            await _hubConnection.StartAsync().ContinueWith(task =>
+                            {
+                                if (task.IsFaulted)
+                                {
+                                    _logger.LogError($"Error opening connection: {_configuration["Custom:Hub"]}");
+                                }
+                                else
+                                {
+                                    _logger.LogInformation($"Connected to ({_configuration["Custom:Hub"]})");
+                                }
+                            });
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogInformation($"Connected to ({_configuration["Custom:Hub"]})");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+        }
         private async Task<ActivityLogResponse> GetActivityLogs(ActivityLogRequest request)
         {
             try
@@ -568,7 +637,7 @@ namespace Backoffice.Utility.Repository
             request.ManualBetSettlementCallbackModel.DateTo = request.ManualBetSettlementCallbackModel.DateTo.Date.Add(new TimeSpan(23, 59, 59));
 
             var activityLogs = (await _backofficeContext.ReadActivityLog
-                    .FromSqlRaw($"GetActivityLogs '{Page.Admin_Settlement_Bet.ToString().Replace('_', '.')}', '', '{request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
+                    .FromSqlRaw($"GetActivityLogs '{AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_', '.')}', '', '{request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
                 .ToListAsync())
                 .Select(s => new ActivityLogModel
                 {
@@ -603,21 +672,7 @@ namespace Backoffice.Utility.Repository
             };
         }
 
-        private string BuildEventDetails(ManualBetDetailsModel.BetSelectionDetails betSelectionDetails, string oddsFormat)
-        {
-            StringBuilder builder = new StringBuilder();
-
-            builder.Append($"{betSelectionDetails.LeagueName}\n");
-            builder.Append($"{betSelectionDetails.FixtureName}\n");
-            builder.Append($"{betSelectionDetails.FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()}\n");
-            builder.Append($"{betSelectionDetails.SelectionName} \n");
-            builder.Append($"{betSelectionDetails.MarketName} @ {betSelectionDetails.Odds} ({oddsFormat})\n");
-            builder.Append($"{betSelectionDetails.BetScore}, Final Score: {betSelectionDetails.SettlementScore}\n");
-
-            return builder.ToString();
-        }
-
-        private string BuildEventDetails(OnGetCancelBetHistoryMessage.BetSelectionDetails betSelectionDetails, string oddsFormat)
+        private string BuildEventDetails(BetSelectionDetails betSelectionDetails, string oddsFormat)
         {
             StringBuilder builder = new StringBuilder();
 

@@ -175,7 +175,7 @@ namespace Backoffice.API.Repositories
                 request.ManualBetSettlementCallbackModel.DateTo = request.ManualBetSettlementCallbackModel.DateTo.Date.Add(new TimeSpan(23, 59, 59));
 
                 var activityLogs = (await _backofficeContext.ReadActivityLog
-                        .FromSqlRaw($"GetActivityLogs '{Page.Admin_Settlement_Bet.ToString().Replace('_', '.')}', '', '{request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
+                        .FromSqlRaw($"GetActivityLogs '{AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_', '.')}', '', '{request.ManualBetSettlementCallbackModel.DateFrom.ToString("yyyyMMdd HH:mm:ss")}', '{request.ManualBetSettlementCallbackModel.DateTo.ToString("yyyyMMdd HH:mm:ss")}'")
                     .ToListAsync())
                     .Select(s => new ActivityLogModel
                     {
@@ -232,12 +232,20 @@ namespace Backoffice.API.Repositories
 
                 if (request.DateFrom == DateTime.MinValue)
                     request.DateFrom = DateTime.UtcNow.AddDays(-1).Date;
+                else
+                    request.DateFrom = request.DateFrom.ToUniversalTime();
                 if (request.DateTo == DateTime.MinValue)
-                    request.DateTo = DateTime.UtcNow.Date;
+                    request.DateTo = DateTime.UtcNow.Date.AddTicks(-1);
+                else
+                    request.DateTo = request.DateTo.ToUniversalTime();
 
-                var fromUTC = request.DateFrom.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
-                var toUTC = request.DateTo.AddDays(1).AddSeconds(-1).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
+                if (request.TimeStamp == DateTime.MinValue)
+                {
+                    request.TimeStamp = DateTime.UtcNow;
+                }
 
+                var fromUTC = request.DateFrom.ToString("yyyy-MM-dd HH:mm:ss");
+                var toUTC = request.DateTo.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
                 var activityLogs = (await _backofficeContext.ReadActivityLog
                         .FromSqlRaw($"GetActivityLogs '{request.Page}', '{request.Payload}', '{fromUTC}', '{toUTC}'")
                     .ToListAsync())

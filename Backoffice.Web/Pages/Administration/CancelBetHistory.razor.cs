@@ -3,7 +3,6 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
-using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -14,12 +13,17 @@ namespace Backoffice.Web.Pages.Administration
     public partial class CancelBetHistory : IDisposable
     {
         #region Properties
+
         [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [Inject] private ToastService? _toasterService { get; set; }
+        [Inject] private ToastService? ToasterService { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+
         public CancelBetHistoryCallbackModel CallbackModel { get; set; }
         public CancelBetHistoryModel CancelBets { get; set; }
         public MetaData MetaData { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreload { get; set; }
@@ -27,7 +31,9 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         #region Fields
-        private ToastService toasterService => _toasterService!;
+
+        private ToastService toasterService => ToasterService!;
+
         #endregion
 
         #region Methods
@@ -61,9 +67,10 @@ namespace Backoffice.Web.Pages.Administration
             if (model == null)
                 return;
 
-            var request = new ActivityLogRequest
+            var request = new OnGetCancelBetHistoryMessage
             {
-                Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
+                ConnectionId = UserModel.ConnectionId,
+                Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                 Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
                 DateFrom = model.DateFrom,
                 DateTo = model.DateTo,
@@ -87,17 +94,25 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
+            CancelBets = null;
+
+            BackOfficeService.Dispose();
+            ToasterService.Dispose();
+            toasterService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion
 
         #region Utilities
+
         private async Task<CancelBetHistoryModel> GetActivityLogList(CancelBetHistoryCallbackModel model)
         {
             var cancelBets = new CancelBetHistoryModel();
             var request = new ActivityLogRequest
             {
-                Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
+                Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                 Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
                 DateFrom = model.DateFrom,
                 DateTo = model.DateTo,

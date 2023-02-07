@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components;
-using Backoffice.Web.Models;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Pages
@@ -12,15 +11,22 @@ namespace Backoffice.Web.Pages
         public List<Claim> UserClaims { get; set; }
 
         protected override async Task OnInitializedAsync()
-        { 
-            var validClaimValues = new string[] { "1", "2", "0" };
-
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        {
             UserClaims = new List<Claim>();
-            UserClaims.AddRange(authState.User.Claims.Where(x => validClaimValues.Contains(x.Value)).ToList());
+
+            var validClaimValues = new string[] { "1", "2", "0" };
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+            UserClaims.AddRange(authState.User.Claims.Where(c => validClaimValues.Contains(c.Value)).ToList());
         }
+
         public void Dispose()
         {
+            AuthenticationStateProvider = null;
+            UserClaims = null;
+
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
         }
     }
 }

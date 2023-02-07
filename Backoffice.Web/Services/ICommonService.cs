@@ -8,5 +8,6 @@ namespace Backoffice.Web.Services
         decimal GetFinalOdds(decimal originalValue);
         string GetHomeName(string name, FixtureType fixtureType);
         string GetAwayName(string name, FixtureType fixtureType);
+        string GenerateToken();
     }
 }

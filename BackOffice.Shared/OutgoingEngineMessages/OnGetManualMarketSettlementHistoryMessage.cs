@@ -7,6 +7,7 @@ namespace Backoffice.Shared.OutgoingEngineMessages
     public class OnGetMarketSettlementHistoryMessage
     {
         public string UserId { get; set; }
+        public string ConnectionId { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
         public string SportId { get; set; }

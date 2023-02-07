@@ -65,7 +65,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
-                Page = Page.OE_Administration_MarketGroup.ToString().Replace("_", "."),
+                Page = SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", "."),
                 Payload = $"{MarketGroupModel.ClientCode}.{MarketGroupModel.SportId}.{MarketGroupModel.FixtureStatusId}",
                 MetaData = MetaData
             })).Result;

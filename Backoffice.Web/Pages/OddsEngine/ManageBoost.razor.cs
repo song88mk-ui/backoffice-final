@@ -16,7 +16,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public Filter FilterReference { get; set; }
 
@@ -204,6 +204,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
+            TradingService.Dispose();
         }
 
         #endregion

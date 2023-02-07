@@ -10,17 +10,22 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class BoostedSettings : IDisposable
     {
         #region Properties
+
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] IModalService ModalService { get; set; }
+
         [Parameter] public string THeadClass { get; set; }
+
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreLoader { get; set; } = true;
+
         protected List<BoostedSettingsModel> ClientsView { get; set; }
         protected SearchFormModel SearchForm { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
+
         #endregion
 
         #region Methods
@@ -50,6 +55,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             SearchForm = new SearchFormModel();
             ClientsView = new List<BoostedSettingsModel>();
+
             await GetContent();
         }
 
@@ -113,6 +119,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public void Dispose()
         {
+            TradingService.Dispose();
         }
 
         #endregion

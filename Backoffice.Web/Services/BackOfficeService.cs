@@ -16,31 +16,36 @@ namespace Backoffice.Web.Services
     public class BackOfficeService : IBackOfficeService
     {
         #region Fields
+
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly IAuthenticationService _authenticationService;
         private readonly IMessageBroker _messageBroker;
+
         #endregion
 
         #region Ctor
-        public BackOfficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService,
-            IHttpContextAccessor httpContextAccessor, IMessageBroker messageBroker)
+
+        public BackOfficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IMessageBroker messageBroker)
         {
             _configuration = configuration;
             _httpClient = httpClient;
             _authenticationService = authenticationService;
             _messageBroker = messageBroker;
-            _messageBroker.Connect();
+            //_messageBroker.Connect();
 
             //var userToken = httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
 
             _httpClient.BaseAddress = new Uri(_configuration["API:Backoffice:Uri"]);
+
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:Backoffice:Security:APIKey"]);
             _httpClient.DefaultRequestHeaders.Add("x-region", _configuration["API:Region"]);
         }
+
         #endregion
 
         #region Method - Maintenance
+
         public async Task<BaseResponse<bool>> GetMaintenance()
         {
             try
@@ -1012,6 +1017,7 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Bet Settlement
+
         public async Task<BaseResponse<ManualBetDetailsResponse>> GetManualBetDetails(ManualBetDetailsRequest request)
         {
             try
@@ -1187,6 +1193,12 @@ namespace Backoffice.Web.Services
             }
         }
         #endregion
+
+        public void Dispose()
+        {
+            _httpClient.Dispose();
+            _authenticationService.Dispose();
+        }
 
     }
 }

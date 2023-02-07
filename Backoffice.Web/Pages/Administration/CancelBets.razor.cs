@@ -2,7 +2,6 @@
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Components.Administration.CancelBets;
-using Backoffice.Web.Components.Administration.ManageUserGroups;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -13,9 +12,12 @@ namespace Backoffice.Web.Pages.Administration
     public partial class CancelBets : IDisposable
     {
         #region Properties
+
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         public CancelBetModel CancelBetModel { get; set; }
         public List<AlertModel> Alerts { get; set; }
 
@@ -157,7 +159,7 @@ namespace Backoffice.Web.Pages.Administration
                                 {
                                     message.OnActivityLogMessages.Add(new OnActivityLogMessage
                                     {
-                                        Page = Page.Admin_CancelBets.ToString().Replace("_", "."),
+                                        Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                                         Payload = $"{UserModel.UserName}.{data.BetId}.{selection.BetSelectionId}.{betData.UserId}.{betData.ClientName}",
                                         Activity = Activity.CancelBet.ToString(),
                                         From = JsonSerializer.Serialize(betData),
@@ -230,6 +232,12 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
+            CancelBetModel = null;
+            Alerts = null;
+
+            BackOfficeService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion
