@@ -2,22 +2,22 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.SubUser;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Security.Claims;
 
-namespace Backoffice.Web.Pages
+namespace Backoffice.Web.Pages.SBC
 {
     public partial class SubUser : IDisposable
     {
         #region Properties
+
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public SubUserCallbackModel CallbackModel { get; set; }
@@ -132,11 +132,10 @@ namespace Backoffice.Web.Pages
 
         public void Dispose()
         {
+            AuthenticationService.Dispose();
         }
 
-
         #endregion
-
 
         #region Utilities
 
@@ -285,6 +284,7 @@ namespace Backoffice.Web.Pages
             }
             return string.Empty;
         }
+
         #endregion
     }
 }

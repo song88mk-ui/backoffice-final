@@ -5,6 +5,7 @@ using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Text.Json;
 
 namespace Backoffice.Web.Shared
 {
