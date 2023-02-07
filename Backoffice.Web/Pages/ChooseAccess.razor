@@ -7,7 +7,7 @@
         <div class="d-flex justify-content-center justify-content-center align-items-center h-100 w-100">
             <div class="d-block align-items-center justify-content-center" style="width: 45rem;">
                 <div class="d-flex justify-content-between">
-                    @if (UserClaims?.Where(c => c.Type.Contains(nameof(PermissionCategoryAcronym.Admin) + ".")).ToList().Count > 0)
+                    @if (UserClaims?.Where(c => c.Type.Contains(nameof(PermissionCategory.Admin) + ".")).ToList().Count > 0)
                     {
                         <div class="access-item m-2 d-flex flex-column justify-content-between rounded-2">
                             <div class="top-row mx-2 pt-5">
@@ -29,7 +29,7 @@
                             </div>
                         </div>
                     }
-                    @if (UserClaims?.Where(c => c.Type.Contains(nameof(PermissionCategoryAcronym.PMS) + ".")).ToList().Count > 0)
+                    @if (UserClaims?.Where(c => c.Type.Contains(nameof(PermissionCategory.PMS) + ".")).ToList().Count > 0)
                     {
                         <div class="access-item m-2 d-flex flex-column justify-content-between rounded-2">
                             <div class="top-row mx-2 pt-5">
@@ -51,7 +51,7 @@
                             </div>
                         </div>
                     }
-                    @if (UserClaims?.Where(c => c.Type.Contains(nameof(PermissionCategoryAcronym.SBC) + ".")).ToList().Count > 0)
+                    @if (UserClaims?.Where(c => c.Type.Contains(nameof(PermissionCategory.SBC) + ".")).ToList().Count > 0)
                     {
                         <div class="access-item m-2 d-flex flex-column justify-content-between rounded-2">
                             <div class="top-row mx-2 pt-5">

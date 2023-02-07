@@ -4,7 +4,6 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages.Administration;
 
 namespace Backoffice.Web.Services
 {
@@ -43,5 +42,6 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ResendSettlementBetDetailModel>> GetResendSettlementBetDetails(ResendSettlementBetDetailRequest request);
         Task<BaseResponse<ResendSettlementResponse>> ResendSettlement(ResendSettlementRequest request);
         Task<BaseResponse<BetModifyResponse>> CancelBet(BetModifyRequest request);
+        void Dispose();
     }
 }

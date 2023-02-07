@@ -1,10 +1,6 @@
-﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using System.Net.Http;
-using System.Net;
-using System.Text.Json;
 
 namespace Backoffice.Web.Services
 {
@@ -23,5 +19,6 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<UserListResponse>> GetUserGroupUsers(UserGroupRequest request);
         Task<BaseResponse<UserGroupResponse>> AddOrUpdateUserGroup(UserGroupRequest request);
         Task<BaseResponse<bool>> DeleteUserGroup(UserGroupRequest request);
+        void Dispose();
     }
 }

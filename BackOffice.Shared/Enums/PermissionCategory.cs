@@ -7,13 +7,6 @@ namespace Backoffice.Shared.Enums
     public enum PermissionCategory
     {
         Admin,
-        Sportsbook,
-        PartnerManagement,
-        OddsEngine
-    }
-    public enum PermissionCategoryAcronym
-    {
-        Admin,
         SBC,
         PMS,
         OE
@@ -67,7 +60,6 @@ namespace Backoffice.Shared.Enums
         SBC_OE_SportsSettings,
         SBC_OE_MarketSetting_SortOrder,
         SBC_OE_MarketSetting_Group,
-        SBC_MarketSetting_Group,
         SBC_OE_PriceBoost_Manage,
         SBC_OE_PriceBoost_Settings
     }
