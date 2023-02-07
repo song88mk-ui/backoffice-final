@@ -250,6 +250,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public void Dispose()
         {
+            BackOfficeService.Dispose();
         }
 
         #endregion

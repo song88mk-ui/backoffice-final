@@ -166,7 +166,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public void Dispose()
         {
-            GC.SuppressFinalize(this);
+            BackOfficeService.Dispose();
         }
 
         #endregion

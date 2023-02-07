@@ -129,11 +129,11 @@ namespace Backoffice.Web.Pages.SBC
         protected async Task SelectPage(int page)
         {
             MetaData.CurrentPage = page;
-            //await GetContents();
         }
 
         public void Dispose()
         {
+            BackOfficeService.Dispose();
         }
 
         #endregion
