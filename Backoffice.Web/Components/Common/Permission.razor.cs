@@ -163,7 +163,7 @@ namespace Backoffice.Web.Components.Common
                         foreach (var subCategory in subcategories)
                         {
                             var claims = Permissions.Where(p => p.CategoryId == permission.CategoryId && p.SubCategoryName == subCategory.SubCategoryName
-                                && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", ".") && string.IsNullOrEmpty(p.GroupName))
+                                && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", ".") && string.IsNullOrEmpty(p.GroupName)).OrderBy(o => o.SortOrder)
                                 .GroupBy(p => p.ClaimType).Select(s => new PermissionTreeModel.PermissionClaim
                                 {
                                     Name = s.FirstOrDefault().Name,
@@ -204,7 +204,8 @@ namespace Backoffice.Web.Components.Common
                             {
                                 SubCategoryName = subCategory.SubCategoryName,
                                 Claims = claims,
-                                Groups = groupList
+                                Groups = groupList,
+                                ColPosition = permission.CategoryName != "SportsbookClient" ? string.Empty : subCategory.SubCategoryName == "Odds Engine" ? "RIGHT" : "LEFT" 
                             });
                         }
                     }

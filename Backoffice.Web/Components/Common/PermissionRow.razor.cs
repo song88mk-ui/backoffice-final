@@ -8,8 +8,8 @@ namespace Backoffice.Web.Components.Common
         #region Properties
         [Parameter] public List<PermissionModel> Permissions { get; set; }
         [Parameter] public PermissionTreeModel.PermissionClaim Claim { get; set; }
+        [Parameter] public List<PermissionTreeModel.Group> Groups { get; set; }
         [Parameter] public bool IsReadOnly { get; set; }
-        [Parameter] public string ClaimId { get; set; }
         #endregion
 
         #region Methods

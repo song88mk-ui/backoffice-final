@@ -100,47 +100,71 @@
                                     @if (category.SubCategories.Any())
                                     {
                                         var maxRow = (int)Math.Ceiling(Convert.ToDecimal(category.SubCategories.Count) / 2m);
+                                        @if (category.CategoryId == (int)PermissionCategory.SBC)
+                                            maxRow = category.SubCategories.Count;
+
                                         <div class="w-50 noselect">
                                             @for (int rowCount = 0; rowCount < maxRow; rowCount++)
                                             {
-                                                <div class="category mb-3">
-                                                    <div class="category-title fw-bold mb-1">@category.SubCategories[rowCount].SubCategoryName</div>
+                                                if (category.SubCategories[rowCount].ColPosition != "RIGHT" )
+                                                {
+                                                    <div class="category mb-3">
+                                                        <div class="category-title fw-bold mb-1">@category.SubCategories[rowCount].SubCategoryName</div>
 
-                                                    @if (category.SubCategories[rowCount].Claims.Any())
-                                                    {
-                                                        for (int ctr = 0; ctr < @category.SubCategories[rowCount].Claims.Count; ctr++)
+                                                        @if (!category.SubCategories[rowCount].Groups.Any())
                                                         {
-                                                            var claim = @category.SubCategories[rowCount].Claims[ctr];
-                                                            var claimId = claim.HasReadOnly ? $"{claim.ClaimType}" : $"{claim.ClaimType}";
+                                                            for (int ctr = 0; ctr < @category.SubCategories[rowCount].Claims.Count; ctr++)
+                                                            {
+                                                                var claim = @category.SubCategories[rowCount].Claims[ctr];
+                                                                var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
+
+                                                                <PermissionRow Claim="@claim" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            var claim = @category.SubCategories[rowCount].Claims[0];
+                                                            var groups = @category.SubCategories[rowCount].Groups;
                                                             var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
 
-                                                            <PermissionRow Claim="@claim" ClaimId="@claimId" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
-
+                                                            <PermissionRow Claim="@claim" Groups="@groups" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
                                                         }
-                                                    }
-                                                </div>
+                                                    </div>
+                                                }
                                             }
                                         </div>
 
                                         <div class="w-50 noselect">
-                                            @for (int rowCount = maxRow; rowCount < category.SubCategories.Count(); rowCount++)
+                                            @{
+                                                var startCount = category.CategoryId == (int)PermissionCategory.SBC ? 0 : maxRow;
+                                            }
+                                            @for (int rowCount = startCount; rowCount < category.SubCategories.Count(); rowCount++)
                                             {
-                                                <div class="category mb-3">
-                                                    <div class="category-title fw-bold mb-1">@category.SubCategories[rowCount].SubCategoryName</div>
+                                                if (category.SubCategories[rowCount].ColPosition != "LEFT")
+                                                {
+                                                    <div class="category mb-3">
+                                                        <div class="category-title fw-bold mb-1">@category.SubCategories[rowCount].SubCategoryName</div>
 
-                                                    @if (category.SubCategories[rowCount].Claims.Any())
-                                                    {
-                                                        for (int ctr = 0; ctr < @category.SubCategories[rowCount].Claims.Count; ctr++)
+                                                        @if (!category.SubCategories[rowCount].Groups.Any())
                                                         {
-                                                            var claim = @category.SubCategories[rowCount].Claims[ctr];
-                                                            var claimId = claim.Name.Contains("readonly", StringComparison.OrdinalIgnoreCase) ? $"{claim.ClaimType}-readonly" : $"{claim.ClaimType}";
+                                                            for (int ctr = 0; ctr < @category.SubCategories[rowCount].Claims.Count; ctr++)
+                                                            {
+                                                                var claim = @category.SubCategories[rowCount].Claims[ctr];
+                                                                var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
+
+                                                                <PermissionRow Claim="@claim" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            var claim = @category.SubCategories[rowCount].Claims[0];
+                                                            var groups = @category.SubCategories[rowCount].Groups;
                                                             var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
 
-                                                            <PermissionRow Claim="@claim" ClaimId="@claimId" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
-
+                                                            <PermissionRow Claim="@claim" Groups="@groups" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
                                                         }
-                                                    }
-                                                </div>
+                                                    </div>
+                                                }
                                             }
                                         </div>
                                     }

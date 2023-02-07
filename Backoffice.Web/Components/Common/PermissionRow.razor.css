@@ -1,1 +1,5 @@
-﻿
+﻿.border-left {
+    border-left: solid;
+    border-width: thin;
+    border-left-color: #404E67;
+}

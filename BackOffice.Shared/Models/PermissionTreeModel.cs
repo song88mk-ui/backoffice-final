@@ -35,6 +35,7 @@ namespace Backoffice.Shared.Models
             public bool IsEnabled { get; set; }
             public List<Group> Groups { get; set; }
             public List<PermissionClaim> Claims { get; set; }
+            public string ColPosition { get; set; }
         }
 
         public class Group
