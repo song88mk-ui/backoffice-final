@@ -192,7 +192,12 @@ namespace Backoffice.Web.Pages.SBC
 
         public void Dispose()
         {
+            ClientListModel = null;
+            Alerts = null;
+
             BackOfficeService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

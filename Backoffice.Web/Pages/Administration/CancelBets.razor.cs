@@ -232,7 +232,12 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
+            CancelBetModel = null;
+            Alerts = null;
+
             BackOfficeService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

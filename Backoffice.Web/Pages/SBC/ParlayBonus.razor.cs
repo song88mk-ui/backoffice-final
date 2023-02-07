@@ -250,7 +250,13 @@ namespace Backoffice.Web.Pages.SBC
 
         public void Dispose()
         {
+            ClientParlayBonusModel = null;
+            TempConfig = null;
+            Clients = null;
+
             BackOfficeService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

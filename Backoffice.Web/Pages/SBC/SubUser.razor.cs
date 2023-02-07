@@ -132,7 +132,14 @@ namespace Backoffice.Web.Pages.SBC
 
         public void Dispose()
         {
+            Permissions = null;
+            SubUserClaims = null;
+            SubUsers = null;
+            Alerts = null;
+
             AuthenticationService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

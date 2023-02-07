@@ -166,7 +166,12 @@ namespace Backoffice.Web.Pages.SBC
 
         public void Dispose()
         {
+            TopLeaguesList = null;
+            TopLeaguesFilter = null;
+
             BackOfficeService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

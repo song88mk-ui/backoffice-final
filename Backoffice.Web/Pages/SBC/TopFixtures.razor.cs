@@ -133,7 +133,11 @@ namespace Backoffice.Web.Pages.SBC
 
         public void Dispose()
         {
+            TopFixturesModel = null;
+
             BackOfficeService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

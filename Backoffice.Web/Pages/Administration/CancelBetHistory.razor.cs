@@ -31,6 +31,7 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         #region Fields
+
         private ToastService toasterService => ToasterService!;
 
         #endregion
@@ -93,12 +94,19 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
+            CancelBets = null;
+
             BackOfficeService.Dispose();
+            ToasterService.Dispose();
+            toasterService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion
 
         #region Utilities
+
         private async Task<CancelBetHistoryModel> GetActivityLogList(CancelBetHistoryCallbackModel model)
         {
             var cancelBets = new CancelBetHistoryModel();

@@ -22,6 +22,11 @@ namespace Backoffice.Web.Pages
 
         public void Dispose()
         {
+            AuthenticationStateProvider = null;
+            UserClaims = null;
+
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
         }
     }
 }
