@@ -132,8 +132,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             BackOfficeService.Dispose();
 
-            ToasterService.Dispose();
-            toasterService.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         #endregion

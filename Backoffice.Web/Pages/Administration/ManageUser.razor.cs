@@ -122,7 +122,10 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
+            UserList.Clear();
             AuthenticationService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

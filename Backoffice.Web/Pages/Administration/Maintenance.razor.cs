@@ -68,6 +68,10 @@ namespace Backoffice.Web.Pages.Administration
         }
         public void Dispose()
         {
+            AlertModel = null;
+            BackOfficeService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
         #endregion
 

@@ -209,6 +209,8 @@ namespace Backoffice.Web.Pages.Administration
         public void Dispose()
         {
             BackOfficeService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

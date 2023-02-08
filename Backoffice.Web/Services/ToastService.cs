@@ -88,11 +88,9 @@ namespace Backoffice.Web.Services
         }
         public void Dispose()
         {
-            if (_timer is not null)
-            {
-                _timer.Elapsed += this.TimerElapsed;
-                _timer.Stop();
-            }
+            _timer.Dispose();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

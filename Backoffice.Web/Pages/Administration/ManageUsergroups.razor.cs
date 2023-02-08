@@ -182,6 +182,8 @@ namespace Backoffice.Web.Pages.Administration
         {
             BackOfficeService.Dispose();
             AuthenticationService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

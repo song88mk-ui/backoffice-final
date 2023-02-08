@@ -97,8 +97,6 @@ namespace Backoffice.Web.Pages.Administration
             CancelBets = null;
 
             BackOfficeService.Dispose();
-            ToasterService.Dispose();
-            toasterService.Dispose();
 
             GC.SuppressFinalize(this);
         }

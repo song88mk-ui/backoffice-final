@@ -111,8 +111,8 @@ namespace Backoffice.Web.Pages.Administration
         {
             TradingService.Dispose();
             BackOfficeService.Dispose();
-            ToasterService.Dispose();
-            toasterService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

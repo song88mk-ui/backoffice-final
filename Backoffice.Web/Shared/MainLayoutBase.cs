@@ -122,6 +122,11 @@ namespace Backoffice.Web.Shared
         public void Dispose()
         {
             BackOfficeService.Dispose();
+
+            toasterService.Dispose();
+            _toasterService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion
