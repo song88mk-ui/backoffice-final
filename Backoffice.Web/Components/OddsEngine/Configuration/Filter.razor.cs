@@ -11,28 +11,22 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
     public partial class Filter : IDisposable
     {
-        #region Properties
-        [Inject] private IModalService ModalService { get; set; }
+        #region Properties        
         [Inject] private ITradingService TradingService { get; set; }        
 
         [Parameter] public ConfigFilterModel ConfigFilterModel { get; set; } = new ConfigFilterModel();
         [Parameter] public EventCallback<ConfigFilterModel> ConfigFilterModelChanged { get; set; }
         [Parameter] public EventCallback IsMarketEditingChanged { get; set; }
-        [Parameter] public FixtureType FixtureType { get; set; }        
-
-        public MarketLookupResponse MarketLookup { get; set; }
-        private MarketTemplateGroupResponse MarketTemplateGroupResponse { get; set; }
-        
-        private bool IsPreloader { get; set; }        
-        public bool IsMarketEditing { get; set; }
+        [Parameter] public FixtureType FixtureType { get; set; }                                                
         #endregion
 
-        #region Methods
-        protected override async Task OnInitializedAsync()
-        {
-            
-        }
+        #region Fields
+        private bool _isPreloader { get; set; }
+        private MarketTemplateGroupResponse _marketTemplateGroupResponse { get; set; }
+        private MarketLookupResponse _marketLookup { get; set; }
+        #endregion
 
+        #region Methods        
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -43,7 +37,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task Initialize()
         {
-            IsPreloader = true;
+            _isPreloader = true;
             var sports = await GetSports();
             var sportId = sports.Any() ? sports.FirstOrDefault().Value : 0;
             var headerTitle = sports.Any() ? sports.FirstOrDefault(c => c.Value == sportId).Name : "";
@@ -109,13 +103,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             };
 
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
-            IsPreloader = false;
+            _isPreloader = false;
             StateHasChanged();   
         }
 
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {
-            IsPreloader = true;
+            _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
@@ -146,13 +140,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             })).Result;
 
             InitMarketTemplateField();
-            IsPreloader = false;
+            _isPreloader = false;
 
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
         }
         public async Task OnSegmentChangedEvent(ChangeEventArgs e)
         {
-            IsPreloader = true;
+            _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
@@ -179,13 +173,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.SearchText = string.Empty;
 
             InitMarketTemplateField();
-            IsPreloader = false;
+            _isPreloader = false;
 
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
         }
         public async Task OnLeagueChangedEvent(ChangeEventArgs e)
         {
-            IsPreloader = true;
+            _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
@@ -209,13 +203,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.SearchText = string.Empty;
 
             InitMarketTemplateField();
-            IsPreloader = false;
+            _isPreloader = false;
 
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
         }
         public async Task OnScopeChangedEvent(ChangeEventArgs e)
         {
-            IsPreloader = true;
+            _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
@@ -229,13 +223,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.SearchText = string.Empty;
 
             InitMarketTemplateField();
-            IsPreloader = false;
+            _isPreloader = false;
 
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
         }
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
-            IsPreloader = true;
+            _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
@@ -259,24 +253,24 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.SearchText = string.Empty;
 
             InitMarketTemplateField();
-            IsPreloader = false;
+            _isPreloader = false;
 
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
         }
         public async Task OnConfigChangedEvent(ChangeEventArgs e)
         {
-            IsPreloader = true;
+            _isPreloader = true;
             ConfigFilterModel.FilterConfigStatus = int.Parse(e.Value.ToString());
             await IsMarketEditingChanged.InvokeAsync();
 
             ConfigFilterModel.SearchText = string.Empty;
 
             InitMarketTemplateField();
-            IsPreloader = false;
+            _isPreloader = false;
         }
         public async Task OnMarketChangedEvent(ChangeEventArgs e)
         {
-            IsPreloader = true;
+            _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
@@ -291,13 +285,18 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.SearchText = string.Empty;
 
             InitMarketTemplateField();
-            IsPreloader = false;
+            _isPreloader = false;
 
             await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
         }
         public void Dispose()
         {
+            _marketTemplateGroupResponse = null;
+            _marketLookup = null;
 
+            TradingService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
         #endregion
 
@@ -384,15 +383,15 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private async Task<List<MarketGroupNavigationModel>> GetMarketTemplateGroup(int scope, int sportId)
         {
-            if (MarketTemplateGroupResponse == null)
-                MarketTemplateGroupResponse = (await TradingService.GetMarketTemplateGroups(scope)).Result;
+            if (_marketTemplateGroupResponse == null)
+                _marketTemplateGroupResponse = (await TradingService.GetMarketTemplateGroups(scope)).Result;
 
-            if (MarketTemplateGroupResponse == null)
+            if (_marketTemplateGroupResponse == null)
             {
                 return new List<MarketGroupNavigationModel>();
             }
 
-            var sportMarketTemplateGroup = MarketTemplateGroupResponse.Sports.Where(s => s.SportId == sportId).FirstOrDefault();
+            var sportMarketTemplateGroup = _marketTemplateGroupResponse.Sports.Where(s => s.SportId == sportId).FirstOrDefault();
 
             if (sportMarketTemplateGroup == null)
             {
@@ -412,9 +411,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var marketTemplateGroupNames = tempMarketTemplateGroup.Select(s => s.MarketTemplateGroupName).Distinct().ToList();
 
             var MarketTemplateGroups = new List<MarketGroupNavigationModel>();
-            MarketLookup = (await TradingService.GetMarketLookup(new MarketLookupRequest { FixtureTypeId = (int)FixtureType, SportId = sportId })).Result;
+            _marketLookup = (await TradingService.GetMarketLookup(new MarketLookupRequest { FixtureTypeId = (int)FixtureType, SportId = sportId })).Result;
 
-            if (MarketLookup != null)
+            if (_marketLookup != null)
             {
                 if (marketTemplateGroupNames.Any())
                 {
@@ -430,7 +429,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             marketTemplates.AddRange(lst);
                         }
 
-                        foreach (var markettemplate in MarketLookup.MarketLookup)
+                        foreach (var markettemplate in _marketLookup.MarketLookup)
                         {
                             if (marketTemplates.Distinct().ToList().Contains(markettemplate.MarketTemplateId))
                             {
@@ -461,7 +460,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             MarketTemplateGroupId = 1,
                             MarketTemplateGroupName = "All Markets",
                             SortOrder = 1,
-                            MarketTemplateIds = MarketLookup.MarketLookup.Select(s => s.MarketTemplateId).Distinct().ToList()
+                            MarketTemplateIds = _marketLookup.MarketLookup.Select(s => s.MarketTemplateId).Distinct().ToList()
                         }
                     });
                 }
@@ -476,7 +475,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             foreach (var MarketTemplateGroup in MarketTemplateGroups)
             {
                 var marketTemplateGroupId = MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId;
-                foreach (var marketLookup in MarketLookup.MarketLookup)
+                foreach (var marketLookup in _marketLookup.MarketLookup)
                 {
                     if (MarketTemplateGroup.MarketTemplateGroup.MarketTemplateIds.Contains(marketLookup.MarketTemplateId))
                     {

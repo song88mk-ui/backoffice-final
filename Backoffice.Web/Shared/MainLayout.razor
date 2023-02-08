@@ -17,11 +17,11 @@
             <div class="sidebar">
                 @if (NavigationManager.Uri.Contains("/admin"))
                 {
-                    <NavMenu NavMenuAccess="NavMenuAccess.Admin" />
+                    <NavMenu NavMenuAccess="PermissionCategory.Admin" NavMenus="NavMenus" />
                 }
                 else
                 {
-                    <NavMenu NavMenuAccess="NavMenuAccess.SBC" />
+                    <NavMenu NavMenuAccess="PermissionCategory.SBC" NavMenus="NavMenus" />
                 }
             </div>
             <main>
@@ -31,5 +31,5 @@
             </main>
         </div>
     }
-</CascadingValue> 
+</CascadingValue>
 <ToastComponent />
