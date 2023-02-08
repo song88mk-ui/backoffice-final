@@ -47,7 +47,7 @@ namespace Backoffice.Web.Components.Common
         {
             category.IsEnabled = !category.IsEnabled;
 
-            if(category.IsEnabled == false)
+            if (category.IsEnabled == false)
             {
                 await OnDisableClickEvent(category);
             }
@@ -85,6 +85,21 @@ namespace Backoffice.Web.Components.Common
                     {
                         if ((IsSubUser && !claim.IsEnabled) == false && claim.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
                             claim.ClaimValue = "1";
+                    }
+
+                    if (subCategory.Groups != null && subCategory.Groups.Any())
+                    {
+                        foreach (var group in subCategory.Groups)
+                        {
+                            if (group.Claims != null && group.Claims.Any())
+                            {
+                                foreach (var claim in group.Claims)
+                                {
+                                    if ((IsSubUser && !claim.IsEnabled) == false && claim.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
+                                        claim.ClaimValue = "1";
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -205,7 +220,7 @@ namespace Backoffice.Web.Components.Common
                                 SubCategoryName = subCategory.SubCategoryName,
                                 Claims = claims,
                                 Groups = groupList,
-                                ColPosition = permission.CategoryName != "SportsbookClient" ? string.Empty : subCategory.SubCategoryName == "Odds Engine" ? "RIGHT" : "LEFT" 
+                                ColPosition = permission.CategoryName != "SportsbookClient" ? string.Empty : subCategory.SubCategoryName == "Odds Engine" ? "RIGHT" : "LEFT"
                             });
                         }
                     }

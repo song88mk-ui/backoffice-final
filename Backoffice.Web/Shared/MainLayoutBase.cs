@@ -130,6 +130,11 @@ namespace Backoffice.Web.Shared
                                     Url = $"#sub-menu-{categoryId}",
                                 };
 
+                                if(category == "User & User Groups")
+                                {
+                                    menu.IconName = "manage-user-group";
+                                }
+
                                 foreach (var subMenu in subMenus)
                                 {
                                     var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenu.ClaimType);

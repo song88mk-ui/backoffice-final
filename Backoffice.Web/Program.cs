@@ -36,13 +36,11 @@ builder.Services.AddAuthorization(options =>
     #endregion
 
     #region Trading
-    options.AddPolicy("trading-menu-monitoring-match", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_Monitoring_Match.ToString().Replace('_', '.')}",
+    options.AddPolicy("trading-menu-monitoring-match", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_Monitoring_MatchType.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("trading-menu-monitoring-outrights", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_Monitoring_Outrights.ToString().Replace('_', '.')}",
             $"{(int)Access.Edit}", $"{(int)Access.View}"));
-    options.AddPolicy("trading-menu-config-match", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_Config_Match.ToString().Replace('_', '.')}",
-        $"{(int)Access.Edit}", $"{(int)Access.View}"));
-    options.AddPolicy("trading-menu-config-outrights", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_Config_Outrights.ToString().Replace('_', '.')}",
+    options.AddPolicy("trading-menu-config", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_Config.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("trading-menu-settlement-market", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_Settlement_Message.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
