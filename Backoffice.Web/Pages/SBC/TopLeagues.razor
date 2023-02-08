@@ -1,9 +1,10 @@
 ﻿@using Backoffice.Web.Components.Common
 @using Backoffice.Web.Components.TopLeagues
+@using Backoffice.Shared.Enums
 
 @page "/top-leagues"
 
-<AuthorizeView Policy="sbc-menu-topleagues">
+<AuthorizeView Policy="sbc-topleagues">
     <Authorized>
         <div class="row">
             <div class="main-content col-md-12 mb-4 pb-3">
@@ -48,21 +49,34 @@
                                                     </div>
                                                 </td>
                                                 <td class="py-2">
-                                                    <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="_ => OnEditClickEvent(item)">
-                                                        <i class="fa fa-edit"></i>
-                                                    </a>
-                                                    @if (item.TopLeagues.Any())
-                                                    {
-                                                        <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="_ => OnCopyClickEvent(item)">
-                                                            <i class="fa fa-copy"></i>
-                                                        </a>
-                                                    }
-                                                    else
-                                                    {
-                                                        <a class="tl-link-copy-disabled me-2">
-                                                            <i class="fa fa-copy"></i>
-                                                        </a>
-                                                    }
+                                                    <AuthorizeView Policy="sbc-topleagues-canedit">
+                                                        <Authorized Context="ActivateAll">
+                                                            <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="_ => OnEditClickEvent(item)">
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                            @if (item.TopLeagues.Any())
+                                                            {
+                                                                <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="_ => OnCopyClickEvent(item)">
+                                                                    <i class="fa fa-copy"></i>
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a class="tl-link-copy-disabled me-2">
+                                                                    <i class="fa fa-copy"></i>
+                                                                </a>
+                                                            }
+                                                        </Authorized>
+                                                        <NotAuthorized Context="ActivateAll">
+                                                            <a class="tl-link-edit me-2" href="javascript:(0)" disabled>
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                            <a class="tl-link-copy-disabled me-2">
+                                                                <i class="fa fa-copy"></i>
+                                                            </a>
+                                                        </NotAuthorized>
+                                                    </AuthorizeView>
+                                                    
                                                 </td>
                                             </tr>
                                         }
