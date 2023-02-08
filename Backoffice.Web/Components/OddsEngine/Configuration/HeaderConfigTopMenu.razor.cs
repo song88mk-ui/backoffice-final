@@ -20,11 +20,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #endregion
 
         #region Methods
-        protected override async Task OnInitializedAsync()
-        {
-            
-        }
-
         public async Task OnImportExportMarginsClickEvent()
         {
             var parameters = new ModalParameters();
@@ -62,7 +57,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public void Dispose()
         {
-            
+            GC.SuppressFinalize(this);
         }
         #endregion
 

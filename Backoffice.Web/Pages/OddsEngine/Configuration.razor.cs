@@ -7,14 +7,9 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.JSInterop;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Shared.OutgoingEngineMessages;
-using System.Runtime.CompilerServices;
-using Backoffice.Web.Components.Common;
-using System.Security.Policy;
-using Blazored.LocalStorage;
 using Backoffice.Web.Components.OddsEngine.Configuration;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -25,7 +20,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }        
-        [Inject] public IConfiguration AppConfiguration { get; set; }        
+        [Inject] private IConfiguration AppConfiguration { get; set; }        
         [Inject] public ToastService? ToastService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -34,21 +29,24 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<BreadcrumbModel> Breadcrumbs { get; set; }        
         public List<MarketLookupNavigationModel> MarketLookupNavigationModelsTemp { get; set; }
         public List<AlertModel> Alerts { get; set; }
-
-        private ToastService toasterService => ToastService!;        
-        public ConfigFilterModel ConfigFilterModel { get; set; }                
-        private HubConnection HubConnection { get; set; }           
+        
+        public ConfigFilterModel ConfigFilterModel { get; set; }                           
 
         public FixtureType FixtureType { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public int? AllMarketStatus { get; set; }
-        public string AllMarketStatusName { get; set; }                        
-        public bool IsConnected => HubConnection.State == HubConnectionState.Connected;        
+        public string AllMarketStatusName { get; set; }                                        
         public bool IsMarketEditing { get; set; }        
         private Guid Guid { get; set; }
 
+        #endregion
+
+        #region Fields
+        private HubConnection _hubConnection { get; set; }
+        private bool _isConnected => _hubConnection.State == HubConnectionState.Connected;
+        private ToastService _toasterService => ToastService!;
         #endregion
 
         #region Methods
@@ -138,10 +136,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async ValueTask DisposeAsync()
         {
-            if (HubConnection != null)
+            if (_hubConnection != null)
             {
-                await HubConnection.StopAsync();
-                await HubConnection.DisposeAsync();
+                await _hubConnection.StopAsync();
+                await _hubConnection.DisposeAsync();
             }
         }
         public void Dispose()
@@ -451,28 +449,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (result.StatusCode == StatusCode.Success)
                 {
                     await ShowMarketChangedAlert(AlertStatus.Success, "Config has been updated");
-                    //if (result?.Result != null && result?.Result?.Notifications.Count != 0)
-                    //{
-                    //    var notificationsDetailsModel = result?.Result?.Notifications;
-                    //    foreach (var item in notificationsDetailsModel)
-                    //    {
-                    //        var notifications = new NotificationsDetailsModel
-                    //        {
-                    //            Id = Guid.NewGuid(),
-                    //            Page = "Config",
-                    //            ClientCode = item.ClientCode,
-                    //            SportsId = item.SportsId,
-                    //            Details = item.Details,
-                    //            PageRedirect = item.PageRedirect,
-                    //            UserId = item.UserId,
-                    //            ClaimType = item.ClaimType,
-                    //            Type = item.Type
-                    //        };
-                    //        MessageBroker.Publish(JsonSerializer.Serialize(notifications), "OnNewNotification", "r.oe.util.notifications", Guid.NewGuid().ToString());
-                    //    }
-
-                    //    await JSRuntime.InvokeVoidAsync("ShowNotication", SaveButton, "Config has been updated.");
-                    //}
 
                     OnMarketConfigMessage messageMarket = new OnMarketConfigMessage
                     {
@@ -523,9 +499,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         IsActive = -99
                     })).Result;
 
-                    if (IsConnected) await HubConnection.SendAsync("OnConfigChange", data);
-
-                    //SaveBarVisible = false;
+                    if (_isConnected) await _hubConnection.SendAsync("OnConfigChange", data);                    
                 }
                 else
                 {
@@ -730,27 +704,27 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             var request = HttpContextAccessor.HttpContext?.Request;
 
-            HubConnection = new HubConnectionBuilder()
+            _hubConnection = new HubConnectionBuilder()
                 .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
                 .Build();
 
-            HubConnection.Closed += async (error) =>
+            _hubConnection.Closed += async (error) =>
             {
                 await Task.Delay(new Random().Next(0, 5) * 1000);
-                await HubConnection.StartAsync();
+                await _hubConnection.StartAsync();
             };
-            HubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
+            _hubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
             {
                 await ProcessOnConfigChange(message);
             });
 
-            HubConnection.On<NotificationsModel>("onnewnotification", async message =>
+            _hubConnection.On<NotificationsModel>("onnewnotification", async message =>
             {
                 await ProcessNotification(message);
             });
 
 
-            await HubConnection.StartAsync();            
+            await _hubConnection.StartAsync();            
         }
 
         private async Task ProcessOnConfigChange(ConfigSettingsModel message)
@@ -801,7 +775,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 if (message.Page.Contains("Config"))
                 {
-                    toasterService.AddToast(Toast.NewToast("Export Margins", message.Details, true));
+                    _toasterService.AddToast(Toast.NewToast("Export Margins", message.Details, true));
                 }
             }
         }
