@@ -1,7 +1,10 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Linq;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Shared
@@ -15,10 +18,10 @@ namespace Backoffice.Web.Shared
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
-        [Parameter] public NavMenuAccess NavMenuAccess { get; set; }
+        [Parameter] public PermissionCategory NavMenuAccess { get; set; }
+        [Parameter] public NavMenuModel NavMenus { get; set; }
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
 
-        public IEnumerable<Claim> Claims { get; set; }
         public SportClickCallbackModel SelectedSport { get; set; }
 
         public SportsTreeModel Menu { get; set; }
@@ -37,8 +40,8 @@ namespace Backoffice.Web.Shared
         {
             Menu = new SportsTreeModel();
             SelectedSport = new SportClickCallbackModel();
-
-            if (NavMenuAccess == NavMenuAccess.OE)
+            
+            if (NavMenuAccess == PermissionCategory.OE)
             {
                 await GetSportsTreeMenu();
 
@@ -75,11 +78,6 @@ namespace Backoffice.Web.Shared
                 //StateHasChanged();
             }
 
-            if (UserModel != null)
-            {
-                if (UserModel.Claims != null && Claims == null)
-                    Claims = UserModel.Claims;
-            }
         }
 
         public void ToggleNavMenu()
@@ -176,7 +174,7 @@ namespace Backoffice.Web.Shared
         #endregion
 
         #region Utilities
-
+        
         private async Task GetSportsTreeMenu()
         {
             var response = await BackOfficeService.GetSportsTreeAsync((int)FixtureType.Match);

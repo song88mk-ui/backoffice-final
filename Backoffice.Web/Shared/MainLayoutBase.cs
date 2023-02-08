@@ -1,10 +1,13 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace Backoffice.Web.Shared
@@ -15,6 +18,7 @@ namespace Backoffice.Web.Shared
         [Inject] private ToastService? _toasterService { get; set; }
         [Inject] private IHttpContextAccessor _httpContextAccessor { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+        [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
@@ -29,6 +33,7 @@ namespace Backoffice.Web.Shared
 
         public UserModel UserModel { get; set; } = new UserModel();
         public LogInModel Model { get; set; }
+        public NavMenuModel NavMenus { get; set; }
 
         public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
         //public bool IsPreLoader { get; set; } = true;
@@ -66,7 +71,7 @@ namespace Backoffice.Web.Shared
                     clients = (await BackOfficeService.GetClients()).Result;
 
                 var tasks = new List<Task>();
-                var permissions = new List<string>() { "CLIENTCODES", "USERID", "TOKENNAME", "MAINUSERID" };
+                var otherPermissions = new List<string>() { "CLIENTCODES", "USERID", "TOKENNAME", "MAINUSERID" };
 
                 if (userClaims is not null)
                 {
@@ -78,7 +83,63 @@ namespace Backoffice.Web.Shared
                     UserModel.Id = userClaims.Where(x => x.Type.ToUpper() == "USERID").FirstOrDefault()?.Value ?? "";
                     UserModel.UserName = userClaims.Where(x => x.Type.ToUpper() == "TOKENNAME").FirstOrDefault()?.Value ?? "";
                     UserModel.MainUserId = userClaims.Where(x => x.Type.ToUpper() == "MAINUSERID").FirstOrDefault()?.Value ?? "";
-                    UserModel.Claims = userClaims.Where(x => !permissions.Contains(x.Type.ToUpper())).ToList();
+                    UserModel.Claims = userClaims.Where(x => !otherPermissions.Contains(x.Type.ToUpper())).ToList();
+                }
+
+                NavMenus = new NavMenuModel();
+
+                var NavMenuAccess = PermissionCategory.SBC;
+                if (NavigationManager.Uri.Contains("/admin"))
+                    NavMenuAccess = PermissionCategory.Admin;
+
+                var permissions = await GetPermissionList();
+                if (permissions != null)
+                {
+                    permissions.Permissions = permissions.Permissions.OrderBy(o => o.CategoryId).ThenBy(o => o.SortOrder).ToList();
+
+                    if (UserModel != null && UserModel.Claims != null)
+                    {
+                        var permissionSubCategory = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.')).Select(s => s.SubCategoryName).Distinct();
+
+                        foreach (var category in permissionSubCategory)
+                        {
+                            var subMenus = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.SubCategoryName == category).ToList();
+                            if (subMenus.Count() == 1)
+                            {
+                                var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
+                                if (claim != null && claim.Value != "0")
+                                {
+                                    var menu = await GetMenu(claim, subMenus[0].Name);
+                                    NavMenus.Menus.Add(menu);
+                                }
+                            }
+                            else
+                            {
+                                var categoryId = category.ToLower().Replace(" ", "-").Replace("&", "");
+                                var menu = new NavMenuModel.MenuModel
+                                {
+                                    Id = $"sub-menu-{categoryId}",
+                                    Name = category,
+                                    IconName = categoryId,
+                                    Url = $"#sub-menu-{categoryId}",
+                                };
+
+                                foreach (var subMenu in subMenus)
+                                {
+                                    var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenu.ClaimType);
+                                    if (claim != null && claim.Value != "0")
+                                    {
+                                        var submenu1 = await GetMenu(claim, subMenu.Name);
+                                        menu.SubMenus.Add(submenu1);
+                                    }
+                                }
+
+                                if (menu.SubMenus.Any())
+                                    NavMenus.Menus.Add(menu);
+                            }
+
+                        }
+                    }
                 }
 
                 IsPreLoader = false;
@@ -181,6 +242,77 @@ namespace Backoffice.Web.Shared
                 toasterService.AddToast(Toast.NewToast
                         (message.Page, message.Details, true));
             }
+        }
+        private async Task<NavMenuModel.MenuModel> GetMenu(Claim claim, string name)
+        {
+            var menu = new NavMenuModel.MenuModel
+            {
+                Id = $"menu.{claim.Type.ToLower()}",
+                Name = claim.Value == "2" ? $"{name} (Readonly)" : $"{name}",
+            };
+
+            if (claim.Type == AdminPermission.Admin_Dashboard.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "dashboard";
+                menu.Url = "admin/dashboard";
+            }
+            else if (claim.Type == AdminPermission.Admin_ManageUsers.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "manage-user";
+                menu.Url = "admin/manage-user";
+            }
+            else if (claim.Type == AdminPermission.Admin_ManageUserGroups.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "manage-user-group";
+                menu.Url = "admin/manage-usergroup";
+            }
+            else if (claim.Type == AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "manual-bet-settlement";
+                menu.Url = "admin/manual-bet-settlement";
+            }
+            else if (claim.Type == AdminPermission.Admin_Settlements_ResendSettlement.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "resend-settlement";
+                menu.Url = "admin/resend-settlement";
+            }
+            else if (claim.Type == AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "market-settlement";
+                menu.Url = "admin/market-settlement";
+            }
+            else if (claim.Type == AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "message-settlement";
+                menu.Url = "admin/message-settlement";
+            }
+            else if (claim.Type == AdminPermission.Admin_CancelBets.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "cancel-bets";
+                menu.Url = "admin/cancel-bets";
+            }
+            else if (claim.Type == AdminPermission.Admin_CancelBetsHistory.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "cancel-bet-history";
+                menu.Url = "admin/cancel-bet-history";
+            }
+
+            return menu;
+        }
+
+        private async Task<PermissionResponse> GetPermissionList()
+        {
+            var response = await AuthenticationService.GetPermissionList(false);
+
+            if (response.StatusCode == StatusCode.Success)
+            {
+                return new PermissionResponse
+                {
+                    Permissions = response.Result.Permissions ?? new List<PermissionModel>(),
+                };
+            }
+
+            return new PermissionResponse();
         }
 
         #endregion
