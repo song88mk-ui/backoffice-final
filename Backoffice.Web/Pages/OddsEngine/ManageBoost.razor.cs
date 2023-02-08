@@ -18,25 +18,27 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
+        public List<PriceBoostConfigModel> PriceBoostList { get; set; }
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
+
         public Filter FilterReference { get; set; }
 
         public string PageTitle { get; set; }
-        public string IconClass { get; set; }
+        public string IconClass { get; set; }                
+                
+        private bool IsPreLoader { get; set; }
+        private string AlertMessage { get; set; }
+        private AlertStatus AlertStatus { get; set; }
 
-        public MetaData MetaData { get; set; }
-        public List<PriceBoostConfigModel> PriceBoostList { get; set; }
-        public LanguagesModel LanguagesModel { get; set; }
-        public List<BreadcrumbModel> Breadcrumbs { get; set; }
-        public string ClientCode { get; set; }
-        public int SportId { get; set; }
-        public int SegmentId { get; set; }
-        public int LeagueId { get; set; }
-        public string Search { get; set; }
+        #endregion
 
-        public bool IsPreLoader { get; set; }
-        public string AlertMessage { get; set; }
-        public AlertStatus AlertStatus { get; set; }
-
+        #region Fields
+        public LanguagesModel _languagesModel { get; set; }
+        private string _search { get; set; }        
+        public string _clientCode { get; set; }
+        public int _sportId { get; set; }
+        public int _segmentId { get; set; }
+        public int _leagueId { get; set; }
         #endregion
 
         #region Methods
@@ -60,29 +62,24 @@ namespace Backoffice.Web.Pages.OddsEngine
                     Url = "odds-engine/manage-boost",
                     IsCurrentPage = true
                 }
-            };
-
-            MetaData = new MetaData();
+            };            
         }
 
         public async Task OnEditClickEvent(PriceBoostConfigModel priceboost)
         {
-            LanguagesModel = new LanguagesModel();
+            _languagesModel = new LanguagesModel();
 
-            LanguagesModel.Languages = LanguagesModel.Languages.Where(c => !priceboost.BoostedSelectionTranslations
-            .Select(s => s.Language.LanguageCode).ToList().Contains(c.LanguageCode)).ToList();
-
-            //string obj = JsonSerializer.Serialize(priceboost);
+            _languagesModel.Languages = _languagesModel.Languages.Where(c => !priceboost.BoostedSelectionTranslations
+            .Select(s => s.Language.LanguageCode).ToList().Contains(c.LanguageCode)).ToList();            
 
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("DialogStyle", "max-width: 90rem;top:50%;transform:translateY(-50%)");
-            //parameters.Add("PriceBoostConfigModel", JsonSerializer.Deserialize<PriceBoostConfigModel>(obj));
+            parameters.Add("DialogStyle", "max-width: 90rem;top:50%;transform:translateY(-50%)");            
             parameters.Add("PriceBoostConfigModel", priceboost);
             parameters.Add("PriceBoostConfigModelSerialized", JsonSerializer.Serialize(priceboost));
-            parameters.Add("Languages", LanguagesModel);            
+            parameters.Add("Languages", _languagesModel);            
 
             var options = new ModalOptions();
 
@@ -124,64 +121,55 @@ namespace Backoffice.Web.Pages.OddsEngine
         
         public async Task OnClientChangedEvent(string clientCode)
         {
-            ClientCode = clientCode;
+            _clientCode = clientCode;
 
             await GetContents();
         }
 
         public async Task OnSportChangedEvent(int sportId)
         {
-            SportId = sportId;
-            SegmentId = 0;
-            LeagueId = 0;
-
-            //PriceBoostFilterModel.SegmentId = 0;
-            //PriceBoostFilterModel.LeagueId = 0;
-
-            //PriceBoostFilterModel.Segments = await LoadSegments(sportId);
-            //PriceBoostFilterModel.Leagues = await LoadLeagues(sportId, PriceBoostFilterModel.SegmentId);
+            _sportId = sportId;
+            _segmentId = 0;
+            _leagueId = 0;
 
             await GetContents();
         }
 
         public async Task OnSegmentChangedEvent(int segmentId)
         {
-            SegmentId = segmentId;
-            LeagueId = 0;
-            //PriceBoostFilterModel.LeagueId = 0;
-
-            //PriceBoostFilterModel.Leagues = await LoadLeagues(param.Item1, param.Item2);
+            _segmentId = segmentId;
+            _leagueId = 0;
 
             await GetContents();
         }
 
         public async Task OnLeagueChangedEvent(int leagueId)
         {
-            LeagueId = leagueId;
+            _leagueId = leagueId;
 
             await GetContents();
         }
 
         public async Task OnInputSearchEvent(string search)
         {
-            Search = search;
+            _search = search;
 
             await GetContents();
         }
 
         public async Task OnModalSave(object message)
         {
-            ClientCode = string.Empty;
-            SportId = 0;
-            SegmentId = 0;
-            LeagueId = 0;
-            Search = string.Empty;
+            _clientCode = string.Empty;
+            _sportId = 0;
+            _segmentId = 0;
+            _leagueId = 0;
+            _search = string.Empty;
 
-            FilterReference.SelectedClientCode = ClientCode;
-            FilterReference.SelectedSportId = SportId;
-            FilterReference.SelectedSegmentId = SegmentId;
-            FilterReference.SelectedLeagueId = LeagueId;
-            FilterReference.SearchForm.SearchText = Search;
+            FilterReference.SelectedClientCode = _clientCode;
+            FilterReference.SelectedSportId = _sportId;
+            FilterReference.SelectedSegmentId = _segmentId;
+            FilterReference.SelectedLeagueId = _leagueId;
+            FilterReference.SearchForm.SearchText = _search;
 
             AlertMessage = $"Price Boost has been {(string)message}!";
             AlertStatus = AlertStatus.Success;
@@ -204,7 +192,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
-            TradingService.Dispose();
+            PriceBoostList = null;
+            Breadcrumbs = null;
+            FilterReference = null;
+            _languagesModel = null;
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion
@@ -217,10 +210,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var priceBoostConfigResponse = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
             {
-                ClientCode = !string.IsNullOrEmpty(ClientCode) ? ClientCode : string.Empty,
-                SportId = SportId > 0 ? SportId.ToString() : string.Empty,
-                SegmentId = SegmentId > 0 ? SegmentId.ToString() : string.Empty,
-                LeagueId = LeagueId > 0 ? LeagueId.ToString() : string.Empty,
+                ClientCode = !string.IsNullOrEmpty(_clientCode) ? _clientCode : string.Empty,
+                SportId = _sportId > 0 ? _sportId.ToString() : string.Empty,
+                SegmentId = _segmentId > 0 ? _segmentId.ToString() : string.Empty,
+                LeagueId = _leagueId > 0 ? _leagueId.ToString() : string.Empty,
                 ProviderFixtureId = string.Empty,
                 MarketTemplateId = string.Empty,
                 SelectionTemplateId = string.Empty,
@@ -240,13 +233,13 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     query = query.Where(c => UserModel.ClientCodes.Contains(c.ClientCode));
 
-                    if (!string.IsNullOrEmpty(Search))
+                    if (!string.IsNullOrEmpty(_search))
                     {
-                        var search = Search.ToLower();
+                        var search = _search.ToLower();
 
-                        query = query.Where(c => c.ClientName.ToLower().Contains(search) || c.SportName.ToLower().Contains(search)
-                        || c.SegmentName.ToLower().Contains(search) || c.LeagueName.ToLower().Contains(search)
-                        || c.SelectionName.ToLower().Contains(search));
+                        query = query.Where(c => c.ClientName.ToLower().Contains(_search) || c.SportName.ToLower().Contains(_search)
+                        || c.SegmentName.ToLower().Contains(_search) || c.LeagueName.ToLower().Contains(_search)
+                        || c.SelectionName.ToLower().Contains(_search));
                     }
 
                     PriceBoostList = query.ToList();

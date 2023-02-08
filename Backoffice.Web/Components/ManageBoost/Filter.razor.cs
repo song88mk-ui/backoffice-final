@@ -35,15 +35,6 @@ namespace Backoffice.Web.Components.ManageBoost
 
         #endregion
 
-        //#region Fields
-
-        //public string _clientCode;
-        //public int _sportId;
-        //public int _segmentId;
-        //public int _leagueId;
-
-        //#endregion
-
         #region Methods
 
         protected override async Task OnInitializedAsync()
@@ -141,6 +132,13 @@ namespace Backoffice.Web.Components.ManageBoost
 
         public void Dispose()
         {
+            Clients = null;
+            Sports = null;
+            Segments = null;
+            Leagues = null;
+            SearchForm = null;
+
+            GC.SuppressFinalize(this);
         }
 
         #endregion

@@ -17,26 +17,32 @@ namespace Backoffice.Web.Components.MarketSettlement
 {
     public partial class Filter : IDisposable
     {
-        #region Properties
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        #region Properties        
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IMessageBroker MessageBroker { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
+
         [Parameter] public MarketSettlementModalFilterModel FilterModel { get; set; }
         [Parameter] public EventCallback<MarketSettlementModalFilterModel> FilterModelChanged { get; set; }
         [Parameter] public EventCallback OnInitializeCallback { get; set; }
         [Parameter] public EventCallback OnExportCallback { get; set; }
-        public bool ShowFilter { get; set; }
-        public MarketFixtureResponse MarketFixtureResponse { get; set; }
-        public MarketFixtureResponse MarketFixtureOutrightResponse { get; set; }
-        public List<SelectListItemModel<int>> Sports { get; set; }
-        public List<SelectListItemModel<int>> Segments { get; set; }
-        public List<SelectListItemModel<int>> Leagues { get; set; }
-        public List<SelectListItemModel<string>> Fixtures { get; set; }
-        public List<SelectListItemModel<string>> Markets { get; set; }
-        public List<SelectListItemModel<int>> Statuses { get; set; }
-        public List<SelectListItemModel<string>> Selections { get; set; }
+
+        private bool ShowFilter { get; set; }        
+        private List<SelectListItemModel<int>> Sports { get; set; }
+        private List<SelectListItemModel<int>> Segments { get; set; }
+        private List<SelectListItemModel<int>> Leagues { get; set; }
+        private List<SelectListItemModel<string>> Fixtures { get; set; }
+        private List<SelectListItemModel<string>> Markets { get; set; }
+        private List<SelectListItemModel<int>> Statuses { get; set; }
+        private List<SelectListItemModel<string>> Selections { get; set; }
+        #endregion
+
+        #region Fields
+        private MarketFixtureResponse _marketFixtureResponse { get; set; }
+        private MarketFixtureResponse _marketFixtureOutrightResponse { get; set; }
         #endregion
 
         #region Methods
@@ -58,12 +64,12 @@ namespace Backoffice.Web.Components.MarketSettlement
                 ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
             };
 
-            MarketFixtureResponse = new MarketFixtureResponse()
+            _marketFixtureResponse = new MarketFixtureResponse()
             {
                 Fixtures = new List<FixtureModel>(),
             };
 
-            MarketFixtureOutrightResponse = new MarketFixtureResponse()
+            _marketFixtureOutrightResponse = new MarketFixtureResponse()
             {
                 Fixtures = new List<FixtureModel>(),
             };
@@ -326,13 +332,13 @@ namespace Backoffice.Web.Components.MarketSettlement
         private async Task<List<SelectListItemModel<string>>> GetFixtures(int sportId, int segmentId, int leagueId)
         {
 
-            MarketFixtureResponse = new MarketFixtureResponse();
+            _marketFixtureResponse = new MarketFixtureResponse();
 
-            MarketFixtureOutrightResponse = new MarketFixtureResponse();
+            _marketFixtureOutrightResponse = new MarketFixtureResponse();
 
             var newMarketFixtureResponse = new List<SelectListItemModel<string>>();
 
-            MarketFixtureResponse = (await TradingService.GetSportsBookFixtures(new MarketFixtureRequest
+            _marketFixtureResponse = (await TradingService.GetSportsBookFixtures(new MarketFixtureRequest
             {
                 FixtureTypeId = (int)FixtureType.Match,
                 LeagueId = leagueId,
@@ -341,7 +347,7 @@ namespace Backoffice.Web.Components.MarketSettlement
                 AllFixtureStatus = true,
             })).Result;
 
-            MarketFixtureOutrightResponse = (await TradingService.GetSportsBookOutrightFixtures(new MarketFixtureRequest
+            _marketFixtureOutrightResponse = (await TradingService.GetSportsBookOutrightFixtures(new MarketFixtureRequest
             {
                 FixtureTypeId = (int)FixtureType.Outright,
                 LeagueId = leagueId,
@@ -349,18 +355,18 @@ namespace Backoffice.Web.Components.MarketSettlement
                 SportId = sportId,
             })).Result;
 
-            if (MarketFixtureResponse == null && MarketFixtureOutrightResponse == null)
+            if (_marketFixtureResponse == null && _marketFixtureOutrightResponse == null)
                 return new List<SelectListItemModel<string>>();
 
-            if (MarketFixtureResponse.Fixtures.Count > 0)
-                newMarketFixtureResponse.AddRange(MarketFixtureResponse.Fixtures.Select(s => new SelectListItemModel<string>()
+            if (_marketFixtureResponse.Fixtures.Count > 0)
+                newMarketFixtureResponse.AddRange(_marketFixtureResponse.Fixtures.Select(s => new SelectListItemModel<string>()
                 {
                     Value = s.FixtureId,
                     Name = s.FixtureName
                 }).Distinct().ToList());
 
-            if (MarketFixtureOutrightResponse.Fixtures.Count > 0)
-                newMarketFixtureResponse.AddRange(MarketFixtureOutrightResponse.Fixtures.Select(s => new SelectListItemModel<string>()
+            if (_marketFixtureOutrightResponse.Fixtures.Count > 0)
+                newMarketFixtureResponse.AddRange(_marketFixtureOutrightResponse.Fixtures.Select(s => new SelectListItemModel<string>()
                 {
                     Value = s.FixtureId,
                     Name = s.FixtureName
@@ -371,14 +377,14 @@ namespace Backoffice.Web.Components.MarketSettlement
 
         private async Task<List<SelectListItemModel<string>>> GetMarkets(string fixtureId)
         {
-            if (MarketFixtureResponse == null && MarketFixtureOutrightResponse == null)
+            if (_marketFixtureResponse == null && _marketFixtureOutrightResponse == null)
                 return new List<SelectListItemModel<string>>();
 
             var markets = new List<SelectListItemModel<string>>();
 
-            if (MarketFixtureResponse != null && MarketFixtureResponse.Fixtures.Any())
+            if (_marketFixtureResponse != null && _marketFixtureResponse.Fixtures.Any())
             {
-                var fixture = MarketFixtureResponse.Fixtures.Where(f => f.FixtureId == fixtureId).FirstOrDefault();
+                var fixture = _marketFixtureResponse.Fixtures.Where(f => f.FixtureId == fixtureId).FirstOrDefault();
                 if (fixture == null)
                     return new List<SelectListItemModel<string>>();
 
@@ -391,9 +397,9 @@ namespace Backoffice.Web.Components.MarketSettlement
                 if (markets2 != null && markets2.Any())
                     markets.AddRange(markets2);
             }
-            if (MarketFixtureOutrightResponse != null && MarketFixtureOutrightResponse.Fixtures.Any())
+            if (_marketFixtureOutrightResponse != null && _marketFixtureOutrightResponse.Fixtures.Any())
             {
-                var fixture = MarketFixtureOutrightResponse.Fixtures.Where(f => f.FixtureId == fixtureId).FirstOrDefault();
+                var fixture = _marketFixtureOutrightResponse.Fixtures.Where(f => f.FixtureId == fixtureId).FirstOrDefault();
                 if (fixture == null)
                     return new List<SelectListItemModel<string>>();
 
@@ -465,14 +471,14 @@ namespace Backoffice.Web.Components.MarketSettlement
 
         private async Task<List<SelectListItemModel<string>>> GetSelections(string fixtureId, string marketId)
         {
-            if (MarketFixtureResponse == null && MarketFixtureOutrightResponse == null)
+            if (_marketFixtureResponse == null && _marketFixtureOutrightResponse == null)
                 return new List<SelectListItemModel<string>>();
 
             var selections = new List<SelectListItemModel<string>>();
 
-            if (MarketFixtureResponse != null && MarketFixtureResponse.Fixtures.Any())
+            if (_marketFixtureResponse != null && _marketFixtureResponse.Fixtures.Any())
             {
-                var fixture = MarketFixtureResponse.Fixtures.Where(f => f.FixtureId == fixtureId).FirstOrDefault();
+                var fixture = _marketFixtureResponse.Fixtures.Where(f => f.FixtureId == fixtureId).FirstOrDefault();
                 if (fixture == null)
                     return new List<SelectListItemModel<string>>();
 
@@ -489,9 +495,9 @@ namespace Backoffice.Web.Components.MarketSettlement
                 if (selection2 != null && selection2.Any())
                     selections.AddRange(selection2);
             }
-            if (MarketFixtureOutrightResponse != null && MarketFixtureOutrightResponse.Fixtures.Any())
+            if (_marketFixtureOutrightResponse != null && _marketFixtureOutrightResponse.Fixtures.Any())
             {
-                var fixture = MarketFixtureOutrightResponse.Fixtures.Where(f => f.FixtureId == fixtureId).FirstOrDefault();
+                var fixture = _marketFixtureOutrightResponse.Fixtures.Where(f => f.FixtureId == fixtureId).FirstOrDefault();
                 if (fixture == null)
                     return new List<SelectListItemModel<string>>();
 

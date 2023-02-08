@@ -23,13 +23,13 @@ namespace Backoffice.Web.Pages.Administration
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-        public bool IsPreLoader { get; set; }
+        private bool IsPreLoader { get; set; }
 
         #endregion
 
         #region Fields
 
-        private ToastService toasterService => ToasterService!;
+        private ToastService _toasterService => ToasterService!;
 
         #endregion
 
@@ -99,7 +99,7 @@ namespace Backoffice.Web.Pages.Administration
         }
         public async Task OnExportClickedEvent()
         {
-            toasterService.AddToast(Toast.NewToast
+            _toasterService.AddToast(Toast.NewToast
                     ("Market Settlement",
                     $"Success! Excel file is being generated system will notify once done."));
         }
@@ -109,8 +109,14 @@ namespace Backoffice.Web.Pages.Administration
         }
         public void Dispose()
         {
+            ModalFilter = null;
+            ManualMarketSettlements = null;
+            MetaData = null;
+
             TradingService.Dispose();
             BackOfficeService.Dispose();
+            ToasterService.Dispose();
+            _toasterService.Dispose();
 
             GC.SuppressFinalize(this);
         }
