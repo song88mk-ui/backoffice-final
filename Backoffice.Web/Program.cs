@@ -29,7 +29,7 @@ builder.Services.AddAuthorization(options =>
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("sbc-menu-topfixtures", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_TopFixtures.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
-    options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_Parlay.ToString().Replace('_', '.')}",
+    options.AddPolicy("sbc-menu-parlaybonus", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_ParlayBonus.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("sbc-menu-subuser", policy => policy.RequireClaim("MainUserId",
         ""));

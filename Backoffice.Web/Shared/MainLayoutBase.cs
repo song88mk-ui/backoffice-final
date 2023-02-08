@@ -103,12 +103,18 @@ namespace Backoffice.Web.Shared
 
                         foreach (var category in permissionSubCategory)
                         {
-                            var subMenus = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.SubCategoryName == category).ToList();
+                            var subMenus = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.') && p.SubCategoryName == category).ToList();
                             if (subMenus.Count() == 1)
                             {
                                 var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
                                 if (claim != null && claim.Value != "0")
                                 {
+                                    if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel?.MainUserId))
+                                        continue;
+
+                                    if (!string.IsNullOrEmpty(subMenus[0].GroupName) && subMenus[0].ClaimType.Contains(SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".")))
+                                        continue;
+
                                     var menu = await GetMenu(claim, subMenus[0].Name);
                                     NavMenus.Menus.Add(menu);
                                 }
@@ -129,6 +135,26 @@ namespace Backoffice.Web.Shared
                                     var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenu.ClaimType);
                                     if (claim != null && claim.Value != "0")
                                     {
+                                        if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel?.MainUserId))
+                                            continue;
+
+
+                                        if (claim.Type == SportsbookClientPermission.SBC_OE.ToString().Replace("_", "."))
+                                        {
+                                            var menu2 = new NavMenuModel.MenuModel
+                                            {
+                                                Id = $"sub-menu-odds-engine",
+                                                Name = "Odds Engine",
+                                                IconName = "odds-engine",
+                                                Url = $"odds-engine",
+                                            };
+                                            NavMenus.Menus.Add(menu2);
+                                            continue;
+                                        }
+
+                                        if (!string.IsNullOrEmpty(subMenu.GroupName) && subMenu.ClaimType.Contains(SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".")))
+                                            continue;
+
                                         var submenu1 = await GetMenu(claim, subMenu.Name);
                                         menu.SubMenus.Add(submenu1);
                                     }
@@ -137,8 +163,8 @@ namespace Backoffice.Web.Shared
                                 if (menu.SubMenus.Any())
                                     NavMenus.Menus.Add(menu);
                             }
-
                         }
+
                     }
                 }
 
@@ -251,6 +277,7 @@ namespace Backoffice.Web.Shared
                 Name = claim.Value == "2" ? $"{name} (Readonly)" : $"{name}",
             };
 
+            //ADMIN
             if (claim.Type == AdminPermission.Admin_Dashboard.ToString().Replace('_', '.'))
             {
                 menu.IconName = "dashboard";
@@ -296,6 +323,94 @@ namespace Backoffice.Web.Shared
                 menu.IconName = "cancel-bet-history";
                 menu.Url = "admin/cancel-bet-history";
             }
+            else if (claim.Type == AdminPermission.Admin_Maintenance.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "maintenance";
+                menu.Url = "admin/maintenance";
+            }
+
+            //SBC
+            if (claim.Type == SportsbookClientPermission.SBC_Dashboard.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "dashboard";
+                menu.Url = "/dashboard";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Reports_DrillDownReport.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "drill-down-report";
+                menu.Url = "/drill-down-report";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Reports_OpenBets.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "open-bets";
+                menu.Url = "/open-bets";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Reports_SearchBetId.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "search-bet";
+                menu.Url = "/search-bet";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Reports_SearchUserId.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "search-user";
+                menu.Url = "/search-user";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Reports_SearchEvent.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "search-event";
+                menu.Url = "/search-event";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Reports_MonitorUsers.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "monitor-users";
+                menu.Url = "/monitor-users";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Reports_Sports.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "sports";
+                menu.Url = "/sports";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Reports_MarketReport.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "market-report";
+                menu.Url = "/market-report";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Reports_CLTV.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "cltv";
+                menu.Url = "/cltv";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Reports_Performance.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "performance";
+                menu.Url = "/performance";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Settings_TopLeagues.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "top-leagues";
+                menu.Url = "/top-leagues";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Settings_TopFixtures.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "top-fixtures";
+                menu.Url = "/top-fixtures";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Settings_ParlayBonus.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "parlay-bonus";
+                menu.Url = "/parlay-bonus";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "sub-user";
+                menu.Url = "/sub-user";
+            }
+            else if (claim.Type == SportsbookClientPermission.SBC_Clients.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "clients";
+                menu.Url = "clients";
+            }
+
 
             return menu;
         }
