@@ -1,6 +1,7 @@
 ﻿using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Drawing;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -10,12 +11,20 @@ namespace Backoffice.Web.Pages.SBC
 
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public ICommonService CommonService { get; set; }
+        [Inject] public IConfiguration Configuration { get; set; }
 
         public ElementReference VizContainer { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public string Token { get; set; }
+        public string IFrameSrc { get; set; }
+
+        #endregion
+
+        #region Fields
+
+        private string _region;        
 
         #endregion
 
@@ -27,6 +36,15 @@ namespace Backoffice.Web.Pages.SBC
             IconClass = "ico ico-drill-down-report";
 
             Token = CommonService.GenerateToken();
+
+            await Initialize();
+        }
+
+        private async Task Initialize()
+        {
+            _region = Configuration["Region"].ToString();
+
+            IFrameSrc = _region == "HK" ? "https://tableau.song88.com/t/song88/views/10bet/2_Reporting" : "";            
         }
 
         public void Dispose()
