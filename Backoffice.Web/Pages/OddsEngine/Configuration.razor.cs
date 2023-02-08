@@ -24,10 +24,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Properties
         [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IMessageBroker MessageBroker { get; set; }
-        [Inject] public IConfiguration AppConfiguration { get; set; }
-        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] private ITradingService TradingService { get; set; }        
+        [Inject] public IConfiguration AppConfiguration { get; set; }        
         [Inject] public ToastService? ToastService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -37,8 +35,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<MarketLookupNavigationModel> MarketLookupNavigationModelsTemp { get; set; }
         public List<AlertModel> Alerts { get; set; }
 
-        private ToastService toasterService => ToastService!;
-        public Configuration ConfigComponent { get; set; }
+        private ToastService toasterService => ToastService!;        
         public ConfigFilterModel ConfigFilterModel { get; set; }                
         private HubConnection HubConnection { get; set; }           
 
@@ -47,10 +44,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public int? AllMarketStatus { get; set; }
-        public string AllMarketStatusName { get; set; }        
-        public string ToastTitle { get; set; }
-        public string ToastMessage { get; set; }
-        public bool IsToastMessageMarkup { get; set; }        
+        public string AllMarketStatusName { get; set; }                        
         public bool IsConnected => HubConnection.State == HubConnectionState.Connected;        
         public bool IsMarketEditing { get; set; }        
         private Guid Guid { get; set; }
@@ -61,8 +55,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         protected override async Task OnInitializedAsync()
         {            
             PageTitle = "Config";
-            IconClass = "";
-            IsToastMessageMarkup = true;
+            IconClass = "";            
             ConfigFilterModel = null;
             IsMarketEditing = false;
             AllMarketStatusName = "Deactivate All";
@@ -153,6 +146,14 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public void Dispose()
         {
+            SelectedContents = null;
+            Breadcrumbs = null;
+            MarketLookupNavigationModelsTemp = null;
+            Alerts = null;
+            ConfigFilterModel = null;
+            TradingService.Dispose();
+
+            GC.SuppressFinalize(this);
         }
         #endregion
 

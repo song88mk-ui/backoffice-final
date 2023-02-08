@@ -6,7 +6,7 @@
             </button>
 
             <div class="d-flex justify-content-around market-toggle">
-                <span>@(Market.MarketLookup.IsActive ? "Market Active" : "Market Inactive")&nbsp;</span>
+                <span class="market-is-active-text">@(Market.MarketLookup.IsActive ? "Market Active" : "Market Inactive")&nbsp;</span>
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox"
                            id="@($"Market-{Market.MarketLookup.MarketTemplateId}Toggle")" role="switch"

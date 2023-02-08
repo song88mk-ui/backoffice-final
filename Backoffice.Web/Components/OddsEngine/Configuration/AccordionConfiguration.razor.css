@@ -31,3 +31,8 @@
 .form-check-input:checked {
     background-color: #404E67;
 }
+
+.market-is-active-text {
+    flex-grow: 1;
+    text-align: right;
+}
