@@ -25,7 +25,14 @@
             </div>
         </div>
         <div class="button-container d-flex flex-row-reverse align-items-end">
-            <a href="javascript:void(0)" class="btn btn-create px-4" @onclick="OnCreateClientClickEvent">Create Client</a>
+            <AuthorizeView Policy="sbc-clients-canedit">
+                <Authorized Context="ActivateAll">
+                    <a href="javascript:void(0)" class="btn btn-create px-4" @onclick="OnCreateClientClickEvent">Create Client</a>
+                </Authorized>
+                <NotAuthorized Context="ActivateAll">
+                    <a href="javascript:void(0)" class="btn btn-create px-4" disabled>Create Client</a>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
     </div>
 </div>

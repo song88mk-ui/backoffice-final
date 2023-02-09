@@ -3,7 +3,7 @@
 
 @page "/sub-user"
 
-<AuthorizeView Policy="sbc-menu-subuser">
+<AuthorizeView Policy="sbc-subusers">
     <Authorized>
         <div class="row">
             <div class="main-content col-md-12 mb-4 pb-3">
@@ -65,14 +65,22 @@
                                                 }
                                             </td>
                                             <td>
-                                                <a class="link-edit me-2" href="javascript:(0)" @onclick="() => OnEditSubUserClickEvent(user)">
-                                                    <i class="fa fa-edit"></i>
-                                                </a>
+                                                <AuthorizeView Policy="sbc-subusers-canedit">
+                                                    <Authorized Context="ActivateAll">
+                                                        <a class="link-edit me-2" href="javascript:(0)" @onclick="() => OnEditSubUserClickEvent(user)">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
+                                                    </Authorized>
+                                                    <NotAuthorized Context="ActivateAll">
+                                                        <a class="link-edit me-2" href="javascript:(0)">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
+                                                    </NotAuthorized>
+                                                </AuthorizeView>
                                             </td>
                                         </tr>
                                     }
                                 }
-
                             </tbody>
                             <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="4" />
                         </table>
@@ -85,5 +93,6 @@
         </div>
     </Authorized>
     <NotAuthorized>
+        <AccessDenied />
     </NotAuthorized>
 </AuthorizeView>

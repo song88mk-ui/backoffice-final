@@ -3,78 +3,93 @@
 @using Backoffice.Web.Components.Clients
 
 @page "/clients"
-
-<div class="row">
-    <div class="main-content col-md-12 mb-4 pb-3">
+<AuthorizeView Policy="sbc-clients">
+    <Authorized>
         <div class="row">
-            <div class="col-md-12">
-                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-            </div>
-            @if (Alerts != null && Alerts.Any())
-            {
-                foreach (var alert in Alerts)
-                {
-                    <div class="col-md-12 mt-4 ">
-                        <div class="mx-3">
-                            <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" />
-                        </div>
+            <div class="main-content col-md-12 mb-4 pb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
                     </div>
-                }
-            }
-            <div class="col-md-12">
-                <Filter OnInitCallback="OnInitEvent" OnCreateClientCallback="OnCreateClientClickEvent" />
-            </div>
-            <div class="col-md-12">
-                <table class="table table-hover table-borderless mt-4">
-                    <thead class="table-head">
-                        <tr>
-                            <th class="th-number py-3">No.</th>
-                            <th class="th-business-name py-3">Business Name</th>
-                            <th class="th-website py-3">Website</th>
-                            <th class="th-status py-3">Status</th>
-                            <th class="th-region py-3">Region</th>
-                            <th class="th-bet-settings py-3">Bet Settings</th>
-                            <th class="th-action py-3">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var client in ClientListModel.Clients)
+                    @if (Alerts != null && Alerts.Any())
+                    {
+                        foreach (var alert in Alerts)
                         {
-
-                            <tr>
-                                <td>@client.Num</td>
-                                <td>
-                                    <span class="fw-bold">@client.Name</span>
-                                </td>
-                                <td>@client.Website</td>
-                                <td>
-                                    @if (client.StatusId == (int)ClientStatus.Normal)
-                                    {
-                                        <span class="status-normal py-1 px-4 rounded-pill">@client.StatusName</span>
-                                    }
-                                    else if (client.StatusId == (int)ClientStatus.Locked)
-                                    {
-                                        <span class="status-locked py-1 px-4 rounded-pill">@client.StatusName</span>
-                                    }
-                                </td>
-                                <td>@client.Region</td>
-                                <td>
-                                    <a class="btn btn-bet-settings" href="javascript:(0)" @onclick="() => OnViewBetSettingClickEvent(client)">View Bet Settings</a>
-                                </td>
-                                <td>
-                                    <a class="link-edit me-2" href="javascript:(0)" @onclick="() => OnEditClientClickEvent(client)">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                </td>
-                            </tr>                        
+                            <div class="col-md-12 mt-4 ">
+                                <div class="mx-3">
+                                    <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" />
+                                </div>
+                            </div>
                         }
-                    </tbody>
-                    <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="5" />
-                </table>
+                    }
+                    <div class="col-md-12">
+                        <Filter OnInitCallback="OnInitEvent" OnCreateClientCallback="OnCreateClientClickEvent" />
+                    </div>
+                    <div class="col-md-12">
+                        <table class="table table-hover table-borderless mt-4">
+                            <thead class="table-head">
+                                <tr>
+                                    <th class="th-number py-3">No.</th>
+                                    <th class="th-business-name py-3">Business Name</th>
+                                    <th class="th-website py-3">Website</th>
+                                    <th class="th-status py-3">Status</th>
+                                    <th class="th-region py-3">Region</th>
+                                    <th class="th-bet-settings py-3">Bet Settings</th>
+                                    <th class="th-action py-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var client in ClientListModel.Clients)
+                                {
+
+                                    <tr>
+                                        <td>@client.Num</td>
+                                        <td>
+                                            <span class="fw-bold">@client.Name</span>
+                                        </td>
+                                        <td>@client.Website</td>
+                                        <td>
+                                            @if (client.StatusId == (int)ClientStatus.Normal)
+                                            {
+                                                <span class="status-normal py-1 px-4 rounded-pill">@client.StatusName</span>
+                                            }
+                                            else if (client.StatusId == (int)ClientStatus.Locked)
+                                            {
+                                                <span class="status-locked py-1 px-4 rounded-pill">@client.StatusName</span>
+                                            }
+                                        </td>
+                                        <td>@client.Region</td>
+                                        <td>
+                                            <a class="btn btn-bet-settings" href="javascript:(0)" @onclick="() => OnViewBetSettingClickEvent(client)">View Bet Settings</a>
+                                        </td>
+                                        <td>
+                                            <AuthorizeView Policy="sbc-clients-canedit">
+                                                <Authorized Context="ActivateAll">
+                                                    <a class="link-edit me-2" href="javascript:(0)" @onclick="() => OnEditClientClickEvent(client)">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                </Authorized>
+                                                <NotAuthorized Context="ActivateAll">
+                                                    <a class="link-edit me-2" href="javascript:(0)" disabled>
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                </NotAuthorized>
+                                            </AuthorizeView>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="5" />
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-<div>
-    <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
-</div>
+        <div>
+            <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

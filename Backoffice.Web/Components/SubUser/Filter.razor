@@ -8,7 +8,14 @@
             </div>
         </div>
         <div class="button-container d-flex flex-row-reverse align-items-end">
-            <a href="javascript:void(0)" class="btn btn-create px-4" @onclick="OnCreateSubUserClickEvent">Create Sub User</a>
+            <AuthorizeView Policy="sbc-subusers-canedit">
+                <Authorized Context="ActivateAll">
+                    <a href="javascript:void(0)" class="btn btn-create px-4" @onclick="OnCreateSubUserClickEvent">Create Sub User</a>
+                </Authorized>
+                <NotAuthorized Context="ActivateAll">
+                    <a href="javascript:void(0)" class="btn btn-create px-4" disabled>Create Sub User</a>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
     </div>
 </div>

@@ -20,13 +20,13 @@
                     </select>
                 }
             </div>
-            <div class="odds-container d-flex justify-content-center align-self-end">                
+            <div class="odds-container d-flex justify-content-center align-self-end">
                 <div class="input-group border-0">
                     <span class="input-group-text min-odds-text">Minimum Odds Per Selection</span>
                     @if (IsUpdating)
                     {
-                        <input type="number" @ref="ParlayBonusMinOddsElementReference" @bind="ClientParlayBonusResponse.ParlayBonusMinOdds" 
-                        class="form-control pe-5 min-odds-input text-center @(IsFormValid ? "border-danger":"")" @oninput="ValidateParlayBonusMinOdds"/>
+                        <input type="number" @ref="ParlayBonusMinOddsElementReference" @bind="ClientParlayBonusResponse.ParlayBonusMinOdds"
+                           class="form-control pe-5 min-odds-input text-center @(IsFormValid ? "border-danger":"")" @oninput="ValidateParlayBonusMinOdds" />
                     }
                     else
                     {
@@ -39,48 +39,41 @@
             </div>
         </div>
         <div class="button-container d-flex align-items-end">
-            <!-- Update -->
-            @if (IsUpdating)
-            {
-                <button type="button" class="btn btn-cancel px-4 py-2 me-2" @onclick="OnCancelClickEvent">Cancel</button>
-                <button type="button" class="btn btn-save px-4 py-2 me-2" @onclick="OnSaveClickEvent" id="saveChangesBtn" disabled="@IsSaveDisabled">Save Changes</button>
-
-                @if (ClientParlayBonusResponse.ParlayBonusConfig.Any())
-                {
-                    @if (ClientParlayBonusResponse.ParlayBonusConfig.Last().ParlayBonus == 0 || ClientParlayBonusResponse.ParlayBonusConfig.Count >= 50)
+            <AuthorizeView Policy="sbc-parlaybonus-canedit">
+                <Authorized Context="ActivateAll">
+                    <!-- Update -->
+                    @if (IsUpdating)
                     {
-                        <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" disabled id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference">Add</button>
+                        <button type="button" class="btn btn-cancel px-4 py-2 me-2" @onclick="OnCancelClickEvent">Cancel</button>
+                        <button type="button" class="btn btn-save px-4 py-2 me-2" @onclick="OnSaveClickEvent" id="saveChangesBtn" disabled="@IsSaveDisabled">Save Changes</button>
+
+                        @if (ClientParlayBonusResponse.ParlayBonusConfig.Any())
+                        {
+                            @if (ClientParlayBonusResponse.ParlayBonusConfig.Last().ParlayBonus == 0 || ClientParlayBonusResponse.ParlayBonusConfig.Count >= 50)
+                            {
+                                <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" disabled id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference">Add</button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference">Add</button>
+                            }
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference">Add</button>
+                        }
                     }
                     else
                     {
-                        <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference">Add</button>
+                        <button type="button" class="btn btn-update px-4 py-2" @onclick="OnUpdateClickEvent" disabled="@(ClientId == "0")">Update</button>
                     }
-                }
-                else
-                {
-                    <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference">Add</button>
-                }
-            }
-            else
-            {
-                @if (ClientId != "0")
-                {
-                    <button type="button" class="btn btn-update px-4 py-2" @onclick="OnUpdateClickEvent">Update</button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-update px-4 py-2" @onclick="OnUpdateClickEvent" disabled>Update</button>
-                }
-                @*if (!string.IsNullOrEmpty(ClientId) || ClientId != "0")
-                {
-                    <button type="button" class="btn btn-update px-4" @onclick="OnUpdateClickEvent">Update</button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-update px-4" @onclick="OnUpdateClickEvent" disabled>Update</button>
-                }*@
-            }
+                </Authorized>
+                <NotAuthorized Context="ActivateAll">
+                    <button type="button" class="btn btn-cancel px-4 py-2 me-2" disabled>Cancel</button>
+                    <button type="button" class="btn btn-save px-4 py-2 me-2" id="saveChangesBtn" disabled>Save Changes</button>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
     </div>
 </div>
-<input type="number" @bind="InvalidCount" id="invalidCount" hidden/>
+<input type="number" @bind="InvalidCount" id="invalidCount" hidden />
