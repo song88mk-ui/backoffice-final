@@ -1,18 +1,19 @@
-﻿@if (IsPreLoader)
-{
-    <Preloader />
-}
-else
-{
-    <div class="modal-body">
-        <div class="row">
-            <div class="col-md-12">
-                <MarketSettlementModalFilter OnUpdateRowCallback="UpdateRowDetails" OnLeagueChangedCallback="SetMarketFixtures" />
-            </div>
+﻿
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12">
+            <MarketSettlementModalFilter OnUpdateRowCallback="UpdateRowDetails" OnLeagueChangedCallback="SetMarketFixtures" />
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-12">
+    <div class="row">
+        <div class="col-md-12">
+            @if (IsPreLoader)
+            {
+                <Preloader />
+            }
+            else
+            {
                 <table class="table table-bordered mt-4">
                     <thead class="table-head">
                         <tr>
@@ -30,9 +31,8 @@ else
                         @if (AddMarketSettlement != null && AddMarketSettlement.AddMarketSettlementSelections.Any())
                         {
                             var marketId = string.Empty;
-                            for (var i = 0; i < AddMarketSettlement.AddMarketSettlementSelections.Count; i++)
+                            for (var index = 0; index < AddMarketSettlement.AddMarketSettlementSelections.Count; index++)
                             {
-                                int index = i;
                                 <tr>
                                     @if (!string.IsNullOrEmpty(AddMarketSettlement.BetId) && AddMarketSettlement.AddMarketSettlementSelections.Count > 1)
                                     {
@@ -43,7 +43,7 @@ else
                                         </td>
                                     }
 
-                                    @if (i == 0 || AddMarketSettlement.AddMarketSettlementSelections[index].MarketId != marketId)
+                                    @if (index == 0 || AddMarketSettlement.AddMarketSettlementSelections[index].MarketId != marketId)
                                     {
                                         var rowCount = AddMarketSettlement.AddMarketSettlementSelections.Where(c => c.MarketId == AddMarketSettlement.AddMarketSettlementSelections[index].MarketId).Count();
                                         marketId = AddMarketSettlement.AddMarketSettlementSelections[index].MarketId;
@@ -54,8 +54,6 @@ else
                                             }
                                             else
                                             {
-
-
                                                 <span>&nbsp;&nbsp;</span> @AddMarketSettlement.AddMarketSettlementSelections[index].SportName
 
                                                 <br />
@@ -75,22 +73,20 @@ else
                                             }
                                         </td>
                                     }
-
                                     <td align="left" valign="top">
                                         @if (string.IsNullOrEmpty(AddMarketSettlement.AddMarketSettlementSelections[index].SelectionName))
                                         {
                                             <p>_</p>
                                         }
                                         else
+                                        {
                                             @AddMarketSettlement.AddMarketSettlementSelections[index].SelectionName
-
-
-
-                                        </td>
-                                        <td valign="middle" align="left">
-                                            <select class="form-control input-sm" name="Status" @onchange="(ChangeEventArgs __e) => OnAddStatusChange(__e, AddMarketSettlement.AddMarketSettlementSelections[index].RowCount)">
-                                                <option value="0">Select Status</option>
-                                                @if (AddMarketSettlement.AddMarketSettlementSelections[index].Statuses != null)
+                                        }
+                                    </td>
+                                    <td valign="middle" align="left">
+                                        <select class="form-control input-sm" name="Status" @onchange="(e) => OnAddStatusChange(e, AddMarketSettlement.AddMarketSettlementSelections[index].RowCount)">
+                                            <option value="0">Select Status</option>
+                                            @if (AddMarketSettlement.AddMarketSettlementSelections[index].Statuses != null)
                                             {
                                                 @foreach (var item in AddMarketSettlement.AddMarketSettlementSelections[index].Statuses)
                                                 {
@@ -112,14 +108,14 @@ else
                         }
                     </tbody>
                 </table>
-            </div>
-        </div>
-        <div class="div-alert mb-2 mt-2 pt-1 pb-1">
-            <AlertMessage AlertStatus="@_alertModel.Status" AlertMessageStr="@_alertModel.Message" Opacity="@_alertModel.Opacity" AlwaysShow="false" />
+            }
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelModal">Cancel</button>
-        <button type="button" class="btn modal-btn btn-settle" @onclick="OnMarketSettlement">Settle Market</button>
+    <div class="div-alert mb-2 mt-2 pt-1 pb-1">
+        <AlertMessage AlertStatus="@AlertModel.Status" AlertMessageStr="@AlertModel.Message" Opacity="AlertModel.Opacity" AlwaysShow="false" />
     </div>
-}
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelModal">Cancel</button>
+    <button type="button" class="btn modal-btn btn-settle" @onclick="OnMarketSettlement">Settle Market</button>
+</div>

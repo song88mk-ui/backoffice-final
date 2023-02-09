@@ -41,11 +41,14 @@
                                     </td>
                                 </tr>
                             }
-                            else if (ManualMarketSettlements != null && ManualMarketSettlements.Any())
+                            else if (ManualMarketSettlements.Any())
                             {
+                                var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+
                                 @foreach (var item in ManualMarketSettlements)
                                 {
-                                    int rowCount = (ManualMarketSettlements.IndexOf(item) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                                    rowCount++;
+
                                     <tr>
                                         <th scope="row">
                                             @rowCount

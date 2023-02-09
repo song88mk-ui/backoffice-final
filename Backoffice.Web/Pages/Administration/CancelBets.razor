@@ -51,8 +51,8 @@
                                     <tr>
                                         <td class="text-center">@bet.Num</td>
                                         <td>
-                                            <div class="input-group">
-                                                <input type="text" class="@(!IsPreload && Alerts.Any(a => a.Control == bet.Num.ToString()) ? "form-control border-danger" : "form-control")" @bind-value="bet.BetReferenceId" />
+                                            <div class="input-group @(!IsPreload && Alerts.Any(a => a.Control == bet.Num.ToString()) ? "border-danger" : "") ">
+                                                <input type="text" class="form-control" @bind-value="bet.BetReferenceId" />
                                                 @if (!IsPreload && !string.IsNullOrEmpty(bet.BetReferenceId))
                                                 {
                                                     <span class="input-group-text form-clear" @onclick="() => OnClearBetReferenceClickEvent(bet)"><i class="fa fa-remove"></i></span>
@@ -87,7 +87,7 @@
                                     <div class="form-floating">
                                         @if (CancelBetModel != null)
                                         {
-                                            <textarea class="@(!IsPreload && IsReasonRequired ? "form-control input-reason border-danger" : "form-control input-reason")" @bind="CancelBetModel.Reason" />
+                                            <textarea class="form-control input-reason @(!IsPreload && IsReasonRequired ? "border-danger" : "")" @bind="CancelBetModel.Reason" />
                                         }
                                     </div>
                                 </td>

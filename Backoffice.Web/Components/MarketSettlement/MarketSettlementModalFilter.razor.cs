@@ -10,14 +10,13 @@ namespace Backoffice.Web.Components.MarketSettlement
     public partial class MarketSettlementModalFilter : IDisposable
     {
         #region Properties
-        [Inject] private IModalService ModalService { get; set; }
+
         [Inject] private ITradingService TradingService { get; set; }
-        [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+
         [Parameter] public EventCallback<AddMarketSettlementModel> OnUpdateRowCallback { get; set; }
         [Parameter] public AddMarketSettlementModel AddMarketSettlement { get; set; } = new AddMarketSettlementModel();
-        [Parameter] public EventCallback<AddMarketSettlementModel> FilterChanged { get; set; }
         [Parameter] public EventCallback<Tuple<MarketFixtureResponse, MarketFixtureResponse>> OnLeagueChangedCallback { get; set; }
+
         public MarketFixtureResponse MarketFixtures { get; set; }
         public MarketFixtureResponse MarketOutrightFixtures { get; set; }
         public List<SelectListItemModel<int>> Sports { get; set; }
@@ -25,13 +24,16 @@ namespace Backoffice.Web.Components.MarketSettlement
         public List<SelectListItemModel<int>> Leagues { get; set; }
         public List<SelectListItemModel<string>> Fixtures { get; set; }
         public List<SelectListItemModel<string>> Markets { get; set; }
+
         #endregion
 
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             AddMarketSettlement = new AddMarketSettlementModel();
         }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -60,6 +62,7 @@ namespace Backoffice.Web.Components.MarketSettlement
                 await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
             }
         }
+
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {
             if (string.IsNullOrEmpty(e.Value.ToString()))
@@ -161,9 +164,11 @@ namespace Backoffice.Web.Components.MarketSettlement
         {
 
         }
+
         #endregion
 
         #region Utilities
+
         private async Task<List<SelectListItemModel<int>>> GetSports()
         {
             var result = await TradingService.GetSportLookup();
@@ -205,6 +210,7 @@ namespace Backoffice.Web.Components.MarketSettlement
 
             return leagues;
         }
+
         private async Task<List<SelectListItemModel<string>>> GetSelections(string fixtureId, string marketId)
         {
             if (MarketFixtures == null && MarketOutrightFixtures == null)
@@ -413,6 +419,7 @@ namespace Backoffice.Web.Components.MarketSettlement
 
             return statuses;
         }
+
         #endregion
     }
 }

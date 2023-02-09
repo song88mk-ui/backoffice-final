@@ -1,13 +1,12 @@
-﻿using Backoffice.Shared.Models.Requests;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.ResendSettlement;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Text;
-using System;
-using Backoffice.Web.Components.ResendSettlement;
-using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.Models;
-using Backoffice.Shared.Enums;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -258,7 +257,7 @@ namespace Backoffice.Web.Pages.Administration
 
             return builder.ToString();
         }
-    }
 
-    #endregion
+        #endregion
+    }
 }

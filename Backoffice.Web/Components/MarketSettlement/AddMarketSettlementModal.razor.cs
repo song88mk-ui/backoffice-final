@@ -14,23 +14,30 @@ namespace Backoffice.Web.Components.MarketSettlement
     public partial class AddMarketSettlementModal : IDisposable
     {
         #region Properties
+
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+
         public AddMarketSettlementModel AddMarketSettlement { get; set; }
-        public bool IsPreLoader { get; set; }
         public MarketFixtureResponse MarketFixtures { get; set; }
         public MarketFixtureResponse MarketOutrightFixtures { get; set; }
-        private AlertModel _alertModel { get; set; }
+        public AlertModel AlertModel { get; set; }
+
+        public bool IsPreLoader { get; set; }
+
         #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             AddMarketSettlement = null;
-            _alertModel = new AlertModel();
+            AlertModel = new AlertModel();
         }
 
         public async Task OnAddStatusChange(ChangeEventArgs e, int rowCount)
@@ -288,13 +295,13 @@ namespace Backoffice.Web.Components.MarketSettlement
                 if (string.IsNullOrEmpty(row.FixtureId) || string.IsNullOrEmpty(row.MarketId) || string.IsNullOrEmpty(row.SelectionId)
                     || string.IsNullOrEmpty(row.FixtureName) || row.ToStatus == 0 || string.IsNullOrEmpty(row.Reason))
                 {
-                    _alertModel = new AlertModel()
+                    AlertModel = new AlertModel()
                     {
                         Status = "Error",
                         Message = "Error! All fields cannot be empty. Please fill in accordingly or remove the empty row",
                         Opacity = 1.0m,
                     };
-                    StateHasChanged();
+
                     return;
                 }
 
@@ -410,22 +417,25 @@ namespace Backoffice.Web.Components.MarketSettlement
 
                     await BackOfficeService.AddActivityLogList(ActivityLogs);
                 }
+
                 IsPreLoader = false;
-                _alertModel = new AlertModel()
+                AlertModel = new AlertModel()
                 {
                     Status = "Success",
                     Message = $"Markets {string.Join(",", request.Select(x => x.MarketName).ToList())} has been successfully settled.",
                     Opacity = 1.0m
                 };
+
                 StateHasChanged();
                 await Task.Delay(3500);
+
                 await Modal.OnSaveClickCallback.InvokeAsync();
                 ModalService.Cancel();
             }
             else
             {
                 IsPreLoader = false;
-                _alertModel = new AlertModel()
+                AlertModel = new AlertModel()
                 {
                     Status = "Error",
                     Message = "Market Settlement Failed!",
@@ -443,9 +453,11 @@ namespace Backoffice.Web.Components.MarketSettlement
         {
 
         }
+
         #endregion
 
         #region Utilities
+
         private async Task<List<SelectListItemModel<string>>> GetSelections(string fixtureId, string marketId)
         {
             if (MarketFixtures == null && MarketOutrightFixtures == null)
@@ -472,6 +484,7 @@ namespace Backoffice.Web.Components.MarketSettlement
                     }
                 }
             }
+
             if (MarketOutrightFixtures != null && MarketOutrightFixtures.Fixtures.Any())
             {
                 var fixture = MarketOutrightFixtures.Fixtures.Where(f => f.FixtureId == fixtureId).FirstOrDefault();
@@ -528,6 +541,7 @@ namespace Backoffice.Web.Components.MarketSettlement
 
             return statuses;
         }
+
         protected string GetMarketLine(string marketName, string line)
         {
             if (!string.IsNullOrEmpty(marketName))
@@ -568,6 +582,7 @@ namespace Backoffice.Web.Components.MarketSettlement
 
             return voidFactor;
         }
+
         #endregion
     }
 }

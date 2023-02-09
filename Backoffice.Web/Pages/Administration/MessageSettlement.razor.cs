@@ -23,7 +23,6 @@ namespace Backoffice.Web.Pages.Administration
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
-
         public MarketSettlementFilterModel FilterModel { get; set; } = new MarketSettlementFilterModel();
         public List<MessageSettlementModel> MessageSettlementModel { get; set; }
         public MetaData MetaData { get; set; }
@@ -38,7 +37,7 @@ namespace Backoffice.Web.Pages.Administration
 
         #region Fields
 
-        private ToastService toasterService => ToasterService!;
+        private ToastService _toasterService => ToasterService!;
 
         #endregion
 
@@ -77,7 +76,7 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task OnExportClickedEvent()
         {
-            toasterService.AddToast(Toast.NewToast
+            _toasterService.AddToast(Toast.NewToast
                     ("Message Settlement", 
                     $"Success! Excel file is being generated system will notify once done."));
         }

@@ -26,13 +26,6 @@ namespace Backoffice.Web.Components.MessageSettlement
         public EventCallback OnModalSave { get; set; }
         public ElementReference SaveButton { get; set; }
         public bool IsPreloader { get; set; }
-        #endregion
-
-        #region Fields
-
-        private string message = string.Empty;
-        private string divStyles = "display:none";
-        private string divClass = string.Empty;
         private Dictionary<string, object> InputAttributes { get; set; } =
             new Dictionary<string, object>()
             {
@@ -41,7 +34,16 @@ namespace Backoffice.Web.Components.MessageSettlement
 
         #endregion
 
+        #region Fields
+
+        private string message = string.Empty;
+        private string divStyles = "display:none";
+        private string divClass = string.Empty;
+
+        #endregion
+
         #region Methods
+
         protected override void OnInitialized()
         {
             IsPreloader = true;
@@ -245,9 +247,11 @@ namespace Backoffice.Web.Components.MessageSettlement
         {
 
         }
+
         #endregion
 
         #region Utilities
+
         private List<SelectListItemModel<int>> GetProducts()
         {
             return new List<SelectListItemModel<int>>()
@@ -268,6 +272,7 @@ namespace Backoffice.Web.Components.MessageSettlement
                 new SelectListItemModel<int> { Value = 17, Name = "vci" },
             };
         }
+
         #endregion
     }
 }

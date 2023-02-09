@@ -1,5 +1,4 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
@@ -8,9 +7,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using System.Text.Json;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.FixtureModel;
 
 namespace Backoffice.Web.Components.MarketSettlement
@@ -38,11 +35,14 @@ namespace Backoffice.Web.Components.MarketSettlement
         private List<SelectListItemModel<string>> Markets { get; set; }
         private List<SelectListItemModel<int>> Statuses { get; set; }
         private List<SelectListItemModel<string>> Selections { get; set; }
+
         #endregion
 
         #region Fields
-        private MarketFixtureResponse _marketFixtureResponse { get; set; }
-        private MarketFixtureResponse _marketFixtureOutrightResponse { get; set; }
+
+        private MarketFixtureResponse _marketFixtureResponse;
+        private MarketFixtureResponse _marketFixtureOutrightResponse;
+
         #endregion
 
         #region Methods
@@ -223,6 +223,7 @@ namespace Backoffice.Web.Components.MarketSettlement
             MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMarketSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
             await OnExportCallback.InvokeAsync();
         }
+
         public async Task OnSearchClickEvent()
         {
             await FilterModelChanged.InvokeAsync(FilterModel);
@@ -234,6 +235,7 @@ namespace Backoffice.Web.Components.MarketSettlement
         {
 
         }
+
         #endregion
 
         #region Utilities
@@ -287,6 +289,7 @@ namespace Backoffice.Web.Components.MarketSettlement
             }
 
         }
+
         private async Task<List<SelectListItemModel<int>>> GetSports()
         {
             var result = (await TradingService.GetSportLookup()).Result;
@@ -517,6 +520,7 @@ namespace Backoffice.Web.Components.MarketSettlement
 
             return selections.Distinct().ToList();
         }
+
         #endregion
     }
 }

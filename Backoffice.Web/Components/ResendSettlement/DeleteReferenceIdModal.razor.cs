@@ -1,5 +1,4 @@
-﻿using Backoffice.Web.Components.Common;
-using Backoffice.Web.Models;
+﻿using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -7,12 +6,19 @@ namespace Backoffice.Web.Components.ResendSettlement
 {
     public partial class DeleteReferenceIdModal : IDisposable
     {
+        #region Properties
+
         [Inject] private IModalService ModalService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter] private CustomModal Modal { get; set; }
+
         private ResendSettlementBetDetailModel Bet { get; set; }
         private EventCallback<ResendSettlementBetDetailModel> DeleteBetCallback { get; set; }
+
+        #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             Bet = ModalParameters.TryGet<ResendSettlementBetDetailModel>("ResendSettlementBetDetailModel");
@@ -35,6 +41,7 @@ namespace Backoffice.Web.Components.ResendSettlement
         {
             
         }
+
         #endregion
     }
 }

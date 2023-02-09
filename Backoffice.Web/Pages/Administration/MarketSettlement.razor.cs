@@ -54,11 +54,12 @@ namespace Backoffice.Web.Pages.Administration
 
             PageTitle = "Market Settlement";
             IconClass = "ico ico-market-settlement";
-            IsPreLoader = true;
         }
 
         public async Task GetContent()
         {
+            IsPreLoader = true;
+
             var fromDate = Convert.ToDateTime(ModalFilter.FromDate.ToString("yyyy-MM-dd 00:00:00"));
             var toDate = Convert.ToDateTime(ModalFilter.ToDate.ToString("yyyy-MM-dd 23:59:59"));
             var filterSportsId = ModalFilter.SportId == 0 ? "%" : ModalFilter.SportId.ToString();
@@ -94,19 +95,24 @@ namespace Backoffice.Web.Pages.Administration
                                         && (string.IsNullOrEmpty(ModalFilter.SelectionId) || x.SelectionId.ToString() == ModalFilter.SelectionId)
                                         && (string.IsNullOrEmpty(ModalFilter.SettledBy) || x.ManualSettledBy.ToUpper().Contains(ModalFilter.SettledBy.ToUpper()))).ToList();
 
-
             IsPreLoader = false;
         }
+
         public async Task OnExportClickedEvent()
         {
             _toasterService.AddToast(Toast.NewToast
                     ("Market Settlement",
                     $"Success! Excel file is being generated system will notify once done."));
         }
-        public async Task SelectPage()
-        {
 
+        public async Task SelectPage(int page)
+        {
+            MetaData.CurrentPage = page;
+
+            await GetContent();
+            //ClientListModel = await GetClientList(ClientListCallbackModel.SearchText, ClientListCallbackModel.SortBy, MetaData.CurrentPage);
         }
+
         public void Dispose()
         {
             ModalFilter = null;

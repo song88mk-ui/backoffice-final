@@ -7,7 +7,6 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using System.Text.Json;
 using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.FixtureModel;
 
@@ -16,13 +15,18 @@ namespace Backoffice.Web.Components.MessageSettlement
     public partial class Filter : IDisposable
     {
         #region Properties
+
         [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+
         [Parameter] public EventCallback OnInitializeCallback { get; set; }
         [Parameter] public EventCallback OnAddCallback { get; set; }
         [Parameter] public EventCallback OnExportCallback { get; set; }
         [Parameter] public EventCallback<MarketSettlementFilterModel> FilterModelChanged { get; set; }
         [Parameter] public MarketSettlementFilterModel FilterModel { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         public List<SelectListItemModel<int>> Sports { get; set; }
         public List<SelectListItemModel<int>> Segments { get; set; }
         public List<SelectListItemModel<int>> Leagues { get; set; }
@@ -30,15 +34,15 @@ namespace Backoffice.Web.Components.MessageSettlement
         public List<SelectListItemModel<string>> Markets { get; set; }
         public List<SelectListItemModel<string>> Selections { get; set; }
         public List<SelectListItemModel<int>> Statuses { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
         public MarketFixtureResponse MarketFixtures { get; set; }
         public MarketFixtureResponse MarketFixtureOutrights { get; set; }
+
         public bool ShowFilter { get; set; }
 
         #endregion
 
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             ShowFilter = false;
@@ -68,19 +72,14 @@ namespace Backoffice.Web.Components.MessageSettlement
             await FilterModelChanged.InvokeAsync(FilterModel);
             await Initialize();
         }
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                //await Initialize();
-            }
-        }
+
         public async Task OnAddMessageSettlement()
         {
             await FilterModelChanged.InvokeAsync(FilterModel);
 
             await OnAddCallback.InvokeAsync();
         }
+
         public async Task OnFilterClickEvent()
         {
             if (!ShowFilter)
@@ -88,11 +87,13 @@ namespace Backoffice.Web.Components.MessageSettlement
             else if (ShowFilter)
                 ShowFilter = false;
         }
+
         public void OnRangeSelect(DateRange range)
         {
             FilterModel.FromDate = Convert.ToDateTime(range.Start.ToString("yyyy-MM-dd 00:00:00"));
             FilterModel.ToDate = Convert.ToDateTime(range.End.ToString("yyyy-MM-dd 23:59:59"));
         }
+
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {
             FilterModel.SportId = int.Parse(e.Value.ToString());
@@ -115,6 +116,7 @@ namespace Backoffice.Web.Components.MessageSettlement
                 Leagues = await GetLeagues(FilterModel.SportId, FilterModel.SegmentId);
             }
         }
+
         public async Task OnSegmentChangedEvent(ChangeEventArgs e)
         {
             FilterModel.SegmentId = int.Parse(e.Value.ToString());
@@ -136,6 +138,7 @@ namespace Backoffice.Web.Components.MessageSettlement
             }
 
         }
+
         public async Task OnLeagueChangedEvent(ChangeEventArgs e)
         {
             FilterModel.LeagueId = int.Parse(e.Value.ToString());
@@ -155,6 +158,7 @@ namespace Backoffice.Web.Components.MessageSettlement
 
 
         }
+
         public async Task OnFixtureChangedEvent(ChangeEventArgs e)
         {
             FilterModel.FixtureId = e.Value.ToString();
@@ -171,10 +175,12 @@ namespace Backoffice.Web.Components.MessageSettlement
             }
 
         }
+
         public async Task OnStatusChangedEvent(ChangeEventArgs e)
         {
             FilterModel.ToStatus = int.Parse(e.Value.ToString());
         }
+
         public async Task OnMarketChangedEvent(ChangeEventArgs e)
         {
             FilterModel.MarketId = e.Value.ToString();
@@ -187,16 +193,19 @@ namespace Backoffice.Web.Components.MessageSettlement
                 Selections = await GetSelections(FilterModel.FixtureId, FilterModel.MarketId);
             }
         }
+
         public async Task OnSelectionChangedEvent(ChangeEventArgs e)
         {
             FilterModel.SelectionId = e.Value.ToString();
         }
+
         public async Task OnSubmitClickEvent()
         {
             await FilterModelChanged.InvokeAsync(FilterModel);
 
             await OnInitializeCallback.InvokeAsync();
         }
+
         public async Task OnExportClickEvent()
         {
 
@@ -223,12 +232,15 @@ namespace Backoffice.Web.Components.MessageSettlement
 
             await OnExportCallback.InvokeAsync();
         }
+
         public void Dispose()
         {
         }
 
         #endregion
+
         #region Initialize
+
         private async Task Initialize()
         {
             try
@@ -287,6 +299,7 @@ namespace Backoffice.Web.Components.MessageSettlement
             {
             }
         }
+
         private async Task<List<SelectListItemModel<int>>> GetSports()
         {
             var result = (await TradingService.GetSportLookup()).Result;
@@ -302,6 +315,7 @@ namespace Backoffice.Web.Components.MessageSettlement
 
             return sports;
         }
+
         private async Task<List<SelectListItemModel<int>>> GetSegments(int sportId)
         {
             var result = (await TradingService.GetSegmentLookup(sportId)).Result;
@@ -314,6 +328,7 @@ namespace Backoffice.Web.Components.MessageSettlement
 
             return segments;
         }
+
         private async Task<List<SelectListItemModel<int>>> GetLeagues(int sportId, int segmentId)
         {
             var result = (await TradingService.GetLeagueLookup(sportId, segmentId)).Result;
@@ -326,6 +341,7 @@ namespace Backoffice.Web.Components.MessageSettlement
 
             return leagues;
         }
+
         private async Task<List<SelectListItemModel<string>>> GetFixtures(int sportId, int segmentId, int leagueId)
         {
 
@@ -377,6 +393,7 @@ namespace Backoffice.Web.Components.MessageSettlement
 
             return newMarketFixtureResponse.Distinct().ToList();
         }
+
         private async Task<List<SelectListItemModel<string>>> GetMarkets(string fixtureId)
         {
             if (MarketFixtures == null && MarketFixtureOutrights == null)
@@ -417,6 +434,7 @@ namespace Backoffice.Web.Components.MessageSettlement
 
             return markets.Distinct().ToList();
         }
+
         private async Task<List<SelectListItemModel<string>>> GetSelections(string fixtureId, string marketId)
         {
             if (MarketFixtures == null && MarketFixtureOutrights == null)
@@ -465,6 +483,7 @@ namespace Backoffice.Web.Components.MessageSettlement
 
             return selections.Distinct().ToList();
         }
+
         private string GetMarketName(string marketName, string marketSpecifier)
         {
             if (string.IsNullOrEmpty(marketName))
@@ -483,6 +502,7 @@ namespace Backoffice.Web.Components.MessageSettlement
             else
                 return marketName;
         }
+
         private async Task<List<SelectListItemModel<int>>> GetStatuses()
         {
             var statuses = new List<SelectListItemModel<int>>()
@@ -516,6 +536,7 @@ namespace Backoffice.Web.Components.MessageSettlement
 
             return statuses;
         }
+
         #endregion
     }
 }

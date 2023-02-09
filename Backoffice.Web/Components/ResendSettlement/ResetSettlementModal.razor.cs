@@ -6,9 +6,16 @@ namespace Backoffice.Web.Components.ResendSettlement
 {
     public partial class ResetSettlementModal : IDisposable
     {
+        #region Properties
+
         [Inject] private IModalService ModalService { get; set; }
+
         [CascadingParameter] private CustomModal Modal { get; set; }
+
+        #endregion
+
         #region Methods
+
         public async Task OnModalCancel()
         {
             ModalService.Cancel();
@@ -19,10 +26,12 @@ namespace Backoffice.Web.Components.ResendSettlement
             await Modal.OnSaveClickCallback.InvokeAsync();
             ModalService.Cancel();
         }
+
         public void Dispose()
         {
             
         }
+
         #endregion
     }
 }
