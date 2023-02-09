@@ -10,8 +10,10 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
     public partial class CopyMarketGroupModal : IDisposable
     {
         #region Properties
+
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
 
@@ -23,14 +25,17 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         public int SelectedSportId { get; set; }
         public List<SelectListItemModel<int>> FixtureStatuses { get; set; }
         public int SelectedFixtureStatusId { get; set; }
+
         public Guid CopyToClientId { get; set; }
         public string CopyToClientCode { get; set; }
         public string CopyToClientName { get; set; }
         public AlertModel AlertModel { get; set; }
         public bool IsPreLoader { get; set; }
+
         #endregion
 
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = true;
@@ -40,6 +45,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             Sports = new List<SelectListItemModel<int>>();
             FixtureStatuses = new List<SelectListItemModel<int>>();
         }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -118,22 +124,27 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 }
             }
         }
+
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
             SelectedClientCode = e.Value.ToString();
         }
+
         public async void OnSportChangedEvent(ChangeEventArgs e)
         {
             SelectedSportId = int.Parse(e.Value.ToString());
         }
+
         public async void OnFixtureStatusChangedEvent(ChangeEventArgs e)
         {
             SelectedFixtureStatusId = int.Parse(e.Value.ToString());
         }
+
         public async Task OnModalCancelEvent()
         {
             ModalService.Cancel();
         }
+
         public async void OnModalCopyEvent()
         {
             IsPreLoader = true;
@@ -162,6 +173,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             var copyToClient = ClientInformations.FirstOrDefault(f => f.ClientCode == CopyToClientCode);
 
             var parameters = new ModalParameters();
+
             parameters.Add("MarketGroupModel", copyFromMarketGroupModel);
             parameters.Add("CopyToClientId", CopyToClientId);
             parameters.Add("CopyToClientCode", CopyToClientCode);
@@ -182,6 +194,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
 
         }
+
         #endregion
     }
 }

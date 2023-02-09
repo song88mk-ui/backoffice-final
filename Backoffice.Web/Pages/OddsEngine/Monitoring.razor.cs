@@ -431,7 +431,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                     await InvokeAsync(StateHasChanged);
                 }
             }
-
         }
 
         private async Task ProcessBetStopGlobal(OnExternalBetStopGlobalMessage message)

@@ -26,8 +26,6 @@
             {
                 @if (ClientMarketTemplates != null && ClientMarketTemplates.Any())
                 {
-                    var rowNumber = 0;
-
                     <table class="table table-striped">
                         <thead class="text-center">
                             <tr>
@@ -38,10 +36,13 @@
                         <tbody>
                             @foreach (var item in ClientMarketTemplates)
                             {
-                                rowNumber++;
                                 <tr>
-                                    <td width="3%"><span>@rowNumber</span></td>
-                                    <td width="55%" align="left"><span>@item.MarketTemplateName</span></td>
+                                    <td>
+                                        <span>@(ClientMarketTemplates.IndexOf(item) + 1)</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.MarketTemplateName</span>
+                                    </td>
                                 </tr>
                             }
                         </tbody>

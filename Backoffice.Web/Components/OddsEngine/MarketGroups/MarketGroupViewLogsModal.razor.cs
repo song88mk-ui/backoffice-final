@@ -11,22 +11,25 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
     public partial class MarketGroupViewLogsModal : IDisposable
     {
         #region Properties
+
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
 
         public MarketGroupModel MarketGroupModel { get; set; }
         public List<ActivityLogModel> ActivityLogs { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
         protected bool IsPreLoader { get; set; } = false;
+
         #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             ActivityLogs = null;
-            IsPreLoader = true;
-            await InvokeAsync(StateHasChanged);
 
             MetaData = new MetaData()
             {
@@ -38,8 +41,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
             MarketGroupModel = ModalParameters.TryGet<MarketGroupModel>("MarketGroupModel");
 
-            IsPreLoader = true;
-            await InvokeAsync(StateHasChanged);
             await GetContent();
         }
 
@@ -47,22 +48,27 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             ModalService.Cancel();
         }
+
         protected async Task SelectedPage(int page)
         {
             MetaData.CurrentPage = page;
-            IsPreLoader = true;
-            await InvokeAsync(StateHasChanged);
+
             await GetContent();
         }
+
         public void Dispose()
         {
             
         }
+
         #endregion
 
         #region Utilities
+
         private async Task GetContent()
         {
+            IsPreLoader = true;
+
             var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", "."),
@@ -75,9 +81,10 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 ActivityLogs = response.ActivityLogs;
                 MetaData = response.MetaData;
             }
+
             IsPreLoader = false;
-            await InvokeAsync(StateHasChanged);
         }
+
         #endregion
     }
 }

@@ -81,7 +81,7 @@
                                         <td>
                                             <div class="d-flex justify-content-center">
                                                 <div class="py-1 px-2">
-                                                    <span class="fw-bold">@GetClientMargin(string.Empty, string.Empty, MarginMarket.Selections, isPlayerProps)</span>
+                                                    <span class="fw-bold">@GetClientMargin(string.Empty, string.Empty, MarginMarket.Selections, _isPlayerProps)</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -92,7 +92,7 @@
                                                     <div class="py-1 px-2">
                                                         @if (HasClientConfig(client.ClientCode, MarginMarket.ClientCode, MarginMarket.ClientCodeMargin))
                                                         {
-                                                            string margin = GetClientMargin(client.ClientCode, MarginMarket.ClientCodeMargin, MarginMarket.Selections, isPlayerProps);
+                                                            string margin = GetClientMargin(client.ClientCode, MarginMarket.ClientCodeMargin, MarginMarket.Selections, _isPlayerProps);
                                                             <span class="fw-bold">@margin</span>
                                                         }
                                                         else

@@ -36,7 +36,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<ClientLeagueSortOrderModel> ClientLeagueOrders { get; set; }
         public SegmentLookupResponse SegmentLookupResponse { get; set; }
         public LeagueLookupResponse LeagueLookupResponse { get; set; }
-        //public List<ClientInformationModel> ClientInformations { get; set; }
 
         public bool IsUpdate { get; set; }
         public bool IsPreload { get; set; }

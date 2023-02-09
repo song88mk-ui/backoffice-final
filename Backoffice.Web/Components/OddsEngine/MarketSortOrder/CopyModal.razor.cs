@@ -1,6 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
-using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -24,10 +23,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public List<ClientInformationModel> ClientInformations { get; set; }
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
-        //public List<SelectListItemModel<int>> Sports { get; set; }
-        //public int SelectedSportId { get; set; }
-        //public List<SelectListItemModel<int>> FixtureStatuses { get; set; }
-        //public int SelectedFixtureStatusId { get; set; }
 
         #endregion
 
@@ -37,8 +32,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         {
             ClientInformations = new List<ClientInformationModel>();
             Clients = new List<SelectListItemModel<string>>();
-            //Sports = new List<SelectListItemModel<int>>();
-            //FixtureStatuses = new List<SelectListItemModel<int>>();
 
             FromClientCode = ModalParameters.TryGet<string>("FromClientCode");
             FromSportId = ModalParameters.TryGet<int>("FromSportId");
@@ -69,39 +62,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                     Name = "No Clients Available"
                 });
             }
-
-            //var sports = (await TradingService.GetSportLookup()).Result;
-
-            //if (sports != null)
-            //{
-            //    Sports = sports.SportLookup.Select(s => new SelectListItemModel<int>
-            //    {
-            //        Value = s.SportId,
-            //        Name = s.SportName
-            //    }).ToList();
-            //}
-            //else
-            //{
-            //    Sports.Add(new SelectListItemModel<int>
-            //    {
-            //        Value = 0,
-            //        Name = "No Sports Available"
-            //    });
-            //}
-
-            //FixtureStatuses.Add(new SelectListItemModel<int>
-            //{
-            //    Value = (int)FixtureStatus.Prematch,
-            //    Name = FixtureStatus.Prematch.ToString()
-            //});
-
-            //FixtureStatuses.Add(new SelectListItemModel<int>
-            //{
-            //    Value = (int)FixtureStatus.Live,
-            //    Name = FixtureStatus.Live.ToString()
-            //});
-
-            //SelectedFixtureStatusId = -1;
         }
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)

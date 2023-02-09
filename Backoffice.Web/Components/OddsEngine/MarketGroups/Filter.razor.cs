@@ -1,19 +1,19 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
 
 namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 {
     public partial class Filter : IDisposable
     {
         #region Properties
+
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         [Parameter] public EventCallback OnAddCallback { get; set; }
         [Parameter] public EventCallback OnUpdateCallback { get; set; }
         [Parameter] public EventCallback OnSaveUpdateCallback { get; set; }
@@ -34,12 +34,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         #endregion
 
         #region Methods
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if(firstRender)
-            {
-            }
-        }
+
         protected override async Task OnInitializedAsync()
         {
             Clients = new List<SelectListItemModel<string>>();
@@ -125,6 +120,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
             await OnUpdateCallback.InvokeAsync();
         }
+
         public async Task OnSaveUpdateClickEvent()
         {
             MarketGroupModel.IsUpdate = true;
@@ -153,6 +149,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             await OnViewLogsCallback.InvokeAsync();
         }
+
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
             SelectedClientCode = e.Value.ToString();
@@ -180,6 +177,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         #endregion
 
         #region Utilities
+
         private async Task PrepareMarketGroupModel()
         {
             if (!string.IsNullOrEmpty(SelectedClientCode) && SelectedSportId != 0)
@@ -195,9 +193,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     await MarketGroupModelChanged.InvokeAsync(MarketGroupModel);
                 }
             }
+
             await MarketGroupModelChanged.InvokeAsync(MarketGroupModel);
             await OnInitCallback.InvokeAsync();
         }
+
         #endregion
     }
 }

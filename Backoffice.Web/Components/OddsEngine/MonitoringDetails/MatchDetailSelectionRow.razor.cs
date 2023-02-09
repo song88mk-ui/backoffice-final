@@ -27,6 +27,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
             return Selection.DecimalOdds;
         }
+
         public bool HasClientConfig(string clientCode, string marketClientCode, string marketClientMargin)
         {
             if (string.IsNullOrEmpty(marketClientCode))

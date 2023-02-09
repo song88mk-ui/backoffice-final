@@ -128,6 +128,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnCancelUpdateClickedEvent()
         {
             MarketGroupModel.IsUpdate = false;
+
             IsPreLoader = true;
             StateHasChanged();
 
@@ -137,7 +138,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarketGroupModel.MarketTemplateGroups.AddRange(MarketGroupModel.OldMarketTemplateGroups);
 
             IsPreLoader = false;
-
             StateHasChanged();
         }
 
@@ -227,8 +227,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             else
             {
                 MarketGroupModel.IsUpdate = false;
-                IsPreLoader = true;
-                StateHasChanged();
 
                 await OnInit();
             }
@@ -242,8 +240,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             MarketGroupModel.IsUpdate = false;
             IsPreLoader = true;
-
-            StateHasChanged();
 
             var marketGroups = await GetMarketGroupSortOrderUpdate();
 
@@ -318,6 +314,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
+
         private async Task OnInit()
         {
             PageTitle = "Market Groups";
@@ -325,7 +322,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsPreLoader = true;
 
             MarketGroupModel.IsUpdate = false;
-            StateHasChanged();
 
             if (!string.IsNullOrEmpty(MarketGroupModel.ClientCode) && MarketGroupModel.SportId != 0)
             {
@@ -357,6 +353,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsSelectAll = MarketGroupModel != null && !MarketGroupModel.MarketTemplateGroups.Any(s => s.IsActive == false);
             await SortOrderRow();
         }
+
         private async Task SortOrderRow()
         {
             if (MarketGroupModel != null && MarketGroupModel.MarketTemplateGroups.Any())
@@ -370,8 +367,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             IsPreLoader = false;
-            StateHasChanged();
         }
+
         private async Task<List<ClientMarketTemplateGroupDTO>> GetMarketGroupSortOrderUpdate()
         {
             DataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getSortOrder", $".{TableClass}");
@@ -422,6 +419,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             return marketTemplateGroup.OrderBy(x => x.SortOrder).ToList();
         }
+
         #endregion
     }
 }

@@ -41,7 +41,11 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #endregion
 
-        public bool isPlayerProps;
+        #region Fields
+
+        public bool _isPlayerProps;
+
+        #endregion
 
         #region Methods
 

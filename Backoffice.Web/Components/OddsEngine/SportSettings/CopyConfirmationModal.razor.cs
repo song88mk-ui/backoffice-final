@@ -10,6 +10,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
     public partial class CopyConfirmationModal : IDisposable
     {
         #region Properties
+
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
 

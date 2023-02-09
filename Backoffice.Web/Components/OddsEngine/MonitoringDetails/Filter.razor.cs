@@ -1,10 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
-using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
 namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 {

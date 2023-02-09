@@ -13,9 +13,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
     public partial class DeleteMarketGroupModal : IDisposable
     {
         #region Properties
+
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
@@ -23,13 +25,17 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         public ClientMarketTemplateGroupDTO MarketTemplateGroup { get; set; }
         public ClientMarketTemplateGroupDTO OldMarketTemplateGroup { get; set; }
         public MarketGroupModel MarketGroupModel { get; set; }
+
         protected bool IsPreLoader { get; set; } = false;
         public string ErrorMessage { get; set; }
         public string AlertStatus { get; set; }
         public decimal Opacity { get; set; } = 0.0m;
         protected bool ShowErrorMessage { get; set; } = false;
+
         #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = false;
@@ -113,6 +119,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
 
         }
+
         #endregion
     }
 }

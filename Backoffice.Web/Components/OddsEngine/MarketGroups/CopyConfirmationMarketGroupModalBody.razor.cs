@@ -12,6 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
     public partial class CopyConfirmationMarketGroupModalBody : IDisposable
     {
         #region Properties
+
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
@@ -21,6 +22,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public MarketGroupModel MarketGroupModel { get; set; }
+
         protected bool IsPreLoader { get; set; } = false;
         public Guid CopyToClientId { get; set; }
         public string CopyToClientCode { get; set; }
@@ -29,9 +31,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         public string CopyToSportName { get; set; }
         public int CopyToFixtureStatusId { get; set; }
         public string CopyToFixtureStatusName { get; set; }
+
         #endregion
 
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             MarketGroupModel = ModalParameters.TryGet<MarketGroupModel>("MarketGroupModel");
@@ -45,10 +49,12 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
             IsPreLoader = false;
         }
+
         public async Task OnCancelClickEvent()
         {
             ModalService.Cancel();
         }
+
         protected async Task OnCopyMarketGroup()
         {
             IsPreLoader = true;
@@ -112,12 +118,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             ModalService.Cancel();
             await Modal.OnSaveClickCallback.InvokeAsync(true);
         }
+
         public void Dispose()
         {
         }
-        #endregion
 
-        #region Methods
         #endregion
     }
 }

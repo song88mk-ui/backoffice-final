@@ -26,9 +26,9 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         #region Fields
 
-        protected int sportId;
-        protected int segmentId;
-        protected int leagueId;
+        protected int _sportId;
+        protected int _segmentId;
+        protected int _leagueId;
 
         #endregion
 
@@ -42,7 +42,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         protected override async Task OnParametersSetAsync()
         {
-            if (sportId != SportId)
+            if (_sportId != SportId)
             {
 
                 TopMarketTemplates = (await BackOfficeService.GetTopMarkets(SportId)).Result;
@@ -52,7 +52,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
                 await PrepareMonitoringData();
             }
-            else if (sportId != SportId || segmentId != SegmentId || leagueId != LeagueId)
+            else if (_sportId != SportId || _segmentId != SegmentId || _leagueId != LeagueId)
             {
                 await PrepareMonitoringData();
             }
@@ -90,9 +90,9 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         private async Task PrepareMonitoringData()
         {
-            sportId = SportId;
-            segmentId = SegmentId;
-            leagueId = LeagueId;
+            _sportId = SportId;
+            _segmentId = SegmentId;
+            _leagueId = LeagueId;
 
             await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
             {
