@@ -4,7 +4,7 @@
             <div class="col-2">
                 <label class="my-1 mr-2">Clients</label>
                 <div class="dropdown">
-                    <button class="btn clientBtn dropdown-toggle" type="button" id="clientDropdown" data-bs-auto-close="outside" data- data-bs-toggle="dropdown" aria-expanded="false">Clients (@ClientIdSelectedModel?.Where(x => x.IsSelected).Count())</button>
+                    <button class="btn clientBtn dropdown-toggle" type="button" id="clientDropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">Clients (@ClientIdSelectedModel?.Where(x => x.IsSelected).Count())</button>
 
                     <ul class="dropdown-menu" aria-labelledby="clientDropdown">
                         <li class="dropdown-item">
@@ -38,7 +38,9 @@
                         {
                             <div class="mx-2 mb-2 p-2 clientBorder">
                                 @item.ClientName
-                                <span><button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="_ => RemoveClient(item.ClientId)"></button></span>
+                                <span>
+                                    <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="_ => RemoveClient(item.ClientId)"></button>
+                                </span>
                             </div>
                         }
                     }

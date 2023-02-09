@@ -1,4 +1,4 @@
-﻿.closeModalCancel {
+﻿.btn-cancel {
     background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
     border-radius: 5px;
     color: white;
@@ -8,17 +8,17 @@
     text-align: center;
 }    
 
-    .table thead {
-        background: #404E67 0% 0% no-repeat padding-box;
-        border-radius: 3px 3px 0px 0px;
-        color: white;
-    }
+.table thead {
+    background: #404E67 0% 0% no-repeat padding-box;
+    border-radius: 3px 3px 0px 0px;
+    color: white;
+}
 
-    .table tr:nth-child(2n+2) {
-        background-color: #F5F5F5;
-    }
+.table tr:nth-child(2n+2) {
+    background-color: #F5F5F5;
+}
 
-.logModal {
+.log-modal {
     overflow-y: scroll;
     max-height: 30rem;
 }

@@ -14,10 +14,11 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public MetaData MetaData { get; set; }
         public TopFixturesModel TopFixturesModel { get; set; }
+
+        public string PageTitle { get; set; }
+        public string IconClass { get; set; }
 
         #endregion
 

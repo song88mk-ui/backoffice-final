@@ -4,7 +4,6 @@
 @page "/parlay-bonus"
 <AuthorizeView Policy="sbc-parlaybonus">
     <Authorized>
-        <Toast ToastTitle="Parlay Bonus" ToastMessage="@ToastMessage" />
         <div class="row">
             <div class="main-content col-md-12 mb-4 pb-3">
                 <div class="row">
@@ -38,7 +37,11 @@
                                             <th class="th-parlay-bonus py-3">
                                                 <span>Parlay Bonus</span>
                                                 <i class="tooltip2 fa fa-info-circle ms-5">
-                                                    <span class="tooltiptext">Minimum Value: 0.01<br />Maximum Value: 5000</span>
+                                                    <span class="tooltiptext">
+                                                        Minimum Value: 0.01
+                                                        <br />
+                                                        Maximum Value: 5000
+                                                    </span>
                                                 </i>
                                             </th>
                                             <th class="th-action py-3">Action</th>
@@ -64,7 +67,6 @@
                                                 <td>
                                                     @if (IsUpdating)
                                                     {
-
                                                         <button type="button" class="btn tl-link-add me-2" title="Delete" @onclick="_ => OnDeleteConfig(item)">
                                                             <i class="fa fa-trash"></i>
                                                         </button>

@@ -1,4 +1,5 @@
 ﻿@using Backoffice.Web.Components.Common;
+
 <div class="modal-body">
     <div class="business-container">
         <div class="row">
@@ -104,7 +105,7 @@
                             </div>
 
                             <div class="col-md-12">
-                                <Permission IsReadOnly="@IsPreload" IsSubUser="true" Permissions="@Permissions" ClientModel="@ClientModel" />
+                                <Permission IsReadOnly="IsPreload" IsSubUser="true" Permissions="Permissions" ClientModel="ClientModel" />
                             </div>
                         </div>
                     </div>
@@ -114,13 +115,13 @@
                             <div class="col-md-8">
                                 @foreach (var alert in Alerts)
                                 {
-                                    <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" />
+                                    <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" />
                                 }
                             </div>
                         }
 
-                        <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
-                        <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Save</button>
+                        <button type="button" class="btn modal-btn cancel-btn waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
+                        <button type="button" class="btn modal-btn save-btn waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Save</button>
                     </div>
                 </form>
             </div>

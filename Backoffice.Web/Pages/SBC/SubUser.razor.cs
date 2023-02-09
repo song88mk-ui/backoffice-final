@@ -18,15 +18,15 @@ namespace Backoffice.Web.Pages.SBC
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public SubUserCallbackModel CallbackModel { get; set; }
-
-        public PermissionResponse Permissions { get; set; }
+        public PermissionResponse PermissionResponse { get; set; }
         public SubUserClaimsModel SubUserClaims { get; set; }
         public UserListResponse SubUsers { get; set; }
         public MetaData MetaData { get; set; }
         public List<AlertModel> Alerts { get; set; }
+
+        public string PageTitle { get; set; }
+        public string IconClass { get; set; }
         public bool IsPreload { get; set; }
         public decimal Opacity { get; set; }
 
@@ -38,7 +38,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             Opacity = 0m;
             Alerts = new List<AlertModel>();
-            Permissions = new PermissionResponse();
+            PermissionResponse = new PermissionResponse();
             SubUserClaims = new SubUserClaimsModel();
             SubUsers = new UserListResponse();
             CallbackModel = new SubUserCallbackModel();
@@ -65,9 +65,9 @@ namespace Backoffice.Web.Pages.SBC
                 SubUserClaims.MainUserName = UserModel.UserName;
                 SubUserClaims.SubUserClaims = new List<PermissionModel>();
 
-                Permissions = await GetPermissionList();
+                PermissionResponse = await GetPermissionList();
 
-                if (Permissions != null && Permissions.Permissions.Any())
+                if (PermissionResponse != null && PermissionResponse.Permissions.Any())
                 {
                     SubUserClaims.SubUserClaims = GetSubUserClaims(null);
                 }
@@ -132,7 +132,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public void Dispose()
         {
-            Permissions = null;
+            PermissionResponse = null;
             SubUserClaims = null;
             SubUsers = null;
             Alerts = null;
@@ -198,7 +198,7 @@ namespace Backoffice.Web.Pages.SBC
             var subUserClaims = new List<PermissionModel>();
 
             bool hasDashboard = false;
-            foreach (var permission in Permissions.Permissions)
+            foreach (var permission in PermissionResponse.Permissions)
             {
                 if (permission.IsSubUser)
                 {
@@ -262,7 +262,7 @@ namespace Backoffice.Web.Pages.SBC
                     GroupName = string.Empty,
                     IsSubUser = true,
                     Name = "Dashboard",
-                    ClaimType = Permissions.Permissions.Where(x => x.ClaimType.ToLower() == SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", ".").ToLower()).FirstOrDefault().Id,
+                    ClaimType = PermissionResponse.Permissions.FirstOrDefault(c => c.ClaimType.ToLower() == SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", ".").ToLower()).Id,
                     HasReadOnly = false,
                     ClaimValue = "1",
                     IsEnabled = false
@@ -279,14 +279,16 @@ namespace Backoffice.Web.Pages.SBC
                 var claimsList = string.Empty;
                 foreach (var claim in claims.Where(x => x.ClaimValue != "0"))
                 {
-                    var permission = Permissions.Permissions.FirstOrDefault(p => p.Id.ToLower() == claim.ClaimType.ToLower());
+                    var permission = PermissionResponse.Permissions.FirstOrDefault(p => p.Id.ToLower() == claim.ClaimType.ToLower());
                     if (permission != null)
                     {
                         claimsList = claimsList + (string.IsNullOrEmpty(claimsList) ? string.Empty : ", ") + $"{permission.Name}" + (claim.ClaimValue == "2" ? " (ReadOnly)" : string.Empty);
                     }
                 }
+
                 return claimsList;
             }
+
             return string.Empty;
         }
 

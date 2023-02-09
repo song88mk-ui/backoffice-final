@@ -1,7 +1,7 @@
 ﻿<div class="modal-body">
     <div class="d-flex flex-column justify-content-center p-5">
         <div class="text-center">
-            <img src="icons/svg/warning-icon.svg" />
+            <icon class="ico ico-warning"></icon>
         </div>
         <div class="text-center">
             You are about to delete "<span class="fw-bold">Parlay Bonus for @ClientName > @((ParlayBonusConfig.ParlayBonus).ToString("#.00"))%</span>".
@@ -11,6 +11,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modalBtn cancelBtn waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
-    <button type="button" class="btn modalBtn applyBtn waves-effect" data-bs-dismiss="modal" @onclick="OnApplyClickEvent">Apply</button>
+    <button type="button" class="btn modal-btn cancel-btn" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
+    <button type="button" class="btn modal-btn apply-btn" data-bs-dismiss="modal" @onclick="OnApplyClickEvent">Apply</button>
 </div>

@@ -168,10 +168,10 @@ namespace Backoffice.Web.Pages.SBC
             var result = (await BackOfficeService.AddOrUpdateParlayBonus(new ParlayBonusRequest()
             {
                 ClientIdRef = ClientId,
-                ParlayBonusConfig = ClientParlayBonusModel.ParlayBonusConfig.Select(x => new ParlayBonusConfigRequest()
+                ParlayBonusConfig = ClientParlayBonusModel.ParlayBonusConfig.Select(s => new ParlayBonusConfigRequest()
                 {
-                    SelectionCount = x.SelectionCount,
-                    ParlayBonus = (x.ParlayBonus / 100)
+                    SelectionCount = s.SelectionCount,
+                    ParlayBonus = (s.ParlayBonus / 100)
                 }).ToList(),
                 ParlayBonusMinOdds = ClientParlayBonusModel.ParlayBonusMinOdds
             }));
@@ -203,7 +203,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public async Task OnCancelClickEvent()
         {
-            ClientParlayBonusModel.ParlayBonusConfig.RemoveAll(x => TempConfig.Contains(x));
+            ClientParlayBonusModel.ParlayBonusConfig.RemoveAll(c => TempConfig.Contains(c));
 
             TempConfig = new List<ParlayBonusConfig>();
 

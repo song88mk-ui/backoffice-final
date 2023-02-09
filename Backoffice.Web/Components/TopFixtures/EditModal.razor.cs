@@ -77,23 +77,6 @@ namespace Backoffice.Web.Components.TopFixtures
                             rowCount++;
                         }
                     }
-
-                    //if (model.SelectedSport.SportId == 0 || model.SelectedSport.SportId == topFixture.SportId)
-                    //{
-                    //    if (model.SelectedSegment.SegmentId == 0 || model.SelectedSegment.SegmentId == topFixture.SegmentId)
-                    //    {
-                    //        if (model.SelectedLeague.LeagueId == 0 || model.SelectedLeague.LeagueId == topFixture.LeagueId)
-                    //        {
-                    //            if (string.IsNullOrEmpty(model.SelectedGameFilter.FixtureId) || model.SelectedGameFilter.FixtureId == "0" || model.SelectedGameFilter.FixtureId == topFixture.FixtureId)
-                    //            {
-                    //                rowCount = rowCount + 1;
-                    //                topFixture.SortOrder = rowCount;
-                    //                NewTopFixture.TopFixtures.Add(topFixture);
-                    //            }
-
-                    //        }
-                    //    }
-                    //}
                 }
             }
 
@@ -167,16 +150,6 @@ namespace Backoffice.Web.Components.TopFixtures
 
         }
 
-        private async Task SortOrderRow()
-        {
-            NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.Select((s, index) =>
-            {
-                s.SortOrder = index + 1;
-
-                return s;
-            }).ToList();
-        }
-
         public async Task OnCancelClickEvent()
         {
             ModalService.Cancel();
@@ -242,6 +215,16 @@ namespace Backoffice.Web.Components.TopFixtures
             }
 
             return rows;
+        }
+
+        private async Task SortOrderRow()
+        {
+            NewTopFixture.TopFixtures = NewTopFixture.TopFixtures.Select((s, index) =>
+            {
+                s.SortOrder = index + 1;
+
+                return s;
+            }).ToList();
         }
 
         #endregion

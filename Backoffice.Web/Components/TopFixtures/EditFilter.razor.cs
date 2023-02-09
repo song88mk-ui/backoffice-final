@@ -8,15 +8,20 @@ namespace Backoffice.Web.Components.TopFixtures
     public partial class EditFilter : IAsyncDisposable, IDisposable
     {
         #region Properties
+
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+
         [Parameter] public int ClientId { get; set; }
         [Parameter] public EventCallback<EditTopFixturesModel> OnInitCallback { get; set; }
+
         public SportsTreeModel SportsTree { get; set; }
         public SportsTreeModel.SportModel SelectedSport { get; set; }
         public SportsTreeModel.SegmentModel SelectedSegment { get; set; }
         public SportsTreeModel.LeagueModel SelectedLeague { get; set; }
         public FixtureModel SelectedGameFilter { get; set; }
+
         public string SortFilter { get; set; }
+
         #endregion
 
         #region Methods
@@ -34,7 +39,7 @@ namespace Backoffice.Web.Components.TopFixtures
 
                 SportsTree = (await BackOfficeService.GetSportstreeByClientId(ClientId)).Result;
 
-                var model = new Models.EditTopFixturesModel
+                var model = new EditTopFixturesModel
                 {
                     Sports = SportsTree.Sports,
                     SelectedSport = SelectedSport,
@@ -52,7 +57,7 @@ namespace Backoffice.Web.Components.TopFixtures
         public async void OnSportChangedEvent(ChangeEventArgs e)
         {
 
-            SelectedSport = SportsTree.Sports.FirstOrDefault(s => s.SportId == Convert.ToInt32(e.Value));
+            SelectedSport = SportsTree.Sports.FirstOrDefault(c => c.SportId == Convert.ToInt32(e.Value));
             if (SelectedSport == null)
                 SelectedSport = new SportsTreeModel.SportModel();
 
@@ -73,7 +78,7 @@ namespace Backoffice.Web.Components.TopFixtures
         }
         public async void OnSegmentChangedEvent(ChangeEventArgs e)
         {
-            SelectedSegment = SelectedSport.Segments.FirstOrDefault(s => s.SegmentId == Convert.ToInt32(e.Value));
+            SelectedSegment = SelectedSport.Segments.FirstOrDefault(c => c.SegmentId == Convert.ToInt32(e.Value));
             if (SelectedSegment == null)
                 SelectedSegment = new SportsTreeModel.SegmentModel();
 
@@ -94,7 +99,7 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async void OnLeagueChangedEvent(ChangeEventArgs e)
         {
-            SelectedLeague = SelectedSegment.Leagues.FirstOrDefault(s => s.LeagueId == Convert.ToInt32(e.Value));
+            SelectedLeague = SelectedSegment.Leagues.FirstOrDefault(c => c.LeagueId == Convert.ToInt32(e.Value));
             if (SelectedLeague == null)
                 SelectedLeague = new SportsTreeModel.LeagueModel();
             SelectedGameFilter = new FixtureModel();
@@ -112,7 +117,7 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async void OnGameChangedEvent(ChangeEventArgs e)
         {
-            SelectedGameFilter = SelectedLeague.Fixtures.FirstOrDefault(f => f.FixtureId == e.Value);
+            SelectedGameFilter = SelectedLeague.Fixtures.FirstOrDefault(c => c.FixtureId == e.Value);
             if (SelectedGameFilter == null)
                 SelectedGameFilter = new FixtureModel();
 
@@ -149,13 +154,13 @@ namespace Backoffice.Web.Components.TopFixtures
 
         public async ValueTask DisposeAsync()
         {
-            
             GC.SuppressFinalize(this);
         }
         public void Dispose()
         {
             GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }

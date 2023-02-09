@@ -1,6 +1,5 @@
 ﻿using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
-using static Backoffice.Shared.Models.Requests.GetTopLeaguesRequest;
 using static Backoffice.Web.Models.SportsTreeModel;
 
 namespace Backoffice.Web.Components.TopLeagues

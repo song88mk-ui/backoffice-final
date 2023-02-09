@@ -14,13 +14,17 @@ namespace Backoffice.Web.Components.Clients
     public partial class CreateOrUpdateModal : IDisposable
     {
         #region Properties
+
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
-        public ClientListResponse.Client Client { get; set; }
+
+        public Client Client { get; set; }
         public SportsLookupModel RealSports { get; set; }
         public SportsLookupModel VirtualSports { get; set; }
+
         public bool monthlyFeeToggle { get; set; }
         public List<string> Currencies { get; set; }
         public List<int> SelectedRealSports { get; set; }
@@ -29,10 +33,11 @@ namespace Backoffice.Web.Components.Clients
         public List<int> SelectedVirtualSportsWin { get; set; }
         public TierRevenueShareModel SportsbookTier { get; set; }
         public TierRevenueShareModel JackpotTier { get; set; }
+
         public bool SportsbookTierOption { get; set; }
         public bool IsEdit { get; set; }
         public string SelectedCurrency { get; set; }
-        public ClientListResponse.BetSetting SelectedBetSetting { get; set; }
+        public BetSetting SelectedBetSetting { get; set; }
         public List<AlertModel> Alerts { get; set; }
         private EditContext EditContext { get; set; }
         public bool IsPreload { get; set; }
@@ -41,17 +46,14 @@ namespace Backoffice.Web.Components.Clients
         #endregion
 
         #region Fields
+
         const decimal maxInputVal = 100;
-        private decimal? InputStake { get; set; }
         private decimal inputWinnings;
-        private decimal InputWinnings
-        {
-            get => inputWinnings;
-            set => inputWinnings = Math.Min(value, maxInputVal);
-        }
+
         #endregion
 
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             IsPreload = false;
@@ -69,7 +71,7 @@ namespace Backoffice.Web.Components.Clients
             JackpotTier.AboveTierPercentage = 50m;
 
             Alerts = new List<AlertModel>();
-            Client = ModalParameters.TryGet<ClientListResponse.Client>("Client");
+            Client = ModalParameters.TryGet<Client>("Client");
             RealSports = ModalParameters.TryGet<SportsLookupModel>("RealSports");
             VirtualSports = ModalParameters.TryGet<SportsLookupModel>("VirtualSports");
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
@@ -121,19 +123,18 @@ namespace Backoffice.Web.Components.Clients
                 "CDF", "ETB", "MWK", "XAF", "NGN", "BTC", "ETH", "PKR", "BRL", "CLP", "PEN", "MXN"
             };
 
-
             if (!IsEdit)
             {
-                Client.BetSettings = new List<ClientListResponse.BetSetting>();
+                Client.BetSettings = new List<BetSetting>();
                 foreach (var currency in Currencies)
                 {
                     decimal suggestedMinimumBet = await GetSuggestedMinimumBet(currency);
                     decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
 
-                    Client.BetSettings.Add(new ClientListResponse.BetSetting
+                    Client.BetSettings.Add(new BetSetting
                     {
                         CurrencyCode = currency,
-                        BetSettingAllSports = new ClientListResponse.BetSettingAllSports
+                        BetSettingAllSports = new BetSettingAllSports
                         {
                             MinPerTicket = suggestedMinimumBet,
                             MaxPerTicket = suggestedMaximumBet,
@@ -172,10 +173,10 @@ namespace Backoffice.Web.Components.Clients
                     decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
                     if (!existingCurrencies.Contains(currency))
                     {
-                        Client.BetSettings.Add(new ClientListResponse.BetSetting
+                        Client.BetSettings.Add(new BetSetting
                         {
                             CurrencyCode = currency,
-                            BetSettingAllSports = new ClientListResponse.BetSettingAllSports
+                            BetSettingAllSports = new BetSettingAllSports
                             {
                                 MinPerTicket = suggestedMinimumBet,
                                 MaxPerTicket = suggestedMaximumBet,
@@ -208,8 +209,8 @@ namespace Backoffice.Web.Components.Clients
 
                 foreach (var setting in Client.BetSettings)
                 {
-                    decimal suggestedMinimumBet = await GetSuggestedMinimumBet(setting.CurrencyCode);
-                    decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
+                    var suggestedMinimumBet = await GetSuggestedMinimumBet(setting.CurrencyCode);
+                    var suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
 
                     if (setting.BetSettingBetBuilder.MinStake == 0)
                         setting.BetSettingBetBuilder.MinStake = suggestedMinimumBet;
@@ -369,7 +370,7 @@ namespace Backoffice.Web.Components.Clients
                     return;
                 }
 
-                var clientRequest = new ClientListResponse.Client()
+                var clientRequest = new Client()
                 {
                     ClientId = Client.ClientId,
                     ClientCode = Client.ClientCode ?? string.Empty,
@@ -697,7 +698,7 @@ namespace Backoffice.Web.Components.Clients
 
             if (Client.IsTierRevenue)
             {
-                Client.RevenueShare = new ClientListResponse.RevenueShare();
+                Client.RevenueShare = new RevenueShare();
             }
             else
             {
@@ -857,6 +858,7 @@ namespace Backoffice.Web.Components.Clients
         #endregion
 
         #region Utilities
+
         private async Task<decimal> GetSuggestedMinimumBet(string currencyCode)
         {
             var currency = (Currency)Enum.Parse(typeof(Currency), currencyCode);
@@ -891,6 +893,7 @@ namespace Backoffice.Web.Components.Clients
 
             return suggestedMinimumBet;
         }
+
         #endregion
     }
 }

@@ -22,11 +22,6 @@ namespace Backoffice.Web.Components.TopFixtures
         {
             fixture.SortOrder = RowCount;
 
-            //var model = new EditTopFixturesModel
-            //{
-            //    SelectedGame = fixture,
-            //};
-
             await OnSelectedGame.InvokeAsync(fixture);
         }
 
@@ -34,6 +29,7 @@ namespace Backoffice.Web.Components.TopFixtures
         {
 
         }
+
         #endregion
 
     }

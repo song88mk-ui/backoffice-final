@@ -8,6 +8,7 @@ namespace Backoffice.Web.Components.TopLeagues
     public partial class Filter : IDisposable
     {
         #region Properties
+
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
@@ -20,6 +21,7 @@ namespace Backoffice.Web.Components.TopLeagues
         public string SelectedSportId { get; set; }
         public List<SelectListItemModel<string>> Sports { get; set; }
         public TopLeaguesFilterModel TopLeaguesFilterModel { get; set; }
+
         public int SelectedClientCount { get; set; }
         public string SelectedClientName { get; set; }
 

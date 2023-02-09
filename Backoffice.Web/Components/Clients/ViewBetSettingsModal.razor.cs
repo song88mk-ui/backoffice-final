@@ -8,15 +8,20 @@ namespace Backoffice.Web.Components.Clients
     public partial class ViewBetSettingsModal : IDisposable
     {
         #region Properties
+
         [Inject] public IModalService ModalService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+
         protected List<ClientListResponse.BetSetting> BetSettings { get; set; }
         protected List<string> Currencies { get; set; }
         protected string SelectedCurrency { get; set; }
         protected ClientListResponse.BetSetting SelectedSetting { get; set; }
+
         #endregion
 
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             BetSettings = ModalParameters.TryGet<List<ClientListResponse.BetSetting>>("BetSettings");
@@ -35,6 +40,7 @@ namespace Backoffice.Web.Components.Clients
             }
 
         }
+
         public async Task OnCancelClickEvent()
         {
             ModalService.Cancel();

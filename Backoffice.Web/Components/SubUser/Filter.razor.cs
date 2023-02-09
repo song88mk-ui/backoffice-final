@@ -9,8 +9,8 @@ namespace Backoffice.Web.Components.SubUser
         #region Properties
         [Parameter] public EventCallback<SubUserCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback OnCreateSubUserCallback { get; set; }
-        public SearchFormModel SearchForm { get; set; }
 
+        public SearchFormModel SearchForm { get; set; }
 
         #endregion
 

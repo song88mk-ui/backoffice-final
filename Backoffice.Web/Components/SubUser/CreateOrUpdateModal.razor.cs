@@ -11,21 +11,28 @@ namespace Backoffice.Web.Components.SubUser
     public partial class CreateOrUpdateModal : IDisposable
     {
         #region Properties
+
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
+
         public UserResponse SubUser { get; set; }
-        public bool IsEdit { get; set; }
         public SubUserClaimsModel SubUserClaims { get; set; }
         public List<AlertModel> Alerts { get; set; }
         public List<PermissionModel> Permissions { get; set; }
         public ClientModel ClientModel { get; set; }
+
         public bool IsTogglePassword { get; set; }
         public bool IsPreload { get; set; }
         public decimal Opacity { get; set; }
+        public bool IsEdit { get; set; }
 
         #endregion
+
+        #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -277,12 +284,15 @@ namespace Backoffice.Web.Components.SubUser
                     });
                 }
             }
-            IsPreload = false;
 
+            IsPreload = false;
         }
+
         public void Dispose()
         {
 
         }
+
+        #endregion
     }
 }

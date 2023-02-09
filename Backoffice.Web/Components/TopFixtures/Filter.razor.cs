@@ -19,6 +19,7 @@ namespace Backoffice.Web.Components.TopFixtures
         public TopFixtureCallbackModel CallbackModel { get; set; }
         public SearchFormModel SearchForm { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
+
         public int SelectedClientCount { get; set; }
         public string SelectedClientName { get; set; }
 
@@ -75,35 +76,6 @@ namespace Backoffice.Web.Components.TopFixtures
 
             await OnInitCallback.InvokeAsync(CallbackModel);
         }
-
-        //public async void OnClientChangedEvent(ChangeEventArgs e)
-        //{
-        //    if (string.IsNullOrEmpty(e.Value.ToString()))
-        //        return;
-
-        //    SelectedClientId = e.Value.ToString();
-
-        //    if (SelectedClientId == "all")
-        //    {
-        //        CallbackModel.Clients = Clients.Where(c => c.Value != "all")
-        //            .Select(s => new TopFixtureCallbackModel.Client
-        //            {
-        //                ClientId = long.Parse(s.Value),
-        //                ClientName = s.Name
-        //            }).ToList();
-        //    }
-        //    else
-        //    {
-        //        CallbackModel.Clients = Clients.Where(c => c.Value != SelectedClientId)
-        //            .Select(s => new TopFixtureCallbackModel.Client
-        //            {
-        //                ClientId = long.Parse(s.Value),
-        //                ClientName = s.Name
-        //            }).ToList();
-        //    }
-
-        //    await OnInitCallback.InvokeAsync(CallbackModel);
-        //}
 
         public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
         {

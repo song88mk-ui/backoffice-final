@@ -29,22 +29,24 @@
                                 <tbody>
                                     @if (TopFixturesModel.TopFixturesFiltered.Any())
                                     {
-                                        var rowCtr = 0;
-                                        foreach (var topFixture in TopFixturesModel.TopFixturesFiltered)
+                                        var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+
+                                        foreach (var model in TopFixturesModel.TopFixturesFiltered)
                                         {
-                                            rowCtr = rowCtr + 1;
+                                            rowCount++;
+
                                             <tr>
                                                 <td class="py-2">
-                                                    <span>@rowCtr</span>
+                                                    <span>@rowCount</span>
                                                 </td>
                                                 <td class="py-2">
-                                                    <span>@topFixture.ClientName</span>
+                                                    <span>@model.ClientName</span>
                                                 </td>
                                                 <td class="py-2">
                                                     <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
-                                                        @if (topFixture.TopFixtures != null && topFixture.TopFixtures.Any())
+                                                        @if (model.TopFixtures != null && model.TopFixtures.Any())
                                                         {
-                                                            foreach (var fixture in topFixture.TopFixtures)
+                                                            foreach (var fixture in model.TopFixtures)
                                                             {
                                                                 <div class="tl-fixture m-1 py-1 rounded-2">
                                                                     <span class="px-3">@fixture.FixtureName</span>
@@ -56,12 +58,12 @@
                                                 <td class="py-2">
                                                     <AuthorizeView Policy="sbc-topfixtures-canedit">
                                                         <Authorized Context="ActivateAll">
-                                                            <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="() => OnEditClickEvent(topFixture)">
+                                                            <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="() => OnEditClickEvent(model)">
                                                                 <i class="fa fa-edit"></i>
                                                             </a>
-                                                            @if (topFixture.TopFixtures != null && topFixture.TopFixtures.Any())
+                                                            @if (model.TopFixtures != null && model.TopFixtures.Any())
                                                             {
-                                                                <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="() => OnCopyClickEvent(topFixture)">
+                                                                <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="() => OnCopyClickEvent(model)">
                                                                     <i class="fa fa-copy"></i>
                                                                 </a>
                                                             }
@@ -93,7 +95,6 @@
                 </div>
             </div>
         </div>
-
         <div>
             <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
         </div>

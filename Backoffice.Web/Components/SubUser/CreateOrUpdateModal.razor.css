@@ -4,18 +4,18 @@
 }
 
 
-.modalBtn {
+.modal-btn {
     width: 112px;
     height: 40px;
     border-radius: 5px;
     color: white;
 }
 
-.modalCancel {
+.cancel-btn {
     background-color: #9AA0AB;
 }
 
-.modalSave {
+.save-btn {
     background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
 

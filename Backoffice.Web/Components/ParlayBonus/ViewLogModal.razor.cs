@@ -8,8 +8,11 @@ namespace Backoffice.Web.Components.ParlayBonus
     {
         #region Properties
         [Inject] public IModalService ModalService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+
         public ParlayBonusConfig ParlayBonusConfig { get; set; }
+
         #endregion
 
         #region Methods
