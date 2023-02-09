@@ -1,19 +1,26 @@
 ﻿@page "/performance"
 
-<div class="row">
-    <div class="main-content col-md-12 mb-4 pb-3">
+<AuthorizeView Policy="sbc-performance">
+    <Authorized>
         <div class="row">
-            <div class="col-md-12">
-                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-            </div>
-            <div class="col-md-12">
-                <tableau-viz id='tableau-viz' 
-                    src='@IFrameSrc' 
-                    token="@Token"
-                    toolbar='bottom'
-                    hide-tabs>
-                </tableau-viz>
+            <div class="main-content col-md-12 mb-4 pb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+                    </div>
+                    <div class="col-md-12">
+                        <tableau-viz id='tableau-viz'
+                                     src='@IFrameSrc'
+                                     token="@Token"
+                                     toolbar='bottom'
+                                     hide-tabs>
+                        </tableau-viz>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>
