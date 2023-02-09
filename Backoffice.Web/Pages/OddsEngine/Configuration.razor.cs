@@ -44,7 +44,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Fields
-        private HubConnection _hubConnection { get; set; }
+        private HubConnection _hubConnection;
         private bool _isConnected => _hubConnection.State == HubConnectionState.Connected;
         private ToastService _toasterService => ToastService!;
         #endregion
