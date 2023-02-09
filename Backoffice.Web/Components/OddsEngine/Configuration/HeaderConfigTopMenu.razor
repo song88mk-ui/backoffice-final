@@ -1,16 +1,37 @@
 ﻿<div class="top-menu float-end">
-    <a href="javascript:void(0)" class="p-2" @onclick="OnImportExportMarginsClickEvent">
-        <i class="fa fa-exchange"></i>
-        Import/Export Margins
-    </a>
+    <AuthorizeView Policy="sbc-config-canedit">
+        <Authorized Context="ActivateAll">
+            <a href="javascript:void(0)" class="p-2" @onclick="OnImportExportMarginsClickEvent">
+                <i class="fa fa-exchange"></i>
+                Import/Export Margins
+            </a>
 
-    <a href="javascript:void(0)" class="p-2" @onclick="OnLogsClickEvent">
-        <i class="fa fa-list-alt"></i>
-        Logs
-    </a>
+            <a href="javascript:void(0)" class="p-2" @onclick="OnLogsClickEvent">
+                <i class="fa fa-list-alt"></i>
+                Logs
+            </a>
 
-    <a href="javascript:void(0)" class="p-2" @onclick="OnCopyClientSettingsClickEvent">
-        <i class="fa fa-copy"></i>
-        Copy Client Settings
-    </a>
+            <a href="javascript:void(0)" class="p-2" @onclick="OnCopyClientSettingsClickEvent">
+                <i class="fa fa-copy"></i>
+                Copy Client Settings
+            </a>
+        </Authorized>
+        <NotAuthorized Context="ActivateAll">
+            <a href="javascript:void(0)" class="p-2" disabled>
+                <i class="fa fa-exchange"></i>
+                Import/Export Margins
+            </a>
+
+            <a href="javascript:void(0)" class="p-2" @onclick="OnLogsClickEvent">
+                <i class="fa fa-list-alt"></i>
+                Logs
+            </a>
+
+            <a href="javascript:void(0)" class="p-2" disabled>
+                <i class="fa fa-copy"></i>
+                Copy Client Settings
+            </a>
+        </NotAuthorized>
+    </AuthorizeView>
+
 </div>

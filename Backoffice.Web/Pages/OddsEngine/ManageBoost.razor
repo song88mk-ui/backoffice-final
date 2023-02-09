@@ -5,121 +5,143 @@
 
 @page "/odds-engine/manage-boost"
 
-<div class="col-md-12">
-    <Breadcrumb Breadcrumbs="Breadcrumbs" />
-</div>
-<div class="col-md-12">
-    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-</div>
-
-@if (!string.IsNullOrEmpty(AlertMessage))
-{
-    <div class="col-md-12 mb-3">
-        <div class="mt-4 mx-3">
-            <AlertMessage AlertMessageStr="@AlertMessage" AlertStatus="@(AlertStatus.ToString())" AlwaysShow="true" />
+<AuthorizeView Policy="sbc-priceboost-manage">
+    <Authorized>
+        <div class="col-md-12">
+            <Breadcrumb Breadcrumbs="Breadcrumbs" />
         </div>
-    </div>
-}
+        <div class="col-md-12">
+            <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+        </div>
 
-<div class="col-md-12">
-    <Filter @ref="FilterReference" OnClientChangedCallback="OnClientChangedEvent" OnSportChangedCallback="OnSportChangedEvent" OnSegmentChangedCallback="OnSegmentChangedEvent" OnLeagueChangedCallback="OnLeagueChangedEvent" OnInitCallback="OnInitCallback" OnInputSearchCallback="OnInputSearchEvent" />
-</div>
+        @if (!string.IsNullOrEmpty(AlertMessage))
+        {
+            <div class="col-md-12 mb-3">
+                <div class="mt-4 mx-3">
+                    <AlertMessage AlertMessageStr="@AlertMessage" AlertStatus="@(AlertStatus.ToString())" AlwaysShow="true" />
+                </div>
+            </div>
+        }
 
-<div class="col-md-12">
-    <div class="mx-3 mt-4">
-        @if (IsPreLoader)
-        {
-            <Preloader />
-        }
-        else
-        {
-            @if (PriceBoostList != null && PriceBoostList.Any())
-            {
-                <table class="table table-hover table-bordered">
-                    <thead class="table-head">
-                        <tr>
-                            <th class="th-client-name py-3">Client Name</th>
-                            <th class="th-sports py-3">Sports</th>
-                            <th class="th-details py-3">Details</th>
-                            <th class="th-br-ctrl py-3">BR Ctrl</th>
-                            <th class="th-current-odds py-3">Current Odds</th>
-                            <th class="th-boosted-odds py-3">Boosted Odds</th>
-                            <th class="th-manage py-3">Manage</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var priceboost in PriceBoostList)
-                        {
-                            <tr class="@(priceboost.FixtureStatusId >= (int)FixtureStatus.Live ? "disabled" : "")">
-                                <td>@priceboost.ClientName</td>
-                                <td>@priceboost.SportName</td>
-                                <td>
-                                    <span class="d-block selection-name fw-bold">@priceboost.SelectionName</span>
-                                    <span class="d-block market">@priceboost.MarketName</span>
-                                    <span class="d-block segment">@priceboost.SegmentName</span>
-                                    <span class="d-block league">@priceboost.LeagueName</span>
-                                    <span class="d-block date">@priceboost.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")</span>
-                                    <span class="d-block time">@priceboost.FixtureStartDate.ToLocalTime().ToString("HH:mm")</span>
-                                    @if (priceboost.FixtureStatusId == (int)FixtureStatus.Live)
-                                    {
-                                        <span class="d-block score">@priceboost.Score</span>
-                                    }
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-center">
-                                        <div class="odds-container py-1 px-3">
-                                            <span>@priceboost.BROdds.ToString("0.00")</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-center">
-                                        <div class="odds-container py-1 px-3">
-                                            <span>@priceboost.ClientOdds.ToString("0.00")</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-center">
-                                        <div class="odds-container py-1 px-3">
-                                            <span>@priceboost.BoostedOdds.ToString("0.00")</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="action">
-                                    <div class="d-flex justify-content-center">
-                                        @if (priceboost.FixtureStatusId < (int)FixtureStatus.Live)
-                                        {
-                                            <a class="link-edit me-3" @onclick="_ => OnEditClickEvent(priceboost)" href="javascript:(0)">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <a class="link-edit me-3" href="javascript:(0)" disabled>
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                        }
-                                        <a class="link-logs me-3" @onclick="_ => OnViewLogClickEvent(priceboost)" href="javascript:(0)">
-                                            <i class="fa fa-list"></i>
-                                        </a>
-                                        <a class="link-delete me-3" @onclick="_ => OnDeleteClickEvent(priceboost)" href="javascript:(0)">
-                                            <i class="fa fa-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <NoRecordFound />
-            }
-        }
-    </div>
-</div>
-<div>
-    <CustomModal OnSaveClickCallback="OnModalSave" OnCancelClickCallback="OnModalBack" />
-</div>
+        <div class="col-md-12">
+            <Filter @ref="FilterReference" OnClientChangedCallback="OnClientChangedEvent" OnSportChangedCallback="OnSportChangedEvent" OnSegmentChangedCallback="OnSegmentChangedEvent" OnLeagueChangedCallback="OnLeagueChangedEvent" OnInitCallback="OnInitCallback" OnInputSearchCallback="OnInputSearchEvent" />
+        </div>
+
+        <div class="col-md-12">
+            <div class="mx-3 mt-4">
+                @if (IsPreLoader)
+                {
+                    <Preloader />
+                }
+                else
+                {
+                    @if (PriceBoostList != null && PriceBoostList.Any())
+                    {
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-head">
+                                <tr>
+                                    <th class="th-client-name py-3">Client Name</th>
+                                    <th class="th-sports py-3">Sports</th>
+                                    <th class="th-details py-3">Details</th>
+                                    <th class="th-br-ctrl py-3">BR Ctrl</th>
+                                    <th class="th-current-odds py-3">Current Odds</th>
+                                    <th class="th-boosted-odds py-3">Boosted Odds</th>
+                                    <th class="th-manage py-3">Manage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var priceboost in PriceBoostList)
+                                {
+                                    <tr class="@(priceboost.FixtureStatusId >= (int)FixtureStatus.Live ? "disabled" : "")">
+                                        <td>@priceboost.ClientName</td>
+                                        <td>@priceboost.SportName</td>
+                                        <td>
+                                            <span class="d-block selection-name fw-bold">@priceboost.SelectionName</span>
+                                            <span class="d-block market">@priceboost.MarketName</span>
+                                            <span class="d-block segment">@priceboost.SegmentName</span>
+                                            <span class="d-block league">@priceboost.LeagueName</span>
+                                            <span class="d-block date">@priceboost.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")</span>
+                                            <span class="d-block time">@priceboost.FixtureStartDate.ToLocalTime().ToString("HH:mm")</span>
+                                            @if (priceboost.FixtureStatusId == (int)FixtureStatus.Live)
+                                            {
+                                                <span class="d-block score">@priceboost.Score</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <div class="odds-container py-1 px-3">
+                                                    <span>@priceboost.BROdds.ToString("0.00")</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <div class="odds-container py-1 px-3">
+                                                    <span>@priceboost.ClientOdds.ToString("0.00")</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <div class="odds-container py-1 px-3">
+                                                    <span>@priceboost.BoostedOdds.ToString("0.00")</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="action">
+                                            <div class="d-flex justify-content-center">
+                                                <AuthorizeView Policy="sbc-priceboost-manage-canedit">
+                                                    <Authorized Context="ActivateAll">
+                                                        @if (priceboost.FixtureStatusId < (int)FixtureStatus.Live)
+                                                        {
+                                                            <a class="link-edit me-3" @onclick="_ => OnEditClickEvent(priceboost)" href="javascript:(0)">
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a class="link-edit me-3" href="javascript:(0)" disabled>
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                        }
+                                                        <a class="link-logs me-3" @onclick="_ => OnViewLogClickEvent(priceboost)" href="javascript:(0)">
+                                                            <i class="fa fa-list"></i>
+                                                        </a>
+                                                        <a class="link-delete me-3" @onclick="_ => OnDeleteClickEvent(priceboost)" href="javascript:(0)">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </Authorized>
+                                                    <NotAuthorized Context="ActivateAll">
+                                                        <a class="link-edit me-3" href="javascript:(0)" disabled>
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
+                                                        <a class="link-logs me-3" @onclick="_ => OnViewLogClickEvent(priceboost)" href="javascript:(0)">
+                                                            <i class="fa fa-list"></i>
+                                                        </a>
+                                                        <a class="link-delete me-3" href="javascript:(0)" disabled>
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </NotAuthorized>
+                                                </AuthorizeView>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <NoRecordFound />
+                    }
+                }
+            </div>
+        </div>
+        <div>
+            <CustomModal OnSaveClickCallback="OnModalSave" OnCancelClickCallback="OnModalBack" />
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

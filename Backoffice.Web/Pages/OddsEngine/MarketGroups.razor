@@ -4,96 +4,103 @@
 
 @page "/odds-engine/market-groups"
 
-<div class="col-md-12">
-    <Breadcrumb Breadcrumbs="Breadcrumbs" />
-</div>
-<div class="col-md-12">
-    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-</div>
-<div class="col-md-12">
-    <Filter @bind-MarketGroupModel="MarketGroupModel"
-            OnAddCallback="OnAddClickedEvent"
-            OnCopyCallback="OnCopyClickedEvent"
-            OnUpdateCallback="OnUpdateClickedEvent"
-            OnSaveUpdateCallback="OnSaveUpdateClickEvent"
-            OnViewLogsCallback="OnViewLogsClickedEvent"
-            OnCancelCallback="OnCancelUpdateClickedEvent"
-            OnInitCallback="OnInit" />
-</div>
-<div class="col-md-12">
-    <div class="mx-3 mt-4">
-        @if (IsPreLoader)
-        {
-            <Preloader />
-        }
-        else
-        {
-            if (MarketGroupModel != null && MarketGroupModel.MarketTemplateGroups != null)
-            {
-                <table class="table table-hover table-bordered @TableClass">
-                    <thead class="table-head">
-                        <tr>
-                            <th scope="col" width="5%" valign="middle" align="center">
-                                <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxSelectAllClickedEvent" />
-                            </th>
-                            <th scope="col" class="text-start">Market Group Name</th>
-                            <th scope="col">Markets</th>
-                            <th scope="col">Manage</th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var MarketTemplateGroup in MarketGroupModel.MarketTemplateGroups.OrderBy(o => o.SortOrder))
-                        {
-                            <tr @key="@($"row-sp:{MarketTemplateGroup.MarketTemplateGroupId}-fist")" class="@(MarketGroupModel.IsUpdate ? "" : "row-disabled")" id="name-@MarketTemplateGroup.MarketTemplateGroupId" data-sort-order="@MarketTemplateGroup.SortOrder">
-                                <td>
-                                    <div class="d-flex justify-content-center">
-                                        <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="MarketTemplateGroup.IsActive" OnChangeCallback="CheckboxClickedEvent" Param1="MarketTemplateGroup" />
-                                    </div>
-                                </td>
-                                <td>@MarketTemplateGroup.Name</td>
-                                <td class="text-center">
-                                    @if (!string.IsNullOrEmpty(MarketTemplateGroup.MarketTemplateIds))
-                                    {
-                                        <a class="btn btn-default btn-sm text-center"
-                           @onclick="async () => await OnViewClickedEvent(MarketTemplateGroup.Name, MarketTemplateGroup.MarketTemplateIds)">
-                                            <span data-toggle="tooltip" data-placement="left" title="Click to View" data-original-title="Click to View">
-                                                <i class="fa fa-eye"></i>@(MarketTemplateGroup.MarketTemplateIds.Split(",").ToList().Count)
-                                            </span>
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <a class="btn btn-default btn-sm text-center" disabled>
-                                            <span data-toggle="tooltip" data-placement="left" title="Click to View" data-original-title="Click to View">
-                                                <i class="fa fa-eye"></i>0
-                                            </span>
-                                        </a>
-                                    }
-                                </td>
-                                <td class="text-center">
-                                    <a class="link-edit me-2">
-                                        <button class="fa fa-edit" @onclick="async () => await OnEditClickedEvent(MarketTemplateGroup.MarketTemplateGroupId)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
-                                    </a>
-                                    <a class="link-delete me-2">
-                                        <button class="fa fa-trash" @onclick="async () => await OnDeleteClickedEvent(MarketTemplateGroup)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
-                                    </a>
-                                </td>
-                                <td class="text-center actions">
-                                    <a href="javascript:void(0);" class="drag-handle">
-                                        <i class="fa fa-bars"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <NoRecordFound />
-            }
-        }
-    </div>
-</div>
-<CustomModal OnSaveClickCallback="OnSaveClickEvent" />
+<AuthorizeView Policy="sbc-market-group">
+    <Authorized>
+        <div class="col-md-12">
+            <Breadcrumb Breadcrumbs="Breadcrumbs" />
+        </div>
+        <div class="col-md-12">
+            <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+        </div>
+        <div class="col-md-12">
+            <Filter @bind-MarketGroupModel="MarketGroupModel"
+                    OnAddCallback="OnAddClickedEvent"
+                    OnCopyCallback="OnCopyClickedEvent"
+                    OnUpdateCallback="OnUpdateClickedEvent"
+                    OnSaveUpdateCallback="OnSaveUpdateClickEvent"
+                    OnViewLogsCallback="OnViewLogsClickedEvent"
+                    OnCancelCallback="OnCancelUpdateClickedEvent"
+                    OnInitCallback="OnInit" />
+        </div>
+        <div class="col-md-12">
+            <div class="mx-3 mt-4">
+                @if (IsPreLoader)
+                {
+                    <Preloader />
+                }
+                else
+                {
+                    if (MarketGroupModel != null && MarketGroupModel.MarketTemplateGroups != null)
+                    {
+                        <table class="table table-hover table-bordered @TableClass">
+                            <thead class="table-head">
+                                <tr>
+                                    <th scope="col" width="5%" valign="middle" align="center">
+                                        <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxSelectAllClickedEvent" />
+                                    </th>
+                                    <th scope="col" class="text-start">Market Group Name</th>
+                                    <th scope="col">Markets</th>
+                                    <th scope="col">Manage</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var MarketTemplateGroup in MarketGroupModel.MarketTemplateGroups.OrderBy(o => o.SortOrder))
+                                {
+                                    <tr @key="@($"row-sp:{MarketTemplateGroup.MarketTemplateGroupId}-fist")" class="@(MarketGroupModel.IsUpdate ? "" : "row-disabled")" id="name-@MarketTemplateGroup.MarketTemplateGroupId" data-sort-order="@MarketTemplateGroup.SortOrder">
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="MarketTemplateGroup.IsActive" OnChangeCallback="CheckboxClickedEvent" Param1="MarketTemplateGroup" />
+                                            </div>
+                                        </td>
+                                        <td>@MarketTemplateGroup.Name</td>
+                                        <td class="text-center">
+                                            @if (!string.IsNullOrEmpty(MarketTemplateGroup.MarketTemplateIds))
+                                            {
+                                                <a class="btn btn-default btn-sm text-center"
+                                   @onclick="async () => await OnViewClickedEvent(MarketTemplateGroup.Name, MarketTemplateGroup.MarketTemplateIds)">
+                                                    <span data-toggle="tooltip" data-placement="left" title="Click to View" data-original-title="Click to View">
+                                                        <i class="fa fa-eye"></i>@(MarketTemplateGroup.MarketTemplateIds.Split(",").ToList().Count)
+                                                    </span>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a class="btn btn-default btn-sm text-center" disabled>
+                                                    <span data-toggle="tooltip" data-placement="left" title="Click to View" data-original-title="Click to View">
+                                                        <i class="fa fa-eye"></i>0
+                                                    </span>
+                                                </a>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="link-edit me-2">
+                                                <button class="fa fa-edit" @onclick="async () => await OnEditClickedEvent(MarketTemplateGroup.MarketTemplateGroupId)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
+                                            </a>
+                                            <a class="link-delete me-2">
+                                                <button class="fa fa-trash" @onclick="async () => await OnDeleteClickedEvent(MarketTemplateGroup)" disabled="@(!MarketGroupModel.IsUpdate)"></button>
+                                            </a>
+                                        </td>
+                                        <td class="text-center actions">
+                                            <a href="javascript:void(0);" class="drag-handle">
+                                                <i class="fa fa-bars"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <NoRecordFound />
+                    }
+                }
+            </div>
+        </div>
+        <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

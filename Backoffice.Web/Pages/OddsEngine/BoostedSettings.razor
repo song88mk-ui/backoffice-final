@@ -3,51 +3,58 @@
 
 @page "/odds-engine/boosted-settings"
 
-<div class="col-md-12">
-    <Breadcrumb Breadcrumbs="Breadcrumbs" />
-</div>
-<div class="col-md-12">
-    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-</div>
-<div class="col-md-12">
-    <Filter />
-</div>
-<div class="col-md-12">
-    <div class="mx-3 mt-4">
+<AuthorizeView Policy="sbc-priceboost-settings">
+    <Authorized>
+        <div class="col-md-12">
+            <Breadcrumb Breadcrumbs="Breadcrumbs" />
+        </div>
+        <div class="col-md-12">
+            <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+        </div>
+        <div class="col-md-12">
+            <Filter />
+        </div>
+        <div class="col-md-12">
+            <div class="mx-3 mt-4">
 
-        <table class="table table-bordered mt-3">
-            <thead>
-                <tr>
-                    <th><strong>Client Name</strong></th>
-                    <th><strong>% Cap of Current Odds from Boosted Odds</strong></th>
-                    <th><strong>Manage</strong></th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (IsPreLoader)
-                {
-                    <tr>
-                        <td colspan="3">
-                            <Preloader></Preloader>
-                        </td>
-                    </tr>
-                }
-                else
-                {
-                    @if (ClientsView == null)
-                    {
-                        <NoRecordFound></NoRecordFound>
-                    }
-                    else
-                    {
-                        @foreach (var client in ClientsView)
+                <table class="table table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th><strong>Client Name</strong></th>
+                            <th><strong>% Cap of Current Odds from Boosted Odds</strong></th>
+                            <th><strong>Manage</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (IsPreLoader)
                         {
-                            <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" ></BoostedSettingsRow>
+                            <tr>
+                                <td colspan="3">
+                                    <Preloader></Preloader>
+                                </td>
+                            </tr>
                         }
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
-<Backoffice.Web.Components.Common.CustomModal OnSaveClickCallback="OnSaveSettingClickEvent" />
+                        else
+                        {
+                            @if (ClientsView == null)
+                            {
+                                <NoRecordFound></NoRecordFound>
+                            }
+                            else
+                            {
+                                @foreach (var client in ClientsView)
+                                {
+                                    <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId"></BoostedSettingsRow>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <Backoffice.Web.Components.Common.CustomModal OnSaveClickCallback="OnSaveSettingClickEvent" />
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

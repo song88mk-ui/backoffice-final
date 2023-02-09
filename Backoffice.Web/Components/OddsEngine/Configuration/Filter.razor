@@ -108,15 +108,22 @@
 
     <div class="row d-none">
         <div class="col ps-3">
-            <button type="button" class="btn">
-                <i class="fa fa-file-excel-o"></i>
-                Export To Excel
-            </button>
-            <button type="button" class="btn">
-                <i class="fa fa-file-excel-o"></i>
-                Import From Excel
-            </button>
-            <i class="fa fa-info-circle"></i>
+            <AuthorizeView Policy="sbc-config-canedit">
+                <Authorized Context="ActivateAll">
+                    <button type="button" class="btn">
+                        <i class="fa fa-file-excel-o"></i>
+                        Export To Excel
+                    </button>
+                    <button type="button" class="btn">
+                        <i class="fa fa-file-excel-o"></i>
+                        Import From Excel
+                    </button>
+                    <i class="fa fa-info-circle"></i>
+                </Authorized>
+                <NotAuthorized Context="ActivateAll">
+
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
     </div>
 }

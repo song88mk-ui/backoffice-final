@@ -4,89 +4,93 @@
 
 @page "/odds-engine/sport-settings"
 
-<div class="col-md-12">
-    <Breadcrumb Breadcrumbs="Breadcrumbs" />
-</div>
-<div class="col-md-12">
-    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-</div>
-
-@if (!string.IsNullOrEmpty(AlertMessage))
-{
-    <div class="col-md-12">
-        <div class="mt-4 mx-3">
-            <AlertMessage AlertMessageStr="@AlertMessage" AlertStatus="@(AlertStatus.ToString())" AlwaysShow="true" />
+<AuthorizeView Policy="sbc-sports-setting">
+    <Authorized>
+        <div class="col-md-12">
+            <Breadcrumb Breadcrumbs="Breadcrumbs" />
         </div>
-    </div>
-}
+        <div class="col-md-12">
+            <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+        </div>
 
-<div class="col-md-12">
-    <Filter OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickCallback="OnCancelClickEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyClickCallback="OnCopyClickEvent" OnViewLogsCallback="OnViewLogsClickEvent" IsPreload="IsPreload" />
-</div>
-<div class="col-md-12">
-    <div class="mx-3 mt-4">
-        @if (IsPreload)
+        @if (!string.IsNullOrEmpty(AlertMessage))
         {
-            <Preloader />
+            <div class="col-md-12">
+                <div class="mt-4 mx-3">
+                    <AlertMessage AlertMessageStr="@AlertMessage" AlertStatus="@(AlertStatus.ToString())" AlwaysShow="true" />
+                </div>
+            </div>
         }
-        else
-        {
-            <table class="table table-hover table-bordered @TableClass">
-                <thead class="table-head">
-                    <tr>
-                        <th class="th-no py-3">#</th>
-                        <th class="th-checkbox py-3">
-                            @*<Tooltip CssClass="bottom" Text="Select/Unselect all sports<br>To Enable/Disable in Client Site.">
-                                <Checkbox HasOnChange="ClientSportOrderFilter.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxClicked" />
-                            </Tooltip>*@
-                            <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" @onchange="e => OnActiveHeaderChangedEvent(e)">
-                            </div>
-                        </th>
-                        <th class="th-sports py-3">Sports</th>
-                        <th class="th-action py-3"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (ClientSportsSettingsModel.Sports.Any())
-                    {
 
-                        foreach (var sport in ClientSportsSettingsModel.Sports)
-                        {
-                            <tr @key="@($"sport-{sport.SportId}")" id="sport-@sport.SportId" class="sport-row">
-                                <td class="text-center fw-bold">@sport.SortOrder</td>
-                                <td>
+        <div class="col-md-12">
+            <Filter OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickCallback="OnCancelClickEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyClickCallback="OnCopyClickEvent" OnViewLogsCallback="OnViewLogsClickEvent" IsPreload="IsPreload" />
+        </div>
+        <div class="col-md-12">
+            <div class="mx-3 mt-4">
+                @if (IsPreload)
+                {
+                    <Preloader />
+                }
+                else
+                {
+                    <table class="table table-hover table-bordered @TableClass">
+                        <thead class="table-head">
+                            <tr>
+                                <th class="th-no py-3">#</th>
+                                <th class="th-checkbox py-3">
                                     <div class="form-check d-flex justify-content-center">
-                                        @if (sport.IsActive)
-                                        {
-                                            <input class="form-check-input" type="checkbox" checked>
-                                        }
-                                        else
-                                        {
-                                            <input class="form-check-input" type="checkbox">
-                                        }
+                                        <input class="form-check-input" type="checkbox" @onchange="e => OnActiveHeaderChangedEvent(e)">
                                     </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-between">
-                                        <span>@sport.SportName</span>
-                                        <span class="dropdown-cat dropdown-segment @(IsUpdate ? "" : "disabled")">
-                                            <i class="fa fa-chevron-down" @onclick="() => OnSportClickEvent(sport)"></i>
-                                            @*<i class="fa @(sport.IsOpen ? "fa-chevron-up" : "fa-chevron-down")" @onclick="() => OnSportClickEvent(sport)"></i>*@
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <a class="link-bars me-2 drag-handle" href="javascript:(0)">
-                                        <i class="fa fa-bars"></i>
-                                    </a>
-                                </td>
+                                </th>
+                                <th class="th-sports py-3">Sports</th>
+                                <th class="th-action py-3"></th>
                             </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        }
-    </div>
-</div>
-<CustomModal OnSaveClickCallback="OnSaveCopyClickEvent" />
+                        </thead>
+                        <tbody>
+                            @if (ClientSportsSettingsModel.Sports.Any())
+                            {
+
+                                foreach (var sport in ClientSportsSettingsModel.Sports)
+                                {
+                                    <tr @key="@($"sport-{sport.SportId}")" id="sport-@sport.SportId" class="sport-row">
+                                        <td class="text-center fw-bold">@sport.SortOrder</td>
+                                        <td>
+                                            <div class="form-check d-flex justify-content-center">
+                                                @if (sport.IsActive)
+                                                {
+                                                    <input class="form-check-input" type="checkbox" checked>
+                                                }
+                                                else
+                                                {
+                                                    <input class="form-check-input" type="checkbox">
+                                                }
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-between">
+                                                <span>@sport.SportName</span>
+                                                <span class="dropdown-cat dropdown-segment @(IsUpdate ? "" : "disabled")">
+                                                    <i class="fa fa-chevron-down" @onclick="() => OnSportClickEvent(sport)"></i>
+                                                    @*<i class="fa @(sport.IsOpen ? "fa-chevron-up" : "fa-chevron-down")" @onclick="() => OnSportClickEvent(sport)"></i>*@
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="link-bars me-2 drag-handle" href="javascript:(0)">
+                                                <i class="fa fa-bars"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <CustomModal OnSaveClickCallback="OnSaveCopyClickEvent" />
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

@@ -4,7 +4,7 @@
             <div class="select-container d-flex">
                 <div class="client-container me-4">
                     <label class="form-label d-block">Clients</label>
-                    <select class="form-select d-block" @onchange="OnClientChangedEvent">                       
+                    <select class="form-select d-block" @onchange="OnClientChangedEvent">
                         @if (Clients.Any())
                         {
                             @foreach (var item in Clients)
@@ -112,10 +112,20 @@
     <div class="col-md-12">
         <div class="mx-3 d-flex justify-content-between mt-3">
             <div>
-                <a href="javascript:void(0)" class="btn btn-boosted-odds px-3" @onclick="OnAddBoostedOdds">
-                    <i class="fa fa-rocket"></i>
-                    Add Boosted Odds
-                </a>
+                <AuthorizeView Policy="sbc-priceboost-manage-canedit">
+                    <Authorized Context="ActivateAll">
+                        <a href="javascript:void(0)" class="btn btn-boosted-odds px-3" @onclick="OnAddBoostedOdds">
+                            <i class="fa fa-rocket"></i>
+                            Add Boosted Odds
+                        </a>
+                    </Authorized>
+                    <NotAuthorized Context="ActivateAll">
+                        <a href="javascript:void(0)" class="btn btn-boosted-odds px-3" disabled>
+                            <i class="fa fa-rocket"></i>
+                            Add Boosted Odds
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
             </div>
             <div>
                 <a href="javascript:void(0)" class="btn btn-logs px-3" @onclick="OnViewAllLogs">

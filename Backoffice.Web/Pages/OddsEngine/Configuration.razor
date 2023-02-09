@@ -4,82 +4,100 @@
 
 @page "/odds-engine/config"
 
-@if (Alerts != null && Alerts.Any())
-{
-    foreach (var alert in Alerts)
-    {
-        <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" Guid="Guid" AlwaysShow=true />
-    }
-}
-
-<div class="col-md-12">
-    <Breadcrumb Breadcrumbs="Breadcrumbs" />
-</div>
-<div class="col-md-12">
-    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-    <HeaderConfigTopMenu ConfigurationRef="this"/>
-</div>
-
-<div class="col-md-12">
-    <Filter @bind-ConfigFilterModel="ConfigFilterModel" FixtureType="FixtureType" IsMarketEditingChanged="UndoEditedMarkets"/>
-</div>
-
-<div class="col-md-12 mb-2">
-    <button type="button" class="btn float-end" @onclick="OnAllMarketStatusClickEvent">@AllMarketStatusName</button>
-</div>
-
-
-<div class="col-md-12">    
-    @if (ConfigFilterModel != null && ConfigFilterModel.MarketTemplates != null)
-    {        
-        if (!string.IsNullOrEmpty(ConfigFilterModel.ClientCode) && ConfigFilterModel.MarketTemplates.Any())
+<AuthorizeView Policy="sbc-config">
+    <Authorized>
+        @if (Alerts != null && Alerts.Any())
         {
-            SelectedContents = GetContents();
-            if (SelectedContents.Any())
+            foreach (var alert in Alerts)
             {
-                var marketCount = 0;
-                foreach (var market in SelectedContents)
+                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" Guid="Guid" AlwaysShow=true />
+            }
+        }
+
+        <div class="col-md-12">
+            <Breadcrumb Breadcrumbs="Breadcrumbs" />
+        </div>
+        <div class="col-md-12">
+            <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+            <HeaderConfigTopMenu ConfigurationRef="this" />
+        </div>
+
+        <div class="col-md-12">
+            <Filter @bind-ConfigFilterModel="ConfigFilterModel" FixtureType="FixtureType" IsMarketEditingChanged="UndoEditedMarkets" />
+        </div>
+
+        <div class="col-md-12 mb-2">
+            <AuthorizeView Policy="sbc-config-canedit">
+                <Authorized Context="ActivateAll">
+                    <button type="button" class="btn float-end" @onclick="OnAllMarketStatusClickEvent">@AllMarketStatusName</button>
+                </Authorized>
+                <NotAuthorized Context="ActivateAll">
+                    <button type="button" class="btn float-end" disabled>@AllMarketStatusName</button>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
+
+        <div class="col-md-12">
+            @if (ConfigFilterModel != null && ConfigFilterModel.MarketTemplates != null)
+            {
+                if (!string.IsNullOrEmpty(ConfigFilterModel.ClientCode) && ConfigFilterModel.MarketTemplates.Any())
                 {
-
-                    if (market.NewMarketLookup == null)
-                        market.IsSelected = marketCount >= 3 ? true : false;
-
-                    GetNewSettings(market);
-                    var configStatus = market.MarketLookup.IsActive ? 1 : 0;
-
-                    if (ConfigFilterModel.FilterConfigStatus == -99 || configStatus == ConfigFilterModel.FilterConfigStatus)
+                    SelectedContents = GetContents();
+                    if (SelectedContents.Any())
                     {
-                        if (AllMarketStatus != null)
+                        var marketCount = 0;
+                        foreach (var market in SelectedContents)
                         {
-                            market.NewMarketLookup.IsActive = (int)AllMarketStatus == 1 ? true : false;
+                            if (market.NewMarketLookup == null)
+                                market.IsSelected = marketCount >= 3 ? true : false;
+
+                            GetNewSettings(market);
+                            var configStatus = market.MarketLookup.IsActive ? 1 : 0;
+
+                            if (ConfigFilterModel.FilterConfigStatus == -99 || configStatus == ConfigFilterModel.FilterConfigStatus)
+                            {
+                                if (AllMarketStatus != null)
+                                {
+                                    market.NewMarketLookup.IsActive = (int)AllMarketStatus == 1 ? true : false;
+                                }
+                                marketCount++;
+                            }
                         }
-                        marketCount++;
+
+                        if (marketCount > 0)
+                        {
+                            AllMarketStatus = null;
+
+                            if (ConfigFilterModel.FilterConfigStatus == 0)
+                                AllMarketStatusName = "Activate All";
+                            if (ConfigFilterModel.FilterConfigStatus == 1)
+                                AllMarketStatusName = "Deactivate All";
+                            if (!SelectedContents.Any(s => s.NewMarketLookup.IsActive))
+                                AllMarketStatusName = "Activate All";
+                            if (!SelectedContents.Any(s => s.NewMarketLookup.IsActive == false))
+                                AllMarketStatusName = "Deactivate All";
+
+                            <Virtualize Context="market" ItemsProvider="GetItemProviderContents">
+                                <ItemContent>
+                                    <AccordionConfiguration Market="market"
+                                            OnMarketChangedCallback="OnMarketChangedEvent"
+                                            @key="@($"{ConfigFilterModel.SportId}-{market.MarketLookup.MarketTemplateId}")"
+                                            @bind-MarketLookupNavigation="MarketLookupNavigationModelsTemp"
+                                            @bind-FilterConfigStatus="ConfigFilterModel.FilterConfigStatus"
+                                            @bind-Scope="ConfigFilterModel.Scope" />
+                                </ItemContent>
+                            </Virtualize>
+                        }
+                        else
+                        {
+                            <NoRecordFound />
+                        }
                     }
-                }
-
-                if (marketCount > 0)
-                {                    
-                    AllMarketStatus = null;
-
-                    if (ConfigFilterModel.FilterConfigStatus == 0)
-                        AllMarketStatusName = "Activate All";
-                    if (ConfigFilterModel.FilterConfigStatus == 1)
-                        AllMarketStatusName = "Deactivate All";
-                    if (!SelectedContents.Any(s => s.NewMarketLookup.IsActive))
-                        AllMarketStatusName = "Activate All";
-                    if (!SelectedContents.Any(s => s.NewMarketLookup.IsActive == false))
-                        AllMarketStatusName = "Deactivate All";
-
-                    <Virtualize Context="market" ItemsProvider="GetItemProviderContents">
-                        <ItemContent>                            
-                            <AccordionConfiguration Market="market"                                
-                                OnMarketChangedCallback="OnMarketChangedEvent"
-                                @key="@($"{ConfigFilterModel.SportId}-{market.MarketLookup.MarketTemplateId}")"
-                                @bind-MarketLookupNavigation="MarketLookupNavigationModelsTemp"
-                                @bind-FilterConfigStatus="ConfigFilterModel.FilterConfigStatus"
-                                @bind-Scope="ConfigFilterModel.Scope"/>
-                        </ItemContent>
-                    </Virtualize>
+                    else
+                    {
+                        <NoRecordFound />
+                    }
                 }
                 else
                 {
@@ -88,35 +106,30 @@
             }
             else
             {
-                <NoRecordFound />
+                <Preloader />
             }
-        }
-        else
-        {
-            <NoRecordFound />
-        }
-    }
-    else
-    {
-        <Preloader />
-    }
-</div>
+        </div>
 
-@if (IsMarketEditing)
-{
-    <div class="market-save-changes">
-        <div class="row market-save-details">
-            <div class="col">
-                <span>Make sure to save your changes</span>
-            </div>
-            <div class="col"></div>
-            <div class="col">
-                <div class="market-save-actions">
-                    <button type="button" class="btn market-cancel me-2" @onclick="OnMarketEditingCancelClickEvent">Cancel</button>
-                    <button type="button" class="btn market-save" @onclick="OnMarketSaveClickEvent">Save My Changes</button>
+        @if (IsMarketEditing)
+        {
+            <div class="market-save-changes">
+                <div class="row market-save-details">
+                    <div class="col">
+                        <span>Make sure to save your changes</span>
+                    </div>
+                    <div class="col"></div>
+                    <div class="col">
+                        <div class="market-save-actions">
+                            <button type="button" class="btn market-cancel me-2" @onclick="OnMarketEditingCancelClickEvent">Cancel</button>
+                            <button type="button" class="btn market-save" @onclick="OnMarketSaveClickEvent">Save My Changes</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-}
-<CustomModal/>
+        }
+        <CustomModal />
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

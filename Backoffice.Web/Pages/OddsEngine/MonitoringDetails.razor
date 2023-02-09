@@ -5,137 +5,124 @@
 
 @page "/odds-engine/monitoring-details/{Id}"
 
-<div class="col-md-12">
-    @if (Breadcrumbs.Any())
-    {
-        <Breadcrumb Breadcrumbs="Breadcrumbs" />
-    }
-</div>
-<div class="col-md-12">
-    <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-</div>
-<div class="col-md-12">
-    @if (SportId != 0)
-    {
-        <Filter SportId="SportId" OnMarketChangedCallback="OnMarketChangedEvent" />
-    }
-</div>
-<div class="col-md-12">
-    <div class="table-container mx-3 mt-4">
-        <table class="table table-hover table-bordered mb-0">
-            <thead class="table-head">
-                <tr>
-                    <th class="th-start-date py-3"></th>
-                    <th class="th-fixture-name py-3"></th>
-                    <th class="th-master py-3">BR CTRL</th>
-                    @foreach (var client in ClientModel.Clients)
-                    {
-                        <th class="th-client py-3">@client.ClientName</th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var market in FixtureMarkets)
-                {
-                    <FixtureRow @key="@market.ProviderMarketId" Clients="ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" />
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
-<div class="col-md-12">
-    @if (SportId != 0)
-    {
-        <MarketGroupFilter SportId="SportId" Fixture="Fixture" OnInputSearchCallback="OnInputSearchEvent" OnMarketTemplateGroupCallback="OnMarketTemplateGroupClickEvent" />
-    }
-</div>
-<div class="col-md-12">
-    <div class="d-flex mx-3 mt-4">
-        @if (MarketTemplateNavigation.Any())
-        {
-            var filteredMarketTemplateNavigation = !string.IsNullOrEmpty(Search) ? MarketTemplateNavigation.Where(c => c.MarketName.ToLower().Contains(Search)).ToList() : MarketTemplateNavigation;
-
-            <div class="market-template-container">
-                <MarketFilter MarketTemplates="filteredMarketTemplateNavigation" OnMarketTemplateClickCallback="OnMarketTemplateClickEvent" />
-            </div>
-            <div class="market-template-fixture-container align-self-start">
-                @if (FixtureMarketTemplates.Any())
-                {
-                    <table class="table table-hover table-bordered mb-0">
-                        <thead class="table-head">
-                            <tr>
-                                <th></th>
-                                <th class="th-master">BR CTRL</th>
-                                @foreach (var client in ClientModel.Clients)
-                                {
-                                    <th class="th-client py-3">@client.ClientName</th>
-                                }
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Table Row Margin -->
-                            <tr>
-                                <td></td>
-                                <td>
-                                    <div class="d-flex justify-content-center">
-                                        <div class="py-1 px-2">
-                                            <span class="fw-bold">@GetClientMargin(string.Empty, string.Empty, MarginMarket.Selections, isPlayerProps)</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                @foreach (var client in ClientModel.Clients)
-                                {
-                                    <td>
-                                        <div class="d-flex justify-content-center">
-                                            <div class="py-1 px-2">
-                                                @if (HasClientConfig(client.ClientCode, MarginMarket.ClientCode, MarginMarket.ClientCodeMargin))
-                                                {
-                                                    string margin = GetClientMargin(client.ClientCode, MarginMarket.ClientCodeMargin, MarginMarket.Selections, isPlayerProps);
-                                                    <span class="fw-bold">@margin</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="fw-bold">-.-</span>
-                                                }
-                                            </div>
-                                        </div>
-                                    </td>
-                                }
-                            </tr>
-                            <!-- End Table Row Margin -->
-                            <!-- Table Row Odds-->
-                            @*@foreach (var marketTemplate in MarketTemplates)
+<AuthorizeView Policy="sbc-monitoring-match">
+    <Authorized>
+        <div class="col-md-12">
+            @if (Breadcrumbs.Any())
+            {
+                <Breadcrumb Breadcrumbs="Breadcrumbs" />
+            }
+        </div>
+        <div class="col-md-12">
+            <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+        </div>
+        <div class="col-md-12">
+            @if (SportId != 0)
+            {
+                <Filter SportId="SportId" OnMarketChangedCallback="OnMarketChangedEvent" />
+            }
+        </div>
+        <div class="col-md-12">
+            <div class="table-container mx-3 mt-4">
+                <table class="table table-hover table-bordered mb-0">
+                    <thead class="table-head">
+                        <tr>
+                            <th class="th-start-date py-3"></th>
+                            <th class="th-fixture-name py-3"></th>
+                            <th class="th-master py-3">BR CTRL</th>
+                            @foreach (var client in ClientModel.Clients)
                             {
-                                if (marketTemplate.IsSelected)
-                                {
-                                    var isBetStop = fixture.IsBetStopGlobal;
+                                <th class="th-client py-3">@client.ClientName</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var market in FixtureMarkets)
+                        {
+                            <FixtureRow @key="@market.ProviderMarketId" Clients="ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" />
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-12">
+            @if (SportId != 0)
+            {
+                <MarketGroupFilter SportId="SportId" Fixture="Fixture" OnInputSearchCallback="OnInputSearchEvent" OnMarketTemplateGroupCallback="OnMarketTemplateGroupClickEvent" />
+            }
+        </div>
+        <div class="col-md-12">
+            <div class="d-flex mx-3 mt-4">
+                @if (MarketTemplateNavigation.Any())
+                {
+                    var filteredMarketTemplateNavigation = !string.IsNullOrEmpty(Search) ? MarketTemplateNavigation.Where(c => c.MarketName.ToLower().Contains(Search)).ToList() : MarketTemplateNavigation;
 
-                                    if (fixture.BetStop != null)
-                                    {
-                                        isBetStop = fixture.BetStop.Count > 0 && fixture.BetStop.FirstOrDefault() == 1 ? true : false;
-                                    }
-
-                                    foreach (var market in marketTemplate.Fixture.Markets)
+                    <div class="market-template-container">
+                        <MarketFilter MarketTemplates="filteredMarketTemplateNavigation" OnMarketTemplateClickCallback="OnMarketTemplateClickEvent" />
+                    </div>
+                    <div class="market-template-fixture-container align-self-start">
+                        @if (FixtureMarketTemplates.Any())
+                        {
+                            <table class="table table-hover table-bordered mb-0">
+                                <thead class="table-head">
+                                    <tr>
+                                        <th></th>
+                                        <th class="th-master">BR CTRL</th>
+                                        @foreach (var client in ClientModel.Clients)
+                                        {
+                                            <th class="th-client py-3">@client.ClientName</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Table Row Margin -->
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <div class="py-1 px-2">
+                                                    <span class="fw-bold">@GetClientMargin(string.Empty, string.Empty, MarginMarket.Selections, isPlayerProps)</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        @foreach (var client in ClientModel.Clients)
+                                        {
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <div class="py-1 px-2">
+                                                        @if (HasClientConfig(client.ClientCode, MarginMarket.ClientCode, MarginMarket.ClientCodeMargin))
+                                                        {
+                                                            string margin = GetClientMargin(client.ClientCode, MarginMarket.ClientCodeMargin, MarginMarket.Selections, isPlayerProps);
+                                                            <span class="fw-bold">@margin</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="fw-bold">-.-</span>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        }
+                                    </tr>
+                                    <!-- End Table Row Margin -->
+                                    <!-- Table Row Odds-->
+                                    @foreach (var market in FixtureMarketTemplates)
                                     {
                                         foreach (var selection in market.Selections)
                                         {
-                                            <MatchDetailSelectionRow Selection="@selection" Market="@market" ClientModel="@ClientModel" />
+                                            <MatchDetailSelectionRow Selection="selection" Market="@market" ClientModel="ClientModel" />
                                         }
                                     }
-                                }
-                            }*@
-                            @foreach (var market in FixtureMarketTemplates)
-                            {
-                                foreach (var selection in market.Selections)
-                                {
-                                    <MatchDetailSelectionRow Selection="selection" Market="@market" ClientModel="ClientModel" />
-                                }
-                            }
-                            <!-- End Table Row Odds -->
-                        </tbody>
-                    </table>
+                                    <!-- End Table Row Odds -->
+                                </tbody>
+                            </table>
+                        }
+                    </div>
                 }
             </div>
-        }
-    </div>
-</div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

@@ -17,40 +17,64 @@
         </div>
     </div>
     <div class="button-container d-flex flex-row-reverse align-items-end">
-        <div class="me-2">
-            <a href="javascript:void(0)" class="btn btn-logs px-3 @(IsPreload ? "disabled" : "")" @onclick="OnViewLogsClickEvent">
-                <i class="fa fa-list"></i>
-                Logs
-            </a>
-        </div>
-        <div class="me-2">
-            <a href="javascript:void(0)" class="btn btn-copy px-3 @(IsPreload ? "disabled" : "")" @onclick="OnCopyClickEvent">
-                <i class="fa fa-copy"></i>
-                Copy
-            </a>
-        </div>
-        @if (!IsUpdate)
-        {
-            <div class="me-2">
-                <a href="javascript:void(0)" class="btn btn-edit px-3 @(IsPreload ? "disabled" : "")" @onclick="OnUpdateClickEvent">
-                    <i class="fa fa-edit"></i>
-                    Update
-                </a>
-            </div>
-        }
-        else
-        {
-            <div class="me-2">
-                <a href="javascript:void(0)" class="btn btn-save px-3 @(IsPreload ? "disabled" : "")" @onclick="OnSaveClickEvent">
-                    <i class="fa fa-check"></i>
-                    Save
-                </a>
-            </div>
-            <div class="me-2">
-                <a href="javascript:void(0)" class="btn btn-cancel px-3 @(IsPreload ? "disabled" : "")" @onclick="OnCancelClickEvent">
-                    Cancel
-                </a>
-            </div>
-        }
+        <AuthorizeView Policy="sbc-sports-setting-canedit">
+            <Authorized Context="ActivateAll">
+                <div class="me-2">
+                    <a href="javascript:void(0)" class="btn btn-logs px-3 @(IsPreload ? "disabled" : "")" @onclick="OnViewLogsClickEvent">
+                        <i class="fa fa-list"></i>
+                        Logs
+                    </a>
+                </div>
+                <div class="me-2">
+                    <a href="javascript:void(0)" class="btn btn-copy px-3 @(IsPreload ? "disabled" : "")" @onclick="OnCopyClickEvent">
+                        <i class="fa fa-copy"></i>
+                        Copy
+                    </a>
+                </div>
+                @if (!IsUpdate)
+                {
+                    <div class="me-2">
+                        <a href="javascript:void(0)" class="btn btn-edit px-3 @(IsPreload ? "disabled" : "")" @onclick="OnUpdateClickEvent">
+                            <i class="fa fa-edit"></i>
+                            Update
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="me-2">
+                        <a href="javascript:void(0)" class="btn btn-save px-3 @(IsPreload ? "disabled" : "")" @onclick="OnSaveClickEvent">
+                            <i class="fa fa-check"></i>
+                            Save
+                        </a>
+                    </div>
+                    <div class="me-2">
+                        <a href="javascript:void(0)" class="btn btn-cancel px-3 @(IsPreload ? "disabled" : "")" @onclick="OnCancelClickEvent">
+                            Cancel
+                        </a>
+                    </div>
+                }
+            </Authorized>
+            <NotAuthorized Context="ActivateAll">
+                <div class="me-2">
+                    <a href="javascript:void(0)" class="btn btn-logs px-3 @(IsPreload ? "disabled" : "")" @onclick="OnViewLogsClickEvent">
+                        <i class="fa fa-list"></i>
+                        Logs
+                    </a>
+                </div>
+                <div class="me-2">
+                    <a href="javascript:void(0)" class="btn btn-copy px-3 disabled">
+                        <i class="fa fa-copy"></i>
+                        Copy
+                    </a>
+                </div>
+                <div class="me-2">
+                    <a href="javascript:void(0)" class="btn btn-edit px-3 disabled">
+                        <i class="fa fa-edit"></i>
+                        Update
+                    </a>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 </div>
