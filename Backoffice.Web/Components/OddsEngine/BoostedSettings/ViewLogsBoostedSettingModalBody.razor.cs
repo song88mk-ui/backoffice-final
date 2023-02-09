@@ -11,24 +11,28 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 {
     public partial class ViewLogsBoostedSettingModalBody : IDisposable
     {
-
         #region Properties
+
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+
         protected SearchFormModel SearchForm { get; set; }
         public MetaData MetaData { get; set; } = new MetaData();
+        protected List<ActivityLogModel> ActivityLogs { get; set; } = new List<ActivityLogModel>();
+
         protected DateTime StartDate { get; set; }
         protected DateTime EndDate { get; set; }
-        protected List<ActivityLogModel> ActivityLogs { get; set; } = new List<ActivityLogModel>();
-        private int PreviousPage { get; set; }
         protected string ClientCode { get; set; }
         protected string ClientName { get; set; }
         protected bool IsPreLoader { get; set; } = false;
+
         #endregion
 
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             ActivityLogs = new List<ActivityLogModel>();
@@ -45,15 +49,19 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             EndDate = DateTime.Now.Date;
 
             var client = ModalParameters?.TryGet<BoostedSettingsModel>("Client");
+
             ClientCode = client.ClientCode;
             ClientName = client.ClientName;
+
             await GetContent();
         }
+
         protected async Task SelectedPage(int page)
         {
             MetaData.CurrentPage = page;
             await GetContent();
         }
+
         public async Task OnSubmitClickEvent()
         {
             await GetContent();
@@ -65,10 +73,12 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             MetaData.TotalCount = ActivityLogs.Count();
             MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
         }
+
         public async Task OnCancelClickEvent()
         {
             ModalService.Cancel();
         }
+
         public async Task GetContent()
         {
             IsPreLoader = true;
@@ -120,6 +130,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
             IsPreLoader = false;
         }
+
         public async Task OnRangeSelect(DateRange range)
         {
             StartDate = Convert.ToDateTime(range.Start.ToString("yyyy-MM-dd 00:00:00"));
@@ -127,6 +138,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
             await GetContent();
         }
+
         private string EvaluateActivity(string changeData)
         {
             if (!(changeData == null || changeData == string.Empty))
@@ -140,10 +152,12 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             }
             return "-";
         }
+
         public void Dispose()
         {
 
         }
+
         #endregion
     }
 }

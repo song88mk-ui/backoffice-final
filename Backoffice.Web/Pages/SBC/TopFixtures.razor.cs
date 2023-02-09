@@ -1,5 +1,5 @@
 ﻿using Backoffice.Shared.Models;
-using Backoffice.Web.Components.TopFixtures;
+using Backoffice.Web.Components.SBC.TopFixtures;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;

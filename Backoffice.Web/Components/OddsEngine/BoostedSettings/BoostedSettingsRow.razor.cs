@@ -8,9 +8,16 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 {
     public partial class BoostedSettingsRow
     {
+        #region Properties
+
+        [Inject] IModalService ModalService { get; set; }
+
         [Parameter] public BoostedSettingsModel BoostedSettings { get; set; }
         [Parameter] public Guid ClientId { get; set; }
-        [Inject] IModalService ModalService { get; set; }
+
+        #endregion
+
+        #region Methods
 
         public async Task OnEditSetting(BoostedSettingsModel client)
         {
@@ -28,6 +35,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
             }
         }
+
         public async Task OnViewLogs(BoostedSettingsModel client)
         {
             try
@@ -45,5 +53,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
             }
         }
+
+        #endregion
     }
 }

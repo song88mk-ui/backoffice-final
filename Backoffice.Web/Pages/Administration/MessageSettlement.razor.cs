@@ -2,7 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Utilities;
-using Backoffice.Web.Components.MessageSettlement;
+using Backoffice.Web.Components.Administration.MessageSettlement;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;

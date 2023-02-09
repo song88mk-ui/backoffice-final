@@ -1,7 +1,7 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Common;
-using Backoffice.Web.Components.ParlayBonus;
+using Backoffice.Web.Components.SBC.ParlayBonus;
 using Backoffice.Web.Hubs;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;

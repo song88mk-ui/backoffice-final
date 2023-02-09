@@ -30,7 +30,7 @@
                         {
                             <tr>
                                 <td colspan="3">
-                                    <Preloader></Preloader>
+                                    <Preloader />
                                 </td>
                             </tr>
                         }
@@ -38,13 +38,13 @@
                         {
                             @if (ClientsView == null)
                             {
-                                <NoRecordFound></NoRecordFound>
+                                <NoRecordFound />
                             }
                             else
                             {
                                 @foreach (var client in ClientsView)
                                 {
-                                    <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId"></BoostedSettingsRow>
+                                    <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" />
                                 }
                             }
                         }
@@ -52,7 +52,7 @@
                 </table>
             </div>
         </div>
-        <Backoffice.Web.Components.Common.CustomModal OnSaveClickCallback="OnSaveSettingClickEvent" />
+        <CustomModal OnSaveClickCallback="OnSaveSettingClickEvent" />
     </Authorized>
     <NotAuthorized>
         <AccessDenied />

@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-md-4 col-sm-6">
             <div class="form-group">
-                <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="StartDate" EndDate="EndDate" MaxDate="@DateTime.Today" OnRangeSelect="OnRangeSelect" />
+                <DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="StartDate" EndDate="EndDate" MaxDate="DateTime.Today" OnRangeSelect="OnRangeSelect" />
             </div>
         </div>
         <div class="col align-self-end pr-1">
@@ -38,11 +38,16 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @{
+                                var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+                            }
+
                             @foreach (var log in ActivityLogs)
                             {
-                                int RowCount = (ActivityLogs.IndexOf(log) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                                rowCount++;
+
                                 <tr>
-                                    <td>@RowCount</td>
+                                    <td>@rowCount</td>
                                     <td>@log.TimeStamp.ToLocalTime().ToString("dd/MM/yy HH:mm")</td>
                                     <td>@ClientName</td>
                                     <td><strong>@log.Activity</strong></td>
@@ -65,5 +70,5 @@
     </div>
 </div>
 <div class="modal-footer notifications">
-    <button type="button" @onclick="OnCancelClickEvent" class="btn btn-danger waves-effect " data-dismiss="modal">Close</button>
+    <button type="button" @onclick="OnCancelClickEvent" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
 </div>

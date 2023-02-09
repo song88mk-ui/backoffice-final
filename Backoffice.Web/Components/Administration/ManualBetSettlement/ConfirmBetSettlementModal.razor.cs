@@ -1,0 +1,102 @@
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Web.Components.Common;
+using Backoffice.Web.Models;
+using Backoffice.Web.Services;
+using Microsoft.AspNetCore.Components;
+using System.Text.Json;
+
+namespace Backoffice.Web.Components.Administration.ManualBetSettlement
+{
+    public partial class ConfirmBetSettlementModal : IDisposable
+    {
+        #region Properties
+
+        [Inject] private IModalService ModalService { get; set; }
+        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+
+        [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter] private CustomModal Modal { get; set; }
+
+        private ManualBetDetailsModel ManualBetDetailsModel { get; set; }
+        public bool IsPreload { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        protected override async Task OnInitializedAsync()
+        {
+            IsPreload = false;
+            ManualBetDetailsModel = ModalParameters.TryGet<ManualBetDetailsModel>("ManualBetDetailsModel");
+        }
+
+        public async Task OnModalCancel()
+        {
+            if (IsPreload)
+                return;
+
+            ModalParameters parameters = new ModalParameters();
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("DialogStyle", "max-width: 80rem");
+            parameters.Add("ManualBetDetailsModel", ManualBetDetailsModel);
+
+            ModalOptions options = new ModalOptions();
+
+            ModalService.Open<AddReferenceModal>("Add Reference ID", parameters, options);
+        }
+
+        public async Task OnModalConfirm()
+        {
+            if (IsPreload)
+                return;
+
+            IsPreload = true;
+
+            OnActivityLogListMessage ActivityLogs = new OnActivityLogListMessage();
+            foreach (var bet in ManualBetDetailsModel.Bets)
+            {
+                OnActivityLogMessage ActivityLog = new OnActivityLogMessage()
+                {
+                    Page = AdminPermission.Admin_Settlements_ManualBetSettlement.ToString().Replace('_','.'),
+                    Activity = Activity.ManualSettlement.ToString(),
+                    Payload = "",
+                    From = "-",
+                    To = JsonSerializer.Serialize(bet),
+                    UserId = UserModel.Id,
+                    UserName = UserModel.UserName,
+                    TimeStamp = DateTime.Now
+                };
+
+                ActivityLogs.OnActivityLogMessages.Add(ActivityLog);
+            }
+
+            var response = (await BackOfficeService.ManualSettlement(new ManualBetSettlementRequest()
+            {
+                BetData = ManualBetDetailsModel.Bets.Select(bet => new ManualBetRequest()
+                {
+                    BetId = bet.BetId.ToString(),
+                    NewStatus = (BetStatus) bet.NewBetStatusId,
+                    Reason = bet.NewReason,
+                }).ToList(),
+                ActivityLogs = ActivityLogs
+            }));
+
+            await Modal.OnSaveClickCallback.InvokeAsync(response);
+
+            ModalService.Cancel();
+
+            IsPreload = false;
+        }
+
+        public void Dispose()
+        {
+
+        }
+
+        #endregion
+    }
+}

@@ -18,13 +18,13 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
-        public bool IsPreLoader { get; set; } = true;
-
         protected List<BoostedSettingsModel> ClientsView { get; set; }
         protected SearchFormModel SearchForm { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
+
+        public string PageTitle { get; set; }
+        public string IconClass { get; set; }
+        public bool IsPreLoader { get; set; } = true;
 
         #endregion
 
@@ -63,6 +63,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             await GetContent();
         }
+
         private async Task GetContent()
         {
             try
@@ -117,6 +118,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             }
         }
+
         public void Dispose()
         {
             TradingService.Dispose();

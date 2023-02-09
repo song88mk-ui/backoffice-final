@@ -90,12 +90,14 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
             await Modal.OnSaveClickCallback.InvokeAsync(true);
             ModalService.Cancel();
+
             IsPreLoader = false;
         }
         public void Dispose()
         {
 
         }
+
         #endregion
     }
 }

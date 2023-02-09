@@ -1,4 +1,4 @@
-﻿using Backoffice.Web.Components.Maintenance;
+﻿using Backoffice.Web.Components.Administration.Maintenance;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;

@@ -1,6 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
-using Backoffice.Web.Components.ManageBoost;
+using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -11,10 +11,13 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
     public partial class Filter : IDisposable
     {
         #region Properties
+
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
+
         public SearchFormModel SearchForm { get; set; }
         public SportsbookClientPermission CurrentPage { get; set; }
+
         public bool ShowManageBoostMenu { get; set; }
         public bool ShowBoostedSettingsMenu { get; set; }
 
@@ -26,6 +29,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         {
             SearchForm = new SearchFormModel();
         }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
@@ -45,6 +49,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         public async Task OnInputSearchEvent()
         {
         }
+
         public void OnViewLogsClickEvent()
         {
             var parameters = new ModalParameters();
