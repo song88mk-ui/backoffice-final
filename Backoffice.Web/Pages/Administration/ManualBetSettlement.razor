@@ -4,110 +4,117 @@
 
 @page "/admin/manual-bet-settlement"
 
-<div class="row">
-    <div class="main-content col-md-12 mb-4 pb-3">
-        @if (Alerts.Any())
-        {
-            foreach (var alert in Alerts)
-            {
-                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" Guid="Guid" />
-            }
-        }
+<AuthorizeView Policy="admin-settlement-manual">
+    <Authorized>
         <div class="row">
-            <div class="col-md-12">
-                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-            </div>
-            <div class="col-md-12">
-                <Filter OnSearchButtonCallback="OnSearchButtonClicked" OnInitCallback="OnInitEvent" OnExportToExcelCallback="OnExportExcel" @bind-IsExportDisabled="IsExportDisabled"/>
-            </div>
-            <div class="col-md-12">
-                <div class="content mx-3">
-                    @if (IsPreloader)
+            <div class="main-content col-md-12 mb-4 pb-3">
+                @if (Alerts.Any())
+                {
+                    foreach (var alert in Alerts)
                     {
-                        <Preloader />
+                        <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" Guid="Guid" />
                     }
-                    else
-                    {
-                        @if (ActivityLogs != null && ActivityLogs.Any())
-                        {    
-                            <table class="table table-bordered mt-4">
-                                <thead class="table-head">
-                                    <tr>
-                                        <th class="th-number py-3">#</th>
-                                        <th class="th-date-settled py-3">Date Settled</th>
-                                        <th class="th-reference-id py-3">Reference ID</th>
-                                        <th class="th-sports py-3">Sports</th>
-                                        <th class="th-bet-date py-3">Bet Date</th>
-                                        <th class="th-event-details py-3">Event Details</th>
-                                        <th class="th-from-status py-3">From Status</th>
-                                        <th class="th-to-status py-3">To Status</th>
-                                        <th class="th-member-name py-3">Member Name</th>
-                                        <th class="th-settled-by py-3">Settled By</th>
-                                        <th class="th-reason py-3">Reason</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
-                                    }
+                }
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+                    </div>
+                    <div class="col-md-12">
+                        <Filter OnSearchButtonCallback="OnSearchButtonClicked" OnInitCallback="OnInitEvent" OnExportToExcelCallback="OnExportExcel" @bind-IsExportDisabled="IsExportDisabled" />
+                    </div>
+                    <div class="col-md-12">
+                        <div class="content mx-3">
+                            @if (IsPreloader)
+                            {
+                                <Preloader />
+                            }
+                            else
+                            {
+                                @if (ActivityLogs != null && ActivityLogs.Any())
+                                {
+                                    <table class="table table-bordered mt-4">
+                                        <thead class="table-head">
+                                            <tr>
+                                                <th class="th-number py-3">#</th>
+                                                <th class="th-date-settled py-3">Date Settled</th>
+                                                <th class="th-reference-id py-3">Reference ID</th>
+                                                <th class="th-sports py-3">Sports</th>
+                                                <th class="th-bet-date py-3">Bet Date</th>
+                                                <th class="th-event-details py-3">Event Details</th>
+                                                <th class="th-from-status py-3">From Status</th>
+                                                <th class="th-to-status py-3">To Status</th>
+                                                <th class="th-member-name py-3">Member Name</th>
+                                                <th class="th-settled-by py-3">Settled By</th>
+                                                <th class="th-reason py-3">Reason</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+                                            }
 
-                                    @foreach (var log in ActivityLogs)
-                                    {
-                                        var betDetails = JsonSerializer.Deserialize<ManualBetDetails>(log.To);
-                                        rowCount++;
+                                            @foreach (var log in ActivityLogs)
+                                            {
+                                                var betDetails = JsonSerializer.Deserialize<ManualBetDetails>(log.To);
+                                                rowCount++;
 
-                                        <tr>
-                                            <td>@rowCount</td>
-                                            <td>
-                                                <span class="settle-date d-block">@(betDetails.SettlementDate.ToString("MM/dd/yyyy"))</span>
-                                                <span class="settle-time d-block">@(betDetails.SettlementDate.ToString("hh:mm:ss tt").ToUpper())</span>
-                                            </td>
-                                            <td>
-                                                @betDetails.BetId
-                                            </td>
-                                            <td>
-                                                @(betDetails.Selections.FirstOrDefault().SportName)
-                                            </td>
-                                            <td>
-                                                <span class="bet-date d-block">@(betDetails.BetDate.ToString("MM/dd/yyyy"))</span>
-                                                <span class="bet-time d-block">@(betDetails.BetDate.ToString("hh:mm:ss tt").ToUpper())</span>
-                                            </td>
-                                            <td>
-                                                <div class="information-container">
-                                                    @((MarkupString)BuildEventDetails(betDetails.Selections.FirstOrDefault(), betDetails.OddsTypeName))
-                                                </div>
-                                            </td>
-                                            <td>
-                                                @betDetails.BetStatusName
-                                            </td>
-                                            <td>
-                                                @GetBetStatusName(betDetails)
-                                            </td>
-                                            <td>
-                                                @betDetails.UserId
-                                            </td>
-                                            <td>
-                                                @log.UserName
-                                            </td>
-                                            <td>
-                                                @(!string.IsNullOrEmpty(betDetails.NewReason) ? betDetails.NewReason : betDetails.Reason)
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                                <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="9" />
-                            </table>
-                        }
-                        else
-                        {
-                            <NoRecordFound />
-                        }
-                    }
+                                                <tr>
+                                                    <td>@rowCount</td>
+                                                    <td>
+                                                        <span class="settle-date d-block">@(betDetails.SettlementDate.ToString("MM/dd/yyyy"))</span>
+                                                        <span class="settle-time d-block">@(betDetails.SettlementDate.ToString("hh:mm:ss tt").ToUpper())</span>
+                                                    </td>
+                                                    <td>
+                                                        @betDetails.BetId
+                                                    </td>
+                                                    <td>
+                                                        @(betDetails.Selections.FirstOrDefault().SportName)
+                                                    </td>
+                                                    <td>
+                                                        <span class="bet-date d-block">@(betDetails.BetDate.ToString("MM/dd/yyyy"))</span>
+                                                        <span class="bet-time d-block">@(betDetails.BetDate.ToString("hh:mm:ss tt").ToUpper())</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="information-container">
+                                                            @((MarkupString)BuildEventDetails(betDetails.Selections.FirstOrDefault(), betDetails.OddsTypeName))
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        @betDetails.BetStatusName
+                                                    </td>
+                                                    <td>
+                                                        @GetBetStatusName(betDetails)
+                                                    </td>
+                                                    <td>
+                                                        @betDetails.UserId
+                                                    </td>
+                                                    <td>
+                                                        @log.UserName
+                                                    </td>
+                                                    <td>
+                                                        @(!string.IsNullOrEmpty(betDetails.NewReason) ? betDetails.NewReason : betDetails.Reason)
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="9" />
+                                    </table>
+                                }
+                                else
+                                {
+                                    <NoRecordFound />
+                                }
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<div>
-    <CustomModal OnSaveClickCallback="OnConfirmBetSettlement" />
-</div>
+        <div>
+            <CustomModal OnSaveClickCallback="OnConfirmBetSettlement" />
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

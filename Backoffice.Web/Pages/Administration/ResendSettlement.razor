@@ -1,86 +1,94 @@
 ﻿@page "/admin/resend-settlement"
 
-<div class="row">
-    <div class="main-content col-md-12 mb-4 pb-3">
-        @if (Alerts != null && Alerts.Any())
-        {
-            foreach (var alert in Alerts)
-            {
-                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" Guid="Guid"/>
-            }
-        }
-        <div class="row">
-            <div class="col-md-12">
-                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-            </div>
-            <div class="col-md-12">
-                <div class="content mx-3 mb-5">
-                    <table class="table table-bordered mt-1">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="th-number py-3">#</th>
-                                <th class="th-reference-id py-3">Reference ID</th>
-                                <th class="th-event-details py-3">Event Details</th>
-                                <th class="th-bet-date py-3">Bet Date</th>
-                                <th class="th-status py-3">Status</th>
-                                <th class="th-reason py-3">Reason</th>
-                                <th class="th-action py-3">
-                                    <button type="button" class="btn link-add-row" @onclick="OnAddRowClickEvent" disabled="@IsAddDisabled">
-                                        <i class="fa fa-plus-circle"></i>
-                                    </button>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach(var item in ResendSettlementModel)
-                            {
 
-                                <tr>
-                                    <td>@(ResendSettlementModel.IndexOf(item) + 1)</td>
-                                    <td>
-                                        <input type="text" class="form-control text-uppercase" @bind="item.Bet.BetId" @oninput="(ChangeEventArgs e) => OnReferenceIdOnChangeEvent(e, item,ResendSettlementModel.IndexOf(item))" disabled="@IsActionDisabled"/>
-                                    </td>
-                                    <td>
-                                        @((MarkupString) BuildEventDetails(item))
-                                    </td>
-                                    <td>
-                                        @((MarkupString) BuildBetDate(item))
-                                    </td>
-                                    <td>
-                                        @if (!string.IsNullOrEmpty(item.Bet.BetStatusName))
-                                        {
-                                            @item.Bet.BetStatusName
-                                        }               
-                                        else
-                                        {
-                                            <span>-</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <div class="form-floating">
-                                            <textarea class="form-control input-reason" placeholder="Reason" @bind="@item.Bet.Reason" disabled="@IsActionDisabled"></textarea>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn link-delete" @onclick="() => OnDeleteReference(item)" disabled="@(ResendSettlementModel.Count == 1 ? true: false)">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="d-flex flex-row-reverse mx-3 pt-4 border-top">
-                    <button type="button" class="btn btn-settlement px-4 py-2" @onclick="OnResendSettlementClickEvent" disabled="@(ResendSettlementModel.Any() ? false : true)">Resend Settlement</button>
-                    <button type="button" class="btn btn-reset me-3 px-4 py-2" @onclick="OnResetSettlementClickEvent">Reset</button>
+<AuthorizeView Policy="admin-settlement-resend">
+    <Authorized>
+        <div class="row">
+            <div class="main-content col-md-12 mb-4 pb-3">
+                @if (Alerts != null && Alerts.Any())
+                {
+                    foreach (var alert in Alerts)
+                    {
+                        <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" Guid="Guid" />
+                    }
+                }
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+                    </div>
+                    <div class="col-md-12">
+                        <div class="content mx-3 mb-5">
+                            <table class="table table-bordered mt-1">
+                                <thead class="table-head">
+                                    <tr>
+                                        <th class="th-number py-3">#</th>
+                                        <th class="th-reference-id py-3">Reference ID</th>
+                                        <th class="th-event-details py-3">Event Details</th>
+                                        <th class="th-bet-date py-3">Bet Date</th>
+                                        <th class="th-status py-3">Status</th>
+                                        <th class="th-reason py-3">Reason</th>
+                                        <th class="th-action py-3">
+                                            <button type="button" class="btn link-add-row" @onclick="OnAddRowClickEvent" disabled="@IsAddDisabled">
+                                                <i class="fa fa-plus-circle"></i>
+                                            </button>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in ResendSettlementModel)
+                                    {
+
+                                        <tr>
+                                            <td>@(ResendSettlementModel.IndexOf(item) + 1)</td>
+                                            <td>
+                                                <input type="text" class="form-control text-uppercase" @bind="item.Bet.BetId" @oninput="(ChangeEventArgs e) => OnReferenceIdOnChangeEvent(e, item,ResendSettlementModel.IndexOf(item))" disabled="@IsActionDisabled" />
+                                            </td>
+                                            <td>
+                                                @((MarkupString)BuildEventDetails(item))
+                                            </td>
+                                            <td>
+                                                @((MarkupString)BuildBetDate(item))
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(item.Bet.BetStatusName))
+                                                {
+                                                    @item.Bet.BetStatusName
+                                                }
+                                                else
+                                                {
+                                                    <span>-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="form-floating">
+                                                    <textarea class="form-control input-reason" placeholder="Reason" @bind="@item.Bet.Reason" disabled="@IsActionDisabled"></textarea>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn link-delete" @onclick="() => OnDeleteReference(item)" disabled="@(ResendSettlementModel.Count == 1 ? true: false)">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="d-flex flex-row-reverse mx-3 pt-4 border-top">
+                            <button type="button" class="btn btn-settlement px-4 py-2" @onclick="OnResendSettlementClickEvent" disabled="@(ResendSettlementModel.Any() ? false : true)">Resend Settlement</button>
+                            <button type="button" class="btn btn-reset me-3 px-4 py-2" @onclick="OnResetSettlementClickEvent">Reset</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<div>
-    <CustomModal OnSaveClickCallback="ResetSettlementEntries"/>
-</div>
+        <div>
+            <CustomModal OnSaveClickCallback="ResetSettlementEntries" />
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

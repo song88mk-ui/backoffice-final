@@ -3,114 +3,121 @@
 
 @page "/admin/market-settlement"
 
-<div class="row">
-    <div class="main-content col-md-12 mb-4 pb-3">
+<AuthorizeView Policy="admin-settlement-market">
+    <Authorized>
         <div class="row">
-            <div class="col-md-12">
-                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-            </div>
-            <div class="col-md-12">
-                <Filter @bind-FilterModel="ModalFilter" OnInitializeCallback="GetContent" OnExportCallback="OnExportClickedEvent"/>
-            </div>
-            <div class="col-md-12 mt-3 ms-3">
-                <span class="fs-6">Manual Market Settlement History</span>
-            </div>
-            <div class="col-md-12">
-                <div class="mx-3 mt-4">
-                    <table class="table table-hover table-bordered">
-                        <thead class="table-head">
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Fixture</th>
-                                <th scope="col">Market Name</th>
-                                <th scope="col">Sport</th>
-                                <th scope="col">Event Details</th>
-                                <th scope="col">Selection</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Settled By</th>
-                                <th scope="col">Date Settled</th>
-                                <th scope="col">Reason</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (IsPreLoader)
-                            {
-                                <tr>
-                                    <td colspan="10">
-                                        <Preloader />
-                                    </td>
-                                </tr>
-                            }
-                            else if (ManualMarketSettlements.Any())
-                            {
-                                var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
-
-                                @foreach (var item in ManualMarketSettlements)
-                                {
-                                    rowCount++;
-
+            <div class="main-content col-md-12 mb-4 pb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+                    </div>
+                    <div class="col-md-12">
+                        <Filter @bind-FilterModel="ModalFilter" OnInitializeCallback="GetContent" OnExportCallback="OnExportClickedEvent" />
+                    </div>
+                    <div class="col-md-12 mt-3 ms-3">
+                        <span class="fs-6">Manual Market Settlement History</span>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mx-3 mt-4">
+                            <table class="table table-hover table-bordered">
+                                <thead class="table-head">
                                     <tr>
-                                        <th scope="row">
-                                            @rowCount
-                                        </th>
-                                        <td>
-                                            @if (item.FixtureTypeId == (int)FixtureType.Outright)
-                                            {
-                                                <span>@item.FixtureName</span>
-                                            }
-                                            else
-                                            {
-                                                <p>@item.FixtureName.Split("vs.").First()<br>@item.FixtureName.Split("vs.").Last()</p>
-                                            }
-                                        </td>
-                                        <td>
-                                            <span>@item.MarketName</span>
-                                        </td>
-                                        <td>
-                                            <span>@item.SportName</span>
-                                        </td>
-                                        <td>
-                                            <span>@item.SegmentName</span> <br>
-                                            <span>@item.LeagueName</span> <br>
-                                            <strong><span>@item.FixtureName</span></strong><br>
-                                            <span>@item.FixtureStartDate.ToLocalTime().ToString("yyyy/MM/dd hh:mm:ss tt")</span><br>
-                                            <span>@item.MarketName @(GetMarketLine(item.MarketName, item.Line))</span>
-                                        </td>
-                                        <td>
-                                            <span>@item.SelectionName</span>
-                                        </td>
-                                        <td>
-                                            <span>@item.ToStatusName</span>
-                                        </td>
-                                        <td>
-                                            <span>@item.ManualSettledBy</span>
-                                        </td>
-                                        <td>
-                                            <span>@item.TimeStamp.ToLocalTime().ToString("MM/dd/yyyy")</span><br>
-                                            <span>@item.TimeStamp.ToLocalTime().ToString("hh:mm:ss tt")</span>
-                                        </td>
-                                        <td>
-                                            <span>@item.Reason</span>
-                                        </td>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Fixture</th>
+                                        <th scope="col">Market Name</th>
+                                        <th scope="col">Sport</th>
+                                        <th scope="col">Event Details</th>
+                                        <th scope="col">Selection</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Settled By</th>
+                                        <th scope="col">Date Settled</th>
+                                        <th scope="col">Reason</th>
                                     </tr>
-                                }
-                            }
-                            else
-                            {
-                                <tr>
-                                    <td colspan="10">
-                                        <NoRecordFound />
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="10" />
-                    </table>
+                                </thead>
+                                <tbody>
+                                    @if (IsPreLoader)
+                                    {
+                                        <tr>
+                                            <td colspan="10">
+                                                <Preloader />
+                                            </td>
+                                        </tr>
+                                    }
+                                    else if (ManualMarketSettlements.Any())
+                                    {
+                                        var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+
+                                        @foreach (var item in ManualMarketSettlements)
+                                        {
+                                            rowCount++;
+
+                                            <tr>
+                                                <th scope="row">
+                                                    @rowCount
+                                                </th>
+                                                <td>
+                                                    @if (item.FixtureTypeId == (int)FixtureType.Outright)
+                                                    {
+                                                        <span>@item.FixtureName</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <p>@item.FixtureName.Split("vs.").First()<br>@item.FixtureName.Split("vs.").Last()</p>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <span>@item.MarketName</span>
+                                                </td>
+                                                <td>
+                                                    <span>@item.SportName</span>
+                                                </td>
+                                                <td>
+                                                    <span>@item.SegmentName</span> <br>
+                                                    <span>@item.LeagueName</span> <br>
+                                                    <strong><span>@item.FixtureName</span></strong><br>
+                                                    <span>@item.FixtureStartDate.ToLocalTime().ToString("yyyy/MM/dd hh:mm:ss tt")</span><br>
+                                                    <span>@item.MarketName @(GetMarketLine(item.MarketName, item.Line))</span>
+                                                </td>
+                                                <td>
+                                                    <span>@item.SelectionName</span>
+                                                </td>
+                                                <td>
+                                                    <span>@item.ToStatusName</span>
+                                                </td>
+                                                <td>
+                                                    <span>@item.ManualSettledBy</span>
+                                                </td>
+                                                <td>
+                                                    <span>@item.TimeStamp.ToLocalTime().ToString("MM/dd/yyyy")</span><br>
+                                                    <span>@item.TimeStamp.ToLocalTime().ToString("hh:mm:ss tt")</span>
+                                                </td>
+                                                <td>
+                                                    <span>@item.Reason</span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="10">
+                                                <NoRecordFound />
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="10" />
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<div>
-    <CustomModal OnSaveClickCallback="GetContent" />
-</div>
+        <div>
+            <CustomModal OnSaveClickCallback="GetContent" />
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

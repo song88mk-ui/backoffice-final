@@ -3,79 +3,86 @@
 
 @page "/admin/manage-user"
 
-<div class="row mx-3">
-    <div class="main-content col-md-12 mb-4 pb-3">
-        <div class="row">
-            <div class="col-md-12">
-                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-            </div>
-            <div class="col-md-12">
-                <Filter @bind-FilterModel="FilterModel" OnCreateUserCallback="OnCreateUserClickEvent" OnInitCallback="Init" />
-            </div>
-            <div class="col-md-12">
-                <table class="table table-hover table-bordered mt-4">
-                    <thead class="table-head">
-                        <tr>
-                            <th class="th-no py-3">No</th>
-                            <th class="th-username py-3">Username</th>
-                            <th class="th-status py-3">Status</th>
-                            <th class="th-user-group py-3">Usergroup</th>
-                            <th class="th-action py-3">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (IsPreLoader)
-                        {
-                            <tr>
-                                <td colspan="5">
-                                    <Preloader />
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            @if (UserList == null)
-                            {
+<AuthorizeView Policy="admin-users">
+    <Authorized>
+        <div class="row mx-3">
+            <div class="main-content col-md-12 mb-4 pb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+                    </div>
+                    <div class="col-md-12">
+                        <Filter @bind-FilterModel="FilterModel" OnCreateUserCallback="OnCreateUserClickEvent" OnInitCallback="Init" />
+                    </div>
+                    <div class="col-md-12">
+                        <table class="table table-hover table-bordered mt-4">
+                            <thead class="table-head">
                                 <tr>
-                                    <td colspan="5">
-                                        <NoRecordFound />
-                                    </td>
+                                    <th class="th-no py-3">No</th>
+                                    <th class="th-username py-3">Username</th>
+                                    <th class="th-status py-3">Status</th>
+                                    <th class="th-user-group py-3">Usergroup</th>
+                                    <th class="th-action py-3">Action</th>
                                 </tr>
-                            }
-                            else
-                            {
-                                var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
-
-                                @foreach (var user in UserList)
+                            </thead>
+                            <tbody>
+                                @if (IsPreLoader)
                                 {
-                                    rowCount++;
-
                                     <tr>
-                                        <td>@rowCount</td>
-                                        <td>@user.UserName</td>
-                                        <td>
-                                            <span class="@(user.Status.ToUpper() == "LOCKED" ? "status-locked" : "status-normal") py-1 px-4 rounded-pill">@user.Status</span>
-                                        </td>
-                                        <td>@user.RoleName</td>
-                                        <td>
-                                            <a class="link-edit me-2" href="javascript:(0)" @onclick="() => OnEditClickEvent(user)">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                            <a class="link-logs me-2" href="javascript:(0)" @onclick="() => ViewUserLog(user.UserId)">
-                                                <i class="fa fa-list"></i>
-                                            </a>
+                                        <td colspan="5">
+                                            <Preloader />
                                         </td>
                                     </tr>
                                 }
-                            }
-                        }
-                    </tbody>
-                    <Pagination MetaData="MetaData" Spread="5" SelectPageEvent="SelectedPage" PaginationColspan="5" />
-                </table>
+                                else
+                                {
+                                    @if (UserList == null)
+                                    {
+                                        <tr>
+                                            <td colspan="5">
+                                                <NoRecordFound />
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+
+                                        @foreach (var user in UserList)
+                                        {
+                                            rowCount++;
+
+                                            <tr>
+                                                <td>@rowCount</td>
+                                                <td>@user.UserName</td>
+                                                <td>
+                                                    <span class="@(user.Status.ToUpper() == "LOCKED" ? "status-locked" : "status-normal") py-1 px-4 rounded-pill">@user.Status</span>
+                                                </td>
+                                                <td>@user.RoleName</td>
+                                                <td>
+                                                    <a class="link-edit me-2" href="javascript:(0)" @onclick="() => OnEditClickEvent(user)">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                    <a class="link-logs me-2" href="javascript:(0)" @onclick="() => ViewUserLog(user.UserId)">
+                                                        <i class="fa fa-list"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                }
+                            </tbody>
+                            <Pagination MetaData="MetaData" Spread="5" SelectPageEvent="SelectedPage" PaginationColspan="5" />
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-<div>
-    <CustomModal OnSaveClickCallback="OnSaveClickEvent"/>
-</div>
+        <div>
+            <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

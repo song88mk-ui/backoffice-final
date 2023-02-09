@@ -2,102 +2,109 @@
 
 @page "/admin/cancel-bet-history"
 
-<div class="row">
-    <div class="main-content col-md-12 mb-4 pb-3">
+<AuthorizeView Policy="admin-cancel-history">
+    <Authorized>
         <div class="row">
-            <div class="col-md-12">
-                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-            </div>
-            @if (IsPreload)
-            {
-                <div class="col-md-12">
-                    <div class="mt-4 mx-3">
-                        <Preloader />
+            <div class="main-content col-md-12 mb-4 pb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
                     </div>
-                </div>
-            }
-            <div class="col-md-12">
-                <Filter OnInitCallback="OnInitEvent" OnExportCallback="OnExportEvent" />
-            </div>
-            <div class="col-md-12">
-                <div class="content mx-3">
-                    <table class="table table-bordered mt-4">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="th-number py-3">No.</th>
-                                <th class="th-date-cancelled py-3">Date Cancelled</th>
-                                <th class="th-reference-id py-3">Reference ID</th>
-                                <th class="th-bet-date py-3">Bet Date</th>
-                                <th class="th-selection py-3">Selection Cancelled</th>
-                                <th class="th-member-name py-3">Member Name</th>
-                                <th class="th-client-name py-3">Partner/SB Client Name</th>
-                                <th class="th-cancelled-by py-3">Cancelled By</th>
-                                <th class="th-reason py-3">Reason</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (CancelBets != null && CancelBets.CancelBets.Any())
-                            {
-                                var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
-
-                                foreach (var bet in CancelBets.CancelBets)
-                                {
-                                    rowCount++;
-
+                    @if (IsPreload)
+                    {
+                        <div class="col-md-12">
+                            <div class="mt-4 mx-3">
+                                <Preloader />
+                            </div>
+                        </div>
+                    }
+                    <div class="col-md-12">
+                        <Filter OnInitCallback="OnInitEvent" OnExportCallback="OnExportEvent" />
+                    </div>
+                    <div class="col-md-12">
+                        <div class="content mx-3">
+                            <table class="table table-bordered mt-4">
+                                <thead class="table-head">
                                     <tr>
-                                        <td>@rowCount</td>
-                                        <td>
-                                            <span class="cancelled-date d-block">@bet.SettlementDate.ToString("yyyy/MM/dd")</span>
-                                            <span class="cancelled-time d-block">@bet.SettlementDate.ToString("hh:mm:ss tt")</span>
-                                        </td>
-                                        <td>
-                                            @bet.BetId
-                                        </td>
-                                        <td>
-                                            <span class="bet-date d-block">@bet.BetDate.ToString("yyyy/MM/dd")</span>
-                                            <span class="bet-time d-block">@bet.BetDate.ToString("hh:mm:ss tt")</span>
-                                        </td>
-                                        <td>
-                                            <span class="sport d-block">@bet.Selections.FirstOrDefault().SportName</span>
-                                            <span class="league d-block">@bet.Selections.FirstOrDefault().LeagueName</span>
-                                            <span class="fixture d-block">@bet.Selections.FirstOrDefault().FixtureName</span>
-                                            <span class="start-date d-block">@bet.Selections.FirstOrDefault().FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()</span>
-                                            <span class="selection-details d-block">@bet.Selections.FirstOrDefault().SelectionName</span>
-                                            <span class="selection-details d-block">@bet.Selections.FirstOrDefault().MarketName @("@") @bet.Selections.FirstOrDefault().Odds.ToString("N2") (@bet.OddsTypeName)</span>
-                                            <span class="bet-score d-block">Bet Result: @bet.Selections.FirstOrDefault().BetScore</span>
-                                            <span class="final-score d-block">Final Result: @bet.Selections.FirstOrDefault().SettlementScore</span>
-                                        </td>
-                                        <td>
-                                            @bet.UserId
-                                        </td>
-                                        <td>
-                                            @bet.ClientName
-                                        </td>
-                                        <td>
-                                            @bet.CancelledBy
-                                        </td>
-                                        <td>
-                                            @bet.Reason
-                                        </td>
+                                        <th class="th-number py-3">No.</th>
+                                        <th class="th-date-cancelled py-3">Date Cancelled</th>
+                                        <th class="th-reference-id py-3">Reference ID</th>
+                                        <th class="th-bet-date py-3">Bet Date</th>
+                                        <th class="th-selection py-3">Selection Cancelled</th>
+                                        <th class="th-member-name py-3">Member Name</th>
+                                        <th class="th-client-name py-3">Partner/SB Client Name</th>
+                                        <th class="th-cancelled-by py-3">Cancelled By</th>
+                                        <th class="th-reason py-3">Reason</th>
                                     </tr>
-                                }
-                            }
-                            else
-                            {
-                                if (!CancelBets.CancelBets.Any())
-                                {
-                                    <tr>
-                                        <td colspan="9">
-                                            <NoRecordFound />
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="9" />
-                    </table>
+                                </thead>
+                                <tbody>
+                                    @if (CancelBets != null && CancelBets.CancelBets.Any())
+                                    {
+                                        var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+
+                                        foreach (var bet in CancelBets.CancelBets)
+                                        {
+                                            rowCount++;
+
+                                            <tr>
+                                                <td>@rowCount</td>
+                                                <td>
+                                                    <span class="cancelled-date d-block">@bet.SettlementDate.ToString("yyyy/MM/dd")</span>
+                                                    <span class="cancelled-time d-block">@bet.SettlementDate.ToString("hh:mm:ss tt")</span>
+                                                </td>
+                                                <td>
+                                                    @bet.BetId
+                                                </td>
+                                                <td>
+                                                    <span class="bet-date d-block">@bet.BetDate.ToString("yyyy/MM/dd")</span>
+                                                    <span class="bet-time d-block">@bet.BetDate.ToString("hh:mm:ss tt")</span>
+                                                </td>
+                                                <td>
+                                                    <span class="sport d-block">@bet.Selections.FirstOrDefault().SportName</span>
+                                                    <span class="league d-block">@bet.Selections.FirstOrDefault().LeagueName</span>
+                                                    <span class="fixture d-block">@bet.Selections.FirstOrDefault().FixtureName</span>
+                                                    <span class="start-date d-block">@bet.Selections.FirstOrDefault().FixtureStartDate.ToString("MM/dd/yyyy hh:mm:ss tt").ToUpper()</span>
+                                                    <span class="selection-details d-block">@bet.Selections.FirstOrDefault().SelectionName</span>
+                                                    <span class="selection-details d-block">@bet.Selections.FirstOrDefault().MarketName @("@") @bet.Selections.FirstOrDefault().Odds.ToString("N2") (@bet.OddsTypeName)</span>
+                                                    <span class="bet-score d-block">Bet Result: @bet.Selections.FirstOrDefault().BetScore</span>
+                                                    <span class="final-score d-block">Final Result: @bet.Selections.FirstOrDefault().SettlementScore</span>
+                                                </td>
+                                                <td>
+                                                    @bet.UserId
+                                                </td>
+                                                <td>
+                                                    @bet.ClientName
+                                                </td>
+                                                <td>
+                                                    @bet.CancelledBy
+                                                </td>
+                                                <td>
+                                                    @bet.Reason
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (!CancelBets.CancelBets.Any())
+                                        {
+                                            <tr>
+                                                <td colspan="9">
+                                                    <NoRecordFound />
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                                <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="9" />
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>

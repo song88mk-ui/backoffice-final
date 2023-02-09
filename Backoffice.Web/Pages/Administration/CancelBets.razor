@@ -2,103 +2,110 @@
 
 @page "/admin/cancel-bets"
 
-<div class="row">
-    <div class="main-content col-md-12 mb-4 pb-3">
+<AuthorizeView Policy="admin-cancel">
+    <Authorized>
         <div class="row">
-            <div class="col-md-12">
-                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-            </div>
-            @if (Alerts != null && Alerts.Any())
-            {
-                foreach (var alert in Alerts)
-                {
-                    <div class="col-md-12 mt-4 ">
-                        <div class="mx-3">
-                            <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" AlwaysShow="true" />
+            <div class="main-content col-md-12 mb-4 pb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+                    </div>
+                    @if (Alerts != null && Alerts.Any())
+                    {
+                        foreach (var alert in Alerts)
+                        {
+                            <div class="col-md-12 mt-4 ">
+                                <div class="mx-3">
+                                    <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" AlwaysShow="true" />
+                                </div>
+                            </div>
+                        }
+                    }
+                    @if (IsPreload)
+                    {
+                        <div class="col-md-12">
+                            <div class="mt-4 mx-3">
+                                <Preloader />
+                            </div>
+                        </div>
+                    }
+                    <div class="col-md-12 mt-4">
+                        <Filter OnAddBetReferenceIdCallback="OnAddBetReferenceIdCallbackEvent" OnCancelBetCallback="OnCancelBetCallbackEvent" OnResetCallback="OnResetCallbackEvent" IsPreload="IsPreload" />
+                    </div>
+                    <div class="col-md-12">
+                        <div class="content mx-3">
+                            <div class="information-container">
+                                <span>Add up to 10 Bet Reference IDs for bet cancellation requests.</span>
+                            </div>
+                            <table class="table table-bordered mt-4">
+                                <thead class="table-head">
+                                    <tr>
+                                        <th class="th-number py-3">No.</th>
+                                        <th class="th-reference-id py-3">Bet Reference ID</th>
+                                        <th class="th-manage py-3">Manage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (CancelBetModel != null && CancelBetModel.BetReferenceIds.Any())
+                                    {
+                                        foreach (var bet in CancelBetModel.BetReferenceIds)
+                                        {
+                                            <tr>
+                                                <td class="text-center">@bet.Num</td>
+                                                <td>
+                                                    <div class="input-group @(!IsPreload && Alerts.Any(a => a.Control == bet.Num.ToString()) ? "border-danger" : "") ">
+                                                        <input type="text" class="form-control" @bind-value="bet.BetReferenceId" />
+                                                        @if (!IsPreload && !string.IsNullOrEmpty(bet.BetReferenceId))
+                                                        {
+                                                            <span class="input-group-text form-clear" @onclick="() => OnClearBetReferenceClickEvent(bet)"><i class="fa fa-remove"></i></span>
+                                                        }
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex justify-content-center">
+                                                        <a class="link-trash me-2" href="javascript:(0)" @onclick="() => OnDeleteBetReferenceClickEvent(bet)">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                }
-            }
-            @if (IsPreload)
-            {
-                <div class="col-md-12">
-                    <div class="mt-4 mx-3">
-                        <Preloader />
-                    </div>
-                </div>
-            }
-            <div class="col-md-12 mt-4">
-                <Filter OnAddBetReferenceIdCallback="OnAddBetReferenceIdCallbackEvent" OnCancelBetCallback="OnCancelBetCallbackEvent" OnResetCallback="OnResetCallbackEvent" IsPreload="IsPreload" />
-            </div>
-            <div class="col-md-12">
-                <div class="content mx-3">
-                    <div class="information-container">
-                        <span>Add up to 10 Bet Reference IDs for bet cancellation requests.</span>
-                    </div>
-                    <table class="table table-bordered mt-4">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="th-number py-3">No.</th>
-                                <th class="th-reference-id py-3">Bet Reference ID</th>
-                                <th class="th-manage py-3">Manage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (CancelBetModel != null && CancelBetModel.BetReferenceIds.Any())
-                            {
-                                foreach (var bet in CancelBetModel.BetReferenceIds)
-                                {
+                    <div class="col-md-12">
+                        <div class="content mx-3">
+                            <table class="table table-bordered mt-4">
+                                <thead class="table-head">
                                     <tr>
-                                        <td class="text-center">@bet.Num</td>
+                                        <th class="th-reason py-3">Reason For Canceling</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
                                         <td>
-                                            <div class="input-group @(!IsPreload && Alerts.Any(a => a.Control == bet.Num.ToString()) ? "border-danger" : "") ">
-                                                <input type="text" class="form-control" @bind-value="bet.BetReferenceId" />
-                                                @if (!IsPreload && !string.IsNullOrEmpty(bet.BetReferenceId))
+                                            <div class="form-floating">
+                                                @if (CancelBetModel != null)
                                                 {
-                                                    <span class="input-group-text form-clear" @onclick="() => OnClearBetReferenceClickEvent(bet)"><i class="fa fa-remove"></i></span>
+                                                    <textarea class="form-control input-reason @(!IsPreload && IsReasonRequired ? "border-danger" : "")" @bind="CancelBetModel.Reason" />
                                                 }
                                             </div>
                                         </td>
-                                        <td>
-                                            <div class="d-flex justify-content-center">
-                                                <a class="link-trash me-2" href="javascript:(0)" @onclick="() => OnDeleteBetReferenceClickEvent(bet)">
-                                                    <i class="fa fa-trash"></i>
-                                                </a>
-                                            </div>
-                                        </td>
                                     </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="content mx-3">
-                    <table class="table table-bordered mt-4">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="th-reason py-3">Reason For Canceling</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="form-floating">
-                                        @if (CancelBetModel != null)
-                                        {
-                                            <textarea class="form-control input-reason @(!IsPreload && IsReasonRequired ? "border-danger" : "")" @bind="CancelBetModel.Reason" />
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<div>
-    <CustomModal OnSaveClickCallback="OnConfirmCancelBetEvent" />
-</div>
+        <div>
+            <CustomModal OnSaveClickCallback="OnConfirmCancelBetEvent" />
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <AccessDenied />
+    </NotAuthorized>
+</AuthorizeView>
