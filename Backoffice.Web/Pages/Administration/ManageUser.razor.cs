@@ -6,13 +6,13 @@ using Backoffice.Web.Components.ManageUser;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Collections.Generic;
 
 namespace Backoffice.Web.Pages.Administration
 {
     public partial class ManageUser : IDisposable
     {
         #region Properties
+
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
@@ -42,6 +42,7 @@ namespace Backoffice.Web.Pages.Administration
                 TotalPages = 0,
                 TotalCount = 0
             };
+
             UserList = new List<UserResponse>();
             Permissions = await GetPermissionList();
         }
@@ -66,7 +67,7 @@ namespace Backoffice.Web.Pages.Administration
             ModalService.Open<CreateOrUpdateModal>("Create User", parameters, options);
         }
 
-        public async Task OnEditClickedEvent(UserResponse user)
+        public async Task OnEditClickEvent(UserResponse user)
         {
             var parameters = new ModalParameters();
 
@@ -102,7 +103,7 @@ namespace Backoffice.Web.Pages.Administration
             ModalService.Open<ViewUserLogModal>("View Logs", parameters, options);
         }
 
-        public async Task OnSaveClickedEvent()
+        public async Task OnSaveClickEvent()
         {
             //IsPreLoader = true;
             //StateHasChanged();
@@ -115,7 +116,7 @@ namespace Backoffice.Web.Pages.Administration
             MetaData.CurrentPage = page;
 
             //IsPreLoader = true;
-            //await InvokeAsync(StateHasChanged);y
+            //await InvokeAsync(StateHasChanged);
 
             await GetContent();
         }

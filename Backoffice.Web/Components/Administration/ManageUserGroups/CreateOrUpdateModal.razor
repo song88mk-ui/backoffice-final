@@ -24,7 +24,7 @@
             </div>
         </div>
     </div>
-    <Permission IsReadOnly="@IsPreload" Permissions="@Permissions.Permissions" ClientModel="@ClientModel" />
+    <Permission IsReadOnly="IsPreload" Permissions="Permissions.Permissions" ClientModel="ClientModel" />
 </div>
 <div class="modal-footer mx-4">
     @if (Alerts != null && Alerts.Any())
@@ -32,7 +32,7 @@
         <div class="col-md-8">
             @foreach (var alert in Alerts)
             {
-                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" />
+                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" />
             }
         </div>
     }

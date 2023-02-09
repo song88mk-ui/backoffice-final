@@ -15,20 +15,25 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
     public partial class CreateOrUpdateModal : IDisposable
     {
         #region Properties
+
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         public UserGroupResponse UserGroup { get; set; }
         public UserGroupResponse OldUserGroup { get; set; }
         public PermissionResponse Permissions { get; set; }
         public ClientModel ClientModel { get; set; }
-        public bool IsEdit { get; set; }
         public List<AlertModel> Alerts { get; set; }
+
+        public bool IsEdit { get; set; }
         public decimal Opacity { get; set; }
         public bool IsPreload { get; set; }
+
         #endregion
 
         #region Methods

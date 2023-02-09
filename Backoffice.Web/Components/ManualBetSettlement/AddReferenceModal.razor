@@ -1,11 +1,11 @@
 ﻿@using Backoffice.Shared.Enums;
 @using static Backoffice.Shared.Models.ManualBetDetailsModel;
 <div class="modal-body">
-    @if (Alerts != null && Alerts.Any())
+    @if (Alerts.Any())
     {
         foreach (var alert in Alerts)
         {
-            <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" Guid="Guid"/>
+            <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" Guid="Guid"/>
         }
     }
     <table class="table">
@@ -18,24 +18,24 @@
                 <th scope="col">Status</th>
                 <th scope="col">Reason</th>
                 <th scope="col">
-                    <button type="button" class="btn" @onclick="OnAddReferenceIdClickedEvent" disabled="@IsAddDisabled">
+                    <button type="button" class="btn" @onclick="OnAddReferenceIdClickedEvent" disabled="IsAddDisabled">
                         <i class="fa fa-plus-circle" aria-hidden="true" />
                     </button>
                 </th>
             </tr>
         </thead>
         <tbody>
-            @for(int i = 0; i<ManualBetDetailsModel.Bets.Count; i++)
+            @for (int count = 0; count < ManualBetDetailsModel.Bets.Count; count++)
             {
-                ManualBetDetails bet = ManualBetDetailsModel.Bets[i];
+                var bet = ManualBetDetailsModel.Bets[count];
             
                 <tr>
                     <th scope="row">
-                        <span>@(i + 1)</span>
+                        <span>@(count + 1)</span>
                     </th>
 
                     <td>
-                        <textarea class="ref-id form-control" @bind="bet.BetId" placeholder="Reference ID" @oninput="(ChangeEventArgs args) => OnReferenceIdOnChangeEvent(args, bet, ManualBetDetailsModel.Bets.IndexOf(bet))" disabled="@IsActionDisabled"></textarea>
+                        <textarea class="ref-id form-control" @bind="bet.BetId" placeholder="Reference ID" @oninput="(args) => OnReferenceIdOnChangeEvent(args, bet, ManualBetDetailsModel.Bets.IndexOf(bet))" disabled="@IsActionDisabled"></textarea>
                     </td>
 
                     <td class="fw-bold">

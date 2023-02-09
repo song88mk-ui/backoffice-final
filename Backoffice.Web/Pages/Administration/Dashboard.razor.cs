@@ -13,6 +13,7 @@ namespace Backoffice.Web.Pages.Administration
         public string IconClass { get; set; }
         public string Token { get; set; }
         public string IFrameSrc { get; set; }
+
         #endregion
 
         #region Fields

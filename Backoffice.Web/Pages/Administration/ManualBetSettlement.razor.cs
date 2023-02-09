@@ -39,7 +39,7 @@ namespace Backoffice.Web.Pages.Administration
 
         #region Fields
 
-        private ToastService toasterService => ToasterService!;
+        private ToastService _toasterService => ToasterService!;
 
         #endregion
 
@@ -116,7 +116,7 @@ namespace Backoffice.Web.Pages.Administration
 
             MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportManualBetSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
 
-            toasterService.AddToast(Toast.NewToast
+            _toasterService.AddToast(Toast.NewToast
                     ("Manual Bet Settlement",
                     $"Success! Excel file is being generated system will notify once done."));
         }
@@ -138,11 +138,11 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         #region Utilities
+
         private async Task OnInitEvent(ManualBetSettlementCallbackModel callbackModel)
         {
             CallbackModel = callbackModel;
         }
-
 
         private async Task GetContents()
         {

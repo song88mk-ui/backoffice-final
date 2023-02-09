@@ -12,6 +12,7 @@ namespace Backoffice.Web.Pages.Administration
     public partial class ManageUsergroups : IDisposable
     {
         #region Properties
+
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
@@ -189,6 +190,7 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         #region Utilities
+
         private async Task<PermissionResponse> GetPermissionList()
         {
             var response = await AuthenticationService.GetPermissionList(false);

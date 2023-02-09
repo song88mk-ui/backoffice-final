@@ -6,9 +6,15 @@ namespace Backoffice.Web.Pages
 {
     public partial class ChooseAccess : IDisposable
     {
+        #region Properties
+
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
         public List<Claim> UserClaims { get; set; }
+
+        #endregion
+
+        #region Methods
 
         protected override async Task OnInitializedAsync()
         {
@@ -28,5 +34,7 @@ namespace Backoffice.Web.Pages
             // Suppress finalization.
             GC.SuppressFinalize(this);
         }
+
+        #endregion
     }
 }

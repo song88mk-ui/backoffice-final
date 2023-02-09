@@ -46,15 +46,13 @@
                         <tbody>
                             @if (CancelBetModel != null && CancelBetModel.BetReferenceIds.Any())
                             {
-                                var count = 0;
                                 foreach (var bet in CancelBetModel.BetReferenceIds)
                                 {
-                                    count++;
                                     <tr>
                                         <td class="text-center">@bet.Num</td>
                                         <td>
                                             <div class="input-group">
-                                                <input type="text" class="@(!IsPreload && Alerts.Any(a => a.Control == count.ToString()) ? "form-control border-danger" : "form-control")" @bind-value="bet.BetReferenceId" />
+                                                <input type="text" class="@(!IsPreload && Alerts.Any(a => a.Control == bet.Num.ToString()) ? "form-control border-danger" : "form-control")" @bind-value="bet.BetReferenceId" />
                                                 @if (!IsPreload && !string.IsNullOrEmpty(bet.BetReferenceId))
                                                 {
                                                     <span class="input-group-text form-clear" @onclick="() => OnClearBetReferenceClickEvent(bet)"><i class="fa fa-remove"></i></span>

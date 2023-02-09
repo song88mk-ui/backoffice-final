@@ -13,19 +13,25 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
     public partial class DeleteUserGroupModal : IDisposable
     {
         #region Properties
+
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         public UserGroupResponse UserGroup { get; set; }
         public List<AlertModel> Alerts { get; set; }
+
         public decimal Opacity { get; set; }
         public bool IsPreload { get; set; }
+
         #endregion
 
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             Opacity = 0m;
@@ -106,6 +112,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         {
 
         }
+
         #endregion
     }
 }

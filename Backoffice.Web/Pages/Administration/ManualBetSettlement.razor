@@ -6,11 +6,11 @@
 
 <div class="row">
     <div class="main-content col-md-12 mb-4 pb-3">
-        @if (Alerts != null && Alerts.Any())
+        @if (Alerts.Any())
         {
             foreach (var alert in Alerts)
             {
-                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="@alert.Opacity" Guid="Guid" />
+                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" Guid="Guid" />
             }
         }
         <div class="row">
@@ -29,7 +29,7 @@
                     else
                     {
                         @if (ActivityLogs != null && ActivityLogs.Any())
-                        {
+                        {    
                             <table class="table table-bordered mt-4">
                                 <thead class="table-head">
                                     <tr>
@@ -47,12 +47,17 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @{
+                                        var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+                                    }
+
                                     @foreach (var log in ActivityLogs)
                                     {
-                                        int RowCount = (ActivityLogs.IndexOf(log) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
-                                        ManualBetDetails betDetails = JsonSerializer.Deserialize<ManualBetDetails>(log.To);
+                                        var betDetails = JsonSerializer.Deserialize<ManualBetDetails>(log.To);
+                                        rowCount++;
+
                                         <tr>
-                                            <td>@RowCount</td>
+                                            <td>@rowCount</td>
                                             <td>
                                                 <span class="settle-date d-block">@(betDetails.SettlementDate.ToString("MM/dd/yyyy"))</span>
                                                 <span class="settle-time d-block">@(betDetails.SettlementDate.ToString("hh:mm:ss tt").ToUpper())</span>
@@ -103,4 +108,6 @@
         </div>
     </div>
 </div>
-<CustomModal OnSaveClickCallback="OnConfirmBetSettlement" />
+<div>
+    <CustomModal OnSaveClickCallback="OnConfirmBetSettlement" />
+</div>

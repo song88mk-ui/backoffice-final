@@ -7,16 +7,18 @@ namespace Backoffice.Web.Pages.Authentication
 {
     public class LogoutModel : PageModel
     {
-        private readonly IAuthenticationService AuthenticationService;
-        [Inject]
-        public NavigationManager NavigationManager { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; }
+
+        private readonly IAuthenticationService _authenticationService;
+
         public LogoutModel(IAuthenticationService authenticationService)
         {
-            AuthenticationService = authenticationService;
+            _authenticationService = authenticationService;
         }
+
         public async Task<IActionResult> OnGet()
         {
-            await AuthenticationService.Logout();
+            await _authenticationService.Logout();
 
             return LocalRedirect("~/login");
         }

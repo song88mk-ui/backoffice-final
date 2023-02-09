@@ -15,22 +15,26 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
     public partial class ViewUserGroupLogModal : IDisposable
     {
         #region Properties
+
         [Inject] private IModalService ModalService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
-        private string UserGroupId { get; set; }
         private MetaData MetaData { get; set; }
-        public bool IsPreLoader { get; set; }
         public List<ActivityLogModel> ActivityLogs { get; set; }
+
+        private string UserGroupId { get; set; }
+        public bool IsPreLoader { get; set; }
+
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
             ActivityLogs = null;
-            IsPreLoader = true;
             UserGroupId = ModalParameters.TryGet<string>("UserGroupId");
+
             ActivityLogs = new List<ActivityLogModel>();
             MetaData = new MetaData()
             {
@@ -39,30 +43,35 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 TotalPages = 0,
                 TotalCount = 0
             };
-            await InvokeAsync(StateHasChanged);
+
             await GetContent();
         }
+
         public async Task OnCloseModalClickEvent()
         {
             ModalService.Cancel();
         }
+
         protected async Task SelectedPage(int page)
         {
             MetaData.CurrentPage = page;
-            IsPreLoader = true;
-            await InvokeAsync(StateHasChanged);
+
             await GetContent();
         }
+
         public void Dispose()
         {
             
         }
+
         #endregion
 
-
         #region Utilities
+
         private async Task GetContent()
         {
+            IsPreLoader = true;
+
             var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = AdminPermission.Admin_ManageUserGroups.ToString().Replace("_", "."),
@@ -75,9 +84,10 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 ActivityLogs = response.ActivityLogs;
                 MetaData = response.MetaData;
             }
+
             IsPreLoader = false;
-            await InvokeAsync(StateHasChanged);
         }
+
         #endregion
     }
 }

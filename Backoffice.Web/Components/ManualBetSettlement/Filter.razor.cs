@@ -4,16 +4,16 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Backoffice.Web.Components.ManualBetSettlement
 {
     public partial class Filter : IDisposable
     {
         #region Properties
+
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
+
         [Parameter] public EventCallback OnSearchButtonCallback { get; set; }
         [Parameter] public EventCallback<ManualBetSettlementCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback OnExportToExcelCallback { get; set; }
@@ -45,28 +45,49 @@ namespace Backoffice.Web.Components.ManualBetSettlement
 
         #region Methods
 
+        protected override async Task OnInitializedAsync()
+        {
+            ShowFilter = false;
+
+            CallbackModel = new ManualBetSettlementCallbackModel();
+
+            Clients = new List<SelectListItemWithCheckboxModel<string>>();
+            Sports = new List<SelectListItemWithCheckboxModel<string>>();
+            Currencies = new List<SelectListItemWithCheckboxModel<string>>();
+            FromStatuses = new List<SelectListItemWithCheckboxModel<string>>();
+            ToStatuses = new List<SelectListItemWithCheckboxModel<string>>();
+
+            await LoadClients();
+            await LoadSports();
+            await LoadCurrencies();
+            await LoadFromStatus();
+            await LoadToStatus();
+
+            await OnInitCallback.InvokeAsync(CallbackModel);
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender)
-            {
-                ShowFilter = false;
+            //if (firstRender)
+            //{
+            //    ShowFilter = false;
 
-                CallbackModel = new ManualBetSettlementCallbackModel();
+            //    CallbackModel = new ManualBetSettlementCallbackModel();
 
-                Clients = new List<SelectListItemWithCheckboxModel<string>>();
-                Sports = new List<SelectListItemWithCheckboxModel<string>>();
-                Currencies = new List<SelectListItemWithCheckboxModel<string>>();
-                FromStatuses = new List<SelectListItemWithCheckboxModel<string>>();
-                ToStatuses = new List<SelectListItemWithCheckboxModel<string>>();
+            //    Clients = new List<SelectListItemWithCheckboxModel<string>>();
+            //    Sports = new List<SelectListItemWithCheckboxModel<string>>();
+            //    Currencies = new List<SelectListItemWithCheckboxModel<string>>();
+            //    FromStatuses = new List<SelectListItemWithCheckboxModel<string>>();
+            //    ToStatuses = new List<SelectListItemWithCheckboxModel<string>>();
 
-                await LoadClients();
-                await LoadSports();
-                await LoadCurrencies();
-                await LoadFromStatus();
-                await LoadToStatus();
+            //    await LoadClients();
+            //    await LoadSports();
+            //    await LoadCurrencies();
+            //    await LoadFromStatus();
+            //    await LoadToStatus();
 
-                await OnInitCallback.InvokeAsync(CallbackModel);
-            }
+            //    await OnInitCallback.InvokeAsync(CallbackModel);
+            //}
         }
 
         public async Task OnAddReferenceClickEvent()
@@ -100,7 +121,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 SelectedClientName = items.FirstOrDefault().Value;
             }
 
-            CallbackModel.Clients = Clients.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementClient
+            CallbackModel.Clients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementClient
             {
                 ClientId = long.Parse(s.Value),
                 ClientName = s.Name
@@ -119,7 +140,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 SelectedSportName = items.FirstOrDefault().Value;
             }
 
-            CallbackModel.Sports = Sports.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementSport
+            CallbackModel.Sports = Sports.Where(c => c.Value != "all" && c.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementSport
             {
                 SportId = long.Parse(s.Value),
                 SportName = s.Name
@@ -138,7 +159,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 SelectedCurrencyName = items.FirstOrDefault().Value;
             }
 
-            CallbackModel.Currencies = Currencies.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementCurrency
+            CallbackModel.Currencies = Currencies.Where(c => c.Value != "all" && c.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementCurrency
             {
                 CurrencyId = int.Parse(s.Value),
                 CurrencyCode = s.Name
@@ -157,7 +178,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 SelectedFromStatusName = items.FirstOrDefault().Value;
             }
 
-            CallbackModel.FromBetStatuses = FromStatuses.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementBetStatus
+            CallbackModel.FromBetStatuses = FromStatuses.Where(c => c.Value != "all" && c.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementBetStatus
             {
                 BetStatusId = int.Parse(s.Value),
                 BetStatusName = s.Name
@@ -176,7 +197,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 SelectedToStatusName = items.FirstOrDefault().Value;
             }
 
-            CallbackModel.ToBetStatuses = ToStatuses.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementBetStatus
+            CallbackModel.ToBetStatuses = ToStatuses.Where(c => c.Value != "all" && c.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementBetStatus
             {
                 BetStatusId = int.Parse(s.Value),
                 BetStatusName = s.Name
@@ -226,6 +247,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         #endregion
 
         #region Utilities
+
         private async Task LoadClients()
         {
             var clients = (await BackOfficeService.GetClients()).Result;
@@ -253,7 +275,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
                 SelectedClientCount = selectedClients.Count;
                 SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
 
-                CallbackModel.Clients = Clients.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementClient
+                CallbackModel.Clients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementClient
                 {
                     ClientId = long.Parse(s.Value),
                     ClientName = s.Name
@@ -332,7 +354,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             SelectedSportCount = selectedSports.Count;
             SelectedSportName = SelectedSportCount > 0 ? string.Empty : Sports.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
 
-            CallbackModel.Sports = Sports.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementSport
+            CallbackModel.Sports = Sports.Where(c => c.Value != "all" && c.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementSport
             {
                 SportId = long.Parse(s.Value),
                 SportName = s.Name
@@ -368,7 +390,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             SelectedCurrencyCount = selectedCurrencies.Count;
             SelectedCurrencyName = SelectedCurrencyCount > 0 ? string.Empty : Currencies.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
 
-            CallbackModel.Currencies = Currencies.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementCurrency
+            CallbackModel.Currencies = Currencies.Where(c => c.Value != "all" && c.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementCurrency
             {
                 CurrencyId = int.Parse(s.Value),
                 CurrencyCode = s.Name
@@ -411,7 +433,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             SelectedFromStatusCount = selectedFromStatuses.Count;
             SelectedFromStatusName = SelectedFromStatusCount > 0 ? string.Empty : FromStatuses.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
 
-            CallbackModel.FromBetStatuses = FromStatuses.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementBetStatus
+            CallbackModel.FromBetStatuses = FromStatuses.Where(c => c.Value != "all" && c.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementBetStatus
             {
                 BetStatusId = int.Parse(s.Value),
                 BetStatusName = s.Name
@@ -453,7 +475,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
             SelectedToStatusCount = selectedToStatuses.Count;
             SelectedToStatusName = SelectedToStatusCount > 0 ? string.Empty : ToStatuses.FirstOrDefault(c => c.Value != "All" && c.IsChecked).Name;
 
-            CallbackModel.ToBetStatuses = ToStatuses.Where(x => x.Value != "all" && x.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementBetStatus
+            CallbackModel.ToBetStatuses = ToStatuses.Where(c => c.Value != "all" && c.IsChecked).Select(s => new ManualBetSettlementCallbackModel.SettlementBetStatus
             {
                 BetStatusId = int.Parse(s.Value),
                 BetStatusName = s.Name

@@ -232,6 +232,14 @@ a, .btn-link {
     content: "\1115";
 }
 
+.ico-warning:before {
+    content: "\1114";
+}
+
+.ico-question-circle:before {
+    content: "\1119";
+}
+
 iframe {
     width: 100% !important;
 }

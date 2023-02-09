@@ -1,13 +1,9 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
 using System.Text;
 using System.Text.Json;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;

@@ -38,12 +38,14 @@
                         <tbody>
                             @if (CancelBets != null && CancelBets.CancelBets.Any())
                             {
-                                var ctr = 0 + ((MetaData.CurrentPage-1) * MetaData.PageSize);
+                                var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+
                                 foreach (var bet in CancelBets.CancelBets)
                                 {
-                                    ctr++;
+                                    rowCount++;
+
                                     <tr>
-                                        <td>@ctr</td>
+                                        <td>@rowCount</td>
                                         <td>
                                             <span class="cancelled-date d-block">@bet.SettlementDate.ToString("yyyy/MM/dd")</span>
                                             <span class="cancelled-time d-block">@bet.SettlementDate.ToString("hh:mm:ss tt")</span>

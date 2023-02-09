@@ -8,15 +8,22 @@ namespace Backoffice.Web.Components.ManualBetSettlement
     public partial class ResetSettlementModal : IDisposable
     {
         #region Properties
+
         [Inject] private IModalService ModalService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+
         private ManualBetDetailsModel ManualBetDetailsModel { get; set; }
+
         #endregion
+
         #region Methods
+
         protected override async Task OnInitializedAsync()
         {
             ManualBetDetailsModel = ModalParameters.TryGet<ManualBetDetailsModel>("ManualBetDetailsModel");
         }
+
         public async Task OnModalCancel()
         {
             ModalParameters parameters = new ModalParameters();
@@ -44,6 +51,7 @@ namespace Backoffice.Web.Components.ManualBetSettlement
         {
             
         }
+
         #endregion
     }
 }

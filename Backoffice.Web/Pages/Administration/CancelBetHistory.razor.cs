@@ -32,7 +32,7 @@ namespace Backoffice.Web.Pages.Administration
 
         #region Fields
 
-        private ToastService toasterService => ToasterService!;
+        private ToastService _toasterService => ToasterService!;
 
         #endregion
 
@@ -80,7 +80,7 @@ namespace Backoffice.Web.Pages.Administration
             MessageBroker.Publish(JsonSerializer.Serialize(request), "ExportCancelBetHistory", "r.bo.util.export", Guid.NewGuid().ToString());
 
 
-            toasterService.AddToast(Toast.NewToast
+            _toasterService.AddToast(Toast.NewToast
                     ("Cancel Bet History",
                     $"Success! Excel file is being generated system will notify once done."));
         }

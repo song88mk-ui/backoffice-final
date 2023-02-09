@@ -10,10 +10,12 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         #region Properties
         [Parameter] public EventCallback<UserGroupCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<bool> OnCreateUserGroupCallback { get; set; }
+
         protected SearchFormModel SearchForm { get; set; }
 
         protected int SortBy { get; set; }
         protected List<SelectListItemModel<int>> SelectSortByList { get; set; }
+
         #endregion
 
         #region Methods
