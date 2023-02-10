@@ -14,8 +14,11 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
+        [Parameter] public SearchFormModel SearchForm { get; set; }
+        [Parameter] public EventCallback<SearchFormModel> SearchFormChanged { get; set; }
+        [Parameter] public EventCallback OnInitializeCallback { get; set; }
+        [Parameter] public EventCallback OnViewAllLogsCallback { get; set; }
 
-        public SearchFormModel SearchForm { get; set; }
         public SportsbookClientPermission CurrentPage { get; set; }
 
         public bool ShowManageBoostMenu { get; set; }
@@ -26,11 +29,6 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {
-            SearchForm = new SearchFormModel();
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
 
@@ -44,20 +42,20 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                 ShowBoostedSettingsMenu = true;
                 CurrentPage = SportsbookClientPermission.SBC_OE_PriceBoost_Settings;
             }
-        }
 
+            SearchForm = new SearchFormModel();
+            await SearchFormChanged.InvokeAsync(SearchForm);
+            await OnInitializeCallback.InvokeAsync();
+        }
         public async Task OnInputSearchEvent()
         {
+            await SearchFormChanged.InvokeAsync(SearchForm);
+            await OnInitializeCallback.InvokeAsync();
         }
 
-        public void OnViewLogsClickEvent()
+        public async void OnViewLogsClickEvent()
         {
-            var parameters = new ModalParameters();
-            parameters.Add("DialogStyle", "max-width: 80%; overflow-y: initial !important");
-            parameters.Add("SelectedPage", CurrentPage);
-            var options = new ModalOptions();
-
-            ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);
+            await OnViewAllLogsCallback.InvokeAsync();
         }
         public void Dispose()
         {

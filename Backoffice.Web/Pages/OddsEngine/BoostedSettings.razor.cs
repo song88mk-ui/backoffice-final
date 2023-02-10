@@ -1,6 +1,8 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.OddsEngine.BoostedSettings;
+using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -19,7 +21,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
         protected List<BoostedSettingsModel> ClientsView { get; set; }
-        protected SearchFormModel SearchForm { get; set; }
+        protected SearchFormModel SearchForm { get; set; } = new SearchFormModel();
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
 
         public string PageTitle { get; set; }
@@ -32,7 +34,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            Breadcrumbs = new List<BreadcrumbModel>();
             THeadClass = "table-head";
             PageTitle = "Boosted Settings";
             IconClass = string.Empty;
@@ -52,11 +53,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
-
-            SearchForm = new SearchFormModel();
             ClientsView = new List<BoostedSettingsModel>();
-
-            await GetContent();
         }
 
         public async Task OnSaveSettingClickEvent(object item)
@@ -68,6 +65,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             try
             {
+                if(!IsPreLoader)
+                {
+                    IsPreLoader = true;
+                }
+
                 var result = await TradingService.GetBoostedSettings(new BoostedSettingsRequest()
                 {
                     ClientCodes = UserModel.ClientCodes.ToList(),
@@ -89,9 +91,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var parameters = new ModalParameters();
 
                 parameters.Add("Client", client);
-                //parameters.Add("ClientCode", BoostedSettings.ClientCode);
-                //parameters.Add("ClientName", BoostedSettings.ClientName);
-                //parameters.Add("Cap", BoostedSettings.Cap);
 
                 var options = new ModalOptions();
                 ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
@@ -101,17 +100,16 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             }
         }
-        public async Task OnViewLogs(BoostedSettingsModel client)
+        public async Task OnViewAllLogsClickEvent()
         {
             try
             {
                 var parameters = new ModalParameters();
-
-                parameters.Add("Client", client);
                 parameters.Add("DialogStyle", "max-width: 80%; overflow-y: initial !important");
-
+                parameters.Add("SelectedPage", SportsbookClientPermission.SBC_OE_PriceBoost_Settings);
                 var options = new ModalOptions();
-                ModalService.Open<ViewLogsBoostedSettingModalBody>($"View Logs for {client.ClientName}", parameters, options);
+
+                ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);
             }
             catch (Exception ex)
             {
