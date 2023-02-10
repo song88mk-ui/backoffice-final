@@ -1,8 +1,8 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.OddsEngine.BoostedSettings;
-using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;

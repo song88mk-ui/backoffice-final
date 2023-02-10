@@ -12,7 +12,7 @@ using System.Text;
 using Activity = Backoffice.Shared.Enums.Activity;
 using PriceBoostLogModel = Backoffice.Web.Models.PriceBoostLogModel;
 
-namespace Backoffice.Web.Components.OddsEngine.ManageBoost
+namespace Backoffice.Web.Components.Common
 {
     public partial class ViewAllLogsModal : IDisposable
     {

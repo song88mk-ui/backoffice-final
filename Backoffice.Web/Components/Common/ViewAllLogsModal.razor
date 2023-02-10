@@ -4,7 +4,7 @@
     <ViewAllLogsFilter @bind-FilterModel="PriceBoostLogFilterModel" SelectedPage="CurrentPage" OnFilterChangedEventCallback="OnFilterChanged" />
     @if (IsPreLoader)
     {
-        <Preloader/>
+        <Preloader />
     }
     else
     {
@@ -112,5 +112,5 @@
     }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Close</button>
+    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">Close</button>
 </div>
