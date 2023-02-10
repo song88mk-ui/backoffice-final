@@ -1,10 +1,9 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
-using Backoffice.Web.Components.OddsEngine.ManageBoost;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 {

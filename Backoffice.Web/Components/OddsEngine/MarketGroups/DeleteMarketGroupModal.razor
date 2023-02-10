@@ -29,12 +29,12 @@
 
     @if (IsPreLoader)
     {
-        <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" disabled>Cancel</button>
-        <button type="button" class="btn modal-btn modal-delete waves-effect" data-bs-dismiss="modal" disabled>Delete</button>
+        <button type="button" class="btn modal-btn modal-cancel" disabled>Cancel</button>
+        <button type="button" class="btn modal-btn modal-delete" disabled>Delete</button>
     }
     else
     {
-        <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">Cancel</button>
-        <button type="button" class="btn modal-btn modal-delete waves-effect" data-bs-dismiss="modal" @onclick="OnDeleteModalClick">Delete</button>
+        <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">Cancel</button>
+        <button type="button" class="btn modal-btn modal-delete" @onclick="OnDeleteModalClick">Delete</button>
     }
 </div>

@@ -50,3 +50,7 @@ table tbody button {
     border: none;
     background: none !important;
 }
+
+.th-checkbox {
+    width: 5%;
+}
