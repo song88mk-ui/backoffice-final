@@ -31,35 +31,36 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
         protected override async Task OnInitializedAsync()
         {
+            Sports = new List<SelectListItemModel<int>>();
+            Segments = new List<SelectListItemModel<int>>();
+            Leagues = new List<SelectListItemModel<int>>();
+            Fixtures = new List<SelectListItemModel<string>>();
+            Markets = new List<SelectListItemModel<string>>();
+            Sports = await GetSports();
+
             AddMarketSettlement = new AddMarketSettlementModel();
+            AddMarketSettlement.AddMarketSettlementSelections.Add(new AddMarketSettlementSelectionModel()
+            {
+                RowCount = AddMarketSettlement.AddMarketSettlementSelections.Count + 1,
+                FixtureId = string.Empty,
+                MarketId = string.Empty,
+                SelectionId = string.Empty,
+                Statuses = await GetStatuses()
+            });
+            AddMarketSettlement.SportId = 0;
+            AddMarketSettlement.SegmentId = 0;
+            AddMarketSettlement.LeagueId = 0;
+            AddMarketSettlement.FixtureId = string.Empty;
+            AddMarketSettlement.MarketId = string.Empty;
+
+            await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                Sports = new List<SelectListItemModel<int>>();
-                Segments = new List<SelectListItemModel<int>>();
-                Leagues = new List<SelectListItemModel<int>>();
-                Fixtures = new List<SelectListItemModel<string>>();
-                Markets = new List<SelectListItemModel<string>>();
-                Sports = await GetSports();
-
-                AddMarketSettlement = new AddMarketSettlementModel();
-                AddMarketSettlement.AddMarketSettlementSelections.Add(new AddMarketSettlementSelectionModel()
-                {
-                    RowCount = AddMarketSettlement.AddMarketSettlementSelections.Count + 1,
-                    FixtureId = string.Empty,
-                    MarketId = string.Empty,
-                    SelectionId = string.Empty,
-                    Statuses = await GetStatuses()
-                });
-                AddMarketSettlement.SportId = 0;
-                AddMarketSettlement.SegmentId = 0;
-                AddMarketSettlement.LeagueId = 0;
-                AddMarketSettlement.FixtureId = string.Empty;
-                AddMarketSettlement.MarketId = string.Empty;
-                await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
+                
             }
         }
 
@@ -157,6 +158,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
         public async Task OnBetIdChangedEvent()
         {
+            
+            AddMarketSettlement.AddMarketSettlementSelections.Clear();
             await OnUpdateRowCallback.InvokeAsync(AddMarketSettlement);
         }
 

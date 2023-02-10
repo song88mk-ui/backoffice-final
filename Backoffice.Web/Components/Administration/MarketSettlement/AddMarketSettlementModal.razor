@@ -12,103 +12,99 @@
             {
                 <Preloader />
             }
-            else
-            {
-                <table class="table table-bordered mt-4">
-                    <thead class="table-head">
-                        <tr>
-                            @if (AddMarketSettlement != null && !string.IsNullOrEmpty(AddMarketSettlement.BetId) && AddMarketSettlement.AddMarketSettlementSelections.Count > 1)
-                            {
-                                <th scope="col">Select</th>
-                            }
-                            <th scope="col">Event Details</th>
-                            <th scope="col">Selection</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Reason</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (AddMarketSettlement != null && AddMarketSettlement.AddMarketSettlementSelections.Any())
+            <table class="table table-bordered mt-4">
+                <thead class="table-head">
+                    <tr>
+                        @if (!string.IsNullOrEmpty(AddMarketSettlement.BetId) && AddMarketSettlement.AddMarketSettlementSelections.Count() > 1)
                         {
-                            var marketId = string.Empty;
-                            for (var index = 0; index < AddMarketSettlement.AddMarketSettlementSelections.Count; index++)
-                            {
-                                <tr>
-                                    @if (!string.IsNullOrEmpty(AddMarketSettlement.BetId) && AddMarketSettlement.AddMarketSettlementSelections.Count > 1)
-                                    {
-                                        <td>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" @onchange="OnCheckboxClicked" />
-                                            </div>
-                                        </td>
-                                    }
+                            <th scope="col">Select</th>
+                        }
+                        <th scope="col">Event Details</th>
+                        <th scope="col">Selection</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (AddMarketSettlement.AddMarketSettlementSelections.Any())
+                    {
+                        var marketId = string.Empty;
+                        for (var index = 0; index < AddMarketSettlement.AddMarketSettlementSelections.Count; index++)
+                        {
+                            var marketSelection = AddMarketSettlement.AddMarketSettlementSelections[index];
 
-                                    @if (index == 0 || AddMarketSettlement.AddMarketSettlementSelections[index].MarketId != marketId)
-                                    {
-                                        var rowCount = AddMarketSettlement.AddMarketSettlementSelections.Where(c => c.MarketId == AddMarketSettlement.AddMarketSettlementSelections[index].MarketId).Count();
-                                        marketId = AddMarketSettlement.AddMarketSettlementSelections[index].MarketId;
-                                        <td rowspan="@rowCount" align="left" valign="top">
-                                            @if (string.IsNullOrEmpty(AddMarketSettlement.AddMarketSettlementSelections[index].FixtureName))
-                                            {
-                                                <p>_</p>
-                                            }
-                                            else
-                                            {
-                                                <span>&nbsp;&nbsp;</span> @AddMarketSettlement.AddMarketSettlementSelections[index].SportName
+                            <tr>
+                                @if (!string.IsNullOrEmpty(AddMarketSettlement.BetId) && AddMarketSettlement.AddMarketSettlementSelections.Count() > 1)
+                                {
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" @onchange="OnCheckboxClicked" />
+                                        </div>
+                                    </td>
+                                }
 
-                                                <br />
-                                                <span>@AddMarketSettlement.AddMarketSettlementSelections[index].SegmentName</span> <br>
-                                                <span>@AddMarketSettlement.AddMarketSettlementSelections[index].LeagueName.ToUpper()</span>
-
-                                                <br />
-                                                @AddMarketSettlement.AddMarketSettlementSelections[index].FixtureName.ToUpper()
-
-                                                <br />
-                                                <span>
-                                                    @AddMarketSettlement.AddMarketSettlementSelections[index].FixtureStartDate.ToLocalTime().ToString("dd/MM/yy") <strong>@AddMarketSettlement.AddMarketSettlementSelections[index].FixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
-                                                </span>
-
-                                                <br />
-                                                <span>@AddMarketSettlement.AddMarketSettlementSelections[index].MarketName.ToUpper() @(GetMarketLine(AddMarketSettlement.AddMarketSettlementSelections[index].MarketName, AddMarketSettlement.AddMarketSettlementSelections[index].Line))</span>
-                                            }
-                                        </td>
-                                    }
-                                    <td align="left" valign="top">
-                                        @if (string.IsNullOrEmpty(AddMarketSettlement.AddMarketSettlementSelections[index].SelectionName))
+                                @if (index == 0 || marketSelection.MarketId != marketId)
+                                {
+                                    marketId = marketSelection.MarketId;
+                                    var rowCount = AddMarketSettlement.AddMarketSettlementSelections.Where(c => c.MarketId == marketId).Count();
+                                    <td rowspan="@rowCount" align="left" valign="top">
+                                        @if (string.IsNullOrEmpty(marketSelection.FixtureName))
                                         {
                                             <p>_</p>
                                         }
                                         else
                                         {
-                                            @AddMarketSettlement.AddMarketSettlementSelections[index].SelectionName
+                                            <span>&nbsp;&nbsp;</span> @marketSelection.SportName
+
+                                            <br />
+                                            <span>@marketSelection.SegmentName</span> <br>
+                                            <span>@marketSelection.LeagueName.ToUpper()</span>
+
+                                            <br />
+                                            @marketSelection.FixtureName.ToUpper()
+
+                                            <br />
+                                            <span>
+                                                @marketSelection.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy") <strong>@marketSelection.FixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
+                                            </span>
+
+                                            <br />
+                                            <span>@marketSelection.MarketName.ToUpper() @(GetMarketLine(marketSelection.MarketName, marketSelection.Line))</span>
                                         }
                                     </td>
-                                    <td valign="middle" align="left">
-                                        <select class="form-control input-sm" name="Status" @onchange="(e) => OnAddStatusChange(e, AddMarketSettlement.AddMarketSettlementSelections[index].RowCount)">
-                                            <option value="0">Select Status</option>
-                                            @if (AddMarketSettlement.AddMarketSettlementSelections[index].Statuses != null)
+                                }
+                                <td align="left" valign="top">
+                                    @if (string.IsNullOrEmpty(marketSelection.SelectionName))
+                                    {
+                                        <p>_</p>
+                                    }
+                                    else
+                                    {
+                                        @marketSelection.SelectionName
+                                    }
+                                </td>
+                                <td valign="middle" align="left">
+                                    <select class="form-control input-sm" name="Status" @onchange="(e) => OnAddStatusChange(e, marketSelection.RowCount)">
+                                        <option value="0">Select Status</option>
+                                        @foreach (var item in marketSelection.Statuses)
+                                        {
+                                            if (item.Value == marketSelection.ToStatus)
                                             {
-                                                @foreach (var item in AddMarketSettlement.AddMarketSettlementSelections[index].Statuses)
-                                                {
-                                                    if (item.Value == AddMarketSettlement.AddMarketSettlementSelections[index].ToStatus)
-                                                    {
-                                                        <option value="@item.Value" selected>@item.Name</option>
-                                                    }
-                                                    else
-                                                    {
-                                                        <option value="@item.Value">@item.Name</option>
-                                                    }
-                                                }
+                                                <option value="@item.Value" selected>@item.Name</option>
                                             }
-                                        </select>
-                                    </td>
-                                    <td valign="middle" align="left"><textarea @bind="AddMarketSettlement.AddMarketSettlementSelections[index].Reason" class="form-control" placeholder="Reason"></textarea></td>
-                                </tr>
-                            }
+                                            else
+                                            {
+                                                <option value="@item.Value">@item.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                </td>
+                                <td valign="middle" align="left"><textarea @bind="marketSelection.Reason" class="form-control" placeholder="Reason"></textarea></td>
+                            </tr>
                         }
-                    </tbody>
-                </table>
-            }
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
     <div class="div-alert mb-2 mt-2 pt-1 pb-1">
@@ -116,6 +112,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelModal">Cancel</button>
-    <button type="button" class="btn modal-btn btn-settle" @onclick="OnMarketSettlement">Settle Market</button>
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelModal" disabled="@IsPreLoader">Cancel</button>
+    <button type="button" class="btn modal-btn btn-settle" @onclick="OnMarketSettlement" disabled="@IsPreLoader">Settle Market</button>
 </div>

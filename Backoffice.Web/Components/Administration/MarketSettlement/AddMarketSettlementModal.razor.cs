@@ -36,8 +36,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
         protected override async Task OnInitializedAsync()
         {
-            AddMarketSettlement = null;
             AlertModel = new AlertModel();
+            AddMarketSettlement = new AddMarketSettlementModel();
         }
 
         public async Task OnAddStatusChange(ChangeEventArgs e, int rowCount)
@@ -62,9 +62,9 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
         public async Task UpdateRowDetails(AddMarketSettlementModel AddMarketSettlement)
         {
+            IsPreLoader = true;
             this.AddMarketSettlement = AddMarketSettlement;
-            AddMarketSettlement.AddMarketSettlementSelections = new List<AddMarketSettlementSelectionModel>();
-
+            
             if (!string.IsNullOrEmpty(AddMarketSettlement.BetId))
             {
                 Guid.TryParse(AddMarketSettlement.BetId, out var betId);
@@ -148,8 +148,10 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                         FixtureId = AddMarketSettlement.FixtureId,
                         MarketId = AddMarketSettlement.MarketId,
                         SelectionId = string.Empty,
+                        Statuses = await GetStatuses()
                     });
                 }
+                IsPreLoader = false;
                 return;
             }
             else
@@ -166,6 +168,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                             FixtureId = AddMarketSettlement.FixtureId,
                             MarketId = AddMarketSettlement.MarketId,
                             SelectionId = selection.Value,
+                            Statuses = await GetStatuses()
                         });
                     }
                 }
@@ -179,6 +182,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                     FixtureId = AddMarketSettlement.FixtureId,
                     MarketId = AddMarketSettlement.MarketId,
                     SelectionId = string.Empty,
+                    Statuses = await GetStatuses()
                 });
             }
 
@@ -206,6 +210,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
                 if (AddMarketSettlement.AddMarketSettlementSelections.Any(r => r.FixtureId == row.FixtureId && r.MarketId == row.MarketId && r.SelectionId == row.SelectionId && r.RowCount != row.RowCount))
                 {
+                    IsPreLoader = false;
                     return;
                 }
 
@@ -221,6 +226,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 }
                 catch (Exception ex)
                 {
+                    IsPreLoader = false;
                     return;
                 }
 
@@ -233,6 +239,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
                 if (detail == null)
                 {
+                    IsPreLoader = false;
                     return;
                 }
 
@@ -276,6 +283,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 row.Statuses = await GetStatuses();
 
             }
+
+            IsPreLoader = false;
         }
 
         public async Task OnMarketSettlement()
@@ -285,7 +294,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
             var fixtureList = new List<Tuple<string, int, string, string, List<SelectionSettlementMessage>>>();
 
             var wonCount = AddMarketSettlement.AddMarketSettlementSelections.Count(c => c.ToStatus == (int)BetStatus.Won);
-            var deadHeat = 1m; //wonCount > 1 ? 1 / wonCount : 
+            var deadHeat = 1m;
 
             foreach (var row in AddMarketSettlement.AddMarketSettlementSelections)
             {
