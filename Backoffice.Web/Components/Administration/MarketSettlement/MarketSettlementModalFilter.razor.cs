@@ -45,7 +45,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 FixtureId = string.Empty,
                 MarketId = string.Empty,
                 SelectionId = string.Empty,
-                Statuses = await GetStatuses()
+                Statuses = await GetStatuses(),
+                DeadHeat = 1m
             });
             AddMarketSettlement.SportId = 0;
             AddMarketSettlement.SegmentId = 0;

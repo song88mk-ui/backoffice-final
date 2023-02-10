@@ -134,7 +134,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                             HalfWonProbability = selection.HalfWonProbability,
                             VoidProbability = selection.VoidProbability,
                             CorrelationId = selection.CorrelationId,
-                            Statuses = await GetStatuses()
+                            Statuses = await GetStatuses(),
+                            DeadHeat = 1m
                         });
                     }
                 }
@@ -148,7 +149,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                         FixtureId = AddMarketSettlement.FixtureId,
                         MarketId = AddMarketSettlement.MarketId,
                         SelectionId = string.Empty,
-                        Statuses = await GetStatuses()
+                        Statuses = await GetStatuses(),
+                        DeadHeat = 1m
                     });
                 }
                 IsPreLoader = false;
@@ -168,7 +170,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                             FixtureId = AddMarketSettlement.FixtureId,
                             MarketId = AddMarketSettlement.MarketId,
                             SelectionId = selection.Value,
-                            Statuses = await GetStatuses()
+                            Statuses = await GetStatuses(),
+                            DeadHeat = 1m
                         });
                     }
                 }
@@ -182,7 +185,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                     FixtureId = AddMarketSettlement.FixtureId,
                     MarketId = AddMarketSettlement.MarketId,
                     SelectionId = string.Empty,
-                    Statuses = await GetStatuses()
+                    Statuses = await GetStatuses(),
+                    DeadHeat = 1m
                 });
             }
 
@@ -319,9 +323,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
                 var marketSpecifier = string.Empty;
                 if (string.IsNullOrEmpty(row.MarketSpecifier) && row.SelectionSpecifier.Contains("?"))
-                {
                     marketSpecifier = row.SelectionSpecifier.Split("?").LastOrDefault();
-                }
 
                 request.Add(new ManualMarketSettlementRequest()
                 {
@@ -358,7 +360,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                     FixtureId = row.FixtureId,
                     MarketId = row.MarketId,
                     SelectionId = row.SelectionId,
-                    DeadHeatFactor = deadHeat,
+                    DeadHeatFactor = row.DeadHeat,
                     SelectionStatus = (BetStatus)row.ToStatus,
                     Reason = row.Reason,
                     ManualSettledBy = UserModel.UserName,

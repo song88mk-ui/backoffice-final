@@ -45,5 +45,7 @@ namespace Backoffice.Web.Models
         public string CorrelationId { get; set; }
         public string Reason { get; set; }
         public bool Selected { get; set; }
+        [Column(TypeName = "decimal(26,12)")]
+        public decimal DeadHeat { get; set; }
     }
 }
