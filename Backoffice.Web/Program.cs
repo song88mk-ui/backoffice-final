@@ -5,11 +5,8 @@ using Backoffice.Web.Hubs;
 using Backoffice.Web.Middleware;
 using Backoffice.Web.Services;
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.ResponseCompression;
-using System.Drawing;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
