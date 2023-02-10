@@ -279,7 +279,7 @@ namespace Backoffice.Web.Pages.SBC
                 var claimsList = string.Empty;
                 foreach (var claim in claims.Where(x => x.ClaimValue != "0"))
                 {
-                    var permission = PermissionResponse.Permissions.FirstOrDefault(p => p.Id.ToLower() == claim.ClaimType.ToLower());
+                    var permission = PermissionResponse.Permissions.FirstOrDefault(p => p.ClaimType.ToLower() == claim.ClaimType.ToLower());
                     if (permission != null)
                     {
                         claimsList = claimsList + (string.IsNullOrEmpty(claimsList) ? string.Empty : ", ") + $"{permission.Name}" + (claim.ClaimValue == "2" ? " (ReadOnly)" : string.Empty);
