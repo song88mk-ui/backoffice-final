@@ -3,6 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
+using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
@@ -40,6 +41,22 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             WithAdministrationPagesAccess = false;
             BoostedSettingsActivityLogs = new List<ActivityLogModel>();
 
+            PriceBoostLogFilterModel = new PriceBoostLogFilterModel()
+            {
+                Clients = new List<KeyValuePair<string, string>>(),
+                Tab = CurrentPage,
+                ClientCode = "ALL",
+                Sports = null,
+                SportId = 0,
+                Segments = null,
+                SegmentId = 0,
+                Leagues = null,
+                LeagueId = 0,
+                DateFrom = DateTime.Now.AddDays(-7),
+                DateTo = DateTime.Now,
+                SearchText = string.Empty
+            };
+
             MetaData = new MetaData()
             {
                 CurrentPage = 1,
@@ -49,7 +66,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             };
 
             await GetContent();
-            StateHasChanged();
         }
         #region Methods
         public async Task GetContent()
@@ -138,7 +154,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             }
 
             IsPreLoader = false;
-            StateHasChanged();
         }
         private async Task<List<KeyValuePair<string, string>>> GetClients()
         {
@@ -166,10 +181,10 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             if (CurrentPage == SportsbookClientPermission.SBC_OE_PriceBoost_Manage)
             {
-                return $"{(PriceBoostLogFilterModel.ClientCode != "ALL" ? PriceBoostLogFilterModel.ClientCode : "%")}." +
-                $"{(PriceBoostLogFilterModel.SportId != 0 ? PriceBoostLogFilterModel.SportId : "%")}." +
-                $"{(PriceBoostLogFilterModel.SegmentId != 0 ? PriceBoostLogFilterModel.SegmentId : "%")}." +
-                $"{(PriceBoostLogFilterModel.LeagueId != 0 ? PriceBoostLogFilterModel.LeagueId : "%")}";
+                return $"%{(PriceBoostLogFilterModel.ClientCode.ToUpper() != "ALL" ? PriceBoostLogFilterModel.ClientCode : "")}%." +
+                $"%{(PriceBoostLogFilterModel.SportId != 0 ? PriceBoostLogFilterModel.SportId : "")}%." +
+                $"%{(PriceBoostLogFilterModel.SegmentId != 0 ? PriceBoostLogFilterModel.SegmentId : "")}%." +
+                $"%{(PriceBoostLogFilterModel.LeagueId != 0 ? PriceBoostLogFilterModel.LeagueId : "")}%";
             }
             else
             {

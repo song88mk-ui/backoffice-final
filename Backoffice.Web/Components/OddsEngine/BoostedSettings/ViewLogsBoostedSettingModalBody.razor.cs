@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -82,21 +83,20 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         public async Task GetContent()
         {
             IsPreLoader = true;
-            await InvokeAsync(StateHasChanged);
 
             ActivityLogs = new List<ActivityLogModel>();
-            var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
+            var response = await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
-                Page = "OE_PriceBoost_Settings".ToString().Replace("_", "."),
+                Page = SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace("_", "."),
                 Payload = $"{ClientCode}",
                 MetaData = MetaData,
                 DateFrom = Convert.ToDateTime(StartDate),
                 DateTo = Convert.ToDateTime(EndDate)
-            })).Result;
+            });
 
-            if (response != null)
+            if (response.Result != null)
             {
-                var tempActivityLogs = response.ActivityLogs.Where(s => s.Activity.ToLower().Contains(SearchForm.SearchText.ToLower()) || s.From.ToLower().Contains(SearchForm.SearchText.ToLower()) ||
+                var tempActivityLogs = response.Result.ActivityLogs.Where(s => s.Activity.ToLower().Contains(SearchForm.SearchText.ToLower()) || s.From.ToLower().Contains(SearchForm.SearchText.ToLower()) ||
                                        s.To.ToLower().Contains(SearchForm.SearchText.ToLower()) || s.UserName.ToLower().Contains(SearchForm.SearchText.ToLower())).ToList();
 
                 foreach (var activityLog in tempActivityLogs)
@@ -125,7 +125,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                     });
                 }
 
-                MetaData = response.MetaData;
+                MetaData = response.Result.MetaData;
             }
 
             IsPreLoader = false;
