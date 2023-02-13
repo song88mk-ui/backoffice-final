@@ -177,6 +177,7 @@ namespace Backoffice.Web.Pages.Administration
             Opacity = Opacity == 1m ? 0.99m : 1m;
 
             var message = "User Group successfully created";
+
             if(item.ToString() == "EDIT")
                 message = "User Group successfully updated";
             else if (item.ToString() == "DELETE")
