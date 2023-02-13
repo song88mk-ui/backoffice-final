@@ -35,8 +35,8 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
-            IsPreLoader = true;
             Opacity = 0m;
+            IsPreLoader = true;
             Alerts = new List<AlertModel>();
             UserGroupListModel = new UserGroupListResponse();
             UserGroupCallbackModel = new UserGroupCallbackModel();
