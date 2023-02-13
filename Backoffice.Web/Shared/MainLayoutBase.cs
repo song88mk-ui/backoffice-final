@@ -230,9 +230,13 @@ namespace Backoffice.Web.Shared
             try
             {
                 var request = _httpContextAccessor.HttpContext?.Request;
+                string currentUrl = NavigationManager.Uri;
 
+                //HubConnection = new HubConnectionBuilder()
+                //    .WithUrl(new Uri(Configuration["API:HubAPI"]))
+                //    .Build();
                 HubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(Configuration["API:HubAPI"]))
+                    .WithUrl(new Uri(NavigationManager.BaseUri + "bohub"))
                     .Build();
 
                 //HubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
