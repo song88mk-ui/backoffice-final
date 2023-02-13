@@ -239,10 +239,6 @@ namespace Backoffice.Web.Shared
                     .WithUrl(new Uri(NavigationManager.BaseUri + "bohub"))
                     .Build();
 
-                //HubConnection.On<ConfigSettingsModel>("onconfigchange", async message =>
-                //{
-                //    await ProcessOnConfigChange(message);
-                //});
                 HubConnection.Closed += async (error) =>
                 {
                     await Task.Delay(new Random().Next(0, 5) * 1000);
