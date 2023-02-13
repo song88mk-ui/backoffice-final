@@ -83,12 +83,26 @@ namespace Backoffice.Web.Pages.Administration
             
             var parameters = new ModalParameters();
 
+            var userGroup = new UserGroupResponse()
+            {
+                UserGroupId = "",
+                Claims = new List<ClaimModel> { 
+                    new ClaimModel()
+                    {
+                        ClaimType = AdminPermission.Admin_Dashboard.ToString().Replace("_","."),
+                        ClaimValue = "1"
+                    },
+                    new ClaimModel()
+                    {
+                        ClaimType = SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_","."),
+                        ClaimValue = "1"
+                    }
+                }
+            };
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("UserGroup", new UserGroupResponse()
-            {
-                UserGroupId = ""
-            });
+            parameters.Add("UserGroup", userGroup);
             parameters.Add("Permissions", Permissions);
             parameters.Add("ClientModel", ClientModel);
             parameters.Add("IsEdit", false);

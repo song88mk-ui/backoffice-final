@@ -116,7 +116,7 @@
                                                             for (int ctr = 0; ctr < @category.SubCategories[rowCount].Claims.Count; ctr++)
                                                             {
                                                                 var claim = @category.SubCategories[rowCount].Claims[ctr];
-                                                                var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
+                                                                var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled) || claim.Name.ToLower().Equals("dashboard");
 
                                                                 <PermissionRow Claim="@claim" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
                                                             }
@@ -125,7 +125,7 @@
                                                         {
                                                             var claim = @category.SubCategories[rowCount].Claims[0];
                                                             var groups = @category.SubCategories[rowCount].Groups;
-                                                            var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
+                                                            var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled) || claim.Name.ToLower().Equals("dashboard");
 
                                                             <PermissionRow Claim="@claim" Groups="@groups" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
                                                         }
@@ -150,7 +150,7 @@
                                                             for (int ctr = 0; ctr < @category.SubCategories[rowCount].Claims.Count; ctr++)
                                                             {
                                                                 var claim = @category.SubCategories[rowCount].Claims[ctr];
-                                                                var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
+                                                                var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled) || claim.Name.ToLower().Equals("dashboard");
 
                                                                 <PermissionRow Claim="@claim" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
                                                             }
@@ -159,7 +159,7 @@
                                                         {
                                                             var claim = @category.SubCategories[rowCount].Claims[0];
                                                             var groups = @category.SubCategories[rowCount].Groups;
-                                                            var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
+                                                            var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled) || claim.Name.ToLower().Equals("dashboard");
 
                                                             <PermissionRow Claim="@claim" Groups="@groups" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
                                                         }
