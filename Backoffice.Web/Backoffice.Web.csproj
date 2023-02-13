@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Pages\Administration\MarketSettlement.razor.cs~RF11c367b.TMP" />
-    <None Remove="Pages\OddsEngine\MarketGroups.razor.cs~RF90a442.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BlazorDeferredRemove" Version="0.2.5" />
     <PackageReference Include="BlazorDateRangePicker" Version="4.2.0" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
