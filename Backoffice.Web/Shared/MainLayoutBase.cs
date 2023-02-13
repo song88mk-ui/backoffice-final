@@ -230,16 +230,10 @@ namespace Backoffice.Web.Shared
             try
             {
                 var request = _httpContextAccessor.HttpContext?.Request;
-                string currentUrl = NavigationManager.Uri;
-
-                //HubConnection = new HubConnectionBuilder()
-                //    .WithUrl(new Uri(Configuration["API:HubAPI"]))
-                //    .Build();
 
                 HubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(NavigationManager.BaseUri + "bohub"))
+                    .WithUrl(new Uri(Configuration["API:HubAPI"]))
                     .Build();
-
                 HubConnection.Closed += async (error) =>
                 {
                     await Task.Delay(new Random().Next(0, 5) * 1000);
