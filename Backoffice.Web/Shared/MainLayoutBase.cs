@@ -235,6 +235,7 @@ namespace Backoffice.Web.Shared
                 //HubConnection = new HubConnectionBuilder()
                 //    .WithUrl(new Uri(Configuration["API:HubAPI"]))
                 //    .Build();
+
                 HubConnection = new HubConnectionBuilder()
                     .WithUrl(new Uri(NavigationManager.BaseUri + "bohub"))
                     .Build();
