@@ -60,7 +60,7 @@
 
                 if (Market != null && Market.Selections.Any())
                 {
-                    <div class="py-1 px-2 ">
+                    <div class="py-1 px-1 ">
                         <span class="text-nowrap">@GetClientMargin(string.Empty, string.Empty, Market.Selections)</span>
                     </div>
                 }
@@ -129,7 +129,7 @@
                         {
                             if (HasClientConfig(client.ClientCode, Market.ClientCode, Market.ClientCodeMargin))
                             {
-                                <div class="py-1 px-2">
+                                <div class="py-1 px-1">
                                     <span class ="text-nowrap">@GetClientMargin(client.ClientCode, Market.ClientCodeMargin, Market.Selections)</span>
                                 </div>
                             }
