@@ -84,7 +84,7 @@
                                     }
                                 </td>
                                 <td valign="middle" align="left">
-                                    <select class="form-control input-sm" name="Status" @onchange="(e) => OnAddStatusChange(e, marketSelection.RowCount)">
+                                    <select class="form-select input-sm" name="Status" @onchange="(e) => OnAddStatusChange(e, marketSelection.RowCount)">
                                         <option value="0">Select Status</option>
                                         @foreach (var item in marketSelection.Statuses)
                                         {
