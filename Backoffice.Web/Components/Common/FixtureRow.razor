@@ -3,7 +3,7 @@
     <td>
         @if (Market.FixtureStatusId == 1)
         {
-            <span>@Market.CurrentPeriod</span>
+            <span class="m-1">@Market.CurrentPeriod</span>
             @if (!string.IsNullOrEmpty(Market.CurrentMinute) && int.Parse(Market.CurrentMinute) > 0)
             {
                 <span class="fw-bold">@Market.CurrentMinute</span>
@@ -28,14 +28,14 @@
             </a>
             @if (Market.FixtureStatusId == 1)
             {
-                <span class="score-info ms-5">@Market.Score</span>
+                <span class="score-info py-2 px-2">@Market.Score</span>
             }
         </div>
     </td>
 
     <!-- BR CTRL -->
     <td>
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-left">
             @if (Market != null && Market.Selections.Any())
             {
                 var hasLine = HasLine;
@@ -60,8 +60,8 @@
 
                 if (Market != null && Market.Selections.Any())
                 {
-                    <div class="py-1 px-2">
-                        <span>@GetClientMargin(string.Empty, string.Empty, Market.Selections)</span>
+                    <div class="py-1 px-1 ">
+                        <span class="text-nowrap">@GetClientMargin(string.Empty, string.Empty, Market.Selections)</span>
                     </div>
                 }
             }
@@ -89,7 +89,7 @@
             var hasLine = HasLine;
 
             <td>
-                <div class="d-flex justify-content-center">
+                <div class="d-flex justify-content-left">
                     @if (Market != null && Market.Selections.Any())
                     {
                         foreach (var selection in Market?.Selections)
@@ -129,8 +129,8 @@
                         {
                             if (HasClientConfig(client.ClientCode, Market.ClientCode, Market.ClientCodeMargin))
                             {
-                                <div class="py-1 px-2">
-                                    <span>@GetClientMargin(client.ClientCode, Market.ClientCodeMargin, Market.Selections)</span>
+                                <div class="py-1 px-1">
+                                    <span class ="text-nowrap">@GetClientMargin(client.ClientCode, Market.ClientCodeMargin, Market.Selections)</span>
                                 </div>
                             }
                             else

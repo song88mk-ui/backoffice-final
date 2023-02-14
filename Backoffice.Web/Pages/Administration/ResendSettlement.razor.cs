@@ -92,13 +92,22 @@ namespace Backoffice.Web.Pages.Administration
                             BetId = betId.ToString()
                         })).Result;
 
-                        if (response != null)
+                        if (response != null && response.Bet.BetId != Guid.Empty)
                         {
                             ResendSettlementModel[index] = response;
+                            IsAddDisabled = false;
                         }
-                    }                    
-                    
-                    IsAddDisabled = false;
+                        else
+                        {
+                            ResendSettlementModel[index] = new ResendSettlementBetDetailModel() 
+                            {
+                                Bet = new ResendSettlementBetDetailResponse.ResendSettlementBetDetail()
+                                {
+                                    BetId = betId
+                                }
+                            };                            
+                        }
+                    }                                                            
                 }
 
                 IsActionDisabled = false;
