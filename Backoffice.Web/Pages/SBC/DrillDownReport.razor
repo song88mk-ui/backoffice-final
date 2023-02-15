@@ -1,4 +1,6 @@
 ﻿@page "/drill-down-report"
+@using System.Text.Json;
+
 <AuthorizeView Policy="sbc-drilldown">
     <Authorized>
         <div class="row">
@@ -14,8 +16,7 @@
                                      toolbar='bottom'
                                      hide-tabs
                                      hide-edit-button
-                                     onFirstInteractive="filterClientName2"
-                                     onCustomViewLoaded="firstInteractive">
+                                     onFirstInteractive="filterClientName(@JsonSerializer.Serialize(Clients))">
                         </tableau-viz>
                     </div>
                 </div>

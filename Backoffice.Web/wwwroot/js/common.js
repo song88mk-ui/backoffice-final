@@ -417,7 +417,7 @@ window.filterClientName = (clients) => {
     const filter = sheet.worksheets[sheet.worksheets.length - 1];
 
     filter.clearFilterAsync("ClientName");
-    filter.applyFilterAsync("ClientName", clients, "replace");
+    filter.applyFilterAsync("ClientName", JSON.parse(clients), "replace");
 }
 
 window.filterClientName2 = () => {
@@ -429,8 +429,4 @@ window.filterClientName2 = () => {
 
     filter.clearFilterAsync("ClientName");
     filter.applyFilterAsync("ClientName", ["GURUPLAY", "10 BET JAPAN"], "replace");
-}
-
-window.firstInteractive = () => {
-    console.log("firstInteractive");
 }

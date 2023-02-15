@@ -15,6 +15,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public ElementReference VizContainer { get; set; }
 
+        public List<string> Clients { get; set; }
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public string Token { get; set; }
@@ -24,7 +25,7 @@ namespace Backoffice.Web.Pages.SBC
 
         #region Fields
 
-        private string _region;        
+        private string _region;
 
         #endregion
 
@@ -37,24 +38,24 @@ namespace Backoffice.Web.Pages.SBC
 
             Token = CommonService.GenerateToken();
 
+            Clients = new List<string>();
+            Clients.Add("GURUPLAY");
+            Clients.Add("10 BET JAPAN");
+
             await Initialize();
-        }
-
-        public async Task OnFilterEvent()
-        {
-            var clients = new List<string>();
-
-            clients.Add("GURUPLAY");
-            clients.Add("10 BET JAPAN");
-
-            await JSRuntime.InvokeVoidAsync("filterClientName", clients);
         }
 
         private async Task Initialize()
         {
             _region = Configuration["Region"].ToString();
 
-            IFrameSrc = _region == "HK" ? "https://tableau.song88.com/t/song88/views/10bet/2_Reporting" : "";            
+            IFrameSrc = _region == "HK" ? "https://tableau.song88.com/t/song88/views/10bet/2_Reporting" : "";
+        }
+
+        [JSInvokable]
+        public async Task OnFilterEvent()
+        {
+
         }
 
         public void Dispose()
