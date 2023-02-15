@@ -13,7 +13,9 @@
                                      token="@Token"
                                      toolbar='bottom'
                                      hide-tabs
-                                     hide-edit-button>
+                                     hide-edit-button
+                                     onFirstInteractive="() => @OnFilterEvent()"
+                                     onFilterChanged="() => @OnFilterEvent()">
                         </tableau-viz>
                     </div>
                 </div>

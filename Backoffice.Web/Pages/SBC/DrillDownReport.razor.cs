@@ -40,6 +40,15 @@ namespace Backoffice.Web.Pages.SBC
             await Initialize();
         }
 
+        public async Task OnFilterEvent()
+        {
+            var clients = new List<string>();
+            clients.Add("GURUPLAY");
+            clients.Add("10 BET JAPAN");
+
+            await JSRuntime.InvokeVoidAsync("filterClientName", clients);
+        }
+
         private async Task Initialize()
         {
             _region = Configuration["Region"].ToString();

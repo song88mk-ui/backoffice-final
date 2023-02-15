@@ -406,3 +406,15 @@ window.resetManualBetSettlementInputs = (index) => {
 
     $('.modal-settle-bets').prop("disabled", true);
 }
+
+//tableau filtering
+window.filterClientName = function (clients) {
+    console.log("filterClient");
+    console.log(clients);
+
+    let viz = document.getElementById('tableau-viz');
+    let sheet = viz.workbook.activeSheet;
+    const filter = sheet.worksheets[sheet.worksheets.length - 1];
+    filter.clearFilterAsync("ClientName");
+    filter.applyFilterAsync("ClientName", clients, "replace");
+}
