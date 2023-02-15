@@ -1,4 +1,5 @@
-﻿using Backoffice.Web.Services;
+﻿using Backoffice.Web.Models;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Drawing;
@@ -9,13 +10,9 @@ namespace Backoffice.Web.Pages.SBC
     {
         #region Properties
 
-        [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public ICommonService CommonService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
-
-        public ElementReference VizContainer { get; set; }
-
-        public List<string> Clients { get; set; }
+        
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public string Token { get; set; }
@@ -38,10 +35,6 @@ namespace Backoffice.Web.Pages.SBC
 
             Token = CommonService.GenerateToken();
 
-            Clients = new List<string>();
-            Clients.Add("GURUPLAY");
-            Clients.Add("10 BET JAPAN");
-
             await Initialize();
         }
 
@@ -50,12 +43,6 @@ namespace Backoffice.Web.Pages.SBC
             _region = Configuration["Region"].ToString();
 
             IFrameSrc = _region == "HK" ? "https://tableau.song88.com/t/song88/views/10bet/2_Reporting" : "";
-        }
-
-        [JSInvokable]
-        public async Task OnFilterEvent()
-        {
-
         }
 
         public void Dispose()

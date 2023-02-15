@@ -2,11 +2,13 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
+using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.JSInterop;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -15,6 +17,7 @@ namespace Backoffice.Web.Shared
     public class MainLayoutBase : LayoutComponentBase, IAsyncDisposable, IDisposable
     {
         #region Properties
+        [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] private ToastService? _toasterService { get; set; }
         [Inject] private IHttpContextAccessor _httpContextAccessor { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
@@ -35,6 +38,8 @@ namespace Backoffice.Web.Shared
         public LogInModel Model { get; set; }
         public NavMenuModel NavMenus { get; set; }
 
+        public static Func<Task> OnFilterClientActionAsync;
+        public ClientModel Clients { get; set; }
         public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
         //public bool IsPreLoader { get; set; } = true;
         public bool IsPreLoader { get; set; }
@@ -65,10 +70,9 @@ namespace Backoffice.Web.Shared
                 var role = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLENAME")?.Value ?? string.Empty;
                 var isSuperAdmin = !string.IsNullOrEmpty(role) && role.ToUpper().Equals("SUPER ADMIN") ? true : false;
 
-                var clients = new ClientModel();
+                OnFilterClientActionAsync = OnFilterClientEvent;
 
-                if (isSuperAdmin)
-                    clients = (await BackOfficeService.GetClients()).Result;
+                Clients = (await BackOfficeService.GetClients()).Result;
 
                 var tasks = new List<Task>();
                 var otherPermissions = new List<string>() { "CLIENTCODES", "USERID", "TOKENNAME", "MAINUSERID" };
@@ -76,9 +80,12 @@ namespace Backoffice.Web.Shared
                 if (userClaims is not null)
                 {
                     if (isSuperAdmin)
-                        UserModel.ClientCodes = clients.Clients.Select(c => c.ClientCode).ToList();
+                        UserModel.ClientCodes = Clients.Clients.Select(c => c.ClientCode).ToList();
                     else
+                    {
                         UserModel.ClientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>();
+                        Clients.Clients = Clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                    }
 
                     UserModel.Id = userClaims.Where(x => x.Type.ToUpper() == "USERID").FirstOrDefault()?.Value ?? "";
                     UserModel.UserName = userClaims.Where(x => x.Type.ToUpper() == "TOKENNAME").FirstOrDefault()?.Value ?? "";
@@ -209,6 +216,17 @@ namespace Backoffice.Web.Shared
                 await HubConnection.StopAsync();
                 await HubConnection.DisposeAsync();
             }
+        }
+
+        [JSInvokable]
+        public static async Task OnInvokeFilterEvent()
+        {
+            await OnFilterClientActionAsync.Invoke();
+        }
+
+        public async Task OnFilterClientEvent()
+        {
+            await JSRuntime.InvokeVoidAsync("filterClientName", Clients.Clients.Select(c => c.ClientName).ToList());
         }
 
         public void Dispose()

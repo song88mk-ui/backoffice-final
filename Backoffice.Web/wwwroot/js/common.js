@@ -408,6 +408,10 @@ window.resetManualBetSettlementInputs = (index) => {
 }
 
 //tableau filtering
+window.initFilterClientName = () => {
+    DotNet.invokeMethodAsync('Backoffice.Web', 'OnInvokeFilterEvent');
+}
+
 window.filterClientName = (clients) => {
     console.log("filterClient");
     console.log(clients);
@@ -417,16 +421,5 @@ window.filterClientName = (clients) => {
     const filter = sheet.worksheets[sheet.worksheets.length - 1];
 
     filter.clearFilterAsync("ClientName");
-    filter.applyFilterAsync("ClientName", JSON.parse(clients), "replace");
-}
-
-window.filterClientName2 = () => {
-    console.log("filterClient");
-
-    let viz = document.getElementById('tableau-viz');
-    let sheet = viz.workbook.activeSheet;
-    const filter = sheet.worksheets[sheet.worksheets.length - 1];
-
-    filter.clearFilterAsync("ClientName");
-    filter.applyFilterAsync("ClientName", ["GURUPLAY", "10 BET JAPAN"], "replace");
+    filter.applyFilterAsync("ClientName", clients, "replace");
 }
