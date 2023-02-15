@@ -43,6 +43,7 @@ namespace Backoffice.Web.Pages.SBC
         public async Task OnFilterEvent()
         {
             var clients = new List<string>();
+
             clients.Add("GURUPLAY");
             clients.Add("10 BET JAPAN");
 

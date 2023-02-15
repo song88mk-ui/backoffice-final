@@ -408,13 +408,29 @@ window.resetManualBetSettlementInputs = (index) => {
 }
 
 //tableau filtering
-window.filterClientName = function (clients) {
+window.filterClientName = (clients) => {
     console.log("filterClient");
     console.log(clients);
 
     let viz = document.getElementById('tableau-viz');
     let sheet = viz.workbook.activeSheet;
     const filter = sheet.worksheets[sheet.worksheets.length - 1];
+
     filter.clearFilterAsync("ClientName");
     filter.applyFilterAsync("ClientName", clients, "replace");
+}
+
+window.filterClientName2 = () => {
+    console.log("filterClient");
+
+    let viz = document.getElementById('tableau-viz');
+    let sheet = viz.workbook.activeSheet;
+    const filter = sheet.worksheets[sheet.worksheets.length - 1];
+
+    filter.clearFilterAsync("ClientName");
+    filter.applyFilterAsync("ClientName", ["GURUPLAY", "10 BET JAPAN"], "replace");
+}
+
+window.firstInteractive = () => {
+    console.log("firstInteractive");
 }
