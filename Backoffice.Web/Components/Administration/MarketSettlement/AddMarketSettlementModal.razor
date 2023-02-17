@@ -38,7 +38,7 @@
                                 {
                                     <td>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" @onchange="OnCheckboxClicked" />
+                                            <input class="form-check-input" type="checkbox" @onchange="(args) => OnCheckboxClicked(args, marketSelection)" />
                                         </div>
                                     </td>
                                 }

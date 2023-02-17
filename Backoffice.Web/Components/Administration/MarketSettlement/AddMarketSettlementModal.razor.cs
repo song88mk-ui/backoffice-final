@@ -32,12 +32,13 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
         #endregion
 
+
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
             AlertModel = new AlertModel();
-            AddMarketSettlement = new AddMarketSettlementModel();
+            AddMarketSettlement = new AddMarketSettlementModel();            
         }
 
         public async Task OnAddStatusChange(ChangeEventArgs e, int rowCount)
@@ -49,9 +50,9 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
         }
 
-        public async Task OnCheckboxClicked(ChangeEventArgs e)
+        public async Task OnCheckboxClicked(ChangeEventArgs e, AddMarketSettlementSelectionModel addMarketSettlementSelection)
         {
-
+            addMarketSettlementSelection.Selected = !addMarketSettlementSelection.Selected;
         }
 
         public async Task SetMarketFixtures(Tuple<MarketFixtureResponse, MarketFixtureResponse> args)
