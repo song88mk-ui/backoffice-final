@@ -4,7 +4,15 @@
 @inherits MainLayoutBase
 
 <CascadingValue Value="UserModel" Name="UserModel">
-    <PageTitle>Backoffice</PageTitle>
+    @if (NavigationManager.Uri.Contains("/admin"))
+    {
+        <PageTitle>Backoffice - Administration</PageTitle>
+    }
+    else
+    {
+        <PageTitle>Backoffice - SBC</PageTitle>
+    }
+
     @if (IsPreLoader)
     {
         <div class="preload-container d-flex justify-content-center align-items-center">
