@@ -352,5 +352,32 @@ namespace Backoffice.API.Controllers.Authentication
                     return BadRequest(result);
             }
         }
+
+
+        [HttpPost("report/roles/url")]
+        public async Task<IActionResult> GetReportRolesUrl([FromBody] ReportRolesUrlRequest request)
+        {
+            var result = new BaseResponse<ReportRolesUrlResponse>()
+            {
+                StatusCode = Shared.Enums.StatusCode.Unauthorized,
+                Message = "Missing authorization"
+            };
+
+            if (HttpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+                result = await _authenticationRepository.GetReportRolesUrl(request, token);
+            }
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
     }
 }
