@@ -19,6 +19,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<UserListResponse>> GetUserGroupUsers(UserGroupRequest request);
         Task<BaseResponse<UserGroupResponse>> AddOrUpdateUserGroup(UserGroupRequest request);
         Task<BaseResponse<bool>> DeleteUserGroup(UserGroupRequest request);
+        Task<BaseResponse<ReportRolesUrlResponse>> GetReportRolesUrl(ReportRolesUrlRequest request);
         void Dispose();
     }
 }
