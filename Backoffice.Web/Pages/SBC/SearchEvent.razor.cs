@@ -1,4 +1,8 @@
-﻿using Backoffice.Web.Services;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Models;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Pages.SBC
@@ -9,17 +13,14 @@ namespace Backoffice.Web.Pages.SBC
 
         [Inject] public ICommonService CommonService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
+        [Inject] public IAuthenticationService AuthenticationService { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public string Token { get; set; }
         public string IFrameSrc { get; set; }
-
-        #endregion
-
-        #region Fields
-
-        private string _region;
 
         #endregion
 
@@ -37,9 +38,13 @@ namespace Backoffice.Web.Pages.SBC
 
         private async Task Initialize()
         {
-            _region = Configuration["Region"].ToString();
+            var reportRoles = (await AuthenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
+            {
+                RoleId = UserModel.RoleId,
+                ClaimType = SportsbookClientPermission.SBC_Reports_DrillDownReport.ToString().Replace("_", ".")
+            })).Result ?? new ReportRolesUrlResponse();
 
-            IFrameSrc = _region == "HK" ? "https://tableau.song88.com/t/song88/views/10bet/10_SearchEvent" : "";
+            IFrameSrc = reportRoles.Url;
         }
 
         public void Dispose()
