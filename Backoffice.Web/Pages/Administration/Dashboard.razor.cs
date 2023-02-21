@@ -1,4 +1,8 @@
-﻿using Backoffice.Web.Services;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Models;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Pages.Administration
@@ -8,17 +12,14 @@ namespace Backoffice.Web.Pages.Administration
         #region Properties
         [Inject] public ICommonService CommonService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
+        [Inject] public IAuthenticationService AuthenticationService { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public string Token { get; set; }
         public string IFrameSrc { get; set; }
-
-        #endregion
-
-        #region Fields
-
-        private string _region;
 
         #endregion
 
@@ -36,9 +37,13 @@ namespace Backoffice.Web.Pages.Administration
 
         private async Task Initialize()
         {
-            _region = Configuration["Region"].ToString();
+            var reportRoles = (await AuthenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
+            {
+                RoleId = UserModel.RoleId,
+                ClaimType = AdminPermission.Admin_Dashboard.ToString().Replace("_", ".")
+            })).Result ?? new ReportRolesUrlResponse();
 
-            IFrameSrc = _region == "HK" ? "" : "";
+            IFrameSrc = reportRoles.Url;
         }
 
         public void Dispose()
