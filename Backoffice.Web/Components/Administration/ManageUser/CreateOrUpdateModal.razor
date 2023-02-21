@@ -59,6 +59,7 @@
                 </div>
             </div>
         </div>
+        <AlertMessage AlertStatus="@AlertModel.Status" AlertMessageStr="@AlertModel.Message" Opacity="@AlertModel.Opacity" />
         <Permission Permissions="Permissions.Permissions" IsReadOnly="true" ClientModel="ClientModel" @ref="PermissionComponent" />
     }
 </div>

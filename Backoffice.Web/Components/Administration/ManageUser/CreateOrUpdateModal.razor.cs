@@ -22,6 +22,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
+        public AlertModel AlertModel { get; set; }
         public EditContext EditContext { get; set; }
         public Permission PermissionComponent { get; set; }
         public PermissionResponse Permissions { get; set; }
@@ -39,6 +40,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
         protected override async Task OnInitializedAsync()
         {
+            AlertModel = new AlertModel();
             ClientModel = new ClientModel();
             UserRegister = new UserRegisterModel();
             UserGroupList = new List<UserGroupResponse>();
@@ -104,6 +106,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         }
         public async Task OnSaveClickedEvent()
         {
+            AlertModel = new AlertModel();
             IsPreLoader = true;
             StateHasChanged();
 
@@ -141,15 +144,16 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
                         ModalService.Cancel();
                         await Modal.OnSaveClickCallback.InvokeAsync();
+                        ModalService.Cancel();
                     }
                     else
                     {
-                        //Alerts.Add(new AlertModel
-                        //{
-                        //    AlertStatus = "Error",
-                        //    AltertMessage = $"{response.Message}",
-                        //    Opacity = 1.0m
-                        //});
+                        AlertModel = new AlertModel
+                        {
+                            Status = "Error",
+                            Message = $"{response.Message}",
+                            Opacity = 1.0m
+                        };
                     }
                 }
                 else
@@ -164,20 +168,18 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         ModalService.Cancel();
 
                         await Modal.OnSaveClickCallback.InvokeAsync();
+                        ModalService.Cancel();
                     }
                     else
                     {
-                        //Alerts.Add(new AlertModel
-                        //{
-                        //    AlertStatus = "Error",
-                        //    AltertMessage = $"{response.Message}",
-                        //    Opacity = 1.0m
-                        //});
+                        AlertModel = new AlertModel
+                        {
+                            Status = "Error",
+                            Message = $"{response.Message}",
+                            Opacity = 1.0m
+                        };
                     }
                 }
-                IsPreLoader = false;
-                await Modal.OnSaveClickCallback.InvokeAsync(true);
-                ModalService.Cancel();
             }
             IsPreLoader = false;
         }
@@ -299,7 +301,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         {
                             IsValidPassword = false;
                         }
-                        var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).+$");
+                        var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&].+$");
 
                         if (!regex.IsMatch(UserRegister.Password))
                         {
