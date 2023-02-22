@@ -75,8 +75,8 @@ namespace Backoffice.Shared.Models.Response
 
         public class TaxConfig
         {
-            public decimal? StakeTax { get; set; }
-            public decimal? WinningsTax { get; set; }
+            public decimal StakeTax { get; set; } = 0m;
+            public decimal WinningsTax { get; set; } = 0m;
             public string ExcludeStakeSportTypes { get; set; }
             public string ExcludeWinningsSportTypes { get; set; }
         }
