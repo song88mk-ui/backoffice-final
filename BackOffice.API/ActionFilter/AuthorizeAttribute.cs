@@ -51,13 +51,13 @@ namespace Backoffice.API.ActionFilter
                 // Invalid Isuer
                 if (jwtToken.Issuer != _configuration["API:AuthenticationAPI:JWT:Issuer"])
                 {
-                    context.Result = new JsonResult(new { title = "Unauthorized", message = "Invalid Issuer." }) { StatusCode = StatusCodes.Status401Unauthorized };
+                    context.Result = new JsonResult(new { title = "Unauthorized", message = "Invalid token." }) { StatusCode = StatusCodes.Status401Unauthorized };
                     return;
                 }
 
                 if (jwtToken.ValidTo < DateTime.UtcNow)
                 {
-                    context.Result = new JsonResult(new { title = "Unauthorized", message = "Expired Token." }) { StatusCode = StatusCodes.Status401Unauthorized };
+                    context.Result = new JsonResult(new { title = "Unauthorized", message = "Invalid token." }) { StatusCode = StatusCodes.Status401Unauthorized };
                     return;
                 }
 
