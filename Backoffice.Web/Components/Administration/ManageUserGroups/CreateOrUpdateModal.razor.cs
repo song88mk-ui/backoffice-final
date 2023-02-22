@@ -6,6 +6,7 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace Backoffice.Web.Components.Administration.ManageUserGroups
@@ -55,18 +56,21 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
             if(UserGroup.Claims.Any())
             {
-                foreach(var claim in UserGroup.Claims)
+
+                foreach (var permission in Permissions.Permissions)
                 {
-                    var permission = Permissions.Permissions.FirstOrDefault(p => p.ClaimType == claim.ClaimType);
-                    if(permission != null)
-                    {
-                        permission.ClaimValue = claim.ClaimValue;
-                    }
+                    var claimValue = UserGroup.Claims.FirstOrDefault(x => x.ClaimType == permission.ClaimType).ClaimValue;
                     OldUserGroup.Claims.Add(new ClaimModel
                     {
-                        ClaimType = claim.ClaimType,
-                        ClaimValue = claim.ClaimValue
+                        ClaimType = permission.ClaimType,
+                        ClaimValue = claimValue
                     });
+
+                    var permissionModel = Permissions.Permissions.FirstOrDefault(p => p.ClaimType == permission.ClaimType);
+                    if (permissionModel != null)
+                    {
+                        permissionModel.ClaimValue = claimValue;
+                    }
                 }
             }
         }
@@ -122,8 +126,9 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 IsPreload = true;
 
                 var claims = new List<ClaimModel>();
+                var newClaims = new List<ClaimModel>();
 
-                foreach(var permission in Permissions.Permissions)
+                foreach (var permission in Permissions.Permissions)
                 {
                     if (string.IsNullOrEmpty(permission.ClaimValue))
                         permission.ClaimValue = "0";
@@ -132,7 +137,12 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                     {
                         ClaimType = permission.Id,
                         ClaimValue = permission.ClaimValue
-                    });                    
+                    });
+                    newClaims.Add(new ClaimModel
+                    {
+                        ClaimType = permission.Name,
+                        ClaimValue = permission.ClaimValue
+                    });
                 }
 
                 var request = new UserGroupRequest()
@@ -146,7 +156,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
                 if (response.StatusCode == StatusCode.Success && response.Result != null)
                 {
-                    UserGroup.Claims = claims;
+                    UserGroup.Claims = newClaims;
 
                     var userGroupId = !IsEdit ? response.Result.UserGroupId : request.UserGroupId;
 

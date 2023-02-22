@@ -2,13 +2,14 @@
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace Backoffice.API.Controllers.SportsbookClients
 {
-    [Authorize]
+    //[Authorize]
     [Route("sportsbook/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class ClientController : Controller
@@ -21,6 +22,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
         }
 
         [HttpGet("list")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetClients()
         {
             var result = await _backofficeRepository.GetClients();

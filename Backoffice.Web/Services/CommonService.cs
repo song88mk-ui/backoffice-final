@@ -576,13 +576,13 @@ namespace Backoffice.Web.Services
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] 
-                { 
-                    new Claim("sub", username), 
-                    new Claim("aud", "tableau"), 
-                    new Claim("jti", DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss.fff tt")), 
-                    new Claim("iss", clientId), 
-                    new Claim("scp", "tableau:views:embed"), 
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim("sub", username),
+                    new Claim("aud", "tableau"),
+                    new Claim("jti", DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss.fff tt")),
+                    new Claim("iss", clientId),
+                    new Claim("scp", "tableau:views:embed"),
                     new Claim("scp", " ")
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(2),
@@ -711,14 +711,19 @@ namespace Backoffice.Web.Services
                 {
                     foreach (var claim in claims)
                     {
+                        if (claim.ClaimValue == "0")
+                        {
+
+                        }
                         var check = anotherClaims.FirstOrDefault(c => c.ClaimType == claim.ClaimType);
                         if (check == null)
                         {
                             if (claim.ClaimValue == "1")
-                                result = result + $"{claim.ClaimType.Replace(".", " ")}<br/><div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}\" disabled checked></div><br/>";
+                                result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}\" disabled checked></div>";
                             else if (claim.ClaimValue == "2")
-                                result = result + $"{claim.ClaimType.Replace(".", " ")} ReadOnly<br/><div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div><br/>";
-
+                                result = result + $"{claim.ClaimType.Replace(".", " ")} ReadOnly<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
+                            else
+                                result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled></div>";
                         }
                         else if (claim.ClaimValue != check.ClaimValue)
                         {
@@ -729,19 +734,19 @@ namespace Backoffice.Web.Services
                                 var uniqueClient = clients.Where(c => !checkClients.Contains(c));
                                 var clientStr = string.Join(", ", uniqueClient);
                                 if (string.IsNullOrEmpty(clientStr))
-                                    result = result + $"Client Access: N/A<br/>";
+                                    result = result + $"Client Access: N/A";
                                 else
-                                    result = result + $"Client Access:<br/>{clientStr}<br/>";
+                                    result = result + $"Client Access:{clientStr}";
 
                             }
                             else
                             {
                                 if (claim.ClaimValue == "1")
-                                    result = result + $"{claim.ClaimType.Replace(".", " ")}<br/><div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div><br/>";
+                                    result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
                                 else if (claim.ClaimValue == "2")
-                                    result = result + $"{claim.ClaimType.Replace(".", " ")} ReadOnly<br/><div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div><br/>";
+                                    result = result + $"{claim.ClaimType.Replace(".", " ")} ReadOnly<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
                                 else
-                                    result = result + $"{claim.ClaimType.Replace(".", " ")}<br/><div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled></div><br/>";
+                                    result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled></div>";
                             }
 
                         }
@@ -752,25 +757,25 @@ namespace Backoffice.Web.Services
             else if (obj.GetType().Name == typeof(UserGroupRequest).Name)
             {
                 var claims = ((UserGroupRequest)obj).Claims;
-                
+
                 if (claims.Any())
                 {
                     foreach (var claim in claims)
                     {
                         if (claim.ClaimValue == "1")
-                            result = result + $"{claim.ClaimType.Replace(".", " ")}<br/><div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}\" disabled checked></div><br/>";
+                            result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}\" disabled checked></div>";
                         else if (claim.ClaimValue == "2")
-                            result = result + $"{claim.ClaimType.Replace(".", " ")} ReadOnly<br/><div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div><br/>";
+                            result = result + $"{claim.ClaimType.Replace(".", " ")} ReadOnly<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
                         else if (claim.ClaimType == SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
                         {
                             var clients = claim.ClaimValue.Split(',');
                             var clientStr = string.Join(", ", clients);
                             if (string.IsNullOrEmpty(clientStr))
-                                result = result + $"Client Access: N/A<br/>";
+                                result = result + $"Client Access: N/A";
                             else
-                                result = result + $"Client Access:<br/>{clientStr}<br/>";
+                                result = result + $"Client Access:{clientStr}";
                         }
-                     }
+                    }
                 }
             }
             else
