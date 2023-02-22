@@ -53,10 +53,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
 
-
             if(UserGroup.Claims.Any())
             {
-
                 foreach (var permission in Permissions.Permissions)
                 {
                     var claimValue = UserGroup.Claims.FirstOrDefault(x => x.ClaimType == permission.ClaimType).ClaimValue;

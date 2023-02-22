@@ -711,10 +711,6 @@ namespace Backoffice.Web.Services
                 {
                     foreach (var claim in claims)
                     {
-                        if (claim.ClaimValue == "0")
-                        {
-
-                        }
                         var check = anotherClaims.FirstOrDefault(c => c.ClaimType == claim.ClaimType);
                         if (check == null)
                         {
