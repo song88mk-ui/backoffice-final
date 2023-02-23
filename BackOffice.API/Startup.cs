@@ -4,6 +4,7 @@ using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -86,7 +87,6 @@ namespace Backoffice.API
             services.AddSingleton<IMemCache, MemCache>();
             services.AddScoped<ApiKeyFilter>();
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

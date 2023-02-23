@@ -7,6 +7,7 @@ using Backoffice.Web.Services;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.ResponseCompression;
+using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
@@ -128,8 +129,19 @@ builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>(cl
 });
 
 builder.Services.AddScoped<IModalService, ModalService>();
-builder.Services.AddHttpClient<ITradingService, TradingService>();
-builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>();
+builder.Services.AddHttpClient<ITradingService, TradingService>(client =>
+{
+    client.BaseAddress = new Uri(configuration["API:Backoffice:Uri"]);
+
+    client.DefaultRequestHeaders.Add("x-api-key", configuration["API:Backoffice:Security:APIKey"]);
+    client.DefaultRequestHeaders.Add("x-region", configuration["API:Region"]);
+});
+builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>(client =>
+{
+    client.BaseAddress = new Uri(configuration["API:Backoffice:Uri"]);
+    client.DefaultRequestHeaders.Add("x-api-key", configuration["API:Backoffice:Security:APIKey"]);
+    client.DefaultRequestHeaders.Add("x-region", configuration["API:Region"]);
+});
 builder.Services.AddScoped<ICommonService, CommonService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
@@ -158,12 +170,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseSession();
 app.UseMiddleware<RabbitMQMiddleware>();
 
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-app.UseSession();
 
 app.UseRouting();
 

@@ -1,22 +1,17 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
-using Backoffice.Shared.Utilities;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
-using System.Linq;
+using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Claims;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Backoffice.API.ActionFilter
 {
@@ -26,7 +21,14 @@ namespace Backoffice.API.ActionFilter
         private IConfiguration _configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json").Build();
-
+        private HttpClient _httpClient { get; set; }
+        public AuthorizeAttribute()
+        {
+            _httpClient = new HttpClient();
+            _httpClient.BaseAddress = new Uri(_configuration["API:AuthenticationAPI:Uri"]);
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:AuthenticationAPI:Security:APIKey"]); ;
+        }
         public async void OnAuthorization(AuthorizationFilterContext context)
         {
             try
@@ -61,13 +63,64 @@ namespace Backoffice.API.ActionFilter
                     return;
                 }
 
+                var result = new BaseResponse<TokenModel>()
+                {
+                    StatusCode = StatusCode.Unauthorized,
+                    Message = "Missing authorization"
+                };
+
+                result = await Authenticate(token);
+
+                if (result.StatusCode != StatusCode.Success)
+                {
+                    context.Result = new JsonResult(new { title = "Unauthorized", message = result.Message }) { StatusCode = StatusCodes.Status401Unauthorized };
+                    return;
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
                 context.Result = new JsonResult(new { title = "Unauthorized", message = ex.Message }) { StatusCode = StatusCodes.Status401Unauthorized };
                 return;
             }
         }
+
+        #region Utilities
+
+        public async Task<BaseResponse<TokenModel>> Authenticate(string token)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                var response = await _httpClient.GetAsync($"authenticate/access");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<TokenModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<TokenModel>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
+                        return JsonSerializer.Deserialize<BaseResponse<TokenModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<TokenModel>();
+                    else
+                    {
+                        return new BaseResponse<TokenModel>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<TokenModel>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+        #endregion
     }
 }

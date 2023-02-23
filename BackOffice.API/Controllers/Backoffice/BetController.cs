@@ -1,6 +1,5 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
-using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -15,12 +14,10 @@ namespace Backoffice.API.Controllers.Backoffice
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class BetController : ControllerBase
     {
-        private readonly IBackofficeRepository _backofficeRepository;
         private readonly IPlatformRepository _platformRepository;
 
-        public BetController(IBackofficeRepository backofficeRepository, IPlatformRepository platformRepository)
+        public BetController(IPlatformRepository platformRepository)
         {
-            _backofficeRepository = backofficeRepository;
             _platformRepository = platformRepository;
         }
 

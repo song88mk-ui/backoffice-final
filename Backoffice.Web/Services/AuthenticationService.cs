@@ -49,6 +49,7 @@ namespace Backoffice.Web.Services
                 var authPayload = await response.Content.ReadAsStringAsync();
                 var token = JsonSerializer.Deserialize<BaseResponse<TokenModel>>(authPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 _httpContextAccessor.HttpContext?.Session.SetString("UserToken", token.Result.AccessToken);
+                _httpContextAccessor.HttpContext?.Session.SetString("OperatorToken", token.Result.OperatorToken);
                 ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(user.Name);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token.Result.AccessToken);
                 var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(token.Result.AccessToken), "jwtAuthType"));
@@ -341,8 +342,6 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-
-
         #endregion
 
         #region User Group

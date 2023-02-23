@@ -39,7 +39,7 @@ namespace Backoffice.Web.Shared
         public NavMenuModel NavMenus { get; set; }
 
         public static Func<Task> OnFilterClientActionAsync;
-        public ClientModel Clients { get; set; }
+        public ClientModel Clients { get; set; } = new ClientModel();
         public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
         //public bool IsPreLoader { get; set; } = true;
         public bool IsPreLoader { get; set; }
@@ -80,12 +80,15 @@ namespace Backoffice.Web.Shared
 
                 if (userClaims is not null)
                 {
-                    if (isSuperAdmin)
-                        UserModel.ClientCodes = Clients.Clients.Select(c => c.ClientCode).ToList();
-                    else
+                    if(Clients.Clients.Any())
                     {
-                        UserModel.ClientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>();
-                        Clients.Clients = Clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                        if (isSuperAdmin)
+                            UserModel.ClientCodes = Clients.Clients.Select(c => c.ClientCode).ToList();
+                        else
+                        {
+                            UserModel.ClientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>();
+                            Clients.Clients = Clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                        }
                     }
 
                     UserModel.Id = userClaims.Where(x => x.Type.ToUpper() == "USERID").FirstOrDefault()?.Value ?? "";
