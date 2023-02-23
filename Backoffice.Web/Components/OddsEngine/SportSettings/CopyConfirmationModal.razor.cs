@@ -20,6 +20,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         public string ToClientName { get; set; }
 
+        private bool IsPreloader { get; set; }
+
         #endregion
 
         #region Methods
@@ -27,6 +29,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         protected override async Task OnInitializedAsync()
         {
             ToClientName = ModalParameters.TryGet<string>("ToClientName");
+            IsPreloader = false;
         }
 
         public async Task OnCancelClickEvent()
@@ -36,6 +39,9 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         public async Task OnCopyClickEvent()
         {
+            IsPreloader = true;
+            await InvokeAsync(StateHasChanged);
+
             var request = new ClientSportSettingRequest
             {
                 ClientCode = ModalParameters.TryGet<string>("ToClientCode"),
