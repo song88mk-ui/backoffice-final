@@ -35,7 +35,7 @@
 
 .col-max-height {
     max-height: 25rem;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .thead-sticky {
