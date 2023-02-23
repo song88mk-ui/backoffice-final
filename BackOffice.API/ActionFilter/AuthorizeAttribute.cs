@@ -92,7 +92,7 @@ namespace Backoffice.API.ActionFilter
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
-                var response = await _httpClient.GetAsync($"authenticate/access");
+                var response = await _httpClient.PostAsync($"v1/authentication/access", new StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<TokenModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
