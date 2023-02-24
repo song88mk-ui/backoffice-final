@@ -37,7 +37,7 @@ namespace Backoffice.Web.Services
                 Message = StatusCode.Error.ToString(),
                 Result = new Tuple<bool, List<string>>(false, policies)
             };
-            user.Provider = "BoWeb";
+            user.Provider = "1001";
             var bodyContent = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
             var userAgent = _httpContextAccessor.HttpContext.Request.Headers.UserAgent;
 

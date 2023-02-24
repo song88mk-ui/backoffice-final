@@ -5,6 +5,6 @@ namespace Backoffice.Shared.Enums
     {
         Backoffice = 1001,
         Sportsbook = 1002,
-        AgentManagementSystem = 1003,
+        AgentManagementSystem = 1003
     }
 }
