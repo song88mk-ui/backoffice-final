@@ -119,6 +119,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 {
                     AppId = (int)Application.Backoffice,
                     AppName = Application.Backoffice.ToString(),
+                    UserIdRef = 0l,
                     Email = UserRegister.Email,
                     MainUserId = "",
                     NickName = UserRegister.NickName,
@@ -297,16 +298,16 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 {
                     if (!string.IsNullOrWhiteSpace(UserRegister.Password))
                     {
-                        if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
-                        {
-                            IsValidPassword = false;
-                        }
-                        var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&].+$");
+                        //if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
+                        //{
+                        //    IsValidPassword = false;
+                        //}
+                        //var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&].+$");
 
-                        if (!regex.IsMatch(UserRegister.Password))
-                        {
-                            IsValidPassword = false;
-                        }
+                        //if (!regex.IsMatch(UserRegister.Password))
+                        //{
+                        //    IsValidPassword = false;
+                        //}
                     }
                 }
             }
