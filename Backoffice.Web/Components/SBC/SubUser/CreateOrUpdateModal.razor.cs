@@ -268,7 +268,7 @@ namespace Backoffice.Web.Components.SBC.SubUser
             {
                 var response = (await AuthenticationService.Register(request));
 
-                if (response.Result)
+                if (response.StatusCode == StatusCode.Success)
                 {
                     ModalService.Cancel();
 

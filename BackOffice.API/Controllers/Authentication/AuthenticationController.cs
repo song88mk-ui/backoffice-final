@@ -94,7 +94,7 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpPost("register")]
         public async Task<IActionResult> Create([FromBody] UserRegisterRequest request)
         {
-            var result = new BaseResponse<bool>()
+            var result = new BaseResponse<long>()
             {
                 StatusCode = Shared.Enums.StatusCode.Unauthorized,
                 Message = "Missing authorization"

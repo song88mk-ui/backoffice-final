@@ -160,7 +160,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 {
                     var response = (await AuthenticationService.Register(request));
 
-                    if (response.Result)
+                    if (response.StatusCode == StatusCode.Success)
                     {
 
                         await InvokeAsync(StateHasChanged);
