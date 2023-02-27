@@ -86,10 +86,6 @@ a, .btn-link {
     font-size: 13px;
 }
 
-.row {
-    overflow-x: hidden;
-}
-
 .ico {
     font-family: "s88-icon";
     display: block;
