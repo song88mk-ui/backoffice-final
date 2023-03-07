@@ -40,7 +40,7 @@ namespace Backoffice.Web.Pages.SBC
             var reportRoles = (await AuthenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
             {
                 RoleId = UserModel.RoleId,
-                ClaimType = SportsbookClientPermission.SBC_Reports_DrillDownReport.ToString().Replace("_", ".")
+                ClaimType = SportsbookClientPermission.SBC_Reports_SearchUserId.ToString().Replace("_", ".")
             })).Result ?? new ReportRolesUrlResponse();
 
             IFrameSrc = reportRoles.Url;
