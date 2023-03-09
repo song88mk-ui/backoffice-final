@@ -57,7 +57,12 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
             {
                 foreach (var permission in Permissions.Permissions)
                 {
-                    var claimValue = UserGroup.Claims.FirstOrDefault(x => x.ClaimType == permission.ClaimType).ClaimValue;
+                    var userClaim = UserGroup.Claims.FirstOrDefault(x => x.ClaimType == permission.ClaimType);
+
+                    var claimValue = "0";
+                    if (userClaim != null)
+                        claimValue = userClaim.ClaimValue;
+
                     OldUserGroup.Claims.Add(new ClaimModel
                     {
                         ClaimType = permission.ClaimType,
