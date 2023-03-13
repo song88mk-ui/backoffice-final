@@ -1,4 +1,4 @@
-name: $(System.TeamProject)-BackOffice-Web-$(Build.BuildId).$(Rev:r)
+name: $(System.TeamProject)-BackOffice-Web-$(Build.BuildId)
 
 pr: none
 
