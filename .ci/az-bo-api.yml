@@ -1,4 +1,4 @@
-name: $(System.TeamProject)-BackOffice-API-$(Build.BuildId).$(Rev:r)
+name: $(System.TeamProject)-BackOffice-API-$(Build.BuildId)
 
 pr: none
 
