@@ -3,6 +3,8 @@
     public enum StatusCode
     {
         Success = 100,
+        Invalid_Password = 201,
+        Username_Not_Found = 202,
         Unauthorized = 401,
         Missing_Or_Unsupported_APIKey_In_Request_Headers = 101,
         Rejected_Bet_Are_Not_Allowed_To_Be_Resent_To_Operator = 150,
