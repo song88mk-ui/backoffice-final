@@ -20,7 +20,7 @@ resources:
       type: github
       name: FlyingCockatoo/BuildTemplates
       endpoint: FlyingCockatoo
-      ref: refs/tags/v0.1.4
+      ref: refs/tags/v0.3.0
     - repository: nuget-helper
       type: github
       name: FlyingCockatoo/infra-build-nuget-helper
@@ -33,3 +33,12 @@ extends:
     runtime: win-x64
     projects:
       - Backoffice.Utility
+    preBuild:
+      - task: Bash@3
+        displayName: Set Build Name
+        inputs:
+          workingDirectory: '$(code)\Backoffice.Utility'
+          targetType: inline
+          script: |
+            APP_VERSION=$(jq -r '.version' .version)
+            echo "##vso[build.updatebuildnumber]BackOffice-Utility-v${APP_VERSION}.${BUILD_BUILDID}"

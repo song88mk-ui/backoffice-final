@@ -123,5 +123,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn modal-btn modal-reset" @onclick="OnModalResetClickEvent">Reset</button>
-    <button type="button" class="btn modal-btn modal-settle-bets" @onclick="OnModalSettleClickEvent" disabled=@(ManualBetDetailsModel.Bets.Any(x => x.BetId == null || x.NewBetStatusId == 0 || (string.IsNullOrEmpty(x.NewReason) || x.NewReason == "")) ? true : false)>Settle Bets</button>
+    <button type="button" class="btn modal-btn modal-settle-bets" @onclick="OnModalSettleClickEvent" disabled=@(ManualBetDetailsModel.Bets.Any(x => x.BetId == null || x.NewBetStatusId == "0" || (string.IsNullOrEmpty(x.NewReason) || x.NewReason == "")) ? true : false)>Settle Bets</button>
 </div>

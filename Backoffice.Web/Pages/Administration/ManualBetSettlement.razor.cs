@@ -186,7 +186,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             if (string.IsNullOrEmpty(betDetails.NewBetStatusName))
             {
-                return ((BetStatus)betDetails.NewBetStatusId).ToString();
+                return ((BetStatus)(int.Parse(betDetails.NewBetStatusId))).ToString();
             }
             else
             {
