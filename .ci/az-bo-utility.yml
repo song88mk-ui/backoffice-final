@@ -1,4 +1,4 @@
-name: $(System.TeamProject)-BackOffice-Utility-$(Build.BuildId)
+name: BackOffice-Utility-$(Build.BuildId)
 
 pr: none
 
@@ -20,7 +20,7 @@ resources:
       type: github
       name: FlyingCockatoo/BuildTemplates
       endpoint: FlyingCockatoo
-      ref: refs/tags/v0.3.0
+      ref: refs/tags/v0.4.0
     - repository: nuget-helper
       type: github
       name: FlyingCockatoo/infra-build-nuget-helper
