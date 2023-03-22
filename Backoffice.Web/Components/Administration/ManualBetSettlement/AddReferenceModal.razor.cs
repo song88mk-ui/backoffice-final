@@ -54,7 +54,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (ManualBetDetailsModel.Bets.Any(x => x.BetId == null || x.NewBetStatusId == 0 || (string.IsNullOrEmpty(x.NewReason) || x.NewReason == "")))
+            if (ManualBetDetailsModel.Bets.Any(x => x.BetId == null || x.NewBetStatusId == "0" || (string.IsNullOrEmpty(x.NewReason) || x.NewReason == "")))
             {
                 await Task.Yield();
                 IsSettleDisabled = true;
@@ -119,9 +119,9 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
         public async Task OnBetStatusChangedEvent(ChangeEventArgs e, ManualBetDetails bet)
         {
-            bet.NewBetStatusId = int.Parse(e.Value.ToString());
+            var newBetStatus = int.Parse(e.Value.ToString());
 
-            switch ((BetStatus)bet.NewBetStatusId)
+            switch ((BetStatus)newBetStatus)
             {
                 case BetStatus.Won:
                     {
