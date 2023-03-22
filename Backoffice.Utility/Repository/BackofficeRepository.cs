@@ -873,8 +873,8 @@ namespace Backoffice.Utility.Repository
         private string GetNewBetStatusName(ManualBetDetails betDetails)
         {
             if (string.IsNullOrEmpty(betDetails.NewBetStatusName))
-            {
-                return ((BetStatus)betDetails.NewBetStatusId).ToString();
+            {                
+                return ((BetStatus)int.Parse(betDetails.NewBetStatusId)).ToString();
             }
             else
             {
