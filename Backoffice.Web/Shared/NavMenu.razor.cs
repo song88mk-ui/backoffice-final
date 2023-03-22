@@ -1,11 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Linq;
-using System.Security.Claims;
 
 namespace Backoffice.Web.Shared
 {
