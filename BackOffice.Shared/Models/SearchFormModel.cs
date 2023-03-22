@@ -6,6 +6,7 @@ namespace Backoffice.Shared.Models
 {
     public class SearchFormModel
     {
-        public string SearchText { get; set; } = string.Empty;
+        public string SearchText { get; set; }
+        public bool IsReset = false;
     }
 }
