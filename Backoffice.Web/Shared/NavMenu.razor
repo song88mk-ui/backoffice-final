@@ -31,10 +31,6 @@ else if (NavMenuAccess == PermissionCategory.OE)
                 {
                     foreach (var menu in NavMenus.Menus)
                     {
-                        if (_dissabledMenus.Contains(menu.Id.ToLower()))
-                        {
-                            continue;
-                        }
                         if (menu.SubMenus.Any())
                         {
                             <div class="nav-item px-3">
@@ -47,10 +43,6 @@ else if (NavMenuAccess == PermissionCategory.OE)
                                     @*<nav class="flex-column">*@
                                     @foreach (var submenu in menu.SubMenus)
                                     {
-                                        if (_dissabledMenus.Contains(submenu.Id.ToLower()))
-                                        {
-                                            continue;
-                                        }
                                         <div class="nav-item">
                                             <NavLink class="nav-link" href="@submenu.Url">
                                                 <span class="ico ico-@(submenu.IconName)" aria-hidden="true"></span>

@@ -14,5 +14,6 @@
         public int SortOrder { get; set; }
         public bool IsSubUser { get; set; }
         public bool IsEnabled { get; set; } = false;
+        public int Version { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Backoffice.Shared.Models.Response;
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -320,8 +321,19 @@ namespace Backoffice.API.Repositories
                 var response = await _httpClient.GetAsync($"v1/api/user/permission/list?isSubUserOnly={isSubUserOnly}");
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<PermissionResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                {
+                    var test = await response.Content.ReadAsStringAsync();
+                    var content = JsonSerializer.Deserialize<BaseResponse<PermissionResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
                         ?? new BaseResponse<PermissionResponse>();
+
+                    if (content.Result != null)
+                    {
+                        if (content.Result.Permissions != null)
+                            content.Result.Permissions = content.Result.Permissions.Where(x => x.Version != 1).ToList();
+                    }
+
+                    return content;
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
