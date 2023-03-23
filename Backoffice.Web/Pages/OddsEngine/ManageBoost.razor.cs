@@ -27,6 +27,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string IconClass { get; set; }                
                 
         private bool IsPreLoader { get; set; }
+        private decimal Opacity { get; set; } = 0;
         private string AlertMessage { get; set; }
         private AlertStatus AlertStatus { get; set; }
 
@@ -47,6 +48,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             PageTitle = "Manage Boost";
             IconClass = string.Empty;
+            IsPreLoader = true;
 
             Breadcrumbs = new List<BreadcrumbModel>()
             {
@@ -171,6 +173,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             FilterReference.SelectedLeagueId = _leagueId;
             FilterReference.SearchForm.SearchText = _search;
 
+            Opacity = 100;
             AlertMessage = $"Price Boost has been {(string)message}!";
             AlertStatus = AlertStatus.Success;
 
@@ -188,6 +191,13 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
 
             ModalService.Open<AddBoostedOddsModal>($"Add Boosted Odds", parameters, options);
+        }
+        public async Task OpacityChanged(decimal opacity)
+        {
+            Opacity = opacity;
+
+            if (opacity == 0)
+                AlertMessage = string.Empty;
         }
 
         public void Dispose()
@@ -207,6 +217,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private async Task GetContents()
         {
             IsPreLoader = true;
+            StateHasChanged();
 
             var priceBoostConfigResponse = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
             {

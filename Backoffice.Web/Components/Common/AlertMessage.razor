@@ -29,18 +29,19 @@
                 {
                     if (Opacity > 0.9m)
                     {
-                        Opacity -= 0.05m;
-                        await Task.Delay(2000);
+                        Opacity -= 0.5m;
+                        await Task.Delay(20);
                     }
                     else
                     {
-                        Opacity -= 0.03m;
-                        await Task.Delay(10);
+                        Opacity -= 1;
+                        //await Task.Delay(10);
                     }
 
                     StateHasChanged();
                 }
                 Opacity = 0.0m;
+                AlertMessageStr = string.Empty;
                 await OpacityChanged.InvokeAsync(Opacity);
             }
         }
@@ -48,7 +49,6 @@
         {
             Opacity = 1.00m;
         }
-
     }
 
     public void Dispose()
