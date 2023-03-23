@@ -70,6 +70,7 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task OnSearchButtonClicked()
         {
+            //
             //IsPreloader = true;
             //StateHasChanged();
             await GetContents();
