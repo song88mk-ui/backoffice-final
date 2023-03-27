@@ -213,6 +213,12 @@ namespace Backoffice.Web.Components.SBC.Clients
                     var suggestedMinimumBet = await GetSuggestedMinimumBet(setting.CurrencyCode);
                     var suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
 
+                    if (setting.BetSettingBetBuilder.MinStake == null)
+                        setting.BetSettingBetBuilder.MinStake = suggestedMinimumBet;
+
+                    if (setting.BetSettingBetBuilder.MaxStake == null)
+                        setting.BetSettingBetBuilder.MaxStake = suggestedMaximumBet;
+
                     if (setting.BetSettingBetBuilder.MinStake == 0)
                         setting.BetSettingBetBuilder.MinStake = suggestedMinimumBet;
 
