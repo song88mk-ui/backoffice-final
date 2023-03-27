@@ -590,12 +590,15 @@ namespace Backoffice.API.Repositories
                 }
                 catch
                 {
-                    return new BaseResponse<bool>
+                    if(request.IsEmailNotification)
                     {
-                        StatusCode = StatusCode.Error,
-                        Message = "Invalid email address",
-                        Result = false
-                    };
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Invalid email address",
+                            Result = false
+                        };
+                    }
                 }
 
                 if (request.IsTierRevenue)
