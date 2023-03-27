@@ -43,6 +43,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             {
                 Client = new BoostedSettingsModel();
                 Client = ModalParameters?.TryGet<BoostedSettingsModel>("Client");
+                TradingService.Region = ModalParameters.TryGet<string>("Region");
                 ClientId = Client.ClientId;
                 ClientCode = Client.ClientCode;
                 ClientName = Client.ClientName;

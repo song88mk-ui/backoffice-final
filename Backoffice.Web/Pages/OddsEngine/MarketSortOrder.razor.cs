@@ -17,6 +17,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
 
+        [Parameter] public string Region { get; set; }
         public IJSStreamReference? DataReference { get; set; }
 
         public string PageTitle { get; set; }
@@ -43,6 +44,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            TradingService.Region = Region;
             MarketSortOrderModel = new MarketSortOrderModel();
 
             PageTitle = "Market Sort Order";

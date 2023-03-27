@@ -213,7 +213,7 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request)
+        public async Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request, string region)
         {
             try
             {

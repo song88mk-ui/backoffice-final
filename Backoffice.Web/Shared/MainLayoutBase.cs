@@ -54,8 +54,8 @@ namespace Backoffice.Web.Shared
         protected override async Task OnInitializedAsync()
         {
             try
-            {
-                IsPreLoader = true;
+            {                
+                IsPreLoader = true;                
 
                 InlineSpinnerCss = "width:10rem;height:10rem;";
 
@@ -80,7 +80,7 @@ namespace Backoffice.Web.Shared
 
                 if (userClaims is not null)
                 {
-                    if(Clients.Clients.Any())
+                    if (Clients.Clients.Any())
                     {
                         if (isSuperAdmin)
                             UserModel.ClientCodes = Clients.Clients.Select(c => c.ClientCode).ToList();
@@ -117,6 +117,7 @@ namespace Backoffice.Web.Shared
                         foreach (var category in permissionSubCategory)
                         {
                             var subMenus = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.') && p.SubCategoryName == category).ToList();
+
                             if (subMenus.Count() == 1)
                             {
                                 var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
@@ -143,7 +144,7 @@ namespace Backoffice.Web.Shared
                                     Url = $"#sub-menu-{categoryId}",
                                 };
 
-                                if(category == "User & User Groups")
+                                if (category == "User & User Groups")
                                 {
                                     menu.IconName = "manage-user-group";
                                 }
@@ -156,7 +157,6 @@ namespace Backoffice.Web.Shared
                                         if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel?.MainUserId))
                                             continue;
 
-
                                         if (claim.Type == SportsbookClientPermission.SBC_OE.ToString().Replace("_", "."))
                                         {
                                             var menu2 = new NavMenuModel.MenuModel
@@ -164,8 +164,26 @@ namespace Backoffice.Web.Shared
                                                 Id = $"sub-menu-odds-engine",
                                                 Name = "Odds Engine",
                                                 IconName = "odds-engine",
-                                                Url = $"odds-engine",
+                                                Url = $"#sub-menu-odds-engine",
+                                                SubMenus = new List<NavMenuModel.MenuModel>()
+                                                {
+                                                    new NavMenuModel.MenuModel()
+                                                    {
+                                                        Id = $"menu.odds-engine.hk",
+                                                        Name = "Asia",
+                                                        IconName = "location",
+                                                        Url = $"hk/odds-engine",
+                                                    },
+                                                    new NavMenuModel.MenuModel()
+                                                    {
+                                                        Id = $"menu.odds-engine.sa",
+                                                        Name = "South Africa",
+                                                        IconName = "location",
+                                                        Url = $"sa/odds-engine",
+                                                    },
+                                                }
                                             };
+
                                             NavMenus.Menus.Add(menu2);
                                             continue;
                                         }

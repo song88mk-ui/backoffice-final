@@ -21,6 +21,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
+        [Parameter] public string Region { get; set; }
         [Parameter] public string Id { get; set; }
 
         private HubConnection HubConnection { get; set; }
@@ -51,6 +52,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            TradingService.Region = Region;
             ClientModel = new ClientModel();
             Breadcrumbs = new List<BreadcrumbModel>();
             Fixture = new MarketFixtureResponse.FixtureModel();

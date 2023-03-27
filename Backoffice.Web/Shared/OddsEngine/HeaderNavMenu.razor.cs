@@ -10,6 +10,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [Parameter] public string Region { get; set; }
 
         public bool ShowPriceBoostMenu { get; set; }
         public bool ShowMarketSettingsMenu { get; set; }
@@ -20,6 +21,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         public bool IsActiveSportSettings { get; set; }
         public bool IsActiveMarketSettings { get; set; }
 
+        private string _address = string.Empty;
         #endregion
 
         #region Methods
@@ -27,6 +29,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         protected override async Task OnInitializedAsync()
         {
             var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+            _address = $"{Region.ToLower()}/odds-engine";
             ActivateMenu(page);
 
             HideAllMenu();
@@ -63,10 +66,14 @@ namespace Backoffice.Web.Shared.OddsEngine
 
             if (menu != null)
             {
-                if (menu.Contains("odds-engine/"))
-                    menu = menu.Replace("odds-engine/", "");
-                if (menu.Contains("odds-engine"))
-                    menu = menu.Replace("odds-engine", "");
+                if (menu.Contains("sa/odds-engine/"))
+                    menu = menu.Replace("sa/odds-engine/", "");
+                if (menu.Contains("sa/odds-engine"))
+                    menu = menu.Replace("sa/odds-engine", "");
+                if (menu.Contains("hk/odds-engine/"))
+                    menu = menu.Replace("hk/odds-engine/", "");
+                if (menu.Contains("hk/odds-engine"))
+                    menu = menu.Replace("hk/odds-engine", "");
 
                 InActiveAllMenu();
 

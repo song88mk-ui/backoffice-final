@@ -31,10 +31,12 @@ namespace Backoffice.Web.Components.Common
         public List<PriceBoostActivityLog> PriceBoostActivityLogs { get; set; }
         public List<ActivityLogModel> BoostedSettingsActivityLogs { get; set; }
         public bool WithAdministrationPagesAccess { get; set; }
+        private string _region = string.Empty;
         #endregion
 
         protected override async Task OnInitializedAsync()
         {
+            TradingService.Region = ModalParameters.TryGet<string>("Region");
             IsPreLoader = true;
             CurrentPage = ModalParameters.TryGet<SportsbookClientPermission>("SelectedPage");
             UserClients = UserModel.ClientCodes;
@@ -85,14 +87,13 @@ namespace Backoffice.Web.Components.Common
                 DateFrom = PriceBoostLogFilterModel.DateFrom.Date.Add(new TimeSpan(0, 0, 0)),
                 DateTo = PriceBoostLogFilterModel.DateTo.Date.Add(new TimeSpan(23, 59, 59)),
                 UserClients = UserClients
-            })).Result;
+            }, _region)).Result;
 
             PriceBoostActivityLogs = new List<PriceBoostActivityLog>();
             BoostedSettingsActivityLogs = new List<ActivityLogModel>();
 
             if (response != null && response.ActivityLogs != null && response.ActivityLogs.Any())
             {
-
                 if (CurrentPage == SportsbookClientPermission.SBC_OE_PriceBoost_Manage)
                 {
                     if (response.ActivityLogs != null && response.ActivityLogs.Any())

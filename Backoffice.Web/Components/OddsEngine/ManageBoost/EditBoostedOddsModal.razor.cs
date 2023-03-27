@@ -22,8 +22,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public LanguagesModel Languages { get; set; }
-        public PriceBoostConfigModel PriceBoostConfigModel { get; set; }  
-        
+        public PriceBoostConfigModel PriceBoostConfigModel { get; set; }
+
         public bool IsPreloader { get; set; }
 
         #endregion
@@ -38,14 +38,15 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         protected override async Task OnInitializedAsync()
         {
-            IsPreloader = true;            
+            IsPreloader = true;
             Languages = ModalParameters.TryGet<LanguagesModel>("Languages");
             PriceBoostConfigModel = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
+            TradingService.Region = ModalParameters.TryGet<string>("Region");
             IsPreloader = false;
         }
 
         public async Task OnSelectLanguage(Tuple<int, Language> args)
-        {           
+        {
             //args.Item 1 = index
 
             var prevLanguage = new Language
@@ -62,7 +63,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             Languages.Languages.Remove(args.Item2);
             if (!string.IsNullOrEmpty(prevLanguage.LanguageCode))
-                Languages.Languages.Add(prevLanguage);            
+                Languages.Languages.Add(prevLanguage);
         }
 
         public async Task OnAddSelection()
@@ -86,10 +87,10 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             PriceBoostConfigModel.BoostedSelectionTranslations.Remove(selection);
 
             await InvokeAsync(StateHasChanged);
-        }        
+        }
 
         public async Task OnCancelModalClick()
-        {            
+        {
             ModalService.Cancel();
         }
 
@@ -114,6 +115,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             PriceBoostConfigModel.UserName = UserModel.UserName;
 
             string currentPriceBoostString = ModalParameters.TryGet<string>("PriceBoostConfigModelSerialized");
+            var region = ModalParameters.TryGet<string>("Region") ?? string.Empty;
 
             var result = await TradingService.AddOrUpdatePriceBoost(new List<PriceBoostConfigModel>() { PriceBoostConfigModel });
             if (result.StatusCode == StatusCode.Success)
@@ -249,7 +251,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
                 var updateLogResponse = await BackOfficeService.AddActivityLog(new ActivityLogModel()
                 {
-                    Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace('_','.'),
+                    Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace('_', '.'),
                     Payload = $"{PriceBoostConfigModel.ClientCode}.{PriceBoostConfigModel.SportId}.{PriceBoostConfigModel.SegmentId}.{PriceBoostConfigModel.LeagueId}",
                     Activity = Activity.Update.ToString(),
                     From = JsonSerializer.Serialize(priceBoostLogModelFrom),
@@ -269,7 +271,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public void Dispose()
         {
-            
+
         }
 
         #endregion

@@ -7,6 +7,7 @@ namespace Backoffice.Web.Services
 {
     public interface ITradingService
     {
+        string Region { get; set; }
         Task<BaseResponse<SportsTreeModel>> GetSports(int fixtureTypeId);
         Task<BaseResponse<SportsLookupResponse>> GetSportLookup();
         Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId);

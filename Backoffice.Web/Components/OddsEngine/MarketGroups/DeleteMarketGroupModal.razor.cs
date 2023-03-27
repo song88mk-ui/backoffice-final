@@ -38,6 +38,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         protected override async Task OnInitializedAsync()
         {
+            TradingService.Region = ModalParameters.TryGet<string>("Region");
             IsPreLoader = false;
             MarketTemplateGroup = new ClientMarketTemplateGroupDTO();
             MarketGroupModel = ModalParameters.TryGet<MarketGroupModel>("MarketGroupModel");

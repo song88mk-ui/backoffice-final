@@ -24,7 +24,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public ToastService? ToastService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-
+        [Parameter] public string Region { get; set; }
         public List<MarketLookupNavigationModel> SelectedContents;
         public List<BreadcrumbModel> Breadcrumbs { get; set; }        
         public List<MarketLookupNavigationModel> MarketLookupNavigationModelsTemp { get; set; }
@@ -57,6 +57,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             ConfigFilterModel = null;
             IsMarketEditing = false;
             AllMarketStatusName = "Deactivate All";
+            TradingService.Region = Region;
             Guid = new Guid();
 
             MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
@@ -118,6 +119,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalDialogClass", "modal-lg");            
             parameters.Add("MarketChangedCount", MarketLookupNavigationModelsTemp.Count);
             parameters.Add("OnCancelCallback", EventCallback.Factory.Create(this, UndoEditedMarkets));
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<UpdateActiveMarketModal>("Clear changes?", parameters, options);

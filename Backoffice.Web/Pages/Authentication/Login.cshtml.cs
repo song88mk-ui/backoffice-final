@@ -88,8 +88,6 @@ namespace Backoffice.Web.Pages.Authentication
                         {
                             case "SPORTSBOOKCLIENT":
                                 return LocalRedirect("/dashboard");
-                            case "Trading":
-                                return LocalRedirect("/odds-engine");
                             default:
                                 return LocalRedirect("/choose-access");
                         }

@@ -23,6 +23,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public IJSStreamReference? DataReference { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [Parameter] public string Region { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -56,6 +57,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            TradingService.Region = Region;
             PageTitle = "Sport Settings";
             IconClass = string.Empty;
             TableClass = "sport-setting-table";
@@ -224,6 +226,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Sports", sports);
 
             parameters.Add("DialogStyle", "max-width: 600px;");
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
 
@@ -240,6 +243,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             parameters.Add("DialogStyle", "max-width: 1300px !important;");
             parameters.Add("ModalClass", "show logs-modal");
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
 

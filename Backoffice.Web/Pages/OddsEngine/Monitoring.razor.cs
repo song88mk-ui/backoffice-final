@@ -4,6 +4,8 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
+using Backoffice.Web.Shared;
+using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
@@ -23,6 +25,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
 
+        [Parameter] public string Region { get; set; }
         [Parameter] public string SportId { get; set; }
         [Parameter] public string SegmentId { get; set; }
         [Parameter] public string LeagueId { get; set; }
@@ -47,6 +50,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            TradingService.Region = Region;
             FixtureMarkets = null;
             MonitoringCallbackModel = new MonitoringCallbackModel();
             ClientModel = new ClientModel();
