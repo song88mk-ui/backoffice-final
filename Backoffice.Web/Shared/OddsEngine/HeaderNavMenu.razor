@@ -4,7 +4,7 @@
     @if (UserModel.Claims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_Monitoring_MatchType.ToString().Replace("_", ".")}"))
     {
         <div class="px-2 me-2 py-3 @(IsActiveMonitoring ? "active" : "")">
-            <a class="header-link text-decoration-none" href="odds-engine/monitoring" @onclick='() => ActivateMenu("monitoring")'>
+            <a class="header-link text-decoration-none" href="@_address/monitoring" @onclick='() => ActivateMenu("monitoring")'>
                 Monitoring
             </a>
         </div>
@@ -12,7 +12,7 @@
     @if (UserModel.Claims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", ".")}"))
     {
         <div class="px-2 me-2 py-3 @(IsActiveConfig ? "active" : "")">
-            <a class="header-link text-decoration-none" href="odds-engine/config" @onclick='() => ActivateMenu("config")'>
+            <a class="header-link text-decoration-none" href="@_address/config" @onclick='() => ActivateMenu("config")'>
                 Config
             </a>
         </div>
@@ -38,7 +38,7 @@
                     @if (UserModel.Claims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace("_", ".")}"))
                     {
                         <li class="py-2">
-                            <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/manage-boost" @onclick='() => ActivateMenu("priceboost")'>
+                            <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/manage-boost" @onclick='() => ActivateMenu("priceboost")'>
                                 Manage Boost
                             </a>
                         </li>
@@ -46,7 +46,7 @@
                     @if (UserModel.Claims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace("_", ".")}"))
                     {
                         <li class="py-2">
-                            <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/boosted-settings" @onclick='() => ActivateMenu("priceboost")'>
+                            <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/boosted-settings" @onclick='() => ActivateMenu("priceboost")'>
                                 Boosted Settings
                             </a>
                         </li>
@@ -58,7 +58,7 @@
     @if (UserModel.Claims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace("_", ".")}"))
     {
         <div class="px-2 me-2 py-3 @(IsActiveSportSettings ? "active" : "")">
-            <a class="header-link text-decoration-none" href="odds-engine/sport-settings" @onclick='() => ActivateMenu("sport-settings")'>
+            <a class="header-link text-decoration-none" href="@_address/sport-settings" @onclick='() => ActivateMenu("sport-settings")'>
                 Sport Settings
             </a>
         </div>
@@ -84,7 +84,7 @@
                     @if (UserModel.Claims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_MarketSetting_SortOrder.ToString().Replace("_", ".")}"))
                     {
                         <li class="py-2">
-                            <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/market-sort-order" @onclick='() => ActivateMenu("market-settings")'>
+                            <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/market-sort-order" @onclick='() => ActivateMenu("market-settings")'>
                                 Market Sort Order
                             </a>
                         </li>
@@ -92,7 +92,7 @@
                     @if (UserModel.Claims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", ".")}"))
                     {
                         <li class="py-2">
-                            <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="odds-engine/market-groups" @onclick='() => ActivateMenu("market-settings")'>
+                            <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/market-groups" @onclick='() => ActivateMenu("market-settings")'>
                                 Market Group
                             </a>
                         </li>

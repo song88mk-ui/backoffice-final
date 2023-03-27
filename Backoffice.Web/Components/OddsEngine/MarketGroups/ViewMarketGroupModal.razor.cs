@@ -30,6 +30,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             IsPreLoader = true;
 
+            TradingService.Region = ModalParameters.TryGet<string>("Region");
             ClientCode = ModalParameters.TryGet<string>("ClientCode");
             SportId = ModalParameters.TryGet<int>("SportId");
             FixtureStatusId = ModalParameters.TryGet<int>("FixtureStatusId");

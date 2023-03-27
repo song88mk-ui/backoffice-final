@@ -17,6 +17,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private ITradingService TradingService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [Parameter] public string Region { get; set; }
 
         public List<PriceBoostConfigModel> PriceBoostList { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
@@ -46,10 +47,11 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            TradingService.Region = Region;
             PageTitle = "Manage Boost";
             IconClass = string.Empty;
             IsPreLoader = true;
-
+            TradingService.Region = Region;
             Breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
@@ -81,7 +83,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("DialogStyle", "max-width: 90rem;top:50%;transform:translateY(-50%)");            
             parameters.Add("PriceBoostConfigModel", priceboost);
             parameters.Add("PriceBoostConfigModelSerialized", JsonSerializer.Serialize(priceboost));
-            parameters.Add("Languages", _languagesModel);            
+            parameters.Add("Languages", _languagesModel);
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
 
@@ -95,6 +98,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("PriceBoostConfigModel", priceboost);
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
 
@@ -110,6 +114,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("DialogStyle", "max-width: 80rem;top:50%;transform:translateY(-50%)");
             parameters.Add("PriceBoostConfigModel", priceboost);
             parameters.Add("PriceBoostConfigModelSerialized", JsonSerializer.Serialize(priceboost));
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
 
@@ -187,6 +192,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("AddPriceBoostFilterModel", (AddPriceBoostFilterModel)addPriceBoostFilterModel);
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
 
