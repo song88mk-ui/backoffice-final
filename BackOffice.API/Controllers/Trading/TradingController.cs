@@ -29,9 +29,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("sports/{fixtureTypeId}")]
         public async Task<IActionResult> GetSports(int fixtureTypeId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetSports(fixtureTypeId, region);
 
@@ -47,9 +45,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("sports/topmarkets/{sportId}")]
         public async Task<IActionResult> GetTopMarkets(int sportId)
         {
-            var region = "HK";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetTopMarkets(sportId, region);
 
@@ -65,9 +61,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("sports/lookup")]
         public async Task<IActionResult> GetSportLookup()
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetSportLookup(region);
 
@@ -83,9 +77,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("sports/selectormarkettemplates")]
         public async Task<IActionResult> GetSelectorMarketTemplates()
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetSelectorMarketTemplates(region);
 
@@ -103,9 +95,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("segment/lookup/{sportId}")]
         public async Task<IActionResult> GetSegmentLookup(int sportId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetSegmentLookup(sportId, region);
 
@@ -123,9 +113,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("league/lookup/{sportId}/{segmentId}")]
         public async Task<IActionResult> GetLeagueLookup(int sportId, int segmentId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetLeagueLookup(sportId, segmentId, region);
 
@@ -141,9 +129,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("tier/leagueorder/list")]
         public async Task<IActionResult> GetTierLeagueOrderList()
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetTierLeagueOrderList(region);
 
@@ -161,9 +147,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("fixtures/market/{fixtureTypeId}/{sportId}/{segmentId}/{leagueId}")]
         public async Task<IActionResult> GetFixturesByMarket(int fixtureTypeId, int sportId, int segmentId, int leagueId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetFixturesByMarket(fixtureTypeId, sportId, segmentId, leagueId, region);
 
@@ -179,9 +163,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("fixtures/market/{fixtureTypeId}/{sportId}/{segmentId}/{leagueId}/{marketTemplateId}")]
         public async Task<IActionResult> GetMarketFixtures(int fixtureTypeId, int sportId, int segmentId, int leagueId, string marketTemplateId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetMarketFixtures(fixtureTypeId, sportId, segmentId, leagueId, marketTemplateId, region);
 
@@ -197,9 +179,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("fixtures/market/selections/{fixtureTypeId}/{providerFixtureId}/{providerMarketId}/{providerSelectionId}")]
         public async Task<IActionResult> GetFixtureMarketSelections(int fixtureTypeId, string providerFixtureId, string providerMarketId, string providerSelectionId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetFixtureMarketSelections(fixtureTypeId, providerFixtureId, providerMarketId, providerSelectionId, region);
 
@@ -215,9 +195,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("fixtures2/market/details/{providerFixtureId}")]
         public async Task<IActionResult> GetMarketFixtureDetails(string providerFixtureId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetFixtureMarketDetails(providerFixtureId, region);
 
@@ -236,9 +214,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("sportsbook/fixtures")]
         public async Task<IActionResult> GetFixtures([FromBody] MarketFixtureRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetFixtures(request, region);
 
@@ -253,9 +229,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("sportsbook/outrightfixtures")]
         public async Task<IActionResult> GetOutrightFixtures([FromBody] MarketFixtureRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetOutrightFixtures(request, region);
 
@@ -273,9 +247,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("priceboost")]
         public async Task<IActionResult> AddOrUpdatePriceBoost([FromBody] List<PriceBoostConfigModel> request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.AddOrUpdatePriceBoost(request, region);
 
@@ -290,9 +262,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("priceboost/list")]
         public async Task<IActionResult> GetPriceBoostConfig([FromBody] PriceBoostConfigRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetPriceBoostConfig(request, region);
 
@@ -307,9 +277,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("priceboost/settings/list")]
         public async Task<IActionResult> GetBoostedSettings([FromBody] BoostedSettingsRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetBoostedSettings(request, region);
 
@@ -324,9 +292,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("priceboost/settings")]
         public async Task<IActionResult> AddOrUpdateBoostedSettings([FromBody] BoostedSettingsModel request, [FromQuery] string userId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.AddOrUpdateBoostedSettings(request, userId, region);
 
@@ -341,9 +307,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("priceboost/audit/list")]
         public async Task<IActionResult> GetPriceBoostAuditList([FromBody] PriceBoostConfigRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetPriceBoostAuditList(request, region);
 
@@ -361,9 +325,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("client")]
         public async Task<IActionResult> GetClientList()
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetClientList(region);
 
@@ -378,9 +340,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/config/all")]
         public async Task<IActionResult> GetClientConfig([FromBody] ClientConfigRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetClientConfig(request, region);
 
@@ -395,9 +355,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/config")]
         public async Task<IActionResult> AddOrUpdateConfig([FromBody] ConfigSettingsModel request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.AddOrUpdateConfig(request, region);
 
@@ -412,9 +370,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/config/audit")]
         public async Task<IActionResult> GetConfigLogs([FromBody] ConfigLogsRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetConfigLogs(request, region);
 
@@ -429,9 +385,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("client/leagueconfig")]
         public async Task<IActionResult> GetFixtures([FromQuery] string clientCode)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetClientLeagueConfig(clientCode, region);
 
@@ -446,9 +400,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("client/marketconfig")]
         public async Task<IActionResult> GetClientMarketConfig([FromQuery] string clientCode)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetClientMarketConfig(clientCode, region);
 
@@ -463,9 +415,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/marketconfig/{pageSize}/{page}")]
         public async Task<IActionResult> GetClientMarketConfig(int pageSize, int page, [FromQuery] string clientCode)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetClientMarketConfig(pageSize, page, clientCode, region);
 
@@ -480,9 +430,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/sportsettings")]
         public async Task<IActionResult> AddOrUpdateClientSportSettings([FromBody] ClientSportSettingRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.AddOrUpdateClientSportSettings(request, region);
 
@@ -498,9 +446,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/sportorder/list")]
         public async Task<IActionResult> GetClientSportOrderList([FromBody] ClientSportOrderListRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetClientSportOrderList(request, region);
 
@@ -515,10 +461,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/sportorder/audit/list")]
         public async Task<IActionResult> GetClientSportOrderAuditList([FromBody] ClientSportOrderAuditRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
-
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetClientSportOrderAuditList(request, region);
 
@@ -534,10 +477,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/segmentorder/list")]
         public async Task<IActionResult> GetClientSegmentOrderList([FromBody] ClientSegmentOrderListRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
-
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetClientSegmentOrderList(request, region);
 
@@ -553,9 +493,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/leagueorder/list")]
         public async Task<IActionResult> GetClientLeagueOrderList([FromBody] ClientLeagueOrderListRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetClientLeagueOrderList(request, region);
 
@@ -570,9 +508,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("client/marketgroup/{clientCode}/{sportId}/{fixtureStatusId}")]
         public async Task<IActionResult> GetClientMarketTemplateGroups(string clientCode, int sportId, int fixtureStatusId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetClientMarketTemplateGroups(clientCode, sportId, fixtureStatusId, region);
 
@@ -588,9 +524,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("client/markettemplate/{clientCode}/{sportId}/{fixtureStatusId}")]
         public async Task<IActionResult> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetClientMarketTemplates(clientCode, sportId, fixtureStatusId, region);
 
@@ -639,9 +573,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/markettemplategroup/post")]
         public async Task<IActionResult> AddOrUpdateClientMarketTemplateGroup([FromBody] ClientPostMarketTemplateGroupRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.AddOrUpdateClientMarketTemplateGroup(request, region);
 
@@ -656,9 +588,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/markettemplategroup/delete")]
         public async Task<IActionResult> DeleteClientMarketTemplateGroup([FromBody] ClientDeleteMarketTemplateGroupRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.DeleteClientMarketTemplateGroup(request, region);
 
@@ -673,9 +603,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("client/markettemplategroup/copy")]
         public async Task<IActionResult> CopyClientMarketTemplateGroup([FromBody] ClientCopyMarketTemplateGroupRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.CopyClientMarketTemplateGroup(request, region);
 
@@ -694,9 +622,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("bet/selections")]
         public async Task<IActionResult> GetBetSelections([FromBody] BetSelectionDetailsRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetBetSelections(request, region);
 
@@ -712,9 +638,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("bet/details")]
         public async Task<IActionResult> GetManualBetDetails([FromBody] ManualBetDetailsRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetManualBetDetails(request, region);
 
@@ -733,9 +657,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("fastodds/sports/{fixtureTypeId}")]
         public async Task<IActionResult> GetFastOddsSports(int fixtureTypeId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetSports(fixtureTypeId, region);
 
@@ -751,9 +673,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("fastodds/fixtures")]
         public async Task<IActionResult> GetFixtures([FromBody] FastOddsFixturesRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetFixtures(request, region);
 
@@ -772,9 +692,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("manual/marketsettlement")]
         public async Task<IActionResult> AddOrUpdateManualMarketSettlement([FromBody] List<ManualMarketSettlementRequest> request, [FromQuery] string userId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.AddOrUpdateManualMarketSettlement(request, userId, region);
 
@@ -790,9 +708,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("manual/marketsettlement/details")]
         public async Task<IActionResult> GetManualMarketSettlementDetails([FromBody] ManualMarketSettlementDetailsRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetManualMarketSettlementDetails(request, region);
 
@@ -807,9 +723,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("manual/messagesettlement")]
         public async Task<IActionResult> AddManualMessageSettlement([FromBody] List<MessageSettlementRequest> request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.AddManualMessageSettlement(request, region);
 
@@ -825,9 +739,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("manual/messagesettlement/list")]
         public async Task<IActionResult> GetMessageSettlementAudit([FromBody] ManualMessageSettlementRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetMessageSettlementAudit(request, region);
 
@@ -844,9 +756,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("marketlookup/{fixtureTypeId}/{sportId}")]
         public async Task<IActionResult> GetMarketLookup(int fixtureTypeId, int sportId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetMarketLookup(fixtureTypeId, sportId, region);
 
@@ -862,9 +772,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("publish")]
         public async Task<IActionResult> Publish([FromBody] MessageRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.Publish(request, region);
 
@@ -880,9 +788,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("bookmakers")]
         public async Task<IActionResult> GetBookmakers()
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetBookmakers(region);
 
@@ -898,9 +804,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("notifications")]
         public async Task<IActionResult> GetNotifications([FromBody] NotificationsRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetNotifications(request, region);
 
@@ -916,9 +820,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpPost("markettemplateplayerprops")]
         public async Task<IActionResult> GetMarketTemplatePlayerProps([FromBody] MarketTemplatePlayerPropsRequest request)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetMarketTemplatePlayerProps(request, region);
 
@@ -934,9 +836,7 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("markettemplategroups/{fixtureTypeId}")]
         public async Task<IActionResult> GetMarketTemplateGroups(int fixtureTypeId)
         {
-            var region = "";
-            if (HttpContext.Request.Headers.ContainsKey("x-region"))
-                region = HttpContext.Request.Headers["x-region"].ToString();
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetMarketTemplateGroups(fixtureTypeId, region);
 

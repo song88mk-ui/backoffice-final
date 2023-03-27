@@ -340,8 +340,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-
-                var query = _backofficeContext.ClientInformation.AsNoTracking();
+                var query = _backofficeContext.ClientInformation.Where(x => x.ApplicationId == (int)Application.SBC).AsNoTracking();
 
                 if (!string.IsNullOrEmpty(request.Search))
                     query = query.Where(c => c.Name.Contains(request.Search));
