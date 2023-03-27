@@ -225,7 +225,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             var request = new UserGroupListRequest
             {
-                SearchText = search,
+                SearchText = search ?? string.Empty,
                 Page = page,
                 PageSize = 25,
                 ShowSuperAdmin = false,

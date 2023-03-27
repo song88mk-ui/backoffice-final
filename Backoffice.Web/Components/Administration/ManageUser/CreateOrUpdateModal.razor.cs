@@ -228,6 +228,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         {
             var response = (await AuthenticationService.GetUserGroupList(new UserGroupListRequest
             {
+                SearchText = string.Empty,
                 PageSize = -1,
                 ShowSuperAdmin = false,
             })).Result.UserGroups;
