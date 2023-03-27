@@ -305,7 +305,7 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<PermissionResponse>> GetPermissionList(bool isSubUser)
+        public async Task<BaseResponse<PermissionResponse>> GetPermissionList(bool isSubUser, bool limitVersion)
         {
             try
             {
@@ -315,8 +315,17 @@ namespace Backoffice.Web.Services
                 var response = await _httpClient.GetAsync($"api/authentication/permission/list?isSubUser={isSubUser}");
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<PermissionResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<PermissionResponse>();
+                {
+                    var result = JsonSerializer.Deserialize<BaseResponse<PermissionResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<PermissionResponse>();
+
+                    if(result.Result != null && limitVersion == true)
+                        if (result.Result.Permissions != null)
+                            result.Result.Permissions = result.Result.Permissions.Where(x => x.Version != 1).ToList();
+
+                    return result;
+
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)

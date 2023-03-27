@@ -180,7 +180,7 @@ namespace Backoffice.Web.Pages.SBC
 
         private async Task<PermissionResponse> GetPermissionList()
         {
-            var response = await AuthenticationService.GetPermissionList(true);
+            var response = await AuthenticationService.GetPermissionList(true, false);
 
             if (response.StatusCode == StatusCode.Success)
             {

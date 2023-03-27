@@ -326,12 +326,6 @@ namespace Backoffice.API.Repositories
                     var content = JsonSerializer.Deserialize<BaseResponse<PermissionResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
                         ?? new BaseResponse<PermissionResponse>();
 
-                    if (content.Result != null)
-                    {
-                        if (content.Result.Permissions != null)
-                            content.Result.Permissions = content.Result.Permissions.Where(x => x.Version != 1).ToList();
-                    }
-
                     return content;
                 }
                 else
