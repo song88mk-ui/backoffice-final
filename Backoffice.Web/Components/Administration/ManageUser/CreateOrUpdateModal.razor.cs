@@ -22,7 +22,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
-        public AlertModel AlertModel { get; set; }
+        public List<AlertModel> Alerts { get; set; }
         public EditContext EditContext { get; set; }
         public Permission PermissionComponent { get; set; }
         public PermissionResponse Permissions { get; set; }
@@ -40,7 +40,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
         protected override async Task OnInitializedAsync()
         {
-            AlertModel = new AlertModel();
+            Alerts = new List<AlertModel>();
             ClientModel = new ClientModel();
             UserRegister = new UserRegisterModel();
             UserGroupList = new List<UserGroupResponse>();
@@ -73,18 +73,33 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         public async Task OnPasswordFocusOutEvent()
         {
             IsValidPassword = true;
+            Alerts.Clear();
 
             if (!IsEdit)
             {
                 if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                 {
                     IsValidPassword = false;
+
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Password must be between 8 to 15 character long.",
+                        Opacity = 1.0m
+                    });
                 }
-                var regex = new Regex("^(?=.*[a-zA-Z])(?=.*[0-9]).+$");
+                var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&].+$");
 
                 if (!regex.IsMatch(UserRegister.Password))
                 {
                     IsValidPassword = false;
+
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Password must be between 8 to 15 character long.",
+                        Opacity = 1.0m
+                    });
                 }
             }
             else
@@ -94,19 +109,33 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                     {
                         IsValidPassword = false;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password must be between 8 to 15 character long.",
+                            Opacity = 1.0m
+                        });
                     }
-                    var regex = new Regex("^(?=.*[a-zA-Z])(?=.*[0-9]).+$");
+                    var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&].+$");
 
                     if (!regex.IsMatch(UserRegister.Password))
                     {
                         IsValidPassword = false;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password should contain uppercase and lowercase characters, with any digit from 0-9, and must include at least one special character",
+                            Opacity = 1.0m
+                        });
                     }
                 }
             }
         }
         public async Task OnSaveClickedEvent()
         {
-            AlertModel = new AlertModel();
+            Alerts.Clear();
             IsPreLoader = true;
             StateHasChanged();
 
@@ -149,12 +178,12 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     }
                     else
                     {
-                        AlertModel = new AlertModel
+                        Alerts.Add(new AlertModel
                         {
                             Status = "Error",
                             Message = $"{response.Message}",
                             Opacity = 1.0m
-                        };
+                        });
                     }
                 }
                 else
@@ -173,12 +202,12 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     }
                     else
                     {
-                        AlertModel = new AlertModel
+                        Alerts.Add(new AlertModel
                         {
                             Status = "Error",
                             Message = $"{response.Message}",
                             Opacity = 1.0m
-                        };
+                        });
                     }
                 }
             }
@@ -267,10 +296,24 @@ namespace Backoffice.Web.Components.Administration.ManageUser
             if (string.IsNullOrWhiteSpace(userModel.UserName))
             {
                 IsValidUsername = false;
+
+                Alerts.Add(new AlertModel
+                {
+                    Status = "Error",
+                    Message = "Username is empty.",
+                    Opacity = 1.0m
+                });
             }
             if (string.IsNullOrWhiteSpace(userModel.Email))
             {
                 IsValidEmail = false;
+
+                Alerts.Add(new AlertModel
+                {
+                    Status = "Error",
+                    Message = "Email is empty.",
+                    Opacity = 1.0m
+                });
             }
 
             if (IsEdit)
@@ -280,12 +323,26 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                     {
                         IsValidPassword = false;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password must be between 8 to 15 character long.",
+                            Opacity = 1.0m
+                        });
                     }
-                    var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).+$");
+                    var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&].+$");
 
                     if (!regex.IsMatch(UserRegister.Password))
                     {
                         IsValidPassword = false;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password must contain any character from A-Z or a-z with any digit from 0-9.",
+                            Opacity = 1.0m
+                        });
                     }
                 }
             }
@@ -294,6 +351,13 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 if (string.IsNullOrWhiteSpace(userModel.Password))
                 {
                     IsValidPassword = false;
+
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Password is empty.",
+                        Opacity = 1.0m
+                    });
                 }
                 else
                 {
@@ -302,12 +366,25 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                         {
                             IsValidPassword = false;
+
+                            Alerts.Add(new AlertModel
+                            {
+                                Status = "Error",
+                                Message = "Password must be between 8 to 15 character long.",
+                                Opacity = 1.0m
+                            });
                         }
                         var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&].+$");
 
                         if (!regex.IsMatch(UserRegister.Password))
                         {
                             IsValidPassword = false;
+                            Alerts.Add(new AlertModel
+                            {
+                                Status = "Error",
+                                Message = "Password should contain uppercase and lowercase characters, with any digit from 0-9, and must include at least one special character",
+                                Opacity = 1.0m
+                            });
                         }
                     }
                 }
