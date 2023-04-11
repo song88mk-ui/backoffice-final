@@ -18,6 +18,8 @@ namespace Backoffice.API.Repositories
     public class AuthenticationRepository : IAuthenticationRepository
     {
         private HttpClient _httpClient { get; set; }
+        private string _boVersion = "1";
+
         public AuthenticationRepository(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -318,6 +320,9 @@ namespace Backoffice.API.Repositories
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                if (!_httpClient.DefaultRequestHeaders.Contains("x-version"))
+                    _httpClient.DefaultRequestHeaders.Add("x-version", _boVersion);
+
                 var response = await _httpClient.GetAsync($"v1/api/user/permission/list?isSubUserOnly={isSubUserOnly}");
 
                 if (response.IsSuccessStatusCode)
