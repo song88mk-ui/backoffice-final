@@ -15,6 +15,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
@@ -199,6 +200,19 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
                 if (messageSettlementRequest.Count != 0)
                 {
                     var response = await TradingService.AddManualMessageSettlement(messageSettlementRequest);
+
+                    OnActivityLogListMessage onActivityLogListMessage = new OnActivityLogListMessage();
+
+                    foreach (var item in messageSettlementRequest)
+                    {
+                        onActivityLogListMessage.OnActivityLogMessages.Add(item.OnActivityLogMessage);
+                    }
+
+                    if (onActivityLogListMessage.OnActivityLogMessages.Any())
+                    {
+                        var activityLogResponse = await BackOfficeService.AddActivityLogList(onActivityLogListMessage);
+                    }
+
 
                     divClass = response.Result.Contains("NOTE") ? "bg-warning" : "bg-success";
                     divStyles = "display: block";
