@@ -7,6 +7,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
@@ -18,6 +19,8 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
@@ -137,7 +140,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         {
             Alerts.Clear();
             IsPreLoader = true;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
 
             UserRegister.AppId = (int)Application.Backoffice;
             UserRegister.AppName = Application.Backoffice.ToString();
@@ -211,6 +214,11 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     }
                 }
             }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("scrollToTopOfElement", ".modal", "fast");
+            }
+
             IsPreLoader = false;
         }
         public async Task OnStatusClickedEvent(bool isLocked)

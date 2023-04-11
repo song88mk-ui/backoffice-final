@@ -423,3 +423,7 @@ window.filterClientName = (clients) => {
     filter.clearFilterAsync("ClientName");
     filter.applyFilterAsync("ClientName", clients, "replace");
 }
+
+window.scrollToTopOfElement = (className, speed) => {
+    $(className).animate({scrollTop: 0}, speed);
+}
