@@ -78,7 +78,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.GetAsync($"authenticate");
 
                 if (response.IsSuccessStatusCode)
@@ -112,7 +112,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.PostAsync($"v1/logout", new StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -146,7 +146,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.PostAsync($"v1/api/user/register", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -180,7 +180,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var query = $"?isShowSuperAdmin={isShowSuperAdmin}";
                 var response = await _httpClient.PostAsync($"v1/api/user/list{query}", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
@@ -215,7 +215,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.PostAsync($"v1/api/user/modify", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -249,7 +249,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.GetAsync($"v1/api/user/{userId}");
 
                 if (response.IsSuccessStatusCode)
@@ -283,7 +283,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.PostAsync($"v1/api/user/subaccount/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -317,7 +317,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.GetAsync($"v1/api/user/permission/list?isSubUserOnly={isSubUserOnly}");
 
                 if (response.IsSuccessStatusCode)
@@ -356,7 +356,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.PostAsync($"v1/api/user/usergroup/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -390,7 +390,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.PostAsync($"v1/api/user/usergroup/user/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -424,7 +424,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.PostAsync($"v1/api/user/usergroup/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -458,7 +458,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.PostAsync($"v1/api/user/usergroup/delete", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -492,7 +492,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var query = !string.IsNullOrWhiteSpace(search) ? $"?search={search}" : "";
 
                 var response = await _httpClient.PostAsync($"v1/api/user/activitylog/list/{userId}{query}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"));
@@ -528,7 +528,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.PostAsync($"v1/api/user/report/roles/url", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
