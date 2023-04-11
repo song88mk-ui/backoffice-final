@@ -18,7 +18,7 @@ namespace Backoffice.API.Repositories
     public class AuthenticationRepository : IAuthenticationRepository
     {
         private HttpClient _httpClient { get; set; }
-        private string _boVersion = "1";
+        private string _boVersion = "2";
 
         public AuthenticationRepository(HttpClient httpClient)
         {

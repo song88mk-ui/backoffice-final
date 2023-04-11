@@ -5,6 +5,15 @@
     }
     else
     {
+        @if (Alerts != null && Alerts.Any())
+        {
+            <div class="col">
+                @foreach (var alert in Alerts)
+                {
+                    <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" />
+                }
+            </div>
+        }
         <div class="information-container mb-3">
             <div class="row">
                 <div class="col-md-12 mb-1">
@@ -59,15 +68,6 @@
                 </div>
             </div>
         </div>
-        @if (Alerts != null && Alerts.Any())
-        {
-            <div class="col">
-                @foreach (var alert in Alerts)
-                {
-                    <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" />
-                }
-            </div>
-        }
         <Permission Permissions="Permissions.Permissions" IsReadOnly="true" ClientModel="ClientModel" @ref="PermissionComponent" />
     }
 </div>

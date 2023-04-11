@@ -1,4 +1,13 @@
 ﻿<div class="modal-body">
+    @if (Alerts != null && Alerts.Any())
+    {
+        <div class="col-md-8">
+            @foreach (var alert in Alerts)
+            {
+                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" />
+            }
+        </div>
+    }
     <div class="information-container mb-3">
         @if (IsPreload)
         {
@@ -27,15 +36,6 @@
     <Permission IsReadOnly="IsPreload" Permissions="Permissions.Permissions" ClientModel="ClientModel" />
 </div>
 <div class="modal-footer mx-4">
-    @if (Alerts != null && Alerts.Any())
-    {
-        <div class="col-md-8">
-            @foreach (var alert in Alerts)
-            {
-                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" />
-            }
-        </div>
-    }
     <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
     <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Save</button>
 </div>
