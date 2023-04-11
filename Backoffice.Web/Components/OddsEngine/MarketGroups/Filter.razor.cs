@@ -23,6 +23,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         [Parameter] public EventCallback OnInitCallback { get; set; }
         [Parameter] public EventCallback OnCancelCallback { get; set; }
         [Parameter] public EventCallback<MarketGroupModel> MarketGroupModelChanged { get; set; }
+        [Parameter] public string Region { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
@@ -44,6 +45,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             try
             {
                 MarketGroupModel.IsUpdate = false;
+                TradingService.Region = Region;
 
                 if (UserModel.ClientCodes != null)
                 {

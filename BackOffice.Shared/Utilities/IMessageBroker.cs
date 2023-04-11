@@ -13,7 +13,7 @@ namespace Backoffice.Shared.Utilities
         void NAcknowledge(BasicDeliverEventArgs e);
         void ExternalPublish<T>(T payload, string messageType, string routingKey, string correlationId);
         void Publish<T>(T payload, string messageType, string routingKey, string correlationId);
-        void Publish(string payload, string messageType, string routingKey, string correlationId);
+        void Publish(string payload, string messageType, string routingKey, string correlationId, string region = "");
         void Dispose();
     }
 }

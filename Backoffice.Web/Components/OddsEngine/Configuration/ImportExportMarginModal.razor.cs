@@ -35,6 +35,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public static HashSet<string> SelectedClientsSet { get; set; }
         public static HashSet<string> SelectedSportsSet { get; set; }
 
+        public string Region { get; set; }
         public bool IsImportTab { get; set; }
         public bool IsUploading { get; set; }        
 
@@ -56,9 +57,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             SelectedClientsSet = new HashSet<string>();
             SelectedSportsSet = new HashSet<string>();
-
+            Region = ModalParameters.TryGet<string>("Region");
             OnExportMarginCallback = ModalParameters.TryGet<EventCallback>("OnExportMarginCallback");
             OnImportMarginCallback = ModalParameters.TryGet<EventCallback<string>>("OnImportMarginCallback");
+            TradingService.Region = Region;
 
             Guid = new Guid();
 

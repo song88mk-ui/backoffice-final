@@ -4,6 +4,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Drawing;
 using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
@@ -18,7 +19,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }        
 
         private EventCallback OnCopyClientSettingsCallback { get; set; }
-
+        private string Region { get; set; }
         private KeyValuePair<string, string> SelectedFromClient { get; set; }
         private KeyValuePair<string, string> SelectedToClient { get; set; }        
         #endregion
@@ -27,7 +28,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             SelectedFromClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedFromClient");
             SelectedToClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedToClient");
-
+            Region = ModalParameters.TryGet<string>("Region");
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback>("OnCopyClientSettingsCallback");
         }
         public async Task OnCancelModalClickEvent()
@@ -35,6 +36,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-md");
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
@@ -49,7 +51,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 ToClientCode = SelectedToClient.Key
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnCopyClientSettings", "r.oe.web.config.oncopyclientsettings", Guid.NewGuid().ToString());
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnCopyClientSettings", "r.oe.web.config.oncopyclientsettings", Guid.NewGuid().ToString(), Region);
 
             ModalService.Cancel();
 

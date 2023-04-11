@@ -261,7 +261,7 @@ namespace Backoffice.Shared.Utilities
             _model.BasicPublish(_exchange, routingKey, properties, payloadBytes);
         }
 
-        public void Publish(string payload, string messageType, string routingKey, string correlationId)
+        public void Publish(string payload, string messageType, string routingKey, string correlationId, string region = "")
         {
             var properties = _model.CreateBasicProperties();
             properties.CorrelationId = correlationId;
