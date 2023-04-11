@@ -33,6 +33,10 @@ namespace Backoffice.API.ActionFilter
         {
             try
             {
+                var region = string.Empty;
+                if (context.HttpContext.Request.Headers.ContainsKey("x-region"))
+                    region = context.HttpContext.Request.Headers["x-region"];
+
                 if (!context.HttpContext.Request.Headers.ContainsKey("Authorization"))
                 {
                     context.Result = new JsonResult(new { title = "Unauthorized", message = "Missing authorization" }) { StatusCode = StatusCodes.Status401Unauthorized };
@@ -111,7 +115,7 @@ namespace Backoffice.API.ActionFilter
                         };
                     }
                 }
-            }
+            } 
             catch (Exception ex)
             {
                 return new BaseResponse<TokenModel>

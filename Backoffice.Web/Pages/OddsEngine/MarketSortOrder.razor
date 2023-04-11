@@ -13,7 +13,7 @@
             <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
         </div>
         <div class="col-md-12">
-            <Filter @bind-IsUpdate="IsUpdate" OnUpdateCallback="OnUpdateClickEvent" OnCancelCallback="OnCancelClickEvent" OnSaveCallback="OnSaveClickEvent" MarketSortOrderModelCallback="PrepareMarketSortOrderModel" OnMarketGroupCallback="OnMarketGroupClickEvent" />
+            <Filter @bind-IsUpdate="IsUpdate" OnUpdateCallback="OnUpdateClickEvent" OnCancelCallback="OnCancelClickEvent" OnSaveCallback="OnSaveClickEvent" MarketSortOrderModelCallback="PrepareMarketSortOrderModel" OnMarketGroupCallback="OnMarketGroupClickEvent" Region="Region"/>
         </div>
 
         @if (!string.IsNullOrEmpty(AlertMessage))
