@@ -1,7 +1,7 @@
 ﻿<div class="modal-body">
     @if (Alerts != null && Alerts.Any())
     {
-        <div class="col-md-8">
+        <div class="col">
             @foreach (var alert in Alerts)
             {
                 <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" />
