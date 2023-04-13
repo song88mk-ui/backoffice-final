@@ -618,12 +618,15 @@ namespace Backoffice.Web.Components.Administration.ManageUser
             {
                 IsValidEmail = Regex.IsMatch(userModel.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
 
-                Alerts.Add(new AlertModel
+                if(!IsValidEmail)
                 {
-                    Status = "Error",
-                    Message = "Email is invalid",
-                    Opacity = 1.0m
-                });
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Email is invalid",
+                        Opacity = 1.0m
+                    });
+                }
             }
 
             if (passwordErrorCount > 1)
@@ -633,7 +636,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 Alerts.Add(new AlertModel
                 {
                     Status = "Error",
-                    Message = "Password is incorrect.",
+                    Message = "Password must be 8-15 characters long, which should contain uppercase and lowercase characters, with any digit from 0-9, and must include at least one special character.",
                     Opacity = 1.0m
                 });
             }
