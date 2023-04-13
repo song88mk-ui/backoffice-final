@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Backoffice.Shared.Models;
+using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -89,20 +90,37 @@ namespace Backoffice.Shared.Utilities
             }
         }
 
-        public void Connect()
+        public void Connect(MessageBrokerCredentialModel messageBroker = null)
         {
-            _isExclusive = string.IsNullOrEmpty(_configuration["MessageBroker:IsExclusive"]) ? false : Convert.ToBoolean(_configuration["MessageBroker:IsExclusive"]);
-            _isPriority = string.IsNullOrEmpty(_configuration["MessageBroker:IsPriority"]) ? false : Convert.ToBoolean(_configuration["MessageBroker:IsPriority"]);
-            _hostName = _configuration["MessageBroker:Host"];
-            _userName = _configuration["MessageBroker:Username"];
-            _password = _configuration["MessageBroker:Password"];
-            _virtualHost = _configuration["MessageBroker:VirtualHost"];
-            _exchange = _configuration["MessageBroker:Exchange"];
-            _queue = _isExclusive == true ? $"{_configuration["MessageBroker:Queue"]}.{Environment.MachineName.ToLower()}" : _configuration["MessageBroker:Queue"];
-            _consumerName = _configuration["MessageBroker:Consumer"];
-            _routingKey = _configuration["MessageBroker:RoutingKey"];
-            _prefetchCount = string.IsNullOrEmpty(_configuration["MessageBroker:PrefetchCount"]) ? "1000" : _configuration["MessageBroker:PrefetchCount"];
+            if(messageBroker != null)
+            {
+                _isExclusive = messageBroker.IsExclusive;
+                _isPriority = messageBroker.IsExclusive;
+                _hostName = messageBroker.Host;
+                _userName = messageBroker.Username;
+                _password = messageBroker.Password;
+                _virtualHost = messageBroker.VirtualHost;
+                _exchange = messageBroker.Exchange;
+                _queue = _isExclusive ? $"{messageBroker.Queue}.{Environment.MachineName.ToLower()}" : messageBroker.Queue;
+                _consumerName = messageBroker.Consumer;
+                _routingKey = messageBroker.RoutingKey;
+                _prefetchCount = string.IsNullOrEmpty(messageBroker.PrefetchCount) ? "1000" : messageBroker.PrefetchCount;
 
+            }
+            else
+            {
+                _isExclusive = string.IsNullOrEmpty(_configuration["MessageBroker:IsExclusive"]) ? false : Convert.ToBoolean(_configuration["MessageBroker:IsExclusive"]);
+                _isPriority = string.IsNullOrEmpty(_configuration["MessageBroker:IsPriority"]) ? false : Convert.ToBoolean(_configuration["MessageBroker:IsPriority"]);
+                _hostName = _configuration["MessageBroker:Host"];
+                _userName = _configuration["MessageBroker:Username"];
+                _password = _configuration["MessageBroker:Password"];
+                _virtualHost = _configuration["MessageBroker:VirtualHost"];
+                _exchange = _configuration["MessageBroker:Exchange"];
+                _queue = _isExclusive == true ? $"{_configuration["MessageBroker:Queue"]}.{Environment.MachineName.ToLower()}" : _configuration["MessageBroker:Queue"];
+                _consumerName = _configuration["MessageBroker:Consumer"];
+                _routingKey = _configuration["MessageBroker:RoutingKey"];
+                _prefetchCount = string.IsNullOrEmpty(_configuration["MessageBroker:PrefetchCount"]) ? "1000" : _configuration["MessageBroker:PrefetchCount"];
+            }
             if (_connection == null)
             {
                 if (_connectionFactory == null)
@@ -249,7 +267,7 @@ namespace Backoffice.Shared.Utilities
             _externalModel.BasicPublish(_externalExchange, routingKey, properties, payloadBytes);
         }
 
-        public void Publish<T>(T payload, string messageType, string routingKey, string correlationId)
+        public void Publish<T>(T payload, string messageType, string routingKey, string correlationId, string region = "")
         {
             var properties = _model.CreateBasicProperties();
             properties.CorrelationId = correlationId;

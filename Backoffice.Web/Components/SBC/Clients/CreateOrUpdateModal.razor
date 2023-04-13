@@ -645,7 +645,7 @@
                                 </div>
                                 <div class="ps-2 pb-2 padRight">
                                     <label class="form-label" for="@($"{SelectedCurrency}.soccerMaxGameField")">Max Per Game</label>
-                                    <InputDecimal class="form-control" id="@($"{SelectedCurrency}.soccerMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerGame" />
+                                    <InputDecimal class="form-control rounded" Min=0 Max=100 id="@($"{SelectedCurrency}.soccerMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerGame" />
                                 </div>
                             </div>
                         </div>

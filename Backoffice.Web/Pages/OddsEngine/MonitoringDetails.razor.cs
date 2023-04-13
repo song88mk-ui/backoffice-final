@@ -24,7 +24,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Parameter] public string Region { get; set; }
         [Parameter] public string Id { get; set; }
 
-        private HubConnection HubConnection { get; set; }
+        private HubConnection _hubConnection { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -147,10 +147,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async ValueTask DisposeAsync()
         {
-            if (HubConnection != null)
+            if (_hubConnection != null)
             {
-                await HubConnection.StopAsync();
-                await HubConnection.DisposeAsync();
+                await _hubConnection.StopAsync();
+                await _hubConnection.DisposeAsync();
             }
         }
 
@@ -289,29 +289,31 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task Subscribe()
         {
-            HubConnection = new HubConnectionBuilder()
+            _hubConnection = new HubConnectionBuilder()
             .WithUrl(new Uri(Configuration["API:HubAPI"]))
             .Build();
 
-            HubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
+            await _hubConnection.InvokeAsync("AddToGroup", Region);
+
+            _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
             {
                 await ProcessOddsChangeMonitoring(message);
 
             });
 
-            HubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async (message) =>
+            _hubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async (message) =>
             {
                 await ProcessOnBetStopFixture(message);
 
             });
 
-            HubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async (message) =>
+            _hubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async (message) =>
             {
                 await ProcessOnBetStopGlobal(message);
 
             });
 
-            await HubConnection.StartAsync();
+            await _hubConnection.StartAsync();
         }
 
         private async Task ProcessOddsChangeMonitoring(OnExternalOddsChangeMessage message)

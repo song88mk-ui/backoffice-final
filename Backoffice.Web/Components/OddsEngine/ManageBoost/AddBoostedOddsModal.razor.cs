@@ -24,6 +24,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         public AddPriceBoostFilterModel Model { get; set; }
         public SportsTreeModel Sports { get; set; }        
         public MarketFixtureResponse MarketFixtureResponse { get; set; }
+        private string Region { get; set; }
 
         public bool IsPreloader { get; set; }
         private string _region;
@@ -44,7 +45,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             Model = new AddPriceBoostFilterModel();
 
-            TradingService.Region = ModalParameters.TryGet<string>("Region");
+            
+            TradingService.Region = Region = ModalParameters.TryGet<string>("Region");
             Model.Sports = await GetSports(SelectedFixtureType);
             _region = ModalParameters.TryGet<string>("Region") ?? string.Empty;
 
@@ -162,6 +164,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("AddPriceBoostFilterModel", Model);
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
 

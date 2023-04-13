@@ -103,7 +103,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                         JackpotTier = JsonSerializer.Deserialize<TierRevenueShareModel>(Client.TierJackpotShare) ?? new TierRevenueShareModel() { AboveTierPercentage = 0.50m };
 
                     SportsbookTier.AboveTierPercentage = SportsbookTier.AboveTierPercentage * 100m;
-                    foreach(var tier in SportsbookTier.Tiers)
+                    foreach (var tier in SportsbookTier.Tiers)
                     {
                         tier.Percentage = tier.Percentage * 100m;
                     }
@@ -166,7 +166,6 @@ namespace Backoffice.Web.Components.SBC.Clients
             }
             else
             {
-
                 var existingCurrencies = Client.BetSettings.Select(s => s.CurrencyCode).ToList();
                 foreach (var currency in Currencies)
                 {
@@ -276,6 +275,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                     return;
 
                 IsPreload = true;
+                StateHasChanged();
 
                 Alerts.Clear();
 
@@ -283,9 +283,9 @@ namespace Backoffice.Web.Components.SBC.Clients
 
                 if (!EditContext.Validate())
                 {
-                    foreach(var message in EditContext.GetValidationMessages().ToList())
+                    foreach (var message in EditContext.GetValidationMessages().ToList())
                     {
-                        if(!Alerts.Any(a => a.Message == message))
+                        if (!Alerts.Any(a => a.Message == message))
                         {
                             Alerts.Add(new AlertModel
                             {
@@ -327,7 +327,7 @@ namespace Backoffice.Web.Components.SBC.Clients
 
                 foreach (var setting in Client.BetSettings)
                 {
-                    if(setting.BetSettingSoccer.MaxPerGame > 0 && setting.BetSettingSoccer.MaxPerGame < setting.BetSettingSoccer.MaxPerTicket)
+                    if (setting.BetSettingSoccer.MaxPerGame > 0 && setting.BetSettingSoccer.MaxPerGame < setting.BetSettingSoccer.MaxPerTicket)
                     {
                         var message = $"MaxPerGame must be greater than or equal {setting.BetSettingSoccer.MaxPerTicket}";
                         if (!Alerts.Any(a => a.Message == message))
@@ -492,7 +492,7 @@ namespace Backoffice.Web.Components.SBC.Clients
 
                 if (response.Result)
                 {
-                    
+
                     ModalService.Cancel();
 
                     await Modal.OnSaveClickCallback.InvokeAsync(IsEdit);
@@ -868,7 +868,7 @@ namespace Backoffice.Web.Components.SBC.Clients
 
         private async Task<decimal> GetSuggestedMinimumBet(string currencyCode)
         {
-            var currency = (Currency)Enum.Parse(typeof(Currency), currencyCode);
+            var currency = (Currency)Enum.Parse(typeof(Currency), currencyCode.ToUpper());
 
             var suggestedMinimumBet = 1m;
 

@@ -22,9 +22,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private ITradingService TradingService { get; set; }        
         [Inject] private IConfiguration AppConfiguration { get; set; }        
         [Inject] public ToastService? ToastService { get; set; }
-
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [Parameter] public string Region { get; set; }
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         public List<MarketLookupNavigationModel> SelectedContents;
         public List<BreadcrumbModel> Breadcrumbs { get; set; }        
         public List<MarketLookupNavigationModel> MarketLookupNavigationModelsTemp { get; set; }
@@ -709,6 +708,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
                 .Build();
+
+            await _hubConnection.InvokeAsync("AddToGroup", Region);
 
             _hubConnection.Closed += async (error) =>
             {
