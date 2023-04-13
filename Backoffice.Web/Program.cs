@@ -1,4 +1,5 @@
 using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Hubs;
@@ -7,7 +8,7 @@ using Backoffice.Web.Services;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.ResponseCompression;
-using System.Net.Http;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
@@ -173,6 +174,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseSession();
 app.UseMiddleware<RabbitMQMiddleware>();
+app.UseMiddleware<RabbitMQMiddleware>("HK");
+app.UseMiddleware<RabbitMQMiddleware>("SA");
 
 app.UseHttpsRedirection();
 

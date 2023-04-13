@@ -66,7 +66,12 @@ namespace Backoffice.Web.Services
             else if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.BadRequest)
             {
                 var authPayload = await response.Content.ReadAsStringAsync();
-                var token = JsonSerializer.Deserialize<BaseResponse<TokenModel>>(authPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                var token = new BaseResponse<TokenModel>();
+
+                if (!string.IsNullOrWhiteSpace(authPayload))
+                {
+                    token = JsonSerializer.Deserialize<BaseResponse<TokenModel>>(authPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                }
                 result = new BaseResponse<Tuple<bool, List<string>>>
                 {
                     StatusCode = token.StatusCode,

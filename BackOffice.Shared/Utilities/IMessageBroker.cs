@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client.Events;
+﻿using Backoffice.Shared.Models;
+using RabbitMQ.Client.Events;
 using System;
 
 namespace Backoffice.Shared.Utilities
@@ -7,12 +8,12 @@ namespace Backoffice.Shared.Utilities
     {
         event EventHandler<BasicDeliverEventArgs> MessageReceived;
         void ExternalConnect();
-        void Connect();
+        void Connect(MessageBrokerCredentialModel messageBrokerModel = null);
         void ConnectWithManualAck();
         void Acknowledge(BasicDeliverEventArgs e);
         void NAcknowledge(BasicDeliverEventArgs e);
         void ExternalPublish<T>(T payload, string messageType, string routingKey, string correlationId);
-        void Publish<T>(T payload, string messageType, string routingKey, string correlationId);
+        void Publish<T>(T payload, string messageType, string routingKey, string correlationId, string region = "");
         void Publish(string payload, string messageType, string routingKey, string correlationId, string region = "");
         void Dispose();
     }

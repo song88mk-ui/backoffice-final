@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Drawing;
 
 namespace Backoffice.Web.Shared
 {
@@ -17,8 +18,8 @@ namespace Backoffice.Web.Shared
         [Parameter] public PermissionCategory NavMenuAccess { get; set; }
         [Parameter] public NavMenuModel NavMenus { get; set; }
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
-        [Parameter] public string Region { get; set; }
 
+        [Parameter] public string Region { get; set; }
         public SportClickCallbackModel SelectedSport { get; set; }
 
         public SportsTreeModel Menu { get; set; }
@@ -40,7 +41,18 @@ namespace Backoffice.Web.Shared
         {
             Menu = new SportsTreeModel();
             SelectedSport = new SportClickCallbackModel();
-            
+
+            var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+            var splitVal = page.Split("/").FirstOrDefault();
+
+            if (splitVal != null)
+            {
+                Region = splitVal.Trim().ToUpper();
+
+                var regions = new List<string>() { "HK", "SA" };
+                Region = regions.Contains(Region.ToUpper()) ? Region : null;
+            }
+
             if (NavMenuAccess == PermissionCategory.OE)
             {
                 await GetSportsTreeMenu();
@@ -68,8 +80,6 @@ namespace Backoffice.Web.Shared
                         }
                     }
                 }
-
-                var page = NavigationManager.Uri.Replace($"{NavigationManager.BaseUri}", "");
 
                 switch(page.ToLower())
                 {
