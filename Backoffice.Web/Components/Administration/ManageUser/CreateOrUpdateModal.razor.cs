@@ -77,12 +77,14 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         {
             IsValidPassword = true;
             Alerts.Clear();
+            var passwordErrorCount = 0;
 
             if (!IsEdit)
             {
                 if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                 {
                     IsValidPassword = false;
+                    passwordErrorCount++;
 
                     Alerts.Add(new AlertModel
                     {
@@ -92,9 +94,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     });
                 }
 
-                if(!UserRegister.Password.Any(char.IsLower))
+                if (!UserRegister.Password.Any(char.IsLower))
                 {
                     IsValidPassword = false;
+                    passwordErrorCount++;
 
                     Alerts.Add(new AlertModel
                     {
@@ -106,6 +109,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 if (!UserRegister.Password.Any(char.IsUpper))
                 {
                     IsValidPassword = false;
+                    passwordErrorCount++;
 
                     Alerts.Add(new AlertModel
                     {
@@ -117,6 +121,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 if (!UserRegister.Password.Any(char.IsDigit))
                 {
                     IsValidPassword = false;
+                    passwordErrorCount++;
 
                     Alerts.Add(new AlertModel
                     {
@@ -130,6 +135,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 if (!regex.IsMatch(UserRegister.Password))
                 {
                     IsValidPassword = false;
+                    passwordErrorCount++;
 
                     Alerts.Add(new AlertModel
                     {
@@ -142,6 +148,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 if (UserRegister.Password.Any(char.IsWhiteSpace))
                 {
                     IsValidPassword = false;
+                    passwordErrorCount++;
 
                     Alerts.Add(new AlertModel
                     {
@@ -158,6 +165,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -170,6 +178,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!UserRegister.Password.Any(char.IsLower))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -181,6 +190,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!UserRegister.Password.Any(char.IsUpper))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -192,6 +202,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!UserRegister.Password.Any(char.IsDigit))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -205,6 +216,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!regex.IsMatch(UserRegister.Password))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -217,6 +229,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (UserRegister.Password.Any(char.IsWhiteSpace))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -346,6 +359,21 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         {
             ModalService.Cancel();
         }
+        public void RemoveError(string property)
+        {
+            switch (property.ToLower())
+            {
+                case "username":
+                    IsValidUsername = true;
+                    break;
+                case "email":
+                    IsValidEmail = true;
+                    break;
+                case "password":
+                    IsValidPassword = true;
+                    break;
+            }
+        }
         #region Methods
         public void Dispose()
         {
@@ -392,6 +420,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
             IsValidPassword = true;
             IsValidUsername = true;
             IsValidEmail = true;
+            var passwordErrorCount = 0;
 
             if (string.IsNullOrWhiteSpace(userModel.UserName))
             {
@@ -412,6 +441,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -424,6 +454,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!UserRegister.Password.Any(char.IsLower))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -435,6 +466,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!UserRegister.Password.Any(char.IsUpper))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -446,6 +478,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!UserRegister.Password.Any(char.IsDigit))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -459,6 +492,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!regex.IsMatch(UserRegister.Password))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -471,6 +505,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (UserRegister.Password.Any(char.IsWhiteSpace))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
 
                         Alerts.Add(new AlertModel
                         {
@@ -486,6 +521,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 if (string.IsNullOrWhiteSpace(userModel.Password))
                 {
                     IsValidPassword = false;
+                    passwordErrorCount++;
 
                     Alerts.Add(new AlertModel
                     {
@@ -501,6 +537,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                         {
                             IsValidPassword = false;
+                            passwordErrorCount++;
 
                             Alerts.Add(new AlertModel
                             {
@@ -513,6 +550,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         if (!UserRegister.Password.Any(char.IsLower))
                         {
                             IsValidPassword = false;
+                            passwordErrorCount++;
 
                             Alerts.Add(new AlertModel
                             {
@@ -524,6 +562,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         if (!UserRegister.Password.Any(char.IsUpper))
                         {
                             IsValidPassword = false;
+                            passwordErrorCount++;
 
                             Alerts.Add(new AlertModel
                             {
@@ -535,6 +574,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         if (!UserRegister.Password.Any(char.IsDigit))
                         {
                             IsValidPassword = false;
+                            passwordErrorCount++;
 
                             Alerts.Add(new AlertModel
                             {
@@ -548,6 +588,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         if (!regex.IsMatch(UserRegister.Password))
                         {
                             IsValidPassword = false;
+                            passwordErrorCount++;
 
                             Alerts.Add(new AlertModel
                             {
@@ -560,6 +601,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         if (UserRegister.Password.Any(char.IsWhiteSpace))
                         {
                             IsValidPassword = false;
+                            passwordErrorCount++;
 
                             Alerts.Add(new AlertModel
                             {
@@ -570,6 +612,30 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         }
                     }
                 }
+            }
+
+            if(!string.IsNullOrWhiteSpace(userModel.Email))
+            {
+                IsValidEmail = Regex.IsMatch(userModel.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+
+                Alerts.Add(new AlertModel
+                {
+                    Status = "Error",
+                    Message = "Email is invalid",
+                    Opacity = 1.0m
+                });
+            }
+
+            if (passwordErrorCount > 1)
+            {
+                Alerts.RemoveAll(x => x.Message.Contains("Password"));
+
+                Alerts.Add(new AlertModel
+                {
+                    Status = "Error",
+                    Message = "Password is incorrect.",
+                    Opacity = 1.0m
+                });
             }
 
             if (IsValidPassword && IsValidUsername && IsValidEmail && IsValidPassword)
