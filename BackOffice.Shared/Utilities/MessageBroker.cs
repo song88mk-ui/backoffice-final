@@ -11,6 +11,8 @@ namespace Backoffice.Shared.Utilities
 {
     public class MessageBroker : IDisposable, IMessageBroker
     {
+        public string Region { get; set; } = "";
+
         private ConnectionFactory _connectionFactory;
         private IConnection _connection;
         private IModel _model;
@@ -92,92 +94,100 @@ namespace Backoffice.Shared.Utilities
 
         public void Connect(MessageBrokerCredentialModel messageBroker = null)
         {
-            if(messageBroker != null)
+            try
             {
-                _isExclusive = messageBroker.IsExclusive;
-                _isPriority = messageBroker.IsExclusive;
-                _hostName = messageBroker.Host;
-                _userName = messageBroker.Username;
-                _password = messageBroker.Password;
-                _virtualHost = messageBroker.VirtualHost;
-                _exchange = messageBroker.Exchange;
-                _queue = _isExclusive ? $"{messageBroker.Queue}.{Environment.MachineName.ToLower()}" : messageBroker.Queue;
-                _consumerName = messageBroker.Consumer;
-                _routingKey = messageBroker.RoutingKey;
-                _prefetchCount = string.IsNullOrEmpty(messageBroker.PrefetchCount) ? "1000" : messageBroker.PrefetchCount;
-
-            }
-            else
-            {
-                _isExclusive = string.IsNullOrEmpty(_configuration["MessageBroker:IsExclusive"]) ? false : Convert.ToBoolean(_configuration["MessageBroker:IsExclusive"]);
-                _isPriority = string.IsNullOrEmpty(_configuration["MessageBroker:IsPriority"]) ? false : Convert.ToBoolean(_configuration["MessageBroker:IsPriority"]);
-                _hostName = _configuration["MessageBroker:Host"];
-                _userName = _configuration["MessageBroker:Username"];
-                _password = _configuration["MessageBroker:Password"];
-                _virtualHost = _configuration["MessageBroker:VirtualHost"];
-                _exchange = _configuration["MessageBroker:Exchange"];
-                _queue = _isExclusive == true ? $"{_configuration["MessageBroker:Queue"]}.{Environment.MachineName.ToLower()}" : _configuration["MessageBroker:Queue"];
-                _consumerName = _configuration["MessageBroker:Consumer"];
-                _routingKey = _configuration["MessageBroker:RoutingKey"];
-                _prefetchCount = string.IsNullOrEmpty(_configuration["MessageBroker:PrefetchCount"]) ? "1000" : _configuration["MessageBroker:PrefetchCount"];
-            }
-            if (_connection == null)
-            {
-                if (_connectionFactory == null)
-                    _connectionFactory = new ConnectionFactory
-                    {
-                        HostName = _hostName,
-                        Port = 5672,
-                        UserName = _userName,
-                        Password = _password,
-                        VirtualHost = _virtualHost,
-                        RequestedHeartbeat = 60,
-                        NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
-                    };
-
-                _connection = _connectionFactory.CreateConnection();
-
-                if (_model == null)
-                    _model = _connection.CreateModel();
-
-                if (!string.IsNullOrEmpty(_queue))
+                if (messageBroker != null)
                 {
-                    _model.ExchangeDeclare(_exchange, "topic", true, false, null);
+                    _isExclusive = messageBroker.IsExclusive;
+                    _isPriority = messageBroker.IsExclusive;
+                    _hostName = messageBroker.Host;
+                    _userName = messageBroker.Username;
+                    _password = messageBroker.Password;
+                    _virtualHost = messageBroker.VirtualHost;
+                    _exchange = messageBroker.Exchange;
+                    _queue = _isExclusive ? $"{messageBroker.Queue}.{Environment.MachineName.ToLower()}" : messageBroker.Queue;
+                    _consumerName = messageBroker.Consumer;
+                    _routingKey = messageBroker.RoutingKey;
+                    _prefetchCount = string.IsNullOrEmpty(messageBroker.PrefetchCount) ? "1000" : messageBroker.PrefetchCount;
 
-                    if (_isExclusive)
-                    {
-                        if (_isPriority)
-                        {
-                            var dictionary = new Dictionary<string, object>();
-                            dictionary.Add("x-max-priority", 10);
-
-                            _model.QueueDeclare(_queue, true, true, true, dictionary);
-                        }
-                        else
-                            _model.QueueDeclare(_queue, true, true, true, null);
-                    }
-                    else
-                    {
-                        if (_isPriority)
-                        {
-                            var dictionary = new Dictionary<string, object>();
-                            dictionary.Add("x-max-priority", 10);
-
-                            _model.QueueDeclare(_queue, true, false, false, dictionary);
-                        }
-                        else
-                            _model.QueueDeclare(_queue, true, false, false, null);
-                    }
-
-                    foreach (var routingKey in _routingKey.Split('|'))
-                        _model.QueueBind(_queue, _exchange, routingKey.ToLower(), null);
-
-                    _model.BasicQos(0, Convert.ToUInt16(_prefetchCount), false);
-                    _consumer = new EventingBasicConsumer(_model);
-                    _consumer.Received += HandleMessage;
-
-                    _model.BasicConsume(_queue, false, $"{_consumerName}.{Guid.NewGuid()}", _consumer);
                 }
+                else
+                {
+                    _isExclusive = string.IsNullOrEmpty(_configuration["MessageBroker:IsExclusive"]) ? false : Convert.ToBoolean(_configuration["MessageBroker:IsExclusive"]);
+                    _isPriority = string.IsNullOrEmpty(_configuration["MessageBroker:IsPriority"]) ? false : Convert.ToBoolean(_configuration["MessageBroker:IsPriority"]);
+                    _hostName = _configuration["MessageBroker:Host"];
+                    _userName = _configuration["MessageBroker:Username"];
+                    _password = _configuration["MessageBroker:Password"];
+                    _virtualHost = _configuration["MessageBroker:VirtualHost"];
+                    _exchange = _configuration["MessageBroker:Exchange"];
+                    _queue = _isExclusive == true ? $"{_configuration["MessageBroker:Queue"]}.{Environment.MachineName.ToLower()}" : _configuration["MessageBroker:Queue"];
+                    _consumerName = _configuration["MessageBroker:Consumer"];
+                    _routingKey = _configuration["MessageBroker:RoutingKey"];
+                    _prefetchCount = string.IsNullOrEmpty(_configuration["MessageBroker:PrefetchCount"]) ? "1000" : _configuration["MessageBroker:PrefetchCount"];
+                }
+                if (_connection == null)
+                {
+                    if (_connectionFactory == null)
+                        _connectionFactory = new ConnectionFactory
+                        {
+                            HostName = _hostName,
+                            Port = 5672,
+                            UserName = _userName,
+                            Password = _password,
+                            VirtualHost = _virtualHost,
+                            RequestedHeartbeat = 60,
+                            NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
+                        };
+
+                    _connection = _connectionFactory.CreateConnection();
+
+                    if (_model == null)
+                        _model = _connection.CreateModel();
+
+                    if (!string.IsNullOrEmpty(_queue))
+                    {
+                        _model.ExchangeDeclare(_exchange, "topic", true, false, null);
+
+                        if (_isExclusive)
+                        {
+                            if (_isPriority)
+                            {
+                                var dictionary = new Dictionary<string, object>();
+                                dictionary.Add("x-max-priority", 10);
+
+                                _model.QueueDeclare(_queue, true, true, true, dictionary);
+                            }
+                            else
+                                _model.QueueDeclare(_queue, true, true, true, null);
+                        }
+                        else
+                        {
+                            if (_isPriority)
+                            {
+                                var dictionary = new Dictionary<string, object>();
+                                dictionary.Add("x-max-priority", 10);
+
+                                _model.QueueDeclare(_queue, true, false, false, dictionary);
+                            }
+                            else
+                                _model.QueueDeclare(_queue, true, false, false, null);
+                        }
+
+                        foreach (var routingKey in _routingKey.Split('|'))
+                            _model.QueueBind(_queue, _exchange, routingKey.ToLower(), null);
+
+                        _model.BasicQos(0, Convert.ToUInt16(_prefetchCount), false);
+                        _consumer = new EventingBasicConsumer(_model);
+                        _consumer.Received += HandleMessage;
+
+                        _model.BasicConsume(_queue, false, $"{_consumerName}.{Guid.NewGuid()}", _consumer);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw;
             }
         }
 
@@ -244,7 +254,7 @@ namespace Backoffice.Shared.Utilities
         private void HandleMessage(object sender, BasicDeliverEventArgs e)
         {
             try
-            {   
+            {
                 MessageReceived(sender, e);
 
                 _consumer.Model.BasicAck(e.DeliveryTag, false);
