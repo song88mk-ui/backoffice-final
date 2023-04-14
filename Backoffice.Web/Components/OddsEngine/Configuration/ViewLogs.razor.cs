@@ -44,7 +44,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 Filter = string.Empty,
             };
 
-            TradingService.Region = ModalParameters.TryGet<string>("Region");
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             MetaData = new MetaData()
             {
                 CurrentPage = 1,

@@ -8,7 +8,7 @@ namespace Backoffice.Shared.Utilities
     {
         event EventHandler<BasicDeliverEventArgs> MessageReceived;
         void ExternalConnect();
-        void Connect(MessageBrokerCredentialModel messageBrokerModel = null);
+        void Connect(MessageBrokerCredentialModel messageBrokerCredential = null);
         void ConnectWithManualAck();
         void Acknowledge(BasicDeliverEventArgs e);
         void NAcknowledge(BasicDeliverEventArgs e);

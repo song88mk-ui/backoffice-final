@@ -57,10 +57,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             SelectedClientsSet = new HashSet<string>();
             SelectedSportsSet = new HashSet<string>();
-            Region = ModalParameters.TryGet<string>("Region");
+            Region = ModalParameters.TryGet<string>("Region").ToUpper();
             OnExportMarginCallback = ModalParameters.TryGet<EventCallback>("OnExportMarginCallback");
             OnImportMarginCallback = ModalParameters.TryGet<EventCallback<string>>("OnImportMarginCallback");
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
 
             Guid = new Guid();
 

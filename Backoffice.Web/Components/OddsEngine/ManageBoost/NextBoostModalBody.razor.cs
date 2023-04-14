@@ -41,7 +41,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = ModalParameters.TryGet<string>("Region");
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             AddPriceBoostFilterModel = ModalParameters.TryGet<AddPriceBoostFilterModel>("AddPriceBoostFilterModel");
             IsSaveDisabled = true;
         }

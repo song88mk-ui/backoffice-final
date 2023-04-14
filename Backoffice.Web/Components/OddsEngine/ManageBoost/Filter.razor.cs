@@ -46,7 +46,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             Segments = new List<SelectListItemModel<int>>();
             Leagues = new List<SelectListItemModel<int>>();
 
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
             SearchForm = new SearchFormModel();
 
             Clients = await LoadClients();

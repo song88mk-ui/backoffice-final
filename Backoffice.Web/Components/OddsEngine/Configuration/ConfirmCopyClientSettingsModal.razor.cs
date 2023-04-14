@@ -28,7 +28,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             SelectedFromClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedFromClient");
             SelectedToClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedToClient");
-            Region = ModalParameters.TryGet<string>("Region");
+            Region = ModalParameters.TryGet<string>("Region").ToUpper();
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback>("OnCopyClientSettingsCallback");
         }
         public async Task OnCancelModalClickEvent()

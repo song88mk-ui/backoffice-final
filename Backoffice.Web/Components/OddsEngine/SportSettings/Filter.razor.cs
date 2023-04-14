@@ -33,7 +33,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         protected override async Task OnInitializedAsync()
         {
             Clients = new List<SelectListItemModel<string>>();
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
 
             var clientResponse = await TradingService.GetClientList();
 

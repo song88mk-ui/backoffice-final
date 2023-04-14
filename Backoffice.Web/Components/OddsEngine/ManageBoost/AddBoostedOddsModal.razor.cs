@@ -46,7 +46,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             Model = new AddPriceBoostFilterModel();
 
             
-            TradingService.Region = Region = ModalParameters.TryGet<string>("Region");
+            TradingService.Region = Region = ModalParameters.TryGet<string>("Region").ToUpper();
             Model.Sports = await GetSports(SelectedFixtureType);
             _region = ModalParameters.TryGet<string>("Region") ?? string.Empty;
 

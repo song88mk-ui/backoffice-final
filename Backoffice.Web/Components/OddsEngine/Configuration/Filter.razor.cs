@@ -39,7 +39,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public async Task Initialize()
         {
             if (!string.IsNullOrEmpty(Region))
-                TradingService.Region = Region;
+                TradingService.Region = Region.ToUpper();
 
             _isPreloader = true;
             var sports = await GetSports();

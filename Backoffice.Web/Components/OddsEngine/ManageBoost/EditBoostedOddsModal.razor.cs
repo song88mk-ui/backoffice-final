@@ -41,7 +41,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             IsPreloader = true;
             Languages = ModalParameters.TryGet<LanguagesModel>("Languages");
             PriceBoostConfigModel = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
-            TradingService.Region = ModalParameters.TryGet<string>("Region");
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             IsPreloader = false;
         }
 

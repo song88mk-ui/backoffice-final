@@ -12,6 +12,7 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public List<Client> Clients { get; set; }
         [Parameter] public FixtureMarketModel Market { get; set; }
         [Parameter] public string MainMarketName { get; set; }
+        [Parameter] public string Region { get; set; }
         public string MarketLine { get; set; }
         public bool IsBetStop { get; set; }
         public bool HasLine { get; set; }

@@ -48,7 +48,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
             TableClass = "table-edit-market-group";
             IsPreLoader = true;
             Breadcrumbs = new List<BreadcrumbModel>()

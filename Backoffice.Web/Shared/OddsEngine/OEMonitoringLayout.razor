@@ -50,7 +50,8 @@
 
         if (splitVal != null)
         {
-            Region = splitVal.Trim().ToUpper();
+            var regions = new List<string>() { "HK", "SA" };
+            Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToUpper() : null;
         }
     }
 }

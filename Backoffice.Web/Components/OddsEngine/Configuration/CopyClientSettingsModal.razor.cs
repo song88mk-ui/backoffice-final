@@ -33,8 +33,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ToClients = new List<SelectListItemModel<string>>();
 
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback>("OnCopyClientSettingsCallback");
-            Region = ModalParameters.TryGet<string>("Region");
-            TradingService.Region = Region;
+            Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            TradingService.Region = Region.ToUpper();
 
             await Initialize();
         }

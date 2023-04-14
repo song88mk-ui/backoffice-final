@@ -42,7 +42,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             Sports = new List<SelectListItemModel<int>>();
             FixtureStatuses = new List<SelectListItemModel<int>>();
             ClientMarketTemplateGroups = new List<MarketSortOrderModel.ClientMarketTemplateGroup>();
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
 
             if (UserModel.ClientCodes != null)
             {

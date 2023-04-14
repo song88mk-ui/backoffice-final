@@ -7,6 +7,7 @@ using Backoffice.Web.Services;
 using Backoffice.Web.Shared;
 using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
@@ -50,7 +51,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
             FixtureMarkets = null;
             MonitoringCallbackModel = new MonitoringCallbackModel();
             ClientModel = new ClientModel();
@@ -61,7 +62,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             Breadcrumbs.Add(new BreadcrumbModel
             {
                 Name = "Monitoring",
-                Url = "odds-engine/monitoring",
+                Url = $"{Region}/odds-engine/monitoring",
                 IsCurrentPage = true
             });
 
@@ -205,7 +206,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             .WithUrl(new Uri(Configuration["API:HubAPI"]))
             .Build();
 
-            await _hubConnection.InvokeAsync("AddToGroup", Region);
 
             _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
             {
@@ -224,6 +224,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             });
 
             await _hubConnection.StartAsync();
+            await _hubConnection.InvokeAsync("AddToGroup", Region.ToUpper());
 
         }
         private async Task<List<FixtureMarketModel>> GetFixtures(MarketFixtureRequest request)

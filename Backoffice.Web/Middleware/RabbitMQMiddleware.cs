@@ -14,72 +14,41 @@ namespace Backoffice.Web.Middleware
     public class RabbitMQMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly List<IMessageBroker> _messageBroker;
+        private readonly IMessageBroker _messageBrokerHk;
+        private readonly IMessageBroker _messageBrokerSa;
         private readonly IHubContext<BoHub> _boHub;
 
-        public RabbitMQMiddleware(RequestDelegate next, IHubContext<BoHub> boHub, IConfiguration config)
+        public RabbitMQMiddleware(RequestDelegate next, IHubContext<BoHub> boHub, IMessageBroker messageBroker, IConfiguration config)
         {
             _next = next;
-            _messageBroker = new List<IMessageBroker>();
+            _messageBrokerHk = messageBroker;
+            _messageBrokerSa = messageBroker;
             _boHub = boHub;
 
-            var regions = new[] { "", "HK", "SA" };
+            _messageBrokerHk.Connect(config.GetSection($"MessageBroker:HK").Get<MessageBrokerCredentialModel>());
+            _messageBrokerSa.Connect(config.GetSection($"MessageBroker:SA").Get<MessageBrokerCredentialModel>());
 
-            foreach(var item in regions)
+
+            _messageBrokerHk.MessageReceived += async (sender, e) =>
             {
-                var messageBroker = new MessageBroker(config);
-                if (string.IsNullOrWhiteSpace(item))
+                var payload = Encoding.UTF8.GetString(e.Body);
+                var messageType = e.BasicProperties.Type;
+
+                if (e.RoutingKey.StartsWith("r.oe.bm.engine."))
                 {
-                    messageBroker.Connect(config?.GetSection($"MessageBroker:{item}").Get<MessageBrokerCredentialModel>());
+                    await SignalRSendMessage("HK", messageType, payload);
                 }
-                else
+            };
+            _messageBrokerHk.MessageReceived += async (sender, e) =>
+            {
+                var payload = Encoding.UTF8.GetString(e.Body);
+                var messageType = e.BasicProperties.Type;
+
+                if (e.RoutingKey.StartsWith("r.oe.bm.engine."))
                 {
-                    messageBroker.Connect();
+                    await SignalRSendMessage("SA", messageType, payload);
                 }
-
-                messageBroker.MessageReceived += (sender, e) =>
-                {
-                    var payload = Encoding.UTF8.GetString(e.Body);
-                    var messageType = e.BasicProperties.Type;
-
-                    try
-                    {
-                        var hubClients = string.IsNullOrWhiteSpace(item) ? _boHub.Clients.All : _boHub.Clients.Group(item);
-
-                        if (e.RoutingKey.StartsWith("r.oe.bm.engine."))
-                        {
-                            switch (messageType)
-                            {
-                                case "OnOddsChange":
-                                    var oddschange = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(payload);
-                                    hubClients.SendAsync("onoddschange", oddschange).Wait();
-                                    break;
-                                case "OnBetStopFixture":
-                                    var betStopFixture = JsonSerializer.Deserialize<OnExternalBetStopFixtureMessage>(payload);
-                                    hubClients.SendAsync("onbetstopfixture", betStopFixture).Wait();
-                                    break;
-                                case "OnBetStopGlobal":
-                                    var betStopGlobal = JsonSerializer.Deserialize<OnExternalBetStopGlobalMessage>(payload);
-                                    hubClients.SendAsync("onbetstopglobal", betStopGlobal).Wait();
-                                    break;
-                                case "OnSignIn":
-                                    var signin = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(payload);
-                                    hubClients.SendAsync("onsignin", signin).Wait();
-                                    break;
-                                case "OnNewNotification":
-                                    var notificationsModel = JsonSerializer.Deserialize<NotificationsModel>(payload);
-                                    hubClients.SendAsync("onnewnotification", notificationsModel).Wait();
-                                    break;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                    }
-                };
-                _messageBroker.Add(messageBroker);
-            }
-
+            };
         }
 
         public async Task Invoke(HttpContext httpContext)
@@ -121,6 +90,41 @@ namespace Backoffice.Web.Middleware
                             await hubClients.SendAsync("onnewnotification", notificationsModel);
                             break;
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        private async Task SignalRSendMessage(string group, string messageType, string payload)
+        {
+            try
+            {
+                var hubClients = _boHub.Clients.Group(group.ToUpper());
+
+                switch (messageType)
+                {
+                    case "OnOddsChange":
+                        var oddschange = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(payload);
+                        hubClients.SendAsync("onoddschange", oddschange).Wait();
+                        break;
+                    case "OnBetStopFixture":
+                        var betStopFixture = JsonSerializer.Deserialize<OnExternalBetStopFixtureMessage>(payload);
+                        hubClients.SendAsync("onbetstopfixture", betStopFixture).Wait();
+                        break;
+                    case "OnBetStopGlobal":
+                        var betStopGlobal = JsonSerializer.Deserialize<OnExternalBetStopGlobalMessage>(payload);
+                        hubClients.SendAsync("onbetstopglobal", betStopGlobal).Wait();
+                        break;
+                    case "OnSignIn":
+                        var signin = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(payload);
+                        hubClients.SendAsync("onsignin", signin).Wait();
+                        break;
+                    case "OnNewNotification":
+                        var notificationsModel = JsonSerializer.Deserialize<NotificationsModel>(payload);
+                        hubClients.SendAsync("onnewnotification", notificationsModel).Wait();
+                        break;
                 }
             }
             catch (Exception ex)

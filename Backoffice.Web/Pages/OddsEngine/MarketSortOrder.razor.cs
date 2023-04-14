@@ -44,7 +44,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
             MarketSortOrderModel = new MarketSortOrderModel();
 
             PageTitle = "Market Sort Order";

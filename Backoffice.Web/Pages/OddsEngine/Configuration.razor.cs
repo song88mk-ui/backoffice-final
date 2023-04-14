@@ -56,7 +56,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             ConfigFilterModel = null;
             IsMarketEditing = false;
             AllMarketStatusName = "Deactivate All";
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
             Guid = new Guid();
 
             MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
@@ -709,8 +709,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
                 .Build();
 
-            await _hubConnection.InvokeAsync("AddToGroup", Region);
-
             _hubConnection.Closed += async (error) =>
             {
                 await Task.Delay(new Random().Next(0, 5) * 1000);
@@ -726,8 +724,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 await ProcessNotification(message);
             });
 
-
-            await _hubConnection.StartAsync();            
+            await _hubConnection.StartAsync();
+            await _hubConnection.InvokeAsync("AddToGroup", Region.ToUpper());
         }
 
         private async Task ProcessOnConfigChange(ConfigSettingsModel message)

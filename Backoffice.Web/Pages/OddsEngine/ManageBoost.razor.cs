@@ -47,11 +47,11 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
             PageTitle = "Manage Boost";
             IconClass = string.Empty;
             IsPreLoader = true;
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
             Breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
@@ -63,7 +63,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 new BreadcrumbModel
                 {
                 Name = "Manage Boost",
-                    Url = "odds-engine/manage-boost",
+                    Url = $"{Region}/odds-engine/manage-boost",
                     IsCurrentPage = true
                 }
             };            

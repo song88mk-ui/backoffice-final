@@ -52,7 +52,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
             ClientModel = new ClientModel();
             Breadcrumbs = new List<BreadcrumbModel>();
             Fixture = new MarketFixtureResponse.FixtureModel();
@@ -179,7 +179,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Breadcrumbs.Add(new BreadcrumbModel
                 {
                     Name = "Monitoring",
-                    Url = $"odds-engine/monitoring",
+                    Url = $"{Region}/odds-engine/monitoring",
                     IsCurrentPage = false
                 });
 
@@ -293,7 +293,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             .WithUrl(new Uri(Configuration["API:HubAPI"]))
             .Build();
 
-            await _hubConnection.InvokeAsync("AddToGroup", Region);
 
             _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
             {
@@ -314,6 +313,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             });
 
             await _hubConnection.StartAsync();
+            await _hubConnection.InvokeAsync("AddToGroup", Region.ToUpper());
         }
 
         private async Task ProcessOddsChangeMonitoring(OnExternalOddsChangeMessage message)

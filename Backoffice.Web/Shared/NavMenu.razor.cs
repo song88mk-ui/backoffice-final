@@ -47,10 +47,8 @@ namespace Backoffice.Web.Shared
 
             if (splitVal != null)
             {
-                Region = splitVal.Trim().ToUpper();
-
                 var regions = new List<string>() { "HK", "SA" };
-                Region = regions.Contains(Region.ToUpper()) ? Region : null;
+                Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToUpper() : null;
             }
 
             if (NavMenuAccess == PermissionCategory.OE)
@@ -172,7 +170,7 @@ namespace Backoffice.Web.Shared
 
                 if (slugs.Count != 1 && slugs[1].ToLower() != "monitoring")
                 {
-                    NavigationManager.NavigateTo("/odds-engine");
+                    NavigationManager.NavigateTo($"/{Region}/odds-engine");
                 }
 
                 await OnSportClickCallback.InvokeAsync(SelectedSport);

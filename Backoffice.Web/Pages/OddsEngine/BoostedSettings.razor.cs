@@ -38,7 +38,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             THeadClass = "table-head";
             PageTitle = "Boosted Settings";
             IconClass = string.Empty;
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
 
             Breadcrumbs = new List<BreadcrumbModel>()
             {

@@ -57,7 +57,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = Region;
+            TradingService.Region = Region.ToUpper();
             PageTitle = "Sport Settings";
             IconClass = string.Empty;
             TableClass = "sport-setting-table";
@@ -76,7 +76,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             Breadcrumbs.Add(new BreadcrumbModel
             {
                 Name = "Sport Settings",
-                Url = "odds-engine/sport-settings",
+                Url = $"{Region}/odds-engine/sport-settings",
                 IsCurrentPage = true
             });
 

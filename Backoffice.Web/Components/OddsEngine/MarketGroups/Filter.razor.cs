@@ -45,7 +45,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             try
             {
                 MarketGroupModel.IsUpdate = false;
-                TradingService.Region = Region;
+                TradingService.Region = Region.ToUpper();
 
                 if (UserModel.ClientCodes != null)
                 {

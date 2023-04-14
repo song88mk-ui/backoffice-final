@@ -35,8 +35,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = ModalParameters.TryGet<string>("Region");
-            PriceBoost = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel"); TradingService.Region = ModalParameters.TryGet<string>("Region");
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            PriceBoost = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
         }
 
         public async Task OnCancelModalClick()

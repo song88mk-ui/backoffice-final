@@ -39,7 +39,7 @@
                     <tbody>
                         @foreach (var market in FixtureMarkets)
                         {
-                            <FixtureRow @key="@market.ProviderMarketId" Clients="ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" />
+                            <FixtureRow @key="@market.ProviderMarketId" Clients="ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" Region="@Region"/>
                         }
                     </tbody>
                 </table>
