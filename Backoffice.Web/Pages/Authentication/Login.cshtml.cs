@@ -1,8 +1,10 @@
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Linq;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
 
 namespace Backoffice.Web.Pages.Authentication
@@ -77,7 +79,9 @@ namespace Backoffice.Web.Pages.Authentication
                 var result = await _authenticationService.Login(UserModel);
                 if (result.Result.Item1)
                 {
-                    policies = result.Result.Item2;
+                    var access = new[] { PermissionCategory.SBC.ToString().ToUpper(), PermissionCategory.Admin.ToString().ToUpper() };
+
+                    policies = result.Result.Item2.Where(x => access.Contains(x.ToUpper())).ToList();
                     if (policies.Count == 1)
                     {
                         switch (policies.FirstOrDefault().ToString().ToUpper())
@@ -85,13 +89,14 @@ namespace Backoffice.Web.Pages.Authentication
                             case "ADMIN":
                                 return LocalRedirect("/admin/dashboard");
                             case "SBC":
+                            case "PM":
                                 return LocalRedirect("/dashboard");
-                            //case "PM":
                             //    return LocalRedirect("/pm/dashboard");
                             default:
                                 return LocalRedirect("/choose-access");
                         }
-                    } else if (policies.Count > 1)
+                    }
+                    else if (policies.Count > 1)
                     {
                         return LocalRedirect("/choose-access");
                     }

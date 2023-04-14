@@ -239,6 +239,10 @@ a, .btn-link {
     content: "\1119";
 }
 
+.ico-location:before {
+    content: "\1128";
+}
+
 iframe {
     width: 100% !important;
 }
