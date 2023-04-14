@@ -9,6 +9,8 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
     {
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public ITradingService TradingService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnFilterCallback { get; set; }
@@ -44,6 +46,14 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
             if (clients != null && clients.Clients.Any())
             {
+                var tradingClients = (await TradingService.GetClientList()).Result;
+
+                if (tradingClients.Any())
+                {
+                    var clientCodes = tradingClients.Select(s => s.ClientCode).ToList();
+                    clients.Clients = clients.Clients.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
+                }
+
                 if (UserModel.ClientCodes.Any())
                     clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 

@@ -208,7 +208,7 @@ namespace Backoffice.Web.Pages.Administration
 
         private async Task<PermissionResponse> GetPermissionList()
         {
-            var response = await AuthenticationService.GetPermissionList(false);
+            var response = await AuthenticationService.GetPermissionList(false, false);
 
             if (response.StatusCode == StatusCode.Success)
             {
@@ -225,7 +225,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             var request = new UserGroupListRequest
             {
-                SearchText = search,
+                SearchText = search ?? string.Empty,
                 Page = page,
                 PageSize = 25,
                 ShowSuperAdmin = false,

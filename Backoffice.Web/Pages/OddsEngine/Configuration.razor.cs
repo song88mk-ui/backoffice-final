@@ -709,6 +709,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
                 .Build();
 
+            await _hubConnection.InvokeAsync("AddToGroup", Region);
+
             _hubConnection.Closed += async (error) =>
             {
                 await Task.Delay(new Random().Next(0, 5) * 1000);

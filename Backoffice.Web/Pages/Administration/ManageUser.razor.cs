@@ -135,7 +135,7 @@ namespace Backoffice.Web.Pages.Administration
 
         private async Task<PermissionResponse> GetPermissionList()
         {
-            var response = await AuthenticationService.GetPermissionList(false);
+            var response = await AuthenticationService.GetPermissionList(false, false);
 
             if (response.StatusCode == StatusCode.Success)
             {

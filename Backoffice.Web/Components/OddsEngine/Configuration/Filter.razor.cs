@@ -12,8 +12,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class Filter : IDisposable
     {
         #region Properties        
-        [Inject] private ITradingService TradingService { get; set; }        
-
+        [Inject] private ITradingService TradingService { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public ConfigFilterModel ConfigFilterModel { get; set; } = new ConfigFilterModel();
         [Parameter] public EventCallback<ConfigFilterModel> ConfigFilterModelChanged { get; set; }
         [Parameter] public EventCallback IsMarketEditingChanged { get; set; }
@@ -375,12 +375,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             var result = (await TradingService.GetClientList()).Result;
 
-            var clients = result.Select(a => new ClientInformationModel
-            {
-                ClientCode = a.ClientCode,
-                ClientId = a.ClientId,
-                ClientName = a.ClientName
-            }).ToList();
+            var clients = UserModel.ClientCodes.Any() ? result.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()))
+                .Select(a => new ClientInformationModel
+                {
+                    ClientCode = a.ClientCode,
+                    ClientId = a.ClientId,
+                    ClientName = a.ClientName
+                }).ToList() 
+                : new List<ClientInformationModel>();
 
             return clients;
         }

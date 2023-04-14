@@ -6,6 +6,7 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -18,6 +19,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
@@ -124,7 +126,10 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 }
 
                 if (Alerts.Any())
+                {
+                    await JSRuntime.InvokeVoidAsync("scrollToTopOfElement", ".modal", "fast");
                     return;
+                }
 
                 IsPreload = true;
 

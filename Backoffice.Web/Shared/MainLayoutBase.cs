@@ -466,7 +466,7 @@ namespace Backoffice.Web.Shared
 
         private async Task<PermissionResponse> GetPermissionList()
         {
-            var response = await AuthenticationService.GetPermissionList(false);
+            var response = await AuthenticationService.GetPermissionList(false, true);
 
             if (response.StatusCode == StatusCode.Success)
             {

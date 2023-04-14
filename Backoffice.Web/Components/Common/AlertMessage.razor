@@ -29,13 +29,13 @@
                 {
                     if (Opacity > 0.9m)
                     {
-                        Opacity -= 0.5m;
-                        await Task.Delay(20);
+                        Opacity -= 0.05m;
+                        await Task.Delay(2000);
                     }
                     else
                     {
-                        Opacity -= 1;
-                        //await Task.Delay(10);
+                        Opacity -= 0.03m;
+                        await Task.Delay(10);
                     }
 
                     StateHasChanged();

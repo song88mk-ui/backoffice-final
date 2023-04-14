@@ -7,6 +7,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
@@ -18,11 +19,13 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
-        public AlertModel AlertModel { get; set; }
+        public List<AlertModel> Alerts { get; set; }
         public EditContext EditContext { get; set; }
         public Permission PermissionComponent { get; set; }
         public PermissionResponse Permissions { get; set; }
@@ -40,7 +43,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
         protected override async Task OnInitializedAsync()
         {
-            AlertModel = new AlertModel();
+            Alerts = new List<AlertModel>();
             ClientModel = new ClientModel();
             UserRegister = new UserRegisterModel();
             UserGroupList = new List<UserGroupResponse>();
@@ -73,18 +76,86 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         public async Task OnPasswordFocusOutEvent()
         {
             IsValidPassword = true;
+            Alerts.Clear();
+            var passwordErrorCount = 0;
 
             if (!IsEdit)
             {
                 if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                 {
                     IsValidPassword = false;
-                }
-                var regex = new Regex("^(?=.*[a-zA-Z])(?=.*[0-9]).+$");
+                    passwordErrorCount++;
 
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Password must be between 8 to 15 character long.",
+                        Opacity = 1.0m
+                    });
+                }
+
+                if (!UserRegister.Password.Any(char.IsLower))
+                {
+                    IsValidPassword = false;
+                    passwordErrorCount++;
+
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Password should contain lowercase characters.",
+                        Opacity = 1.0m
+                    });
+                }
+                if (!UserRegister.Password.Any(char.IsUpper))
+                {
+                    IsValidPassword = false;
+                    passwordErrorCount++;
+
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Password should contain uppercase characters.",
+                        Opacity = 1.0m
+                    });
+                }
+                if (!UserRegister.Password.Any(char.IsDigit))
+                {
+                    IsValidPassword = false;
+                    passwordErrorCount++;
+
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Password should contain any digit from 0-9.",
+                        Opacity = 1.0m
+                    });
+                }
+
+                var regex = new Regex(@"[!@#$%^&*()_+=\[{\]};:<>|./?,-]");
                 if (!regex.IsMatch(UserRegister.Password))
                 {
                     IsValidPassword = false;
+                    passwordErrorCount++;
+
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Password must include at least one special character.",
+                        Opacity = 1.0m
+                    });
+                }
+
+                if (UserRegister.Password.Any(char.IsWhiteSpace))
+                {
+                    IsValidPassword = false;
+                    passwordErrorCount++;
+
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Password should not contain spaces.",
+                        Opacity = 1.0m
+                    });
                 }
             }
             else
@@ -94,21 +165,87 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                     {
                         IsValidPassword = false;
-                    }
-                    var regex = new Regex("^(?=.*[a-zA-Z])(?=.*[0-9]).+$");
+                        passwordErrorCount++;
 
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password must be between 8 to 15 character long.",
+                            Opacity = 1.0m
+                        });
+                    }
+
+                    if (!UserRegister.Password.Any(char.IsLower))
+                    {
+                        IsValidPassword = false;
+                        passwordErrorCount++;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password should contain lowercase characters.",
+                            Opacity = 1.0m
+                        });
+                    }
+                    if (!UserRegister.Password.Any(char.IsUpper))
+                    {
+                        IsValidPassword = false;
+                        passwordErrorCount++;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password should contain uppercase characters.",
+                            Opacity = 1.0m
+                        });
+                    }
+                    if (!UserRegister.Password.Any(char.IsDigit))
+                    {
+                        IsValidPassword = false;
+                        passwordErrorCount++;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password should contain any digit from 0-9.",
+                            Opacity = 1.0m
+                        });
+                    }
+
+                    var regex = new Regex(@"[!@#$%^&*()_+=\[{\]};:<>|./?,-]");
                     if (!regex.IsMatch(UserRegister.Password))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password must include at least one special character.",
+                            Opacity = 1.0m
+                        });
+                    }
+
+                    if (UserRegister.Password.Any(char.IsWhiteSpace))
+                    {
+                        IsValidPassword = false;
+                        passwordErrorCount++;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password should not contain spaces.",
+                            Opacity = 1.0m
+                        });
                     }
                 }
             }
         }
         public async Task OnSaveClickedEvent()
         {
-            AlertModel = new AlertModel();
+            Alerts.Clear();
             IsPreLoader = true;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
 
             UserRegister.AppId = (int)Application.Backoffice;
             UserRegister.AppName = Application.Backoffice.ToString();
@@ -149,12 +286,12 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     }
                     else
                     {
-                        AlertModel = new AlertModel
+                        Alerts.Add(new AlertModel
                         {
                             Status = "Error",
                             Message = $"{response.Message}",
                             Opacity = 1.0m
-                        };
+                        });
                     }
                 }
                 else
@@ -173,15 +310,20 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     }
                     else
                     {
-                        AlertModel = new AlertModel
+                        Alerts.Add(new AlertModel
                         {
                             Status = "Error",
                             Message = $"{response.Message}",
                             Opacity = 1.0m
-                        };
+                        });
                     }
                 }
             }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("scrollToTopOfElement", ".modal", "fast");
+            }
+
             IsPreLoader = false;
         }
         public async Task OnStatusClickedEvent(bool isLocked)
@@ -217,6 +359,21 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         {
             ModalService.Cancel();
         }
+        public void RemoveError(string property)
+        {
+            switch (property.ToLower())
+            {
+                case "username":
+                    IsValidUsername = true;
+                    break;
+                case "email":
+                    IsValidEmail = true;
+                    break;
+                case "password":
+                    IsValidPassword = true;
+                    break;
+            }
+        }
         #region Methods
         public void Dispose()
         {
@@ -228,6 +385,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         {
             var response = (await AuthenticationService.GetUserGroupList(new UserGroupListRequest
             {
+                SearchText = string.Empty,
                 PageSize = -1,
                 ShowSuperAdmin = false,
             })).Result.UserGroups;
@@ -262,14 +420,18 @@ namespace Backoffice.Web.Components.Administration.ManageUser
             IsValidPassword = true;
             IsValidUsername = true;
             IsValidEmail = true;
+            var passwordErrorCount = 0;
 
             if (string.IsNullOrWhiteSpace(userModel.UserName))
             {
                 IsValidUsername = false;
-            }
-            if (string.IsNullOrWhiteSpace(userModel.Email))
-            {
-                IsValidEmail = false;
+
+                Alerts.Add(new AlertModel
+                {
+                    Status = "Error",
+                    Message = "Username is empty.",
+                    Opacity = 1.0m
+                });
             }
 
             if (IsEdit)
@@ -279,12 +441,78 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                     {
                         IsValidPassword = false;
-                    }
-                    var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).+$");
+                        passwordErrorCount++;
 
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password must be between 8 to 15 character long.",
+                            Opacity = 1.0m
+                        });
+                    }
+
+                    if (!UserRegister.Password.Any(char.IsLower))
+                    {
+                        IsValidPassword = false;
+                        passwordErrorCount++;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password should contain lowercase characters.",
+                            Opacity = 1.0m
+                        });
+                    }
+                    if (!UserRegister.Password.Any(char.IsUpper))
+                    {
+                        IsValidPassword = false;
+                        passwordErrorCount++;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password should contain uppercase characters.",
+                            Opacity = 1.0m
+                        });
+                    }
+                    if (!UserRegister.Password.Any(char.IsDigit))
+                    {
+                        IsValidPassword = false;
+                        passwordErrorCount++;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password should contain any digit from 0-9.",
+                            Opacity = 1.0m
+                        });
+                    }
+
+                    var regex = new Regex(@"[!@#$%^&*()_+=\[{\]};:<>|./?,-]");
                     if (!regex.IsMatch(UserRegister.Password))
                     {
                         IsValidPassword = false;
+                        passwordErrorCount++;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password must include at least one special character.",
+                            Opacity = 1.0m
+                        });
+                    }
+
+                    if (UserRegister.Password.Any(char.IsWhiteSpace))
+                    {
+                        IsValidPassword = false;
+                        passwordErrorCount++;
+
+                        Alerts.Add(new AlertModel
+                        {
+                            Status = "Error",
+                            Message = "Password should not contain spaces.",
+                            Opacity = 1.0m
+                        });
                     }
                 }
             }
@@ -293,6 +521,14 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 if (string.IsNullOrWhiteSpace(userModel.Password))
                 {
                     IsValidPassword = false;
+                    passwordErrorCount++;
+
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Password is empty.",
+                        Opacity = 1.0m
+                    });
                 }
                 else
                 {
@@ -301,15 +537,108 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         if (!(UserRegister.Password.Count() >= 8 && UserRegister.Password.Count() <= 15))
                         {
                             IsValidPassword = false;
-                        }
-                        var regex = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&].+$");
+                            passwordErrorCount++;
 
+                            Alerts.Add(new AlertModel
+                            {
+                                Status = "Error",
+                                Message = "Password must be between 8 to 15 character long.",
+                                Opacity = 1.0m
+                            });
+                        }
+
+                        if (!UserRegister.Password.Any(char.IsLower))
+                        {
+                            IsValidPassword = false;
+                            passwordErrorCount++;
+
+                            Alerts.Add(new AlertModel
+                            {
+                                Status = "Error",
+                                Message = "Password should contain lowercase characters.",
+                                Opacity = 1.0m
+                            });
+                        }
+                        if (!UserRegister.Password.Any(char.IsUpper))
+                        {
+                            IsValidPassword = false;
+                            passwordErrorCount++;
+
+                            Alerts.Add(new AlertModel
+                            {
+                                Status = "Error",
+                                Message = "Password should contain uppercase characters.",
+                                Opacity = 1.0m
+                            });
+                        }
+                        if (!UserRegister.Password.Any(char.IsDigit))
+                        {
+                            IsValidPassword = false;
+                            passwordErrorCount++;
+
+                            Alerts.Add(new AlertModel
+                            {
+                                Status = "Error",
+                                Message = "Password should contain any digit from 0-9.",
+                                Opacity = 1.0m
+                            });
+                        }
+
+                        var regex = new Regex(@"[!@#$%^&*()_+=\[{\]};:<>|./?,-]");
                         if (!regex.IsMatch(UserRegister.Password))
                         {
                             IsValidPassword = false;
+                            passwordErrorCount++;
+
+                            Alerts.Add(new AlertModel
+                            {
+                                Status = "Error",
+                                Message = "Password must include at least one special character.",
+                                Opacity = 1.0m
+                            });
+                        }
+
+                        if (UserRegister.Password.Any(char.IsWhiteSpace))
+                        {
+                            IsValidPassword = false;
+                            passwordErrorCount++;
+
+                            Alerts.Add(new AlertModel
+                            {
+                                Status = "Error",
+                                Message = "Password should not contain spaces.",
+                                Opacity = 1.0m
+                            });
                         }
                     }
                 }
+            }
+
+            if(!string.IsNullOrWhiteSpace(userModel.Email))
+            {
+                IsValidEmail = Regex.IsMatch(userModel.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+
+                if(!IsValidEmail)
+                {
+                    Alerts.Add(new AlertModel
+                    {
+                        Status = "Error",
+                        Message = "Email is invalid",
+                        Opacity = 1.0m
+                    });
+                }
+            }
+
+            if (passwordErrorCount > 1)
+            {
+                Alerts.RemoveAll(x => x.Message.Contains("Password"));
+
+                Alerts.Add(new AlertModel
+                {
+                    Status = "Error",
+                    Message = "Password must be 8-15 characters long, which should contain uppercase and lowercase characters, with any digit from 0-9, and must include at least one special character.",
+                    Opacity = 1.0m
+                });
             }
 
             if (IsValidPassword && IsValidUsername && IsValidEmail && IsValidPassword)

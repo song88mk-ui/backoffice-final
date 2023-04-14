@@ -5,6 +5,15 @@
     }
     else
     {
+        @if (Alerts != null && Alerts.Any())
+        {
+            <div class="col">
+                @foreach (var alert in Alerts)
+                {
+                    <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" />
+                }
+            </div>
+        }
         <div class="information-container mb-3">
             <div class="row">
                 <div class="col-md-12 mb-1">
@@ -14,23 +23,23 @@
             <div class="row">
                 <div class="col-md-4">
                     <label class="form-label">Business Name</label>
-                    <input type="text" class="form-control @(IsValidUsername ? "valid" : "invalid")" placeholder="Enter Username" @bind-value="UserRegister.UserName" disabled="@IsEdit" />
+                    <input type="text" class="form-control @(IsValidUsername ? "valid" : "invalid")" placeholder="Enter Username" @bind-value="UserRegister.UserName" disabled="@IsEdit" @oninput="@(() => RemoveError("username"))"/>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Email Address</label>
-                    <input type="text" class="form-control @(IsValidEmail ? "valid" : "invalid")" placeholder="Enter Email Address" @bind-value="UserRegister.Email" />
+                    <input type="text" class="form-control @(IsValidEmail ? "valid" : "invalid")" placeholder="Enter Email Address" @bind-value="UserRegister.Email" @oninput="@(() => RemoveError("email"))" />
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Password</label>
                     <div class="input-group">
-                        <input id="password" type="password" class="form-control pe-5 @(IsValidPassword ? "valid" : "invalid")" placeholder="Enter your password" @bind-value="UserRegister.Password" @onfocusout="OnPasswordFocusOutEvent" />
+                        <input id="password" type="password" class="form-control pe-5 @(IsValidPassword ? "valid" : "invalid")" placeholder="Enter your password" @bind-value="UserRegister.Password" @oninput="@(() => RemoveError("password"))" />
                         <button type="button" class="d-flex align-items-center position-absolute end-0 h-100 bg-transparent border-0 password-eye" onclick="password_show_hide();">
                             <i class="fa fa-eye-slash text-center eye-icon" id="show_eye"></i>
                             <i class="fa fa-eye d-none text-center eye-icon" id="hide_eye"></i>
                         </button>
                     </div>
                     <div class="form-text fst-italic">
-                        Password must contain any character from A-Z or a-z with any digit from 0-9, and between 8 to 15 character long
+                        Password must be 8-15 characters long, which should contain uppercase and lowercase characters, with any digit from 0-9, and must include at least one special character
                     </div>
                 </div>
             </div>
@@ -59,7 +68,6 @@
                 </div>
             </div>
         </div>
-        <AlertMessage AlertStatus="@AlertModel.Status" AlertMessageStr="@AlertModel.Message" Opacity="@AlertModel.Opacity" />
         <Permission Permissions="Permissions.Permissions" IsReadOnly="true" ClientModel="ClientModel" @ref="PermissionComponent" />
     }
 </div>

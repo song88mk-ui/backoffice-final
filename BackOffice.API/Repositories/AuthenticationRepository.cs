@@ -18,6 +18,8 @@ namespace Backoffice.API.Repositories
     public class AuthenticationRepository : IAuthenticationRepository
     {
         private HttpClient _httpClient { get; set; }
+        private string _boVersion = "2";
+
         public AuthenticationRepository(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -78,7 +80,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.GetAsync($"authenticate");
 
                 if (response.IsSuccessStatusCode)
@@ -318,6 +320,9 @@ namespace Backoffice.API.Repositories
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                if (!_httpClient.DefaultRequestHeaders.Contains("x-version"))
+                    _httpClient.DefaultRequestHeaders.Add("x-version", _boVersion);
+
                 var response = await _httpClient.GetAsync($"v1/api/user/permission/list?isSubUserOnly={isSubUserOnly}");
 
                 if (response.IsSuccessStatusCode)
@@ -325,12 +330,6 @@ namespace Backoffice.API.Repositories
                     var test = await response.Content.ReadAsStringAsync();
                     var content = JsonSerializer.Deserialize<BaseResponse<PermissionResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
                         ?? new BaseResponse<PermissionResponse>();
-
-                    if (content.Result != null)
-                    {
-                        if (content.Result.Permissions != null)
-                            content.Result.Permissions = content.Result.Permissions.Where(x => x.Version != 1).ToList();
-                    }
 
                     return content;
                 }

@@ -1,4 +1,13 @@
 ﻿<div class="modal-body">
+    @if (Alerts.Any())
+    {
+        <div class="col">
+            @foreach (var alert in Alerts)
+            {
+                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" />
+            }
+        </div>
+    }
     <div class="d-flex flex-column justify-content-center p-5">
         <div class="text-center">
             <icon class="ico ico-warning"></icon>
@@ -11,15 +20,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    @if (Alerts.Any())
-    {
-        <div class="col-md-8">
-            @foreach (var alert in Alerts)
-            {
-                <AlertMessage AlertStatus="@alert.Status" AlertMessageStr="@alert.Message" Opacity="alert.Opacity" />
-            }
-        </div>
-    }
     <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent" disabled="@IsPreload">Close</button>
     <button type="button" class="btn modal-btn modal-apply" @onclick="OnDeleteClickEvent" disabled="@IsPreload">Apply</button>
 </div>

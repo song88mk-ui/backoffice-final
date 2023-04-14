@@ -38,7 +38,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         protected override async Task OnInitializedAsync()
         {
             AlertModel = new AlertModel();
-            AddMarketSettlement = new AddMarketSettlementModel();            
+            AddMarketSettlement = new AddMarketSettlementModel();
         }
 
         public async Task OnAddStatusChange(ChangeEventArgs e, int rowCount)
@@ -65,7 +65,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         {
             IsPreLoader = true;
             this.AddMarketSettlement = AddMarketSettlement;
-            
+
             if (!string.IsNullOrEmpty(AddMarketSettlement.BetId))
             {
                 Guid.TryParse(AddMarketSettlement.BetId, out var betId);
@@ -391,7 +391,48 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                     Activity = Activity.ManualSettlement.ToString(),
                     Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
                     From = "-",
-                    To = JsonSerializer.Serialize(item),
+                    To = JsonSerializer.Serialize(new ManualMarketSettlementAuditModel()
+                    {
+                        SportId = item.SportId,
+                        SportName = item.SportName,
+                        SegmentId = item.SegmentId,
+                        SegmentName = item.SegmentName,
+                        LeagueId = item.LeagueId,
+                        LeagueName = item.LeagueName,
+                        FixtureId = Convert.ToInt64(item.FixtureId),
+                        FixtureName = item.FixtureName,
+                        FixtureTypeId = item.FixtureTypeId,
+                        FixtureTypeName = item.FixtureTypeName,
+                        MarketTemplateId = item.MarketTemplateId,
+                        MarketId = Convert.ToInt64(item.MarketId),
+                        MarketName = item.MarketName,
+                        SelectionTemplateId = item.SelectionTemplateId,
+                        SelectionId = Convert.ToInt64(item.SelectionId),
+                        SelectionName = item.SelectionName,
+                        FixtureStatusId = item.FixtureStatusId,
+                        FixtureStatusName = item.FixtureStatusName,
+                        Line = item.Line,
+                        Odds = item.Odds,
+                        ProviderFixtureId = item.ProviderFixtureId,
+                        FixtureSpecifier = item.FixtureSpecifier,
+                        MarketSpecifier = item.MarketSpecifier,
+                        SelectionSpecifier = item.SelectionSpecifier,
+                        FixtureStartDate = item.FixtureStartDate,
+                        SettlementScore = item.SettlementScore,
+                        Probability = item.Probability,
+                        WonProbability = item.WonProbability,
+                        LostProbability = item.LostProbability,
+                        VoidProbability = item.VoidProbability,
+                        HalfWonProbability = item.HalfWonProbability,
+                        HalfLostProbability = item.HalfLostProbability,
+                        CorrelationId = item.CorrelationId,
+                        DeadHeatFactor = item.DeadHeatFactor,
+                        ManualSettledBy = item.ManualSettledBy,
+                        TimeStamp = DateTime.UtcNow,
+                        Reason = item.Reason,
+                        ToStatusId = (int)item.SelectionStatus,
+                        ToStatusName = item.SelectionStatus.ToString()
+                    }),
                     UserId = UserModel.Id,
                     UserName = UserModel.UserName,
                     TimeStamp = DateTime.Now

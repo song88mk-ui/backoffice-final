@@ -38,7 +38,11 @@
                         {
                             @if (ClientsView == null)
                             {
-                                <NoRecordFound />
+                                <tr>
+                                    <td colspan="3">
+                                        <NoRecordFound />
+                                    </td>
+                                </tr>
                             }
                             else
                             {

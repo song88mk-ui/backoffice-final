@@ -5,6 +5,7 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -17,6 +18,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
@@ -65,6 +67,11 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                         Message = "Cannot delete this user group",
                         Opacity = Opacity
                     });
+                }
+
+                if (Alerts.Any())
+                {
+                    await JSRuntime.InvokeVoidAsync("scrollToTopOfElement", ".modal", "fast");
                     return;
                 }
 
