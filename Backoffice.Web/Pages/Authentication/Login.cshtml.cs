@@ -1,3 +1,4 @@
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
@@ -77,7 +78,9 @@ namespace Backoffice.Web.Pages.Authentication
                 var result = await _authenticationService.Login(UserModel);
                 if (result.Result.Item1)
                 {
-                    policies = result.Result.Item2;
+                    var access = new[] { PermissionCategory.SBC.ToString().ToUpper(), PermissionCategory.Admin.ToString().ToUpper() };
+
+                    policies = result.Result.Item2.Where(x => access.Contains(x.ToUpper())).ToList();
                     if (policies.Count == 1)
                     {
                         switch (policies.FirstOrDefault().ToString().ToUpper())
@@ -91,7 +94,8 @@ namespace Backoffice.Web.Pages.Authentication
                             default:
                                 return LocalRedirect("/choose-access");
                         }
-                    } else if (policies.Count > 1)
+                    }
+                    else if (policies.Count > 1)
                     {
                         return LocalRedirect("/choose-access");
                     }
@@ -103,7 +107,7 @@ namespace Backoffice.Web.Pages.Authentication
 
                 //ModelState.AddFormError("Username or Password is incorrect");
                 //ModelState.AddModelError("UserModel.Password", "Username or Password is incorrect");
-                if(!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
+                if (!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
                 {
                     ModelState.AddModelError(string.Empty, result.Message);
                 }
