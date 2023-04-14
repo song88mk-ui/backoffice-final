@@ -182,6 +182,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
 
             await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
+
+            IsPreload = true;
+
+            StateHasChanged();
+
+            await GetSports();
+
+            IsPreload = false;
         }
 
         public async Task OnCopyClickEvent()
@@ -602,7 +610,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     .ToList();
             }
 
-            ModifiedClientSportsSettingsModel = ClientSportsSettingsModel;
+            ModifiedClientSportsSettingsModel = ClientSportsSettingsModel;            
         }
 
         private async Task InitializeSortTable(string rowSelector, string categorySelector)
