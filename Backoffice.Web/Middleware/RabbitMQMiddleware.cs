@@ -14,29 +14,71 @@ namespace Backoffice.Web.Middleware
     public class RabbitMQMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IMessageBroker _messageBroker;
+        private readonly List<IMessageBroker> _messageBroker;
         private readonly IHubContext<BoHub> _boHub;
-        private readonly string _region = "";
 
-        public RabbitMQMiddleware(RequestDelegate next, IMessageBroker messageBroker, IHubContext<BoHub> boHub, IConfiguration config, string region = "")
+        public RabbitMQMiddleware(RequestDelegate next, IHubContext<BoHub> boHub, IConfiguration config)
         {
             _next = next;
-            _messageBroker = messageBroker;
-            _region = region.ToUpper();
-
-            if (string.IsNullOrWhiteSpace(region))
-            {
-                _messageBroker.Connect(config?.GetSection($"MessageBroker:{_region}").Get<MessageBrokerCredentialModel>());
-            }
-            else
-            {
-                _messageBroker.Connect();
-            }
-
-            _messageBroker.Connect();
-            _messageBroker.MessageReceived += MessageReceived;
-
+            _messageBroker = new List<IMessageBroker>();
             _boHub = boHub;
+
+            var regions = new[] { "", "HK", "SA" };
+
+            foreach(var item in regions)
+            {
+                var messageBroker = new MessageBroker(config);
+                if (string.IsNullOrWhiteSpace(item))
+                {
+                    messageBroker.Connect(config?.GetSection($"MessageBroker:{item}").Get<MessageBrokerCredentialModel>());
+                }
+                else
+                {
+                    messageBroker.Connect();
+                }
+
+                messageBroker.MessageReceived += (sender, e) =>
+                {
+                    var payload = Encoding.UTF8.GetString(e.Body);
+                    var messageType = e.BasicProperties.Type;
+
+                    try
+                    {
+                        var hubClients = string.IsNullOrWhiteSpace(item) ? _boHub.Clients.All : _boHub.Clients.Group(item);
+
+                        if (e.RoutingKey.StartsWith("r.oe.bm.engine."))
+                        {
+                            switch (messageType)
+                            {
+                                case "OnOddsChange":
+                                    var oddschange = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(payload);
+                                    hubClients.SendAsync("onoddschange", oddschange).Wait();
+                                    break;
+                                case "OnBetStopFixture":
+                                    var betStopFixture = JsonSerializer.Deserialize<OnExternalBetStopFixtureMessage>(payload);
+                                    hubClients.SendAsync("onbetstopfixture", betStopFixture).Wait();
+                                    break;
+                                case "OnBetStopGlobal":
+                                    var betStopGlobal = JsonSerializer.Deserialize<OnExternalBetStopGlobalMessage>(payload);
+                                    hubClients.SendAsync("onbetstopglobal", betStopGlobal).Wait();
+                                    break;
+                                case "OnSignIn":
+                                    var signin = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(payload);
+                                    hubClients.SendAsync("onsignin", signin).Wait();
+                                    break;
+                                case "OnNewNotification":
+                                    var notificationsModel = JsonSerializer.Deserialize<NotificationsModel>(payload);
+                                    hubClients.SendAsync("onnewnotification", notificationsModel).Wait();
+                                    break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                };
+                _messageBroker.Add(messageBroker);
+            }
 
         }
 
@@ -52,7 +94,7 @@ namespace Backoffice.Web.Middleware
 
             try
             {
-                var hubClients = string.IsNullOrWhiteSpace(_region) ? _boHub.Clients.All : _boHub.Clients.Group(_region);
+                var hubClients = string.IsNullOrWhiteSpace("") ? _boHub.Clients.All : _boHub.Clients.Group("");
 
                 if (e.RoutingKey.StartsWith("r.oe.bm.engine."))
                 {

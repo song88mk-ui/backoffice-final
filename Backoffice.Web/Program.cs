@@ -174,8 +174,6 @@ if (!app.Environment.IsDevelopment())
 
 app.UseSession();
 app.UseMiddleware<RabbitMQMiddleware>();
-app.UseMiddleware<RabbitMQMiddleware>("HK");
-app.UseMiddleware<RabbitMQMiddleware>("SA");
 
 app.UseHttpsRedirection();
 
