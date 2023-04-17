@@ -20,8 +20,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
-        [Parameter] public string Region { get; set; }
+        [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public string Id { get; set; }
 
         private HubConnection _hubConnection { get; set; }
