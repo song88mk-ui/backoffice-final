@@ -10,7 +10,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [Parameter] public string Region { get; set; }
+        [Parameter] public string Region { get; set; } = "hk";
 
         public bool ShowPriceBoostMenu { get; set; }
         public bool ShowMarketSettingsMenu { get; set; }
@@ -66,10 +66,10 @@ namespace Backoffice.Web.Shared.OddsEngine
 
             if (menu != null)
             {
-                if (menu.Contains("sa/odds-engine/"))
-                    menu = menu.Replace("sa/odds-engine/", "");
-                if (menu.Contains("sa/odds-engine"))
-                    menu = menu.Replace("sa/odds-engine", "");
+                //if (menu.Contains("sa/odds-engine/"))
+                //    menu = menu.Replace("sa/odds-engine/", "");
+                //if (menu.Contains("sa/odds-engine"))
+                //    menu = menu.Replace("sa/odds-engine", "");
                 if (menu.Contains("hk/odds-engine/"))
                     menu = menu.Replace("hk/odds-engine/", "");
                 if (menu.Contains("hk/odds-engine"))

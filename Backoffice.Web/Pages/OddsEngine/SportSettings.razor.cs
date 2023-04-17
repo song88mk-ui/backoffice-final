@@ -23,7 +23,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public IJSStreamReference? DataReference { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [Parameter] public string Region { get; set; }
+        [Parameter] public string Region { get; set; } = "hk";
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }

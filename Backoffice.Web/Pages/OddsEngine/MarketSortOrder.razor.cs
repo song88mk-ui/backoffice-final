@@ -16,8 +16,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
-
-        [Parameter] public string Region { get; set; }
+        [Parameter] public string Region { get; set; } = "hk";
         public IJSStreamReference? DataReference { get; set; }
 
         public string PageTitle { get; set; }

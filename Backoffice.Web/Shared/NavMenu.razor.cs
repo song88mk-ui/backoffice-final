@@ -20,8 +20,7 @@ namespace Backoffice.Web.Shared
         [Parameter] public PermissionCategory NavMenuAccess { get; set; }
         [Parameter] public NavMenuModel NavMenus { get; set; }
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
-
-        [Parameter] public string Region { get; set; }
+        [Parameter] public string Region { get; set; } = "hk";
         public SportClickCallbackModel SelectedSport { get; set; }
 
         public SportsTreeModel Menu { get; set; }
@@ -84,9 +83,9 @@ namespace Backoffice.Web.Shared
 
                 switch(page.ToLower())
                 {
-                    case "sa/odds-engine":
+                    //case "sa/odds-engine":
                     case "hk/odds-engine":
-                    case "sa/odds-engine/monitoring":
+                    //case "sa/odds-engine/monitoring":
                     case "hk/odds-engine/monitoring":
                         await OnSportClickCallback.InvokeAsync(SelectedSport);
                         break;

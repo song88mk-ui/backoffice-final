@@ -178,13 +178,13 @@ namespace Backoffice.Web.Shared
                                                         IconName = "location",
                                                         Url = $"hk/odds-engine",
                                                     },
-                                                    new NavMenuModel.MenuModel()
-                                                    {
-                                                        Id = $"menu.odds-engine.sa",
-                                                        Name = "South Africa",
-                                                        IconName = "location",
-                                                        Url = $"sa/odds-engine",
-                                                    },
+                                                    //new NavMenuModel.MenuModel()
+                                                    //{
+                                                    //    Id = $"menu.odds-engine.sa",
+                                                    //    Name = "South Africa",
+                                                    //    IconName = "location",
+                                                    //    Url = $"sa/odds-engine",
+                                                    //},
                                                 }
                                             };
 

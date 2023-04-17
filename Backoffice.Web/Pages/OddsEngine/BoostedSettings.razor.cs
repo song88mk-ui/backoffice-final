@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] IModalService ModalService { get; set; }
 
         [Parameter] public string THeadClass { get; set; }
-        [Parameter] public string Region { get; set; }
+        [Parameter] public string Region { get; set; } = "hk";
 
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 

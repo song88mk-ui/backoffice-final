@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private ITradingService TradingService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [Parameter] public string Region { get; set; }
+        [Parameter] public string Region { get; set; } = "hk";
 
         public List<PriceBoostConfigModel> PriceBoostList { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
