@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Drawing;
 
 namespace Backoffice.Web.Shared
 {
@@ -18,6 +19,7 @@ namespace Backoffice.Web.Shared
         [Parameter] public NavMenuModel NavMenus { get; set; }
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
 
+        [Parameter] public string Region { get; set; }
         public SportClickCallbackModel SelectedSport { get; set; }
 
         public SportsTreeModel Menu { get; set; }
@@ -39,7 +41,16 @@ namespace Backoffice.Web.Shared
         {
             Menu = new SportsTreeModel();
             SelectedSport = new SportClickCallbackModel();
-            
+
+            var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+            var splitVal = page.Split("/").FirstOrDefault();
+
+            if (splitVal != null)
+            {
+                var regions = new List<string>() { "HK", "SA" };
+                Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToUpper() : null;
+            }
+
             if (NavMenuAccess == PermissionCategory.OE)
             {
                 await GetSportsTreeMenu();
@@ -68,17 +79,18 @@ namespace Backoffice.Web.Shared
                     }
                 }
 
-                var page = NavigationManager.Uri.Replace($"{NavigationManager.BaseUri}", "");
-
-                if (page.ToLower() == "odds-engine" || page.ToLower() == "odds-engine/monitoring")
+                switch(page.ToLower())
                 {
-                    await OnSportClickCallback.InvokeAsync(SelectedSport);
+                    case "sa/odds-engine":
+                    case "hk/odds-engine":
+                    case "sa/odds-engine/monitoring":
+                    case "hk/odds-engine/monitoring":
+                        await OnSportClickCallback.InvokeAsync(SelectedSport);
+                        break;
                 }
-                //StateHasChanged();
             }
 
         }
-
         public void ToggleNavMenu()
         {
             collapseNavMenu = !collapseNavMenu;
@@ -127,7 +139,7 @@ namespace Backoffice.Web.Shared
 
                 if (slugs.Count != 1 && slugs[1].ToLower() != "monitoring")
                 {
-                    NavigationManager.NavigateTo("/odds-engine");
+                    NavigationManager.NavigateTo($"/{Region}/odds-engine");
                 }
 
                 await OnSportClickCallback.InvokeAsync(SelectedSport);
@@ -158,7 +170,7 @@ namespace Backoffice.Web.Shared
 
                 if (slugs.Count != 1 && slugs[1].ToLower() != "monitoring")
                 {
-                    NavigationManager.NavigateTo("/odds-engine");
+                    NavigationManager.NavigateTo($"/{Region}/odds-engine");
                 }
 
                 await OnSportClickCallback.InvokeAsync(SelectedSport);

@@ -3,7 +3,7 @@
 
 @layout OEMonitoringLayout
 
-@page "/odds-engine/manage-boost"
+@page "/{Region}/odds-engine/manage-boost"
 
 <AuthorizeView Policy="sbc-priceboost-manage">
     <Authorized>
@@ -24,7 +24,7 @@
         }
 
         <div class="col-md-12">
-            <Filter @ref="FilterReference" OnClientChangedCallback="OnClientChangedEvent" OnSportChangedCallback="OnSportChangedEvent" OnSegmentChangedCallback="OnSegmentChangedEvent" OnLeagueChangedCallback="OnLeagueChangedEvent" OnInitCallback="OnInitCallback" OnInputSearchCallback="OnInputSearchEvent"/>
+            <Filter @ref="FilterReference" OnClientChangedCallback="OnClientChangedEvent" OnSportChangedCallback="OnSportChangedEvent" OnSegmentChangedCallback="OnSegmentChangedEvent" OnLeagueChangedCallback="OnLeagueChangedEvent" OnInitCallback="OnInitCallback" OnInputSearchCallback="OnInputSearchEvent" Region="Region"/>
         </div>
 
         <div class="col-md-12">

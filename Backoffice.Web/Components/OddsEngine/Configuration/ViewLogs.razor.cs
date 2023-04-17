@@ -5,6 +5,7 @@ using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Drawing;
 using System.Text;
 using System.Text.Json;
 
@@ -16,6 +17,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         private ConfigLogsFilterModel ConfigLogsFilterModel { get; set; }
         private MetaData MetaData { get; set; } = new MetaData();
         private int CursorId { get; set; }
@@ -42,6 +44,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 Filter = string.Empty,
             };
 
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             MetaData = new MetaData()
             {
                 CurrentPage = 1,

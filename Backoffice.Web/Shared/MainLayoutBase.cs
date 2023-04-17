@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
+using System.Drawing;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -31,10 +32,11 @@ namespace Backoffice.Web.Shared
 
         private ToastService toasterService => _toasterService!;
 
-        private HubConnection HubConnection { get; set; }
+        private HubConnection _hubConnection { get; set; }
         public HeaderNavMenu HeaderNavMenuReference { get; set; }
 
         public UserModel UserModel { get; set; } = new UserModel();
+        public string Region { get; set; } = null;
         public LogInModel Model { get; set; }
         public NavMenuModel NavMenus { get; set; }
 
@@ -54,8 +56,8 @@ namespace Backoffice.Web.Shared
         protected override async Task OnInitializedAsync()
         {
             try
-            {
-                IsPreLoader = true;
+            {                
+                IsPreLoader = true;                
 
                 InlineSpinnerCss = "width:10rem;height:10rem;";
 
@@ -80,7 +82,7 @@ namespace Backoffice.Web.Shared
 
                 if (userClaims is not null)
                 {
-                    if(Clients.Clients.Any())
+                    if (Clients.Clients.Any())
                     {
                         if (isSuperAdmin)
                             UserModel.ClientCodes = Clients.Clients.Select(c => c.ClientCode).ToList();
@@ -117,6 +119,7 @@ namespace Backoffice.Web.Shared
                         foreach (var category in permissionSubCategory)
                         {
                             var subMenus = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.') && p.SubCategoryName == category).ToList();
+
                             if (subMenus.Count() == 1)
                             {
                                 var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
@@ -143,7 +146,7 @@ namespace Backoffice.Web.Shared
                                     Url = $"#sub-menu-{categoryId}",
                                 };
 
-                                if(category == "User & User Groups")
+                                if (category == "User & User Groups")
                                 {
                                     menu.IconName = "manage-user-group";
                                 }
@@ -156,7 +159,6 @@ namespace Backoffice.Web.Shared
                                         if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel?.MainUserId))
                                             continue;
 
-
                                         if (claim.Type == SportsbookClientPermission.SBC_OE.ToString().Replace("_", "."))
                                         {
                                             var menu2 = new NavMenuModel.MenuModel
@@ -164,8 +166,26 @@ namespace Backoffice.Web.Shared
                                                 Id = $"sub-menu-odds-engine",
                                                 Name = "Odds Engine",
                                                 IconName = "odds-engine",
-                                                Url = $"odds-engine",
+                                                Url = $"#sub-menu-odds-engine",
+                                                SubMenus = new List<NavMenuModel.MenuModel>()
+                                                {
+                                                    new NavMenuModel.MenuModel()
+                                                    {
+                                                        Id = $"menu.odds-engine.hk",
+                                                        Name = "Asia",
+                                                        IconName = "location",
+                                                        Url = $"hk/odds-engine",
+                                                    },
+                                                    new NavMenuModel.MenuModel()
+                                                    {
+                                                        Id = $"menu.odds-engine.sa",
+                                                        Name = "South Africa",
+                                                        IconName = "location",
+                                                        Url = $"sa/odds-engine",
+                                                    },
+                                                }
                                             };
+
                                             NavMenus.Menus.Add(menu2);
                                             continue;
                                         }
@@ -217,10 +237,10 @@ namespace Backoffice.Web.Shared
 
         public async ValueTask DisposeAsync()
         {
-            if (HubConnection != null)
+            if (_hubConnection != null)
             {
-                await HubConnection.StopAsync();
-                await HubConnection.DisposeAsync();
+                await _hubConnection.StopAsync();
+                await _hubConnection.DisposeAsync();
             }
         }
 
@@ -255,16 +275,17 @@ namespace Backoffice.Web.Shared
             {
                 var request = _httpContextAccessor.HttpContext?.Request;
 
-                HubConnection = new HubConnectionBuilder()
+                _hubConnection = new HubConnectionBuilder()
                     .WithUrl(new Uri(Configuration["API:HubAPI"]))
                     .Build();
-                HubConnection.Closed += async (error) =>
+
+                _hubConnection.Closed += async (error) =>
                 {
                     await Task.Delay(new Random().Next(0, 5) * 1000);
-                    await HubConnection.StartAsync();
+                    await _hubConnection.StartAsync();
                 };
 
-                await HubConnection.StartAsync().ContinueWith(task =>
+                await _hubConnection.StartAsync().ContinueWith(task =>
                 {
                     if (task.IsFaulted)
                     {
@@ -273,11 +294,12 @@ namespace Backoffice.Web.Shared
                     }
                     else if (task.IsCompletedSuccessfully)
                     {
-                        UserModel.ConnectionId = HubConnection.ConnectionId.ToString();
+                        UserModel.ConnectionId = _hubConnection.ConnectionId.ToString();
                     }
                 });
 
-                HubConnection.On<string>("Notification", async message =>
+                await _hubConnection.InvokeAsync("AddToGroup", "HK");
+                _hubConnection.On<string>("Notification", async message =>
                 {
                     var payload = JsonSerializer.Deserialize<NotificationsModel>(message);
                     await ProcessNotification(payload);

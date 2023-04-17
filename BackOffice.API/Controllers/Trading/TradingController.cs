@@ -1,4 +1,5 @@
-﻿using Backoffice.API.Repositories;
+﻿using Backoffice.API.ActionFilter;
+using Backoffice.API.Repositories;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Backoffice.API.Controllers.Trading
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class TradingController : ControllerBase

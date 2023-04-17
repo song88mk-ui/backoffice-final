@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Linq;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
 
 namespace Backoffice.Web.Pages.Authentication
@@ -88,8 +89,8 @@ namespace Backoffice.Web.Pages.Authentication
                             case "ADMIN":
                                 return LocalRedirect("/admin/dashboard");
                             case "SBC":
+                            case "PM":
                                 return LocalRedirect("/dashboard");
-                            //case "PM":
                             //    return LocalRedirect("/pm/dashboard");
                             default:
                                 return LocalRedirect("/choose-access");

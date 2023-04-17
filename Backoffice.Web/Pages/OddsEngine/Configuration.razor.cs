@@ -22,9 +22,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private ITradingService TradingService { get; set; }        
         [Inject] private IConfiguration AppConfiguration { get; set; }        
         [Inject] public ToastService? ToastService { get; set; }
-
+        [Parameter] public string Region { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-
         public List<MarketLookupNavigationModel> SelectedContents;
         public List<BreadcrumbModel> Breadcrumbs { get; set; }        
         public List<MarketLookupNavigationModel> MarketLookupNavigationModelsTemp { get; set; }
@@ -57,6 +56,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             ConfigFilterModel = null;
             IsMarketEditing = false;
             AllMarketStatusName = "Deactivate All";
+            TradingService.Region = Region.ToUpper();
             Guid = new Guid();
 
             MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
@@ -118,6 +118,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalDialogClass", "modal-lg");            
             parameters.Add("MarketChangedCount", MarketLookupNavigationModelsTemp.Count);
             parameters.Add("OnCancelCallback", EventCallback.Factory.Create(this, UndoEditedMarkets));
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<UpdateActiveMarketModal>("Clear changes?", parameters, options);
@@ -708,6 +709,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
                 .Build();
 
+            await _hubConnection.InvokeAsync("AddToGroup", Region);
+
             _hubConnection.Closed += async (error) =>
             {
                 await Task.Delay(new Random().Next(0, 5) * 1000);
@@ -723,8 +726,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 await ProcessNotification(message);
             });
 
-
-            await _hubConnection.StartAsync();            
+            await _hubConnection.StartAsync();
+            await _hubConnection.InvokeAsync("AddToGroup", Region.ToUpper());
         }
 
         private async Task ProcessOnConfigChange(ConfigSettingsModel message)

@@ -5,7 +5,7 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Drawing;
 
 namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 {
@@ -24,9 +24,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         public AddPriceBoostFilterModel Model { get; set; }
         public SportsTreeModel Sports { get; set; }        
         public MarketFixtureResponse MarketFixtureResponse { get; set; }
+        private string Region { get; set; }
 
         public bool IsPreloader { get; set; }
-
         #endregion
 
         #region Fields
@@ -42,8 +42,10 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             IsPreloader = true;
             SelectedFixtureType = FixtureType.Match;
 
-            Model = new AddPriceBoostFilterModel();            
+            Model = new AddPriceBoostFilterModel();
 
+            
+            TradingService.Region = Region = ModalParameters.TryGet<string>("Region").ToUpper();
             Model.Sports = await GetSports(SelectedFixtureType);
 
             IsPreloader = false;
@@ -160,6 +162,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("AddPriceBoostFilterModel", Model);
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
 

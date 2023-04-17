@@ -17,6 +17,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] IModalService ModalService { get; set; }
 
         [Parameter] public string THeadClass { get; set; }
+        [Parameter] public string Region { get; set; }
 
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
@@ -37,6 +38,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             THeadClass = "table-head";
             PageTitle = "Boosted Settings";
             IconClass = string.Empty;
+            TradingService.Region = Region.ToUpper();
 
             Breadcrumbs = new List<BreadcrumbModel>()
             {
@@ -91,6 +93,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var parameters = new ModalParameters();
 
                 parameters.Add("Client", client);
+                parameters.Add("Region", Region);
 
                 var options = new ModalOptions();
                 ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
@@ -107,6 +110,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var parameters = new ModalParameters();
                 parameters.Add("DialogStyle", "max-width: 80%; overflow-y: initial !important");
                 parameters.Add("SelectedPage", SportsbookClientPermission.SBC_OE_PriceBoost_Settings);
+                parameters.Add("Region", Region);
                 var options = new ModalOptions();
 
                 ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);

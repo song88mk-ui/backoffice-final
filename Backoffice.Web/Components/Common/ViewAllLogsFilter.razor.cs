@@ -25,6 +25,7 @@ public partial class ViewAllLogsFilter : IDisposable
     {
         Pages = new Dictionary<SportsbookClientPermission, string>() { { SportsbookClientPermission.SBC_OE_PriceBoost_Manage, "Manage Boost" }, { SportsbookClientPermission.SBC_OE_PriceBoost_Settings, "Boosted Setting" } };
 
+        TradingService.Region = "";
         var client = await GetClients();
         FilterModel = new PriceBoostLogFilterModel()
         {

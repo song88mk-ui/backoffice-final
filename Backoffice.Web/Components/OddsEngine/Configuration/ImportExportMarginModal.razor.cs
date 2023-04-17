@@ -35,6 +35,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public static HashSet<string> SelectedClientsSet { get; set; }
         public static HashSet<string> SelectedSportsSet { get; set; }
 
+        public string Region { get; set; }
         public bool IsImportTab { get; set; }
         public bool IsUploading { get; set; }        
 
@@ -56,9 +57,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             SelectedClientsSet = new HashSet<string>();
             SelectedSportsSet = new HashSet<string>();
-
+            Region = ModalParameters.TryGet<string>("Region").ToUpper();
             OnExportMarginCallback = ModalParameters.TryGet<EventCallback>("OnExportMarginCallback");
             OnImportMarginCallback = ModalParameters.TryGet<EventCallback<string>>("OnImportMarginCallback");
+            TradingService.Region = Region.ToUpper();
 
             Guid = new Guid();
 
@@ -221,7 +223,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 SportIds = string.Join(",", SelectedSportsSet)
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet2", "r.oe.web.config.ongetmarginspreadsheet2", Guid.NewGuid().ToString());
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet2", "r.oe.web.config.ongetmarginspreadsheet2", Guid.NewGuid().ToString(), Region);
 
             IsUploading = false;
             

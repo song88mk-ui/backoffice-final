@@ -3,10 +3,10 @@
 
 @layout OEMonitoringLayout
 
-@page "/odds-engine"
-@page "/odds-engine/monitoring"
-@*@page "/odds-engine/monitoring/{SportId}/{SegmentId}"*@
-@page "/odds-engine/monitoring/{SportId}/{SegmentId}/{LeagueId}"
+@page "/{Region}/odds-engine"
+@page "/{Region}/odds-engine/monitoring"
+@*@page "/{Region}/odds-engine/monitoring/{SportId}/{SegmentId}"*@
+@page "/{Region}/odds-engine/monitoring/{SportId}/{SegmentId}/{LeagueId}"
 
 <AuthorizeView Policy="sbc-monitoring-match">
     <Authorized>
@@ -53,7 +53,7 @@
                                 {
                                     foreach (var market in FixtureMarkets)
                                     {
-                                        <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" />
+                                        <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" Region="@Region" />
                                     }
                                 }
                             </tbody>

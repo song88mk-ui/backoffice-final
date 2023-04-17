@@ -17,7 +17,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public ConfigFilterModel ConfigFilterModel { get; set; } = new ConfigFilterModel();
         [Parameter] public EventCallback<ConfigFilterModel> ConfigFilterModelChanged { get; set; }
         [Parameter] public EventCallback IsMarketEditingChanged { get; set; }
-        [Parameter] public FixtureType FixtureType { get; set; }                                                
+        [Parameter] public FixtureType FixtureType { get; set; }
+        [Parameter] public string Region { get; set; } = string.Empty;
         #endregion
 
         #region Fields
@@ -37,6 +38,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task Initialize()
         {
+            if (!string.IsNullOrEmpty(Region))
+                TradingService.Region = Region.ToUpper();
+
             _isPreloader = true;
             var sports = await GetSports();
             var sportId = sports.Any() ? sports.FirstOrDefault().Value : 0;

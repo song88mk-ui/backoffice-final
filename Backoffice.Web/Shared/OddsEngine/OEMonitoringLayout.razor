@@ -5,36 +5,53 @@
 
 <ToastComponent />
 <CascadingValue Value="UserModel" Name="UserModel">
-    <PageTitle>Backoffice - SBC - Odds Engine</PageTitle>
-    <div class="page">
-        @if (IsPreLoader)
-        {
-            <div class="preload-container d-flex justify-content-center align-items-center">
-                <Preloader InlineSpinnerCss="@InlineSpinnerCss" />
-            </div>
-        }
-        else
-        {
-            <div class="sidebar">
-                <NavMenu NavMenuAccess="PermissionCategory.OE" OnSportClickCallback="OnSportClickEvent" />
-            </div>
-            <main>
-                <article class="content px-4">
-                    <div class="row">
-                        <div class="main-content col-md-12 mb-4 pb-3 rounded">
-                            <div class="row">
-                                <div class="header-container col-md-12">
-                                    <HeaderNavMenu @ref="HeaderNavMenuReference" />
-                                </div>
+        <PageTitle>Backoffice - SBC - Odds Engine</PageTitle>
+        <div class="page">
+            @if (IsPreLoader)
+            {
+                <div class="preload-container d-flex justify-content-center align-items-center">
+                    <Preloader InlineSpinnerCss="@InlineSpinnerCss" />
+                </div>
+            }
+            else
+            {
+                <div class="sidebar">
+                    <NavMenu NavMenuAccess="PermissionCategory.OE" OnSportClickCallback="OnSportClickEvent" Region="@Region"/>
+                </div>
+                <main>
+                    <article class="content px-4">
+                        <div class="row">
+                            <div class="main-content col-md-12 mb-4 pb-3 rounded">
+                                <div class="row">
+                                    <div class="header-container col-md-12">
+                                        <HeaderNavMenu @ref="HeaderNavMenuReference" Region="@Region"/>
+                                    </div>
 
-                                <CascadingValue Value="SelectedSport" Name="SelectedSport">
-                                    @Body
-                                </CascadingValue>
+                                    <CascadingValue Value="SelectedSport" Name="SelectedSport">
+                                        @Body
+                                    </CascadingValue>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </article>
-            </main>
-        }
-    </div>
+                    </article>
+                </main>
+            }
+        </div>
 </CascadingValue>
+
+@code
+{
+    public string Region { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+        var splitVal = page.Split("/").FirstOrDefault();
+
+        if (splitVal != null)
+        {
+            var regions = new List<string>() { "HK", "SA" };
+            Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToUpper() : null;
+        }
+    }
+}

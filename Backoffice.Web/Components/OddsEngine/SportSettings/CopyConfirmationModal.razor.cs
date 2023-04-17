@@ -29,6 +29,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         protected override async Task OnInitializedAsync()
         {
             ToClientName = ModalParameters.TryGet<string>("ToClientName");
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             IsPreloader = false;
         }
 

@@ -20,6 +20,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         [Parameter] public EventCallback OnCopyClickCallback { get; set; }
         [Parameter] public EventCallback OnViewLogsCallback { get; set; }
         [Parameter] public bool IsPreload { get; set; }
+        [Parameter] public string Region { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
@@ -32,6 +33,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         protected override async Task OnInitializedAsync()
         {
             Clients = new List<SelectListItemModel<string>>();
+            TradingService.Region = Region.ToUpper();
 
             var clientResponse = await TradingService.GetClientList();
 

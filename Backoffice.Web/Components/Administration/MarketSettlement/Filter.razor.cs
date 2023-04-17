@@ -220,7 +220,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 ConnectionId = UserModel.ConnectionId
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMarketSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMarketSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString(), "HK");
             await OnExportCallback.InvokeAsync();
         }
 

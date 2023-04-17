@@ -22,6 +22,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [Parameter] public string Region { get; set; }
 
         public IJSStreamReference? DataReference { get; set; }
 
@@ -47,6 +48,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            TradingService.Region = Region.ToUpper();
             TableClass = "table-edit-market-group";
             IsPreLoader = true;
             Breadcrumbs = new List<BreadcrumbModel>()
@@ -79,6 +81,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<AddOrEditMarketGroupModal>($"Add Market Group", parameters, options);
@@ -105,6 +108,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
             parameters.Add("IsEdit", true);
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<AddOrEditMarketGroupModal>($"Edit Market Group", parameters, options);
@@ -120,6 +124,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<DeleteMarketGroupModal>($"Delete Market Group", parameters, options);
@@ -148,6 +153,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<CopyMarketGroupModal>($"Edit Market Group", parameters, options);
@@ -160,6 +166,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<MarketGroupViewLogsModal>($"View Logs Market Group", parameters, options);
@@ -175,6 +182,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
             parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<ViewMarketGroupModal>($"View Market Group", parameters, options);

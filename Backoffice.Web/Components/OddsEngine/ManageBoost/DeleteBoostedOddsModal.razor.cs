@@ -23,7 +23,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public PriceBoostConfigModel PriceBoost { get; set; }
         public bool IsPreLoader { get; set; }
-
         #endregion
 
         #region Fields
@@ -36,6 +35,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         protected override async Task OnInitializedAsync()
         {
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             PriceBoost = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
         }
 

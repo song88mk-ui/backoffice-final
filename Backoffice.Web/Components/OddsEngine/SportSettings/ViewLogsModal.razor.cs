@@ -25,6 +25,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         protected override async Task OnInitializedAsync()
         {
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             ClientSportOrderAudit = new List<ClientSportOrderAuditResponse>();
 
             IsPreLoader = true;

@@ -2,7 +2,7 @@
 
 @layout OEMonitoringLayout
 
-@page "/odds-engine/config"
+@page "/{Region}/odds-engine/config"
 
 <AuthorizeView Policy="sbc-config">
     <Authorized>
@@ -19,11 +19,11 @@
         </div>
         <div class="col-md-12">
             <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-            <HeaderConfigTopMenu ConfigurationRef="this" />
+            <HeaderConfigTopMenu ConfigurationRef="this" Region="@Region"/>
         </div>
 
         <div class="col-md-12">
-            <Filter @bind-ConfigFilterModel="ConfigFilterModel" FixtureType="FixtureType" IsMarketEditingChanged="UndoEditedMarkets" />
+            <Filter @bind-ConfigFilterModel="ConfigFilterModel" FixtureType="FixtureType" IsMarketEditingChanged="UndoEditedMarkets" Region="Region"/>
         </div>
 
         <div class="col-md-12 mb-2">

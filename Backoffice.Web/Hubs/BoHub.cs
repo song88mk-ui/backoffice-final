@@ -17,5 +17,9 @@ namespace Backoffice.Web.Hubs
         //{
         //    await Clients.All.SendAsync("onconfigchange", message);
         //}
+        public async Task AddToGroup(string groupName)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+        }
     }
 }

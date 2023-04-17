@@ -39,7 +39,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = true;
-
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             AlertModel = new AlertModel();
             Clients = new List<SelectListItemModel<string>>();
             Sports = new List<SelectListItemModel<int>>();

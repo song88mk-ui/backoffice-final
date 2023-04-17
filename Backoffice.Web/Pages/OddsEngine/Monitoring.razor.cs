@@ -4,8 +4,12 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
+using Backoffice.Web.Shared;
+using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR.Client;
+using System;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -22,12 +26,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
-
+        [Parameter] public string Region { get; set; }
         [Parameter] public string SportId { get; set; }
         [Parameter] public string SegmentId { get; set; }
         [Parameter] public string LeagueId { get; set; }
 
-        private HubConnection HubConnection { get; set; }
+        private HubConnection _hubConnection { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -47,6 +51,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            TradingService.Region = Region.ToUpper();
             FixtureMarkets = null;
             MonitoringCallbackModel = new MonitoringCallbackModel();
             ClientModel = new ClientModel();
@@ -57,7 +62,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             Breadcrumbs.Add(new BreadcrumbModel
             {
                 Name = "Monitoring",
-                Url = "odds-engine/monitoring",
+                Url = $"{Region}/odds-engine/monitoring",
                 IsCurrentPage = true
             });
 
@@ -180,15 +185,16 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async ValueTask DisposeAsync()
         {
-            if (HubConnection != null)
+            if (_hubConnection != null)
             {
-                await HubConnection.StopAsync();
-                await HubConnection.DisposeAsync();
+                await _hubConnection.StopAsync();
+                await _hubConnection.DisposeAsync();
             }
         }
 
         public void Dispose()
         {
+            _hubConnection.DisposeAsync();
         }
 
         #endregion
@@ -196,27 +202,29 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Utilities
         private async Task Subscribe()
         {
-            HubConnection = new HubConnectionBuilder()
+            _hubConnection = new HubConnectionBuilder()
             .WithUrl(new Uri(Configuration["API:HubAPI"]))
             .Build();
 
-            HubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
+
+            _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
             {
                 await ProcessOddsChange(message);
 
             });
 
-            HubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async (message) =>
+            _hubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async (message) =>
             {
                 await ProcessBetStopFixture(message);
             });
 
-            HubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async (message) =>
+            _hubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async (message) =>
             {
                 await ProcessBetStopGlobal(message);
             });
 
-            await HubConnection.StartAsync();
+            await _hubConnection.StartAsync();
+            await _hubConnection.InvokeAsync("AddToGroup", Region.ToUpper());
 
         }
         private async Task<List<FixtureMarketModel>> GetFixtures(MarketFixtureRequest request)
@@ -264,7 +272,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task ProcessOddsChange(OnExternalOddsChangeMessage message)
         {
-            if (FixtureMarkets == null )
+            if (FixtureMarkets == null)
                 return;
 
             if (SelectedSport.SportId != message.SportId || SelectedSport.SegmentId != message.SegmentId || SelectedSport.LeagueId != message.LeagueId)

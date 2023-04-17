@@ -24,7 +24,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = true;
-
             PriceBoost = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
 
             ActivityLogs = new List<PriceBoostActivityLog>();

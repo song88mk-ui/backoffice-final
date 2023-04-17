@@ -39,6 +39,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 TotalPages = 0,
             };
 
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             MarketGroupModel = ModalParameters.TryGet<MarketGroupModel>("MarketGroupModel");
 
             await GetContent();

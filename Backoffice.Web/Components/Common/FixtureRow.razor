@@ -21,7 +21,7 @@
     </td>
     <td>
         <div class="d-flex justify-content-between px-2">
-            <a href="@($"odds-engine/monitoring-details/{Market.ProviderFixtureId}")" class="fixture-details text-decoration-none">
+            <a href="@($"{Region}/odds-engine/monitoring-details/{Market.ProviderFixtureId}")" class="fixture-details text-decoration-none">
                 <span class="fw-bold">@Market.HomeName.ToUpper()</span>
                 <br />
                 <span>@Market.AwayName.ToUpper()</span>
@@ -44,7 +44,7 @@
                 {
                     var selectionKey = $"br-{selection.ProviderSelectionId}";
 
-                    <SelectionRow @key="selectionKey" Selection="selection" ColumnSize="@ColumnSize" IsBetStop="IsBetStop" CurrentMarketStatus="@Market.MarketStatusId" HasClientConfig="true" />
+                    <SelectionRow @key="selectionKey" Selection="selection" ColumnSize="@ColumnSize" IsBetStop="IsBetStop" CurrentMarketStatus="@Market.MarketStatusId" HasClientConfig="true" Region="@Region"/>
 
                     if (hasLine)
                     {

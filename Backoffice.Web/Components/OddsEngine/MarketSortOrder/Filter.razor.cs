@@ -12,15 +12,16 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }        
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public EventCallback OnUpdateCallback { get; set; }
         [Parameter] public EventCallback OnCancelCallback { get; set; }
         [Parameter] public EventCallback OnSaveCallback { get; set; }
         [Parameter] public EventCallback<MarketSortOrderModel> MarketSortOrderModelCallback { get; set; }
-        [Parameter] public EventCallback<string> OnMarketGroupCallback { get; set; }        
+        [Parameter] public EventCallback<string> OnMarketGroupCallback { get; set; }
         [Parameter] public EventCallback<bool> IsUpdateChanged { get; set; }
         [Parameter] public bool IsUpdate { get; set; }
+        [Parameter] public string Region { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
@@ -29,7 +30,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         public List<SelectListItemModel<int>> FixtureStatuses { get; set; }
         public int SelectedFixtureStatusId { get; set; }
         public List<MarketSortOrderModel.ClientMarketTemplateGroup> ClientMarketTemplateGroups { get; set; }
-        public int SelectedMarketTemplateGroupId { get; set; }        
+        public int SelectedMarketTemplateGroupId { get; set; }
 
         #endregion
 
@@ -41,12 +42,13 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             Sports = new List<SelectListItemModel<int>>();
             FixtureStatuses = new List<SelectListItemModel<int>>();
             ClientMarketTemplateGroups = new List<MarketSortOrderModel.ClientMarketTemplateGroup>();
+            TradingService.Region = Region.ToUpper();
 
             if (UserModel.ClientCodes != null)
             {
                 var clients = (await TradingService.GetClientList()).Result;
                 var roleName = UserModel.RoleName;
-                
+
                 if (roleName != "Super Admin")
                 {
                     var clientCodes = UserModel.ClientCodes;
@@ -184,8 +186,8 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
             parameters.Add("ClientName", clientName);
 
-            var options = new ModalOptions();            
-            ModalService.Open<CancelModal>($"Discard Changes?", parameters, options);            
+            var options = new ModalOptions();
+            ModalService.Open<CancelModal>($"Discard Changes?", parameters, options);
         }
 
         public async Task OnMarketGroupClickEvent(int marketTemplateGroupId)

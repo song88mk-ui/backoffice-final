@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -11,6 +12,7 @@ namespace Backoffice.Web.Services
 {
     public class TradingService : ITradingService
     {
+        public string Region { get; set; }
         private HttpClient _client;
         private HttpClient _httpClient
         {
@@ -18,6 +20,12 @@ namespace Backoffice.Web.Services
             {
                 var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken");
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                if (_client.DefaultRequestHeaders.Contains("x-region"))
+                {
+                    _client.DefaultRequestHeaders.Remove("x-region");
+                }
+                _client.DefaultRequestHeaders.Add("x-region", Region);
                 return _client;
             }
             set

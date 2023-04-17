@@ -22,6 +22,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [Parameter] public EventCallback<int> OnSegmentChangedCallback { get; set; }
         [Parameter] public EventCallback<int> OnLeagueChangedCallback { get; set; }
         [Parameter] public EventCallback<string> OnInputSearchCallback { get; set; }
+        [Parameter] public string Region { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
         public string SelectedClientCode { get; set; }
@@ -45,6 +46,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             Segments = new List<SelectListItemModel<int>>();
             Leagues = new List<SelectListItemModel<int>>();
 
+            TradingService.Region = Region.ToUpper();
             SearchForm = new SearchFormModel();
 
             Clients = await LoadClients();
