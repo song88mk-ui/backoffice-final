@@ -71,13 +71,12 @@ nav-item ::deep .nav-link.header.active, .nav-item ::deep .nav-link.header:hover
     color: white;
 }*/
 
-.nav-item ::deep .nav-link.account, .nav-item ::deep .nav-link.switch-access, .nav-item ::deep .nav-link.logout {
+.nav-item ::deep .nav-link.account, .nav-item ::deep .nav-link.switch-access, .nav-item ::deep .nav-link.logout, .nav-item ::deep .nav-link.key {
     color: #fff;
 }
 
-.nav-item ::deep .nav-link.account {
+.nav-item.info {
     border-bottom: solid 1px #4C5A71;
-    border-radius: unset;
 }
 
 .nav-item ::deep .nav-link.switch-access {

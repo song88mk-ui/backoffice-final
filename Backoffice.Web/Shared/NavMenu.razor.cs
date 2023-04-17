@@ -201,6 +201,19 @@ namespace Backoffice.Web.Shared
             ModalService.Open<ConfirmLogoutModal>("Logout", parameters, options);
         }
 
+        public async Task OnChangePasswordClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-md");
+            parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
+            parameters.Add("TitleClass", "w-100");
+
+            var options = new ModalOptions();
+            ModalService.Open<ChangePasswordModal>("Change Password", parameters, options);
+        }
+
         public void Dispose()
         {
             BackOfficeService.Dispose();

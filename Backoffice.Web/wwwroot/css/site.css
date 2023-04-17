@@ -251,6 +251,10 @@ a, .btn-link {
     content: "\112A";
 }
 
+.ico-key:before {
+    content: "\1129";
+}
+
 iframe {
     width: 100% !important;
 }

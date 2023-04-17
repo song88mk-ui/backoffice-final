@@ -133,10 +133,13 @@ else if (NavMenuAccess == PermissionCategory.OE)
             <div class="nav-item px-3 pb-1">
                 <span class="nav-item-header">PROFILE</span>
             </div>
-            <div class="nav-item px-3 pb-2">
+            <div class="nav-item info mx-3 pb-1 mb-3 d-flex justify-content-between">
                 <NavLink class="nav-link account ps-0" href="javascript:void(0)">
                     <span class="ico ico-user" aria-hidden="true"></span>
                     <span class="nav-menu-text">@UserModel?.UserName?.ToUpper()</span>
+                </NavLink>
+                <NavLink class="nav-link key p-0" href="javascript:void(0)" @onclick="OnChangePasswordClickEvent">
+                    <span class="ico ico-key" aria-hidden="true"></span>
                 </NavLink>
             </div>
             @if (ShowSwitchAccess)
