@@ -143,6 +143,44 @@ namespace Backoffice.Web.Pages.SBC
                 ClientId = client.ClientId
             })).Result.BetSettings ?? new List<ClientListResponse.BetSetting>();
 
+            //transform data
+            foreach (var betSetting in client.BetSettings)
+            {
+                #region Soccer
+                betSetting.BetSettingSoccer.MaxPerTicket = betSetting.BetSettingSoccer.MaxPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingSoccer.MaxPerTicket.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingSoccer.MinPerTicket = betSetting.BetSettingSoccer.MinPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingSoccer.MinPerTicket.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingSoccer.MaxPerGame = betSetting.BetSettingSoccer.MaxPerGame.HasValue ? decimal.Parse(betSetting.BetSettingSoccer.MaxPerGame.Value.ToString("#.00")) : 0.00m;
+                #endregion
+
+                #region Cricket
+                betSetting.BetSettingCricket.MaxPerTicket = betSetting.BetSettingCricket.MaxPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingCricket.MaxPerTicket.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingCricket.MinPerTicket = betSetting.BetSettingCricket.MinPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingCricket.MinPerTicket.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingCricket.MaxPerGame = betSetting.BetSettingCricket.MaxPerGame.HasValue ? decimal.Parse(betSetting.BetSettingCricket.MaxPerGame.Value.ToString("#.00")) : 0.00m;
+                #endregion
+
+                #region Other Sports
+                betSetting.BetSettingAllSports.MaxPerTicket = betSetting.BetSettingAllSports.MaxPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingAllSports.MaxPerTicket.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingAllSports.MinPerTicket = betSetting.BetSettingAllSports.MinPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingAllSports.MinPerTicket.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingAllSports.MaxPerGame = betSetting.BetSettingAllSports.MaxPerGame.HasValue ? decimal.Parse(betSetting.BetSettingAllSports.MaxPerGame.Value.ToString("#.00")) : 0.00m;
+                #endregion
+
+                #region Parlay
+                betSetting.BetSettingParlay.MaxPerTicket = betSetting.BetSettingParlay.MaxPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingParlay.MaxPerTicket.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingParlay.MinPerTicket = betSetting.BetSettingParlay.MinPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingParlay.MinPerTicket.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingParlay.MaxPayoutPerTicket = betSetting.BetSettingParlay.MaxPayoutPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingParlay.MaxPayoutPerTicket.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingParlay.MaxWinningsBonus = betSetting.BetSettingParlay.MaxWinningsBonus.HasValue ? decimal.Parse(betSetting.BetSettingParlay.MaxWinningsBonus.Value.ToString("#.00")) : 0.00m;
+                #endregion
+
+                #region Priceboost
+                betSetting.BetSettingPriceboost.MaxStake = betSetting.BetSettingPriceboost.MaxStake.HasValue ? decimal.Parse(betSetting.BetSettingPriceboost.MaxStake.Value.ToString("#.00")) : 0.00m;
+                #endregion
+
+                #region BetSettingBuilder
+                betSetting.BetSettingBetBuilder.MaxStake = betSetting.BetSettingBetBuilder.MaxStake.HasValue ? decimal.Parse(betSetting.BetSettingBetBuilder.MaxStake.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingBetBuilder.MinStake = betSetting.BetSettingBetBuilder.MinStake.HasValue ? decimal.Parse(betSetting.BetSettingBetBuilder.MinStake.Value.ToString("#.00")) : 0.00m;
+                #endregion
+            }
+
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");

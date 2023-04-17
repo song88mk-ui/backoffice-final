@@ -99,7 +99,7 @@ namespace Backoffice.Web.Pages.SBC
                     .Skip(skip).Take(MetaData.PageSize)
                     .Select((s, index) => new TopLeaguesModel.ClientTopLeague
                     {
-                        RowNo = index + 1,
+                        RowNo = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
                         ClientIdRef = s.ClientIdRef,
                         ClientName = s.ClientName,
                         TopLeagues = s.TopLeagues

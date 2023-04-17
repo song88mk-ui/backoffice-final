@@ -181,6 +181,18 @@ namespace Backoffice.Web.Pages.Administration
                         Opacity = 1.0m
                     });
 
+                    CancelBetModel = new CancelBetModel()
+                    {
+                        BetReferenceIds = new List<CancelBetModel.BetReferenceModel>()
+                        {
+                            new CancelBetModel.BetReferenceModel()
+                            {
+                                Num = 1,
+                                BetReferenceId = ""
+                            }
+                        }
+                    };
+
                 }
                 else
                 {
