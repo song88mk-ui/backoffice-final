@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -11,6 +12,7 @@ namespace Backoffice.Web.Shared
         #region Properties
 
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
@@ -184,6 +186,17 @@ namespace Backoffice.Web.Shared
 
                 await OnSportClickCallback.InvokeAsync(SelectedSport);
             }
+        }
+
+        public async Task OnLogoutClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-md");
+
+            var options = new ModalOptions();
+            ModalService.Open<ConfirmLogoutModal>("Logout", parameters, options);
         }
 
         public void Dispose()
