@@ -194,6 +194,9 @@ namespace Backoffice.Web.Shared
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-md");
+            parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
+            parameters.Add("ModalHeaderClass", "text-center");
+            parameters.Add("TitleClass", "w-100");
 
             var options = new ModalOptions();
             ModalService.Open<ConfirmLogoutModal>("Logout", parameters, options);
