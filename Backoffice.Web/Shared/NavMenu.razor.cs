@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -11,6 +12,7 @@ namespace Backoffice.Web.Shared
         #region Properties
 
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
@@ -22,6 +24,7 @@ namespace Backoffice.Web.Shared
         public SportClickCallbackModel SelectedSport { get; set; }
 
         public SportsTreeModel Menu { get; set; }
+        public bool ShowSwitchAccess { get; set; }
 
         //private List<string> _dissabledMenus = new List<string>() { "menu.sbc.deeplinkgenerator", "menu.sbc.allbets", "menu.sbc.winloss" , "menu.sbc.profitloss" ,
         //    "menu.sbc.ggr" , "sub-menu-revenue-settlement",  "menu.admin.createuser","menu.admin.createusergroup", "menu.admin.settlements.manualbetsettlementhistory"};
@@ -89,6 +92,14 @@ namespace Backoffice.Web.Shared
                 }
             }
 
+            var permissionCategories = new string[] { nameof(PermissionCategory.Admin), nameof(PermissionCategory.SBC) };
+            var access = new string[] { ((int)Access.View).ToString(), ((int)Access.Edit).ToString() };
+
+            var categories = UserModel.Claims.Where(c => access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
+            categories = categories.Where(c => permissionCategories.Contains(c)).ToList();
+
+            if (categories.Count > 1)
+                ShowSwitchAccess = true;
         }
         public void ToggleNavMenu()
         {
@@ -174,6 +185,17 @@ namespace Backoffice.Web.Shared
 
                 await OnSportClickCallback.InvokeAsync(SelectedSport);
             }
+        }
+
+        public async Task OnLogoutClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-md");
+
+            var options = new ModalOptions();
+            ModalService.Open<ConfirmLogoutModal>("Logout", parameters, options);
         }
 
         public void Dispose()

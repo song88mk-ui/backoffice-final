@@ -130,12 +130,31 @@ else if (NavMenuAccess == PermissionCategory.OE)
             <span class="nav-menu-text">Notifications</span>
             </NavLink>
             </div>*@
-            <div class="nav-item px-3">
-                <NavLink class="nav-link account" href="choose-access">
+            <div class="nav-item px-3 pb-1">
+                <span class="nav-item-header">PROFILE</span>
+            </div>
+            <div class="nav-item px-3 pb-2">
+                <NavLink class="nav-link account ps-0" href="javascript:void(0)">
                     <span class="ico ico-user" aria-hidden="true"></span>
                     <span class="nav-menu-text">@UserModel?.UserName?.ToUpper()</span>
+                </NavLink>
+            </div>
+            @if (ShowSwitchAccess)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link switch-access justify-content-center" href="choose-access">
+                        <span class="ico ico-switch-access" aria-hidden="true"></span>
+                        <span class="const-menu-item nav-menu-text">Switch Access</span>
+                    </NavLink>
+                </div>
+            }
+            <div class="nav-item px-3">
+                <NavLink class="nav-link logout justify-content-center" href="javascript:void(0)" @onclick="OnLogoutClickEvent">
+                    <span class="ico ico-logout" aria-hidden="true"></span>
+                    <span class="const-menu-item nav-menu-text">Logout</span>
                 </NavLink>
             </div>
         </nav>
     </div>
 </div>
+<CustomModal />

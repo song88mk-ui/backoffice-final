@@ -26,6 +26,10 @@
     flex: auto;
 }
 
+.const-menu-item {
+    flex: unset;
+}
+
 .nav-item:first-of-type {
     padding-top: 0.2rem;
 }
@@ -43,6 +47,10 @@
     line-height: 1rem;
 }
 
+.nav-item .nav-item-header {
+    color: #9AA0AB;
+}
+
 ::deep .nav-link.header {
     color: #fff;
 }
@@ -53,7 +61,7 @@ nav-item ::deep .nav-link.header.active, .nav-item ::deep .nav-link.header:hover
 }
 
 
-.nav-item ::deep a.active {
+/*.nav-item ::deep a.active {
     background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
     color: white;
 }
@@ -61,11 +69,23 @@ nav-item ::deep .nav-link.header.active, .nav-item ::deep .nav-link.header:hover
 .nav-item ::deep a:hover {
     background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
     color: white;
+}*/
+
+.nav-item ::deep .nav-link.account, .nav-item ::deep .nav-link.switch-access, .nav-item ::deep .nav-link.logout {
+    color: #fff;
 }
 
 .nav-item ::deep .nav-link.account {
+    border-bottom: solid 1px #4C5A71;
+    border-radius: unset;
+}
+
+.nav-item ::deep .nav-link.switch-access {
     border: solid 1px #fff;
-    color: #fff;
+}
+
+.nav-item ::deep .nav-link.logout {
+    background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
 }
 
 @media (min-width: 641px) {
