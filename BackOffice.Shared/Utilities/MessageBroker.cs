@@ -60,7 +60,7 @@ namespace Backoffice.Shared.Utilities
             _credentials = new Dictionary<string, MessageBrokerCredentialModel>();
             _credentials.Add("HK", configuration.GetSection("MessageBroker:HK").Get<MessageBrokerCredentialModel>());
             //_credentials.Add("SA", configuration.GetSection("MessageBroker:SA").Get<MessageBrokerCredentialModel>());
-            ConnectRegions();
+            //ConnectRegions();
         }
 
         public void Acknowledge(BasicDeliverEventArgs e)
