@@ -77,7 +77,7 @@ namespace Backoffice.Web.Pages.Administration
                 MetaData = MetaData
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(request), "ExportCancelBetHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+            MessageBroker.Publish(JsonSerializer.Serialize(request), "ExportCancelBetHistory", "r.bo.util.export", Guid.NewGuid().ToString(), "HK");
 
 
             _toasterService.AddToast(Toast.NewToast

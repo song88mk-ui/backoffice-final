@@ -22,12 +22,12 @@ namespace Backoffice.Web.Middleware
         {
             _next = next;
             _messageBrokerHk = messageBroker;
+            _messageBrokerHk = messageBroker;
             _messageBrokerSa = messageBroker;
             _boHub = boHub;
 
             _messageBrokerHk.Connect(config.GetSection($"MessageBroker:HK").Get<MessageBrokerCredentialModel>());
             _messageBrokerSa.Connect(config.GetSection($"MessageBroker:SA").Get<MessageBrokerCredentialModel>());
-
 
             _messageBrokerHk.MessageReceived += async (sender, e) =>
             {
@@ -36,7 +36,7 @@ namespace Backoffice.Web.Middleware
 
                 if (e.RoutingKey.StartsWith("r.oe.bm.engine."))
                 {
-                    await SignalRSendMessage("HK", messageType, payload);
+                    await SignalRSendMessage(messageType, payload, "HK");
                 }
             };
             _messageBrokerHk.MessageReceived += async (sender, e) =>
@@ -46,7 +46,7 @@ namespace Backoffice.Web.Middleware
 
                 if (e.RoutingKey.StartsWith("r.oe.bm.engine."))
                 {
-                    await SignalRSendMessage("SA", messageType, payload);
+                    await SignalRSendMessage(messageType, payload, "SA");
                 }
             };
         }
@@ -56,52 +56,11 @@ namespace Backoffice.Web.Middleware
             await _next(httpContext);
         }
 
-        private async void MessageReceived(object sender, BasicDeliverEventArgs e)
-        {
-            var payload = Encoding.UTF8.GetString(e.Body);
-            var messageType = e.BasicProperties.Type;
-
-            try
-            {
-                var hubClients = string.IsNullOrWhiteSpace("") ? _boHub.Clients.All : _boHub.Clients.Group("");
-
-                if (e.RoutingKey.StartsWith("r.oe.bm.engine."))
-                {
-                    switch (messageType)
-                    {
-                        case "OnOddsChange":
-                            var oddschange = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(payload);
-                            await hubClients.SendAsync("onoddschange", oddschange);
-                            break;
-                        case "OnBetStopFixture":
-                            var betStopFixture = JsonSerializer.Deserialize<OnExternalBetStopFixtureMessage>(payload);
-                            await hubClients.SendAsync("onbetstopfixture", betStopFixture);
-                            break;
-                        case "OnBetStopGlobal":
-                            var betStopGlobal = JsonSerializer.Deserialize<OnExternalBetStopGlobalMessage>(payload);
-                            await hubClients.SendAsync("onbetstopglobal", betStopGlobal);
-                            break;
-                        case "OnSignIn":
-                            var signin = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(payload);
-                            await hubClients.SendAsync("onsignin", signin);
-                            break;
-                        case "OnNewNotification":
-                            var notificationsModel = JsonSerializer.Deserialize<NotificationsModel>(payload);
-                            await hubClients.SendAsync("onnewnotification", notificationsModel);
-                            break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-            }
-        }
-
-        private async Task SignalRSendMessage(string group, string messageType, string payload)
+        private async Task SignalRSendMessage(string messageType, string payload, string group = "")
         {
             try
             {
-                var hubClients = _boHub.Clients.Group(group.ToUpper());
+                var hubClients = string.IsNullOrWhiteSpace("") ? _boHub.Clients.All : _boHub.Clients.Group(group.ToUpper());
 
                 switch (messageType)
                 {

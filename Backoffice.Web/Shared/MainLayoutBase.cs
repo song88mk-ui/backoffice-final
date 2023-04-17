@@ -278,6 +278,7 @@ namespace Backoffice.Web.Shared
                 _hubConnection = new HubConnectionBuilder()
                     .WithUrl(new Uri(Configuration["API:HubAPI"]))
                     .Build();
+
                 _hubConnection.Closed += async (error) =>
                 {
                     await Task.Delay(new Random().Next(0, 5) * 1000);
@@ -297,6 +298,7 @@ namespace Backoffice.Web.Shared
                     }
                 });
 
+                await _hubConnection.InvokeAsync("AddToGroup", "HK");
                 _hubConnection.On<string>("Notification", async message =>
                 {
                     var payload = JsonSerializer.Deserialize<NotificationsModel>(message);

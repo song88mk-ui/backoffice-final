@@ -14,8 +14,6 @@ namespace Backoffice.Shared.Utilities
 {
     public class MessageBroker : IDisposable, IMessageBroker
     {
-        public string Region { get; set; } = "";
-
         private ConnectionFactory _connectionFactory;
         private IConnection _connection;
         private IModel _model;
@@ -40,11 +38,9 @@ namespace Backoffice.Shared.Utilities
         private IConnection _externalConnection;
         private IModel _externalModel;
         private IModel _modelHk;
-        private EventingBasicConsumer _consumerHk;
         private IModel _modelSa;
-        private EventingBasicConsumer _consumerSa;
 
-        private readonly string _messageBrokerName = $"MessageBroker:HK";
+        private readonly string _messageBrokerName;
 
         private string _externalHostName = string.Empty;
         private string _externalUserName = string.Empty;
@@ -59,6 +55,7 @@ namespace Backoffice.Shared.Utilities
 
         public MessageBroker(IConfiguration configuration)
         {
+            _messageBrokerName = $"MessageBroker";
             _configuration = configuration;
             _credentials = new Dictionary<string, MessageBrokerCredentialModel>();
             _credentials.Add("HK", configuration.GetSection("MessageBroker:HK").Get<MessageBrokerCredentialModel>());

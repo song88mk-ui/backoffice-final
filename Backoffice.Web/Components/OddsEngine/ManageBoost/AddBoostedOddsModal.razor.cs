@@ -27,7 +27,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         private string Region { get; set; }
 
         public bool IsPreloader { get; set; }
-        private string _region;
         #endregion
 
         #region Fields
@@ -48,7 +47,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             
             TradingService.Region = Region = ModalParameters.TryGet<string>("Region").ToUpper();
             Model.Sports = await GetSports(SelectedFixtureType);
-            _region = ModalParameters.TryGet<string>("Region") ?? string.Empty;
 
             IsPreloader = false;
         }

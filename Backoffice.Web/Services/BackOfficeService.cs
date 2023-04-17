@@ -167,7 +167,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                _messageBroker.Publish(JsonSerializer.Serialize(request), "LogActivity", "r.bo.util.logs", Guid.NewGuid().ToString());
+                _messageBroker.Publish(JsonSerializer.Serialize(request), "LogActivity", "r.bo.util.logs", Guid.NewGuid().ToString(), "HK");
 
                 return new BaseResponse<MessageResponse>
                 {
@@ -192,7 +192,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                _messageBroker.Publish(JsonSerializer.Serialize(request), "LogActivityList", "r.bo.util.logs", Guid.NewGuid().ToString());
+                _messageBroker.Publish(JsonSerializer.Serialize(request), "LogActivityList", "r.bo.util.logs", Guid.NewGuid().ToString(), "HK");
 
                 return new BaseResponse<MessageResponse>
                 {

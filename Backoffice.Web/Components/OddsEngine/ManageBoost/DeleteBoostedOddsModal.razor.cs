@@ -37,7 +37,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             PriceBoost = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
-            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
         }
 
         public async Task OnCancelModalClick()
