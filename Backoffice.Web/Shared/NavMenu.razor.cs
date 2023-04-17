@@ -23,6 +23,7 @@ namespace Backoffice.Web.Shared
         public SportClickCallbackModel SelectedSport { get; set; }
 
         public SportsTreeModel Menu { get; set; }
+        public bool ShowSwitchAccess { get; set; }
 
         //private List<string> _dissabledMenus = new List<string>() { "menu.sbc.deeplinkgenerator", "menu.sbc.allbets", "menu.sbc.winloss" , "menu.sbc.profitloss" ,
         //    "menu.sbc.ggr" , "sub-menu-revenue-settlement",  "menu.admin.createuser","menu.admin.createusergroup", "menu.admin.settlements.manualbetsettlementhistory"};
@@ -90,6 +91,14 @@ namespace Backoffice.Web.Shared
                 }
             }
 
+            var permissionCategories = new string[] { nameof(PermissionCategory.Admin), nameof(PermissionCategory.SBC) };
+            var access = new string[] { ((int)Access.View).ToString(), ((int)Access.Edit).ToString() };
+
+            var categories = UserModel.Claims.Where(c => access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
+            categories = categories.Where(c => permissionCategories.Contains(c)).ToList();
+
+            if (categories.Count > 1)
+                ShowSwitchAccess = true;
         }
         public void ToggleNavMenu()
         {

@@ -243,6 +243,14 @@ a, .btn-link {
     content: "\1128";
 }
 
+.ico-switch-access:before {
+    content: "\112B";
+}
+
+.ico-logout:before {
+    content: "\112A";
+}
+
 iframe {
     width: 100% !important;
 }
