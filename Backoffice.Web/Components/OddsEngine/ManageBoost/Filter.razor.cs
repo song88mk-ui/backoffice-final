@@ -71,6 +71,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("Region", Region);
             //parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);            
 
             var options = new ModalOptions();

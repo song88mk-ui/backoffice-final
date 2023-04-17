@@ -1,6 +1,8 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -91,7 +93,16 @@ namespace Backoffice.API.Controllers.Backoffice
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _platformRepository.CancelBet(request, region);
+            var result = new BaseResponse<BetModifyResponse>();
+            if (string.IsNullOrEmpty(region))
+            {
+                result = await _platformRepository.CancelBet(request, "HK");
+                result = await _platformRepository.CancelBet(request, "SA");
+            }
+            else
+            {
+                result = await _platformRepository.CancelBet(request, region);
+            }
 
             switch (result.StatusCode)
             {
