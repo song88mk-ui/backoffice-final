@@ -15,19 +15,18 @@ namespace Backoffice.Web.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly IMessageBroker _messageBrokerHk;
-        private readonly IMessageBroker _messageBrokerSa;
+        //private readonly IMessageBroker _messageBrokerSa;
         private readonly IHubContext<BoHub> _boHub;
 
         public RabbitMQMiddleware(RequestDelegate next, IHubContext<BoHub> boHub, IMessageBroker messageBroker, IConfiguration config)
         {
             _next = next;
             _messageBrokerHk = messageBroker;
-            _messageBrokerHk = messageBroker;
-            _messageBrokerSa = messageBroker;
+            //_messageBrokerSa = messageBroker;
             _boHub = boHub;
 
             _messageBrokerHk.Connect(config.GetSection($"MessageBroker:HK").Get<MessageBrokerCredentialModel>());
-            _messageBrokerSa.Connect(config.GetSection($"MessageBroker:SA").Get<MessageBrokerCredentialModel>());
+            //_messageBrokerSa.Connect(config.GetSection($"MessageBroker:SA").Get<MessageBrokerCredentialModel>());
 
             _messageBrokerHk.MessageReceived += async (sender, e) =>
             {
@@ -39,16 +38,16 @@ namespace Backoffice.Web.Middleware
                     await SignalRSendMessage(messageType, payload, "HK");
                 }
             };
-            _messageBrokerHk.MessageReceived += async (sender, e) =>
-            {
-                var payload = Encoding.UTF8.GetString(e.Body);
-                var messageType = e.BasicProperties.Type;
+            //_messageBrokerHk.MessageReceived += async (sender, e) =>
+            //{
+            //    var payload = Encoding.UTF8.GetString(e.Body);
+            //    var messageType = e.BasicProperties.Type;
 
-                if (e.RoutingKey.StartsWith("r.oe.bm.engine."))
-                {
-                    await SignalRSendMessage(messageType, payload, "SA");
-                }
-            };
+            //    if (e.RoutingKey.StartsWith("r.oe.bm.engine."))
+            //    {
+            //        await SignalRSendMessage(messageType, payload, "SA");
+            //    }
+            //};
         }
 
         public async Task Invoke(HttpContext httpContext)

@@ -38,7 +38,7 @@ namespace Backoffice.Shared.Utilities
         private IConnection _externalConnection;
         private IModel _externalModel;
         private IModel _modelHk;
-        private IModel _modelSa;
+        //private IModel _modelSa;
 
         private readonly string _messageBrokerName;
 
@@ -59,7 +59,7 @@ namespace Backoffice.Shared.Utilities
             _configuration = configuration;
             _credentials = new Dictionary<string, MessageBrokerCredentialModel>();
             _credentials.Add("HK", configuration.GetSection("MessageBroker:HK").Get<MessageBrokerCredentialModel>());
-            _credentials.Add("SA", configuration.GetSection("MessageBroker:SA").Get<MessageBrokerCredentialModel>());
+            //_credentials.Add("SA", configuration.GetSection("MessageBroker:SA").Get<MessageBrokerCredentialModel>());
             ConnectRegions();
         }
 
@@ -179,76 +179,76 @@ namespace Backoffice.Shared.Utilities
             }
             #endregion
             #region Sa
-            messageBroker = _credentials["SA"];
-            try
-            {
-                var connectionFactory = new ConnectionFactory
-                {
-                    HostName = messageBroker.Host,
-                    Port = 5672,
-                    UserName = messageBroker.Username,
-                    Password = messageBroker.Password,
-                    VirtualHost = messageBroker.VirtualHost,
-                    RequestedHeartbeat = 60,
-                    NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
-                };
+            //messageBroker = _credentials["SA"];
+            //try
+            //{
+            //    var connectionFactory = new ConnectionFactory
+            //    {
+            //        HostName = messageBroker.Host,
+            //        Port = 5672,
+            //        UserName = messageBroker.Username,
+            //        Password = messageBroker.Password,
+            //        VirtualHost = messageBroker.VirtualHost,
+            //        RequestedHeartbeat = 60,
+            //        NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
+            //    };
 
-                _modelSa = connectionFactory.CreateConnection().CreateModel();
+            //    _modelSa = connectionFactory.CreateConnection().CreateModel();
 
-                if (!string.IsNullOrEmpty(messageBroker.Queue))
-                {
-                    _modelSa.ExchangeDeclare(messageBroker.Exchange, "topic", true, false, null);
+            //    if (!string.IsNullOrEmpty(messageBroker.Queue))
+            //    {
+            //        _modelSa.ExchangeDeclare(messageBroker.Exchange, "topic", true, false, null);
 
-                    if (messageBroker.IsExclusive)
-                    {
-                        if (messageBroker.IsPriority)
-                        {
-                            var dictionary = new Dictionary<string, object>();
-                            dictionary.Add("x-max-priority", 10);
+            //        if (messageBroker.IsExclusive)
+            //        {
+            //            if (messageBroker.IsPriority)
+            //            {
+            //                var dictionary = new Dictionary<string, object>();
+            //                dictionary.Add("x-max-priority", 10);
 
-                            _modelSa.QueueDeclare(messageBroker.Queue, true, true, true, dictionary);
-                        }
-                        else
-                            _modelSa.QueueDeclare(messageBroker.Queue, true, true, true, null);
-                    }
-                    else
-                    {
-                        if (messageBroker.IsPriority)
-                        {
-                            var dictionary = new Dictionary<string, object>();
-                            dictionary.Add("x-max-priority", 10);
+            //                _modelSa.QueueDeclare(messageBroker.Queue, true, true, true, dictionary);
+            //            }
+            //            else
+            //                _modelSa.QueueDeclare(messageBroker.Queue, true, true, true, null);
+            //        }
+            //        else
+            //        {
+            //            if (messageBroker.IsPriority)
+            //            {
+            //                var dictionary = new Dictionary<string, object>();
+            //                dictionary.Add("x-max-priority", 10);
 
-                            _modelSa.QueueDeclare(messageBroker.Queue, true, false, false, dictionary);
-                        }
-                        else
-                            _modelSa.QueueDeclare(messageBroker.Queue, true, false, false, null);
-                    }
+            //                _modelSa.QueueDeclare(messageBroker.Queue, true, false, false, dictionary);
+            //            }
+            //            else
+            //                _modelSa.QueueDeclare(messageBroker.Queue, true, false, false, null);
+            //        }
 
-                    foreach (var routingKey in messageBroker.RoutingKey.Split('|'))
-                        _modelSa.QueueBind(messageBroker.Queue, messageBroker.Exchange, routingKey.ToLower(), null);
+            //        foreach (var routingKey in messageBroker.RoutingKey.Split('|'))
+            //            _modelSa.QueueBind(messageBroker.Queue, messageBroker.Exchange, routingKey.ToLower(), null);
 
-                    _modelSa.BasicQos(0, Convert.ToUInt16(messageBroker.PrefetchCount), false);
-                    var consumer = new EventingBasicConsumer(_modelSa);
-                    consumer.Received += (sender, e) =>
-                    {
-                        try
-                        {
-                            MessageReceived(sender, e);
+            //        _modelSa.BasicQos(0, Convert.ToUInt16(messageBroker.PrefetchCount), false);
+            //        var consumer = new EventingBasicConsumer(_modelSa);
+            //        consumer.Received += (sender, e) =>
+            //        {
+            //            try
+            //            {
+            //                MessageReceived(sender, e);
 
-                            consumer.Model.BasicAck(e.DeliveryTag, false);
-                        }
-                        catch (Exception)
-                        {
-                            consumer.Model.BasicNack(e.DeliveryTag, false, true);
-                        };
-                    };
+            //                consumer.Model.BasicAck(e.DeliveryTag, false);
+            //            }
+            //            catch (Exception)
+            //            {
+            //                consumer.Model.BasicNack(e.DeliveryTag, false, true);
+            //            };
+            //        };
 
-                    _modelSa.BasicConsume(messageBroker.Queue, false, $"{messageBroker.Consumer}.{Guid.NewGuid()}", consumer);
-                }
-            }
-            catch (Exception ex)
-            {
-            }
+            //        _modelSa.BasicConsume(messageBroker.Queue, false, $"{messageBroker.Consumer}.{Guid.NewGuid()}", consumer);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //}
             #endregion
         }
         public void Connect(MessageBrokerCredentialModel messageBroker = null)
@@ -478,9 +478,9 @@ namespace Backoffice.Shared.Utilities
                 case "HK":
                     _modelHk.BasicPublish(_credentials["HK"].Exchange, routingKey, properties, payloadBytes);
                     break;
-                case "SA":
-                    _modelSa.BasicPublish(_credentials["SA"].Exchange, routingKey, properties, payloadBytes);
-                    break;
+                //case "SA":
+                //    _modelSa.BasicPublish(_credentials["SA"].Exchange, routingKey, properties, payloadBytes);
+                //    break;
                 default:
                     _model.BasicPublish(_exchange, routingKey, properties, payloadBytes);
                     break;
