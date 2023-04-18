@@ -200,6 +200,29 @@ window.password_show_hide = () => {
     }
 }
 
+window.password_show_hide2 = (ele) => {
+    var inputEle = $(ele).prev();
+
+    //for eye
+    var showEyeEl = $(ele).find('#show_eye');
+    var hideEyeEl = $(ele).find('#hide_eye');
+
+    hideEyeEl.removeClass("d-none");
+
+    if ($(inputEle).attr('type') == 'password') {
+        $(inputEle).attr('type', 'text');        
+
+        showEyeEl.css('display', 'none');
+        hideEyeEl.css('display', 'block');
+    }
+    else {
+        $(inputEle).attr('type', 'password');
+
+        showEyeEl.css('display', 'block');
+        hideEyeEl.css('display', 'none');
+    }
+}
+
 //function password_show_hide() {
 //    var x = document.getElementById("password");
 //    var show_eye = document.getElementById("show_eye");

@@ -5,7 +5,6 @@ using Backoffice.Shared.Models.Response;
 using System;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -247,6 +246,42 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+
+        public async Task<BaseResponse<bool>> UpdateUserPassword(string userId, UserRegisterRequest request, string token)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                var response = await _httpClient.PostAsync($"v1/api/user/modify/{userId}", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<bool>();
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
+                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<bool>();
+                    else
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<UserResponse>> GetCurrentUser(string userId, string token)
         {
             try
@@ -493,7 +528,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<LogInActivityLogResponse>> GetLogInActivityLogList(string userId,string search, MetaData metaData, string token)
+        public async Task<BaseResponse<LogInActivityLogResponse>> GetLogInActivityLogList(string userId, string search, MetaData metaData, string token)
         {
             try
             {
