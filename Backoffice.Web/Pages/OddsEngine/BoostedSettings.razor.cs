@@ -72,10 +72,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsPreLoader = true;
                 }
 
+                
                 var result = await TradingService.GetBoostedSettings(new BoostedSettingsRequest()
                 {
                     ClientCodes = UserModel.ClientCodes.ToList(),
-                    Search = SearchForm.SearchText
+                    Search = SearchForm.SearchText ?? string.Empty
                 });
                 ClientsView = result.Result;
                 IsPreLoader = false;
