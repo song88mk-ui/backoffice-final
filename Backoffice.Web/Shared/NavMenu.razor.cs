@@ -11,7 +11,7 @@ namespace Backoffice.Web.Shared
         #region Properties
 
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [Inject] public IModalService ModalService { get; set; }
+        [Inject] public INavMenuModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }

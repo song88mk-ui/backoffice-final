@@ -44,6 +44,6 @@ namespace Backoffice.Web.Services
             modalResult.ModalType = _modalType;
             CloseModal?.Invoke();
             OnClose?.Invoke(modalResult);
-        }        
+        }
     }
 }
