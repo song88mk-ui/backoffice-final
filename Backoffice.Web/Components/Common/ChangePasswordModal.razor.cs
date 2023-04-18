@@ -95,7 +95,7 @@ namespace Backoffice.Web.Components.Common
                     Alerts.Add(new AlertModel
                     {
                         Status = "Error",
-                        Message = "Both passwords must match",
+                        Message = "Password must match",
                         Opacity = 1.0m
                     });
                 }
@@ -179,6 +179,7 @@ namespace Backoffice.Web.Components.Common
             }
             else
             {
+                IsValidPassword = false;
                 passwordErrorCount++;
 
                 Alerts.Add(new AlertModel
