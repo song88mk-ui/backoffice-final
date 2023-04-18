@@ -2,9 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
-using static Backoffice.Shared.Models.TierRevenueShareModel;
 
 namespace Backoffice.Web.Components.Common
 {
@@ -12,7 +10,7 @@ namespace Backoffice.Web.Components.Common
     {
         #region Properties
 
-        [Inject] private IModalService ModalService { get; set; }
+        [Inject] private INavMenuModalService ModalService { get; set; }
         [Inject] private IAuthenticationService AuthenticationService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }

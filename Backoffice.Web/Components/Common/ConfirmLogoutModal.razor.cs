@@ -7,7 +7,7 @@ namespace Backoffice.Web.Components.Common
     {
         #region Properties
 
-        [Inject] private IModalService ModalService { get; set; }
+        [Inject] private INavMenuModalService ModalService { get; set; }
 
         #endregion
 

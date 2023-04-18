@@ -131,6 +131,8 @@ builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>(cl
 });
 
 builder.Services.AddScoped<IModalService, ModalService>();
+builder.Services.AddScoped<INavMenuModalService, NavMenuModalService>();
+
 builder.Services.AddHttpClient<ITradingService, TradingService>(client =>
 {
     client.BaseAddress = new Uri(configuration["API:Backoffice:Uri"]);

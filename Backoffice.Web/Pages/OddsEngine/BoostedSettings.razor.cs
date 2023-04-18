@@ -56,6 +56,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
             ClientsView = new List<BoostedSettingsModel>();
+
+            await GetContent();
         }
 
         public async Task OnSaveSettingClickEvent(object item)
