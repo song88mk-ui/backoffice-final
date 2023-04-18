@@ -55,9 +55,12 @@ namespace Backoffice.Web.Components.Common
                     Alerts.Add(new AlertModel
                     {
                         Status = AlertStatus.Success.ToString(),
-                        Message = "Password has been successfully updated",
+                        Message = "Password successfully updated",
                         Opacity = 1.0m
                     });
+
+                    NewPassword = string.Empty;
+                    ConfirmNewPassword = string.Empty;
                 }
                 else
                 {
@@ -71,6 +74,13 @@ namespace Backoffice.Web.Components.Common
                     });
                 }
             }
+        }
+
+        public async Task OnCancelClickEvent()
+        {
+            NewPassword = string.Empty;
+            ConfirmNewPassword = string.Empty;
+            Alerts.Clear();
         }
 
         public void Dispose()

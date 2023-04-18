@@ -3,8 +3,6 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.ViewComponents;
-using System.Drawing;
 
 namespace Backoffice.Web.Shared
 {
@@ -15,7 +13,6 @@ namespace Backoffice.Web.Shared
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
-        [Inject] public IViewComponentSelector ComponentSelector { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
@@ -83,7 +80,7 @@ namespace Backoffice.Web.Shared
                     }
                 }
 
-                switch(page.ToLower())
+                switch (page.ToLower())
                 {
                     //case "sa/odds-engine":
                     case "hk/odds-engine":
@@ -224,7 +221,7 @@ namespace Backoffice.Web.Shared
         #endregion
 
         #region Utilities
-        
+
         private async Task GetSportsTreeMenu()
         {
             var response = await BackOfficeService.GetSportsTreeAsync((int)FixtureType.Match);
