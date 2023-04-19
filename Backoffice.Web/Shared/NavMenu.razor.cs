@@ -191,8 +191,7 @@ namespace Backoffice.Web.Shared
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-md");
-            parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
+            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");            
             parameters.Add("ModalHeaderClass", "text-center");
             parameters.Add("TitleClass", "w-100");
 
@@ -205,8 +204,7 @@ namespace Backoffice.Web.Shared
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-md");
-            parameters.Add("DialogStyle", "top:50%;transform:translateY(-50%)");
+            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");            
             parameters.Add("TitleClass", "w-100");
 
             var options = new ModalOptions();

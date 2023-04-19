@@ -118,7 +118,7 @@ namespace Backoffice.Web.Pages.SBC
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("ModalDialogClass", "modal-dialog-scrollable modal-lg");
             parameters.Add("ClientId", model.ClientIdRef);
             parameters.Add("CurrentTopLeagues", model.TopLeagues);
             parameters.Add("SportId", TopLeaguesFilter.SportId);
