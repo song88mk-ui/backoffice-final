@@ -46,7 +46,7 @@ namespace Backoffice.Web.Pages.Administration
             MetaData = new MetaData
             {
                 CurrentPage = 1,
-                PageSize = 20,
+                PageSize = 10,
                 TotalCount = 0,
                 TotalPages = 1,
             };
@@ -57,7 +57,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 ClientModel = new ClientModel
                 {
-                    Clients = clients.Clients.ToList()
+                    Clients = clients.Clients.OrderBy(x => x.ClientName).ToList()
                 };
             }
 
@@ -227,7 +227,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 SearchText = search ?? string.Empty,
                 Page = page,
-                PageSize = 25,
+                PageSize = 10,
                 ShowSuperAdmin = false,
             };
 
@@ -246,7 +246,7 @@ namespace Backoffice.Web.Pages.Administration
 
                 var userGroupList = temp.Select((s, index) => new UserGroupResponse
                 {
-                    Num = index + 1,
+                    Num = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
                     UserGroupId = s.UserGroupId,
                     UserGroupName = s.UserGroupName,
                     Claims = s.Claims

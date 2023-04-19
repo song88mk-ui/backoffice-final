@@ -36,7 +36,7 @@
                                             data-bs-toggle="dropdown" aria-expanded="false" @onclick="() => OnDropdownSelect(model.SortOrder)">
                                             @model.FixtureName
                                         </button>
-                                        <ul class="dropdown-menu" aria-labelledby="row-@model.SortOrder" id="select-@model.SortOrder">
+                                        <ul class="dropdown-menu w-100" aria-labelledby="row-@model.SortOrder" id="select-@model.SortOrder">
                                             @if (model.SortOrder == SelectedRow)
                                             {
                                             <Select @key="@($"Key{model.SortOrder}")" SportsTree="SportsTree" CurrentTopFixtures="CurrentTopFixtures" SelectedTopFixture="@model.FixtureId" RowCount="model.SortOrder" OnSelectedGame="OnSelectedGameEvent" />
@@ -87,7 +87,7 @@
                                             data-bs-toggle="dropdown" aria-expanded="false" @onclick="() => OnDropdownSelect(model.SortOrder)">
                                             No Game
                                         </button>
-                                        <ul class="dropdown-menu" aria-labelledby="row-@model.SortOrder" id="select-@model.SortOrder">
+                                        <ul class="dropdown-menu w-100" aria-labelledby="row-@model.SortOrder" id="select-@model.SortOrder">
                                             @if (model.SortOrder == SelectedRow)
                                             {
                                             <Select @key="@($"Key{model.SortOrder}")" SportsTree="SportsTree" CurrentTopFixtures="CurrentTopFixtures" SelectedTopFixture="@model.FixtureId" RowCount="model.SortOrder" OnSelectedGame="OnSelectedGameEvent" />

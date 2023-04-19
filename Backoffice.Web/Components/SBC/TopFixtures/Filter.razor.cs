@@ -52,7 +52,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 if (UserModel.ClientCodes.Any())
                     clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
-                Clients = clients.Clients.Select(s => new SelectListItemWithCheckboxModel<string>
+                Clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
                 {
                     IsChecked = true,
                     Value = s.ClientId.ToString(),

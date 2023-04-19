@@ -1,3 +1,8 @@
 ﻿.dropdown-toggle:after {
     float: right;
 }
+
+ul {
+    overflow-y: auto;
+    max-height: 20vh;
+}

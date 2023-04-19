@@ -59,7 +59,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                 {
                     Name = s.ClientName,
                     Value = s.ClientCode
-                }).ToList();
+                }).OrderBy(x => x.Name).ToList();
             }
             else
             {

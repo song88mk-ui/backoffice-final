@@ -46,7 +46,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 {
                     Value = s.ClientCode,
                     Name = s.ClientName,
-                }).ToList();
+                }).OrderBy(x => x.Name).ToList();
             }
 
             SelectedClientCode = Clients.FirstOrDefault().Value ?? string.Empty;

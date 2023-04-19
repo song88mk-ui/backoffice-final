@@ -381,7 +381,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     ClientCode = a.ClientCode,
                     ClientId = a.ClientId,
                     ClientName = a.ClientName
-                }).ToList() 
+                }).OrderBy(x => x.ClientName).ToList() 
                 : new List<ClientInformationModel>();
 
             return clients;

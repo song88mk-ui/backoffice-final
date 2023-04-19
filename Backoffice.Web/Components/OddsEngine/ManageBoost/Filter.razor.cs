@@ -164,7 +164,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             {
                 Name = s.ClientName,
                 Value = s.ClientCode
-            }).ToList();
+            }).OrderBy(x => x.Name).ToList();
 
             clients.Insert(0, new SelectListItemModel<string>
             {

@@ -86,3 +86,8 @@ td.actions a {
 .bg-live {
     background: transparent linear-gradient(268deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;    
 }
+
+ul {
+    overflow-y: auto;
+    max-height: 20vh;
+}

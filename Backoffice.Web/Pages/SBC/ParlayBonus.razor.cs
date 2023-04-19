@@ -278,7 +278,7 @@ namespace Backoffice.Web.Pages.SBC
                     clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                 }
 
-                Clients = clients.Clients.Select(s => new SelectListItemModel<ClientModel.Client>
+                Clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemModel<ClientModel.Client>
                 {
                     Value = s,
                     Name = s.ClientName

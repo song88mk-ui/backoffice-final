@@ -66,7 +66,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                         Region = s.Region
                     }).ToList();
 
-                Clients = TopLeaguesFilterModel.Clients.Select(s => new SelectListItemWithCheckboxModel<string>
+                Clients = TopLeaguesFilterModel.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
                 {
                     Value = s.ClientId.ToString(),
                     Name = s.ClientName,
