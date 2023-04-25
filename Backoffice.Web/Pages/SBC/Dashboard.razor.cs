@@ -15,8 +15,10 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public ICommonService CommonService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -29,11 +31,13 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnInitializedAsync()
         {
+            await AuthenticateAccess.InvokeAsync();
+
             PageTitle = "Dashboard";
             IconClass = "ico ico-dashboard";
 
             Token = CommonService.GenerateToken();
-            
+
             await Initialize();
         }
 

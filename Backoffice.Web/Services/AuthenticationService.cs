@@ -83,17 +83,17 @@ namespace Backoffice.Web.Services
             return result;
         }
 
-        public async Task<TokenModel> AuthenticateToken()
+        public async Task<BaseResponse<TokenModel>> AuthenticateToken()
         {
             var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
             var response = await _httpClient.GetAsync("api/authentication/authenticate");
-            var token = new TokenModel();
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<TokenModel>>(await response.Content.ReadAsStreamAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                token = new TokenModel()
+                
+                var token = new TokenModel()
                 {
                     AccessToken = result.Result.AccessToken
                 };
@@ -105,9 +105,15 @@ namespace Backoffice.Web.Services
 
                 ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(userName);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+                return result;
             }
 
-            return token;
+            return new BaseResponse<TokenModel>
+            {
+                StatusCode = response.StatusCode == HttpStatusCode.Unauthorized ? StatusCode.Unauthorized : StatusCode.Error,
+                Result = new TokenModel()
+            };
         }
         public async Task<bool> Logout()
         {

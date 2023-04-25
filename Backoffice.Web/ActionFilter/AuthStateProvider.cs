@@ -23,7 +23,6 @@ namespace Backoffice.Web.ActionFilter
             _anonymous = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 
-
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             try

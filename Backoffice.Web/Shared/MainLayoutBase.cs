@@ -43,6 +43,7 @@ namespace Backoffice.Web.Shared
         public static Func<Task> OnFilterClientActionAsync;
         public ClientModel Clients { get; set; } = new ClientModel();
         public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
+        public EventCallback AuthenticateAccessEvent => EventCallback.Factory.Create(this, AuthenticateAccess);
         //public bool IsPreLoader { get; set; } = true;
         public bool IsPreLoader { get; set; }
         public string InlineSpinnerCss { get; set; }
@@ -259,6 +260,16 @@ namespace Backoffice.Web.Shared
         public async Task OnFilterClientEvent()
         {
             await JSRuntime.InvokeVoidAsync("filterClientName", Clients.Clients.Select(c => c.ClientName).ToList());
+        }
+
+        public async Task AuthenticateAccess()
+        {
+            var authResponse = await AuthenticationService.AuthenticateToken();
+
+            if (authResponse.StatusCode != StatusCode.Success)
+            {
+                NavigationManager.NavigateTo("login", true);
+            }
         }
 
         public void Dispose()
