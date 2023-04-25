@@ -96,7 +96,7 @@ namespace Backoffice.Web.Pages.SBC
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("ModalDialogClass", "modal-xl");
             parameters.Add("Client", new ClientListResponse.Client());
             parameters.Add("RealSports", realSports);
             parameters.Add("VirtualSports", virtualSports);
@@ -184,7 +184,7 @@ namespace Backoffice.Web.Pages.SBC
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("ModalDialogClass", "modal-xl");
             parameters.Add("Client", client);
             parameters.Add("RealSports", realSports);
             parameters.Add("VirtualSports", virtualSports);
