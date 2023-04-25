@@ -56,8 +56,8 @@ namespace Backoffice.Web.Shared
         protected override async Task OnInitializedAsync()
         {
             try
-            {                
-                IsPreLoader = true;                
+            {
+                IsPreLoader = true;
 
                 InlineSpinnerCss = "width:10rem;height:10rem;";
 
@@ -108,104 +108,108 @@ namespace Backoffice.Web.Shared
                     NavMenuAccess = PermissionCategory.Admin;
 
                 var permissions = await GetPermissionList();
-                if (permissions != null)
+
+                if (permissions == null || permissions.StatusCode != StatusCode.Success)
                 {
-                    permissions.Permissions = permissions.Permissions.OrderBy(o => o.CategoryId).ThenBy(o => o.SortOrder).ToList();
+                    NavigationManager.NavigateTo("login", true);
+                    return;
+                }
 
-                    if (UserModel != null && UserModel.Claims != null)
+                permissions.Permissions = permissions.Permissions.OrderBy(o => o.CategoryId).ThenBy(o => o.SortOrder).ToList();
+
+                if (UserModel != null && UserModel.Claims != null)
+                {
+                    // Temporary Hide Settlement
+                    var permissionSubCategory = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.')
+                    && p.SubCategoryName.ToUpper() != "Settlements".ToUpper()).Select(s => s.SubCategoryName).Distinct();
+
+                    foreach (var category in permissionSubCategory)
                     {
-                        // Temporary Hide Settlement
-                        var permissionSubCategory = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.')
-                        && p.SubCategoryName.ToUpper() != "Settlements".ToUpper()).Select(s => s.SubCategoryName).Distinct();
+                        var subMenus = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.') && p.SubCategoryName == category).ToList();
 
-                        foreach (var category in permissionSubCategory)
+                        if (subMenus.Count() == 1)
                         {
-                            var subMenus = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.') && p.SubCategoryName == category).ToList();
-
-                            if (subMenus.Count() == 1)
+                            var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
+                            if (claim != null && claim.Value != "0")
                             {
-                                var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
+                                if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel?.MainUserId))
+                                    continue;
+
+                                if (!string.IsNullOrEmpty(subMenus[0].GroupName) && subMenus[0].ClaimType.Contains(SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".")))
+                                    continue;
+
+                                var menu = await GetMenu(claim, subMenus[0].Name);
+                                NavMenus.Menus.Add(menu);
+                            }
+                        }
+                        else
+                        {
+                            var categoryId = category.ToLower().Replace(" ", "-").Replace("&", "");
+                            var menu = new NavMenuModel.MenuModel
+                            {
+                                Id = $"sub-menu-{categoryId}",
+                                Name = category,
+                                IconName = categoryId,
+                                Url = $"#sub-menu-{categoryId}",
+                            };
+
+                            if (category == "User & User Groups")
+                            {
+                                menu.IconName = "manage-user-group";
+                            }
+
+                            foreach (var subMenu in subMenus)
+                            {
+                                var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenu.ClaimType);
                                 if (claim != null && claim.Value != "0")
                                 {
                                     if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel?.MainUserId))
                                         continue;
 
-                                    if (!string.IsNullOrEmpty(subMenus[0].GroupName) && subMenus[0].ClaimType.Contains(SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".")))
+                                    if (claim.Type == SportsbookClientPermission.SBC_OE.ToString().Replace("_", "."))
+                                    {
+                                        var menu2 = new NavMenuModel.MenuModel
+                                        {
+                                            Id = $"sub-menu-odds-engine",
+                                            Name = "Odds Engine",
+                                            IconName = "odds-engine",
+                                            Url = $"#sub-menu-odds-engine",
+                                            SubMenus = new List<NavMenuModel.MenuModel>()
+                                            {
+                                                new NavMenuModel.MenuModel()
+                                                {
+                                                    Id = $"menu.odds-engine.hk",
+                                                    Name = "Asia",
+                                                    IconName = "location",
+                                                    Url = $"hk/odds-engine",
+                                                },
+                                                //new NavMenuModel.MenuModel()
+                                                //{
+                                                //    Id = $"menu.odds-engine.sa",
+                                                //    Name = "South Africa",
+                                                //    IconName = "location",
+                                                //    Url = $"sa/odds-engine",
+                                                //},
+                                            }
+                                        };
+
+                                        NavMenus.Menus.Add(menu2);
+                                        continue;
+                                    }
+
+                                    if (!string.IsNullOrEmpty(subMenu.GroupName) && subMenu.ClaimType.Contains(SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".")))
                                         continue;
 
-                                    var menu = await GetMenu(claim, subMenus[0].Name);
-                                    NavMenus.Menus.Add(menu);
+                                    var submenu1 = await GetMenu(claim, subMenu.Name);
+                                    menu.SubMenus.Add(submenu1);
                                 }
                             }
-                            else
-                            {
-                                var categoryId = category.ToLower().Replace(" ", "-").Replace("&", "");
-                                var menu = new NavMenuModel.MenuModel
-                                {
-                                    Id = $"sub-menu-{categoryId}",
-                                    Name = category,
-                                    IconName = categoryId,
-                                    Url = $"#sub-menu-{categoryId}",
-                                };
 
-                                if (category == "User & User Groups")
-                                {
-                                    menu.IconName = "manage-user-group";
-                                }
-
-                                foreach (var subMenu in subMenus)
-                                {
-                                    var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenu.ClaimType);
-                                    if (claim != null && claim.Value != "0")
-                                    {
-                                        if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel?.MainUserId))
-                                            continue;
-
-                                        if (claim.Type == SportsbookClientPermission.SBC_OE.ToString().Replace("_", "."))
-                                        {
-                                            var menu2 = new NavMenuModel.MenuModel
-                                            {
-                                                Id = $"sub-menu-odds-engine",
-                                                Name = "Odds Engine",
-                                                IconName = "odds-engine",
-                                                Url = $"#sub-menu-odds-engine",
-                                                SubMenus = new List<NavMenuModel.MenuModel>()
-                                                {
-                                                    new NavMenuModel.MenuModel()
-                                                    {
-                                                        Id = $"menu.odds-engine.hk",
-                                                        Name = "Asia",
-                                                        IconName = "location",
-                                                        Url = $"hk/odds-engine",
-                                                    },
-                                                    //new NavMenuModel.MenuModel()
-                                                    //{
-                                                    //    Id = $"menu.odds-engine.sa",
-                                                    //    Name = "South Africa",
-                                                    //    IconName = "location",
-                                                    //    Url = $"sa/odds-engine",
-                                                    //},
-                                                }
-                                            };
-
-                                            NavMenus.Menus.Add(menu2);
-                                            continue;
-                                        }
-
-                                        if (!string.IsNullOrEmpty(subMenu.GroupName) && subMenu.ClaimType.Contains(SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".")))
-                                            continue;
-
-                                        var submenu1 = await GetMenu(claim, subMenu.Name);
-                                        menu.SubMenus.Add(submenu1);
-                                    }
-                                }
-
-                                if (menu.SubMenus.Any())
-                                    NavMenus.Menus.Add(menu);
-                            }
+                            if (menu.SubMenus.Any())
+                                NavMenus.Menus.Add(menu);
                         }
-
                     }
+
                 }
 
                 IsPreLoader = false;
@@ -472,15 +476,28 @@ namespace Backoffice.Web.Shared
         {
             var response = await AuthenticationService.GetPermissionList(false, true);
 
+            //if (response.StatusCode == StatusCode.Success)
+            //{
+            //    return new PermissionResponse
+            //    {
+            //        Permissions = response.Result.Permissions ?? new List<PermissionModel>(),
+            //    };
+            //}
+
+            //return new PermissionResponse();
+
+            var permissions = new List<PermissionModel>();
+
             if (response.StatusCode == StatusCode.Success)
             {
-                return new PermissionResponse
-                {
-                    Permissions = response.Result.Permissions ?? new List<PermissionModel>(),
-                };
+                permissions = response.Result.Permissions ?? new List<PermissionModel>();
             }
 
-            return new PermissionResponse();
+            return new PermissionResponse
+            {
+                StatusCode = response.StatusCode,
+                Permissions = permissions,
+            };
         }
 
         #endregion

@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Backoffice.Shared.Enums;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Backoffice.Shared.Models.Response
 {
@@ -10,7 +9,7 @@ namespace Backoffice.Shared.Models.Response
         {
             Permissions = new List<PermissionModel>();
         }
-
+        public StatusCode StatusCode { get; set; }
         public List<PermissionModel> Permissions { get; set; }
     }
 }
