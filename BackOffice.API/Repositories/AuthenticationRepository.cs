@@ -80,7 +80,7 @@ namespace Backoffice.API.Repositories
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.GetAsync($"authenticate");
+                var response = await _httpClient.PostAsync($"v1/authentication/access", new StringContent(string.Empty, Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<TokenModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
