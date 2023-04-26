@@ -16,6 +16,8 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         private MetaData MetaData { get; set; }
         public PermissionResponse Permissions { get; set; }
         public ManageUserFilterModel FilterModel { get; set; } = new ManageUserFilterModel();
@@ -44,6 +46,9 @@ namespace Backoffice.Web.Pages.Administration
             };
 
             UserList = new List<UserResponse>();
+
+            await AuthenticateAccess.InvokeAsync();
+
             Permissions = await GetPermissionList();
         }
 

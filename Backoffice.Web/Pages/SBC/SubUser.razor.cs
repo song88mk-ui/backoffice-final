@@ -16,6 +16,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public SubUserCallbackModel CallbackModel { get; set; }
@@ -49,6 +50,8 @@ namespace Backoffice.Web.Pages.SBC
                 TotalCount = 0,
                 TotalPages = 1,
             };
+
+            await AuthenticateAccess.InvokeAsync();
 
             PageTitle = "Sub Users";
             IconClass = "ico ico-sub-user";

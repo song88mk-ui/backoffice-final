@@ -26,6 +26,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public string SportId { get; set; }
         [Parameter] public string SegmentId { get; set; }
@@ -50,7 +52,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {
+        {            
             TradingService.Region = Region.ToUpper();
             FixtureMarkets = null;
             MonitoringCallbackModel = new MonitoringCallbackModel();
@@ -65,6 +67,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Url = $"{Region}/odds-engine/monitoring",
                 IsCurrentPage = true
             });
+
+            await AuthenticateAccess.InvokeAsync();
 
             var clients = (await TradingService.GetClientList()).Result;
 

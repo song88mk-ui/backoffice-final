@@ -17,6 +17,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public string PageTitle { get; set; }
@@ -30,6 +31,8 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnInitializedAsync()
         {
+            await AuthenticateAccess.InvokeAsync();
+
             PageTitle = "Drill Down Report";
             IconClass = "ico ico-drill-down-report";
 

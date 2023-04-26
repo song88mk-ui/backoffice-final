@@ -23,6 +23,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public IJSStreamReference? DataReference { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         [Parameter] public string Region { get; set; } = "hk";
 
         public string PageTitle { get; set; }
@@ -79,6 +81,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Url = $"{Region}/odds-engine/sport-settings",
                 IsCurrentPage = true
             });
+
+            await AuthenticateAccess.InvokeAsync();
 
             //ClientInformations = (await TradingService.GetClientList()).Result;
 

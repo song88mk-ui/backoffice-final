@@ -15,6 +15,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -27,6 +28,8 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
+            await AuthenticateAccess.InvokeAsync();
+
             PageTitle = "Sports";
             IconClass = "ico ico-sports";
 

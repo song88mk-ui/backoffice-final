@@ -11,6 +11,8 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         private bool OldIsMaintenance { get; set; }
         public AlertModel AlertModel { get; set; }
         public string PageTitle { get; set; }
@@ -40,6 +42,8 @@ namespace Backoffice.Web.Pages.Administration
         {
             //IsPreLoader = true;
             AlertModel = new AlertModel();
+
+            await AuthenticateAccess.InvokeAsync();
 
             PageTitle = "Maintenance";
             IconClass = "ico ico-maintenance";

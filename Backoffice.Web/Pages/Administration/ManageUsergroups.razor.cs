@@ -17,6 +17,8 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         public MetaData MetaData { get; set; }
         public UserGroupListResponse UserGroupListModel { get; set; }
         public UserGroupCallbackModel UserGroupCallbackModel { get; set; }
@@ -50,6 +52,8 @@ namespace Backoffice.Web.Pages.Administration
                 TotalCount = 0,
                 TotalPages = 1,
             };
+
+            await AuthenticateAccess.InvokeAsync();
 
             var clients = (await BackOfficeService.GetClients()).Result;
 

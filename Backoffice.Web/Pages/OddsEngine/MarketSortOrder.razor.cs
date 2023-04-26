@@ -16,7 +16,11 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         [Parameter] public string Region { get; set; } = "hk";
+
         public IJSStreamReference? DataReference { get; set; }
 
         public string PageTitle { get; set; }
@@ -42,7 +46,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {
+        {            
             TradingService.Region = Region.ToUpper();
             MarketSortOrderModel = new MarketSortOrderModel();
 
@@ -71,6 +75,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Url = string.Empty,
                 IsCurrentPage = true
             });
+
+            await AuthenticateAccess.InvokeAsync();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

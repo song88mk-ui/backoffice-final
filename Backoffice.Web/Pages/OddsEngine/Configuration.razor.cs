@@ -22,8 +22,12 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private ITradingService TradingService { get; set; }        
         [Inject] private IConfiguration AppConfiguration { get; set; }        
         [Inject] public ToastService? ToastService { get; set; }
+
         [Parameter] public string Region { get; set; } = "hk";
+
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         public List<MarketLookupNavigationModel> SelectedContents;
         public List<BreadcrumbModel> Breadcrumbs { get; set; }        
         public List<MarketLookupNavigationModel> MarketLookupNavigationModelsTemp { get; set; }
@@ -70,7 +74,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                     Url = "odds-engine/config",
                     IsCurrentPage = true
                 }
-            };            
+            };
+
+            await AuthenticateAccess.InvokeAsync();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

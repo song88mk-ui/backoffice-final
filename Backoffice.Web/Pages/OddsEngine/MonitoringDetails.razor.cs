@@ -20,6 +20,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public string Id { get; set; }
 
@@ -62,6 +64,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             PageTitle = string.Empty;
             IconClass = string.Empty;
+
+            await AuthenticateAccess.InvokeAsync();
 
             var clients = (await TradingService.GetClientList()).Result;
 
