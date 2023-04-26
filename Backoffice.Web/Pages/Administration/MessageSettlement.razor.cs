@@ -22,6 +22,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public MarketSettlementFilterModel FilterModel { get; set; } = new MarketSettlementFilterModel();
         public List<MessageSettlementModel> MessageSettlementModel { get; set; }
@@ -56,6 +57,8 @@ namespace Backoffice.Web.Pages.Administration
                 TotalCount = 0,
                 TotalPages = 1,
             };
+
+            await AuthenticateAccess.InvokeAsync();
         }
 
         public async Task OnAddClickedEvent()

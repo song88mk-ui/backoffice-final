@@ -16,8 +16,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
+
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public List<PriceBoostConfigModel> PriceBoostList { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
@@ -46,7 +48,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {
+        {            
             TradingService.Region = Region.ToUpper();
             PageTitle = "Manage Boost";
             IconClass = string.Empty;
@@ -66,7 +68,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                     Url = $"{Region}/odds-engine/manage-boost",
                     IsCurrentPage = true
                 }
-            };            
+            };
+
+            await AuthenticateAccess.InvokeAsync();
         }
 
         public async Task OnEditClickEvent(PriceBoostConfigModel priceboost)

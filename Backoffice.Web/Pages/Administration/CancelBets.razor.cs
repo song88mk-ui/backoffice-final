@@ -17,6 +17,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public CancelBetModel CancelBetModel { get; set; }
         public List<AlertModel> Alerts { get; set; }
@@ -38,6 +39,8 @@ namespace Backoffice.Web.Pages.Administration
                 Num = 1,
                 BetReferenceId = string.Empty
             });
+
+            await AuthenticateAccess.InvokeAsync();
 
             PageTitle = "Cancel Bets";
             IconClass = "ico ico-cancel-bets";

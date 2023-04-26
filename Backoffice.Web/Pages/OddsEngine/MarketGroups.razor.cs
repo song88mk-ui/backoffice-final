@@ -22,6 +22,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         [Parameter] public string Region { get; set; } = "hk";
 
         public IJSStreamReference? DataReference { get; set; }
@@ -47,7 +49,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Methods
         protected override async Task OnInitializedAsync()
-        {
+        {            
             TradingService.Region = Region.ToUpper();
             TableClass = "table-edit-market-group";
             IsPreLoader = true;
@@ -66,6 +68,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
+
+            await AuthenticateAccess.InvokeAsync();
         }
 
         public async Task OnAddClickedEvent()

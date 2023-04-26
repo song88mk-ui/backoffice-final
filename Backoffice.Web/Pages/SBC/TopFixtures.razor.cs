@@ -18,6 +18,8 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] private ToastService? ToasterService { get; set; }
 
 
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         public MetaData MetaData { get; set; }
         public TopFixturesModel TopFixturesModel { get; set; }
         public bool IsPreLoader { get; set; } = true;
@@ -44,6 +46,8 @@ namespace Backoffice.Web.Pages.SBC
             };
 
             TopFixturesModel = new TopFixturesModel();
+
+            await AuthenticateAccess.InvokeAsync();
         }
 
         public async Task OnInitEvent(TopFixtureCallbackModel request)

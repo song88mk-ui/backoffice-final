@@ -20,6 +20,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Parameter] public string Region { get; set; } = "hk";
 
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         protected List<BoostedSettingsModel> ClientsView { get; set; }
         protected SearchFormModel SearchForm { get; set; } = new SearchFormModel();
@@ -34,7 +35,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {
+        {          
             THeadClass = "table-head";
             PageTitle = "Boosted Settings";
             IconClass = string.Empty;
@@ -56,6 +57,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
             ClientsView = new List<BoostedSettingsModel>();
+
+            await AuthenticateAccess.InvokeAsync();
 
             await GetContent();
         }

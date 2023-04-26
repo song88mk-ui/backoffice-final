@@ -18,6 +18,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
         public string PageTitle { get; set; }
@@ -66,6 +67,8 @@ namespace Backoffice.Web.Pages.SBC
             };
 
             OnDisableSaveActionAsync = DisableSaveButton;
+
+            await AuthenticateAccess.InvokeAsync();
 
             await LoadClients();
         }

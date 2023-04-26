@@ -16,6 +16,8 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         public MetaData MetaData { get; set; }
         public ClientListResponse ClientListModel { get; set; }
         public ClientListCallbackModel ClientListCallbackModel { get; set; }
@@ -44,6 +46,8 @@ namespace Backoffice.Web.Pages.SBC
                 TotalCount = 0,
                 TotalPages = 1,
             };
+
+            await AuthenticateAccess.InvokeAsync();
 
             PageTitle = "Manage Clients";
             IconClass = "ico ico-clients";

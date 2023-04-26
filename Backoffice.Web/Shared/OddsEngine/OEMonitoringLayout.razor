@@ -4,7 +4,8 @@
 @inherits MainLayoutBase
 
 <ToastComponent />
-<CascadingValue Value="UserModel" Name="UserModel">
+<CascadingValue Value="AuthenticateAccessEvent" Name="AuthenticateAccessEvent">
+    <CascadingValue Value="UserModel" Name="UserModel">
         <PageTitle>Backoffice - SBC - Odds Engine</PageTitle>
         <div class="page">
             @if (IsPreLoader)
@@ -16,7 +17,7 @@
             else
             {
                 <div class="sidebar">
-                    <NavMenu NavMenuAccess="PermissionCategory.OE" OnSportClickCallback="OnSportClickEvent" Region="@Region"/>
+                    <NavMenu NavMenuAccess="PermissionCategory.OE" OnSportClickCallback="OnSportClickEvent" Region="@Region" />
                 </div>
                 <main>
                     <article class="content px-4">
@@ -24,7 +25,7 @@
                             <div class="main-content col-md-12 mb-4 pb-3 rounded">
                                 <div class="row">
                                     <div class="header-container col-md-12">
-                                        <HeaderNavMenu @ref="HeaderNavMenuReference" Region="@Region"/>
+                                        <HeaderNavMenu @ref="HeaderNavMenuReference" Region="@Region" />
                                     </div>
 
                                     <CascadingValue Value="SelectedSport" Name="SelectedSport">
@@ -37,6 +38,7 @@
                 </main>
             }
         </div>
+    </CascadingValue>
 </CascadingValue>
 
 @code

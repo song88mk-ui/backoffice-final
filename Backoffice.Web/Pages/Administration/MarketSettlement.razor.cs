@@ -17,6 +17,8 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         public MarketSettlementModalFilterModel ModalFilter { get; set; } = new MarketSettlementModalFilterModel();
         public List<ManualMarketSettlementAuditModel> ManualMarketSettlements { get; set; }
         public MetaData MetaData { get; set; }
@@ -51,6 +53,8 @@ namespace Backoffice.Web.Pages.Administration
                 FromDate = DateTime.Now.Date.AddDays(-1),
                 ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
             };
+
+            await AuthenticateAccess.InvokeAsync();
 
             PageTitle = "Market Settlement";
             IconClass = "ico ico-market-settlement";

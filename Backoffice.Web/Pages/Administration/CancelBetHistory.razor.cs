@@ -19,6 +19,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public CancelBetHistoryCallbackModel CallbackModel { get; set; }
         public CancelBetHistoryModel CancelBets { get; set; }
@@ -50,6 +51,8 @@ namespace Backoffice.Web.Pages.Administration
                 TotalCount = 0,
                 TotalPages = 1,
             };
+
+            await AuthenticateAccess.InvokeAsync();
 
             PageTitle = "Cancel Bet History";
             IconClass = "ico ico-cancel-bet-history";
