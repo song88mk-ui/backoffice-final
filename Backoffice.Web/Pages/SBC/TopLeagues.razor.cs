@@ -42,13 +42,6 @@ namespace Backoffice.Web.Pages.SBC
             IconClass = "ico ico-top-leagues";
             IsPreLoader = true;
 
-            for (var i = 0; i < 5; i++)
-            {
-                _toasterService.AddToast(Toast.NewToast
-                        ("Client Top Fixtures",
-                        $"Test {i + 1}"));
-            }
-
             GetTopLeaguesRequest = new GetTopLeaguesRequest();
             TopLeaguesFilter = new TopLeaguesFilterModel();
 
