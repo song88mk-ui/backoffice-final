@@ -10,6 +10,9 @@ namespace Backoffice.Shared.Utilities
     {
         public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
+            if(jwt == null)
+                return new List<Claim>();
+
             var claims = new List<Claim>();
             var payload = jwt.Split('.')[1];
 

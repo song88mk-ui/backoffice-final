@@ -27,56 +27,75 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (TopLeaguesList != null && TopLeaguesList.ClientTopLeagues.Any())
+                                    @if (IsPreLoader)
                                     {
-                                        @foreach (var item in TopLeaguesList.ClientTopLeagues)
+                                        <tr>
+                                            <td colspan=4>
+                                                <Preloader />
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        if (TopLeaguesList != null && TopLeaguesList.ClientTopLeagues.Any())
                                         {
-                                            <tr>
-                                                <td class="py-2">
-                                                    <span>@item.RowNo</span>
-                                                </td>
-                                                <td class="py-2">
-                                                    <span>@item.ClientName</span>
-                                                </td>
-                                                <td class="py-2">
-                                                    <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
-                                                        @foreach (var x in item.TopLeagues)
-                                                        {
-                                                            <div class="tl-fixture m-1 py-1 rounded-2">
-                                                                <span class="px-3">@x.SegmentName > @x.LeagueName</span>
-                                                            </div>
-                                                        }
-                                                    </div>
-                                                </td>
-                                                <td class="py-2">
-                                                    <AuthorizeView Policy="sbc-topleagues-canedit">
-                                                        <Authorized Context="ActivateAll">
-                                                            <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="_ => OnEditClickEvent(item)">
-                                                                <i class="fa fa-edit"></i>
-                                                            </a>
-                                                            @if (item.TopLeagues.Any())
+                                            foreach (var item in TopLeaguesList.ClientTopLeagues)
+                                            {
+                                                <tr>
+                                                    <td class="py-2">
+                                                        <span>@item.RowNo</span>
+                                                    </td>
+                                                    <td class="py-2">
+                                                        <span>@item.ClientName</span>
+                                                    </td>
+                                                    <td class="py-2">
+                                                        <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
+                                                            @foreach (var x in item.TopLeagues)
                                                             {
-                                                                <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="_ => OnCopyClickEvent(item)">
-                                                                    <i class="fa fa-copy"></i>
-                                                                </a>
+                                                                <div class="tl-fixture m-1 py-1 rounded-2">
+                                                                    <span class="px-3">@x.SegmentName > @x.LeagueName</span>
+                                                                </div>
                                                             }
-                                                            else
-                                                            {
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-2">
+                                                        <AuthorizeView Policy="sbc-topleagues-canedit">
+                                                            <Authorized Context="ActivateAll">
+                                                                <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="_ => OnEditClickEvent(item)">
+                                                                    <i class="fa fa-edit"></i>
+                                                                </a>
+                                                                @if (item.TopLeagues.Any())
+                                                                {
+                                                                    <a class="tl-link-copy me-2" href="javascript:(0)" @onclick="_ => OnCopyClickEvent(item)">
+                                                                        <i class="fa fa-copy"></i>
+                                                                    </a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a class="tl-link-copy-disabled me-2">
+                                                                        <i class="fa fa-copy"></i>
+                                                                    </a>
+                                                                }
+                                                            </Authorized>
+                                                            <NotAuthorized Context="ActivateAll">
+                                                                <a class="tl-link-edit me-2" href="javascript:(0)" disabled>
+                                                                    <i class="fa fa-edit"></i>
+                                                                </a>
                                                                 <a class="tl-link-copy-disabled me-2">
                                                                     <i class="fa fa-copy"></i>
                                                                 </a>
-                                                            }
-                                                        </Authorized>
-                                                        <NotAuthorized Context="ActivateAll">
-                                                            <a class="tl-link-edit me-2" href="javascript:(0)" disabled>
-                                                                <i class="fa fa-edit"></i>
-                                                            </a>
-                                                            <a class="tl-link-copy-disabled me-2">
-                                                                <i class="fa fa-copy"></i>
-                                                            </a>
-                                                        </NotAuthorized>
-                                                    </AuthorizeView>
-                                                    
+                                                            </NotAuthorized>
+                                                        </AuthorizeView>
+
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan=4>
+                                                    <NoRecordFound />
                                                 </td>
                                             </tr>
                                         }

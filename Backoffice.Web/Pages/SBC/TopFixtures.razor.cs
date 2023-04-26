@@ -4,6 +4,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Shared.Models.Requests;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -13,14 +14,18 @@ namespace Backoffice.Web.Pages.SBC
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] private ToastService? ToasterService { get; set; }
+
 
         public MetaData MetaData { get; set; }
         public TopFixturesModel TopFixturesModel { get; set; }
+        public bool IsPreLoader { get; set; } = true;
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-
         #endregion
+        private ToastService _toasterService => ToasterService!;
 
         #region Methods
 
@@ -28,6 +33,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             PageTitle = "Top Fixtures";
             IconClass = "ico ico-top-fixtures";
+            IsPreLoader = true;
 
             MetaData = new MetaData()
             {
@@ -42,9 +48,27 @@ namespace Backoffice.Web.Pages.SBC
 
         public async Task OnInitEvent(TopFixtureCallbackModel request)
         {
-            var clientIds = string.Join(",", request.Clients.Select(s => s.ClientId).ToList());
-            var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = clientIds })).Result;
+            if (!IsPreLoader)
+            {
+                IsPreLoader = true;
+                StateHasChanged();
+            }
 
+            var clientIds = string.Join(",", request.Clients.Select(s => s.ClientId).ToList());
+            var topFixtureResponse = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = clientIds }));
+
+            if (topFixtureResponse.StatusCode != Backoffice.Shared.Enums.StatusCode.Success)
+            {
+                _toasterService.AddToast(Toast.NewToast
+                        ("Client Top Fixtures",
+                        $"{topFixtureResponse.Message}"));
+                IsPreLoader = false;
+                return;
+            }
+
+            var result = topFixtureResponse.Result;
+
+            TopFixturesModel = new TopFixturesModel();
             if (result != null && result.TopFixtures.Any())
             {
                 TopFixturesModel.TopFixtures = result.TopFixtures;
@@ -53,11 +77,11 @@ namespace Backoffice.Web.Pages.SBC
             {
                 TopFixturesModel.TopFixtures = new List<ClientTopFixtureModel.OrderedClientTopFixture>();
 
-                foreach(var client in request.Clients)
+                foreach (var client in request.Clients)
                 {
-                    TopFixturesModel.TopFixtures.Add(new ClientTopFixtureModel.OrderedClientTopFixture 
-                    { 
-                        ClientIdRef = (int)client.ClientId,  
+                    TopFixturesModel.TopFixtures.Add(new ClientTopFixtureModel.OrderedClientTopFixture
+                    {
+                        ClientIdRef = (int)client.ClientId,
                         ClientName = client.ClientName,
                         TopFixtures = new List<ClientTopFixtureModel.TopFixture>()
                     });
@@ -65,6 +89,8 @@ namespace Backoffice.Web.Pages.SBC
             }
 
             await OnSearchEvent(request.SearchText);
+
+            IsPreLoader = false;
         }
 
         public async Task OnSearchEvent(string searchString)
@@ -112,7 +138,7 @@ namespace Backoffice.Web.Pages.SBC
         public async Task OnSaveClickEvent(object item)
         {
             var clientIdRefs = string.IsNullOrEmpty(item.ToString()) ? new List<string>() : item.ToString().Split(",").ToList();
-            foreach(var clientIdRef in clientIdRefs)
+            foreach (var clientIdRef in clientIdRefs)
             {
                 if (string.IsNullOrEmpty(clientIdRef))
                     continue;

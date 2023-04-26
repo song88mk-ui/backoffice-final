@@ -14,19 +14,22 @@ namespace Backoffice.Web.Services
         public readonly DateTimeOffset Posted = DateTimeOffset.Now;
         public bool IsBurnt => TimeToBurn < DateTimeOffset.Now;
         private TimeSpan elapsedTime => Posted - DateTimeOffset.Now;
+        private static int _secToLive = 20;
+
         public string ElapsedTimeText =>
                         elapsedTime.Seconds > 60
                         ? $"posted {-elapsedTime.Minutes} mins ago"
                         : $"posted {-elapsedTime.Seconds} secs ago";
         public static Toast NewToast(string title, string message)
-                             => NewToast(title, message, 5, false);
+                             => NewToast(title, message, _secToLive, false);
         public static Toast NewToast(string title, string message, bool IsMessageMarkup)
-                             => NewToast(title, message, 5, IsMessageMarkup);
+                             => NewToast(title, message, _secToLive, IsMessageMarkup);
         public static Toast NewToast(string title, string message, int secsToLive)
                              => NewToast(title, message, secsToLive, false);
         public static Toast NewToast(string title, string message, int secsToLive, bool IsMessageMarkup)
                              => new Toast
                              {
+                                 Id = Guid.NewGuid(),
                                  Title = title,
                                  Message = message,
                                  IsMessageMarkup = IsMessageMarkup,
@@ -71,7 +74,8 @@ namespace Backoffice.Web.Services
 
         public void AddToast(Toast toast)
         {
-            _toastList = _toastList.Prepend(toast).ToList();
+            _toastList.Insert(0, toast);
+            //_toastList = _toastList.Prepend(toast).ToList();
 
             if (!this.ClearBurntToast())
                 this.ToasterChanged?.Invoke(this, EventArgs.Empty);
@@ -81,7 +85,8 @@ namespace Backoffice.Web.Services
         {
             if (_toastList.Contains(toast))
             {
-                _toastList.Remove(toast);
+                //_toastList.Remove(_toastList.FirstOrDefault(x => x.Id == toast.Id));
+
                 if (!this.ClearBurntToast())
                     this.ToasterChanged?.Invoke(this, EventArgs.Empty);
             }

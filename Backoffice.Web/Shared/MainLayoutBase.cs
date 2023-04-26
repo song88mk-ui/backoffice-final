@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
@@ -65,6 +66,7 @@ namespace Backoffice.Web.Shared
                 if (HttpContextAccessor?.HttpContext?.Session.GetString("UserToken") == null)
                 {
                     NavigationManager.NavigateTo("login", true);
+                    IsPreLoader = false;
                     return;
                 }
 
@@ -76,8 +78,18 @@ namespace Backoffice.Web.Shared
 
                 OnFilterClientActionAsync = OnFilterClientEvent;
 
-                Clients = (await BackOfficeService.GetClients()).Result;
+                var clientResult = await BackOfficeService.GetClients();
 
+                if (clientResult.StatusCode != StatusCode.Success)
+                {
+                    _toasterService.AddToast(Toast.NewToast
+                            ("Client Top Fixtures",
+                            $"{clientResult.Message}"));
+                    IsPreLoader = false;
+                    return;
+                }
+
+                Clients = clientResult.Result;
                 var tasks = new List<Task>();
                 var otherPermissions = new List<string>() { "CLIENTCODES", "USERID", "TOKENNAME", "MAINUSERID" };
 
@@ -212,12 +224,14 @@ namespace Backoffice.Web.Shared
                     }
 
                 }
-
-                IsPreLoader = false;
             }
             catch (Exception)
             {
                 NavigationManager.NavigateTo("login", true);
+            }
+            finally
+            {
+                IsPreLoader = false;
             }
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)

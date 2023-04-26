@@ -1,10 +1,12 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.SBC.TopLeagues;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -14,11 +16,14 @@ namespace Backoffice.Web.Pages.SBC
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] protected UserModel UserModel { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
+        public bool IsPreLoader { get; set; } = true;
 
         public GetTopLeaguesRequest GetTopLeaguesRequest { get; set; }
         public TopLeaguesModel TopLeaguesList { get; set; }
@@ -26,6 +31,7 @@ namespace Backoffice.Web.Pages.SBC
         public MetaData MetaData { get; set; } = new MetaData();
 
         #endregion
+        private ToastService _toasterService => ToasterService!;
 
         #region Methods
 
@@ -33,6 +39,14 @@ namespace Backoffice.Web.Pages.SBC
         {
             PageTitle = "Top Leagues";
             IconClass = "ico ico-top-leagues";
+            IsPreLoader = true;
+
+            for (var i = 0; i < 5; i++)
+            {
+                _toasterService.AddToast(Toast.NewToast
+                        ("Client Top Fixtures",
+                        $"Test {i + 1}"));
+            }
 
             GetTopLeaguesRequest = new GetTopLeaguesRequest();
             TopLeaguesFilter = new TopLeaguesFilterModel();
@@ -48,6 +62,12 @@ namespace Backoffice.Web.Pages.SBC
 
         public async Task OnInitEvent(TopLeaguesFilterModel model)
         {
+            if (!IsPreLoader)
+            {
+                IsPreLoader = true;
+                StateHasChanged();
+            }
+
             TopLeaguesFilter = model;
 
             GetTopLeaguesRequest = new GetTopLeaguesRequest()
@@ -57,7 +77,18 @@ namespace Backoffice.Web.Pages.SBC
                 LanguageCode = "en"
             };
 
-            TopLeaguesList = (await BackOfficeService.GetTopLeaguesAsync(GetTopLeaguesRequest)).Result;
+            var topLeaguesResponse = await BackOfficeService.GetTopLeaguesAsync(GetTopLeaguesRequest);
+
+            if (topLeaguesResponse.StatusCode != Backoffice.Shared.Enums.StatusCode.Success)
+            {
+                _toasterService.AddToast(Toast.NewToast
+                        ("Client Top Fixtures",
+                        $"{topLeaguesResponse.Message}"));
+                IsPreLoader = false;
+                return;
+            }
+
+            TopLeaguesList = topLeaguesResponse.Result;
 
             if (TopLeaguesList != null)
             {
@@ -73,9 +104,9 @@ namespace Backoffice.Web.Pages.SBC
 
                 if (!string.IsNullOrWhiteSpace(model.Search))
                 {
-                    var result = TopLeaguesList.ClientTopLeagues.Where(c => c.ClientName.ToUpper().Contains(model.Search.ToUpper()) 
-                    || c.TopLeagues.Any(tf => tf.SportName.ToUpper().Contains(model.Search.ToUpper())) 
-                    || c.TopLeagues.Any(tf => tf.SegmentName.ToUpper().Contains(model.Search.ToUpper())) 
+                    var result = TopLeaguesList.ClientTopLeagues.Where(c => c.ClientName.ToUpper().Contains(model.Search.ToUpper())
+                    || c.TopLeagues.Any(tf => tf.SportName.ToUpper().Contains(model.Search.ToUpper()))
+                    || c.TopLeagues.Any(tf => tf.SegmentName.ToUpper().Contains(model.Search.ToUpper()))
                     || c.TopLeagues.Any(tf => tf.LeagueName.ToUpper().Contains(model.Search.ToUpper()))).ToList();
 
                     if (result != null)
@@ -106,6 +137,8 @@ namespace Backoffice.Web.Pages.SBC
                     })
                     .ToList();
             }
+
+            IsPreLoader = false;
         }
 
         public async Task OnFilterEvent(TopLeaguesFilterModel model)
@@ -160,7 +193,7 @@ namespace Backoffice.Web.Pages.SBC
                 ClientIds = TopLeaguesFilter.ClientIds,
                 Clients = TopLeaguesFilter.Clients,
             };
-                 
+
             await OnInitEvent(filter);
         }
 

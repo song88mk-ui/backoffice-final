@@ -22,10 +22,10 @@ namespace Backoffice.Web.Components.Common
             {
                 if (model.Value == "all")
                 {
-                    foreach (var item in Items)
+                    Items.ForEach(x =>
                     {
-                        item.IsChecked = true;
-                    }
+                        x.IsChecked = true;
+                    });
                 }
                 else
                 {
@@ -33,17 +33,16 @@ namespace Backoffice.Web.Components.Common
 
                     if (!Items.Where(c => c.Value != "all").Any(c => c.IsChecked == false))
                         Items[0].IsChecked = true;
-
                 }
             }
             else
             {
                 if (model.Value == "all")
                 {
-                    foreach (var item in Items)
+                    Items.ForEach(x =>
                     {
-                        item.IsChecked = false;
-                    }
+                        x.IsChecked = false;
+                    });
                 }
                 else
                 {

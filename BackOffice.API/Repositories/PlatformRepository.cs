@@ -12,7 +12,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using static Backoffice.Shared.Models.Requests.GetTopLeaguesRequest;
-using static Backoffice.Shared.Models.Response.ClientParlayBonusResponse;
 using static Backoffice.Shared.Models.Response.ClientTopFixtureResponse;
 using static Backoffice.Shared.Models.Response.GetTopLeaguesResponse;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -62,7 +61,7 @@ namespace Backoffice.API.Repositories
             }
 
         }
-        
+
         public async Task<BaseResponse<StatusCode>> ProcessBackOfficeClientBetConfig(AddOrUpdateBetConfigRequest request, string region)
         {
             try
@@ -749,7 +748,7 @@ namespace Backoffice.API.Repositories
             client.DefaultRequestHeaders.Add("x-api-key", GetApikey(region));
 
             return client;
-        }      
+        }
         private string GetBaseUrl(string region)
         {
             if (region.ToUpper() == "SA")

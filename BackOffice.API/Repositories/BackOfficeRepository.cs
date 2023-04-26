@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Mail;
 using System.Text.Json;
@@ -489,12 +488,13 @@ namespace Backoffice.API.Repositories
                 if (!string.IsNullOrEmpty(clientIdRefs))
                 {
                     var clients = clientIdRefs.Split(',').ToList().ConvertAll(int.Parse);
+                    var clientInformation = GetClientInformation();
 
-                    var hkResult = GetClientInformation().Where(s => clients.Contains(s.ClientId) && s.Region == "HK").Select(s => s.ClientId).ToList();
+                    var hkResult = clientInformation.Where(s => clients.Contains(s.ClientId) && s.Region == "HK").Select(s => s.ClientId).ToList();
                     if (hkResult.Any())
                         result.Add("HK", string.Join(",", hkResult));
 
-                    var saResult = GetClientInformation().Where(s => clients.Contains(s.ClientId) && s.Region == "SA").Select(s => s.ClientId).ToList();
+                    var saResult = clientInformation.Where(s => clients.Contains(s.ClientId) && s.Region == "SA").Select(s => s.ClientId).ToList();
                     if (saResult.Any())
                         result.Add("SA", string.Join(",", saResult));
                 }
