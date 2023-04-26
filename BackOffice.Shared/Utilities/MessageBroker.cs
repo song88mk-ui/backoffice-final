@@ -476,7 +476,8 @@ namespace Backoffice.Shared.Utilities
             switch (region.ToUpper())
             {
                 case "HK":
-                    _modelHk.BasicPublish(_credentials["HK"].Exchange, routingKey, properties, payloadBytes);
+                    _model.BasicPublish(_credentials["HK"].Exchange, routingKey, properties, payloadBytes);
+                    //_modelHk.BasicPublish(_credentials["HK"].Exchange, routingKey, properties, payloadBytes);
                     break;
                 //case "SA":
                 //    _modelSa.BasicPublish(_credentials["SA"].Exchange, routingKey, properties, payloadBytes);
