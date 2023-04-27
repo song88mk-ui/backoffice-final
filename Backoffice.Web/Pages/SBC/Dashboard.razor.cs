@@ -22,7 +22,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-        [CascadingParameter(Name = "Token")]  public string Token { get; set; }        
+        public string Token { get; set; }
         public string IFrameSrc { get; set; }
 
         #endregion
@@ -36,7 +36,6 @@ namespace Backoffice.Web.Pages.SBC
             PageTitle = "Dashboard";
             IconClass = "ico ico-dashboard";
 
-            //Token = CommonService.GenerateToken();
 
             await Initialize();
         }
@@ -50,6 +49,7 @@ namespace Backoffice.Web.Pages.SBC
             })).Result ?? new ReportRolesUrlResponse();
 
             IFrameSrc = reportRoles.Url;
+            Token = CommonService.GenerateToken();
         }
 
         public void Dispose()

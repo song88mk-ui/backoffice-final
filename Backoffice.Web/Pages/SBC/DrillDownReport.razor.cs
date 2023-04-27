@@ -36,7 +36,6 @@ namespace Backoffice.Web.Pages.SBC
             PageTitle = "Drill Down Report";
             IconClass = "ico ico-drill-down-report";
 
-            //Token = CommonService.GenerateToken();
 
             await Initialize();
         }
@@ -50,6 +49,7 @@ namespace Backoffice.Web.Pages.SBC
             })).Result ?? new ReportRolesUrlResponse();
 
             IFrameSrc = reportRoles.Url;
+            Token = CommonService.GenerateToken();
         }
 
         public void Dispose()

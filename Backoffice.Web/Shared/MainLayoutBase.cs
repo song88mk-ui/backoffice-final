@@ -27,7 +27,7 @@ namespace Backoffice.Web.Shared
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
-        [Inject] public ICommonService CommonService { get; set; }
+        //[Inject] public ICommonService CommonService { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
         [Parameter] public SportClickCallbackModel SelectedSport { get; set; }
@@ -130,7 +130,7 @@ namespace Backoffice.Web.Shared
                     return;
                 }
 
-                Token = CommonService.GenerateToken();
+                //Token = CommonService.GenerateToken();
 
                 permissions.Permissions = permissions.Permissions.OrderBy(o => o.CategoryId).ThenBy(o => o.SortOrder).ToList();
 

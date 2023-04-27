@@ -34,7 +34,6 @@ namespace Backoffice.Web.Pages.SBC
             PageTitle = "Open Bets";
             IconClass = "ico ico-open-bets";
 
-            //Token = CommonService.GenerateToken();
 
             await Initialize();
         }
@@ -48,6 +47,7 @@ namespace Backoffice.Web.Pages.SBC
             })).Result ?? new ReportRolesUrlResponse();
 
             IFrameSrc = reportRoles.Url;
+            Token = CommonService.GenerateToken();
         }
 
         public void Dispose()

@@ -34,7 +34,6 @@ namespace Backoffice.Web.Pages.SBC
             PageTitle = "Search Bet Id";
             IconClass = "ico ico-search-bet";
 
-            //Token = CommonService.GenerateToken();
 
             await Initialize();
         }
@@ -47,7 +46,8 @@ namespace Backoffice.Web.Pages.SBC
                 ClaimType = SportsbookClientPermission.SBC_Reports_SearchBetId.ToString().Replace("_", ".")
             })).Result ?? new ReportRolesUrlResponse();
 
-            IFrameSrc = reportRoles.Url;
+            IFrameSrc = reportRoles.Url; 
+            Token = CommonService.GenerateToken();
         }
 
         public void Dispose()

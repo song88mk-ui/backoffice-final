@@ -34,7 +34,6 @@ namespace Backoffice.Web.Pages.SBC
             PageTitle = "Search Event";
             IconClass = "ico ico-search-event";
 
-            //Token = CommonService.GenerateToken();
 
             await Initialize();
         }
@@ -48,6 +47,7 @@ namespace Backoffice.Web.Pages.SBC
             })).Result ?? new ReportRolesUrlResponse();
 
             IFrameSrc = reportRoles.Url;
+            Token = CommonService.GenerateToken();
         }
 
         public void Dispose()

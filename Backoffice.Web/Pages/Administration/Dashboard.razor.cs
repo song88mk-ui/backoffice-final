@@ -33,7 +33,6 @@ namespace Backoffice.Web.Pages.Administration
             PageTitle = "Sports";
             IconClass = "ico ico-sports";
 
-            Token = CommonService.GenerateToken();
 
             await Initialize();
         }
@@ -47,6 +46,7 @@ namespace Backoffice.Web.Pages.Administration
             })).Result ?? new ReportRolesUrlResponse();
 
             IFrameSrc = reportRoles.Url;
+            Token = CommonService.GenerateToken();
         }
 
         public void Dispose()
