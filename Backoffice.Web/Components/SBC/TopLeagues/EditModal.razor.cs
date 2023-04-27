@@ -32,6 +32,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         public GetAllLeaguesRequest GetAllLeaguesRequest { get; set; }
         public List<TopLeaguesModel.TopLeague> CurrentTopLeagues { get; set; }
         public List<TopLeaguesModel.TopLeague> NewTopLeagues { get; set; }
+        public List<TopLeaguesModel.TopLeague> TempNewTopLeagues { get; set; }
         public PostTopLeaguesRequest PostTopLeaguesRequest { get; set; }
 
         public string TableClass { get; set; }
@@ -52,6 +53,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
             CurrentTopLeagues = ModalParameters.TryGet<List<TopLeaguesModel.TopLeague>>("CurrentTopLeagues");
             AlertStatus = AlertStatus.Success;
+            TempNewTopLeagues = new List<TopLeaguesModel.TopLeague>();
             //SelectedRow = -1;
 
             GetAllLeaguesRequest = new GetAllLeaguesRequest()
@@ -86,7 +88,21 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                         NewTopLeagues = CurrentTopLeagues.Where(c => c.SegmentId == model.SelectedSegment?.SegmentId && c.LeagueId == model.SelectedLeague?.LeagueId).ToList();
                 }
                 else
-                    NewTopLeagues = CurrentTopLeagues;
+                {
+                    NewTopLeagues = CurrentTopLeagues.Select(x => new TopLeaguesModel.TopLeague()
+                    {
+                        LeagueId = x.LeagueId,
+                        LeagueName = x.LeagueName,
+                        LiveCount = x.LiveCount,
+                        SegmentId = x.SegmentId,
+                        SegmentName = x.SegmentName,
+                        SortOrder = x.SortOrder,
+                        SportId = x.SportId,
+                        SportName = x.SportName,
+                        Status = x.Status
+                    }).ToList();
+                }
+                    //NewTopLeagues = CurrentTopLeagues;
             }
 
             if (NewTopLeagues == null || !NewTopLeagues.Any())
@@ -141,10 +157,12 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         {
             if (NewTopLeagues.Count < 50)
             {
-                NewTopLeagues.Insert(count, new TopLeaguesModel.TopLeague
+                var newTopLeague = new TopLeaguesModel.TopLeague()
                 {
                     SortOrder = count + 1
-                });
+                };
+
+                NewTopLeagues.Insert(count, newTopLeague);                
 
                 SortOrderRow();
             }
