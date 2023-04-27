@@ -191,6 +191,25 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
         public async Task OnSaveClickEvent()
         {
+            AlertMessage = string.Empty;
+
+            //validate
+            if (NewTopLeagues.Count == 1 && NewTopLeagues.Any(x => string.IsNullOrEmpty(x.SegmentName) || string.IsNullOrEmpty(x.LeagueName)))
+            {
+                AlertMessage = "Select atleast 1 League";
+                AlertStatus = AlertStatus.Error;
+
+                return;
+            }
+
+            if (NewTopLeagues.Count > 1 && NewTopLeagues.Any(x => string.IsNullOrEmpty(x.SegmentName) || string.IsNullOrEmpty(x.LeagueName)))
+            {
+                AlertMessage = "Please remove empty row";
+                AlertStatus = AlertStatus.Error;
+
+                return;
+            }            
+
             if (NewTopLeagues.Count == 1 && NewTopLeagues.Any(c => c.LeagueId == 0))
                 NewTopLeagues = new List<TopLeaguesModel.TopLeague>();
             else
