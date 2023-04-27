@@ -83,7 +83,7 @@ namespace Backoffice.Web.Shared
                 if (clientResult.StatusCode != StatusCode.Success)
                 {
                     _toasterService.AddToast(Toast.NewToast
-                            ("Client Top Fixtures",
+                            ("Get Clients",
                             $"{clientResult.Message}"));
                     IsPreLoader = false;
                     return;
