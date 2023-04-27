@@ -58,6 +58,87 @@ namespace Backoffice.Web.Pages.SBC
 
         public async Task OnInitEvent(TopLeaguesFilterModel model)
         {
+            await GetContent(model);
+        }
+        public async Task OnFilterEvent(TopLeaguesFilterModel model)
+        {
+            MetaData = new MetaData
+            {
+                CurrentPage = 1,
+                PageSize = 25,
+                TotalCount = 0,
+                TotalPages = 1,
+            };
+
+            await GetContent(model);
+        }
+
+        public async Task OnEditClickEvent(TopLeaguesModel.ClientTopLeague model)
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("ClientId", model.ClientIdRef);
+            parameters.Add("CurrentTopLeagues", model.TopLeagues);
+            parameters.Add("SportId", TopLeaguesFilter.SportId);
+            parameters.Add("SportName", TopLeaguesFilter.SportName);
+
+            var options = new ModalOptions();
+            ModalService.Open<EditModal>($"Set the Top Leagues of {model.ClientName} ({TopLeaguesFilter.SportName})", parameters, options);
+        }
+
+        public async Task OnCopyClickEvent(TopLeaguesModel.ClientTopLeague model)
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("CopyFromClientId", model.ClientIdRef);
+            parameters.Add("CopyFromClientTopLeagues", model.TopLeagues);
+            parameters.Add("SportId", TopLeaguesFilter.SportId);
+            parameters.Add("SportName", TopLeaguesFilter.SportName);
+
+            var options = new ModalOptions();
+            ModalService.Open<CopyModal>($"Copy {model.ClientName} Top League Settings ({TopLeaguesFilter.SportName}) To", parameters, options);
+        }
+
+        protected async Task SelectPage(int page)
+        {
+            MetaData.CurrentPage = page;
+
+            await OnInitEvent(TopLeaguesFilter);
+        }
+
+        public async Task OnSaveClickEvent()
+        {
+            var filter = new TopLeaguesFilterModel()
+            {
+                Search = TopLeaguesFilter.Search,
+                SportId = TopLeaguesFilter.SportId,
+                SportName = TopLeaguesFilter.SportName,
+                ClientIds = TopLeaguesFilter.ClientIds,
+                Clients = TopLeaguesFilter.Clients,
+            };
+
+            await OnInitEvent(filter);
+        }
+
+        public void Dispose()
+        {
+            TopLeaguesList = null;
+            TopLeaguesFilter = null;
+
+            BackOfficeService.Dispose();
+
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
+
+        #region Utilities
+        private async Task GetContent(TopLeaguesFilterModel model)
+        {
             if (!IsPreLoader)
             {
                 IsPreLoader = true;
@@ -136,73 +217,6 @@ namespace Backoffice.Web.Pages.SBC
 
             IsPreLoader = false;
         }
-
-        public async Task OnFilterEvent(TopLeaguesFilterModel model)
-        {
-            await OnInitEvent(model);
-        }
-
-        public async Task OnEditClickEvent(TopLeaguesModel.ClientTopLeague model)
-        {
-            var parameters = new ModalParameters();
-
-            parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("ClientId", model.ClientIdRef);
-            parameters.Add("CurrentTopLeagues", model.TopLeagues);
-            parameters.Add("SportId", TopLeaguesFilter.SportId);
-            parameters.Add("SportName", TopLeaguesFilter.SportName);
-
-            var options = new ModalOptions();
-            ModalService.Open<EditModal>($"Set the Top Leagues of {model.ClientName} ({TopLeaguesFilter.SportName})", parameters, options);
-        }
-
-        public async Task OnCopyClickEvent(TopLeaguesModel.ClientTopLeague model)
-        {
-            var parameters = new ModalParameters();
-
-            parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("CopyFromClientId", model.ClientIdRef);
-            parameters.Add("CopyFromClientTopLeagues", model.TopLeagues);
-            parameters.Add("SportId", TopLeaguesFilter.SportId);
-            parameters.Add("SportName", TopLeaguesFilter.SportName);
-
-            var options = new ModalOptions();
-            ModalService.Open<CopyModal>($"Copy {model.ClientName} Top League Settings ({TopLeaguesFilter.SportName}) To", parameters, options);
-        }
-
-        protected async Task SelectPage(int page)
-        {
-            MetaData.CurrentPage = page;
-
-            await OnInitEvent(TopLeaguesFilter);
-        }
-
-        public async Task OnSaveClickEvent()
-        {
-            var filter = new TopLeaguesFilterModel()
-            {
-                Search = TopLeaguesFilter.Search,
-                SportId = TopLeaguesFilter.SportId,
-                SportName = TopLeaguesFilter.SportName,
-                ClientIds = TopLeaguesFilter.ClientIds,
-                Clients = TopLeaguesFilter.Clients,
-            };
-
-            await OnInitEvent(filter);
-        }
-
-        public void Dispose()
-        {
-            TopLeaguesList = null;
-            TopLeaguesFilter = null;
-
-            BackOfficeService.Dispose();
-
-            GC.SuppressFinalize(this);
-        }
-
         #endregion
     }
 }
