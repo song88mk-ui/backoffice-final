@@ -580,10 +580,14 @@ namespace Backoffice.Web.Services
                 {
                     new Claim("sub", username),
                     new Claim("aud", "tableau"),
-                    new Claim("jti", DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss.fff tt")),
+                    //new Claim("jti", DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss.fff tt")),
+                    new Claim("jti", Guid.NewGuid().ToString()),
                     new Claim("iss", clientId),
                     new Claim("scp", "tableau:views:embed"),
-                    new Claim("scp", " ")
+                    new Claim("scp", "tableau:content:read"),
+                    new Claim("scp", "tableau:sites:*"),
+                    new Claim("scp", "tableau:permissions:*"),
+                    new Claim("scp", "tableau:projects:*")
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(2),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

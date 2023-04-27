@@ -273,7 +273,7 @@ namespace Backoffice.Web.Shared
 
         public async Task OnFilterClientEvent()
         {
-            await JSRuntime.InvokeVoidAsync("filterClientName", Clients.Clients.Select(c => c.ClientName).ToList());
+            //await JSRuntime.InvokeVoidAsync("filterClientName", Clients.Clients.Select(c => c.ClientName).ToList());
         }
 
         public async Task AuthenticateAccess()
