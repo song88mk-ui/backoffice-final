@@ -345,8 +345,11 @@ namespace Backoffice.API.Repositories
                 var topFixture = new List<OrderedClientTopFixture>();
                 foreach (var region in regionclientIds)
                 {
-                    var response = await GetHttpClient(region.Key).GetAsync($"v1/client/topfixtures?clientRefIds={region.Value}");
-                    var payload = JsonConvert.DeserializeObject<BaseResponse<ClientTopFixtureResponse>>(response.Content.ReadAsStringAsync().Result);
+                    var response = await GetHttpClient(region.Key).PostAsync($"v3/client/topfixtures", new StringContent(
+                        JsonConvert.SerializeObject(new
+                        {
+                            clientRefIds = region.Value
+                        }), Encoding.UTF8, "application/json"));
 
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
