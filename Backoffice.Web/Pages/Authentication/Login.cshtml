@@ -7,6 +7,7 @@
 
 @{
     var hasError = TempData["HasError"] != null ? bool.Parse(TempData["HasError"].ToString()) : false;
+    var logError = TempData["LogError"];
     Layout = null;
 }
 <!DOCTYPE html>
@@ -85,18 +86,16 @@
                                 @if (hasError)
                                 {
                                     <div class="cold-block border border-0 border-secondary rounded d-flex justify-content-center h-50 p-3" style="background-color: #FFB5B5">
-                                           @Html.ValidationSummary()
-                                            @*Username or Password is incorrect*@
+                                        @Html.ValidationSummary()
+                                        @Html.Raw(logError)
+                                        @*Username or Password is incorrect*@
                                     </div>
                                 }
                                 <div class="row my-4">
                                     <div class="col-md-6">
-                                        <input type="checkbox" class="form-check-input me-1" />
+                                        <input type="checkbox" class="form-check-input m8e-1" />
                                         <label class="form-check-label">Remember Information</label>
                                     </div>
-                                    @*<div class="col-md-6">
-                                    <a class="form-link text-decoration-none float-end" href="javascript:void(0);">Forgot Password?</a>
-                                    </div>*@
                                 </div>
                             </div>
                             <div class="login-footer">
@@ -109,22 +108,5 @@
         </div>
     </div>
     <script src="js/common.js"></script>
-   @*<script>
-        function password_show_hide() {
-            var x = document.getElementById("password");
-            var show_eye = document.getElementById("show_eye");
-            var hide_eye = document.getElementById("hide_eye");
-            hide_eye.classList.remove("d-none");
-            if (x.type === "password") {
-                x.type = "text";
-                show_eye.style.display = "none";
-                hide_eye.style.display = "block";
-            } else {
-                x.type = "password";
-                show_eye.style.display = "block";
-                hide_eye.style.display = "none";
-            }
-        }
-    </script>*@
 </body>
 </html>

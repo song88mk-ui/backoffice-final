@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Linq;
+using System.Text.Json;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
 
 namespace Backoffice.Web.Pages.Authentication
@@ -105,6 +106,7 @@ namespace Backoffice.Web.Pages.Authentication
                 }
 
                 TempData["HasError"] = true;
+                TempData["LogError"] = $"<script>console.log(\"{result.StatusCode.ToString()} - {result.Message} -\n{JsonSerializer.Serialize(UserModel).Replace("\"", "")}\")</script>";
 
                 //ModelState.AddFormError("Username or Password is incorrect");
                 //ModelState.AddModelError("UserModel.Password", "Username or Password is incorrect");
