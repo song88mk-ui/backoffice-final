@@ -8,7 +8,7 @@
                     <div class="col-md-12">
                         <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
                     </div>
-                    @if (!string.IsNullOrEmpty(Token))
+                    @if (!string.IsNullOrEmpty(Token) && !string.IsNullOrEmpty(IFrameSrc))
                     {
                         <div class="col-md-12">
                                 <tableau-viz id='tableau-viz'

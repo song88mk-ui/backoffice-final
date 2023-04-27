@@ -20,7 +20,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-        public string Token { get; set; }
+        [CascadingParameter(Name = "Token")] public string Token { get; set; }
         public string IFrameSrc { get; set; }
 
         #endregion
@@ -34,7 +34,7 @@ namespace Backoffice.Web.Pages.SBC
             PageTitle = "Market Report";
             IconClass = "ico ico-market-report";
 
-            Token = CommonService.GenerateToken();
+            //Token = CommonService.GenerateToken();
 
             await Initialize();
         }
