@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Azure;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -137,7 +138,7 @@ namespace Backoffice.API.Repositories
                 var topLeagues = new List<OrderedClientTopLeagues>();
                 foreach (var region in regionclientIds)
                 {
-                    var queryStrings = await FormUrlEncoded(new GetTopLeaguesRequest
+                    var payload = JsonConvert.SerializeObject(new
                     {
                         ClientIdRefs = region.Value,
                         LanguageCode = request.LanguageCode,
@@ -146,14 +147,28 @@ namespace Backoffice.API.Repositories
                         SportId = request.SportId
                     });
 
-                    var result = GetHttpClient(region.Key).GetAsync($"v1/client/topleagues{queryStrings}").Result;
+                    var response = await GetHttpClient(region.Key).PostAsync($"v3/client/topleagues", new StringContent(
+                        payload, Encoding.UTF8, "application/json"));
 
-                    if (result.StatusCode == HttpStatusCode.OK)
+                    if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        var newresult = JsonConvert.DeserializeObject<BaseResponse<GetTopLeaguesResponse>>(result.Content.ReadAsStringAsync().Result).Result.ClientTopLeagues;
+                        var newresult = JsonConvert.DeserializeObject<BaseResponse<GetTopLeaguesResponse>>(response.Content.ReadAsStringAsync().Result).Result.ClientTopLeagues;
                         if (newresult.Any())
                         {
                             topLeagues.AddRange(newresult);
+                        }
+                    }
+                    else
+                    {
+                        if (response.StatusCode == HttpStatusCode.BadRequest)
+                            return JsonConvert.DeserializeObject<BaseResponse<GetTopLeaguesResponse>>(await response.Content.ReadAsStringAsync());
+                        else
+                        {
+                            return new BaseResponse<GetTopLeaguesResponse>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                            };
                         }
                     }
 
