@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public EventCallback<TopFixtureCallbackModel> OnInitCallback { get; set; }
-        [Parameter] public EventCallback<string> OnSearchCallback { get; set; }
+        [Parameter] public EventCallback<TopFixtureCallbackModel> OnFilterCallback { get; set; }
 
         public TopFixtureCallbackModel CallbackModel { get; set; }
         public SearchFormModel SearchForm { get; set; }
@@ -93,12 +93,14 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 ClientName = s.Value
             }).ToList();
 
-            await OnInitCallback.InvokeAsync(CallbackModel);
+            await OnFilterCallback.InvokeAsync(CallbackModel);
         }
 
         public async Task OnInputSearchEvent()
         {
-            await OnSearchCallback.InvokeAsync(SearchForm.SearchText);
+            CallbackModel.SearchText = SearchForm.SearchText;
+
+            await OnFilterCallback.InvokeAsync(CallbackModel);
         }
 
         public void Dispose()

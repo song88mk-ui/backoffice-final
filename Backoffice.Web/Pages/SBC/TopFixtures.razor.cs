@@ -5,6 +5,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Shared.Models.Requests;
 using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -20,6 +21,7 @@ namespace Backoffice.Web.Pages.SBC
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
+        public TopFixtureCallbackModel FilterModel { get; set; }
         public MetaData MetaData { get; set; }
         public TopFixturesModel TopFixturesModel { get; set; }
         public bool IsPreLoader { get; set; } = true;
@@ -40,7 +42,7 @@ namespace Backoffice.Web.Pages.SBC
             MetaData = new MetaData()
             {
                 CurrentPage = 1,
-                PageSize = 100,
+                PageSize = 25,
                 TotalCount = 0,
                 TotalPages = 1,
             };
@@ -52,65 +54,20 @@ namespace Backoffice.Web.Pages.SBC
 
         public async Task OnInitEvent(TopFixtureCallbackModel request)
         {
-            if (!IsPreLoader)
-            {
-                IsPreLoader = true;
-                StateHasChanged();
-            }
-
-            var clientIds = string.Join(",", request.Clients.Select(s => s.ClientId).ToList());
-            var topFixtureResponse = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = clientIds }));
-
-            if (topFixtureResponse.StatusCode != Backoffice.Shared.Enums.StatusCode.Success)
-            {
-                _toasterService.AddToast(Toast.NewToast
-                        ("Client Top Fixtures",
-                        $"{topFixtureResponse.Message}"));
-                IsPreLoader = false;
-                return;
-            }
-
-            var result = topFixtureResponse.Result;
-
-            TopFixturesModel = new TopFixturesModel();
-            if (result != null && result.TopFixtures.Any())
-            {
-                TopFixturesModel.TopFixtures = result.TopFixtures;
-            }
-            else
-            {
-                TopFixturesModel.TopFixtures = new List<ClientTopFixtureModel.OrderedClientTopFixture>();
-
-                foreach (var client in request.Clients)
-                {
-                    TopFixturesModel.TopFixtures.Add(new ClientTopFixtureModel.OrderedClientTopFixture
-                    {
-                        ClientIdRef = (int)client.ClientId,
-                        ClientName = client.ClientName,
-                        TopFixtures = new List<ClientTopFixtureModel.TopFixture>()
-                    });
-                }
-            }
-
-            await OnSearchEvent(request.SearchText);
-
-            IsPreLoader = false;
+            await GetContent(request);
         }
 
-        public async Task OnSearchEvent(string searchString)
+        public async Task OnFilterEvent(TopFixtureCallbackModel filterModel)
         {
-            TopFixturesModel.TopFixturesFiltered.Clear();
-
-            if (!string.IsNullOrEmpty(searchString))
+            MetaData = new MetaData()
             {
-                TopFixturesModel.TopFixturesFiltered.AddRange(TopFixturesModel.TopFixtures.Where(t => t.ClientName.Contains(searchString) || t.TopFixtures.Any(tf => tf.SportName.Contains(searchString))));
-            }
-            else
-            {
-                TopFixturesModel.TopFixturesFiltered.AddRange(TopFixturesModel.TopFixtures);
-            }
+                CurrentPage = 1,
+                PageSize = 25,
+                TotalCount = 0,
+                TotalPages = 1,
+            };
 
-            MetaData.TotalCount = TopFixturesModel.TopFixturesFiltered.Count();
+            await GetContent(filterModel);
         }
 
         public async Task OnEditClickEvent(ClientTopFixtureModel.OrderedClientTopFixture topFixture)
@@ -160,6 +117,8 @@ namespace Backoffice.Web.Pages.SBC
         protected async Task SelectPage(int page)
         {
             MetaData.CurrentPage = page;
+
+            await OnInitEvent(FilterModel);
         }
 
         public void Dispose()
@@ -170,7 +129,75 @@ namespace Backoffice.Web.Pages.SBC
 
             GC.SuppressFinalize(this);
         }
+        #endregion
 
+        #region Utilities
+        private async Task GetContent(TopFixtureCallbackModel filterModel)
+        {
+            if (!IsPreLoader)
+            {
+                IsPreLoader = true;
+                StateHasChanged();
+            }
+
+            FilterModel = filterModel;
+            var clientIds = string.Join(",", filterModel.Clients.Select(s => s.ClientId).ToList());
+            var topFixtureResponse = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = clientIds }));
+
+            if (topFixtureResponse.StatusCode != Backoffice.Shared.Enums.StatusCode.Success)
+            {
+                _toasterService.AddToast(Toast.NewToast
+                        ("Client Top Fixtures",
+                        $"{topFixtureResponse.Message}"));
+                IsPreLoader = false;
+                return;
+            }
+
+            var result = topFixtureResponse.Result;
+
+            TopFixturesModel = new TopFixturesModel();
+            if (result != null && result.TopFixtures.Any())
+            {
+                TopFixturesModel.TopFixtures = result.TopFixtures;
+            }
+            else
+            {
+                TopFixturesModel.TopFixtures = new List<ClientTopFixtureModel.OrderedClientTopFixture>();
+
+                foreach (var client in filterModel.Clients)
+                {
+                    TopFixturesModel.TopFixtures.Add(new ClientTopFixtureModel.OrderedClientTopFixture
+                    {
+                        ClientIdRef = (int)client.ClientId,
+                        ClientName = client.ClientName,
+                        TopFixtures = new List<ClientTopFixtureModel.TopFixture>()
+                    });
+                }
+            }
+
+            if (!string.IsNullOrEmpty(filterModel.SearchText))
+            {
+                TopFixturesModel.TopFixturesFiltered.AddRange(TopFixturesModel.TopFixtures.Where(t => t.ClientName.ToUpper().Contains(filterModel.SearchText.ToUpper()) || t.TopFixtures.Any(tf => tf.SportName.ToUpper().Contains(filterModel.SearchText.ToUpper()))));
+            }
+            else
+            {
+                TopFixturesModel.TopFixturesFiltered.AddRange(TopFixturesModel.TopFixtures);
+            }
+
+            MetaData.TotalCount = TopFixturesModel.TopFixturesFiltered.Count;
+            MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
+
+            var skip = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+
+            if (MetaData.CurrentPage > 0)
+            {
+                TopFixturesModel.TopFixturesFiltered = TopFixturesModel.TopFixturesFiltered
+                    .Skip(skip).Take(MetaData.PageSize)
+                    .ToList();
+            }
+
+            IsPreLoader = false;
+        }
         #endregion
     }
 }
