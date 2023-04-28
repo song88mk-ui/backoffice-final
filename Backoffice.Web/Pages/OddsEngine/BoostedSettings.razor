@@ -6,58 +6,60 @@
 
 <AuthorizeView Policy="sbc-priceboost-settings">
     <Authorized>
-        <div class="col-md-12">
-            <Breadcrumb Breadcrumbs="Breadcrumbs" />
-        </div>
-        <div class="col-md-12">
-            <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-        </div>
-        <div class="col-md-12">
-            <Filter @bind-SearchForm="@SearchForm" OnInitializeCallback="GetContent" OnViewAllLogsCallback="OnViewAllLogsClickEvent" />
-        </div>
-        <div class="col-md-12">
-            <div class="mx-3 mt-4">
+        <CascadingValue Name="Region" Value="@Region">
+            <div class="col-md-12">
+                <Breadcrumb Breadcrumbs="Breadcrumbs" />
+            </div>
+            <div class="col-md-12">
+                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+            </div>
+            <div class="col-md-12">
+                <Filter @bind-SearchForm="@SearchForm" OnInitializeCallback="GetContent" OnViewAllLogsCallback="OnViewAllLogsClickEvent" />
+            </div>
+            <div class="col-md-12">
+                <div class="mx-3 mt-4">
 
-                <table class="table table-bordered mt-3">
-                    <thead>
-                        <tr>
-                            <th><strong>Client Name</strong></th>
-                            <th><strong>% Cap of Current Odds from Boosted Odds</strong></th>
-                            <th><strong>Manage</strong></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (IsPreLoader)
-                        {
+                    <table class="table table-bordered mt-3">
+                        <thead>
                             <tr>
-                                <td colspan="3">
-                                    <Preloader />
-                                </td>
+                                <th><strong>Client Name</strong></th>
+                                <th><strong>% Cap of Current Odds from Boosted Odds</strong></th>
+                                <th><strong>Manage</strong></th>
                             </tr>
-                        }
-                        else
-                        {
-                            @if (ClientsView == null)
+                        </thead>
+                        <tbody>
+                            @if (IsPreLoader)
                             {
                                 <tr>
                                     <td colspan="3">
-                                        <NoRecordFound />
+                                        <Preloader />
                                     </td>
                                 </tr>
                             }
                             else
                             {
-                                @foreach (var client in ClientsView)
+                                @if (ClientsView == null)
                                 {
-                                    <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" />
+                                    <tr>
+                                        <td colspan="3">
+                                            <NoRecordFound />
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var client in ClientsView)
+                                    {
+                                        <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" />
+                                    }
                                 }
                             }
-                        }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <CustomModal OnSaveClickCallback="OnSaveSettingClickEvent" />
+            <CustomModal OnSaveClickCallback="OnSaveSettingClickEvent" />
+        </CascadingValue>
     </Authorized>
     <NotAuthorized>
         <AccessDenied />

@@ -9,3 +9,12 @@
     background-color: #FF1A00;
     color: #FFFFFF;
 }
+
+.market-column {
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+    .market-column .me-3 > a {
+        text-align: left;
+    }

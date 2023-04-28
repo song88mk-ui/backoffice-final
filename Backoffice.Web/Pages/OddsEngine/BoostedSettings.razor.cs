@@ -100,7 +100,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 parameters.Add("Client", client);
                 parameters.Add("Region", Region);
-
+                
                 var options = new ModalOptions();
                 ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
             }

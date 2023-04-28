@@ -15,6 +15,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         [Parameter] public BoostedSettingsModel BoostedSettings { get; set; }
         [Parameter] public Guid ClientId { get; set; }
 
+        [CascadingParameter(Name = "Region")] public string Region { get; set; }
+
         #endregion
 
         #region Methods
@@ -26,6 +28,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                 var parameters = new ModalParameters();
 
                 parameters.Add("Client", client);
+                parameters.Add("Region", Region);
+                parameters.Add("ModalDialogClass", "modal-dialog-centered");
 
                 var options = new ModalOptions();
                 ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);

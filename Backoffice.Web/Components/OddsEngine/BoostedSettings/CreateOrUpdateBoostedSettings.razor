@@ -13,7 +13,7 @@
                     <td class="text-center">
                         <center>
                             <div class="col-md-4 input-icon input-icon-right">
-                                <input class="cap-bg-default col-4 col-sm-2 col-md-4 col-lg-8" type="number" placeholder='0.00' @bind-value="CapEdit" data-decimal="2" oninput="enforceNumberValidation(this)" />
+                                <input class="cap-bg-default col-4 col-sm-2 col-md-4 col-lg-8 text-center" type="number" placeholder='0.00' @bind-value="CapEdit" data-decimal="2" oninput="enforceNumberValidation(this)" />
                                 <i>%</i>
                             </div>
                         </center>
@@ -26,12 +26,12 @@
 <div class="modal-footer">
     @if (IsPreLoader)
     {
-        <button type="button" class="btn btn-default waves-effect" disabled>Cancel</button>
-        <button type="button" class="btn btn-primary" data-type="inverse" data-from="top" data-align="right" @ref="SaveButton" disabled>Save</button>
+        <button type="button" class="btn btn-cancel" disabled>Cancel</button>
+        <button type="button" class="btn btn-save" data-type="inverse" data-from="top" data-align="right" @ref="SaveButton" disabled>Save</button>
     }
     else
     {
-        <button type="button" class="btn btn-default waves-effect" @onclick="_ => OnCancelClickEvent()">Cancel</button>
-        <button type="button" class="btn btn-primary" data-type="inverse" data-from="top" data-align="right" @onclick="_ => OnSaveClickEvent()" @ref="SaveButton">Save</button>
+        <button type="button" class="btn btn-cancel" @onclick="_ => OnCancelClickEvent()">Cancel</button>
+        <button type="button" class="btn btn-save" data-type="inverse" data-from="top" data-align="right" @onclick="_ => OnSaveClickEvent()" @ref="SaveButton">Save</button>
     }
 </div>

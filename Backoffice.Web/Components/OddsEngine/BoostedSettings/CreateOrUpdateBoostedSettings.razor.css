@@ -8,3 +8,19 @@ input::-webkit-inner-spin-button {
 input[type=number] {
     -moz-appearance: textfield;
 }
+
+.btn {
+    border-radius: 2px;
+    opacity: 1;
+    font-size: 15px;
+    color: white;
+    width: 7rem;
+}
+
+.btn-cancel {
+    background: #9AA0AB 0% 0% no-repeat padding-box;
+}
+
+.btn-save {
+    background: transparent linear-gradient(180deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
