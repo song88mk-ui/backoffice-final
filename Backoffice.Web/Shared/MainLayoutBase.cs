@@ -27,7 +27,6 @@ namespace Backoffice.Web.Shared
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
-        //[Inject] public ICommonService CommonService { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
         [Parameter] public SportClickCallbackModel SelectedSport { get; set; }
@@ -52,7 +51,6 @@ namespace Backoffice.Web.Shared
         public string ToastTitle { get; set; }
         public string ToastMessage { get; set; }
         public string ToastId { get; set; }
-        public string Token { get; set; }
         #endregion
 
         #region Methods

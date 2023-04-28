@@ -22,7 +22,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-        [CascadingParameter(Name = "Token")] public string Token { get; set; }
+        public string Token { get; set; }
         public string IFrameSrc { get; set; }
 
         #endregion
