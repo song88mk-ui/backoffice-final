@@ -87,6 +87,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             parameters.Add("DialogStyle","max-width: 85rem;");
             //parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);
             parameters.Add("SelectedPage", SportsbookClientPermission.SBC_OE_PriceBoost_Manage);
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);

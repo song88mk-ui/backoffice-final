@@ -168,9 +168,10 @@ namespace Backoffice.Web.Pages.Administration
 
             parameters.Add("DialogStyle", "max-width: 30rem;");
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
             parameters.Add("Users", users.Select((u, index) => new UserResponse { UserId = (index + 1).ToString(), UserName = u.UserName } ).ToList());
             parameters.Add("UserGroupName", userGroup.UserGroupName);
+            parameters.Add("ModalContentStyle", "max-height: 90vh");
 
             var options = new ModalOptions();
             ModalService.Open<ViewUsersModal>("View Users", parameters, options);
