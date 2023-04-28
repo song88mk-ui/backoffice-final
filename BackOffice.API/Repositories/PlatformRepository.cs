@@ -147,7 +147,7 @@ namespace Backoffice.API.Repositories
                         SportId = request.SportId
                     });
 
-                    var response = await GetHttpClient(region.Key).PostAsync($"v3/client/topleagues", new StringContent(
+                    var response = await GetHttpClient(region.Key).PostAsync($"v1/client/topleagues/list", new StringContent(
                         payload, Encoding.UTF8, "application/json"));
 
                     if (response.StatusCode == HttpStatusCode.OK)
@@ -365,7 +365,7 @@ namespace Backoffice.API.Repositories
                         clientRefIds = region.Value
                     });
 
-                    var response = await GetHttpClient(region.Key).PostAsync($"v3/client/topfixtures", new StringContent(
+                    var response = await GetHttpClient(region.Key).PostAsync($"v1/client/topfixtures/list", new StringContent(
                         payload, Encoding.UTF8, "application/json"));
 
                     if (response.StatusCode == HttpStatusCode.OK)
