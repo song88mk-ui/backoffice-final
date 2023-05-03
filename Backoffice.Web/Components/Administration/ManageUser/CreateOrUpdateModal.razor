@@ -22,7 +22,7 @@
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <label class="form-label">Business Name</label>
+                    <label class="form-label">Username</label>
                     <input type="text" class="form-control @(IsValidUsername ? "valid" : "invalid")" placeholder="Enter Username" @bind-value="UserRegister.UserName" disabled="@IsEdit" @oninput="@(() => RemoveError("username"))"/>
                 </div>
                 <div class="col-md-4">
