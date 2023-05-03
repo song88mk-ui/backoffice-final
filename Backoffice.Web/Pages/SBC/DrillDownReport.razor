@@ -9,17 +9,13 @@
                     <div class="col-md-12">
                         <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
                     </div>
-                    @if (!string.IsNullOrEmpty(Token) && !string.IsNullOrEmpty(IFrameSrc))
+                    @if (!string.IsNullOrEmpty(IFrameSrc))
                     {
-                        <div class="col-md-12">
-                                <tableau-viz id='tableau-viz'
-                                         src='@IFrameSrc'
-                                         token="@Token"
-                                         toolbar='bottom'
-                                         hide-tabs
-                                         hide-edit-button>
-                            </tableau-viz>
-                        </div>
+                        @* <object class="tableauViz" width="900" height="700">
+                    <param name="path" value="@IFrameSrc" />
+                    </object> *@
+
+                        <iframe src="@IFrameSrc" width="800" height="600"></iframe>
                     }
                 </div>
             </div>

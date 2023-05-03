@@ -152,6 +152,7 @@ builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
 builder.Services.AddScoped<ToastService>();
 
 builder.Services.AddScoped<IExcelService, ExcelService>();
+builder.Services.AddScoped<ITableauService, TableauService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSignalR();

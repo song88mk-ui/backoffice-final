@@ -13,8 +13,7 @@ namespace Backoffice.Web.Pages.SBC
     {
         #region Properties
 
-        [Inject] public ICommonService CommonService { get; set; }
-        [Inject] public IConfiguration Configuration { get; set; }
+        [Inject] public ITableauService TableauService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
@@ -48,8 +47,10 @@ namespace Backoffice.Web.Pages.SBC
                 ClaimType = SportsbookClientPermission.SBC_Reports_DrillDownReport.ToString().Replace("_", ".")
             })).Result ?? new ReportRolesUrlResponse();
 
-            IFrameSrc = reportRoles.Url;
-            Token = CommonService.GenerateToken();
+            var ticket = await TableauService.GetTicket();
+
+            IFrameSrc = $"https://tableau.song88.com/trusted/{ticket}/t/song88/views/10bet-URLS/2_Reporting";
+            //Token = CommonService.GenerateToken();
         }
 
         public void Dispose()
