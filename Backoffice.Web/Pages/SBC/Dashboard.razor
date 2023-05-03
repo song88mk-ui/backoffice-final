@@ -8,10 +8,6 @@
             </div>
             @if (!string.IsNullOrEmpty(IFrameSrc))
             {
-               @* <object class="tableauViz" width="900" height="700">
-                    <param name="path" value="@IFrameSrc" />
-                </object> *@
-
                 <iframe class="tableau-iframe" src="@IFrameSrc"></iframe>
             }
         </div>

@@ -21,7 +21,6 @@ namespace Backoffice.Web.Pages.SBC
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-        public string Token { get; set; }
         public string IFrameSrc { get; set; }
 
         #endregion
@@ -47,10 +46,7 @@ namespace Backoffice.Web.Pages.SBC
                 ClaimType = SportsbookClientPermission.SBC_Reports_DrillDownReport.ToString().Replace("_", ".")
             })).Result ?? new ReportRolesUrlResponse();
 
-            var ticket = await TableauService.GetTicket();
-
-            IFrameSrc = $"https://tableau.song88.com/trusted/{ticket}/t/song88/views/10bet-URLS/2_Reporting";
-            //Token = CommonService.GenerateToken();
+            IFrameSrc = await TableauService.GetTableauUrl(reportRoles.Url);
         }
 
         public void Dispose()

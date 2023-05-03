@@ -32,13 +32,18 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Methods
-        public async Task<string> GetTicket()
+        public async Task<string> GetTableauUrl(string reportName)
         {
             try
             {
                 var response = await _httpClient.PostAsync($"trusted?username={_configuration["Tableau:UserName"]}&target_site={_configuration["Tableau:SiteId"]}", null);
 
-                return await response.Content.ReadAsStringAsync();
+                var ticket = await response.Content.ReadAsStringAsync();
+
+                if (ticket.Equals("-1"))
+                    return string.Empty;
+
+                return $"{_configuration["Tableau:Uri"]}/trusted/{ticket}/t/{_configuration["Tableau:SiteId"]}/views/{reportName}"; 
             }
             catch (Exception ex)
             {

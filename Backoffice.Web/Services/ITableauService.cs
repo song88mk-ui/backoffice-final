@@ -7,6 +7,6 @@ namespace Backoffice.Web.Services
 {
     public interface ITableauService
     {
-        Task<string> GetTicket();
+        Task<string> GetTableauUrl(string reportName);
     }
 }
