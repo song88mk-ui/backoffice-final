@@ -92,7 +92,16 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
 
             }            
-        }        
+        }
+
+        public async Task ConfigFilterCallback(ConfigFilterModel model)
+        {
+            ConfigFilterModel = model;
+            SelectedContents = await GetContents();
+            SelectedContents.ForEach(market => GetNewSettings(market));
+
+            await InvokeAsync(StateHasChanged);
+        }
 
         public async Task OnMarketChangedEvent(MarketLookupNavigationModel market)
         {           
@@ -163,7 +172,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-        public List<MarketLookupNavigationModel> GetContents()
+        public async Task<List<MarketLookupNavigationModel>> GetContents()
         {
             if (ConfigFilterModel.MarketTemplateGroupId == 0)
                 ConfigFilterModel.MarketTemplateGroupId = ConfigFilterModel.MarketTemplates.FirstOrDefault(m => m.IsSelected).MarketTemplateGroupId;
@@ -329,7 +338,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {            
             MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
 
-            SelectedContents = GetContents();
+            SelectedContents = await GetContents();
             SelectedContents.ForEach(market => GetNewSettings(market));
 
             if (AllMarketStatusName == "Activate All")
@@ -534,13 +543,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                     market.NewLiveSettings = GetLiveSettings(market.MarketLookup.MarketTemplateId);
                 }
             }
-        }
-
-        public async ValueTask<ItemsProviderResult<MarketLookupNavigationModel>> GetItemProviderContents(ItemsProviderRequest request)
-        {
-            var contents = SelectedContents.Skip(request.StartIndex).Take(request.Count);
-
-             return new ItemsProviderResult<MarketLookupNavigationModel>(contents, SelectedContents.Count());
         }
 
         private string GetFirstKey(ClientMarketConfig config, bool isPrematch)
