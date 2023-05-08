@@ -319,5 +319,5 @@ table .fa-chevron-down {
 }
 
 .tableau-iframe {
-    height: calc(100vh - 150px);
+    height: 85vh;
 }
