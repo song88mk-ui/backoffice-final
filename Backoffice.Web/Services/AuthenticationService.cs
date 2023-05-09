@@ -11,6 +11,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using UAParser;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Backoffice.Web.Services
@@ -37,6 +38,16 @@ namespace Backoffice.Web.Services
                 Message = StatusCode.Error.ToString(),
                 Result = new Tuple<bool, List<string>>(false, policies)
             };
+            var userAgent = _httpContextAccessor.HttpContext.Request.Headers.UserAgent;
+
+            if (!string.IsNullOrEmpty(userAgent))
+            {
+                var uaParser = Parser.GetDefault();
+                ClientInfo client = uaParser.Parse(userAgent);
+                user.BrowserInfo = client.UA.Family.ToString();
+                user.BrowserVersion = $"{client.UA.Major}.{client.UA.Minor}.{client.UA.Patch}";
+                user.OperatingSystem = client.OS.ToString();
+            }
 
             var bodyContent = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync("api/authentication/login", bodyContent);

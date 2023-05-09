@@ -7,9 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using UAParser;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -28,17 +26,6 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
-            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString() ?? "";
-
-            if(!string.IsNullOrEmpty(userAgent))
-            {
-                var uaParser = Parser.GetDefault();
-                ClientInfo client = uaParser.Parse(HttpContext.Request.Headers["User-Agent"].ToString() ?? "");
-                content.BrowserInfo = client.UA.Family.ToString();
-                content.BrowserVersion = $"{client.UA.Major}.{client.UA.Minor}.{client.UA.Patch}";
-                content.OperatingSystem = client.OS.ToString();
-            }
-
             content.IpAddress = GetRemoteIpAddress().Trim();
             content.Country = GetIpCountry().Trim();
             content.Provider = $"{(int)Application.Backoffice}";
