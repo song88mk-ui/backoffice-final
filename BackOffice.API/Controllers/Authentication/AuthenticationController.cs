@@ -5,9 +5,11 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UAParser;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -26,6 +28,13 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
+            if (string.IsNullOrEmpty(content.IpAddress))
+                content.IpAddress = GetRemoteIpAddress().Trim();
+            if (string.IsNullOrEmpty(content.Country))
+                content.Country = GetIpCountry().Trim();
+            if(string.IsNullOrEmpty(content.UserAgent))
+                content.UserAgent = HttpContext.Request.Headers["user-agent"].FirstOrDefault() ?? "";
+
             content.Provider = $"{(int)Application.Backoffice}";
 
             var result = await _authenticationRepository.Login(content);

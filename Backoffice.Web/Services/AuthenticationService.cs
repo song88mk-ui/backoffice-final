@@ -49,14 +49,7 @@ namespace Backoffice.Web.Services
 
             user.IpAddress = ip.Trim();
             user.Country = _httpContextAccessor?.HttpContext?.Request.Headers["CF-IPCountry"].FirstOrDefault() ?? "";
-            if (!string.IsNullOrEmpty(userAgent))
-            {
-                var uaParser = Parser.GetDefault();
-                ClientInfo client = uaParser.Parse(userAgent);
-                user.BrowserInfo = client.UA.Family.ToString();
-                user.BrowserVersion = $"{client.UA.Major}.{client.UA.Minor}.{client.UA.Patch}";
-                user.OperatingSystem = client.OS.ToString();
-            }
+            user.UserAgent = userAgent;
 
             var bodyContent = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync("api/authentication/login", bodyContent);
