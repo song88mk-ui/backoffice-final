@@ -1,7 +1,10 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
+using Backoffice.Web.Pages.Authentication;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Text;
+using UAParser;
 
 namespace Backoffice.Web.Components.Administration.ManageUser
 {
@@ -57,6 +60,18 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         {
             MetaData.CurrentPage = page;
             await GetContent();
+        }
+        public string ParseUserAgent(string content)
+        {
+            var stringBuilder = new StringBuilder();
+
+            var uaParser = Parser.GetDefault();
+            ClientInfo client = uaParser.Parse(content);
+            stringBuilder.Append(client.UA.Family.ToString());
+            stringBuilder.Append($"{client.UA.Major}.{client.UA.Minor}.{client.UA.Patch}");
+            stringBuilder.Append(client.OS.ToString());
+
+            return stringBuilder.ToString();
         }
 
         public void Dispose()

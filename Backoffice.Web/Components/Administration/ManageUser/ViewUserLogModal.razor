@@ -39,11 +39,7 @@
                                     <span>@item.IpAddress</span>
                                 </td>
                                 <td>
-                                    <p>
-                                        Browser: @item.BrowserInfo,<br />
-                                        Browser Version: @item.BrowserVersion, <br />
-                                        OS: @item.OperatingSystem
-                                    </p>
+                                    @((MarkupString)ParseUserAgent(item.UserAgent))
                                 </td>
                                 <td>
                                     <span>
