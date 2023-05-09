@@ -26,8 +26,6 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
-            content.IpAddress = GetRemoteIpAddress().Trim();
-            content.Country = GetIpCountry().Trim();
             content.Provider = $"{(int)Application.Backoffice}";
 
             var result = await _authenticationRepository.Login(content);

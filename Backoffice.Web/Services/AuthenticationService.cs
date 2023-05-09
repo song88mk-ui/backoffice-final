@@ -38,8 +38,17 @@ namespace Backoffice.Web.Services
                 Message = StatusCode.Error.ToString(),
                 Result = new Tuple<bool, List<string>>(false, policies)
             };
-            var userAgent = _httpContextAccessor.HttpContext.Request.Headers.UserAgent;
+            var userAgent = _httpContextAccessor?.HttpContext?.Request.Headers.UserAgent;
+            var ip = _httpContextAccessor?.HttpContext?.Request.Headers["X-Forwarded-For"].FirstOrDefault()?.Trim() ?? "";
 
+            if (string.IsNullOrEmpty(ip))
+            {
+                ip = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "";
+            }
+            ip = ip.Split(':')?.FirstOrDefault()?.Split(",").FirstOrDefault() ?? "";
+
+            user.IpAddress = ip.Trim();
+            user.Country = _httpContextAccessor?.HttpContext?.Request.Headers["CF-IPCountry"].FirstOrDefault() ?? "";
             if (!string.IsNullOrEmpty(userAgent))
             {
                 var uaParser = Parser.GetDefault();
