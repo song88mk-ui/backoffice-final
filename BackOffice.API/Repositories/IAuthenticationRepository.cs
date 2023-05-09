@@ -3,13 +3,14 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using System.Collections.Generic;
+using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace Backoffice.API.Repositories
 {
     public interface IAuthenticationRepository
     {
-        Task<BaseResponse<TokenModel>> Login(LogInModel loginModel, string userAgent = "", string ipAddress = "");
+        Task<BaseResponse<TokenModel>> Login(LogInModel loginModel, Dictionary<string, string> headers = null);
         Task<BaseResponse<TokenModel>> Authenticate(string token);
         Task<BaseResponse<bool>> Logout(string token);
         Task<BaseResponse<UserListResponse>> GetUserList(UserGroupRequest request, string token, bool isShowSuperAdmin = false);

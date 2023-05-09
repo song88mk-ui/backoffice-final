@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -26,10 +27,15 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
-            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString() ?? "";
+            var headers = new Dictionary<string, string>()
+            {
+                { "user-agent", HttpContext.Request.Headers["User-Agent"].ToString() ?? ""},
+                { "x-forwarder-for", GetRemoteIpAddress().Trim()},
+                { "CF-IPCountry", GetIpCountry().Trim()}
+            };
             content.Provider = $"{(int)Application.Backoffice}";
 
-            var result = await _authenticationRepository.Login(content, userAgent, GetRemoteIpAddress().Trim());
+            var result = await _authenticationRepository.Login(content, headers);
 
             switch (result.StatusCode)
             {
@@ -407,6 +413,10 @@ namespace Backoffice.API.Controllers.Authentication
             };
 
             return headers;
+        }
+        private string GetIpCountry()
+        {
+            return HttpContext.Request.Headers["CF-IPCountry"].FirstOrDefault() ?? "";
         }
         private string GetRemoteIpAddress()
         {

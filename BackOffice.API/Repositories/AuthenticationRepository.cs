@@ -3,14 +3,12 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using System;
-using System.Globalization;
-using System.IO;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using UAParser;
 
 namespace Backoffice.API.Repositories
 {
@@ -23,13 +21,15 @@ namespace Backoffice.API.Repositories
         {
             _httpClient = httpClient;
         }
-        public async Task<BaseResponse<TokenModel>> Login(LogInModel loginModel, string userAgent = "", string ipAddress = "")
+        public async Task<BaseResponse<TokenModel>> Login(LogInModel loginModel, Dictionary<string, string> headers = null)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("user-agent", userAgent);
-                _httpClient.DefaultRequestHeaders.Add("x-forwarder-for", ipAddress);
-                var response = await _httpClient.PostAsync($"v1/login", new StringContent(JsonSerializer.Serialize(loginModel), System.Text.Encoding.UTF8, "application/json"));
+                foreach (var header in headers)
+                {
+                    _httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
+                }
+                var response = await _httpClient.PostAsync($"v1/login", new StringContent(JsonSerializer.Serialize(loginModel), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<TokenModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
