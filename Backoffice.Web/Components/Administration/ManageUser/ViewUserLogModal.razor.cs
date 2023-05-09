@@ -67,8 +67,8 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
             var uaParser = Parser.GetDefault();
             ClientInfo client = uaParser.Parse(content);
-            stringBuilder.Append(client.UA.Family.ToString());
-            stringBuilder.Append($"{client.UA.Major}.{client.UA.Minor}.{client.UA.Patch}");
+            stringBuilder.Append($"{client.UA.Family.ToString()}<br>");
+            stringBuilder.Append($"{client.UA.Major}.{client.UA.Minor}.{client.UA.Patch}<br>");
             stringBuilder.Append(client.OS.ToString());
 
             return stringBuilder.ToString();
