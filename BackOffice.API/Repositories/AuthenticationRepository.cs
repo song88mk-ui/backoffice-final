@@ -21,14 +21,10 @@ namespace Backoffice.API.Repositories
         {
             _httpClient = httpClient;
         }
-        public async Task<BaseResponse<TokenModel>> Login(LogInModel loginModel, Dictionary<string, string> headers = null)
+        public async Task<BaseResponse<TokenModel>> Login(LogInModel loginModel)
         {
             try
             {
-                foreach (var header in headers)
-                {
-                    _httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
-                }
                 var response = await _httpClient.PostAsync($"v1/login", new StringContent(JsonSerializer.Serialize(loginModel), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)

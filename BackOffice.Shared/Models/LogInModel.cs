@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Backoffice.Shared.Models
 {
@@ -11,5 +12,11 @@ namespace Backoffice.Shared.Models
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
         public string Provider { get; set; }
+        public string BrowserInfo { get; set; } = "";
+        public string BrowserVersion { get; set; } = "";
+        public string OperatingSystem { get; set; } = "";
+        public string IpAddress { get; set; } = "";
+        public string Country { get; set; } = "";
+        public DateTime Date { get; set; } = DateTime.UtcNow;
     }
 }

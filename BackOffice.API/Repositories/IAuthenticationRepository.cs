@@ -10,7 +10,7 @@ namespace Backoffice.API.Repositories
 {
     public interface IAuthenticationRepository
     {
-        Task<BaseResponse<TokenModel>> Login(LogInModel loginModel, Dictionary<string, string> headers = null);
+        Task<BaseResponse<TokenModel>> Login(LogInModel loginModel);
         Task<BaseResponse<TokenModel>> Authenticate(string token);
         Task<BaseResponse<bool>> Logout(string token);
         Task<BaseResponse<UserListResponse>> GetUserList(UserGroupRequest request, string token, bool isShowSuperAdmin = false);

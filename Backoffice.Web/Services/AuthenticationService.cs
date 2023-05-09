@@ -39,9 +39,6 @@ namespace Backoffice.Web.Services
             };
 
             var bodyContent = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-            var userAgent = _httpContextAccessor.HttpContext.Request.Headers.UserAgent;
-
-            _httpClient.DefaultRequestHeaders.Add("User-Agent", userAgent.ToString());
             var response = await _httpClient.PostAsync("api/authentication/login", bodyContent);
 
             if (response.StatusCode == HttpStatusCode.OK)
