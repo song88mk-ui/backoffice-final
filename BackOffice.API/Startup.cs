@@ -4,12 +4,9 @@ using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System;
@@ -70,7 +67,6 @@ namespace Backoffice.API
             {
                 opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
-
             services.AddHttpClient<IAuthenticationRepository, AuthenticationRepository>(client =>
             {
                 client.BaseAddress = new Uri(Configuration["API:AuthenticationAPI:Uri"]);
@@ -98,7 +94,6 @@ namespace Backoffice.API
             }
             app.UseSwagger();
             app.UseSwaggerUI();
-
             app.UseRouting();
             app.UseCors();
             app.UseAuthorization();

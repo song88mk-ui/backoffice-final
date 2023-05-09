@@ -1,9 +1,12 @@
 ﻿using Backoffice.API.Repositories;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -23,9 +26,10 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
-            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
+            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString() ?? "";
+            content.Provider = $"{(int)Application.AgentManagementSystem}";
 
-            var result = await _authenticationRepository.Login(content, userAgent);
+            var result = await _authenticationRepository.Login(content, userAgent, GetRemoteIpAddress().Trim());
 
             switch (result.StatusCode)
             {
@@ -394,5 +398,27 @@ namespace Backoffice.API.Controllers.Authentication
             }
         }
 
+        #region Utilities
+        private Dictionary<string, string> Headers()
+        {
+            var headers = new Dictionary<string, string>
+            {
+                {"X-Forwarded-For", GetRemoteIpAddress()}
+            };
+
+            return headers;
+        }
+        private string GetRemoteIpAddress()
+        {
+            var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(ip))
+            {
+                ip = HttpContext.Connection.RemoteIpAddress.ToString();
+            }
+
+            return ip.Split(':').FirstOrDefault();
+        }
+        #endregion
     }
 }

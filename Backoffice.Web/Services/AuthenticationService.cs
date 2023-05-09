@@ -37,7 +37,7 @@ namespace Backoffice.Web.Services
                 Message = StatusCode.Error.ToString(),
                 Result = new Tuple<bool, List<string>>(false, policies)
             };
-            user.Provider = "1001";
+
             var bodyContent = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
             var userAgent = _httpContextAccessor.HttpContext.Request.Headers.UserAgent;
 
@@ -92,7 +92,7 @@ namespace Backoffice.Web.Services
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<TokenModel>>(await response.Content.ReadAsStreamAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                
+
                 var token = new TokenModel()
                 {
                     AccessToken = result.Result.AccessToken
@@ -369,7 +369,7 @@ namespace Backoffice.Web.Services
                     var result = JsonSerializer.Deserialize<BaseResponse<PermissionResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
                             ?? new BaseResponse<PermissionResponse>();
 
-                    if(result.Result != null && limitVersion == true)
+                    if (result.Result != null && limitVersion == true)
                         if (result.Result.Permissions != null)
                             result.Result.Permissions = result.Result.Permissions.Where(x => x.Version != 1).ToList();
 
@@ -598,6 +598,5 @@ namespace Backoffice.Web.Services
         {
             _httpClient.Dispose();
         }
-
     }
 }
