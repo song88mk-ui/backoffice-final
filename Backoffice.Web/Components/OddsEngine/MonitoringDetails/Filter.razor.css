@@ -1,1 +1,11 @@
 ﻿
+
+.btn-close-market {
+    background-color: #EEEEEE;
+    color: #232323;
+}
+
+.btn-close-market.active {
+    background-color: #FF1A00;
+    color: #FFFFFF;
+}

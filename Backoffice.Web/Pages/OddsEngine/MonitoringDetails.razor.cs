@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
+using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -111,6 +112,20 @@ namespace Backoffice.Web.Pages.OddsEngine
             FixtureMarkets = PrepareFixtureMarkets(markets);
 
             MarginMarket = markets.FirstOrDefault();
+        }
+
+        public async Task OnCloseMarkeEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg");
+            parameters.Add("Fixture", Fixture);
+            //parameters.Add("OnCancelCallback", EventCallback.Factory.Create(this, UndoEditedMarkets));
+            parameters.Add("Region", Region);
+
+            var options = new ModalOptions();
+            ModalService.Open<UpdateActiveMarketModal>("Close Markets", parameters, options);
         }
 
         public async Task OnInputSearchEvent(string search)
