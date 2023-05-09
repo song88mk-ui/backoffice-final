@@ -27,7 +27,7 @@ namespace Backoffice.API.Controllers.Authentication
         public async Task<IActionResult> Login([FromBody] LogInModel content)
         {
             var userAgent = HttpContext.Request.Headers["User-Agent"].ToString() ?? "";
-            content.Provider = $"{(int)Application.AgentManagementSystem}";
+            content.Provider = $"{(int)Application.Backoffice}";
 
             var result = await _authenticationRepository.Login(content, userAgent, GetRemoteIpAddress().Trim());
 
