@@ -14,11 +14,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Properties        
         [Inject] private ITradingService TradingService { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [Parameter] public ConfigFilterModel ConfigFilterModel { get; set; } = new ConfigFilterModel();
-        [Parameter] public EventCallback<ConfigFilterModel> ConfigFilterModelChanged { get; set; }
+        [Parameter] public EventCallback<ConfigFilterModel> ConfigFilterCallback { get; set; }
         [Parameter] public EventCallback IsMarketEditingChanged { get; set; }
         [Parameter] public FixtureType FixtureType { get; set; }
         [Parameter] public string Region { get; set; } = string.Empty;
+        public SearchFormModel SearchForm { get; set; }
+        public ConfigFilterModel ConfigFilterModel { get; set; }
         #endregion
 
         #region Fields
@@ -42,6 +43,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 TradingService.Region = Region.ToUpper();
 
             _isPreloader = true;
+
+            SearchForm = new SearchFormModel();
+
             var sports = await GetSports();
             var sportId = sports.Any() ? sports.FirstOrDefault().Value : 0;
             var headerTitle = sports.Any() ? sports.FirstOrDefault(c => c.Value == sportId).Name : "";
@@ -103,10 +107,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 MarketTemplates = marketTemplateGroups.Count > 0 ? await GetMarketTemplate(marketTemplateGroups) : new List<MarketLookupNavigationModel>(),
                 MarketTemplateGroupId = marketTemplateGroup.MarketTemplateGroupId,
                 MarketTemplateGroupName = marketTemplateGroup.MarketTemplateGroupName,
-                ClientConfig = clientConfig
+                ClientConfig = clientConfig,
+                SearchText = SearchForm.SearchText
             };
 
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
             _isPreloader = false;
             StateHasChanged();   
         }
@@ -116,7 +121,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
 
@@ -143,17 +148,19 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 IsActive = -99
             })).Result;
 
+            ConfigFilterModel.SearchText = SearchForm.SearchText;
+
             InitMarketTemplateField();
             _isPreloader = false;
 
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
         }
         public async Task OnSegmentChangedEvent(ChangeEventArgs e)
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
 
@@ -174,19 +181,19 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 IsActive = -99
             })).Result;
 
-            ConfigFilterModel.SearchText = string.Empty;
+            ConfigFilterModel.SearchText = SearchForm.SearchText;
 
             InitMarketTemplateField();
             _isPreloader = false;
 
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
         }
         public async Task OnLeagueChangedEvent(ChangeEventArgs e)
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
 
@@ -204,19 +211,19 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 IsActive = -99
             })).Result;
 
-            ConfigFilterModel.SearchText = string.Empty;
+            ConfigFilterModel.SearchText = SearchForm.SearchText;
 
             InitMarketTemplateField();
             _isPreloader = false;
 
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
         }
         public async Task OnScopeChangedEvent(ChangeEventArgs e)
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
 
@@ -224,19 +231,19 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.MarketTemplateGroups = await GetMarketTemplateGroup(ConfigFilterModel.Scope, ConfigFilterModel.SportId);
             ConfigFilterModel.MarketTemplates = await GetMarketTemplate(ConfigFilterModel.MarketTemplateGroups);
 
-            ConfigFilterModel.SearchText = string.Empty;
+            ConfigFilterModel.SearchText = SearchForm.SearchText;
 
             InitMarketTemplateField();
             _isPreloader = false;
 
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
         }
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
 
@@ -254,12 +261,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 IsActive = -99
             })).Result;
 
-            ConfigFilterModel.SearchText = string.Empty;
+            ConfigFilterModel.SearchText = SearchForm.SearchText;
 
             InitMarketTemplateField();
             _isPreloader = false;
 
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
         }
         public async Task OnConfigChangedEvent(ChangeEventArgs e)
         {
@@ -267,7 +274,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ConfigFilterModel.FilterConfigStatus = int.Parse(e.Value.ToString());
             await IsMarketEditingChanged.InvokeAsync();
 
-            ConfigFilterModel.SearchText = string.Empty;
+            ConfigFilterModel.SearchText = SearchForm.SearchText;
 
             InitMarketTemplateField();
             _isPreloader = false;
@@ -277,7 +284,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
 
@@ -286,13 +293,24 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             ConfigFilterModel.MarketTemplates = await GetMarketTemplate(ConfigFilterModel.MarketTemplateGroups);
 
-            ConfigFilterModel.SearchText = string.Empty;
+            ConfigFilterModel.SearchText = SearchForm.SearchText;
 
             InitMarketTemplateField();
             _isPreloader = false;
 
-            await ConfigFilterModelChanged.InvokeAsync(ConfigFilterModel);
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
         }
+
+        public async Task OnInputSearchEvent()
+        {
+            if (!string.IsNullOrEmpty(SearchForm.SearchText) && SearchForm.SearchText.Length == 1)
+                return;
+
+            ConfigFilterModel.SearchText = SearchForm.SearchText;
+
+            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
+        }
+
         public void Dispose()
         {
             _marketTemplateGroupResponse = null;

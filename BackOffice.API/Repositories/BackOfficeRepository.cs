@@ -339,7 +339,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var query = _backofficeContext.ClientInformation.Where(x => x.ApplicationId == (int)Application2.SBC).AsNoTracking();
+                var query = _backofficeContext.ClientInformation.Where(x => x.ApplicationId == (int)Application2.SBC || x.ApplicationId == (int)Application.Sportsbook).AsNoTracking();
 
                 if (!string.IsNullOrEmpty(request.Search))
                     query = query.Where(c => c.Name.Contains(request.Search));
@@ -924,7 +924,7 @@ namespace Backoffice.API.Repositories
                             ModifiedBy = 0,
                             ModifiedDate = DateTime.UtcNow,
                             StatusId = request.StatusId,
-                            ApplicationId = (int)Application.Backoffice,
+                            ApplicationId = (int)Application.Sportsbook,
                             SportsbookShare = request.RevenueShare.SportsbookShare,
                             JackpotShare = request.RevenueShare.JackpotShare,
                             ClientShare = 0,
@@ -948,6 +948,7 @@ namespace Backoffice.API.Repositories
 
                         if (client != null)
                         {
+                            client.ApplicationId = (int)Application.Sportsbook;
                             client.Name = request.Name;
                             client.Email = request.Email;
                             client.TelephoneNumber = request.TelephoneNumber;

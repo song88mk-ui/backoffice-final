@@ -52,7 +52,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {            
+        {
             TradingService.Region = Region.ToUpper();
             FixtureMarkets = null;
             MonitoringCallbackModel = new MonitoringCallbackModel();
@@ -241,34 +241,38 @@ namespace Backoffice.Web.Pages.OddsEngine
             var fixtureMarkets = new List<FixtureMarketModel>();
             foreach (var fixture in marketFixtures.Fixtures)
             {
-                foreach (var market in fixture.Markets)
+                if (string.IsNullOrEmpty(request.SearchText) || (fixture.FixtureName.Contains(request.SearchText, StringComparison.OrdinalIgnoreCase)))
                 {
-                    fixtureMarkets.Add(new FixtureMarketModel()
+                    foreach (var market in fixture.Markets)
                     {
-                        FixtureName = fixture.FixtureName,
-                        MarketId = market.MarketId,
-                        ClientCode = market.ClientCode,
-                        ClientCodeMargin = market.ClientCodeMargin,
-                        MarketName = market.MarketName,
-                        ProviderMarketId = market.ProviderMarketId,
-                        ProviderFixtureId = market.ProviderFixtureId,
-                        AwayName = fixture.AwayName,
-                        BetStop = fixture.BetStop,
-                        CurrentMinute = fixture.CurrentMinute,
-                        CurrentPeriod = fixture.CurrentPeriod,
-                        FixtureStartDate = fixture.FixtureStartDate,
-                        FixtureStatusId = fixture.FixtureStatusId,
-                        HomeName = fixture.HomeName,
-                        IsBetStopGlobal = fixture.IsBetStopGlobal,
-                        Score = fixture.Score,
-                        Line = market.Line,
-                        MarketSpecifier = market.MarketSpecifier,
-                        MarketStatusId = market.MarketStatusId,
-                        MarketStatusName = market.MarketStatusName,
-                        MarketTemplateId = market.MarketTemplateId,
-                        Selections = market.Selections
-                    });
+                        fixtureMarkets.Add(new FixtureMarketModel()
+                        {
+                            FixtureName = fixture.FixtureName,
+                            MarketId = market.MarketId,
+                            ClientCode = market.ClientCode,
+                            ClientCodeMargin = market.ClientCodeMargin,
+                            MarketName = market.MarketName,
+                            ProviderMarketId = market.ProviderMarketId,
+                            ProviderFixtureId = market.ProviderFixtureId,
+                            AwayName = fixture.AwayName,
+                            BetStop = fixture.BetStop,
+                            CurrentMinute = fixture.CurrentMinute,
+                            CurrentPeriod = fixture.CurrentPeriod,
+                            FixtureStartDate = fixture.FixtureStartDate,
+                            FixtureStatusId = fixture.FixtureStatusId,
+                            HomeName = fixture.HomeName,
+                            IsBetStopGlobal = fixture.IsBetStopGlobal,
+                            Score = fixture.Score,
+                            Line = market.Line,
+                            MarketSpecifier = market.MarketSpecifier,
+                            MarketStatusId = market.MarketStatusId,
+                            MarketStatusName = market.MarketStatusName,
+                            MarketTemplateId = market.MarketTemplateId,
+                            Selections = market.Selections
+                        });
+                    }
                 }
+                
             }
 
             return fixtureMarkets;

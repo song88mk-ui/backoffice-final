@@ -96,6 +96,9 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
         public async Task OnInputSearchEvent()
         {
+            if (!string.IsNullOrEmpty(SearchForm.SearchText) && SearchForm.SearchText.Length == 1)
+                return;
+
             await OnInputSearchCallback.InvokeAsync(SearchForm.SearchText);
         }
 

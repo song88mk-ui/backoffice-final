@@ -11,10 +11,8 @@ namespace Backoffice.Web.Pages.SBC
     public partial class Dashboard : IDisposable
     {
         #region Properties
-
-        [Inject] public ICommonService CommonService { get; set; }
-        [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
+        [Inject] public ITableauService TableauService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -22,7 +20,6 @@ namespace Backoffice.Web.Pages.SBC
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
-        public string Token { get; set; }
         public string IFrameSrc { get; set; }
 
         #endregion
@@ -48,8 +45,7 @@ namespace Backoffice.Web.Pages.SBC
                 ClaimType = SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", ".")
             })).Result ?? new ReportRolesUrlResponse();
 
-            IFrameSrc = reportRoles.Url;
-            Token = CommonService.GenerateToken();
+            IFrameSrc = await TableauService.GetTableauUrl(reportRoles.Url);
         }
 
         public void Dispose()

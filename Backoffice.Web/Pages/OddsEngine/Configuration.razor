@@ -20,11 +20,11 @@
         </div>
         <div class="col-md-12">
             <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
-            <HeaderConfigTopMenu ConfigurationRef="this" Region="@Region"/>
+            <HeaderConfigTopMenu ConfigurationRef="this" Region="@Region" />
         </div>
 
         <div class="col-md-12">
-            <Filter @bind-ConfigFilterModel="ConfigFilterModel" FixtureType="FixtureType" IsMarketEditingChanged="UndoEditedMarkets" Region="Region"/>
+            <Filter ConfigFilterCallback="ConfigFilterCallback" FixtureType="FixtureType" IsMarketEditingChanged="UndoEditedMarkets" Region="Region" />
         </div>
 
         <div class="col-md-12 mb-2">
@@ -44,7 +44,6 @@
             {
                 if (!string.IsNullOrEmpty(ConfigFilterModel.ClientCode) && ConfigFilterModel.MarketTemplates.Any())
                 {
-                    SelectedContents = GetContents();
                     if (SelectedContents.Any())
                     {
                         var marketCount = 0;
@@ -79,16 +78,16 @@
                             if (!SelectedContents.Any(s => s.NewMarketLookup.IsActive == false))
                                 AllMarketStatusName = "Deactivate All";
 
-                            <Virtualize Context="market" ItemsProvider="GetItemProviderContents">
-                                <ItemContent>
-                                    <AccordionConfiguration Market="market"
-                                            OnMarketChangedCallback="OnMarketChangedEvent"
-                                            @key="@($"{ConfigFilterModel.SportId}-{market.MarketLookup.MarketTemplateId}")"
-                                            @bind-MarketLookupNavigation="MarketLookupNavigationModelsTemp"
-                                            @bind-FilterConfigStatus="ConfigFilterModel.FilterConfigStatus"
-                                            @bind-Scope="ConfigFilterModel.Scope" />
-                                </ItemContent>
-                            </Virtualize>
+                            foreach (var market in SelectedContents)
+                            {
+                                <AccordionConfiguration Market="market"
+                                    OnMarketChangedCallback="OnMarketChangedEvent"
+                                    @key="@($"{ConfigFilterModel.SportId}-{market.MarketLookup.MarketTemplateId}")"
+                                    @bind-MarketLookupNavigation="MarketLookupNavigationModelsTemp"
+                                    @bind-FilterConfigStatus="ConfigFilterModel.FilterConfigStatus"
+                                    @bind-Scope="ConfigFilterModel.Scope" />
+                            }
+
                         }
                         else
                         {

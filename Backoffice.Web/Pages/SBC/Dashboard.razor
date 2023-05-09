@@ -6,17 +6,9 @@
             <div class="col-md-12">
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
             </div>
-            @if (!string.IsNullOrEmpty(Token) && !string.IsNullOrEmpty(IFrameSrc))
+            @if (!string.IsNullOrEmpty(IFrameSrc))
             {
-                <div class="col-md-12">
-                        <tableau-viz id='tableau-viz'
-                                 src='@IFrameSrc'
-                                 token="@Token"
-                                 toolbar='bottom'
-                                 hide-tabs
-                                 hide-edit-button>
-                    </tableau-viz>
-                </div>
+                <iframe class="tableau-iframe" src="@IFrameSrc"></iframe>
             }
         </div>
     </div>

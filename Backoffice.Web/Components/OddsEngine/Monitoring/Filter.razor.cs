@@ -72,6 +72,9 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         public async Task OnInputSearchEvent()
         {
+            if (!string.IsNullOrEmpty(SearchForm.SearchText) && SearchForm.SearchText.Length == 1)
+                return;
+
             await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
             {
                 SportId = SportId,
