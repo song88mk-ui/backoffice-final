@@ -55,6 +55,8 @@ namespace Backoffice.Web.Pages.Administration
         public async Task Init()
         {
             //IsPreLoader = true;
+            MetaData.CurrentPage = 1;
+
             await GetContent();
         }
 
@@ -163,7 +165,6 @@ namespace Backoffice.Web.Pages.Administration
                 SearchText = FilterModel.SearchText,
                 SortBy = FilterModel.UserSorting
             });
-
             if (userResponse.Result != null)
             {
                 MetaData = userResponse.Result.MetaData;

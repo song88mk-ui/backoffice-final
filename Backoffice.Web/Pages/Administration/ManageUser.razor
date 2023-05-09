@@ -36,19 +36,11 @@
                                 }
                                 else
                                 {
-                                    @if (UserList == null)
-                                    {
-                                        <tr>
-                                            <td colspan="5">
-                                                <NoRecordFound />
-                                            </td>
-                                        </tr>
-                                    }
-                                    else
+                                    @if (UserList != null && UserList.Any())
                                     {
                                         var rowCount = (MetaData.CurrentPage - 1) * MetaData.PageSize;
 
-                                        @foreach (var user in UserList)
+                                        foreach (var user in UserList)
                                         {
                                             rowCount++;
 
@@ -78,6 +70,14 @@
                                                 </td>
                                             </tr>
                                         }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5">
+                                                <NoRecordFound />
+                                            </td>
+                                        </tr>
                                     }
                                 }
                             </tbody>
