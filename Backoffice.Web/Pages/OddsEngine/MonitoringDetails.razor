@@ -55,13 +55,13 @@
             <div class="d-flex mx-3 mt-4">
                 @if (MarketTemplateNavigation.Any())
                 {
-                    var filteredMarketTemplateNavigation = !string.IsNullOrEmpty(Search) ? MarketTemplateNavigation.Where(c => c.MarketName.ToLower().Contains(Search)).ToList() : MarketTemplateNavigation;
+                    var filteredMarketTemplateNavigation = !string.IsNullOrEmpty(Search) ? MarketTemplateNavigation.Where(c => c.MarketName.Contains(Search, StringComparison.OrdinalIgnoreCase)).ToList() : MarketTemplateNavigation;
 
                     <div class="market-template-container">
                         <MarketFilter MarketTemplates="filteredMarketTemplateNavigation" OnMarketTemplateClickCallback="OnMarketTemplateClickEvent" />
                     </div>
                     <div class="market-template-fixture-container align-self-start">
-                        @if (FixtureMarketTemplates.Any())
+                    @if (filteredMarketTemplateNavigation.Any() && FixtureMarketTemplates.Any())
                         {
                             <table class="table table-hover table-bordered mb-0">
                                 <thead class="table-head">
@@ -116,6 +116,10 @@
                                     <!-- End Table Row Odds -->
                                 </tbody>
                             </table>
+                        }
+                        else
+                        {
+                            <NoRecordFound />
                         }
                     </div>
                 }
