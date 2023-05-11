@@ -2,172 +2,57 @@
     <div class="business-container">
         <div class="row">
             <div class="col-md-12">
+                Select the markets that will be set to Closed or select all to close th whole fixture.<br/>
                 <table class="table table-bordered">
+                    <thead class="table-head">
+                        <tr>
+                            <th class="w-50 border-0">Fixture Details</th
+                            <th class="w-50 border-0"></th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <tr>
-                            <td class="col-bet-setting col-header w-50">Bet Setting</td>
-                            <td class="w-50">
-                                <select class="form-control form-select d-block" id="currencyDropdown" @onchange="OnCurrencyClicked">
-                                    @foreach (var currency in Currencies)
-                                    {
-                                        if (currency == SelectedCurrency)
-                                        {
-                                            <option value="@currency" selected>@currency</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@currency">@currency</option>
-                                        }
-                                    }
-                                </select>
-                            </td>
+                            <td>23/06/2023<br />23:30</td>
+                            <td>FixtureName</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                @foreach (var group in MarketTemplateGroups)
+                {
+                    var groupId = $"radio{group.MarketTemplateGroup.MarketTemplateGroupId}";
+                    <div class="d-inline-block">
+                        <input type="radio" class="btn-check" name="options" id="@groupId" autocomplete="off" @onclick="OnMarketGroupRadioClickEvent" />
+                        <label class="btn" for="importRadio">@group.MarketTemplateGroup.MarketTemplateGroupName</label>
+                    </div>
+                }
 
-            @if (SelectedSetting != null)
-            {
-                <div class="col-md-12">
-                    <table class="table table-bordered">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="w-50 border-0">Soccer</th>
-                                <th class="w-50 border-0"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Min Per Ticket</td>
-                                <td>@SelectedSetting.BetSettingSoccer.MinPerTicket</td>
-                            </tr>
-                            <tr>
-                                <td>Max Per Ticket</td>
-                                <td>@SelectedSetting.BetSettingSoccer.MaxPerTicket</td>
-                            </tr>
-                            <tr>
-                                <td>Max Per Game</td>
-                                <td>@SelectedSetting.BetSettingSoccer.MaxPerGame</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-12">
-                    <table class="table table-bordered">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="w-50 border-0">Cricket</th>
-                                <th class="w-50 border-0"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Min Per Ticket</td>
-                                <td>@SelectedSetting.BetSettingCricket.MinPerTicket</td>
-                            </tr>
-                            <tr>
-                                <td>Max Per Ticket</td>
-                                <td>@SelectedSetting.BetSettingCricket.MaxPerTicket</td>
-                            </tr>
-                            <tr>
-                                <td>Max Per Game</td>
-                                <td>@SelectedSetting.BetSettingCricket.MaxPerGame</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-12">
-                    <table class="table table-bordered">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="w-50 border-0">Other Sports</th>
-                                <th class="w-50 border-0"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Min Per Ticket</td>
-                                <td>@SelectedSetting.BetSettingAllSports.MinPerTicket</td>
-                            </tr>
-                            <tr>
-                                <td>Max Per Ticket</td>
-                                <td>@SelectedSetting.BetSettingAllSports.MaxPerTicket</td>
-                            </tr>
-                            <tr>
-                                <td>Max Per Game</td>
-                                <td>@SelectedSetting.BetSettingAllSports.MaxPerGame</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-12">
-                    <table class="table table-bordered">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="w-50 border-0">Parlay</th>
-                                <th class="w-50 border-0"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Min Per Ticket</td>
-                                <td>@SelectedSetting.BetSettingParlay.MinPerTicket</td>
-                            </tr>
-                            <tr>
-                                <td>Max Per Ticket</td>
-                                <td>@SelectedSetting.BetSettingParlay.MaxPerTicket</td>
-                            </tr>
-                            <tr>
-                                <td>Max Payout Per Ticket</td>
-                                <td>@SelectedSetting.BetSettingParlay.MaxPayoutPerTicket</td>
-                            </tr>
-                            <tr>
-                                <td>Max Bonus Winnings</td>
-                                <td>@SelectedSetting.BetSettingParlay.MaxWinningsBonus</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-12">
-                    <table class="table table-bordered">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="w-50 border-0">Priceboost</th>
-                                <th class="w-50 border-0"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Max Stake</td>
-                                <td>@SelectedSetting.BetSettingPriceboost.MaxStake</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-12">
-                    <table class="table table-bordered">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="w-50 border-0">Bet Builder</th>
-                                <th class="w-50 border-0"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td scope="col">Min Per Ticket</td>
-                                <td>@SelectedSetting.BetSettingParlay.MinPerTicket</td>
-                            </tr>
-                            <tr>
-                                <td>Max Per Ticket</td>
-                                <td>@SelectedSetting.BetSettingParlay.MaxPerTicket</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-bordered">
+                    <thead class="table-head">
+                        <tr>
+                            <th class="w-50 border-0"></th
+                            <th class="w-50 border-0">Market Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td>Market Name</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Close</button>
+    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
+    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Close Markets</button>
 </div>

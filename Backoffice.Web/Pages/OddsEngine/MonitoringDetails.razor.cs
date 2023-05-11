@@ -3,6 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Components.OddsEngine.Configuration;
+using Backoffice.Web.Components.OddsEngine.MonitoringDetails;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -19,6 +20,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
@@ -41,6 +43,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public int SportId { get; set; }
         public string Search { get; set; }
         public string MarketTemplateId { get; set; }
+        public List<AlertModel> Alerts { get; set; }
+        public decimal Opacity { get; set; }
 
         #endregion
 
@@ -125,7 +129,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-            ModalService.Open<UpdateActiveMarketModal>("Close Markets", parameters, options);
+            ModalService.Open<CloseMarketsModal>("Close Markets", parameters, options);
         }
 
         public async Task OnInputSearchEvent(string search)
@@ -161,6 +165,20 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnMarketTemplateClickEvent(string marketTemplateId)
         {
             FixtureMarketTemplates = PrepareFixtureMarketTemplates(marketTemplateId);
+        }
+
+        public async Task OnSaveClickEvent(object item)
+        {
+            Opacity = Opacity == 1m ? 0.99m : 1m;
+
+            Alerts.Clear();
+            Alerts.Add(new AlertModel
+            {
+                Status = "Success",
+                Message = (bool)item ? "Selected Market has been closed successfully" : "Client successfully created",
+                Opacity = Opacity
+            });
+
         }
 
         public async ValueTask DisposeAsync()
