@@ -850,5 +850,22 @@ namespace Backoffice.API.Controllers.Trading
                     return BadRequest(result);
             }
         }
+
+
+        [HttpPost("fixture/market/deactivate")]
+        public async Task<IActionResult> DeactivateFixtureMarkets([FromBody] DeactivateFixtureMarketRequest request)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            
+            var result = await _tradingRepository.DeactivateFixtureMarkets(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
     }
 }
