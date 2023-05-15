@@ -1,5 +1,8 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Web.Components.OddsEngine.Monitoring;
+using Backoffice.Web.Models;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using static Backoffice.Web.Models.ClientModel;
@@ -9,10 +12,13 @@ namespace Backoffice.Web.Components.Common
     public partial class FixtureRow : IDisposable
     {
         #region Properties
+        [Inject] public IModalService ModalService { get; set; }
+
         [Parameter] public List<Client> Clients { get; set; }
         [Parameter] public FixtureMarketModel Market { get; set; }
         [Parameter] public string MainMarketName { get; set; }
         [Parameter] public string Region { get; set; }
+
         public string MarketLine { get; set; }
         public bool IsBetStop { get; set; }
         public bool HasLine { get; set; }
@@ -47,6 +53,16 @@ namespace Backoffice.Web.Components.Common
             {
                 IsBetStop = Market.BetStop.Count > 0 && Market.BetStop.FirstOrDefault() == 1 ? true : false;
             }
+        }
+
+        public async Task OnCloseMatchClickEvent()
+        {
+            ModalParameters parameters = new ModalParameters();
+            parameters.Add("ModalDialogClass", "modal-dialog-centered modal-lg");            
+
+            ModalOptions options = new ModalOptions();
+
+            ModalService.Open<CloseMatchModal>("Close Match", parameters, options);
         }
 
         public void Dispose()

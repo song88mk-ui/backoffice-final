@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
 
 namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
@@ -13,6 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         #region Properties
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
@@ -78,13 +80,15 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             }
         }
 
-        public async Task OnMarketGroupRadioClickEvent()
+        public async Task OnMarketGroupRadioClickEvent(string groupId)
         {
             //MarketTemplateGroups.ForEach((c) => { c.IsSelected = false; });
 
             var marketGroupTemplate = MarketTemplateGroups.FirstOrDefault(m => m.MarketTemplateGroup.MarketTemplateGroupId == 0);
             if(marketGroupTemplate != null)
                 marketGroupTemplate.IsSelected = !marketGroupTemplate.IsSelected;
+
+            await JSRuntime.InvokeVoidAsync("scrollIntoElement", $"#lbl-{groupId}");
         }
 
         public async Task OnCancelClickEvent()

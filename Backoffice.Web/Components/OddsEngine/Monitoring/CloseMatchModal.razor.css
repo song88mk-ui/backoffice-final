@@ -1,0 +1,17 @@
+﻿.modal-btn {
+    color: white;
+    border-radius: 2px;
+}
+
+.cancel-btn {
+    background: #9AA0AB 0% 0% no-repeat padding-box;
+}
+
+.confirm-btn {
+    background: transparent linear-gradient(268deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+.ico-warning {
+    font-size: 6em;
+    color: red;
+}

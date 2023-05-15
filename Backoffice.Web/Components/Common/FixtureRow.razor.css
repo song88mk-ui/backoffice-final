@@ -11,3 +11,7 @@
 .margin-value {
     width: 50px;
 }
+
+.close-match-btn{
+    white-space: nowrap;
+}

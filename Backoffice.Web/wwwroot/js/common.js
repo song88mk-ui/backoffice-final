@@ -450,3 +450,7 @@ window.filterClientName = (clients) => {
 window.scrollToTopOfElement = (className, speed) => {
     $(className).animate({scrollTop: 0}, speed);
 }
+
+window.scrollIntoElement = (elementId) => {
+    $(elementId)[0].scrollIntoView();
+}

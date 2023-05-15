@@ -1,18 +1,21 @@
 ﻿<div class="modal-body">
-    <div class="business-container">
+    <div class="business-container mx-3">
         <div class="row">
-            <div class="col-md-12">
-                Select the markets that will be set to Closed or select all to close th whole fixture.<br/>
+            <div class="col my-2">
+                Select the markets that will be set to Closed or select all to close th whole fixture.
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">                
                 <table class="table table-bordered">
                     <thead class="table-head">
                         <tr>
-                            <th class="w-50 border-0">Fixture Details</th
-                            <th class="w-50 border-0"></th>
+                            <th colspan="2">Fixture Details</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>23/06/2023<br />23:30</td>
+                            <td class="td-min-width">23/06/2023<br />23:30</td>
                             <td>FixtureName</td>
                         </tr>
                     </tbody>
@@ -21,15 +24,16 @@
         </div>
         <div class="row mb-3">
             <div class="col-12">
-                @foreach (var group in MarketTemplateGroups)
-                {
-                    var groupId = $"radio{group.MarketTemplateGroup.MarketTemplateGroupId}";
-                    <div class="d-inline-block">
-                        <input type="radio" class="btn-check" name="options" id="@groupId" autocomplete="off" @onclick="OnMarketGroupRadioClickEvent" />
-                        <label class="btn" for="importRadio">@group.MarketTemplateGroup.MarketTemplateGroupName</label>
-                    </div>
-                }
-
+                <ul class="nav text-nowrap flex-nowrap">
+                    @foreach (var group in MarketTemplateGroups)
+                    {
+                        <li>
+                            @{var groupId = $"radio{group.MarketTemplateGroup.MarketTemplateGroupId}";}
+                            <input type="radio" class="btn-check" name="marketTemplates" id="@groupId" @onclick="() => OnMarketGroupRadioClickEvent(groupId)" />
+                            <label id="lbl-@groupId" class="btn fw-bold" for="@groupId">@group.MarketTemplateGroup.MarketTemplateGroupName</label>
+                        </li>
+                    }
+                </ul>
             </div>
         </div>
         <div class="row">
@@ -37,14 +41,14 @@
                 <table class="table table-bordered">
                     <thead class="table-head">
                         <tr>
-                            <th class="w-50 border-0"></th
-                            <th class="w-50 border-0">Market Name</th>
+                            <th class="th-width px-4 py-3"><input type="checkbox"/></th>
+                            <th class="align-middle">Market Name</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td></td>
-                            <td>Market Name</td>
+                            <td class="px-4 py-3"><input type="checkbox" /></td>
+                            <td class="fs-6">Market Name</td>
                         </tr>
                     </tbody>
                 </table>
@@ -53,6 +57,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
-    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Close Markets</button>
+    <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
+    <button type="button" class="btn modal-btn modal-save waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Close Markets</button>
 </div>
