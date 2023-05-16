@@ -5,13 +5,77 @@ using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Hubs;
 using Backoffice.Web.Middleware;
 using Backoffice.Web.Services;
+using Backoffice.Web.Telemetry;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.ResponseCompression;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using System.Diagnostics.Metrics;
+using System.Reflection;
+using System.Text;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
+
+// Telemetry
+Action<ResourceBuilder> configureResource = r => r.AddService(
+    serviceName: String.Format("{0}/{1}", builder.Configuration["Telemetry:Environment"], "Backoffice.Web"),
+    serviceVersion:  Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "latest",
+    serviceInstanceId: Environment.MachineName);
+
+builder.Services.AddSingleton<Instrumentation>();
+
+if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
+{
+  builder.Services.AddOpenTelemetry()
+    .ConfigureResource(configureResource)
+    .WithTracing(tracing =>
+    {
+      tracing
+        .AddSource(Instrumentation.ActivitySourceName)
+        .SetSampler(new AlwaysOnSampler())
+        .AddHttpClientInstrumentation()
+        .AddAspNetCoreInstrumentation((opts) => opts.Filter = httpContext =>
+        {
+          return (
+              !httpContext.Request.Path.ToString().StartsWith("/js") ||
+              !httpContext.Request.Path.ToString().StartsWith("/css")
+              );
+        })
+        .AddSqlClientInstrumentation();
+
+      builder.Services.Configure<AspNetCoreInstrumentationOptions>(builder.Configuration.GetSection("Telemetry:AspNetCoreInstrumentation"));
+
+      tracing.AddOtlpExporter(otlpOptions =>
+      {
+        otlpOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+        otlpOptions.Endpoint = new Uri(builder.Configuration["Telemetry:Collector"]+"/v1/traces");
+      });
+
+    })
+    .WithMetrics(metrics =>
+    {
+      metrics
+        .AddMeter(Instrumentation.MeterName)
+        .AddRuntimeInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddAspNetCoreInstrumentation();
+
+      metrics.AddOtlpExporter(otlpOptions =>
+      {
+        otlpOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+        otlpOptions.Endpoint = new Uri(builder.Configuration["Telemetry:Collector"]+"/v1/metrics");
+      });
+
+    });
+}
+// end of telemetry
 
 // Add services to the container.
 builder.Services.AddRazorPages();

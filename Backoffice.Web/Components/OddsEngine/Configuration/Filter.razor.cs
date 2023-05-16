@@ -120,8 +120,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
-            await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
+            await IsMarketEditingChanged.InvokeAsync();            
 
             await Task.Delay(100);
 
@@ -159,8 +158,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
-            await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
+            await IsMarketEditingChanged.InvokeAsync();            
 
             await Task.Delay(100);
 
@@ -192,8 +190,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
-            await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
+            await IsMarketEditingChanged.InvokeAsync();            
 
             await Task.Delay(100);
 
@@ -222,8 +219,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
-            await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
+            await IsMarketEditingChanged.InvokeAsync();            
 
             await Task.Delay(100);
 
@@ -243,7 +239,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
 
@@ -284,7 +279,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
             await IsMarketEditingChanged.InvokeAsync();
-            await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
 
             await Task.Delay(100);
 
