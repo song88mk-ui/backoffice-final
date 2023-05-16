@@ -20,8 +20,10 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
         protected MarketFixtureResponse.FixtureModel Fixture { get; set; }
         protected List<MarketGroupNavigationModel> MarketTemplateGroups { get; set; }
+        protected List<MarketFixtureResponse.MarketModel> Markets { get; set; }
 
         public bool IsPreload { get; set; }
+        public List<string> SelectedMarketTemplateIds { get; set; }
         #endregion
 
         #region Methods
@@ -30,6 +32,28 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         {
             Fixture = ModalParameters.TryGet<MarketFixtureResponse.FixtureModel>("Fixture");
             MarketTemplateGroups = new List<MarketGroupNavigationModel>();
+            Markets = new List<MarketFixtureResponse.MarketModel>();
+            SelectedMarketTemplateIds = new List<string>();
+
+            if (Fixture.Markets.Any())
+            {
+                foreach(var market in Fixture.Markets)
+                {
+                    
+                    if(!Markets.Any(m => m.MarketTemplateId == market.MarketTemplateId))
+                    {
+                        var newMarket = new MarketFixtureResponse.MarketModel
+                        {
+                            MarketName = market.MarketName,
+                            MarketTemplateId = market.MarketTemplateId,
+                            MarketSpecifier = market.MarketSpecifier,
+                            MarketStatusId = market.MarketStatusId
+                        };
+
+                        Markets.Add(newMarket);
+                    }
+                }
+            }
 
             // 99 = all fixture types
             var marketTemplateGroupResponse = (await BackOfficeService.GetMarketTemplateGroups(99));
@@ -76,19 +100,35 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
                     marketTemplateGroupId++;
                 }
-
+                
             }
         }
 
         public async Task OnMarketGroupRadioClickEvent(string groupId)
         {
-            //MarketTemplateGroups.ForEach((c) => { c.IsSelected = false; });
+            if (string.IsNullOrEmpty(groupId))
+                return;
 
-            var marketGroupTemplate = MarketTemplateGroups.FirstOrDefault(m => m.MarketTemplateGroup.MarketTemplateGroupId == 0);
+            MarketTemplateGroups.ForEach((c) => { c.IsSelected = false; });
+
+            var marketGroupTemplate = MarketTemplateGroups.FirstOrDefault(m => m.MarketTemplateGroup.MarketTemplateGroupId == Convert.ToInt32(groupId.Replace("radio", "")));
             if(marketGroupTemplate != null)
-                marketGroupTemplate.IsSelected = !marketGroupTemplate.IsSelected;
+            {
+                marketGroupTemplate.IsSelected = true;
+                SelectedMarketTemplateIds = marketGroupTemplate.MarketTemplateGroup.MarketTemplateIds;
+            }
+
 
             await JSRuntime.InvokeVoidAsync("scrollIntoElement", $"#lbl-{groupId}");
+        }
+
+        public async Task OnMarketChecked(string marketTemplateId)
+        {
+            var market = Markets.FirstOrDefault(m => m.MarketTemplateId == marketTemplateId);
+            if (market != null)
+            {
+                market.MarketStatusId = market.MarketStatusId == (int)MarketStatus.Active ? (int)MarketStatus.Inactive : (int)MarketStatus.Active;
+            }
         }
 
         public async Task OnCancelClickEvent()
