@@ -332,6 +332,7 @@ namespace Backoffice.Web.Shared
                 });
 
                 await _hubConnection.InvokeAsync("AddToGroup", "HK");
+                await _hubConnection.InvokeAsync("AddToGroup", "HK");
                 _hubConnection.On<string>("Notification", async message =>
                 {
                     var payload = JsonSerializer.Deserialize<NotificationsModel>(message);
