@@ -14,7 +14,7 @@ namespace Backoffice.Web.Services
         public readonly DateTimeOffset Posted = DateTimeOffset.Now;
         public bool IsBurnt => TimeToBurn < DateTimeOffset.Now;
         private TimeSpan elapsedTime => Posted - DateTimeOffset.Now;
-        private static int _secToLive = 500000;
+        private static int _secToLive = 20;
 
         public string ElapsedTimeText =>
                         elapsedTime.Seconds > 60
