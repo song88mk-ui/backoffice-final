@@ -14,7 +14,7 @@ namespace Backoffice.Web.Services
         public readonly DateTimeOffset Posted = DateTimeOffset.Now;
         public bool IsBurnt => TimeToBurn < DateTimeOffset.Now;
         private TimeSpan elapsedTime => Posted - DateTimeOffset.Now;
-        private static int _secToLive = 20;
+        private static int _secToLive = 500000;
 
         public string ElapsedTimeText =>
                         elapsedTime.Seconds > 60
@@ -52,12 +52,18 @@ namespace Backoffice.Web.Services
         }
         private bool ClearBurntToast()
         {
-            var toastsToDelete = _toastList.Where(item => item.IsBurnt).ToList();
-            if (toastsToDelete is not null && toastsToDelete.Count > 0)
+            try
             {
-                toastsToDelete.ForEach(toast => _toastList.Remove(toast));
-                this.ToasterChanged?.Invoke(this, EventArgs.Empty);
-                return true;
+                var toastsToDelete = _toastList.Where(item => item.IsBurnt).ToList();
+                if (toastsToDelete is not null && toastsToDelete.Count > 0)
+                {
+                    toastsToDelete.ForEach(toast => _toastList.Remove(toast));
+                    this.ToasterChanged?.Invoke(this, EventArgs.Empty);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
             }
             return false;
         }

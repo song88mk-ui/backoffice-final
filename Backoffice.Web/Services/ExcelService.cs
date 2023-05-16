@@ -189,7 +189,7 @@ namespace Backoffice.Web.Services
                         foreach (var client in clients)
                         {
 
-                            // prepare client markets
+                            #region Market
                             var rawClientMarkets = (from DataRow dr in marketDT.Rows select dr).Skip(1)
                                 .Where(c => !string.IsNullOrEmpty(c[8].ToString()) && !string.IsNullOrEmpty(c[9].ToString()))
                                 .Select(dr => new ClientMarketConfigModel
@@ -210,6 +210,21 @@ namespace Backoffice.Web.Services
                                     Live = @"[{""T"":0,""M"":" + dr[9].ToString() + "}]",
                                     Username = "OEMarketActivation"
                                 }).ToList();
+                            #endregion
+                            #region League
+
+                            var rawClientLeagues = (from DataRow dr in leagueDT.Rows select dr).Skip(1)
+                                .Where(c => !string.IsNullOrEmpty(c[6].ToString()))
+                                .Select(dr => new ClientLeagueConfig
+                                {
+                                    ClientCode = client.ClientCode,
+                                    SportId = int.Parse(dr[0].ToString()),
+                                    SegmentId = int.Parse(dr[2].ToString()),
+                                    LeagueId = int.Parse(dr[4].ToString()),
+                                    ClientId = client.ClientId,
+                                    IsActive = bool.Parse(dr[6].ToString()),
+                                }).ToList();
+                            #endregion
 
                             var hasRecords = true;
                             var skip = 0;
@@ -218,45 +233,31 @@ namespace Backoffice.Web.Services
                             while (hasRecords)
                             {
                                 var filteredClientMarkets = rawClientMarkets.Skip(skip).Take(take).ToList();
+                                var filteredClientLeagues = rawClientLeagues.Skip(skip).Take(take).ToList();
 
-                                if (!filteredClientMarkets.Any())
+                                if (!filteredClientMarkets.Any() && !filteredClientLeagues.Any())
                                 {
                                     hasRecords = false;
-
                                 }
                                 else
                                 {
-
                                     skip += take;
 
                                     //publish only on last client
                                     var isPublish = client.ClientCode == clients.LastOrDefault().ClientCode;
                                     var isLastMessage = isPublish && !rawClientMarkets.Skip(skip).Take(take).Any();
 
-                                    // prepare client leagues
-                                    var filterClientLeagues = filteredClientMarkets.GroupBy(g => new { g.ClientCode, g.SportId, g.SegmentId, g.LeagueId, g.ClientId })
-                                        .Select(s => new ClientLeagueConfig
-                                        {
-                                            ClientCode = s.Key.ClientCode,
-                                            SportId = s.Key.SportId,
-                                            SegmentId = s.Key.SegmentId,
-                                            LeagueId = s.Key.LeagueId,
-                                            ClientId = s.Key.ClientId,
-                                            IsActive = s.Any(a => a.IsActive)
-                                        }).ToList();
-
                                     var message = new OnBulkUpdateConfigMessage()
                                     {
                                         UserId = userId,
                                         FileName = fileName,
                                         ClientMarketConfigs = filteredClientMarkets,
-                                        ClientLeagueConfigs = filterClientLeagues,
+                                        ClientLeagueConfigs = filteredClientLeagues,
                                         IsPublish = isPublish,
                                         IsLastMessage = isLastMessage
                                     };
 
                                     messageBroker.Publish(JsonSerializer.Serialize(message), "OnBulkUpdateConfig2", "r.oe.web.config.onbulkupdateconfig2", Guid.NewGuid().ToString(), "HK");
-
                                 }
 
                             }

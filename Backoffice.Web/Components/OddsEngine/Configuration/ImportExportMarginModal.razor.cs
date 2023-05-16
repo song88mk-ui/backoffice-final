@@ -155,7 +155,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         //AlertStatus = $"Processing {fileStream.Key}";
                         //AlertMessage = $"Processing {processCount} of {files.Count} file/s..";
 
-                        await InvokeAsync(StateHasChanged);
+                        StateHasChanged();
 
                         using (MemoryStream ms = new MemoryStream(fileStream.Value))
                         {
