@@ -9,6 +9,8 @@ namespace Backoffice.Web.Components.Common
 
         [Parameter] public List<BreadcrumbModel> Breadcrumbs { get; set; }
 
+        [Parameter] public string Region { get; set; }
+      
         #endregion
 
         #region Methods
