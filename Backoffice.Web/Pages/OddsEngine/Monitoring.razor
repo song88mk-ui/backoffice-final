@@ -54,7 +54,7 @@
                                 {
                                     foreach (var market in FixtureMarkets)
                                     {
-                                        <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" Region="@Region" />
+                                        <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" Region="@Region" IsMonitoringPage=true />
                                     }
                                 }
                             </tbody>

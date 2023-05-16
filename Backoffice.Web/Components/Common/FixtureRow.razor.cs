@@ -18,6 +18,7 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public FixtureMarketModel Market { get; set; }
         [Parameter] public string MainMarketName { get; set; }
         [Parameter] public string Region { get; set; }
+        [Parameter] public bool IsMonitoringPage { get; set; } 
 
         public string MarketLine { get; set; }
         public bool IsBetStop { get; set; }
