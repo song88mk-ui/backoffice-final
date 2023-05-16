@@ -59,7 +59,8 @@ namespace Backoffice.Web.Components.Common
         public async Task OnCloseMatchClickEvent()
         {
             ModalParameters parameters = new ModalParameters();
-            parameters.Add("ModalDialogClass", "modal-dialog-centered modal-lg");            
+            parameters.Add("ModalDialogClass", "modal-dialog-centered modal-lg");
+            parameters.Add("Market", Market);
 
             ModalOptions options = new ModalOptions();
 
