@@ -100,8 +100,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             try
             {
                 IsUploading = true;
-
-                await InvokeAsync(StateHasChanged);
+                StateHasChanged();
 
                 if (e.File.Name.Contains(".xlsx"))
                 {
@@ -110,8 +109,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                     var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(stream, e.File.Name, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
 
-                    IsUploading = false;
 
+                    IsUploading = false;
                     if (payload.StatusCode == StatusCode.Error)
                     {
                         await OnImportMarginCallback.InvokeAsync(payload.Message);
@@ -173,7 +172,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     }
 
                     IsUploading = false;
-
                 }
                 else
                 {
@@ -187,9 +185,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     });
 
                     Guid = Guid.NewGuid();
+                    return;
                 }
 
                 IsUploading = false;
+                ModalService.Cancel();
             }
             catch (Exception ex)
             {
