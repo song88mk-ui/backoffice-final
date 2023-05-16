@@ -1,5 +1,6 @@
 using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
+using Backoffice.API.Telemetry;
 using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Utilities;
 using Microsoft.AspNetCore.Builder;
@@ -9,6 +10,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using System.Diagnostics;
+using System.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -27,6 +36,62 @@ namespace Backoffice.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Telemetry
+            Action<ResourceBuilder> configureResource = r => r.AddService(
+                serviceName: String.Format("{0}/{1}", Configuration["Telemetry:Environment"], "Backoffice.API"),
+                serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "latest",
+                serviceInstanceId: Environment.MachineName);
+
+            services.AddSingleton<Instrumentation>();
+
+            if (Convert.ToBoolean(Configuration["Telemetry:Enabled"]))
+            {
+
+              services
+                .AddOpenTelemetry()
+                .ConfigureResource(configureResource)
+                .WithTracing(tracing =>
+                {
+                  tracing
+                    .AddSource(Instrumentation.ActivitySourceName)
+                    .SetSampler(new AlwaysOnSampler())
+                    .AddHttpClientInstrumentation()
+                    .AddAspNetCoreInstrumentation((aspCoreOpts) => aspCoreOpts.Filter = httpContext =>
+                    {
+                      return (
+                          httpContext.Request.Path.ToString().StartsWith("/api") ||
+                          httpContext.Request.Path.ToString().StartsWith("/sportsbook")
+                          );
+                    })
+                    .AddSqlClientInstrumentation();
+
+                  services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("Telemetry:AspNetCoreInstrumentation"));
+
+                  tracing.AddOtlpExporter(exporterOpts =>
+                  {
+                    exporterOpts.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    exporterOpts.Endpoint = new Uri(Configuration["Telemetry:Collector"]+"/v1/traces");
+                  });
+
+                })
+                .WithMetrics(metrics =>
+                {
+                  metrics
+                    .AddMeter(Instrumentation.MeterName)
+                    .AddRuntimeInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddAspNetCoreInstrumentation();
+
+                  metrics.AddOtlpExporter(exporterOpts =>
+                  {
+                    exporterOpts.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    exporterOpts.Endpoint = new Uri(Configuration["Telemetry:Collector"]+"/v1/metrics");
+                  });
+
+                });
+
+            } //if telemetry enabled
+
             services.AddControllers();
             services.AddCors(options =>
             {

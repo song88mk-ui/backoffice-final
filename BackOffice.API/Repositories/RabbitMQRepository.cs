@@ -1,9 +1,12 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Backoffice.API.Telemetry;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -14,21 +17,33 @@ namespace Backoffice.API.Repositories
     public class RabbitMqRepository : IRabbitMqRepository
     {
         private readonly IConfiguration _configuration;
-        public RabbitMqRepository(HttpClient httpClient, IConfiguration configuration)
+
+        private readonly ActivitySource _activitySource;
+        private readonly Counter<long> _publishedMessagesCounter;
+
+        public RabbitMqRepository(HttpClient httpClient, IConfiguration configuration, Instrumentation instrumentation)
         {
             _configuration = configuration;
+            this._activitySource = instrumentation.ActivitySource;
+            this._publishedMessagesCounter = instrumentation.PublishedMessagesCounter;
         }
 
         public async Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region)
         {
+            using var activity = this._activitySource.StartActivity("broker-publish");
             try
             {
                 var response = await GetHttpClient(region).PostAsync($"v1/broker/publish", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
+                {
+                    activity?.SetStatus(ActivityStatusCode.Ok);
+                    this._publishedMessagesCounter.Add(1);
                     return JsonSerializer.Deserialize<BaseResponse<MessageResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                }
                 else
                 {
+                    activity?.SetStatus(ActivityStatusCode.Error, response.ReasonPhrase);
                     return new BaseResponse<MessageResponse>
                     {
                         StatusCode = StatusCode.Error,
@@ -42,6 +57,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
+                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 return new BaseResponse<MessageResponse>
                 {
                     StatusCode = StatusCode.Error,
