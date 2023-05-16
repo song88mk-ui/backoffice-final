@@ -74,7 +74,7 @@
                                                 <div class="dropdown w-100">
                                                     @if (!IsSubUser)
                                                     {
-                                                        <button class="btn clients-btn dropdown-toggle ps-4" type="button" id="clientDropdown" data-bs-toggle="dropdown" data-bs-auto-close="dropdown" aria-expanded="false">
+                                                        <button class="btn clients-btn dropdown-toggle ps-4" type="button" id="clientDropdown" data-bs-toggle="dropdown" data-bs-auto-close="dropdown" aria-expanded="false" disabled=@(!category.IsEnabled)>
                                                             Select Clients
                                                         </button>
                                                         @if (ClientModel.Clients.Any())
@@ -92,7 +92,7 @@
                                             </div>
                                         }
                                         <div class="col text-center">
-                                            <button type="button" class="btn btn-enable-all" @onclick="() => OnEnableClickEvent(category)" disabled="@IsReadOnly">Enable All</button>
+                                            <button type="button" class="btn btn-enable-all" @onclick="() => OnEnableClickEvent(category)" disabled=@(!category.IsEnabled)>Enable All</button>
                                         </div>
                                     </div>
                                 </div>

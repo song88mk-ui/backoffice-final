@@ -180,7 +180,7 @@ namespace Backoffice.Web.Pages.Administration
                     Alerts.Add(new AlertModel
                     {
                         Status = AlertStatus.Success.ToString(),
-                        Message = "Bet Refrence IDs has been successfully cancelled",
+                        Message = "Bet Reference IDs has been successfully cancelled",
                         Opacity = 1.0m
                     });
 
