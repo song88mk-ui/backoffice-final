@@ -1,0 +1,65 @@
+﻿.modal-body .title {
+    border-image: linear-gradient(241deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 1;
+    border-left: 3px solid;
+}
+
+.modal-body {
+    overflow-y: auto;
+    max-height: 50rem;
+}
+
+table tfoot td:first-child {
+    border-bottom-left-radius: 3px;
+}
+
+table tfoot td:last-child {
+    border-bottom-right-radius: 3px;
+}
+
+.modal-btn {
+    color: white;
+}
+
+.modal-cancel {
+    background-color: #9AA0AB;
+}
+
+.modal-save {
+    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+.table-head, .col-header {
+    color: #FFF;
+    background-color: #404E67;
+}
+
+.table-head {    
+    border-width: 1px;
+}
+
+.btn-check:checked + label {
+    border-bottom: solid #E12E22 3px;
+    border-radius: 0;
+}
+
+.th-width, .td-min-width {
+    width: 1px;
+    white-space: nowrap;
+}
+
+.btn-check:checked + label {
+    border-bottom: solid 3px #E12E22;
+    color: black;
+    box-shadow: none !important;
+    border-radius: 0;
+}
+
+.col-12 .nav {
+    overflow-x: auto;
+    border-bottom: 1px solid grey;
+    scroll-behavior: smooth;
+}
+
+.col-12 .nav::-webkit-scrollbar {
+    display: none;
+}

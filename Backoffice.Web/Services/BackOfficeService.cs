@@ -1118,6 +1118,39 @@ namespace Backoffice.Web.Services
         }
         #endregion
 
+        #region Deactivate Fixture Markets
+        public async Task<BaseResponse<bool>> DeactivateFixtureMarkets(DeactivateFixtureMarketRequest request)
+        {
+            try
+            {
+                var Model = await _httpClient.PostAsync($"api/trading/fixture/market/deactivate", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+
+                if (Model.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<bool>();
+                else
+                {
+                    if (Model.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<bool>();
+                    else
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+        #endregion
         public void Dispose()
         {
             //_httpClient.Dispose();

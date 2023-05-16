@@ -339,7 +339,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var query = _backofficeContext.ClientInformation.Where(x => x.ApplicationId == (int)Application2.SBC || x.ApplicationId == (int)Application.Sportsbook).AsNoTracking();
+                var query = GetClientInformation().Where(x => x.ApplicationId == (int)Application2.SBC || x.ApplicationId == (int)Application.Sportsbook);
 
                 if (!string.IsNullOrEmpty(request.Search))
                     query = query.Where(c => c.Name.Contains(request.Search));
@@ -524,7 +524,7 @@ namespace Backoffice.API.Repositories
                 var userId = 0;
 
                 long clientId = 0;
-                if (_backofficeContext.ClientInformation.Any(c => c.Name == request.Name && c.ClientId != request.ClientId))
+                if (GetClientInformation().Any(c => c.Name == request.Name && c.ClientId != request.ClientId))
                 {
                     return new BaseResponse<bool>
                     {
@@ -563,7 +563,7 @@ namespace Backoffice.API.Repositories
                         websites.Add(urlToValidate);
                     }
 
-                    if (await _backofficeContext.ClientInformation.AnyAsync(c => websites.Contains(c.Website) && c.ClientId != request.ClientId))
+                    if (GetClientInformation().Any(c => websites.Contains(c.Website) && c.ClientId != request.ClientId))
                     {
                         return new BaseResponse<bool>
                         {
@@ -878,7 +878,7 @@ namespace Backoffice.API.Repositories
 
                 }
 
-                if (_backofficeContext.ClientInformation.Any(c => c.Brand == request.ClientCode && c.ClientId != request.ClientId))
+                if (GetClientInformation().Any(c => c.Brand == request.ClientCode && c.ClientId != request.ClientId))
                 {
                     return new BaseResponse<bool>
                     {
@@ -1457,6 +1457,7 @@ namespace Backoffice.API.Repositories
         {
             _backofficeContext.ClientInformation.Add(client);
             _backofficeContext.SaveChanges();
+            _memCache.AddOrUpdateCache<List<ClientInformation>>("boci", _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24);
 
             return client.ClientId;
         }
@@ -1464,6 +1465,8 @@ namespace Backoffice.API.Repositories
         {
             var entity = _backofficeContext.ClientInformation.Update(client).Entity;
             _backofficeContext.SaveChanges();
+            _memCache.AddOrUpdateCache<List<ClientInformation>>("boci", _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24);
+
             return client.ClientId;
         }
         private async Task<decimal> GetSuggestedMinimumBet(string currencyCode)
