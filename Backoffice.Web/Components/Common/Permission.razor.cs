@@ -51,6 +51,11 @@ namespace Backoffice.Web.Components.Common
             {
                 await OnDisableClickEvent(category);
             }
+            else
+            {
+                //always enable dashboard permission
+                EnableDashboardPermission(category);                                
+            }
         }
 
         public async Task OnDisableClickEvent(PermissionTreeModel.PermissionCategoryModel category)
@@ -230,6 +235,42 @@ namespace Backoffice.Web.Components.Common
                 }
             }
             return permissionTree;
+        }
+
+        private async Task EnableDashboardPermission(PermissionTreeModel.PermissionCategoryModel category)
+        {
+            switch ((PermissionCategory)category.CategoryId)
+            {
+                case PermissionCategory.Admin:
+                    foreach (var subCategory in category.SubCategories)
+                    {
+                        foreach (var claim in subCategory.Claims)
+                        {
+                            if (claim.ClaimType == AdminPermission.Admin_Dashboard.ToString().Replace("_", "."))
+                            {
+                                claim.ClaimValue = "1";
+                                break;
+                            }
+                        }
+                    }
+
+                    break;
+                case PermissionCategory.SBC:
+                    foreach (var subCategory in category.SubCategories)
+                    {
+                        foreach (var claim in subCategory.Claims)
+                        {
+                            if (claim.ClaimType == SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", "."))
+                            {
+                                claim.ClaimValue = "1";
+                                break;
+                            }
+                        }
+                    }
+                    break;
+            }
+            
+            Permissions.FirstOrDefault(p => p.CategoryId == category.CategoryId && p.Name == "Dashboard").ClaimValue = "1";
         }
         #endregion
     }
