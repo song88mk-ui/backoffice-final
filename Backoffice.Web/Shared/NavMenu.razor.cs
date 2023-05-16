@@ -24,10 +24,6 @@ namespace Backoffice.Web.Shared
 
         public SportsTreeModel Menu { get; set; }
         public bool ShowSwitchAccess { get; set; }
-
-        //private List<string> _dissabledMenus = new List<string>() { "menu.sbc.deeplinkgenerator", "menu.sbc.allbets", "menu.sbc.winloss" , "menu.sbc.profitloss" ,
-        //    "menu.sbc.ggr" , "sub-menu-revenue-settlement",  "menu.admin.createuser","menu.admin.createusergroup", "menu.admin.settlements.manualbetsettlementhistory"};
-
         #endregion
 
         #region Fields
