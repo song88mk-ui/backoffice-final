@@ -41,6 +41,7 @@
                                 <tr>
                                     <th class="th-start-date py-3"></th>
                                     <th class="th-fixture-name py-3"></th>
+                                    <th class="th-close-match py-3"></th>
                                     <th class="th-master py-3">BTR CTRL</th>
                                     @foreach (var client in ClientModel.Clients)
                                     {
@@ -53,7 +54,7 @@
                                 {
                                     foreach (var market in FixtureMarkets)
                                     {
-                                        <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" Region="@Region" />
+                                        <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" Region="@Region" IsMonitoringPage=true />
                                     }
                                 }
                             </tbody>
@@ -62,6 +63,8 @@
                 }
             }
         </div>
+
+        <CustomModal/>
     </Authorized>
     <NotAuthorized>
         <AccessDenied />

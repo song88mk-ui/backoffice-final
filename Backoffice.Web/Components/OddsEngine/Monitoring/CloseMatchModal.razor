@@ -1,0 +1,20 @@
+﻿<div class="modal-body">
+    <div class="d-flex flex-column justify-content-center p-5">
+        <div class="text-center">
+            <icon class="ico ico-warning"></icon>
+        </div>
+        <div class="text-center">
+            Are you sure you want to close the match "<span class="fw-bold">"@(Fixture.FixtureName)"</span>"
+            <br />
+            Please be certain as this cannot be undone
+        </div>
+        @if (IsPreload)
+        {
+            <Preloader />
+        }
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn cancel-btn" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
+    <button type="button" class="btn modal-btn confirm-btn" data-bs-dismiss="modal" @onclick="OnConfirmClickEvent" disabled="@IsPreload">Confirm</button>
+</div>
