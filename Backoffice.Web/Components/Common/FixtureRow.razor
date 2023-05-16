@@ -33,7 +33,7 @@
         </div>
     </td>
 
-    @if (IsMonitoringPage)
+    @if (IsMonitoringPage && UserModel.RoleName.ToLower().Equals("super admin"))
     {
         <td>
             <button type="button" class="btn btn-dark close-match-btn mx-4" @onclick="OnCloseMatchClickEvent">Close Match</button>
