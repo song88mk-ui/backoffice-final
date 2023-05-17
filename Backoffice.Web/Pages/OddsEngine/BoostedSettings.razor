@@ -1,14 +1,14 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.BoostedSettings
 @layout OEMonitoringLayout
 
-@*@page "/{Region}/odds-engine/boosted-settings"*@
-@page "/hk/odds-engine/boosted-settings"
+@page "/{Region}/odds-engine/boosted-settings"
+@*@page "/hk/odds-engine/boosted-settings"*@
 
 <AuthorizeView Policy="sbc-priceboost-settings">
     <Authorized>
         <CascadingValue Name="Region" Value="@Region">
             <div class="col-md-12">
-                <Breadcrumb Breadcrumbs="Breadcrumbs" />
+                <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"/>
             </div>
             <div class="col-md-12">
                 <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />

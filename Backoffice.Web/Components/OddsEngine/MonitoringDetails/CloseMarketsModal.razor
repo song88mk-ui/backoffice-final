@@ -1,0 +1,87 @@
+﻿<div class="modal-body">
+    <div class="business-container mx-3">
+        <div class="row">
+            <div class="col my-2">
+                Select the markets that will be set to Closed or select all to close th whole fixture.
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-bordered">
+                    <thead class="table-head">
+                        <tr>
+                            <th colspan="2">Fixture Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="td-min-width">
+                                <span>
+                                    @Fixture.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")
+                                    <br>
+                                    <strong>@Fixture.FixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-bold">@Fixture.HomeName.ToUpper()</span>
+                                <br />
+                                <span>@Fixture.AwayName.ToUpper()</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <ul class="nav text-nowrap flex-nowrap">
+                    @foreach (var group in MarketTemplateGroups)
+                    {
+                        <li>
+                            @{
+                                var groupId = $"radio{group.MarketTemplateGroup.MarketTemplateGroupId}";
+                            }
+                            <input type="radio" class="btn-check" name="marketTemplates" id="@groupId" @onclick="() => OnMarketGroupRadioClickEvent(groupId)" />
+                            <label id="lbl-@groupId" class="btn fw-bold" for="@groupId">@group.MarketTemplateGroup.MarketTemplateGroupName</label>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-bordered">
+                    <thead class="table-head">
+                        <tr>
+                            @{
+                                var isAllChecked = Markets.Any(m => m.MarketStatusId != 1) ? false : true;
+                            }
+                            <th class="th-width px-4 py-3"><input type="checkbox" checked="@isAllChecked" /></th>
+                            <th class="align-middle">Market Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Fixture.Markets.Any())
+                        {
+                            foreach (var market in Markets)
+                            {
+                                var isChecked = market.MarketStatusId != 1 ? true : false;
+                                if (SelectedMarketTemplateIds.Contains(market.MarketTemplateId))
+                                {
+                                    <tr>
+                                        <td class="px-4 py-3"><input type="checkbox" id="@(market.MarketTemplateId)" checked="@isChecked" @onclick="() => OnMarketChecked(market.MarketTemplateId)" /></td>
+                                        <td class="fs-6">@market.MarketName</td>
+                                    </tr>                                    
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
+    <button type="button" class="btn modal-btn modal-save waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Close Markets</button>
+</div>

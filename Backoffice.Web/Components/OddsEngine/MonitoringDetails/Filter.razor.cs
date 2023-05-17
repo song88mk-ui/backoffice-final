@@ -12,6 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
 
         [Parameter] public EventCallback<string> OnMarketChangedCallback { get; set; }
+        [Parameter] public EventCallback OnCloseMarketCallback { get; set; }
         [Parameter] public int SportId { get; set; }
 
         public List<SelectListItemModel<string>> MarketTemplates { get; set; }
@@ -49,6 +50,11 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             SelectedMarketTemplateId = e.Value.ToString();
 
             await OnMarketChangedCallback.InvokeAsync(SelectedMarketTemplateId);
+        }
+
+        public async Task OnCloseMarketsClickEvent()
+        {
+            await OnCloseMarketCallback.InvokeAsync();
         }
 
         public void Dispose()
