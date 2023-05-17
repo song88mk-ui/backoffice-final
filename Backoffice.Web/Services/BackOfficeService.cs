@@ -23,7 +23,7 @@ namespace Backoffice.Web.Services
         {
             get
             {
-                var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken");
+                var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 return _client;
             }

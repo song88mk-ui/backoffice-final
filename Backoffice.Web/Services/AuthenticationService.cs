@@ -6,6 +6,7 @@ using Backoffice.Shared.Utilities;
 using Backoffice.Web.ActionFilter;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -132,11 +133,13 @@ namespace Backoffice.Web.Services
         }
         public async Task<bool> Logout()
         {
+            var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+            var auth = _httpClient.GetAsync("api/authentication/logout").Result;
+
             _httpContextAccessor.HttpContext?.Session.Remove("UserToken");
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
             _httpClient.DefaultRequestHeaders.Authorization = null;
-
-            await _httpClient.GetAsync("/logout");
 
             return true;
         }
