@@ -19,6 +19,7 @@ namespace Backoffice.Web.Pages.Authentication
         public async Task<IActionResult> OnGet()
         {
             await _authenticationService.Logout();
+            Response.Cookies.Delete("RememberMePreference");
 
             return LocalRedirect("~/login");
         }
