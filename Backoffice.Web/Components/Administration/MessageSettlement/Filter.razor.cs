@@ -320,7 +320,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
         {
             var result = (await TradingService.GetSegmentLookup(sportId)).Result;
 
-            var segments = result.SegmentLookup.Select(s => new SelectListItemModel<int>()
+            var segments = result.SegmentLookup?.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.SegmentId,
                 Name = s.SegmentName

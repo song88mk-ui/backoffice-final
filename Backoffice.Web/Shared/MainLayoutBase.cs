@@ -134,9 +134,10 @@ namespace Backoffice.Web.Shared
 
                 if (UserModel != null && UserModel.Claims != null)
                 {
-                    // Temporary Hide Settlement
-                    var permissionSubCategory = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.')
-                    && p.SubCategoryName.ToUpper() != "Settlements".ToUpper()).Select(s => s.SubCategoryName).Distinct();
+                    var permissionSubCategory = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.')).Select(s => s.SubCategoryName).Distinct();
+                    //// Temporary Hide Settlement
+                    //var permissionSubCategory = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.')
+                    //&& p.SubCategoryName.ToUpper() != "Settlements".ToUpper()).Select(s => s.SubCategoryName).Distinct();
 
                     foreach (var category in permissionSubCategory)
                     {
