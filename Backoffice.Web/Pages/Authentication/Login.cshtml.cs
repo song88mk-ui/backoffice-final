@@ -180,6 +180,12 @@ namespace Backoffice.Web.Pages.Authentication
                     {
                         return LocalRedirect("/choose-access");
                     }
+                    else if (!policies.Any())
+                    {
+                        TempData["HasError"] = true;
+                        ModelState.AddModelError(string.Empty, "No permissions enabled for this user account. Contact admin.");
+                        return Page();
+                    }
 
                     NavigationManager.NavigateTo("/");
                 }

@@ -1,4 +1,5 @@
 ﻿using Backoffice.Web.Models;
+using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Components.Common
@@ -10,10 +11,17 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public List<BreadcrumbModel> Breadcrumbs { get; set; }
 
         [Parameter] public string Region { get; set; }
-      
+
+        [CascadingParameter(Name = "HeaderNavMenuReference")] public HeaderNavMenu HeaderNavMenuReference { get; set; }
+
         #endregion
 
         #region Methods
+
+        public async Task OnOEBreadcrumbClickEvent()
+        {
+            HeaderNavMenuReference.ActivateMenu("MONITORING");
+        }
 
         public void Dispose()
         {
