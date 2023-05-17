@@ -19,6 +19,7 @@ using System.Diagnostics.Metrics;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using Microsoft.JSInterop;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
@@ -26,54 +27,54 @@ var configuration = builder.Services.BuildServiceProvider().GetService<IConfigur
 // Telemetry
 Action<ResourceBuilder> configureResource = r => r.AddService(
     serviceName: String.Format("{0}/{1}", builder.Configuration["Telemetry:Environment"], "Backoffice.Web"),
-    serviceVersion:  Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "latest",
+    serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "latest",
     serviceInstanceId: Environment.MachineName);
 
 builder.Services.AddSingleton<Instrumentation>();
 
 if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
 {
-  builder.Services.AddOpenTelemetry()
-    .ConfigureResource(configureResource)
-    .WithTracing(tracing =>
-    {
-      tracing
-        .AddSource(Instrumentation.ActivitySourceName)
-        .SetSampler(new AlwaysOnSampler())
-        .AddHttpClientInstrumentation()
-        .AddAspNetCoreInstrumentation((opts) => opts.Filter = httpContext =>
+    builder.Services.AddOpenTelemetry()
+      .ConfigureResource(configureResource)
+      .WithTracing(tracing =>
+      {
+          tracing
+          .AddSource(Instrumentation.ActivitySourceName)
+          .SetSampler(new AlwaysOnSampler())
+          .AddHttpClientInstrumentation()
+          .AddAspNetCoreInstrumentation((opts) => opts.Filter = httpContext =>
+          {
+              return (
+                !httpContext.Request.Path.ToString().StartsWith("/js") ||
+                !httpContext.Request.Path.ToString().StartsWith("/css")
+                );
+          })
+          .AddSqlClientInstrumentation();
+
+          builder.Services.Configure<AspNetCoreInstrumentationOptions>(builder.Configuration.GetSection("Telemetry:AspNetCoreInstrumentation"));
+
+          tracing.AddOtlpExporter(otlpOptions =>
         {
-          return (
-              !httpContext.Request.Path.ToString().StartsWith("/js") ||
-              !httpContext.Request.Path.ToString().StartsWith("/css")
-              );
-        })
-        .AddSqlClientInstrumentation();
+            otlpOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+            otlpOptions.Endpoint = new Uri(builder.Configuration["Telemetry:Collector"] + "/v1/traces");
+        });
 
-      builder.Services.Configure<AspNetCoreInstrumentationOptions>(builder.Configuration.GetSection("Telemetry:AspNetCoreInstrumentation"));
-
-      tracing.AddOtlpExporter(otlpOptions =>
+      })
+      .WithMetrics(metrics =>
       {
-        otlpOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
-        otlpOptions.Endpoint = new Uri(builder.Configuration["Telemetry:Collector"]+"/v1/traces");
+          metrics
+          .AddMeter(Instrumentation.MeterName)
+          .AddRuntimeInstrumentation()
+          .AddHttpClientInstrumentation()
+          .AddAspNetCoreInstrumentation();
+
+          metrics.AddOtlpExporter(otlpOptions =>
+        {
+            otlpOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+            otlpOptions.Endpoint = new Uri(builder.Configuration["Telemetry:Collector"] + "/v1/metrics");
+        });
+
       });
-
-    })
-    .WithMetrics(metrics =>
-    {
-      metrics
-        .AddMeter(Instrumentation.MeterName)
-        .AddRuntimeInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddAspNetCoreInstrumentation();
-
-      metrics.AddOtlpExporter(otlpOptions =>
-      {
-        otlpOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
-        otlpOptions.Endpoint = new Uri(builder.Configuration["Telemetry:Collector"]+"/v1/metrics");
-      });
-
-    });
 }
 // end of telemetry
 

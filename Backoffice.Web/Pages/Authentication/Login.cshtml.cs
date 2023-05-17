@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.JSInterop;
 using System.Text.Json;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
 
@@ -16,10 +17,12 @@ namespace Backoffice.Web.Pages.Authentication
         [Inject] public NavigationManager NavigationManager { get; set; }
         [TempData] public string ErrorMessage { get; set; }
         [BindProperty] public LogInModel UserModel { get; set; } = new LogInModel();
+        [BindProperty] public bool IsSaveCookie { get; set; }
 
         public bool IsValidLogin { get; set; }
         public string ReturnUrl { get; set; }
         public string Error { get; set; }
+        private IJSRuntime _jsRuntime;
 
         #endregion
 
@@ -37,6 +40,7 @@ namespace Backoffice.Web.Pages.Authentication
         {
             _authenticationService = authenticationService;
             _httpContextAccessor = httpContextAccessor;
+            //_jsRuntime = jSRuntime;
         }
 
         #endregion
@@ -45,6 +49,8 @@ namespace Backoffice.Web.Pages.Authentication
 
         public async Task<IActionResult> OnGet(string? returnUrl = null)
         {
+            //IsSaveCookie = await GetRememberMePreference();
+
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
                 TempData["HasError"] = true;
@@ -72,6 +78,22 @@ namespace Backoffice.Web.Pages.Authentication
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (IsSaveCookie)
+            {
+                // Store "Remember Me" preference in a cookie
+                var options = new CookieOptions
+                {
+                    Expires = DateTime.UtcNow.AddMonths(1) // Example: Cookie expires in 1 month
+                };
+
+                _httpContextAccessor.HttpContext.Response.Cookies.Append("RememberMePreference", "true", options);
+            }
+            else
+            {
+                // Remove the "Remember Me" preference cookie
+                _httpContextAccessor.HttpContext.Response.Cookies.Delete("RememberMePreference");
+            }
+
             if (ModelState.IsValid)
             {
                 var policies = new List<string>();
@@ -107,8 +129,6 @@ namespace Backoffice.Web.Pages.Authentication
                 TempData["HasError"] = true;
                 TempData["LogError"] = $"<script>console.log(\"{result.StatusCode.ToString()} - {result.Message} -\n{JsonSerializer.Serialize(UserModel).Replace("\"", "")}\")</script>";
 
-                //ModelState.AddFormError("Username or Password is incorrect");
-                //ModelState.AddModelError("UserModel.Password", "Username or Password is incorrect");
                 if (!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
                 {
                     ModelState.AddModelError(string.Empty, result.Message);
@@ -121,6 +141,25 @@ namespace Backoffice.Web.Pages.Authentication
             return Page();
         }
 
+        #endregion
+
+        #region Utilities
+        private async Task<bool> GetRememberMePreference()
+        {
+            try
+            {
+                var preference = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "RememberMePreference");
+                return preference != null && bool.TryParse(preference, out bool result) ? result : false;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        private async Task SetRememberMePreference(bool value)
+        {
+            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "RememberMePreference", value.ToString().ToLower());
+        }
         #endregion
     }
 }
