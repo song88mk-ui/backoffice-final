@@ -2,7 +2,9 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,7 +14,6 @@ using Newtonsoft.Json.Linq;
 using System.Security.Claims;
 using System.Text.Json;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
-
 namespace Backoffice.Web.Pages.Authentication
 {
     public class LoginModel : PageModel
@@ -61,27 +62,25 @@ namespace Backoffice.Web.Pages.Authentication
             {
                 try
                 {
-                    IsSaveCookie = true;
                     var policies = new List<string>();
                     TempData["HasError"] = false;
-                    var preference = JsonSerializer.Deserialize<Tuple<LogInModel, TokenModel>>(Request.Cookies["RememberMePreference"]?.ToString());
-                    UserModel = preference.Item1;
-                    var tokenModel = preference.Item2;
 
-                    if (tokenModel == null && UserModel == null)
+                    var preference = JsonSerializer.Deserialize<TokenModel>(Request.Cookies["RememberMePreference"]?.ToString());
+
+                    if (preference.AccessToken == null)
                     {
-                        IsSaveCookie = false;
-                        Response.Cookies.Delete("RememberMePreference");
+                        SetRememberMePreference(false);
                     }
                     else
                     {
-                        if (tokenModel?.AccessToken != null)
+                        IsSaveCookie = true;
+                        if (preference?.AccessToken != null)
                         {
-                            var authenticate = await _authenticationService.AuthenticateToken(tokenModel.AccessToken);
+                            var authenticate = await _authenticationService.AuthenticateToken(preference.AccessToken);
                             if (authenticate.StatusCode == Backoffice.Shared.Enums.StatusCode.Success)
                             {
-                                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(tokenModel.AccessToken), "jwtAuthType"));
-                                policies = claimsPrincipal.Claims?.Where(x => x.Value != "0" && _access.Contains(x.Type.ToUpper()))
+                                var claimsPrincipal = JwtParser.ParseClaimsFromJwt(preference.AccessToken);
+                                policies = claimsPrincipal?.Where(x => x.Value != "0" && _access.Contains(x.Type.Split(".")?.FirstOrDefault().ToUpper()))
                                     .Select(x => x.Type.Split('.').FirstOrDefault())
                                     .Distinct()
                                     .ToList();
@@ -122,7 +121,7 @@ namespace Backoffice.Web.Pages.Authentication
                 }
                 catch (Exception ex)
                 {
-                    Response.Cookies.Delete("RememberMePreference");
+                    SetRememberMePreference(false);
                 }
             }
 
@@ -153,30 +152,15 @@ namespace Backoffice.Web.Pages.Authentication
 
         public async Task<IActionResult> OnPostAsync()
         {
-
             if (ModelState.IsValid)
             {
                 var policies = new List<string>();
                 TempData["HasError"] = false;
                 var result = await _authenticationService.Login(UserModel);
+
                 if (result.Result.Item1)
                 {
-                    if (IsSaveCookie)
-                    {
-                        // Store "Remember Me" preference in a cookie
-                        var options = new CookieOptions
-                        {
-                            Expires = DateTime.UtcNow.AddMonths(1), // Example: Cookie expires in 1 month
-                            SameSite = SameSiteMode.Lax,
-                            Secure = true
-                        };
-
-                        Response.Cookies.Append("RememberMePreference", JsonSerializer.Serialize(new Tuple<LogInModel, TokenModel>(UserModel, result.Result.Item3)), options);
-                        //_httpContextAccessor.HttpContext.Response.Cookies.Append("RememberMePreference", "true", options);
-                    }
-                    else
-                        Response.Cookies.Delete("RememberMePreference");
-
+                    SetRememberMePreference(IsSaveCookie, result.Result.Item3);
                     policies = result.Result.Item2.Where(x => _access.Contains(x.ToUpper())).ToList();
                     if (policies.Count == 1)
                     {
@@ -224,21 +208,24 @@ namespace Backoffice.Web.Pages.Authentication
         #endregion
 
         #region Utilities
-        private async Task<bool> GetRememberMePreference()
+        private void SetRememberMePreference(bool value, TokenModel token = null)
         {
-            try
+            if (value && token != null)
             {
-                var preference = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "RememberMePreference");
-                return preference != null && bool.TryParse(preference, out bool result) ? result : false;
+                var options = new CookieOptions
+                {
+                    Expires = DateTime.UtcNow.AddMonths(1), // Example: Cookie expires in 1 month
+                    SameSite = SameSiteMode.Lax,
+                    Secure = true
+                };
+                Response.Cookies.Append("RememberMePreference", JsonSerializer.Serialize(token), options);
             }
-            catch (Exception ex)
+            else
             {
-                throw;
+                Response.Cookies.Delete("RememberMePreference");
             }
-        }
-        private async Task SetRememberMePreference(bool value)
-        {
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "RememberMePreference", value.ToString().ToLower());
+
+            IsSaveCookie = value;
         }
         #endregion
     }

@@ -69,13 +69,13 @@
                             <div class="login-body mb-3">
                                 <div class="mb-4">
                                     <label class="form-label">Username</label>
-                                    @Html.TextBoxFor(m => m.UserModel.Username, new {@class = "form-control p-3", @placeholder="Enter your username"})
+                                    @Html.TextBoxFor(m => m.UserModel.Username, new {@class = "form-control p-3", @placeholder="Enter your username", @id="username", @autocomplete="off", @onchange=""})
                                     @Html.ValidationMessageFor(m => m.UserModel.Username)
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label">Password</label>
                                     <div class="input-group">
-                                        @Html.TextBoxFor(m => m.UserModel.Password, new {@type="password", @class = "form-control p-3 pe-5", @placeholder="Enter your password", id="password", autocomplete="bo-password"})
+                                        @Html.TextBoxFor(m => m.UserModel.Password, new {@type="password", @class = "form-control p-3 pe-5", @placeholder="Enter your password", id="password", autocomplete="off"})
                                         <button type="button" class="d-flex align-items-center position-absolute end-0 h-100 bg-transparent border-0 password-eye" onclick="password_show_hide();">
                                             <i class="fa fa-eye-slash text-center eye-icon" id="show_eye"></i>
                                             <i class="fa fa-eye d-none text-center eye-icon" id="hide_eye"></i>
@@ -88,13 +88,11 @@
                                     <div class="cold-block border border-0 border-secondary rounded d-flex justify-content-center h-50 p-3" style="background-color: #FFB5B5">
                                         @Html.ValidationSummary()
                                         @Html.Raw(logError)
-                                        @*Username or Password is incorrect*@
                                     </div>
                                 }
                                 <div class="row my-4">
                                     <div class="col-md-6">
-                                        @Html.CheckBoxFor(m => m.IsSaveCookie, new {@class = "-check-input m8e-1"})
-                                        @*<input type="checkbox" class="form-check-input m8e-1" />*@
+                                        @Html.CheckBoxFor(m => m.IsSaveCookie, new {@class = "form-check-input m8e-1", @id="rememberMe" })
                                         <label class="form-check-label">Remember Information</label>
                                     </div>
                                 </div>

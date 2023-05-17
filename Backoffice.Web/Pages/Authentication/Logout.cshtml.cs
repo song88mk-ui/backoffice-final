@@ -25,20 +25,7 @@ namespace Backoffice.Web.Pages.Authentication
             await _authenticationService.Logout();
             if (Request.Cookies.ContainsKey("RememberMePreference"))
             {
-                var preference = JsonSerializer.Deserialize<Tuple<LogInModel, TokenModel>>(Request.Cookies["RememberMePreference"]?.ToString());
-                var userModel = preference.Item1;
                 Response.Cookies.Delete("RememberMePreference");
-
-                if (userModel != null)
-                {
-                    var options = new CookieOptions
-                    {
-                        Expires = DateTime.UtcNow.AddMonths(1), // Example: Cookie expires in 1 month
-                        SameSite = SameSiteMode.Lax,
-                        Secure = true
-                    };
-                    Response.Cookies.Append("RememberMePreference", JsonSerializer.Serialize(new Tuple<LogInModel, TokenModel>(userModel, new TokenModel())), options);
-                }
             }
 
             return LocalRedirect("~/login");
