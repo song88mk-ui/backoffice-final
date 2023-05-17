@@ -29,14 +29,14 @@ namespace Backoffice.Web.Services
             _authStateProvider = authStateProvider;
         }
 
-        public async Task<BaseResponse<Tuple<bool, List<string>>>> Login(LogInModel user)
+        public async Task<BaseResponse<Tuple<bool, List<string>, TokenModel>>> Login(LogInModel user)
         {
             var policies = new List<string>();
-            var result = new BaseResponse<Tuple<bool, List<string>>>
+            var result = new BaseResponse<Tuple<bool, List<string>, TokenModel>>
             {
                 StatusCode = StatusCode.Error,
                 Message = StatusCode.Error.ToString(),
-                Result = new Tuple<bool, List<string>>(false, policies)
+                Result = new Tuple<bool, List<string>, TokenModel>(false, policies, null)
             };
             var userAgent = _httpContextAccessor?.HttpContext?.Request.Headers.UserAgent;
             var ip = _httpContextAccessor?.HttpContext?.Request.Headers["X-Forwarded-For"].FirstOrDefault()?.Trim() ?? "";
@@ -66,11 +66,11 @@ namespace Backoffice.Web.Services
 
                 policies = claimsPrincipal.Claims.Where(x => x.Value != "0").Select(x => x.Type.Split('.').FirstOrDefault()).Distinct().ToList();
 
-                result = new BaseResponse<Tuple<bool, List<string>>>
+                result = new BaseResponse<Tuple<bool, List<string>, TokenModel>>
                 {
                     StatusCode = token.StatusCode,
                     Message = token.Message,
-                    Result = new Tuple<bool, List<string>>(true, policies)
+                    Result = new Tuple<bool, List<string>, TokenModel>(true, policies, token.Result)
                 };
             }
             else if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.BadRequest)
@@ -82,20 +82,25 @@ namespace Backoffice.Web.Services
                 {
                     token = JsonSerializer.Deserialize<BaseResponse<TokenModel>>(authPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 }
-                result = new BaseResponse<Tuple<bool, List<string>>>
+                result = new BaseResponse<Tuple<bool, List<string>, TokenModel>>
                 {
                     StatusCode = token.StatusCode,
                     Message = token.Message,
-                    Result = new Tuple<bool, List<string>>(false, new List<string>())
+                    Result = new Tuple<bool, List<string>, TokenModel>(false, new List<string>(), null)
                 };
             }
 
             return result;
         }
 
-        public async Task<BaseResponse<TokenModel>> AuthenticateToken()
+        public async Task<BaseResponse<TokenModel>> AuthenticateToken(string accesstoken = "")
         {
-            var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+            var userToken = accesstoken;
+            if(string.IsNullOrEmpty(accesstoken))
+            {
+                userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+            }
+
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
             var response = await _httpClient.GetAsync("api/authentication/authenticate");
 

@@ -32,8 +32,9 @@ namespace Backoffice.Web.ActionFilter
                     return _anonymous;
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(token), "jwtAuthType"));
-                var claimsIdentity = new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(token), "jwtAuthType");
+                var parsedToken = JwtParser.ParseClaimsFromJwt(token);
+                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(parsedToken, "jwtAuthType"));
+                var claimsIdentity = new ClaimsIdentity(parsedToken, "jwtAuthType");
 
                 return new AuthenticationState(claimsPrincipal);
             }

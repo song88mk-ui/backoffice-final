@@ -1,5 +1,6 @@
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
+using Newtonsoft.Json.Linq;
+using System.Security.Claims;
 using System.Text.Json;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
 
@@ -25,6 +28,7 @@ namespace Backoffice.Web.Pages.Authentication
         public string ReturnUrl { get; set; }
         public string Error { get; set; }
         private IJSRuntime _jsRuntime;
+        private readonly List<string> _access;
 
         #endregion
 
@@ -42,6 +46,7 @@ namespace Backoffice.Web.Pages.Authentication
         {
             _authenticationService = authenticationService;
             _httpContextAccessor = httpContextAccessor;
+            _access = new List<string>() { PermissionCategory.SBC.ToString().ToUpper(), PermissionCategory.Admin.ToString().ToUpper() };
         }
 
         #endregion
@@ -56,48 +61,64 @@ namespace Backoffice.Web.Pages.Authentication
             {
                 try
                 {
+                    IsSaveCookie = true;
                     var policies = new List<string>();
                     TempData["HasError"] = false;
-                    UserModel = JsonSerializer.Deserialize<LogInModel>(Request.Cookies["RememberMePreference"]?.ToString());
+                    var preference = JsonSerializer.Deserialize<Tuple<LogInModel, TokenModel>>(Request.Cookies["RememberMePreference"]?.ToString());
+                    UserModel = preference.Item1;
+                    var tokenModel = preference.Item2;
 
-                    IsSaveCookie = true;
-                    var result = await _authenticationService.Login(UserModel);
-                    if (result.Result.Item1)
+                    if (tokenModel == null && UserModel == null)
                     {
-                        var access = new[] { PermissionCategory.SBC.ToString().ToUpper(), PermissionCategory.Admin.ToString().ToUpper() };
-
-                        policies = result.Result.Item2.Where(x => access.Contains(x.ToUpper())).ToList();
-                        if (policies.Count == 1)
-                        {
-                            switch (policies.FirstOrDefault().ToString().ToUpper())
-                            {
-                                case "ADMIN":
-                                    return LocalRedirect("/admin/dashboard");
-                                case "SBC":
-                                case "PM":
-                                    return LocalRedirect("/dashboard");
-                                //    return LocalRedirect("/pm/dashboard");
-                                default:
-                                    return LocalRedirect("/choose-access");
-                            }
-                        }
-                        else if (policies.Count > 1)
-                        {
-                            return LocalRedirect("/choose-access");
-                        }
-                    }
-
-                    TempData["HasError"] = true;
-                    TempData["LogError"] = $"<script>console.log(\"{result.StatusCode.ToString()} - {result.Message} -\n{JsonSerializer.Serialize(UserModel).Replace("\"", "")}\")</script>";
-
-                    if (!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
-                    {
-                        ModelState.AddModelError(string.Empty, result.Message);
+                        IsSaveCookie = false;
+                        Response.Cookies.Delete("RememberMePreference");
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
+                        if (tokenModel?.AccessToken != null)
+                        {
+                            var authenticate = await _authenticationService.AuthenticateToken(tokenModel.AccessToken);
+                            if (authenticate.StatusCode == Backoffice.Shared.Enums.StatusCode.Success)
+                            {
+                                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(tokenModel.AccessToken), "jwtAuthType"));
+                                policies = claimsPrincipal.Claims?.Where(x => x.Value != "0" && _access.Contains(x.Type.ToUpper()))
+                                    .Select(x => x.Type.Split('.').FirstOrDefault())
+                                    .Distinct()
+                                    .ToList();
+                                if (policies.Count == 1)
+                                {
+                                    switch (policies.FirstOrDefault().ToString().ToUpper())
+                                    {
+                                        case "ADMIN":
+                                            return LocalRedirect("/admin/dashboard");
+                                        case "SBC":
+                                        case "PM":
+                                            return LocalRedirect("/dashboard");
+                                        //    return LocalRedirect("/pm/dashboard");
+                                        default:
+                                            return LocalRedirect("/choose-access");
+                                    }
+                                }
+                                else if (policies.Count > 1)
+                                {
+                                    return LocalRedirect("/choose-access");
+                                }
+                            }
+
+                            TempData["HasError"] = true;
+                            TempData["LogError"] = $"<script>console.log(\"{authenticate.StatusCode.ToString()} - {authenticate.Message} -\n{JsonSerializer.Serialize(UserModel).Replace("\"", "")}\")</script>";
+
+                            if (!string.IsNullOrEmpty(authenticate.Message) && !authenticate.Message.Contains("Incorrect password"))
+                            {
+                                ModelState.AddModelError(string.Empty, authenticate.Message);
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
+                            }
+                        }
                     }
+
                 }
                 catch (Exception ex)
                 {
@@ -132,25 +153,6 @@ namespace Backoffice.Web.Pages.Authentication
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (IsSaveCookie)
-            {
-                // Store "Remember Me" preference in a cookie
-                var options = new CookieOptions
-                {
-                    Expires = DateTime.UtcNow.AddMonths(1), // Example: Cookie expires in 1 month
-                    SameSite = SameSiteMode.Lax,
-                    Secure = true
-                };
-
-                Response.Cookies.Append("RememberMePreference", JsonSerializer.Serialize(UserModel), options);
-                //_httpContextAccessor.HttpContext.Response.Cookies.Append("RememberMePreference", "true", options);
-            }
-            else
-            {
-                // Remove the "Remember Me" preference cookie
-                //_httpContextAccessor.HttpContext.Response.Cookies.Delete("RememberMePreference");
-                Response.Cookies.Delete("RememberMePreference");
-            }
 
             if (ModelState.IsValid)
             {
@@ -159,9 +161,23 @@ namespace Backoffice.Web.Pages.Authentication
                 var result = await _authenticationService.Login(UserModel);
                 if (result.Result.Item1)
                 {
-                    var access = new[] { PermissionCategory.SBC.ToString().ToUpper(), PermissionCategory.Admin.ToString().ToUpper() };
+                    if (IsSaveCookie)
+                    {
+                        // Store "Remember Me" preference in a cookie
+                        var options = new CookieOptions
+                        {
+                            Expires = DateTime.UtcNow.AddMonths(1), // Example: Cookie expires in 1 month
+                            SameSite = SameSiteMode.Lax,
+                            Secure = true
+                        };
 
-                    policies = result.Result.Item2.Where(x => access.Contains(x.ToUpper())).ToList();
+                        Response.Cookies.Append("RememberMePreference", JsonSerializer.Serialize(new Tuple<LogInModel, TokenModel>(UserModel, result.Result.Item3)), options);
+                        //_httpContextAccessor.HttpContext.Response.Cookies.Append("RememberMePreference", "true", options);
+                    }
+                    else
+                        Response.Cookies.Delete("RememberMePreference");
+
+                    policies = result.Result.Item2.Where(x => _access.Contains(x.ToUpper())).ToList();
                     if (policies.Count == 1)
                     {
                         switch (policies.FirstOrDefault().ToString().ToUpper())
@@ -217,10 +233,6 @@ namespace Backoffice.Web.Pages.Authentication
         private async Task SetRememberMePreference(bool value)
         {
             await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "RememberMePreference", value.ToString().ToLower());
-        }
-        private async Task Redirect()
-        {
-
         }
         #endregion
     }
