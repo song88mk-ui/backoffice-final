@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Drawing;
 
 namespace Backoffice.Web.Components.OddsEngine.SportSettings
 {
@@ -22,6 +23,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         public string SelectedClientCode { get; set; }
 
         public string FromClientCode { get; set; }
+        private string Region { get; set; }
 
         #endregion
 
@@ -30,7 +32,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         protected override async Task OnInitializedAsync()
         {
             Clients = new List<SelectListItemModel<string>>();
-            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            TradingService.Region = Region;
 
             FromClientCode = ModalParameters.TryGet<string>("FromClientCode");
 
@@ -78,6 +81,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             parameters.Add("ToClientCode", toClient.ClientCode);
             parameters.Add("ToClientName", toClient.ClientName);
             parameters.Add("Sports", ModalParameters.TryGet<List<SportsSortOrder>>("Sports"));
+            parameters.Add("Region", Region);
 
             parameters.Add("DialogStyle", "max-width: 600px;");
 
