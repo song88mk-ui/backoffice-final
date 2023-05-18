@@ -22,7 +22,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private ITradingService TradingService { get; set; }        
         [Inject] private IConfiguration AppConfiguration { get; set; }        
         [Inject] public ToastService? ToastService { get; set; }
-
+        [Inject] public NavigationManager NavigationManager { get; set; } = default!;
         [Parameter] public string Region { get; set; } = "hk";
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -714,7 +714,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var request = HttpContextAccessor.HttpContext?.Request;
 
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl(new Uri(AppConfiguration["API:HubAPI"]))
+                .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
                 .Build();
 
 

@@ -23,6 +23,6 @@ namespace Backoffice.API.Repositories
         #endregion
 
         Task<BaseResponse<List<CurrenciesResponse>>> GetCurrencies();
-        Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);        
+        Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request, List<string> brands = null);
     }
 }

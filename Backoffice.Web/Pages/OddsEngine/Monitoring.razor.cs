@@ -197,7 +197,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private async Task Subscribe()
         {
             _hubConnection = new HubConnectionBuilder()
-            .WithUrl(new Uri(Configuration["API:HubAPI"]))
+                .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
             .Build();
 
 

@@ -310,7 +310,7 @@ namespace Backoffice.Web.Shared
                 var request = _httpContextAccessor.HttpContext?.Request;
 
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(Configuration["API:HubAPI"]))
+                    .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "hub")))
                     .Build();
 
                 _hubConnection.Closed += async (error) =>

@@ -21,6 +21,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
@@ -326,7 +327,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private async Task Subscribe()
         {
             _hubConnection = new HubConnectionBuilder()
-            .WithUrl(new Uri(Configuration["API:HubAPI"]))
+                .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
             .Build();
 
 

@@ -335,12 +335,16 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request)
+        public async Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request, List<string> brands = null)
         {
             try
             {
-                var query = GetClientInformation().Where(x => x.ApplicationId == (int)Application2.SBC || x.ApplicationId == (int)Application.Sportsbook);
+                var query = GetClientInformation().Where(x => (x.ApplicationId == (int)Application2.SBC || x.ApplicationId == (int)Application.Sportsbook));
 
+                if(brands != null)
+                {
+                    query = query.Where(x => brands.Contains(x.Brand));
+                }
                 if (!string.IsNullOrEmpty(request.Search))
                     query = query.Where(c => c.Name.Contains(request.Search));
 

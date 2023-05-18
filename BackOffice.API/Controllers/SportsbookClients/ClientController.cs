@@ -2,9 +2,12 @@
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Backoffice.API.Controllers.SportsbookClients
@@ -39,7 +42,10 @@ namespace Backoffice.API.Controllers.SportsbookClients
         [HttpPost("information/list")]
         public async Task<IActionResult> GetClientList([FromBody] GetClientListRequest request)
         {
-            var result = await _backofficeRepository.GetClientList(request);
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var brands = JwtParser.ParseClaimsFromJwt(token).Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>(); 
+
+            var result = await _backofficeRepository.GetClientList(request, brands);
 
             switch (result.StatusCode)
             {
