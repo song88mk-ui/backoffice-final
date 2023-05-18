@@ -133,6 +133,8 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("sbc-monitoring-match", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_Monitoring_MatchType.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
+    options.AddPolicy("sbc-monitoring-match-canedit", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_Monitoring_MatchType.ToString().Replace('_', '.')}",
+        $"{(int)Access.Edit}"));
     options.AddPolicy("sbc-monitoring-outright", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_OE_Monitoring_Outrights.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
 

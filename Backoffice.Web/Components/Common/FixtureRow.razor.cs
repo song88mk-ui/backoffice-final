@@ -13,7 +13,6 @@ namespace Backoffice.Web.Components.Common
     {
         #region Properties
         [Inject] public IModalService ModalService { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public List<Client> Clients { get; set; }
         [Parameter] public FixtureMarketModel Market { get; set; }
