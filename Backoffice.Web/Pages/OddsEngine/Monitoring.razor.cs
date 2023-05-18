@@ -46,8 +46,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public bool IsPreloader { get; set; }
         public bool PassParametersToModel { get; set; }
-        public string AlertMessage { get; set; }
-        public AlertStatus AlertStatus { get; set; }
+        public AlertModel AlertModel { get; set; }
 
         #endregion
 
@@ -55,12 +54,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            AlertModel = new AlertModel();
             TradingService.Region = Region.ToUpper();
             FixtureMarkets = null;
             MonitoringCallbackModel = new MonitoringCallbackModel();
             ClientModel = new ClientModel();
             Slugs = new List<string>();
-
             Breadcrumbs = new List<BreadcrumbModel>();
 
             Breadcrumbs.Add(new BreadcrumbModel
@@ -175,19 +174,27 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             var model = (DeactivateFixtureCallbackModel)param;
 
-            if(model != null)
+            if (model != null)
             {
                 if (model.Result)
                 {
                     await OnInitEvent();
 
-                    AlertMessage = $"{model.FixtureName} has been successfully closed.";
-                    AlertStatus = AlertStatus.Success;
+                    AlertModel = new AlertModel
+                    {
+                        Opacity = 1m,
+                        Status = AlertStatus.Success.ToString(),
+                        Message = $"{model.FixtureName} has been successfully closed."
+                    };
                 }
                 else
                 {
-                    AlertMessage = $"{model.FixtureName} is NOT closed successfully.";
-                    AlertStatus = AlertStatus.Error;
+                    AlertModel = new AlertModel
+                    {
+                        Opacity = 1m,
+                        Status = AlertStatus.Error.ToString(),
+                        Message = $"{model.FixtureName} is NOT closed successfully."
+                    };
                 }
             }
         }
@@ -277,7 +284,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         });
                     }
                 }
-                
+
             }
 
             return fixtureMarkets;

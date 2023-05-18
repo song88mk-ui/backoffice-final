@@ -23,11 +23,11 @@
             }
         </div>
 
-        @if (!string.IsNullOrEmpty(AlertMessage))
+        @if (!string.IsNullOrEmpty(AlertModel.Message))
         {
             <div class="col-md-12">
                 <div class="mt-4 mx-3">
-                    <AlertMessage AlertMessageStr="@AlertMessage" AlertStatus="@(AlertStatus.ToString())" AlwaysShow="false" />
+                    <AlertMessage AlertMessageStr="@AlertModel.Message" AlertStatus="@AlertModel.Status" Opacity="@AlertModel.Opacity" />
                 </div>
             </div>
         }
