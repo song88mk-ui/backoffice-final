@@ -1,5 +1,5 @@
 ﻿.accordion-button {
-    background-color: #F1F1F1;
+    background-color: transparent;
 }
 
     .accordion-button::after {
@@ -17,6 +17,7 @@
 
 .accordion-header {
     position: relative;
+    background-color: #F1F1F1;
 }
 
 .market-toggle {
