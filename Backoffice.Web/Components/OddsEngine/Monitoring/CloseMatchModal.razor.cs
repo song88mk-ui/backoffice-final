@@ -52,6 +52,9 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                 {
                     foreach(var market in newFixture.Markets)
                     {
+                        if (market.Selections.Count == 0)
+                            continue;
+
                         markets.Add(new DeactivateFixtureMarketRequest.MarketMessage
                         {
                             MarketTemplateId = market.MarketTemplateId,

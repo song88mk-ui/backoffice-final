@@ -116,25 +116,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     PassParametersToModel = false;
                 }
-                //else if (!string.IsNullOrEmpty(SportId) && !string.IsNullOrEmpty(SegmentId))
-                //{
-                //    if (SelectedSport.SportId != int.Parse(SportId) && SelectedSport.SegmentId != int.Parse(SegmentId))
-                //    {
-                //        SelectedSport.SportId = int.Parse(SportId);
-                //        SelectedSport.SegmentId = int.Parse(SegmentId);
-                //    }
 
-                //    PassParametersToModel = false;
-                //}
-                //else if (!string.IsNullOrEmpty(SportId))
-                //{
-                //    if (SelectedSport.SportId != int.Parse(SportId))
-                //    {
-                //        SelectedSport.SportId = int.Parse(SportId);
-                //    }
-
-                //    PassParametersToModel = false;
-                //}
             }
         }
 
@@ -185,6 +167,14 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             MonitoringCallbackModel = model;
             await OnInitEvent();
+        }
+
+        public async Task OnSaveClickedEvent(object param)
+        {
+            if(Convert.ToBoolean(param))
+            {
+                await OnInitEvent();
+            }
         }
 
         public async ValueTask DisposeAsync()
