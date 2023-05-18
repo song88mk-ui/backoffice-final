@@ -2,6 +2,7 @@
     display: inline-block;
     width: calc(100% - 28px);
     overflow-x: scroll;
+    height: 68vh;
 }
 
 .table-head {
