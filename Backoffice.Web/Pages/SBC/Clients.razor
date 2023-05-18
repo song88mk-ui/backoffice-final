@@ -90,6 +90,6 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@SportsbookClientPermission.SBC_Clients.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>
