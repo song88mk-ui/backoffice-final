@@ -4,9 +4,12 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.ActionFilter;
+using Backoffice.Web.Telemetry;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -23,11 +26,16 @@ namespace Backoffice.Web.Services
         private readonly HttpClient _httpClient;
         private readonly AuthenticationStateProvider _authStateProvider;
 
-        public AuthenticationService(HttpClient httpClient, AuthenticationStateProvider authStateProvider, ILocalStorageService localStorage, IHttpContextAccessor httpContextAccessor)
+        private readonly Histogram<double> _authLoginCallDurationHistogram;
+
+        public AuthenticationService(HttpClient httpClient, AuthenticationStateProvider authStateProvider,
+            ILocalStorageService localStorage, IHttpContextAccessor httpContextAccessor, Instrumentation instrumentation)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClient;
             _authStateProvider = authStateProvider;
+
+            this._authLoginCallDurationHistogram = instrumentation.AuthLoginCallDurationHistogram;
         }
 
         public async Task<BaseResponse<Tuple<bool, List<string>, TokenModel>>> Login(LogInModel user)
@@ -52,8 +60,14 @@ namespace Backoffice.Web.Services
             user.Country = _httpContextAccessor?.HttpContext?.Request.Headers["CF-IPCountry"].FirstOrDefault() ?? "";
             user.UserAgent = userAgent;
 
+            Stopwatch? duration = _authLoginCallDurationHistogram.Enabled ? Stopwatch.StartNew() : null;
+
             var bodyContent = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync("api/authentication/login", bodyContent);
+
+            if (duration != null)
+                _authLoginCallDurationHistogram.Record(duration.Elapsed.TotalMilliseconds);
+
 
             if (response.StatusCode == HttpStatusCode.OK)
             {

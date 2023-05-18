@@ -25,6 +25,7 @@ namespace Backoffice.Web.Services
         private readonly ActivitySource _activitySource;
         private readonly Counter<long> _getTableauUrlSuccessCounter;
         private readonly Counter<long> _getTableauUrlFailureCounter;
+        private readonly Histogram<double> _tableauTrustedCallDurationHistogram;
         #endregion
 
         #region Ctor
@@ -38,6 +39,7 @@ namespace Backoffice.Web.Services
             this._activitySource = instrumentation.ActivitySource;
             this._getTableauUrlSuccessCounter = instrumentation.GetTableauUrlSuccessCounter;
             this._getTableauUrlFailureCounter = instrumentation.GetTableauUrlFailureCounter;
+            this._tableauTrustedCallDurationHistogram = instrumentation.TableauTrustedCallDurationHistogram;
         }
         #endregion
 
@@ -48,7 +50,13 @@ namespace Backoffice.Web.Services
 
             try
             {
+                Stopwatch? duration = _tableauTrustedCallDurationHistogram.Enabled ? Stopwatch.StartNew() : null;
+
                 var response = await _httpClient.PostAsync($"trusted?username={_configuration["Tableau:UserName"]}&target_site={_configuration["Tableau:SiteId"]}", null);
+
+                if (duration != null)
+                  _tableauTrustedCallDurationHistogram.Record(duration.Elapsed.TotalMilliseconds,
+                      new KeyValuePair<string, object?>("report", reportName));
 
                 var ticket = await response.Content.ReadAsStringAsync();
 
