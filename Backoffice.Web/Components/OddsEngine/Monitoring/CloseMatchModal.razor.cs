@@ -48,15 +48,13 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
             var result = await BackOfficeService.DeactivateFixtureMarkets(request);
 
-            if (result.Result)
+            await Modal.OnSaveClickCallback.InvokeAsync(new DeactivateFixtureCallbackModel
             {
-                await Modal.OnSaveClickCallback.InvokeAsync(true);
+                Result = result.Result,
+                FixtureName = Fixture.FixtureName
+            });
 
-                ModalService.Cancel();
-
-                IsPreload = false;
-
-            }
+            ModalService.Cancel();
 
             IsPreload = false;
         }

@@ -46,6 +46,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public bool IsPreloader { get; set; }
         public bool PassParametersToModel { get; set; }
+        public string AlertMessage { get; set; }
+        public AlertStatus AlertStatus { get; set; }
 
         #endregion
 
@@ -171,9 +173,22 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnSaveClickedEvent(object param)
         {
-            if(Convert.ToBoolean(param))
+            var model = (DeactivateFixtureCallbackModel)param;
+
+            if(model != null)
             {
-                await OnInitEvent();
+                if (model.Result)
+                {
+                    await OnInitEvent();
+
+                    AlertMessage = $"{model.FixtureName} has been successfully closed.";
+                    AlertStatus = AlertStatus.Success;
+                }
+                else
+                {
+                    AlertMessage = $"{model.FixtureName} is NOT closed successfully.";
+                    AlertStatus = AlertStatus.Error;
+                }
             }
         }
 
