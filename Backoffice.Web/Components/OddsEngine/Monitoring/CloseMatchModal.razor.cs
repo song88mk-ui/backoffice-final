@@ -40,60 +40,22 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         {
             IsPreload = true;
 
-            var marketFixtureResponse = await BackOfficeService.GetMarketFixtureDetails(Fixture.ProviderFixtureId);
-
-            if (marketFixtureResponse.StatusCode == StatusCode.Success)
+            var request = new DeactivateFixtureMarketRequest
             {
-                var newFixture = marketFixtureResponse.Result.Fixture;
+                ProviderFixtureId = Fixture.ProviderFixtureId,
+                Raw = string.Empty,
+            };
 
-                var markets = new List<DeactivateFixtureMarketRequest.MarketMessage>();
+            var result = await BackOfficeService.DeactivateFixtureMarkets(request);
 
-                if(newFixture.Markets.Any())
-                {
-                    foreach(var market in newFixture.Markets)
-                    {
-                        if (market.Selections.Count == 0)
-                            continue;
+            if (result.Result)
+            {
+                await Modal.OnSaveClickCallback.InvokeAsync(true);
 
-                        markets.Add(new DeactivateFixtureMarketRequest.MarketMessage
-                        {
-                            MarketTemplateId = market.MarketTemplateId,
-                            MarketName = market.MarketName,
-                            MarketTemplateName = market.MarketName,
-                            MarketSpecifier = market.MarketSpecifier,
-                            Line = market.Line,
-                            MarketStatusId = market.MarketStatusId == (int)MarketStatus.Active ? (int)MarketStatus.Inactive : market.MarketStatusId,
-                            Selections = market.Selections.Select(s => new DeactivateFixtureMarketRequest.SelectionMessage
-                            {
-                                IsActive = false,
-                                SelectionName = s.SelectionName,
-                                SelectionTemplateId = s.SelectionTemplateId,
-                                SelectionSpecifier = s.SelectionSpecifier
-                            }).ToList()
-                        });
-                    }
-                }
+                ModalService.Cancel();
 
-                var request = new DeactivateFixtureMarketRequest
-                {
-                    ProviderFixtureId = Fixture.ProviderFixtureId,
-                    SportId = newFixture.SportId,
-                    SportName = newFixture.SportName,
-                    Raw = JsonSerializer.Serialize(newFixture),
-                    Markets = markets
-                };
+                IsPreload = false;
 
-                var result = await BackOfficeService.DeactivateFixtureMarkets(request);
-
-                if(result.Result)
-                {
-                    await Modal.OnSaveClickCallback.InvokeAsync();
-
-                    ModalService.Cancel();
-
-                    IsPreload = false;
-
-                }
             }
 
             IsPreload = false;
