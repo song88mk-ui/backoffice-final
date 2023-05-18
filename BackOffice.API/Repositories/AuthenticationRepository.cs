@@ -25,6 +25,9 @@ namespace Backoffice.API.Repositories
         {
             try
             {
+                if (!_httpClient.DefaultRequestHeaders.Contains("x-version"))
+                    _httpClient.DefaultRequestHeaders.Add("x-version", _boVersion);
+
                 var response = await _httpClient.PostAsync($"v1/login", new StringContent(JsonSerializer.Serialize(loginModel), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
