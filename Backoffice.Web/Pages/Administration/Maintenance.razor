@@ -40,6 +40,6 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@AdminPermission.Admin_Maintenance.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>

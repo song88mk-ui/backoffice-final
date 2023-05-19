@@ -92,6 +92,6 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@AdminPermission.Admin_ManageUsers.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>

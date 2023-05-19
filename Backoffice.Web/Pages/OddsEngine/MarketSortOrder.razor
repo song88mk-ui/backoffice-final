@@ -76,6 +76,6 @@
         <CustomModal OnSaveClickCallback="OnSaveCopyClickEvent" OnCancelClickCallback="OnModalDiscardChanges" />
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@SportsbookClientPermission.SBC_OE_MarketSetting_SortOrder.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>

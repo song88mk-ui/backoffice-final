@@ -1,15 +1,21 @@
 ﻿@page "/admin/dashboard"
-
-<div class="row">
-    <div class="main-content col-md-12 mb-4 pb-3">
+<AuthorizeView Policy="sbc-dashboard">
+    <Authorized>
         <div class="row">
-            <div class="col-md-12">
-                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+            <div class="main-content col-md-12 mb-4 pb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+                    </div>
+                    @if (!string.IsNullOrEmpty(IFrameSrc))
+                    {
+                        <iframe class="tableau-iframe" src="@IFrameSrc"></iframe>
+                    }
+                </div>
             </div>
-            @if (!string.IsNullOrEmpty(IFrameSrc))
-            {
-                <iframe class="tableau-iframe" src="@IFrameSrc"></iframe>
-            }
         </div>
-    </div>
-</div>
+    </Authorized>
+    <NotAuthorized>
+        <RedirectToPage FromPage="@AdminPermission.Admin_Dashboard.ToString().Replace('_', '.')" />
+    </NotAuthorized>
+</AuthorizeView>

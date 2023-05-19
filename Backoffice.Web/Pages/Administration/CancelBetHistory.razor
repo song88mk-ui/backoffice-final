@@ -105,6 +105,6 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@AdminPermission.Admin_CancelBetsHistory.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>

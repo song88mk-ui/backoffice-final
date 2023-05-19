@@ -89,6 +89,6 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@AdminPermission.Admin_Settlements_ResendSettlement.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>

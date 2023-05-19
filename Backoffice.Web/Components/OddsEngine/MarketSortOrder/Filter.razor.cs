@@ -209,7 +209,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         private async Task PrepareMarketSortOrderModel()
         {
-            if (SelectedClientCode != "NA" && SelectedSportId != 0)
+            if (!string.IsNullOrEmpty(SelectedClientCode) &&  SelectedClientCode != "NA" && SelectedSportId != 0)
             {
                 var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId)).Result;
                 var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId)).Result;
