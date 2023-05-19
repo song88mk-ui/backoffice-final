@@ -3,7 +3,14 @@
 {
     <div>
         <div class=@($"alert {(AlertStatus.Contains("Success") ? "alert-success" : AlertStatus.Contains("Error") || AlertStatus.Contains("Danger") ? "alert-danger" : "alert-primary")} text-left") role="alert" style="@(Opacity == 0 ? $"display: none; opacity: {Opacity}" : $"display: block; opacity: {Opacity}")">
-            @AlertMessageStr
+            @if (IsHtmlMessage)
+            {
+                @((MarkupString)AlertMessageStr)
+            }
+            else
+            {
+                @AlertMessageStr
+            }
         </div>
     </div>
 
@@ -17,6 +24,7 @@
     [Parameter] public string AlertMessageStr { get; set; }
     [Parameter] public bool AlwaysShow { get; set; } = false;    
     [Parameter] public Guid Guid { get; set; }
+    [Parameter] public bool IsHtmlMessage { get; set; } = false;
 
     #region Methods
     protected override async Task OnParametersSetAsync()

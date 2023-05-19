@@ -22,10 +22,12 @@ namespace Backoffice.Web.Pages.Administration
         public PermissionResponse Permissions { get; set; }
         public ManageUserFilterModel FilterModel { get; set; } = new ManageUserFilterModel();
         public List<UserResponse> UserList { get; set; }
+        public List<AlertModel> Alerts { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
+        public decimal Opacity { get; set; }
 
         #endregion
 
@@ -36,6 +38,7 @@ namespace Backoffice.Web.Pages.Administration
             IsPreLoader = true;
             PageTitle = "Manage User";
             IconClass = "ico ico-manage-user";
+            Opacity = 0m;
 
             MetaData = new MetaData()
             {
@@ -46,6 +49,7 @@ namespace Backoffice.Web.Pages.Administration
             };
 
             UserList = new List<UserResponse>();
+            Alerts = new List<AlertModel>();
 
             await AuthenticateAccess.InvokeAsync();
 
@@ -110,10 +114,32 @@ namespace Backoffice.Web.Pages.Administration
             ModalService.Open<ViewUserLogModal>("View Logs", parameters, options);
         }
 
-        public async Task OnSaveClickEvent()
+        public async Task OnSaveClickEvent(object item)
         {
+            var itemCasted = item as Tuple<UserRegisterRequest, bool>;
             //IsPreLoader = true;
             //StateHasChanged();
+
+            Opacity = Opacity == 1m ? 0.99m : 1m;
+
+            string message = string.Empty;
+
+            if (itemCasted.Item2)
+            {
+                message = $"<b>{itemCasted.Item1.UserName}</b> has been successfully created";
+            }
+            else
+            {
+                message = $"<b>{itemCasted.Item1.UserName}</b> has been successfully updated";
+            }
+
+            Alerts.Clear();
+            Alerts.Add(new AlertModel
+            {
+                Status = "Success",
+                Message = message,
+                Opacity = Opacity
+            });
 
             await GetContent();
         }

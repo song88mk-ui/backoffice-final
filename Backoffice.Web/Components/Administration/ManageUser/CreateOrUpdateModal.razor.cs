@@ -279,9 +279,8 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     {
                         await InvokeAsync(StateHasChanged);
                         await Task.Delay(3500);
-
-                        ModalService.Cancel();
-                        await Modal.OnSaveClickCallback.InvokeAsync();
+                        
+                        await Modal.OnSaveClickCallback.InvokeAsync(new Tuple<UserRegisterRequest, bool>(request, false));
                         ModalService.Cancel();
                     }
                     else
@@ -302,10 +301,9 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     {
 
                         await InvokeAsync(StateHasChanged);
-                        await Task.Delay(3500);
-                        ModalService.Cancel();
+                        await Task.Delay(3500);                        
 
-                        await Modal.OnSaveClickCallback.InvokeAsync();
+                        await Modal.OnSaveClickCallback.InvokeAsync(new Tuple<UserRegisterRequest, bool>(request, false));
                         ModalService.Cancel();
                     }
                     else
