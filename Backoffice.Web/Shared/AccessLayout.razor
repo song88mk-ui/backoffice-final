@@ -1,7 +1,10 @@
-﻿@inherits LayoutComponentBase
+﻿@inherits MainLayoutBase
 
-<div class="access-layout">
-    <div class="page">
-        @Body
+
+<CascadingValue Value="AuthenticateAccessEvent" Name="AuthenticateAccessEvent">
+    <div class="access-layout">
+        <div class="page">
+            @Body
+        </div>
     </div>
-</div>
+</CascadingValue>

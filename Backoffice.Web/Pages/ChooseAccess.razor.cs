@@ -14,6 +14,8 @@ namespace Backoffice.Web.Pages
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
         public List<Claim> UserClaims { get; set; }
 
         #endregion
@@ -23,6 +25,8 @@ namespace Backoffice.Web.Pages
         protected override async Task OnInitializedAsync()
         {
             UserClaims = new List<Claim>();
+
+            await AuthenticateAccess.InvokeAsync();
 
             var validClaimValues = new string[] { "1", "2", "0" };
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
