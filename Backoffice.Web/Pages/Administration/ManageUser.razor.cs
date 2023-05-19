@@ -67,7 +67,7 @@ namespace Backoffice.Web.Pages.Administration
             parameters.Add("Permissions", Permissions);
             parameters.Add("IsEdit", false);
             parameters.Add("UserModel", new UserRegisterModel());
-            parameters.Add("DialogStyle", "max-width: 65rem;");
+            parameters.Add("DialogStyle", "max-width: 65rem;");            
 
             var options = new ModalOptions();
 
