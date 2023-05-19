@@ -103,6 +103,6 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@SportsbookClientPermission.SBC_Settings_ParlayBonus.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>

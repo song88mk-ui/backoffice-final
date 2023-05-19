@@ -102,6 +102,6 @@
         <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>

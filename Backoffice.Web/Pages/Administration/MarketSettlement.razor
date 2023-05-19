@@ -119,6 +119,6 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>

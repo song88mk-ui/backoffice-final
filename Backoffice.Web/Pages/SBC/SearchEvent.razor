@@ -17,6 +17,6 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@SportsbookClientPermission.SBC_Reports_SearchEvent.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>

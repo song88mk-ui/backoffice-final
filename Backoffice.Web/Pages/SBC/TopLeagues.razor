@@ -114,6 +114,6 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@SportsbookClientPermission.SBC_Settings_TopLeagues.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>

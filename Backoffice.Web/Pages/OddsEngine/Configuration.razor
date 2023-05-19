@@ -130,6 +130,6 @@
         <CustomModal />
     </Authorized>
     <NotAuthorized>
-        <AccessDenied />
+        <RedirectToPage FromPage="@SportsbookClientPermission.SBC_OE_Config.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>
