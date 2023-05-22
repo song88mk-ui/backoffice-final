@@ -77,6 +77,10 @@ namespace Backoffice.Web.Services
                 this._getTableauUrlFailureCounter.Add(1);
                 return string.Empty;
             }
+            finally
+            {
+              activity?.Stop();
+            }
         }
         #endregion
 

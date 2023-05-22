@@ -68,6 +68,9 @@ namespace Backoffice.API.Repositories
                     }
                 };
             }
+            finally {
+              activity?.Stop();
+            }
         }
 
         #region Utilities
