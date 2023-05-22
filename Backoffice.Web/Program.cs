@@ -168,6 +168,8 @@ builder.Services.AddAuthorization(options =>
     #endregion
 
     #region ADMIN
+    options.AddPolicy("admin-dashboard", policy => policy.RequireClaim($"{AdminPermission.Admin_Dashboard.ToString().Replace('_', '.')}",
+        $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("admin-users", policy => policy.RequireClaim($"{AdminPermission.Admin_ManageUsers.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("admin-usergroups", policy => policy.RequireClaim($"{AdminPermission.Admin_ManageUserGroups.ToString().Replace('_', '.')}",
