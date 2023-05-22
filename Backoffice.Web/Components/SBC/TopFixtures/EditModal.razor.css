@@ -91,3 +91,8 @@ ul {
     overflow-y: auto;
     max-height: 40vh;
 }
+
+.disabled {
+    pointer-events: none;
+    color: gray !important;
+}

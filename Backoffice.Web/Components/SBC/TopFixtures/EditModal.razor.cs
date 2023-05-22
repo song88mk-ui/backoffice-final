@@ -31,6 +31,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
         public int SelectedRow { get; set; }
         public int CurrentIndex { get; set; }
         public string TableClass { get; set; }
+        public bool IsDisabled { get; set; }
 
         #endregion
 
@@ -130,18 +131,25 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
         }
 
         public async Task OnAddClickEvent(int count)
-        {
+        {            
             NewTopFixture.TopFixtures.Insert(count, new ClientTopFixtureModel.TopFixture
             {
                 SortOrder = count + 1
             });
 
+            IsDisabled = NewTopFixture.TopFixtures.Any() && NewTopFixture.TopFixtures.Count >= 100 ? true : false;
+            
             SortOrderRow();
         }
 
         public async Task OnDeleteRow(ClientTopFixtureModel.TopFixture fixture)
         {
             NewTopFixture.TopFixtures.Remove(fixture);
+
+            if (NewTopFixture.TopFixtures.Any() && NewTopFixture.TopFixtures.Count < 100)
+            {
+                IsDisabled = false;
+            }
 
             if (NewTopFixture.TopFixtures.Count == 0)
                 NewTopFixture.TopFixtures.Add(new ClientTopFixtureModel.TopFixture() { SortOrder = 1 });
