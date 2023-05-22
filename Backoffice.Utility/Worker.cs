@@ -3,13 +3,18 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Utility.Repository;
+using Backoffice.Utility.Telemetry;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using OpenTelemetry;
+using OpenTelemetry.Context.Propagation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
@@ -26,11 +31,15 @@ namespace Backoffice.Utility
         private readonly IMessageBroker _messageBroker;
         private readonly IBackofficeRepository _backofficeRepository;
 
-        public Worker(ILogger<Worker> logger, IMessageBroker messageBroker, IBackofficeRepository backofficeRepository)
+        private readonly ActivitySource _activitySource;
+        private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
+
+        public Worker(ILogger<Worker> logger, IMessageBroker messageBroker, IBackofficeRepository backofficeRepository, Instrumentation instrumentation)
         {
             _logger = logger;
             _messageBroker = messageBroker;
             _backofficeRepository = backofficeRepository;
+            _activitySource = instrumentation.ActivitySource;
         }
         public override Task StartAsync(CancellationToken cancellationToken)
         {
@@ -56,8 +65,20 @@ namespace Backoffice.Utility
             var messageType = e.BasicProperties.Type;
             var correlationId = e.BasicProperties.CorrelationId;
 
+            var parentContext = Propagator.Extract(default, e.BasicProperties, this.ExtractTraceContextFromBasicProperties);
+            Baggage.Current = parentContext.Baggage;
+
+            var activityName = $"{e.RoutingKey} receive";
+
+            using var activity = this._activitySource.StartActivity(activityName, ActivityKind.Consumer, parentContext.ActivityContext);
             try
             {
+
+                activity?.SetTag("messaging.system", "rabbitmq");
+                activity?.SetTag("messaging.destination_kind", "queue");
+                activity?.SetTag("messaging.rabbitmq.routing_key", e.RoutingKey);
+                activity?.SetTag("messaging.rabbitmq.message_type", messageType);
+
                 switch (messageType)
                 {
                     case "LogActivity":
@@ -91,6 +112,27 @@ namespace Backoffice.Utility
                 _logger.LogError($"Error: {ex.Message}");
 
             }
+            finally
+            {
+              activity?.Stop();
+            }
+        }
+
+        private IEnumerable<string> ExtractTraceContextFromBasicProperties(IBasicProperties props, string key)
+        {
+          try
+          {
+            if (props.Headers.TryGetValue(key, out var value))
+            {
+              var bytes = value as byte[];
+              return new[] {  Encoding.UTF8.GetString(bytes) };
+            }
+          }
+          catch (Exception ex)
+          {
+            _logger.LogError($"Failed to extract properites: {ex.Message}");
+          }
+          return Enumerable.Empty<string>();
         }
     }
 }
