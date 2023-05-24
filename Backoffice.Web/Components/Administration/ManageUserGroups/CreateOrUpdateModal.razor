@@ -33,9 +33,9 @@
             </div>
         </div>
     </div>
-    <Permission IsReadOnly="IsPreload" Permissions="Permissions.Permissions" ClientModel="ClientModel" />
+    <Permission IsReadOnly="IsPreload" Permissions="Permissions.Permissions" ClientModel="ClientModel" IsClientEmptyCallback="IsEmptyClientCallback" />
 </div>
 <div class="modal-footer mx-4">
     <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
-    <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Save</button>
+    <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@(IsPreload || IsClientEmpty)">Save</button>
 </div>

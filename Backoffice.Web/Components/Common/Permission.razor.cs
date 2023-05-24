@@ -16,13 +16,17 @@ namespace Backoffice.Web.Components.Common
     {
         #region Properties
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
+
         [Parameter] public List<PermissionModel> Permissions { get; set; }
         [Parameter] public ClientModel ClientModel { get; set; }
         [Parameter] public bool IsReadOnly { get; set; }
         [Parameter] public bool IsSubUser { get; set; }
+        [Parameter] public EventCallback<bool> IsClientEmptyCallback { get; set; }
+
         public PermissionTreeModel PermissionTree { get; set; }
         public List<string> SelectedClients { get; set; }
         public int SelectedCategoryId { get; set; }
+        public List<SelectListItemWithCheckboxModel<string>> SelectItems { get; set; }
 
         #endregion
 
@@ -127,6 +131,15 @@ namespace Backoffice.Web.Components.Common
             if (permission != null)
             {
                 permission.ClaimValue = SelectedClients.Any() ? string.Join(",", SelectedClients) : string.Empty;
+
+                if (string.IsNullOrEmpty(permission.ClaimValue))
+                {
+                    await IsClientEmptyCallback.InvokeAsync(true);
+                }
+                else
+                {
+                    await IsClientEmptyCallback.InvokeAsync(false);
+                }
             }
         }
 
@@ -147,6 +160,22 @@ namespace Backoffice.Web.Components.Common
 
             SelectedCategoryId = PermissionTree.Permissions.FirstOrDefault().CategoryId;
 
+            SelectItems = new List<SelectListItemWithCheckboxModel<string>>();
+
+            SelectItems = ClientModel.Clients.Select( x => new SelectListItemWithCheckboxModel<string>()
+                                                        {
+                                                            Name = x.ClientName,
+                                                            Value = x.ClientCode,
+                                                            IsChecked = SelectedClients.Contains(x.ClientCode)
+                                                        }).ToList();
+
+            SelectItems.Insert(0, new SelectListItemWithCheckboxModel<string>()
+            {
+                Name = "Select All Clients",
+                Value = "all",
+                IsChecked = ClientModel.Clients.Count == SelectedClients.Count ? true : false
+            });
+            
             foreach (var category in PermissionTree.Permissions)
             {
                 if (category.SubCategories.Any(s => s.Claims.Any(c => c.ClaimValue != "0")))

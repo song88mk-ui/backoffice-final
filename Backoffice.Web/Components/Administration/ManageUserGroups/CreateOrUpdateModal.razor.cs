@@ -34,6 +34,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         public bool IsEdit { get; set; }
         public decimal Opacity { get; set; }
         public bool IsPreload { get; set; }
+        public bool IsClientEmpty { get; set; }
 
         #endregion
 
@@ -137,7 +138,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 var newClaims = new List<ClaimModel>();
 
                 foreach (var permission in Permissions.Permissions)
-                {
+                {                    
                     if (string.IsNullOrEmpty(permission.ClaimValue))
                         permission.ClaimValue = "0";
 
@@ -199,6 +200,11 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
             }
 
             IsPreload = false; 
+        }
+
+        public async Task IsEmptyClientCallback(bool isEmpty)
+        {
+            IsClientEmpty = isEmpty;
         }
 
 

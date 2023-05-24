@@ -79,13 +79,7 @@
                                                         </button>
                                                         @if (ClientModel.Clients.Any())
                                                         {
-                                                            <SelectWithCheckbox Items="ClientModel.Clients.Select(
-                                                        x => new SelectListItemWithCheckboxModel<string>()
-                                                        {
-                                                            Name = x.ClientName,
-                                                            Value = x.ClientCode,
-                                                            IsChecked = SelectedClients.Contains(x.ClientCode)
-                                                        }).ToList()" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="clientDropdown" IsReadOnly="@IsReadOnly" />
+                                                            <SelectWithCheckbox Items="SelectItems" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="clientDropdown" IsReadOnly="@IsReadOnly" />
                                                         }
                                                     }
                                                 </div>
