@@ -225,7 +225,7 @@ namespace Backoffice.Web.Pages.SBC
                     {
                         hasDashboard = true;
                         subUserClaim.ClaimValue = "1";
-                        subUserClaim.IsEnabled = false;
+                        subUserClaim.IsEnabled = true;
                     }
                     else
                     {
