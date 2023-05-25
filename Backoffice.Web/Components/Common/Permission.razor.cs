@@ -238,7 +238,7 @@ namespace Backoffice.Web.Components.Common
                     {
                         foreach (var subCategory in subcategories)
                         {
-                            if (!subCategory.Claims.Where(x => x.IsEnabled).Any())
+                            if (!subCategory.Claims.Where(x => x.IsEnabled).Any() && IsSubUser)
                                 continue;
 
                             var claims = Permissions.Where(p => p.CategoryId == permission.CategoryId && p.SubCategoryName == subCategory.SubCategoryName

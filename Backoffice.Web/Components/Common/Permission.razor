@@ -116,6 +116,10 @@
                                                                 {
                                                                     <PermissionRow Claim="@claim" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
                                                                 }
+                                                                else if (!IsSubUser)
+                                                                {
+                                                                    <PermissionRow Claim="@claim" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
+                                                                }
                                                             }
                                                         }
                                                         else
