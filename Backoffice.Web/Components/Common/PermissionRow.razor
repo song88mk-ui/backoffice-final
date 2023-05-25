@@ -1,16 +1,16 @@
 ﻿<div class="form-switch mb-2">
-    @if (Claim.Name.Contains("readonly", StringComparison.OrdinalIgnoreCase) && Claim.ClaimValue == "2")
-    {
-        <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked disabled="@IsReadOnly">
-    }
-    else if (Claim.ClaimValue == "1")
-    {
-        <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@IsReadOnly">
-    }
-    else
-    {
-        <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@IsReadOnly">
-    }
+        @if (Claim.Name.Contains("readonly", StringComparison.OrdinalIgnoreCase) && Claim.ClaimValue == "2")
+        {
+            <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked disabled="@IsReadOnly">
+        }
+        else if (Claim.ClaimValue == "1")
+        {
+            <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@IsReadOnly">
+        }
+        else
+        {
+            <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@IsReadOnly">
+        }
     <label class="form-check-label" for="@Claim.ClaimType">@Claim.Name</label>
 
 </div>
@@ -42,7 +42,7 @@
                 @for (int ctr = 0; ctr < @group.Claims.Count; ctr++)
                 {
                     var claim = @group.Claims[ctr];
-                    
+
                     <PermissionRow Claim="@claim" IsReadOnly="@IsReadOnly" Permissions="@Permissions" />
                 }
             </div>

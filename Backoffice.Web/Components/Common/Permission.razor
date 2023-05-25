@@ -100,7 +100,7 @@
                                         <div class="w-50 noselect">
                                             @for (int rowCount = 0; rowCount < maxRow; rowCount++)
                                             {
-                                                if (category.SubCategories[rowCount].ColPosition != "RIGHT" )
+                                                if (category.SubCategories[rowCount].ColPosition != "RIGHT")
                                                 {
                                                     <div class="category mb-3">
                                                         <div class="category-title fw-bold mb-1">@category.SubCategories[rowCount].SubCategoryName</div>
@@ -112,7 +112,10 @@
                                                                 var claim = @category.SubCategories[rowCount].Claims[ctr];
                                                                 var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
 
-                                                                <PermissionRow Claim="@claim" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
+                                                                if (IsSubUser && claim.IsEnabled)
+                                                                {
+                                                                    <PermissionRow Claim="@claim" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
+                                                                }
                                                             }
                                                         }
                                                         else
@@ -121,7 +124,10 @@
                                                             var groups = @category.SubCategories[rowCount].Groups;
                                                             var isReadOnly = IsReadOnly || !category.IsEnabled || (IsSubUser && !claim.IsEnabled);
 
-                                                            <PermissionRow Claim="@claim" Groups="@groups" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
+                                                            if (IsSubUser && claim.IsEnabled)
+                                                            {
+                                                                <PermissionRow Claim="@claim" Groups="@groups" IsReadOnly="@isReadOnly" Permissions="@Permissions" />
+                                                            }
                                                         }
                                                     </div>
                                                 }

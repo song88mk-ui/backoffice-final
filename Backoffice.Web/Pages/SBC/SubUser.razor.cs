@@ -218,7 +218,7 @@ namespace Backoffice.Web.Pages.SBC
                         ClaimType = permission.ClaimType,
                         HasReadOnly = permission.HasReadOnly,
                         ClaimValue = "0",
-                        IsEnabled = true
+                        IsEnabled = UserModel.Claims.Where(x => x.Type == permission.ClaimType).Any()
                     };
 
                     if (permission.Name.ToLower() == "dashboard")
@@ -229,7 +229,6 @@ namespace Backoffice.Web.Pages.SBC
                     }
                     else
                     {
-
                         var claim = UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType);
                         if (claim != null && Convert.ToInt32(claim.Value) > 0)
                         {
@@ -283,7 +282,8 @@ namespace Backoffice.Web.Pages.SBC
                 foreach (var claim in claims.Where(x => x.ClaimValue != "0"))
                 {
                     var permission = PermissionResponse.Permissions.FirstOrDefault(p => p.ClaimType.ToLower() == claim.ClaimType.ToLower());
-                    if (permission != null)
+
+                    if (permission != null && UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType) != null)
                     {
                         claimsList = claimsList + (string.IsNullOrEmpty(claimsList) ? string.Empty : ", ") + $"{permission.Name}" + (claim.ClaimValue == "2" ? " (ReadOnly)" : string.Empty);
                     }

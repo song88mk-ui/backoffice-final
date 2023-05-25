@@ -221,6 +221,16 @@ namespace Backoffice.Web.Components.Common
                     var subcategories = Permissions.Where(p => p.CategoryId == permission.CategoryId)
                         .GroupBy(p => p.SubCategoryName).Select(s => new PermissionTreeModel.SubCategory
                         {
+                            Claims = Permissions.Where(x => x.SubCategoryName == s.Key).Select(x => new PermissionClaim()
+                            {
+                                Name = x.Name,
+                                ClaimType = x.ClaimType,
+                                IsSubUser = x.IsSubUser,
+                                HasReadOnly = x.HasReadOnly,
+                                SortOrder = x.SortOrder,
+                                ClaimValue = x.ClaimValue,
+                                IsEnabled = x.IsEnabled
+                            }).ToList(),
                             SubCategoryName = s.Key,
                         }).Distinct().ToList();
 
@@ -228,6 +238,9 @@ namespace Backoffice.Web.Components.Common
                     {
                         foreach (var subCategory in subcategories)
                         {
+                            if (!subCategory.Claims.Where(x => x.IsEnabled).Any())
+                                continue;
+
                             var claims = Permissions.Where(p => p.CategoryId == permission.CategoryId && p.SubCategoryName == subCategory.SubCategoryName
                                 && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", ".") && string.IsNullOrEmpty(p.GroupName)).OrderBy(o => o.SortOrder)
                                 .GroupBy(p => p.ClaimType).Select(s => new PermissionTreeModel.PermissionClaim
