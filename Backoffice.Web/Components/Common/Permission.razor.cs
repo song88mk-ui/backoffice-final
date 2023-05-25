@@ -51,6 +51,15 @@ namespace Backoffice.Web.Components.Common
         {
             category.IsEnabled = !category.IsEnabled;
 
+            if (SelectItems.Where(x => !x.IsChecked).Count() == SelectItems.Count())
+            {
+                await IsClientEmptyCallback.InvokeAsync(true);
+            }
+            else
+            {
+                await IsClientEmptyCallback.InvokeAsync(false);
+            }
+
             if (category.IsEnabled == false)
             {
                 await OnDisableClickEvent(category);
@@ -175,11 +184,24 @@ namespace Backoffice.Web.Components.Common
                 Value = "all",
                 IsChecked = ClientModel.Clients.Count == SelectedClients.Count ? true : false
             });
-            
+
             foreach (var category in PermissionTree.Permissions)
             {
                 if (category.SubCategories.Any(s => s.Claims.Any(c => c.ClaimValue != "0")))
                     category.IsEnabled = true;
+            }
+
+            var permission = Permissions.FirstOrDefault(permission => permission.ClaimType == SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."));
+            if (permission != null)
+            {
+                if (SelectItems.Where(x => !x.IsChecked).Count() == SelectItems.Count())
+                {
+                    await IsClientEmptyCallback.InvokeAsync(true);
+                }
+                else
+                {
+                    await IsClientEmptyCallback.InvokeAsync(false);
+                }
             }
         }
         private async Task<PermissionTreeModel> GetPermissionTree()
