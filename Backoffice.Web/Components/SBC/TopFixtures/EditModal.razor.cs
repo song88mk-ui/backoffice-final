@@ -45,6 +45,8 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
             TopFixture = ModalParameters.TryGet<ClientTopFixtureModel.OrderedClientTopFixture>("TopFixture");
 
             CurrentTopFixtures = TopFixture.TopFixtures.Any() ? TopFixture.TopFixtures.Select(s => s.FixtureId).ToList() : new List<string>();
+
+            IsDisabled = CurrentTopFixtures.Count() >= 100;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
