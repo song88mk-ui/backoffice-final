@@ -391,7 +391,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
             if (!IsEdit)
             {
-                UserRegister.RoleId = UserGroupList != null ? UserGroupList.FirstOrDefault().UserGroupId : "";
+                UserRegister.RoleId = UserGroupList != null ? UserGroupList.FirstOrDefault(x => x.UserGroupName == "Default").UserGroupId : "";
                 UserRegister.RoleName = UserGroupList.Where(x => x.UserGroupId == UserRegister.RoleId).FirstOrDefault().UserGroupName;
             }
 

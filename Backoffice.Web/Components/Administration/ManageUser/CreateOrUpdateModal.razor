@@ -51,21 +51,7 @@
                         {
                             @foreach (var userGroup in UserGroupList)
                             {
-                                if (!IsEdit)
-                                {
-                                    if (userGroup.UserGroupName == "Default")
-                                    {
-                                        <option value="@userGroup.UserGroupId" selected>@userGroup.UserGroupName</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@userGroup.UserGroupId">@userGroup.UserGroupName</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="@userGroup.UserGroupId" selected="@(UserRegister.RoleId == userGroup.UserGroupId)">@userGroup.UserGroupName</option>
-                                }                                
+                                <option value="@userGroup.UserGroupId" selected="@(UserRegister.RoleId == userGroup.UserGroupId)">@userGroup.UserGroupName</option>
                             }
                         }
                     </select>
