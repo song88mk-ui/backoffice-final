@@ -17,6 +17,11 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs);
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
+        #region Config
+        Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string userId);
+        Task<BaseResponse<List<ConfigTemplateModel>>> AddOrUpdateConfigTemplate(string userId, ConfigTemplateModel request);
+        Task<BaseResponse<List<ConfigClientModel>>> GetConfigClient(string userId, List<string> clientCodes, bool isAssigned);
+        #endregion
 
         #region TOP FIXTURES
         Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);

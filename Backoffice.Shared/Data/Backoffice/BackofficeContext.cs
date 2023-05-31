@@ -16,6 +16,7 @@ namespace Backoffice.Shared.Data.Backoffice
         public DbSet<ClientInformation> ClientInformation { get; set; }
 
         public DbSet<ClientBetSetting> ClientBetSetting { get; set; }
+        public DbSet<ConfigTemplate> ConfigTemplates { get; set; }
         public DbSet<ActivityLog> ActivityLog { get; set; }
         // Stored Procedure
         public DbSet<ActivityLog> ReadActivityLog { get; set; }

@@ -2,6 +2,7 @@
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Backoffice.API.Controllers.Trading
 {
     [Authorize]
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class TradingController : ControllerBase
     {
         // Include "x-region" in request Header
@@ -341,6 +342,21 @@ namespace Backoffice.API.Controllers.Trading
         }
         [HttpPost("client/config/all")]
         public async Task<IActionResult> GetClientConfig([FromBody] ClientConfigRequest request)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+
+            var result = await _tradingRepository.GetClientConfig(request, region);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("client/config")]
+        public async Task<IActionResult> GetClientConfigv2([FromBody] ClientConfigRequestv2 request)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 

@@ -15,6 +15,7 @@ namespace Backoffice.API.Repositories
         #region Client
         Task<BaseResponse<List<ClientInformationModel>>> GetClientList(string region);
         Task<BaseResponse<ConfigModel>> GetClientConfig(ClientConfigRequest request, string region);
+        Task<BaseResponse<ConfigModel>> GetClientConfigv2(ClientConfigRequestv2 request, string region);
         Task<BaseResponse<ClientConfigResponse>> AddOrUpdateConfig(ConfigSettingsModel request, string region);
         Task<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>> GetConfigLogs(ConfigLogsRequest request, string region);
         Task<BaseResponse<List<ClientLeagueConfig>>> GetClientLeagueConfig(string clientCode, string region);
