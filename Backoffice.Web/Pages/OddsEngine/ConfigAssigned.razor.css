@@ -1,4 +1,8 @@
-﻿.filter-div {
+﻿﻿.page-title {
+    font-weight: bold;
+}
+
+.filter-div {
     gap: 2rem;
     flex-basis: 45%;
 }

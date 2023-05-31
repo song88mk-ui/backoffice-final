@@ -14,6 +14,7 @@
 
 .filter-div {
     gap: 2rem;
+    flex-basis: 25%;
 }
 
 .btn-create {
