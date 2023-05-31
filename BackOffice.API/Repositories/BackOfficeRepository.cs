@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net.Mail;
 using System.Text.Json;
@@ -213,7 +214,7 @@ namespace Backoffice.API.Repositories
                     }
                 };
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return new BaseResponse<ActivityLogResponse>
                 {
@@ -341,7 +342,7 @@ namespace Backoffice.API.Repositories
             {
                 var query = GetClientInformation().Where(x => (x.ApplicationId == (int)Application2.SBC || x.ApplicationId == (int)Application.Sportsbook));
 
-                if(brands != null)
+                if (brands != null)
                 {
                     query = query.Where(x => brands.Contains(x.Brand));
                 }
@@ -520,7 +521,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request)
+        public async Task<BaseResponse<bool>> AddOrUpdateClient(Client request)
         {
             try
             {
@@ -594,7 +595,7 @@ namespace Backoffice.API.Repositories
                 }
                 catch
                 {
-                    if(request.IsEmailNotification)
+                    if (request.IsEmailNotification)
                     {
                         return new BaseResponse<bool>
                         {
@@ -1339,6 +1340,105 @@ namespace Backoffice.API.Repositories
         }
         #endregion
 
+        #region Config
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string userId)
+        {
+            var query = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId).AsNoTracking().ToList();
+
+            var result = query.Select(x => new ConfigTemplateModel()
+            {
+                Id = x.Id.ToString(),
+                UserId = x.UserId,
+                Name = x.Name,
+                SportId = x.SportId,
+                FixtureStatusId = x.FixtureStatusId,
+                ClientCodes = x.ClientCodes.Split(',').ToList(),
+                LeagueIds = x.LeagueIds.Split(',')
+                        .Select(str => int.Parse(str))
+                        .ToList()
+            }).ToList();
+
+            return new BaseResponse<List<ConfigTemplateModel>>()
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = result
+            };
+        }
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> AddOrUpdateConfigTemplate(string userId, ConfigTemplateModel request)
+        {
+            try
+            {
+                var config = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId && x.Id.ToString() == request.Id).AsNoTracking().FirstOrDefault();
+
+                if (config != null)
+                {
+                    config.ClientCodes = string.Join(',', request.ClientCodes);
+                    config.LeagueIds = string.Join(',', request.LeagueIds);
+
+                    _backofficeContext.ConfigTemplates.Update(config);
+                }
+                else
+                {
+                    _backofficeContext.ConfigTemplates.Add(new ConfigTemplate()
+                    {
+                        Id = Guid.Parse(request.Id),
+                        UserId = request.UserId,
+                        Name = request.Name,
+                        SportId = request.SportId,
+                        FixtureStatusId = request.FixtureStatusId,
+                        ClientCodes = string.Join(',', request.ClientCodes),
+                        LeagueIds = string.Join(',', request.LeagueIds)
+
+                    });
+                }
+
+                return await GetConfigTemplate(userId);
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<ConfigTemplateModel>>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
+            }
+        }
+        public async Task<BaseResponse<List<ConfigClientModel>>> GetConfigClient(string userId, List<string> clientCodes, bool isAssigned)
+        {
+            var result = new List<ConfigClientModel>();
+
+            if(isAssigned)
+            {
+                var templates = await GetConfigTemplate(userId);
+                var clientList = GetClientInformation();
+
+                foreach (var template in templates.Result)
+                {
+                    foreach (var client in template.ClientCodes)
+                    {
+                        foreach(var league in template.LeagueIds)
+                        {
+                            new ConfigClientModel()
+                            {
+                                ClientCode = client.ToUpper(),
+                                ClientName = clientList.Where(x => x.Brand.ToUpper() == client).Select(x => x.Name).FirstOrDefault(),
+                                SportId = template.SportId,
+                                FixtureStatusId = template.FixtureStatusId,
+                                LeagueId = league,
+                                TemplateId = template.Id,
+                                TemplateName = template.Name
+                            };
+                        }
+                    }
+                }
+            }
+
+            return new BaseResponse<List<ConfigClientModel>>()
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = result
+            };
+        }
+        #endregion
+
         #region Methods - Top Fixtures
 
         public async Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request)
@@ -1543,7 +1643,7 @@ namespace Backoffice.API.Repositories
 
             if (callbackModel.Sports != null && callbackModel.Sports.Any())
             {
-                sportIds = string.Join(",", callbackModel.Sports.Select(sport => sport.SportId)).Split(',');                
+                sportIds = string.Join(",", callbackModel.Sports.Select(sport => sport.SportId)).Split(',');
 
                 activityLogs = activityLogs
                 .Where(x => sportIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).Selections.FirstOrDefault().SportId.ToString())).ToList();
@@ -1568,14 +1668,13 @@ namespace Backoffice.API.Repositories
             if (callbackModel.ToBetStatuses != null && callbackModel.ToBetStatuses.Any())
             {
                 toStatusesIds = string.Join(",", callbackModel.ToBetStatuses.Select(status => status.BetStatusId)).Split(',');
-                
+
                 activityLogs = activityLogs
                 .Where(x => toStatusesIds.Contains(JsonSerializer.Deserialize<ManualBetDetails>(x.To).NewBetStatusId.ToString())).ToList();
             }
 
             return activityLogs;
         }
-
         #endregion
     }
 }

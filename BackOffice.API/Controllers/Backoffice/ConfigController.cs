@@ -1,6 +1,5 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
-using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Cors;
@@ -42,6 +41,52 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> GetMaintenance()
         {
             var result = await _maintenanceRepository.GetMaintenance();
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("template")]
+        public async Task<IActionResult> GetClientConfigTemplate()
+        {
+            var userId = HttpContext.Items["UserId"].ToString();
+
+            var result = await _backofficeRepository.GetConfigTemplate(userId);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("template")]
+        public async Task<IActionResult> AddOrUpdateConfigTemplate([FromBody] ConfigTemplateModel request)
+        {
+            var userId = HttpContext.Items["UserId"].ToString();
+
+            var result = await _backofficeRepository.AddOrUpdateConfigTemplate(userId, request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("template/client/{isAssigned}")] // type = assigned / unassigneed
+        public async Task<IActionResult> GetConfigClients([FromRoute] bool isAssigned)
+        {
+            var userId = HttpContext.Items["UserId"].ToString();
+
+            var result = await _backofficeRepository.GetConfigClient(userId, new System.Collections.Generic.List<string>(), isAssigned);
 
             switch (result.StatusCode)
             {
