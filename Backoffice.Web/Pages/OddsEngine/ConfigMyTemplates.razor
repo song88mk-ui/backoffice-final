@@ -1,0 +1,153 @@
+﻿@using Backoffice.Web.Components.OddsEngine.Configuration
+
+@layout OEMonitoringLayout
+
+@*@page "/{Region}/odds-engine/config/my-templates"*@
+@page "/hk/odds-engine/config/my-templates"
+
+<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"></Breadcrumb>
+
+<div class="col-md-12 mb-4">
+    <ConfigNavMenu Region="@Region"></ConfigNavMenu>
+</div>
+
+<div class="col-md-12 mb-4">
+    <div class="d-flex justify-content-between mx-4">
+        <div>
+            <h4 class="page-title">@PageTitle</h4>
+        </div>
+
+        <div>
+            <a class="btn btn-logs" href="#">
+                <i class="fa fa-list">Logs</i>
+            </a>
+        </div>
+    </div>    
+</div>
+
+
+<div class="col-md-12 mb-4">
+    <div class="d-flex justify-content-between mx-4">
+       <div class="d-flex filter-div">
+            <select class="form-select">
+                <option value="1">Basketball</option>
+                <option value="2">Soccer</option>
+                <option value="3">Baseball</option>
+                <option value="4">Tennis</option>
+            </select>
+
+            <select class="form-select">
+                <option value="1">Prematch</option>
+                <option value="2">Live</option>
+            </select>
+       </div>
+
+        <div>
+            <button class="btn btn-create">
+                Create New
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="mx-4">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Template Name</th>
+                    <th scope="col">Sports</th>
+                    <th scope="col">Scope</th>
+                    <th class="text-center" scope="col">Client Assigned</th>
+                    <th class="text-center" scope="col">League Assigned</th>
+                    <th class="text-center" scope="col">Date Created</th>
+                    <th class="text-center" scope="col">Manage</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <th scope="row">Designer Template</th>
+                    <td>Basketball</td>
+                    <td>Live</td>
+                    <td class="text-center">3 Clients</td>
+                    <td class="text-center">5 Leagues</td>
+                    <td class="text-center">@(DateTime.UtcNow)</td>
+                    <td>
+                        <div class="manage-cell">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-edit"></i>
+                            </a>
+
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-trash"></i>
+                            </a>
+
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-file-archive-o"></i>
+                            </a>
+
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-list"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Designer Template</th>
+                    <td>Basketball</td>
+                    <td>Live</td>
+                    <td class="text-center">3 Clients</td>
+                    <td class="text-center">5 Leagues</td>
+                    <td class="text-center">@(DateTime.UtcNow)</td>
+                    <td>
+                        <div class="manage-cell">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-edit"></i>
+                            </a>
+
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-trash"></i>
+                            </a>
+
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-file-archive-o"></i>
+                            </a>
+
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-list"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Designer Template</th>
+                    <td>Basketball</td>
+                    <td>Live</td>
+                    <td class="text-center">3 Clients</td>
+                    <td class="text-center">5 Leagues</td>
+                    <td class="text-center">@(DateTime.UtcNow)</td>
+                    <td>
+                        <div class="manage-cell">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-edit"></i>
+                            </a>
+
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-trash"></i>
+                            </a>
+
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-file-archive-o"></i>
+                            </a>
+
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-list"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>    
+</div>

@@ -1,0 +1,40 @@
+﻿.page-title {
+    font-weight: bold;
+}
+
+.btn-logs {
+    color: black;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.fa-list:before {
+    margin-right: 10px;
+}
+
+.filter-div {    
+    gap: 2rem;
+}
+
+.btn-create {
+    color: white;
+    font-weight: 500;
+    background: transparent linear-gradient(180deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+    border-radius: 2px;
+    opacity: 1;
+}
+
+table thead {
+    color: white;
+    background-color: #354156;
+}
+
+.manage-cell {
+    display:flex;
+    justify-content: space-around;
+}
+
+.manage-cell > a {
+    color: black;
+    text-decoration: none;
+}
