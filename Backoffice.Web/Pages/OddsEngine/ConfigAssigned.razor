@@ -1,0 +1,122 @@
+﻿@using Backoffice.Web.Components.OddsEngine.Configuration
+
+@layout OEMonitoringLayout
+
+@*@page "/{Region}/odds-engine/config/my-templates"*@
+@page "/hk/odds-engine/config/assigned"
+
+<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"></Breadcrumb>
+
+<div class="col-md-12 mb-4">
+    <ConfigNavMenu Region="@Region" CurrentMenu="2"></ConfigNavMenu>
+</div>
+
+<div class="col-md-12 mb-4">
+    <div class="col-md-12 mb-4">
+        <div class="d-flex justify-content-between mx-4">
+            <div>
+                <h4 class="page-title">@PageTitle</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12 mb-4">
+    <div class="d-flex justify-content-between mx-4">
+        <div class="d-flex filter-div">
+            <select class="form-select">
+                <option value="1">All Clients</option>
+                <option value="2">Client 1</option>
+                <option value="3">Client 2</option>
+                <option value="4">Client 3</option>
+            </select>
+
+            <select class="form-select">
+                <option value="1">All Sports</option>
+                <option value="2">Sport 1</option>
+                <option value="3">Sport 2</option>
+                <option value="4">Sport 3</option>
+            </select>
+
+            <select class="form-select">
+                <option value="1">Live</option>
+                <option value="2">Prematch</option>
+            </select>
+
+            <button class="btn btn-dark">
+                Reset
+            </button>
+        </div>
+
+        <div>
+            <div class="input-group">
+                <input type="text" id="search" placeholder="Search" class="form-control search-text valid border-end-0" />
+                <span class="input-group-text border-start-0">
+                    <i class="fa fa-search"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="mx-4">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th class="text-center" scope="col">No.</th>
+                    <th class="text-center" scope="col">Client Name</th>
+                    <th class="text-center" scope="col">Sport</th>
+                    <th class="text-center" scope="col">Scope</th>
+                    <th class="text-center" scope="col">League Name</th>
+                    <th class="text-center" scope="col">Template</th>
+                    <th class="text-center" scope="col">Manage</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <th class="text-center" scope="row">1</th>
+                    <td class="text-center">10BET Crypto</td>
+                    <td class="text-center">Volleyball</td>
+                    <td class="text-center">Live</td>
+                    <td class="text-center">Pro League</td>
+                    <td class="text-center">
+                        <select class="form-select">
+                            <option value="0">Select Template</option>
+                            <option value="1">Volleyball [Live] [Tier 1]</option>
+                            <option value="2">Volleyball [Live] [Tier 2]</option>
+                            <option value="3">Volleyball [Live] [Tier 3]</option>
+                        </select>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-change-template">
+                            Change Template
+                        </button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th class="text-center" scope="row">2</th>
+                    <td class="text-center">10BET Crypto</td>
+                    <td class="text-center">Volleyball</td>
+                    <td class="text-center">Live</td>
+                    <td class="text-center">Pro League</td>
+                    <td class="text-center">
+                        <select class="form-select">
+                            <option value="0">Select Template</option>
+                            <option value="1">Volleyball [Live] [Tier 1]</option>
+                            <option value="2">Volleyball [Live] [Tier 2]</option>
+                            <option value="3">Volleyball [Live] [Tier 3]</option>
+                        </select>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-change-template">
+                            Change Template
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
