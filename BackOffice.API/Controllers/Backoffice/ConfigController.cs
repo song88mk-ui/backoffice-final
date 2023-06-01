@@ -1,11 +1,13 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
-using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OpenTelemetry.Metrics;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
@@ -42,6 +44,80 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> GetMaintenance()
         {
             var result = await _maintenanceRepository.GetMaintenance();
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("template")]
+        public async Task<IActionResult> GetClientConfigTemplate()
+        {
+            var userId = HttpContext.Items["UserId"].ToString();
+
+            var result = await _backofficeRepository.GetConfigTemplate(userId);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("template")]
+        public async Task<IActionResult> AddOrUpdateConfigTemplate([FromBody] ConfigTemplateModel request)
+        {
+            var userId = HttpContext.Items["UserId"].ToString();
+
+            var result = await _backofficeRepository.AddOrUpdateConfigTemplate(userId, request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpDelete("template/{id}")]
+        public async Task<IActionResult> DeleteConfigTemplate([FromRoute] string id)
+        {
+            var userId = HttpContext.Items["UserId"].ToString();
+
+            var result = await _backofficeRepository.DeleteConfigTemplate(userId, id);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("template/{type}")] // type = assigned / unassigned
+        public async Task<IActionResult> GetConfigClients([FromRoute] string type, [FromBody] MetaData metaData)
+        {
+            var userId = HttpContext.Items["UserId"].ToString();
+            var clientCodes = HttpContext.Items["ClientCodes"].ToString().Split(',').ToList();
+
+            var isAssigned = true;
+
+            switch(type.ToLower())
+            {
+                case "assigned":
+                case "unassigned":
+                    isAssigned = type.ToLower() == "assigned";
+                    break;
+                default:
+                    return BadRequest(new BaseResponse<List<ConfigClientModel>>() { StatusCode = BoStatusCode.Error, Message = "Invalid template type", Result = null });
+            }    
+
+            var result = await _backofficeRepository.GetConfigClient(userId, clientCodes, isAssigned);
 
             switch (result.StatusCode)
             {

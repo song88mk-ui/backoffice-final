@@ -1,5 +1,7 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Backoffice.API.Controllers;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -8,6 +10,7 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -22,6 +25,7 @@ namespace Backoffice.API.ActionFilter
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json").Build();
         private HttpClient _httpClient { get; set; }
+
         public AuthorizeAttribute()
         {
             _httpClient = new HttpClient();
@@ -80,6 +84,12 @@ namespace Backoffice.API.ActionFilter
                     context.Result = new JsonResult(new { title = "Unauthorized", message = result.Message }) { StatusCode = StatusCodes.Status401Unauthorized };
                     return;
                 }
+
+                var parsed = JwtParser.ParseClaimsFromJwt(token);
+                context.HttpContext.Items["UserToken"] = token;
+                context.HttpContext.Items["UserId"] = parsed.Where(x => x.Type.ToUpper() == "UserId".ToUpper()).FirstOrDefault()?.Value.ToString();
+                context.HttpContext.Items["UserIdRef"]  = parsed.Where(x => x.Type.ToUpper() == "UserIdRef".ToUpper()).FirstOrDefault()?.Value.ToString();
+                context.HttpContext.Items["ClientCodes"] = parsed.Where(x => x.Type.ToUpper() == "ClientCodes".ToUpper()).FirstOrDefault()?.Value.ToString();
             }
             catch (Exception ex)
             {
