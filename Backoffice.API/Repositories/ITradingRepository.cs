@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -58,16 +59,16 @@ namespace Backoffice.API.Repositories
         #region Sports
         Task<BaseResponse<SportsTreeResponse>> GetSports(int fixtureTypeId, string region);
         Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId, string region);
-        Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region);
+        Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region = "");
         Task<BaseResponse<SportSelectorMarketTemplateResponse>> GetSelectorMarketTemplates(string region);
         #endregion
 
         #region Segment
-        Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string region);
+        Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string region = "");
         #endregion
 
         #region League
-        Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string region);
+        Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string region = "");
         Task<BaseResponse<List<TierLeagueOrderResponse>>> GetTierLeagueOrderList(string region);
         #endregion
 

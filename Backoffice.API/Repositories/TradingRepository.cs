@@ -93,7 +93,7 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region)
+        public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region = "")
         {
             try
             {
@@ -159,7 +159,7 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Segment
-        public async Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string region)
+        public async Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string region = "")
         {
             try
             {
@@ -193,7 +193,7 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region League
-        public async Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string region)
+        public async Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string region = "")
         {
             try
             {
