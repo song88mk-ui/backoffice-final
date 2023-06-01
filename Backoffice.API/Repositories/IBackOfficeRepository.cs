@@ -20,6 +20,7 @@ namespace Backoffice.API.Repositories
         #region Config
         Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string userId);
         Task<BaseResponse<List<ConfigTemplateModel>>> AddOrUpdateConfigTemplate(string userId, ConfigTemplateModel request);
+        Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string userId, string id);
         Task<BaseResponse<List<ConfigClientModel>>> GetConfigClient(string userId, List<string> clientCodes, bool isAssigned);
         #endregion
 

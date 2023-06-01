@@ -81,6 +81,21 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
+        [HttpDelete("template/{id}")]
+        public async Task<IActionResult> DeleteConfigTemplate([FromRoute] string id)
+        {
+            var userId = HttpContext.Items["UserId"].ToString();
+
+            var result = await _backofficeRepository.DeleteConfigTemplate(userId, id);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         [HttpPost("template/client/{isAssigned}")] // type = assigned / unassigneed
         public async Task<IActionResult> GetConfigClients([FromRoute] bool isAssigned)
         {

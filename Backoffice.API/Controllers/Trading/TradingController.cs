@@ -355,12 +355,12 @@ namespace Backoffice.API.Controllers.Trading
                     return BadRequest(result);
             }
         }
-        [HttpPost("client/config")]
+        [HttpPost("v2/client/config")]
         public async Task<IActionResult> GetClientConfigv2([FromBody] ClientConfigRequestv2 request)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetClientConfig(request, region);
+            var result = await _tradingRepository.GetClientConfigv2(request, region);
 
             switch (result.StatusCode)
             {
