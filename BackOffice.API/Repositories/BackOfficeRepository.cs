@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Data.Backoffice;
+﻿using Azure.Core;
+using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
@@ -1391,6 +1392,24 @@ namespace Backoffice.API.Repositories
                         LeagueIds = string.Join(',', request.LeagueIds)
 
                     });
+                }
+
+                return await GetConfigTemplate(userId);
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<ConfigTemplateModel>>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
+            }
+        }
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string userId, string id)
+        {
+            try
+            {
+                var config = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId && x.Id.ToString() == id).AsNoTracking().FirstOrDefault();
+
+                if (config != null)
+                {
+                    _backofficeContext.ConfigTemplates.Remove(config);
                 }
 
                 return await GetConfigTemplate(userId);
