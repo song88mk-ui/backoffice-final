@@ -5,6 +5,9 @@ using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OpenTelemetry.Metrics;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
@@ -96,12 +99,25 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
-        [HttpPost("template/client/{isAssigned}")] // type = assigned / unassigneed
-        public async Task<IActionResult> GetConfigClients([FromRoute] bool isAssigned)
+        [HttpPost("template/{type}")] // type = assigned / unassigned
+        public async Task<IActionResult> GetConfigClients([FromRoute] string type, [FromBody] MetaData metaData)
         {
             var userId = HttpContext.Items["UserId"].ToString();
+            var clientCodes = HttpContext.Items["ClientCodes"].ToString().Split(',').ToList();
 
-            var result = await _backofficeRepository.GetConfigClient(userId, new System.Collections.Generic.List<string>(), isAssigned);
+            var isAssigned = true;
+
+            switch(type.ToLower())
+            {
+                case "assigned":
+                case "unassigned":
+                    isAssigned = type.ToLower() == "assigned";
+                    break;
+                default:
+                    return BadRequest(new BaseResponse<List<ConfigClientModel>>() { StatusCode = BoStatusCode.Error, Message = "Invalid template type", Result = null });
+            }    
+
+            var result = await _backofficeRepository.GetConfigClient(userId, clientCodes, isAssigned);
 
             switch (result.StatusCode)
             {

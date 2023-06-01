@@ -15,5 +15,6 @@ namespace Backoffice.Shared.Data.Backoffice.Entities
         public int FixtureStatusId { get; set; }
         public string ClientCodes { get; set; }
         public string LeagueIds { get; set; }
+        public DateTime Timestamp { get; set; }
     }
 }

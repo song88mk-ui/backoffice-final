@@ -89,6 +89,7 @@ namespace Backoffice.API.ActionFilter
                 context.HttpContext.Items["UserToken"] = token;
                 context.HttpContext.Items["UserId"] = parsed.Where(x => x.Type.ToUpper() == "UserId".ToUpper()).FirstOrDefault()?.Value.ToString();
                 context.HttpContext.Items["UserIdRef"]  = parsed.Where(x => x.Type.ToUpper() == "UserIdRef".ToUpper()).FirstOrDefault()?.Value.ToString();
+                context.HttpContext.Items["ClientCodes"] = parsed.Where(x => x.Type.ToUpper() == "ClientCodes".ToUpper()).FirstOrDefault()?.Value.ToString();
             }
             catch (Exception ex)
             {
