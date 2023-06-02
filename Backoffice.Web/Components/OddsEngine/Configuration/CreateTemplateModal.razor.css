@@ -1,0 +1,9 @@
+﻿.btn-modal {   
+    border-radius: 2px;
+    opacity: 1;
+}
+
+.btn-save {
+    background: transparent linear-gradient(180deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+    color: white;
+}
