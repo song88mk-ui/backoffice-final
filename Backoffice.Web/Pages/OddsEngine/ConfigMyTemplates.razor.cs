@@ -1,4 +1,6 @@
-﻿using Backoffice.Web.Models;
+﻿using Backoffice.Web.Components.OddsEngine.Configuration;
+using Backoffice.Web.Models;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -7,6 +9,8 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
         [Parameter] public string Region { get; set; } = "hk";
+
+        [Inject] private IModalService ModalService { get; set; }
 
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
 
@@ -29,6 +33,63 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
+        }
+
+        public async Task OnCreateNewTemplateClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-show");
+            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
+            parameters.Add("Region", Region);
+
+            var options = new ModalOptions();
+
+            ModalService.Open<CreateTemplateModal>($"Create Template", parameters, options);
+        }        
+
+        public async Task OnEditTemplateClickEvent()
+        {
+
+        }
+
+        public async Task OnDeleteTemplateClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-show");
+            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
+            parameters.Add("Region", Region);
+
+            var options = new ModalOptions();
+
+            ModalService.Open<DeleteTemplateModal>($"Delete Template", parameters, options);
+        }
+
+        public async Task OnExportTemplateClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-show");
+            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
+            parameters.Add("Region", Region);
+
+            var options = new ModalOptions();
+
+            ModalService.Open<ExportTemplateModal>($"Export Templates", parameters, options);
+        }
+
+        public async Task OnViewAssignedClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
+            parameters.Add("Region", Region);
+
+            var options = new ModalOptions();
+
+            ModalService.Open<ViewAssignedModal>($"View Assigned", parameters, options);
         }
 
         public void Dispose()
