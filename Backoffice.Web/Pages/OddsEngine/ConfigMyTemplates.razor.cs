@@ -35,6 +35,20 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
         }
 
+        public async Task OnLogsClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
+            parameters.Add("DialogStyle", "max-width:1500px");
+            parameters.Add("Region", Region);
+
+            var options = new ModalOptions();
+
+            ModalService.Open<ViewMyTemplatesLogs>($"View Logs", parameters, options);
+        }
+
         public async Task OnCreateNewTemplateClickEvent()
         {
             var parameters = new ModalParameters();

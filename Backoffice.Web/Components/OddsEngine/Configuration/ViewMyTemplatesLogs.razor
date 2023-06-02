@@ -1,0 +1,101 @@
+﻿<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <div class="d-flex justify-content-between log-filter">
+                <div class="d-flex">
+                    <select class="form-select">
+                        <optgroup label="Sports">
+                            <option value="0">Select Sport</option>
+                            <option value="1">Basketball</option>
+                            <option value="2">Baseball</option>
+                            <option value="3">Running</option>
+                        </optgroup>                        
+                    </select>
+
+                    <select class="form-select">
+                        <optgroup label="Scope">
+                            <option value="0">All Scope</option>
+                            <option value="1">Prematch</option>
+                            <option value="1">Live</option>
+                        </optgroup>
+                    </select>
+
+                    <BlazorDateRangePicker.DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="DateTime.Today" EndDate="DateTime.Today" MaxDate="DateTime.Today"></BlazorDateRangePicker.DateRangePicker>
+                </div>
+
+                <div class="input-group">
+                    <input id="search" placeholder="Find" class="form-control search-text valid border-end-0 valid">
+                    <span class="input-group-text border-start-0"><i class="fa fa-search"></i></span>
+                </div>
+            </div>            
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Sports</th>
+                        <th scope="col">Scope</th>
+                        <th scope="col">Template</th>
+                        <th scope="col">Changes Made</th>
+                        <th scope="col">From</th>
+                        <th scope="col">To</th>
+                        <th scope="col">Updated By</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <th scope="row">@(DateTime.UtcNow.ToString("dd/mm/yyyy hh:mm"))</th>
+                        <td>Basketball</td>
+                        <td>Prematch</td>
+                        <td>Basketball Template</td>
+                        <td>Draw or Any Clean Sheet</td>
+                        <td>Template 1</td>
+                        <td>Template 2</td>
+                        <td>OEMarketActivation</td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">@(DateTime.UtcNow.ToString("dd/mm/yyyy hh:mm"))</th>
+                        <td>Basketball</td>
+                        <td>Prematch</td>
+                        <td>Basketball Template</td>
+                        <td>Draw or Any Clean Sheet</td>
+                        <td>Template 1</td>
+                        <td>Template 2</td>
+                        <td>OEMarketActivation</td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">@(DateTime.UtcNow.ToString("dd/mm/yyyy hh:mm"))</th>
+                        <td>Basketball</td>
+                        <td>Prematch</td>
+                        <td>Basketball Template</td>
+                        <td>Draw or Any Clean Sheet</td>
+                        <td>Template 1</td>
+                        <td>Template 2</td>
+                        <td>OEMarketActivation</td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">@(DateTime.UtcNow.ToString("dd/mm/yyyy hh:mm"))</th>
+                        <td>Basketball</td>
+                        <td>Prematch</td>
+                        <td>Basketball Template</td>
+                        <td>Draw or Any Clean Sheet</td>
+                        <td>Template 1</td>
+                        <td>Template 2</td>
+                        <td>OEMarketActivation</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn" @onclick="OnCloseClickEvent">Close</button>
+</div>
