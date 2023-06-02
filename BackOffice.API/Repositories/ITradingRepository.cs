@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace Backoffice.API.Repositories
         #region Client
         Task<BaseResponse<List<ClientInformationModel>>> GetClientList(string region);
         Task<BaseResponse<ConfigModel>> GetClientConfig(ClientConfigRequest request, string region);
+        Task<BaseResponse<ConfigModel>> GetClientConfigv2(ClientConfigRequestv2 request, string region);
         Task<BaseResponse<ClientConfigResponse>> AddOrUpdateConfig(ConfigSettingsModel request, string region);
         Task<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>> GetConfigLogs(ConfigLogsRequest request, string region);
         Task<BaseResponse<List<ClientLeagueConfig>>> GetClientLeagueConfig(string clientCode, string region);
@@ -57,16 +59,16 @@ namespace Backoffice.API.Repositories
         #region Sports
         Task<BaseResponse<SportsTreeResponse>> GetSports(int fixtureTypeId, string region);
         Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId, string region);
-        Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region);
+        Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region = "");
         Task<BaseResponse<SportSelectorMarketTemplateResponse>> GetSelectorMarketTemplates(string region);
         #endregion
 
         #region Segment
-        Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string region);
+        Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string region = "");
         #endregion
 
         #region League
-        Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string region);
+        Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string region = "");
         Task<BaseResponse<List<TierLeagueOrderResponse>>> GetTierLeagueOrderList(string region);
         #endregion
 

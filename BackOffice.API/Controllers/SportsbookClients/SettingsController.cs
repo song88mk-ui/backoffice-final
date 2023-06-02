@@ -1,6 +1,5 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
-using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
