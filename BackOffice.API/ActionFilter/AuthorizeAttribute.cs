@@ -77,7 +77,7 @@ namespace Backoffice.API.ActionFilter
                     Message = "Missing authorization"
                 };
 
-                result = await Authenticate(token);
+                result = Authenticate(token).Result;
 
                 if (result.StatusCode != StatusCode.Success)
                 {

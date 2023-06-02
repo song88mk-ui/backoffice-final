@@ -55,11 +55,11 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpGet("template")]
-        public async Task<IActionResult> GetClientConfigTemplate()
+        public async Task<IActionResult> GetClientConfigTemplate([FromQuery] int sportId = -1, [FromQuery] int scopeId = -1)
         {
-            var userId = HttpContext.Items["UserId"].ToString();
+            var userId = HttpContext.Items["UserId"]?.ToString();
 
-            var result = await _backofficeRepository.GetConfigTemplate(userId);
+            var result = await _backofficeRepository.GetConfigTemplate(userId, null, sportId == -1 ?  null : new List<int>() { sportId}, scopeId == -1? null: new List<int>() { scopeId });
 
             switch (result.StatusCode)
             {
@@ -72,7 +72,7 @@ namespace Backoffice.API.Controllers.Backoffice
         [HttpPost("template")]
         public async Task<IActionResult> AddOrUpdateConfigTemplate([FromBody] ConfigTemplateModel request)
         {
-            var userId = HttpContext.Items["UserId"].ToString();
+            var userId = HttpContext.Items["UserId"]?.ToString();
 
             var result = await _backofficeRepository.AddOrUpdateConfigTemplate(userId, request);
 
@@ -87,7 +87,7 @@ namespace Backoffice.API.Controllers.Backoffice
         [HttpDelete("template/{id}")]
         public async Task<IActionResult> DeleteConfigTemplate([FromRoute] string id)
         {
-            var userId = HttpContext.Items["UserId"].ToString();
+            var userId = HttpContext.Items["UserId"]?.ToString();
 
             var result = await _backofficeRepository.DeleteConfigTemplate(userId, id);
 
@@ -100,10 +100,10 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         [HttpPost("template/{type}")] // type = assigned / unassigned
-        public async Task<IActionResult> GetConfigClients([FromRoute] string type, [FromBody] MetaData metaData)
+        public async Task<IActionResult> GetConfigClients([FromRoute] string type, [FromBody] ConfigTemplateLeagueRequest payload)
         {
-            var userId = HttpContext.Items["UserId"].ToString();
-            var clientCodes = HttpContext.Items["ClientCodes"].ToString().Split(',').ToList();
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
 
             var isAssigned = true;
 
@@ -117,7 +117,7 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(new BaseResponse<List<ConfigClientModel>>() { StatusCode = BoStatusCode.Error, Message = "Invalid template type", Result = null });
             }    
 
-            var result = await _backofficeRepository.GetConfigClient(userId, clientCodes, isAssigned);
+            var result = await _backofficeRepository.GetConfigClient(userId, clientCodes, payload, isAssigned);
 
             switch (result.StatusCode)
             {
