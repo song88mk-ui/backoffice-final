@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Backoffice.Shared.Models
 {
@@ -11,5 +12,6 @@ namespace Backoffice.Shared.Models
         public int FixtureStatusId { get; set; }
         public List<string> ClientCodes { get; set; }
         public List<int> LeagueIds { get; set; }
+        public DateTime Timestamp { get; set; }
     }
 }

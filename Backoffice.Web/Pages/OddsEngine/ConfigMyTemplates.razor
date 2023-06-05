@@ -29,14 +29,30 @@
 <div class="col-md-12 mb-4">
     <div class="d-flex justify-content-between mx-4">
        <div class="d-flex filter-div">
-            <select class="form-select">
-                <option value="1">Basketball</option>
-                <option value="2">Soccer</option>
-                <option value="3">Baseball</option>
-                <option value="4">Tennis</option>
+            <select class="form-select" @onchange="OnSportChangedEvent">
+                <option value="0">All Sports</option>
+                @if (Sports.Any())
+                {
+                    @foreach (var item in Sports)
+                    {
+                        if (item.Value == SelectedSportId)
+                        {
+                            <option value="@item.Value" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Name</option>
+                        }
+                    }
+                }
+                else
+                {
+                    <option value="0">--</option>
+                }
             </select>
 
-            <select class="form-select">
+            <select class="form-select" @onchange="OnScopeChangedEvent">
+                <option value="-1">All Scopes</option>
                 <option value="1">Prematch</option>
                 <option value="2">Live</option>
             </select>
@@ -66,87 +82,36 @@
             </thead>
 
             <tbody>
-                <tr>
-                    <th scope="row">Designer Template</th>
-                    <td>Basketball</td>
-                    <td>Live</td>
-                    <td class="text-center">3 Clients</td>
-                    <td class="text-center">5 Leagues</td>
-                    <td class="text-center">@(DateTime.UtcNow.ToString("hh:mm dd/mm/yyyy"))</td>
-                    <td>
-                        <div class="manage-cell">
-                            <a href="javascript:void(0)" @onclick="OnEditTemplateClickEvent" title="Edit Template">
-                                <i class="fa fa-edit"></i>
-                            </a>
+                @foreach (var configTemplate in ConfigTemplates)
+                {
+                    <tr>
+                        <th scope="row">@configTemplate.Name</th>
+                        <td>@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId) != null ? $"{Sports.FirstOrDefault(e => e.Value == configTemplate.SportId).Name}" : "")</td>
+                        <td>@(((FixtureStatus)configTemplate.FixtureStatusId).ToString())</td>
+                        <td class="text-center">@(configTemplate.ClientCodes.Count == 0 ? "0 Client" : $"{configTemplate.ClientCodes.Count} Clients")</td>
+                        <td class="text-center">@(configTemplate.LeagueIds.Count == 0 ? "0 League" : $"{configTemplate.LeagueIds.Count} Leagues")</td>
+                        <td class="text-center">@(configTemplate.Timestamp.ToString("hh:mm dd/mm/yyyy"))</td>
+                        <td>
+                            <div class="manage-cell">
+                                <a href="javascript:void(0)" @onclick="OnEditTemplateClickEvent" title="Edit Template">
+                                    <i class="fa fa-edit"></i>
+                                </a>
 
-                            <a href="javascript:void(0)" @onclick="OnDeleteTemplateClickEvent" title="Delete Template">
-                                <i class="fa fa-trash"></i>
-                            </a>
+                                <a href="javascript:void(0)" @onclick="() => OnDeleteTemplateClickEvent(configTemplate)" title="Delete Template">
+                                    <i class="fa fa-trash"></i>
+                                </a>
 
-                            <a href="javascript:void(0)" @onclick="OnExportTemplateClickEvent" title="Export Template">
-                                <i class="fa fa-file-archive-o"></i>
-                            </a>
+                                <a href="javascript:void(0)" @onclick="OnExportTemplateClickEvent" title="Export Template">
+                                    <i class="fa fa-file-archive-o"></i>
+                                </a>
 
-                            <a href="javascript:void(0)" @onclick="OnViewAssignedClickEvent" title="View Assigned">
-                                <i class="fa fa-list"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">Designer Template</th>
-                    <td>Basketball</td>
-                    <td>Live</td>
-                    <td class="text-center">3 Clients</td>
-                    <td class="text-center">5 Leagues</td>
-                    <td class="text-center">@(DateTime.UtcNow.ToString("hh:mm dd/mm/yyyy"))</td>
-                    <td>
-                        <div class="manage-cell">
-                            <a href="javascript:void(0)" @onclick="OnEditTemplateClickEvent" title="Edit Template">
-                                <i class="fa fa-edit"></i>
-                            </a>
-
-                            <a href="javascript:void(0)" @onclick="OnDeleteTemplateClickEvent" title="Delete Template">
-                                <i class="fa fa-trash"></i>
-                            </a>
-
-                            <a href="javascript:void(0)" @onclick="OnExportTemplateClickEvent" title="Export Template">
-                                <i class="fa fa-file-archive-o"></i>
-                            </a>
-
-                            <a href="javascript:void(0)" @onclick="OnViewAssignedClickEvent" title="View Assigned">
-                                <i class="fa fa-list"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">Designer Template</th>
-                    <td>Basketball</td>
-                    <td>Live</td>
-                    <td class="text-center">3 Clients</td>
-                    <td class="text-center">5 Leagues</td>
-                    <td class="text-center">@(DateTime.UtcNow.ToString("hh:mm dd/mm/yyyy"))</td>
-                    <td>
-                        <div class="manage-cell">
-                            <a href="javascript:void(0)" @onclick="OnEditTemplateClickEvent" title="Edit Template">
-                                <i class="fa fa-edit"></i>
-                            </a>
-
-                            <a href="javascript:void(0)" @onclick="OnDeleteTemplateClickEvent" title="Delete Template">
-                                <i class="fa fa-trash"></i>
-                            </a>
-
-                            <a href="javascript:void(0)" @onclick="OnExportTemplateClickEvent" title="Export Template">
-                                <i class="fa fa-file-archive-o"></i>
-                            </a>
-
-                            <a href="javascript:void(0)" @onclick="OnViewAssignedClickEvent" title="View Assigned">
-                                <i class="fa fa-list"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
+                                <a href="javascript:void(0)" @onclick="OnViewAssignedClickEvent" title="View Assigned">
+                                    <i class="fa fa-list"></i>
+                                </a>
+                            </div>
+                            </td>
+                        </tr>
+                }               
             </tbody>
         </table>
     </div>    
