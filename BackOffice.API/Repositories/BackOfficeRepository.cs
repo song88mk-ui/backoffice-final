@@ -1342,29 +1342,52 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Config
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string userId)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string userId, int sportId = 0, int fixtureStatusId = -1)
         {
-            var query = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId).AsNoTracking().ToList();
-
-            var result = query.Select(x => new ConfigTemplateModel()
+            try
             {
-                Id = x.Id.ToString(),
-                UserId = x.UserId,
-                Name = x.Name,
-                SportId = x.SportId,
-                FixtureStatusId = x.FixtureStatusId,
-                ClientCodes = x.ClientCodes.Split(',').ToList(),
-                LeagueIds = x.LeagueIds.Split(',')
-                        .Select(str => int.Parse(str))
-                        .ToList()
-            }).ToList();
+                List<ConfigTemplate> query = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId).AsNoTracking().ToList();                
 
-            return new BaseResponse<List<ConfigTemplateModel>>()
+                if (sportId != 0)
+                {
+                    //all sports
+                    query = query.Where(x => x.UserId == userId && x.FixtureStatusId == fixtureStatusId).ToList();
+                }
+
+                if (fixtureStatusId != -1)
+                {
+                    //all scopes
+                    query = query.Where(x => x.UserId == userId && x.FixtureStatusId == fixtureStatusId).ToList();
+                }
+
+                var result = query.Select(x => new ConfigTemplateModel()
+                {
+                    Id = x.Id.ToString(),
+                    UserId = x.UserId,
+                    Name = x.Name,
+                    SportId = x.SportId,
+                    FixtureStatusId = x.FixtureStatusId,
+                    ClientCodes = !string.IsNullOrEmpty(x.ClientCodes) ? x.ClientCodes.Split(',').ToList() : new List<string>(),
+                    LeagueIds = !string.IsNullOrEmpty(x.LeagueIds) ? x.LeagueIds.Split(',').Select(str => int.Parse(str)).ToList() : new List<int>(),
+                    Timestamp = x.Timestamp
+                }).ToList();
+
+                return new BaseResponse<List<ConfigTemplateModel>>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
+            }
+            catch (Exception ex)
             {
-                StatusCode = StatusCode.Success,
-                Message = StatusCode.Success.ToString(),
-                Result = result
-            };
+                return new BaseResponse<List<ConfigTemplateModel>>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString()}: {ex.Message}",
+                    Result = new List<ConfigTemplateModel>()
+                };
+            }
         }
         public async Task<BaseResponse<List<ConfigTemplateModel>>> AddOrUpdateConfigTemplate(string userId, ConfigTemplateModel request)
         {
@@ -1381,18 +1404,32 @@ namespace Backoffice.API.Repositories
                 }
                 else
                 {
+                    var isConfigExisting = _backofficeContext.ConfigTemplates.Any(e => e.Name == request.Name && e.UserId == request.UserId);
+
+                    if (isConfigExisting)
+                    {
+                        return new BaseResponse<List<ConfigTemplateModel>>()
+                        {
+                            Message = "Sorry, that name already exists!",
+                            StatusCode = StatusCode.Error,
+                            Result = null
+                        };
+                    }
+
                     _backofficeContext.ConfigTemplates.Add(new ConfigTemplate()
                     {
-                        Id = Guid.Parse(request.Id),
+                        Id = Guid.NewGuid(),
                         UserId = request.UserId,
                         Name = request.Name,
                         SportId = request.SportId,
                         FixtureStatusId = request.FixtureStatusId,
                         ClientCodes = string.Join(',', request.ClientCodes),
-                        LeagueIds = string.Join(',', request.LeagueIds)
-
+                        LeagueIds = string.Join(',', request.LeagueIds),
+                        Timestamp = DateTime.UtcNow
                     });
                 }
+
+                await _backofficeContext.SaveChangesAsync();
 
                 return await GetConfigTemplate(userId);
             }
@@ -1411,6 +1448,8 @@ namespace Backoffice.API.Repositories
                 {
                     _backofficeContext.ConfigTemplates.Remove(config);
                 }
+
+                await _backofficeContext.SaveChangesAsync();
 
                 return await GetConfigTemplate(userId);
             }

@@ -54,12 +54,12 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
-        [HttpGet("template")]
-        public async Task<IActionResult> GetClientConfigTemplate()
+        [HttpGet("template/{sportId}/{fixtureStatusId}")]
+        public async Task<IActionResult> GetClientConfigTemplate([FromRoute] int sportId = 0, [FromRoute] int fixtureStatusId = 0)
         {
             var userId = HttpContext.Items["UserId"].ToString();
 
-            var result = await _backofficeRepository.GetConfigTemplate(userId);
+            var result = await _backofficeRepository.GetConfigTemplate(userId, sportId, fixtureStatusId);
 
             switch (result.StatusCode)
             {

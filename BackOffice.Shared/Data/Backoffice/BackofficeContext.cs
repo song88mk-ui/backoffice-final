@@ -11,6 +11,7 @@ namespace Backoffice.Shared.Data.Backoffice
             modelBuilder.Entity<ClientInformation>().HasKey(k => new { k.ClientId });
             modelBuilder.Entity<ClientBetSetting>().HasKey(k => new { k.ClientBetSettingId });
             modelBuilder.Entity<ActivityLog>().HasKey(k => new { k.Id });
+            modelBuilder.Entity<ConfigTemplate>().HasKey(k => new { k.Id });
         }
 
         public DbSet<ClientInformation> ClientInformation { get; set; }
