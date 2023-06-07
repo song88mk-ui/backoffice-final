@@ -32,7 +32,7 @@ namespace Backoffice.Shared.Models
                 Claims = new List<PermissionClaim>();
             }
             public string SubCategoryName { get; set; }
-            public bool IsEnabled { get; set; }
+            public int Availability { get; set; } = 1;
             public List<Group> Groups { get; set; }
             public List<PermissionClaim> Claims { get; set; }
             public string ColPosition { get; set; }
@@ -55,7 +55,7 @@ namespace Backoffice.Shared.Models
             public int SortOrder { get; set; }
             public bool IsSubUser { get; set; }
             public string ClaimValue { get; set; }
-            public bool IsEnabled { get; set; }
+            public int Availability { get; set; }
         }
     }
 

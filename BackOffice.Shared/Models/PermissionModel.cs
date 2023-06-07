@@ -13,7 +13,7 @@
         public bool HasReadOnly { get; set; }
         public int SortOrder { get; set; }
         public bool IsSubUser { get; set; }
-        public bool IsEnabled { get; set; } = false;
+        public int Availability { get; set; } = 1;
         public int Version { get; set; }
     }
 }

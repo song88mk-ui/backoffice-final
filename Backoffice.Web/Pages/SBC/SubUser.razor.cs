@@ -2,10 +2,12 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.SBC.SubUser;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Security.Claims;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -201,10 +203,13 @@ namespace Backoffice.Web.Pages.SBC
             var subUserClaims = new List<PermissionModel>();
 
             bool hasDashboard = false;
-            foreach (var permission in PermissionResponse.Permissions)
+            foreach (var permission in PermissionResponse.Permissions.Where(x => UserModel.Claims.Any(um => um.Type == x.ClaimType)))
             {
                 if (permission.IsSubUser)
                 {
+                    var availability = 0;
+                    int.TryParse(UserModel.Claims.Where(x => x.Type == permission.ClaimType)?.FirstOrDefault()?.Value, out availability);
+
                     var subUserClaim = new PermissionModel
                     {
                         Id = permission.Id,
@@ -218,14 +223,14 @@ namespace Backoffice.Web.Pages.SBC
                         ClaimType = permission.ClaimType,
                         HasReadOnly = permission.HasReadOnly,
                         ClaimValue = "0",
-                        IsEnabled = UserModel.Claims.Where(x => x.Type == permission.ClaimType).Any()
+                        Availability = availability
                     };
 
                     if (permission.Name.ToLower() == "dashboard")
                     {
                         hasDashboard = true;
                         subUserClaim.ClaimValue = "1";
-                        subUserClaim.IsEnabled = true;
+                        subUserClaim.Availability = 1;
                     }
                     else
                     {
@@ -236,7 +241,7 @@ namespace Backoffice.Web.Pages.SBC
                         }
 
                         if (string.IsNullOrEmpty(subUserClaim.ClaimValue) || subUserClaim.ClaimValue == "0")
-                            subUserClaim.IsEnabled = false;
+                            subUserClaim.Availability = 0;
 
                         if (claims != null)
                         {
@@ -267,7 +272,7 @@ namespace Backoffice.Web.Pages.SBC
                     ClaimType = PermissionResponse.Permissions.FirstOrDefault(c => c.ClaimType.ToLower() == SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", ".").ToLower()).Id,
                     HasReadOnly = false,
                     ClaimValue = "1",
-                    IsEnabled = false
+                    Availability = 0
                 });
             }
 
@@ -276,23 +281,25 @@ namespace Backoffice.Web.Pages.SBC
 
         private string GetClaimsList(List<ClaimModel> claims)
         {
-            if (claims != null && claims.Any())
-            {
-                var claimsList = string.Empty;
-                foreach (var claim in claims.Where(x => x.ClaimValue != "0"))
-                {
-                    var permission = PermissionResponse.Permissions.FirstOrDefault(p => p.ClaimType.ToLower() == claim.ClaimType.ToLower());
+            var userClaims = UserModel.Claims.Where(x => claims.Any(c => c.ClaimType == x.Type && x.Value == c.ClaimValue)).Select(x => x.Type).ToList();
 
-                    if (permission != null && UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType) != null)
-                    {
-                        claimsList = claimsList + (string.IsNullOrEmpty(claimsList) ? string.Empty : ", ") + $"{permission.Name}" + (claim.ClaimValue == "2" ? " (ReadOnly)" : string.Empty);
-                    }
-                }
+            return string.Join(',', userClaims);
 
-                return claimsList;
-            }
+            //if (claims != null && claims.Any())
+            //{
+            //    var claimsList = string.Empty;
+            //    foreach (var claim in claims.Where(x => x.ClaimValue != "0"))
+            //    {
+            //        var permission = PermissionResponse.Permissions.FirstOrDefault(p => p.ClaimType.ToLower() == claim.ClaimType.ToLower());
 
-            return string.Empty;
+            //        if (permission != null && UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType) != null)
+            //        {
+            //            claimsList = claimsList + (string.IsNullOrEmpty(claimsList) ? string.Empty : ", ") + $"{permission.Name}" + (claim.ClaimValue == "2" ? " (ReadOnly)" : string.Empty);
+            //        }
+            //    }
+
+            //    return claimsList;
+            //}
         }
 
         #endregion

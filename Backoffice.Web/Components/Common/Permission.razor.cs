@@ -96,7 +96,7 @@ namespace Backoffice.Web.Components.Common
                 {
                     foreach (var claim in subCategory.Claims)
                     {
-                        if ((IsSubUser && !claim.IsEnabled) == false && claim.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
+                        if ((IsSubUser && claim.Availability == 0) == false && claim.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
                             claim.ClaimValue = "1";
                     }
 
@@ -108,7 +108,7 @@ namespace Backoffice.Web.Components.Common
                             {
                                 foreach (var claim in group.Claims)
                                 {
-                                    if ((IsSubUser && !claim.IsEnabled) == false && claim.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
+                                    if ((IsSubUser && claim.Availability == 0) == false && claim.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
                                         claim.ClaimValue = "1";
                                 }
                             }
@@ -117,7 +117,7 @@ namespace Backoffice.Web.Components.Common
                 }
             }
 
-            var permissions = Permissions.Where(p => p.CategoryId == category.CategoryId && (IsSubUser && !p.IsEnabled) == false
+            var permissions = Permissions.Where(p => p.CategoryId == category.CategoryId && (IsSubUser && p.Availability != 0) == false
                 && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."));
             foreach (var permission in permissions)
             {
@@ -229,7 +229,7 @@ namespace Backoffice.Web.Components.Common
                                 HasReadOnly = x.HasReadOnly,
                                 SortOrder = x.SortOrder,
                                 ClaimValue = x.ClaimValue,
-                                IsEnabled = x.IsEnabled
+                                Availability = x.Availability
                             }).ToList(),
                             SubCategoryName = s.Key,
                         }).Distinct().ToList();
@@ -238,7 +238,7 @@ namespace Backoffice.Web.Components.Common
                     {
                         foreach (var subCategory in subcategories)
                         {
-                            if (!subCategory.Claims.Where(x => x.IsEnabled).Any() && IsSubUser)
+                            if (!subCategory.Claims.Where(x => x.Availability != 0).Any() && IsSubUser)
                                 continue;
 
                             var claims = Permissions.Where(p => p.CategoryId == permission.CategoryId && p.SubCategoryName == subCategory.SubCategoryName
@@ -251,7 +251,7 @@ namespace Backoffice.Web.Components.Common
                                     HasReadOnly = s.FirstOrDefault().HasReadOnly,
                                     SortOrder = s.FirstOrDefault().SortOrder,
                                     ClaimValue = s.FirstOrDefault().ClaimValue,
-                                    IsEnabled = s.FirstOrDefault().IsEnabled
+                                    Availability = s.FirstOrDefault().Availability
                                 }).Distinct().ToList();
 
                             var groups = Permissions.Where(p => p.CategoryId == permission.CategoryId && p.SubCategoryName == subCategory.SubCategoryName && !string.IsNullOrEmpty(p.GroupName)).Select(s => s.GroupName).Distinct().ToList();
@@ -268,7 +268,7 @@ namespace Backoffice.Web.Components.Common
                                         HasReadOnly = s.HasReadOnly,
                                         SortOrder = s.SortOrder,
                                         ClaimValue = s.ClaimValue,
-                                        IsEnabled = s.IsEnabled
+                                        Availability = s.Availability
                                     }).Distinct().ToList();
 
                                 var groupModel = new PermissionTreeModel.Group

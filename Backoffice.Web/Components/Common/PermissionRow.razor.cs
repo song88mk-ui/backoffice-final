@@ -10,6 +10,8 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public PermissionTreeModel.PermissionClaim Claim { get; set; }
         [Parameter] public List<PermissionTreeModel.Group> Groups { get; set; }
         [Parameter] public bool IsReadOnly { get; set; }
+        [Parameter] public bool IsSubUser { get; set; }
+        [Parameter] public int Availability { get; set; }
         #endregion
 
         #region Methods
