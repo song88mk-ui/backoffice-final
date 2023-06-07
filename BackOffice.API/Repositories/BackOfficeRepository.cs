@@ -1346,35 +1346,37 @@ namespace Backoffice.API.Repositories
         #region Config
         public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string userId, List<string> clientCodes = null, List<int> sportIds = null, List<int> scopeIds = null)
         {
-            var query = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId).AsNoTracking();
+            try
+            {
+                var query = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId).AsNoTracking();
 
-            if (sportIds != null && clientCodes.Any())
-            {
-                query = query.Where(x => clientCodes.Any(client => x.ClientCodes.Contains(client)));
-            }
-            if (sportIds != null && sportIds.Count() > 0)
-            {
-                query = query.Where(x => sportIds.Contains(x.SportId));
-            }
-            if (scopeIds != null && scopeIds.Count() > 0)
-            {
-                query = query.Where(x => sportIds.Contains(x.FixtureStatusId));
-            }
+                if (sportIds != null && clientCodes.Any())
+                {
+                    query = query.Where(x => clientCodes.Any(client => x.ClientCodes.Contains(client)));
+                }
+                if (sportIds != null && sportIds.Count() > 0)
+                {
+                    query = query.Where(x => sportIds.Contains(x.SportId));
+                }
+                if (scopeIds != null && scopeIds.Count() > 0)
+                {
+                    query = query.Where(x => sportIds.Contains(x.FixtureStatusId));
+                }
 
-            var result = query.ToList().Select(x => new ConfigTemplateModel()
-            {
-                Id = x.Id.ToString(),
-                UserId = x.UserId,
-                Name = x.Name,
-                SportId = x.SportId,
-                FixtureStatusId = x.FixtureStatusId,
-                ClientCodes = x.ClientCodes.Split(',').ToList(),
-                LeagueIds = string.IsNullOrEmpty(x.LeagueIds)
-                        ? new List<int>()
-                        : x.LeagueIds.Split(',')
-                            .Select(str => int.Parse(str))
-                            .ToList()
-            }).ToList();
+                var result = query.ToList().Select(x => new ConfigTemplateModel()
+                {
+                    Id = x.Id.ToString(),
+                    UserId = x.UserId,
+                    Name = x.Name,
+                    SportId = x.SportId,
+                    FixtureStatusId = x.FixtureStatusId,
+                    ClientCodes = x.ClientCodes.Split(',').ToList(),
+                    LeagueIds = string.IsNullOrEmpty(x.LeagueIds)
+                            ? new List<int>()
+                            : x.LeagueIds.Split(',')
+                                .Select(str => int.Parse(str))
+                                .ToList()
+                }).ToList();
 
                 return new BaseResponse<List<ConfigTemplateModel>>()
                 {
@@ -1575,34 +1577,35 @@ namespace Backoffice.API.Repositories
 
         public async Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(string userId, List<string> clientCodes)
         {
-            try
-            {
-                var userConfigTemplates = (await GetConfigTemplate(userId)).Result;
-                var assignedTemplates = (await GetConfigClient(userId, clientCodes, true)).Result;
-                var unAssignedTemplates = (await GetConfigClient(userId, clientCodes, false)).Result;
+            throw new NotImplementedException();
+            //try
+            //{
+            //    var userConfigTemplates = (await GetConfigTemplate(userId)).Result;
+            //    var assignedTemplates = (await GetConfigClient(userId, clientCodes, true)).Result;
+            //    var unAssignedTemplates = (await GetConfigClient(userId, clientCodes, false)).Result;
 
-                return new BaseResponse<TemplateConfigCount>()
-                {
-                    StatusCode = StatusCode.Success,
-                    Message = StatusCode.Success.ToString(),
-                    Result = new TemplateConfigCount() 
-                    {
-                        MyTemplatesCount = userConfigTemplates.Count,
-                        AssignedTemplatesCount = assignedTemplates.Count,
-                        UnAssignedTemplatesCount = unAssignedTemplates.Count
-                    }
-                };
-            }
-            catch(Exception ex) 
-            {
+            //    return new BaseResponse<TemplateConfigCount>()
+            //    {
+            //        StatusCode = StatusCode.Success,
+            //        Message = StatusCode.Success.ToString(),
+            //        Result = new TemplateConfigCount()
+            //        {
+            //            MyTemplatesCount = userConfigTemplates.Count,
+            //            AssignedTemplatesCount = assignedTemplates.Count,
+            //            UnAssignedTemplatesCount = unAssignedTemplates.Count
+            //        }
+            //    };
+            //}
+            //catch (Exception ex)
+            //{
 
-                return new BaseResponse<TemplateConfigCount>()
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = ex.Message,
-                    Result = null
-                };
-            }
+            //    return new BaseResponse<TemplateConfigCount>()
+            //    {
+            //        StatusCode = StatusCode.Error,
+            //        Message = ex.Message,
+            //        Result = null
+            //    };
+            //}
         }
 
         #endregion

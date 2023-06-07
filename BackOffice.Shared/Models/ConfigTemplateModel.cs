@@ -10,8 +10,8 @@ namespace Backoffice.Shared.Models
         public string Name { get; set; }
         public int SportId { get; set; }
         public int FixtureStatusId { get; set; }
-        public List<string> ClientCodes { get; set; }
-        public List<int> LeagueIds { get; set; }
+        public List<string> ClientCodes { get; set; } = new List<string>();
+        public List<int> LeagueIds { get; set; } = new List<int>();
         public DateTime Timestamp { get; set; }
     }
 }
