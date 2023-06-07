@@ -1351,7 +1351,7 @@ namespace Backoffice.API.Repositories
                 if (sportId != 0)
                 {
                     //all sports
-                    query = query.Where(x => x.UserId == userId && x.FixtureStatusId == fixtureStatusId).ToList();
+                    query = query.Where(x => x.UserId == userId && x.SportId == sportId && x.FixtureStatusId == fixtureStatusId).ToList();
                 }
 
                 if (fixtureStatusId != -1)
@@ -1465,12 +1465,12 @@ namespace Backoffice.API.Repositories
                 var result = new List<ConfigClientModel>();
                 var configTemplate = await GetConfigTemplate(userId);
                 var templates = configTemplate.Result;
-                var clientList = GetClientInformation();
+                var clientList = (await _tradingRepository.GetClientList("hk")).Result;
                 if (clientCodes.Count == 1)
                 {
                     if (clientCodes.FirstOrDefault().ToUpper() == "ALL")
                     {
-                        clientCodes = GetClientInformation().Select(x => x.Brand).ToList();
+                        clientCodes = clientList.Select(x => x.ClientCode).ToList();
                     }
                 }
 
@@ -1485,7 +1485,7 @@ namespace Backoffice.API.Repositories
                                 result.Add(new ConfigClientModel()
                                 {
                                     ClientCode = client.ToUpper(),
-                                    ClientName = clientList.Where(x => x.Brand.ToUpper() == client).Select(x => x.Name).FirstOrDefault(),
+                                    ClientName = clientList.Where(x => x.ClientCode.ToUpper() == client).Select(x => x.ClientName).FirstOrDefault(),
                                     SportId = template.SportId,
                                     FixtureStatusId = template.FixtureStatusId,
                                     LeagueId = league,
@@ -1527,7 +1527,7 @@ namespace Backoffice.API.Repositories
                                                 result.Add(new ConfigClientModel()
                                                 {
                                                     ClientCode = client.ToUpper(),
-                                                    ClientName = clientList.Where(x => x.Brand.ToUpper() == client).Select(x => x.Name).FirstOrDefault(),
+                                                    ClientName = clientList.Where(x => x.ClientCode.ToUpper() == client).Select(x => x.ClientName).FirstOrDefault(),
                                                     SportId = sport.SportId,
                                                     FixtureStatusId = fixtureStatus,
                                                     LeagueId = league.LeagueId
@@ -1558,7 +1558,7 @@ namespace Backoffice.API.Repositories
                                                 result.Add(new ConfigClientModel()
                                                 {
                                                     ClientCode = client.ToUpper(),
-                                                    ClientName = clientList.Where(x => x.Brand.ToUpper() == client).Select(x => x.Name).FirstOrDefault(),
+                                                    ClientName = clientList.Where(x => x.ClientCode.ToUpper() == client).Select(x => x.ClientName).FirstOrDefault(),
                                                     SportId = sport.SportId,
                                                     FixtureStatusId = fixtureStatus,
                                                     LeagueId = league.LeagueId
@@ -1583,6 +1583,39 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<List<ConfigClientModel>>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
             }
         }
+
+        public async Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(string userId, List<string> clientCodes)
+        {
+            try
+            {
+                var userConfigTemplates = (await GetConfigTemplate(userId)).Result;
+                var assignedTemplates = (await GetConfigClient(userId, clientCodes, true)).Result;
+                var unAssignedTemplates = (await GetConfigClient(userId, clientCodes, false)).Result;
+
+                return new BaseResponse<TemplateConfigCount>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new TemplateConfigCount() 
+                    {
+                        MyTemplatesCount = userConfigTemplates.Count,
+                        AssignedTemplatesCount = assignedTemplates.Count,
+                        UnAssignedTemplatesCount = unAssignedTemplates.Count
+                    }
+                };
+            }
+            catch(Exception ex) 
+            {
+
+                return new BaseResponse<TemplateConfigCount>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message,
+                    Result = null
+                };
+            }
+        }
+
         #endregion
 
         #region Methods - Top Fixtures

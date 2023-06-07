@@ -110,13 +110,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             ModalService.Open<ExportTemplateModal>($"Export Templates", parameters, options);
         }
 
-        public async Task OnViewAssignedClickEvent()
+        public async Task OnViewAssignedClickEvent(ConfigTemplateModel configTemplateModel)
         {
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
             parameters.Add("Region", Region);
+            parameters.Add("ConfigTemplateModel", configTemplateModel);
 
             var options = new ModalOptions();
 
@@ -149,8 +150,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private async Task Init()
         {                       
             Sports =  await LoadSports();
-
-            SelectedSportId = Sports.FirstOrDefault().Value;
+            
 
             await LoadConfigTemplates();
         }
