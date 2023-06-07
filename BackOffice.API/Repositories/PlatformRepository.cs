@@ -414,7 +414,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var response = await GetHttpClient(region).PostAsync($"v2/client/topfixtures", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await GetHttpClient(region).PostAsync($"v1/client/topfixtures", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonConvert.DeserializeObject<BaseResponse<PlatformMessageResponse>>(await response.Content.ReadAsStringAsync());
@@ -457,7 +457,7 @@ namespace Backoffice.API.Repositories
                 sortOrder++;
             }
 
-            var result = GetHttpClient(region).PostAsync($"v2/client/topfixtures/copy", new StringContent(JsonConvert.SerializeObject(new
+            var result = GetHttpClient(region).PostAsync($"v1/client/topfixtures/copy", new StringContent(JsonConvert.SerializeObject(new
             {
                 ClientIds = request.ClientIds,
                 TopFixtures = topFixtures
