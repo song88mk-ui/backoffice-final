@@ -1359,8 +1359,14 @@ namespace Backoffice.API.Repositories
             {
                 var query = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId).AsNoTracking();
 
-                if (sportIds != null && clientCodes.Any())
+                if (clientCodes != null && clientCodes.Any())
                 {
+                    var clientList = GetTradingClientInformation();
+                    if (clientCodes.FirstOrDefault().ToUpper() == "ALL")
+                    {
+                        clientCodes = clientList.Select(x => x.ClientCode).ToList();
+                    }
+
                     query = query.Where(x => clientCodes.Any(client => x.ClientCodes.Contains(client)));
                 }
                 if (sportIds != null && sportIds.Count() > 0)
