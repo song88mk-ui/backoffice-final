@@ -1,10 +1,5 @@
 ﻿<div class="col mx-4 config-nav-container">
-    <a href="@Region/odds-engine/config/my-templates" class="@(CurrentMenu == 1 ? "config-nav active" : "config-nav")">My Templates (4)</a>
-    <a href="@Region/odds-engine/config/assigned" class="@(CurrentMenu == 2 ? "config-nav active" : "config-nav")">Assigned (48)</a>
-    <a href="@Region/odds-engine/config/unassigned" class="@(CurrentMenu == 3 ? "config-nav active" : "config-nav")">Unassigned (5)</a>
+    <a href="@Region/odds-engine/config/my-templates" class="@(CurrentMenu == 1 ? "config-nav active" : "config-nav")">My Templates (@TemplateConfigCount.MyTemplatesCount)</a>
+    <a href="@Region/odds-engine/config/assigned" class="@(CurrentMenu == 2 ? "config-nav active" : "config-nav")">Assigned (@TemplateConfigCount.AssignedTemplatesCount)</a>
+    <a href="@Region/odds-engine/config/unassigned" class="@(CurrentMenu == 3 ? "config-nav active" : "config-nav")">Unassigned (@TemplateConfigCount.UnAssignedTemplatesCount)</a>
 </div>
-
-@code {
-    [Parameter] public string Region { get; set; }
-    [Parameter] public int CurrentMenu { get; set; }
-}

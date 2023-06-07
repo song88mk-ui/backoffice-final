@@ -1431,6 +1431,37 @@ namespace Backoffice.Web.Services
             }
         }
 
+        public async Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(string token)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"api/config/template/count");
+
+                if(response.IsSuccessStatusCode)
+                {
+                    return JsonSerializer.Deserialize<BaseResponse<TemplateConfigCount>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<TemplateConfigCount>();
+                }
+                else
+                {
+                    return new BaseResponse<TemplateConfigCount>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<TemplateConfigCount>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         #endregion
 
         public void Dispose()

@@ -1,5 +1,27 @@
 ﻿<div class="modal-body">
     <div class="accordion" id="viewAssignedAccordion">
+
+        @*WIP*@
+        @*@foreach(var client in ConfigTemplateModel.ClientCodes)
+        {
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="@($"{client}-header")">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="@($"#{client}Collapse")" aria-expanded="true" aria-controls="@($"{client}Collapse")">
+                        @client
+                    </button>
+                </h2>
+
+                <div id="" class="accordion-collapse collapse show" aria-labelledby="">
+                    <div class="accordion-body">
+                        <ul class="list-group">
+                            @foreach()
+                        </ul>
+                    <div>
+                </div>
+
+            </div>
+        }*@
+
         <div class="accordion-item">
             <h2 class="accordion-header" id="header1">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">

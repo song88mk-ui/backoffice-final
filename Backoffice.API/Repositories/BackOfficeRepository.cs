@@ -1581,6 +1581,39 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<ConfigTemplateLeagueResponse>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
             }
         }
+
+        public async Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(string userId, List<string> clientCodes)
+        {
+            try
+            {
+                var userConfigTemplates = (await GetConfigTemplate(userId)).Result;
+                var assignedTemplates = (await GetConfigClient(userId, clientCodes, true)).Result;
+                var unAssignedTemplates = (await GetConfigClient(userId, clientCodes, false)).Result;
+
+                return new BaseResponse<TemplateConfigCount>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new TemplateConfigCount() 
+                    {
+                        MyTemplatesCount = userConfigTemplates.Count,
+                        AssignedTemplatesCount = assignedTemplates.Count,
+                        UnAssignedTemplatesCount = unAssignedTemplates.Count
+                    }
+                };
+            }
+            catch(Exception ex) 
+            {
+
+                return new BaseResponse<TemplateConfigCount>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message,
+                    Result = null
+                };
+            }
+        }
+
         #endregion
 
         #region Methods - Top Fixtures
