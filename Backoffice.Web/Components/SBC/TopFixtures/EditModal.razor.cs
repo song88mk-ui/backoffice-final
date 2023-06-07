@@ -46,7 +46,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
             CurrentTopFixtures = TopFixture.TopFixtures.Any() ? TopFixture.TopFixtures.Select(s => s.FixtureId).ToList() : new List<string>();
 
-            IsDisabled = CurrentTopFixtures.Count() >= 100;
+            IsDisabled = CurrentTopFixtures.Count() >= 50;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -139,7 +139,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 SortOrder = count + 1
             });
 
-            IsDisabled = NewTopFixture.TopFixtures.Any() && NewTopFixture.TopFixtures.Count >= 100 ? true : false;
+            IsDisabled = NewTopFixture.TopFixtures.Any() && NewTopFixture.TopFixtures.Count >= 50 ? true : false;
             
             SortOrderRow();
         }
@@ -148,7 +148,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
         {
             NewTopFixture.TopFixtures.Remove(fixture);
 
-            if (NewTopFixture.TopFixtures.Any() && NewTopFixture.TopFixtures.Count < 100)
+            if (NewTopFixture.TopFixtures.Any() && NewTopFixture.TopFixtures.Count < 50)
             {
                 IsDisabled = false;
             }
