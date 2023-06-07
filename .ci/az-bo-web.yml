@@ -10,7 +10,7 @@ trigger:
   paths:
     include:
       - Backoffice.Web
-      - Backoffice.Shared
+      - BackOffice.Shared
     exclude:
       - README.md
 
