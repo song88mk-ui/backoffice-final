@@ -2,18 +2,36 @@
     <div class="row mb-3">
         <label for="nameTemplate" class="col-sm-2 col-form-label">Name:</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" id="nameTemplate" />
+            <input type="text" class="form-control" id="nameTemplate" @bind-value="TemplateName"/>
+            @if (IsConfigNameExisting)
+            {
+                <span class="fst-italic text-danger">Sorry, that name already exists!</span>
+            }
         </div>
     </div>
 
     <div class="row mb-3">
         <label for="sportsSelect" class="col-sm-2 col-form-label">Sports:</label>
         <div class="col-sm-10">
-            <select class="form-select">
-                <option value="1">Basketball</option>
-                <option value="2">Soccer</option>
-                <option value="3">Baseball</option>
-                <option value="4">Tennis</option>
+            <select class="form-select" @onchange="OnSportSelectChanged">
+                @if (Sports.Any())
+                {
+                    @foreach (var item in Sports)
+                    {
+                        if (item.Value == SelectedSportId)
+                        {
+                            <option value="@item.Value" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Name</option>
+                        }
+                    }
+                }
+                else
+                {
+                    <option value="0">--</option>
+                }
             </select>
         </div>
     </div>
@@ -21,9 +39,9 @@
     <div class="row mb-3">
         <label for="scopeSelect" class="col-sm-2 col-form-label">Scope:</label>
         <div class="col-sm-10">
-            <select class="form-select">
-                <option value="1">Prematch</option>
-                <option value="2">Live</option>
+            <select class="form-select" @onchange="OnScopeSelectChanged">
+                <option value="0">Prematch</option>
+                <option value="1">Live</option>
             </select>
         </div>
     </div>

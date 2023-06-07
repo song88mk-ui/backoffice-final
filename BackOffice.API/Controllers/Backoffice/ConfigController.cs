@@ -107,7 +107,7 @@ namespace Backoffice.API.Controllers.Backoffice
 
             var isAssigned = true;
 
-            switch(type.ToLower())
+            switch (type.ToLower())
             {
                 case "assigned":
                 case "unassigned":
@@ -115,9 +115,25 @@ namespace Backoffice.API.Controllers.Backoffice
                     break;
                 default:
                     return BadRequest(new BaseResponse<List<ConfigClientModel>>() { StatusCode = BoStatusCode.Error, Message = "Invalid template type", Result = null });
-            }    
+            }
 
             var result = await _backofficeRepository.GetConfigClient(userId, clientCodes, payload, isAssigned);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpGet("template/count")]
+        public async Task<IActionResult> GetTemplateConfigCount()
+        {
+            var userId = HttpContext.Items["UserId"].ToString();
+            var clientCodes = HttpContext.Items["ClientCodes"].ToString().Split(',').ToList();
+
+            var result = await _backofficeRepository.GetTemplateConfigCount(userId, clientCodes);
 
             switch (result.StatusCode)
             {

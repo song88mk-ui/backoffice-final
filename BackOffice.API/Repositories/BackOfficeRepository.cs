@@ -1376,12 +1376,22 @@ namespace Backoffice.API.Repositories
                             .ToList()
             }).ToList();
 
-            return new BaseResponse<List<ConfigTemplateModel>>()
+                return new BaseResponse<List<ConfigTemplateModel>>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
+            }
+            catch (Exception ex)
             {
-                StatusCode = StatusCode.Success,
-                Message = StatusCode.Success.ToString(),
-                Result = result
-            };
+                return new BaseResponse<List<ConfigTemplateModel>>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString()}: {ex.Message}",
+                    Result = new List<ConfigTemplateModel>()
+                };
+            }
         }
         public async Task<BaseResponse<List<ConfigTemplateModel>>> AddOrUpdateConfigTemplate(string userId, ConfigTemplateModel request)
         {
@@ -1398,9 +1408,21 @@ namespace Backoffice.API.Repositories
                 }
                 else
                 {
+                    var isConfigExisting = _backofficeContext.ConfigTemplates.Any(e => e.Name == request.Name && e.UserId == request.UserId);
+
+                    if (isConfigExisting)
+                    {
+                        return new BaseResponse<List<ConfigTemplateModel>>()
+                        {
+                            Message = "Sorry, that name already exists!",
+                            StatusCode = StatusCode.Error,
+                            Result = null
+                        };
+                    }
+
                     _backofficeContext.ConfigTemplates.Add(new ConfigTemplate()
                     {
-                        Id = Guid.Parse(request.Id),
+                        Id = Guid.NewGuid(),
                         UserId = request.UserId,
                         Name = request.Name,
                         SportId = request.SportId,
@@ -1410,6 +1432,8 @@ namespace Backoffice.API.Repositories
                         Timestamp = DateTime.UtcNow
                     });
                 }
+
+                await _backofficeContext.SaveChangesAsync();
 
                 return await GetConfigTemplate(userId);
             }
@@ -1428,6 +1452,8 @@ namespace Backoffice.API.Repositories
                 {
                     _backofficeContext.ConfigTemplates.Remove(config);
                 }
+
+                await _backofficeContext.SaveChangesAsync();
 
                 return await GetConfigTemplate(userId);
             }
@@ -1546,6 +1572,39 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<ConfigTemplateLeagueResponse>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
             }
         }
+
+        public async Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(string userId, List<string> clientCodes)
+        {
+            try
+            {
+                var userConfigTemplates = (await GetConfigTemplate(userId)).Result;
+                var assignedTemplates = (await GetConfigClient(userId, clientCodes, true)).Result;
+                var unAssignedTemplates = (await GetConfigClient(userId, clientCodes, false)).Result;
+
+                return new BaseResponse<TemplateConfigCount>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new TemplateConfigCount() 
+                    {
+                        MyTemplatesCount = userConfigTemplates.Count,
+                        AssignedTemplatesCount = assignedTemplates.Count,
+                        UnAssignedTemplatesCount = unAssignedTemplates.Count
+                    }
+                };
+            }
+            catch(Exception ex) 
+            {
+
+                return new BaseResponse<TemplateConfigCount>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message,
+                    Result = null
+                };
+            }
+        }
+
         #endregion
 
         #region Methods - Top Fixtures
