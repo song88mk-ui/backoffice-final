@@ -58,8 +58,9 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> GetClientConfigTemplate([FromQuery] int sportId = -1, [FromQuery] int scopeId = -1)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
+            var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
 
-            var result = await _backofficeRepository.GetConfigTemplate(userId, null, sportId == -1 ?  null : new List<int>() { sportId}, scopeId == -1? null: new List<int>() { scopeId });
+            var result = await _backofficeRepository.GetConfigTemplate(userId, clientCodes, sportId == -1 ?  null : new List<int>() { sportId}, scopeId == -1? null: new List<int>() { scopeId });
 
             switch (result.StatusCode)
             {
