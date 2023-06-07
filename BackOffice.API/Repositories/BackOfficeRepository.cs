@@ -528,6 +528,15 @@ namespace Backoffice.API.Repositories
                 var userId = 0;
 
                 long clientId = 0;
+                if (GetClientInformation().Any(c => c.Brand == request.ClientCode && c.ClientId != request.ClientId))
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = "Brand ID is already in use. Please add another ID.",
+                        Result = false
+                    };
+                }
                 if (GetClientInformation().Any(c => c.Name == request.Name && c.ClientId != request.ClientId))
                 {
                     return new BaseResponse<bool>
