@@ -1490,10 +1490,6 @@ namespace Backoffice.API.Repositories
                         clientCodes = clientList.Select(x => x.ClientCode).ToList();
                     }
                 }
-                else if (clientCodes.Count() > 1)
-                {
-                    clientCodes = clientList.Where(x => clientCodes.Contains(x.ClientCode)).Select(x => x.ClientCode).ToList();
-                }
 
                 if (payload.ClientCodes.Any())
                     clientCodes = payload.ClientCodes.ToList();
@@ -1556,16 +1552,18 @@ namespace Backoffice.API.Repositories
                         }
                     }
 
-                    metaData.TotalCount = result.Count();
-                    metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
-
-                    var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
-
-                    if (metaData.CurrentPage > 0)
-                        result = result.Skip(skip).Take(metaData.PageSize).ToList();
-                    else
-                        result = result.Skip(0).Take(metaData.PageSize).ToList();
                 }
+
+                metaData.TotalCount = result.Count();
+                metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
+
+                var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
+                metaData.PageSize = metaData.PageSize == -1 ? metaData.TotalCount : metaData.PageSize;
+
+                if (metaData.CurrentPage > 0)
+                    result = result.Skip(skip).Take(metaData.PageSize).ToList();
+                else
+                    result = result.Skip(0).Take(metaData.PageSize).ToList();
 
                 return new BaseResponse<ConfigTemplateLeagueResponse>()
                 {
@@ -1586,35 +1584,52 @@ namespace Backoffice.API.Repositories
 
         public async Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(string userId, List<string> clientCodes)
         {
-            throw new NotImplementedException();
-            //try
-            //{
-            //    var userConfigTemplates = (await GetConfigTemplate(userId)).Result;
-            //    var assignedTemplates = (await GetConfigClient(userId, clientCodes, true)).Result;
-            //    var unAssignedTemplates = (await GetConfigClient(userId, clientCodes, false)).Result;
+            try
+            {
 
-            //    return new BaseResponse<TemplateConfigCount>()
-            //    {
-            //        StatusCode = StatusCode.Success,
-            //        Message = StatusCode.Success.ToString(),
-            //        Result = new TemplateConfigCount()
-            //        {
-            //            MyTemplatesCount = userConfigTemplates.Count,
-            //            AssignedTemplatesCount = assignedTemplates.Count,
-            //            UnAssignedTemplatesCount = unAssignedTemplates.Count
-            //        }
-            //    };
-            //}
-            //catch (Exception ex)
-            //{
+                var myConfiTemplates = 0;
+                var assignedTemplates = 0;
+                var unassignedTemplates = 0;
+                var taskList = new List<Task>()
+                {
+                    Task.Run(async () => {
+                        var configTemplate = await GetConfigTemplate(userId);
+                        var templates = configTemplate.Result;
+                        myConfiTemplates = templates.Count();
+                    }),
+                    Task.Run(async () => {
+                        var tempConfig = await GetConfigClient(userId, clientCodes, new ConfigTemplateLeagueRequest(), true);
+                        assignedTemplates = tempConfig.Result.ClientConfigs.Count();
+                    }),
+                    Task.Run(async () => {
+                        var tempConfig = await GetConfigClient(userId, clientCodes, new ConfigTemplateLeagueRequest(), false);
+                        unassignedTemplates = tempConfig.Result.ClientConfigs.Count();
+                    })
+                };
 
-            //    return new BaseResponse<TemplateConfigCount>()
-            //    {
-            //        StatusCode = StatusCode.Error,
-            //        Message = ex.Message,
-            //        Result = null
-            //    };
-            //}
+                Task.WaitAll(taskList.ToArray());
+                return new BaseResponse<TemplateConfigCount>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new TemplateConfigCount()
+                    {
+                        MyTemplatesCount = myConfiTemplates,
+                        AssignedTemplatesCount = assignedTemplates,
+                        UnAssignedTemplatesCount = unassignedTemplates
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+
+                return new BaseResponse<TemplateConfigCount>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message,
+                    Result = null
+                };
+            }
         }
 
         #endregion
