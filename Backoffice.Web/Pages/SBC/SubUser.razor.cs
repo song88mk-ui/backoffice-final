@@ -283,23 +283,8 @@ namespace Backoffice.Web.Pages.SBC
         {
             var userClaims = UserModel.Claims.Where(x => claims.Any(c => c.ClaimType == x.Type && x.Value == c.ClaimValue)).Select(x => x.Type).ToList();
 
-            return string.Join(',', userClaims);
 
-            //if (claims != null && claims.Any())
-            //{
-            //    var claimsList = string.Empty;
-            //    foreach (var claim in claims.Where(x => x.ClaimValue != "0"))
-            //    {
-            //        var permission = PermissionResponse.Permissions.FirstOrDefault(p => p.ClaimType.ToLower() == claim.ClaimType.ToLower());
-
-            //        if (permission != null && UserModel.Claims.FirstOrDefault(c => c.Type == permission.ClaimType) != null)
-            //        {
-            //            claimsList = claimsList + (string.IsNullOrEmpty(claimsList) ? string.Empty : ", ") + $"{permission.Name}" + (claim.ClaimValue == "2" ? " (ReadOnly)" : string.Empty);
-            //        }
-            //    }
-
-            //    return claimsList;
-            //}
+            return string.Join(", ", PermissionResponse.Permissions.Where(x => userClaims.Contains(x.ClaimType)).Select(x => x.Name).ToList());
         }
 
         #endregion

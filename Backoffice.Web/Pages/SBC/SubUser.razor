@@ -58,7 +58,7 @@
                                                     <span class="status-locked py-1 px-4 rounded-pill">Locked</span>
                                                 }
                                             </td>
-                                            <td>
+                                            <td class="text-break">
                                                 @if (user.Claims != null && user.Claims.Any())
                                                 {
                                                     @($"{GetClaimsList(user.Claims)}")
