@@ -1,18 +1,14 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Components.Common;
 using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
-using System.Drawing;
-using System.Security.Claims;
 using System.Text.Json;
 
 namespace Backoffice.Web.Shared

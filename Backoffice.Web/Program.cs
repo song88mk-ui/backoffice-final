@@ -1,5 +1,4 @@
 using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Hubs;
@@ -11,15 +10,10 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.ResponseCompression;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using System.Diagnostics.Metrics;
 using System.Reflection;
-using System.Text;
-using System.Text.Json;
-using Microsoft.JSInterop;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
