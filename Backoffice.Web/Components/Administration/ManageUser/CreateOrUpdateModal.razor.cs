@@ -275,7 +275,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                 {
                     var response = (await AuthenticationService.UpdateUser(request));
 
-                    if (response.Result)
+                    if (response.StatusCode == StatusCode.Success)
                     {
                         await InvokeAsync(StateHasChanged);
                         await Task.Delay(3500);

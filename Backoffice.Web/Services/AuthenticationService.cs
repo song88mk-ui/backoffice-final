@@ -7,7 +7,6 @@ using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Telemetry;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Net;
@@ -15,7 +14,6 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using UAParser;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Backoffice.Web.Services
@@ -195,7 +193,7 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<bool>> UpdateUser(UserRegisterRequest request)
+        public async Task<BaseResponse<string>> UpdateUser(UserRegisterRequest request)
         {
             try
             {
@@ -205,16 +203,16 @@ namespace Backoffice.Web.Services
                 var response = await _httpClient.PostAsync($"api/authentication/user/modify", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<bool>();
+                    return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<string>();
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                            ?? new BaseResponse<bool>();
+                        return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<string>();
                     else
                     {
-                        return new BaseResponse<bool>
+                        return new BaseResponse<string>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -225,7 +223,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                return new BaseResponse<bool>
+                return new BaseResponse<string>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

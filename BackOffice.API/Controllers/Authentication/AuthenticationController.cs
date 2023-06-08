@@ -144,7 +144,7 @@ namespace Backoffice.API.Controllers.Authentication
         [HttpPost("user/modify")]
         public async Task<IActionResult> UpdateUser([FromBody] UserRegisterRequest request)
         {
-            var result = new BaseResponse<bool>()
+            var result = new BaseResponse<string>()
             {
                 StatusCode = Shared.Enums.StatusCode.Unauthorized,
                 Message = "Missing authorization"
