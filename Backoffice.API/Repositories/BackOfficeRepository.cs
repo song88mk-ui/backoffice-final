@@ -1383,7 +1383,7 @@ namespace Backoffice.API.Repositories
                     Name = x.Name,
                     SportId = x.SportId,
                     FixtureStatusId = x.FixtureStatusId,
-                    ClientCodes = clientCodes.Any() ? x.ClientCodes.Split(',').ToList().Where(x => clientCodes.Contains(x)).ToList() : x.ClientCodes.Split(',').ToList(),
+                    ClientCodes = clientCodes != null ? x.ClientCodes.Split(',').ToList().Where(x => clientCodes.Contains(x)).ToList() : x.ClientCodes.Split(',').ToList(),
                     LeagueIds = string.IsNullOrEmpty(x.LeagueIds)
                             ? new List<int>()
                             : x.LeagueIds.Split(',')
