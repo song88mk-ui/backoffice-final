@@ -1154,12 +1154,12 @@ namespace Backoffice.Web.Services
 
         #region Config
 
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetClientConfigTemplate(string token, int sportId, int fixtureStatusId)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetClientConfigTemplate(string token)
         {
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.GetAsync($"api/config/template/{sportId}/{fixtureStatusId}");
+                var response = await _httpClient.GetAsync($"api/config/template");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<List<ConfigTemplateModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

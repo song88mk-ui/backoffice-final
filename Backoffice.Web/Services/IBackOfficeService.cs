@@ -46,7 +46,7 @@ namespace Backoffice.Web.Services
 
         #region ConfigTemplate
 
-        Task<BaseResponse<List<ConfigTemplateModel>>> GetClientConfigTemplate(string token, int sportId, int fixtureStatusId);
+        Task<BaseResponse<List<ConfigTemplateModel>>> GetClientConfigTemplate(string token);
         Task<BaseResponse<List<ConfigTemplateModel>>> AddOrUpdateConfigTemplate(string token, ConfigTemplateModel request);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string token, string id);
         Task<BaseResponse<List<ConfigClientModel>>> GetConfigClient(string token, string type, MetaData metaData);

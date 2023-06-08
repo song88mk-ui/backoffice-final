@@ -93,7 +93,7 @@
                         <td class="text-center">@(configTemplate.Timestamp.ToString("hh:mm dd/mm/yyyy"))</td>
                         <td>
                             <div class="manage-cell">
-                                <a href="javascript:void(0)" @onclick="OnEditTemplateClickEvent" title="Edit Template">
+                                <a href="javascript:void(0)" @onclick="() => OnEditTemplateClickEvent(configTemplate)" title="Edit Template">
                                     <i class="fa fa-edit"></i>
                                 </a>
 
