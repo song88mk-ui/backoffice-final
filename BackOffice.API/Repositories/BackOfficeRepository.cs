@@ -1358,7 +1358,7 @@ namespace Backoffice.API.Repositories
                         clientCodes = clientList.Select(x => x.ClientCode).ToList();
                     }
 
-                    query = query.Where(x => clientCodes.Any(client => x.ClientCodes.Contains(client)));
+                    query = query.ToList().Where(x => clientCodes.Any(client => x.ClientCodes.Contains(client))).AsQueryable<ConfigTemplate>();
                 }
                 if (sportIds != null && sportIds.Count() > 0)
                 {
