@@ -1366,8 +1366,8 @@ namespace Backoffice.API.Repositories
                     {
                         clientCodes = clientList.Select(x => x.ClientCode).ToList();
                     }
-
-                    query = query.ToList().Where(x => clientCodes.Any(client => x.ClientCodes.Contains(client))).AsQueryable<ConfigTemplate>();
+                        
+                    query = query.ToList().Where(x => clientCodes.Any(client => x.ClientCodes.Contains(client)) || string.IsNullOrEmpty(x.ClientCodes)).AsQueryable<ConfigTemplate>();
                 }
                 if (sportIds != null && sportIds.Count() > 0)
                 {
@@ -1760,7 +1760,7 @@ namespace Backoffice.API.Repositories
         }
         private List<ClientInformationModel> GetTradingClientInformation()
         {
-            return _memCache.GetCache("boci", () => _tradingRepository.GetClientList("").Result?.Result, 24) ?? new List<ClientInformationModel>();
+            return _memCache.GetCache("botci", () => _tradingRepository.GetClientList("").Result?.Result, 24) ?? new List<ClientInformationModel>();
         }
         private long InsertClientRecord(ClientInformation client)
         {
