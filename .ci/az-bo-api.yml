@@ -10,7 +10,7 @@ trigger:
   paths:
     include:
       - BackOffice.API
-      - Backoffice.Shared
+      - BackOffice.Shared
     exclude:
       - README.md
 
@@ -21,12 +21,7 @@ resources:
       type: github
       name: FlyingCockatoo/BuildTemplates
       endpoint: FlyingCockatoo
-      ref: refs/tags/v1.5.0
-    - repository: nuget-helper
-      type: github
-      name: FlyingCockatoo/infra-build-nuget-helper
-      endpoint: FlyingCockatoo
-      ref: refs/heads/main
+      ref: refs/tags/v1.8.0
 
 extends:
   template: dotnetservice.yml@bt
