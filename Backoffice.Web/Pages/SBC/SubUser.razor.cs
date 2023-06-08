@@ -261,15 +261,17 @@ namespace Backoffice.Web.Pages.SBC
 
             if (!hasDashboard)
             {
+                var tempPermission = PermissionResponse.Permissions.FirstOrDefault(c => c.ClaimType.ToLower() == SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", ".").ToLower());
                 subUserClaims.Insert(0, new PermissionModel
                 {
                     CategoryId = (int)PermissionCategory.SBC,
-                    CategoryName = PermissionCategory.SBC.ToString(),
+                    CategoryName = "SportsbookClient",
                     SubCategoryName = "Dashboard",
                     GroupName = string.Empty,
                     IsSubUser = true,
                     Name = "Dashboard",
-                    ClaimType = PermissionResponse.Permissions.FirstOrDefault(c => c.ClaimType.ToLower() == SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", ".").ToLower()).Id,
+                    ClaimType = tempPermission.ClaimType,
+                    Id= tempPermission.Id,
                     HasReadOnly = false,
                     ClaimValue = "1",
                     Availability = 0
