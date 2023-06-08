@@ -1366,8 +1366,6 @@ namespace Backoffice.API.Repositories
                     {
                         clientCodes = clientList.Select(x => x.ClientCode).ToList();
                     }
-                        
-                    query = query.ToList().Where(x => clientCodes.Any(client => x.ClientCodes.Contains(client)) || string.IsNullOrEmpty(x.ClientCodes)).AsQueryable<ConfigTemplate>();
                 }
                 if (sportIds != null && sportIds.Count() > 0)
                 {
@@ -1385,12 +1383,13 @@ namespace Backoffice.API.Repositories
                     Name = x.Name,
                     SportId = x.SportId,
                     FixtureStatusId = x.FixtureStatusId,
-                    ClientCodes = x.ClientCodes.Split(',').ToList(),
+                    ClientCodes = clientCodes.Any() ? x.ClientCodes.Split(',').ToList().Where(x => clientCodes.Contains(x)).ToList() : x.ClientCodes.Split(',').ToList(),
                     LeagueIds = string.IsNullOrEmpty(x.LeagueIds)
                             ? new List<int>()
                             : x.LeagueIds.Split(',')
                                 .Select(str => int.Parse(str))
-                                .ToList()
+                                .ToList(),
+                    Timestamp = x.Timestamp
                 }).ToList();
 
                 return new BaseResponse<List<ConfigTemplateModel>>()
