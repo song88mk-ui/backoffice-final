@@ -193,7 +193,7 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<string>> UpdateUser(UserRegisterRequest request)
+        public async Task<BaseResponse<bool>> UpdateUser(UserRegisterRequest request)
         {
             try
             {
@@ -203,16 +203,16 @@ namespace Backoffice.Web.Services
                 var response = await _httpClient.PostAsync($"api/authentication/user/modify", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                        ?? new BaseResponse<string>();
+                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                        ?? new BaseResponse<bool>();
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
-                            ?? new BaseResponse<string>();
+                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
+                            ?? new BaseResponse<bool>();
                     else
                     {
-                        return new BaseResponse<string>
+                        return new BaseResponse<bool>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -223,7 +223,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                return new BaseResponse<string>
+                return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
