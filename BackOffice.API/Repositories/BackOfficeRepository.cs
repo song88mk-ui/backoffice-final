@@ -1589,7 +1589,7 @@ namespace Backoffice.API.Repositories
                 var taskList = new List<Task>()
                 {
                     Task.Run(async () => {
-                        var configTemplate = await GetConfigTemplate(userId);
+                        var configTemplate = await GetConfigTemplate(userId, clientCodes);
                         var templates = configTemplate.Result;
                         myConfiTemplates = templates.Count();
                     }),

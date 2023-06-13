@@ -17,6 +17,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private NavigationManager NavigationManager { get; set; }
 
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<ConfigTemplateModel> ConfigTemplates { get; set; }
@@ -78,9 +79,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             ModalService.Open<CreateTemplateModal>($"Create Template", parameters, options);
         }        
 
-        public async Task OnEditTemplateClickEvent()
+        public async Task OnEditTemplateClickEvent(ConfigTemplateModel configTemplateModel)
         {
-
+            NavigationManager.NavigateTo($"/hk/odds-engine/config/edit/{configTemplateModel.FixtureStatusId}/{configTemplateModel.Name}");
         }
 
         public async Task OnDeleteTemplateClickEvent(ConfigTemplateModel configTemplateModel)
@@ -157,7 +158,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task LoadConfigTemplates()
         {
-            ConfigTemplates =  (await BackOfficeService.GetClientConfigTemplate(UserModel.Id, SelectedSportId, SelectedScopeId)).Result;
+            ConfigTemplates =  (await BackOfficeService.GetClientConfigTemplate(UserModel.Id)).Result;
         }
 
         private async Task<List<SelectListItemModel<int>>> LoadSports()
