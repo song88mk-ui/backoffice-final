@@ -102,8 +102,8 @@ namespace Backoffice.Utility
                         _backofficeRepository.ProcessOnGetMarketSettlementHistory(marketSettlementHistory, _messageBroker);
                         break;
                     case "ExportOeConfigTemplate":
-                        var oeConfigTemplate = JsonSerializer.Deserialize<OnGetMarketSettlementHistoryMessage>(payload);
-                        _backofficeRepository.ProcessOnGetMarketSettlementHistory(oeConfigTemplate, _messageBroker);
+                        var oeConfigTemplate = JsonSerializer.Deserialize<OnGetOeConfigTemplateMessage>(payload);
+                        _backofficeRepository.ProcessOnGetOeConfigTemplate(oeConfigTemplate, _messageBroker);
                         break;
                     case "ExportCancelBetHistory":
                         var cancelBetHistory = JsonSerializer.Deserialize<OnGetCancelBetHistoryMessage>(payload);
