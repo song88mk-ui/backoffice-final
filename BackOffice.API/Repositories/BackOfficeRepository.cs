@@ -1627,7 +1627,6 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
         #endregion
 
         #region Methods - Top Fixtures
