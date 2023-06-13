@@ -145,6 +145,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
+
         #region ActivityLog
         [HttpPost("activitylog")]
         public async Task<IActionResult> ActivityLog([FromBody] ActivityLogModel request)
