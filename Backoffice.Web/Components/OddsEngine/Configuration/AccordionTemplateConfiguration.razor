@@ -1,0 +1,766 @@
+﻿<div class="accordion">
+    <div class="accordion-item">
+        <div class="accordion-header">
+            <button class="accordion-button ps-5" type="button" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="@($"#Market-1")">
+                Quarter - Total
+            </button>
+
+            <div class="d-flex justify-content-around market-toggle">
+                <span class="market-is-active-text">Market Active &nbsp;</span>
+                <AuthorizeView Policy="sbc-config-canedit">
+                    <Authorized Context="ActivateAll">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="@($"Market-Toggle")" role="switch" aria-label="Toggle Switch" />
+                        </div>
+                    </Authorized>
+                    <NotAuthorized Context="ActivateAll">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" disabled />
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+
+        <div id="@($"Market-1")" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                <div class="border pb-3 mb-3">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="p-1 bg-default">
+                                <div class="row">
+                                    <div class="col-sm-4"></div>
+                                    <div class="col-sm-2">
+                                        <span>First Key: 125</span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <span>Last Key: 112</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 timeline-col">
+                            <div class="d-flex py-2 pe-2 mx-3 mt-2 align-items-center timeline-axis">
+                                <div class="timeline-axis-line"></div>
+                                <span class="timeline-axis-label label-prematch">Prematch</span>
+
+                                <div class="timeline-axis-item my-3 first-axis">
+                                    <a id="timeline-0" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key-big timeline-axis-item-key-init" title="Click to edit key">107</span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">INST</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-2" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">240D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-3" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">120D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-4" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                           
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">60D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-5" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">30D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-6" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">15D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-7" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">10D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-8" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">9D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-9" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">8D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-10" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">7D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-11" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">6D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-12" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">5D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-13" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">4D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-14" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">3D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-15" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">2.5D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-16" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">2D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-17" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">36h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-18" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">240D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-19" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">18h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-20" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">12h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-21" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">6h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-22" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">3h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-23" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">1h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-24" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">30m</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-25" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">15m</span>
+                                </div>
+
+
+                                <span class="timeline-axis-label label-kickoff">Kick Off</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <div class="accordion-header">
+            <button class="accordion-button ps-5" type="button" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="@($"#Market-2")">
+                Quarter - 1x2
+            </button>
+
+            <div class="d-flex justify-content-around market-toggle">
+                <span class="market-is-active-text">Market Active &nbsp;</span>
+                <AuthorizeView Policy="sbc-config-canedit">
+                    <Authorized Context="ActivateAll">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="@($"Market-Toggle")" role="switch" aria-label="Toggle Switch" />
+                        </div>
+                    </Authorized>
+                    <NotAuthorized Context="ActivateAll">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" disabled />
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+
+        <div id="@($"Market-2")" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                <div class="border pb-3 mb-3">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="p-1 bg-default">
+                                <div class="row">
+                                    <div class="col-sm-4"></div>
+                                    <div class="col-sm-2">
+                                        <span>First Key: 125</span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <span>Last Key: 112</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 timeline-col">
+                            <div class="d-flex py-2 pe-2 mx-3 mt-2 align-items-center timeline-axis">
+                                <div class="timeline-axis-line"></div>
+                                <span class="timeline-axis-label label-prematch">Prematch</span>
+
+                                <div class="timeline-axis-item my-3 first-axis">
+                                    <a id="timeline-0" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key-big timeline-axis-item-key-init" title="Click to edit key">107</span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">INST</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-2" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">240D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-3" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">120D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-4" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                           
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">60D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-5" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">30D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-6" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">15D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-7" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">10D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-8" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">9D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-9" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">8D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-10" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">7D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-11" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">6D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-12" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">5D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-13" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">4D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-14" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">3D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-15" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">2.5D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-16" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">2D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-17" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">36h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-18" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">240D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-19" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">18h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-20" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">12h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-21" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">6h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-22" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">3h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-23" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">1h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-24" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">30m</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-25" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">15m</span>
+                                </div>
+
+
+                                <span class="timeline-axis-label label-kickoff">Kick Off</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <div class="accordion-header">
+            <button class="accordion-button ps-5" type="button" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="@($"#Market-3")">
+                Quarter - Double Chance
+            </button>
+
+            <div class="d-flex justify-content-around market-toggle">
+                <span class="market-is-active-text">Market Active &nbsp;</span>
+                <AuthorizeView Policy="sbc-config-canedit">
+                    <Authorized Context="ActivateAll">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="@($"Market-Toggle")" role="switch" aria-label="Toggle Switch" />
+                        </div>
+                    </Authorized>
+                    <NotAuthorized Context="ActivateAll">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" disabled />
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+
+        <div id="@($"Market-3")" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                <div class="border pb-3 mb-3">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="p-1 bg-default">
+                                <div class="row">
+                                    <div class="col-sm-4"></div>
+                                    <div class="col-sm-2">
+                                        <span>First Key: 125</span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <span>Last Key: 112</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 timeline-col">
+                            <div class="d-flex py-2 pe-2 mx-3 mt-2 align-items-center timeline-axis">
+                                <div class="timeline-axis-line"></div>
+                                <span class="timeline-axis-label label-prematch">Prematch</span>
+
+                                <div class="timeline-axis-item my-3 first-axis">
+                                    <a id="timeline-0" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key-big timeline-axis-item-key-init" title="Click to edit key">107</span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">INST</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-2" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">240D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-3" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">120D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-4" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                           
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">60D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-5" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">30D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-6" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">15D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-7" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">10D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-8" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">9D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-9" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">8D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-10" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">7D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-11" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">6D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-12" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">5D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-13" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">4D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-14" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">3D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-15" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">2.5D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-16" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">2D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-17" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">36h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-18" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">240D</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-19" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">18h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-20" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">12h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-21" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">6h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-22" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">3h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-23" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">1h</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-24" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">30m</span>
+                                </div>
+
+                                <div class="timeline-axis-item my-3">
+                                    <a id="timeline-25" class="waves-effect waves-light timeline-axis-item-key-container">
+                                        <span class="timeline-axis-item-key" title="Click to edit key">                                            
+                                        </span>
+                                    </a>
+                                    <span class="timeline-axis-item-label">15m</span>
+                                </div>
+
+
+                                <span class="timeline-axis-label label-kickoff">Kick Off</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
