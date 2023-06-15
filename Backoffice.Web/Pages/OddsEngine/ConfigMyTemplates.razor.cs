@@ -44,7 +44,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 new BreadcrumbModel
                 {
                     Name = "Config",
-                    Url = "odds-engine/config/my-templates",
+                    Url = "hk/odds-engine/config/my-templates",
                     IsCurrentPage = true
                 }
             };
@@ -81,7 +81,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnEditTemplateClickEvent(ConfigTemplateModel configTemplateModel)
         {
-            NavigationManager.NavigateTo($"/hk/odds-engine/config/edit/{configTemplateModel.FixtureStatusId}/{configTemplateModel.Name}");
+            NavigationManager.NavigateTo($"/hk/odds-engine/config/edit/{configTemplateModel.SportId}/{configTemplateModel.FixtureStatusId}/{configTemplateModel.Name}");
         }
 
         public async Task OnDeleteTemplateClickEvent(ConfigTemplateModel configTemplateModel)

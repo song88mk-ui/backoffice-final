@@ -3,7 +3,7 @@
 @layout OEMonitoringLayout
 
 @*@page "/{Region}/odds-engine/config/my-templates"*@
-@page "/hk/odds-engine/config/edit/{scopeId:int}/{configName}"
+@page "/hk/odds-engine/config/edit/{sportId:int}/{scopeId:int}/{configName}"
 
 <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"></Breadcrumb>
 
@@ -126,5 +126,5 @@
 </div>
 
 <div class="col-md-12 mb-4">
-    @*<AccordionConfiguration Market="new Models.MarketLookupNavigationModel()"/>*@
+    <AccordionTemplateConfiguration></AccordionTemplateConfiguration>
 </div>
