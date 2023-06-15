@@ -1582,28 +1582,14 @@ namespace Backoffice.API.Repositories
         {
             try
             {
+                var configTemplate = await GetConfigTemplate(userId, clientCodes);
+                var templates = configTemplate.Result;
+                var myConfiTemplates = templates.Count();
+                var assignedConfig = await GetConfigClient(userId, clientCodes, new ConfigTemplateLeagueRequest(), true);
+                var assignedTemplates = assignedConfig.Result.ClientConfigs.Count();
+                var unassignedConfig = await GetConfigClient(userId, clientCodes, new ConfigTemplateLeagueRequest(), false);
+                var unassignedTemplates = unassignedConfig.Result.ClientConfigs.Count();
 
-                var myConfiTemplates = 0;
-                var assignedTemplates = 0;
-                var unassignedTemplates = 0;
-                var taskList = new List<Task>()
-                {
-                    Task.Run(async () => {
-                        var configTemplate = await GetConfigTemplate(userId, clientCodes);
-                        var templates = configTemplate.Result;
-                        myConfiTemplates = templates.Count();
-                    }),
-                    Task.Run(async () => {
-                        var tempConfig = await GetConfigClient(userId, clientCodes, new ConfigTemplateLeagueRequest(), true);
-                        assignedTemplates = tempConfig.Result.ClientConfigs.Count();
-                    }),
-                    Task.Run(async () => {
-                        var tempConfig = await GetConfigClient(userId, clientCodes, new ConfigTemplateLeagueRequest(), false);
-                        unassignedTemplates = tempConfig.Result.ClientConfigs.Count();
-                    })
-                };
-
-                Task.WaitAll(taskList.ToArray());
                 return new BaseResponse<TemplateConfigCount>
                 {
                     StatusCode = StatusCode.Success,
