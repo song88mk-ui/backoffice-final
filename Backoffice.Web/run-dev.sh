@@ -1,0 +1,1 @@
+TELEMETRY__ENABLED=true dn run

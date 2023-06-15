@@ -1,0 +1,1 @@
+curl -L -H 'content-type: application/json' -H 'x-api-key: 9a8ad73dd129bf49754242e44988b3e7e39f0a05' -H 'x-forwarded-for: 1.1.1.1' -H 'cf-ipcountry: PH' -d '{username:fci-elmer, password: P@ssw0rd}' http://localhost:5000/api/authentication/login | jq
