@@ -1,4 +1,5 @@
-﻿using Backoffice.Web.Components.Common;
+﻿using Backoffice.Web.ActionFilter;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -29,7 +30,8 @@ namespace Backoffice.Web.Pages
             await AuthenticateAccess.InvokeAsync();
 
             var validClaimValues = new string[] { "1", "2", "0" };
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var authState = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
+            //var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
             UserClaims.AddRange(authState.User.Claims.Where(c => validClaimValues.Contains(c.Value)).ToList());
         }
@@ -50,8 +52,8 @@ namespace Backoffice.Web.Pages
 
         public void Dispose()
         {
-            AuthenticationStateProvider = null;
-            UserClaims = null;
+            //AuthenticationStateProvider = null;
+            //UserClaims = null;
 
             // Suppress finalization.
             GC.SuppressFinalize(this);

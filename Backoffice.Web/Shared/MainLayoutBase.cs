@@ -1,18 +1,15 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Components.Common;
+using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
-using System.Drawing;
-using System.Security.Claims;
 using System.Text.Json;
 
 namespace Backoffice.Web.Shared
@@ -70,8 +67,8 @@ namespace Backoffice.Web.Shared
                     IsPreLoader = false;
                     return;
                 }
-
-                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var authState = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
+                //var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 var userClaims = authState.User.Claims.ToList();
                 var roleId = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLEID")?.Value ?? string.Empty;
                 var role = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLENAME")?.Value ?? string.Empty;
