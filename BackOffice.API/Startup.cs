@@ -38,7 +38,8 @@ namespace Backoffice.API
         {
             // Telemetry
             Action<ResourceBuilder> configureResource = r => r.AddService(
-                serviceName: String.Format("{0}/{1}", Configuration["Telemetry:Environment"], "Backoffice.API"),
+                serviceName: "Backoffice.API",
+                serviceNamespace: Configuration["Telemetry:Environment"],
                 serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "latest",
                 serviceInstanceId: Environment.MachineName);
 
