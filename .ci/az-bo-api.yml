@@ -9,8 +9,8 @@ trigger:
       - main
   paths:
     include:
-      - BackOffice.API
-      - BackOffice.Shared
+      - Backoffice.API
+      - Backoffice.Shared
     exclude:
       - README.md
 
