@@ -26,7 +26,8 @@ var configuration = builder.Services.BuildServiceProvider().GetService<IConfigur
 
 // Telemetry
 Action<ResourceBuilder> configureResource = r => r.AddService(
-    serviceName: String.Format("{0}/{1}", builder.Configuration["Telemetry:Environment"], "Backoffice.Web"),
+    serviceName: "Backoffice.Web",
+    serviceNamespace: builder.Configuration["Telemetry:Environment"],
     serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "latest",
     serviceInstanceId: Environment.MachineName);
 
