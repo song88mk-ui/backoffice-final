@@ -27,7 +27,8 @@ namespace Backoffice.Utility
                     var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
 
                     Action<ResourceBuilder> resource = r => r.AddService(
-                        serviceName: String.Format("{0}/{1}", configuration["Telemetry:Environment"], "BackOffice.Utility"),
+                        serviceName: "BackOffice.Utility",
+                        serviceNamespace: configuration["Telemetry:Environment"],
                         serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "latest",
                         serviceInstanceId: Environment.MachineName);
 
