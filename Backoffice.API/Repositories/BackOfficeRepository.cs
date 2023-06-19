@@ -1500,7 +1500,7 @@ namespace Backoffice.API.Repositories
 
                 await _backofficeContext.SaveChangesAsync();
 
-                return await GetConfigTemplate(userId);
+                return await GetConfigTemplates(userId);
             }
             catch (Exception ex)
             {
