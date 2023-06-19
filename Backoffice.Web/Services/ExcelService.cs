@@ -6,15 +6,20 @@ using ExcelDataReader;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Data;
+using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Backoffice.Web.Services
 {
     public class ExcelService : IExcelService
     {
         #region Properties
+
         private ITradingService _tradingService;
+        private IConfiguration _configuration;
+
         #endregion
 
         #region Ctor
@@ -70,13 +75,13 @@ namespace Backoffice.Web.Services
 
                         if (!leagueColumns.SequenceEqual(leagueHeaders))
                         {
-                           //SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n File: {fileName}\n Status: Error! League sheet header are incorrect. Excel file should follow the same format the excel when it was exported." }, _configuration["SlackWebHook"]);
+                            SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n File: {fileName}\n Status: Error! League sheet header are incorrect. Excel file should follow the same format the excel when it was exported." }, _configuration["SlackWebHook"]);
 
-                           // return new BaseResponseModel<OnBulkUpdateConfigMessage2>
-                           // {
-                           //     StatusCode = StatusCode.Error,
-                           //     Message = "Error! League sheet header are incorrect. Excel file should follow the same format the excel when it was exported."
-                           // };
+                            return new BaseResponse<OnBulkUpdateConfigMessage>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Error! League sheet header are incorrect. Excel file should follow the same format the excel when it was exported."
+                            };
                         }
 
                         var marketColumns = new string[] { "Sport ID", "Sport Name", "Segment ID", "Segment Name", "League ID", "League Name", "Market Template ID", "Market Template Name", "Prematch Margin", "Live Margin", "Is Market Active?" };
@@ -84,25 +89,25 @@ namespace Backoffice.Web.Services
 
                         if (!marketColumns.SequenceEqual(marketHeaders))
                         {
-                            //SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n File: {fileName}\n Status: Error! Markets-Prematch sheet header are incorrect. Excel file should follow the same format the excel when it was exported." }, _configuration["SlackWebHook"]);
+                            SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n File: {fileName}\n Status: Error! Markets-Prematch sheet header are incorrect. Excel file should follow the same format the excel when it was exported." }, _configuration["SlackWebHook"]);
 
-                            //return new BaseResponseModel<OnBulkUpdateConfigMessage2>
-                            //{
-                            //    StatusCode = StatusCode.Error,
-                            //    Message = "Error! Markets-Prematch sheet header are incorrect. Excel file should follow the same format the excel when it was exported."
-                            //};
+                            return new BaseResponse<OnBulkUpdateConfigMessage>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Error! Markets-Prematch sheet header are incorrect. Excel file should follow the same format the excel when it was exported."
+                            };
                         }
 
                         // validate if there are any blank values in all rows
                         if (DataTableHasNull(leagueDT) || DataTableHasNull(marketDT))
                         {
-                            //SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Detected empty or blank cell values in the Excel file. Please check the file before importing." }, _configuration["SlackWebHook"]);
+                            SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Detected empty or blank cell values in the Excel file. Please check the file before importing." }, _configuration["SlackWebHook"]);
 
-                            //return new BaseResponseModel<OnBulkUpdateConfigMessage2>
-                            //{
-                            //    StatusCode = StatusCode.Error,
-                            //    Message = "Error! Detected empty or blank cell values in the Excel file. Please check the file before importing."
-                            //};
+                            return new BaseResponse<OnBulkUpdateConfigMessage>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Error! Detected empty or blank cell values in the Excel file. Please check the file before importing."
+                            };
                         }
 
                         // validate if there are markets with no prematch margins
@@ -111,13 +116,13 @@ namespace Backoffice.Web.Services
 
                         if (hasEmptyPrematchMargins)
                         {
-                            //SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Detected prematch markets without margins, please add margins to all markets to proceed." }, _configuration["SlackWebHook"]);
+                            SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Detected prematch markets without margins, please add margins to all markets to proceed." }, _configuration["SlackWebHook"]);
 
-                            //return new BaseResponseModel<OnBulkUpdateConfigMessage2>
-                            //{
-                            //    StatusCode = StatusCode.Error,
-                            //    Message = "Error! Detected prematch markets without margins, please add margins to all markets to proceed."
-                            //};
+                            return new BaseResponse<OnBulkUpdateConfigMessage>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Error! Detected prematch markets without margins, please add margins to all markets to proceed."
+                            };
                         }
 
                         // validate if there are markets with no live margins
@@ -126,13 +131,13 @@ namespace Backoffice.Web.Services
 
                         if (hasEmptyLiveMargins)
                         {
-                            //SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Detected live markets without margins, please add margins to all markets to proceed." }, _configuration["SlackWebHook"]);
+                            SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Detected live markets without margins, please add margins to all markets to proceed." }, _configuration["SlackWebHook"]);
 
-                            //return new BaseResponseModel<OnBulkUpdateConfigMessage2>
-                            //{
-                            //    StatusCode = StatusCode.Error,
-                            //    Message = "Error! Detected live markets without margins, please add margins to all markets to proceed."
-                            //};
+                            return new BaseResponse<OnBulkUpdateConfigMessage>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Error! Detected live markets without margins, please add margins to all markets to proceed."
+                            };
                         }
 
                         // validate if there are prematch margins lower than 100
@@ -146,13 +151,13 @@ namespace Backoffice.Web.Services
 
                         if (hasPrematchMarginsLowerThan100)
                         {
-                            //SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Detected prematch markets with margins lower than 100, margins should be above or equal to 100." }, _configuration["SlackWebHook"]);
+                            SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Detected prematch markets with margins lower than 100, margins should be above or equal to 100." }, _configuration["SlackWebHook"]);
 
-                            //return new BaseResponseModel<OnBulkUpdateConfigMessage2>
-                            //{
-                            //    StatusCode = StatusCode.Error,
-                            //    Message = "Error! Detected prematch markets with margins lower than 100, margins should be above or equal to 100."
-                            //};
+                            return new BaseResponse<OnBulkUpdateConfigMessage>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Error! Detected prematch markets with margins lower than 100, margins should be above or equal to 100."
+                            };
                         }
 
                         // validate if there are live margins lower than 100
@@ -166,13 +171,13 @@ namespace Backoffice.Web.Services
 
                         if (hasLiveMarginsLowerThan100)
                         {
-                            //SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Detected live markets with margins lower than 100, margins should be above or equal to 100." }, _configuration["SlackWebHook"]);
+                            SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Detected live markets with margins lower than 100, margins should be above or equal to 100." }, _configuration["SlackWebHook"]);
 
-                            //return new BaseResponseModel<OnBulkUpdateConfigMessage2>
-                            //{
-                            //    StatusCode = StatusCode.Error,
-                            //    Message = "Error! Detected live markets with margins lower than 100, margins should be above or equal to 100."
-                            //};
+                            return new BaseResponse<OnBulkUpdateConfigMessage>
+                            {
+                                StatusCode = StatusCode.Error,
+                                Message = "Error! Detected live markets with margins lower than 100, margins should be above or equal to 100."
+                            };
                         }
 
                         #endregion
@@ -266,7 +271,7 @@ namespace Backoffice.Web.Services
                         }
                         reader.Dispose();
 
-                        //SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Clients: {string.Join(", ", clients.Select(x => x.ClientCode))}\n Status: {StatusCode.Success.ToString().Replace("_", "")}" }, _configuration["SlackWebHook"]);
+                        SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Clients: {string.Join(", ", clients.Select(x => x.ClientCode))}\n Status: {StatusCode.Success.ToString().Replace("_", "")}" }, _configuration["SlackWebHook"]);
                     }
                 }
 
@@ -278,7 +283,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                //SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Please contact the administrator. \n Reason: {ex.Message}" }, _configuration["SlackWebHook"]);
+                SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Please contact the administrator. \n Reason: {ex.Message}" }, _configuration["SlackWebHook"]);
 
                 return new BaseResponse<OnBulkUpdateConfigMessage>
                 {
@@ -300,6 +305,23 @@ namespace Backoffice.Web.Services
 
             return false;
         }
+
+        private void SendNotification(SlackMessage message, string url)
+        {
+            using (WebClient webClient = new WebClient())
+            {
+                webClient.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+                byte[] request = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
+                byte[] response = webClient.UploadData(url, "POST", request);
+            }
+        }
+
+        public sealed class SlackMessage
+        {
+            [JsonPropertyName("text")]
+            public string Text { get; set; }
+        }
+
         #endregion
     }
 }
