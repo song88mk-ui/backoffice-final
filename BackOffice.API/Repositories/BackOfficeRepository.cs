@@ -5,6 +5,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -1344,7 +1345,7 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Config
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string userId, List<string> clientCodes = null, List<int> sportIds = null, List<int> scopeIds = null)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(string userId, List<string> clientCodes = null, List<int> sportIds = null, List<int> scopeIds = null)
         {
             try
             {
@@ -1397,6 +1398,54 @@ namespace Backoffice.API.Repositories
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString()}: {ex.Message}",
                     Result = new List<ConfigTemplateModel>()
+                };
+            }
+        }
+        public async Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(string userId, string templateId, List<string> clientCodes = null)
+        {
+            try
+            {
+                var query = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId).AsNoTracking();
+
+                if (clientCodes != null && clientCodes.Any())
+                {
+                    var clientList = GetTradingClientInformation();
+                    if (clientCodes.FirstOrDefault().ToUpper() == "ALL")
+                    {
+                        clientCodes = clientList.Select(x => x.ClientCode).ToList();
+                    }
+                }
+
+                var result = query.ToList().Select(x => new ConfigTemplateModel()
+                {
+                    Id = x.Id.ToString(),
+                    UserId = x.UserId,
+                    Name = x.Name,
+                    SportId = x.SportId,
+                    FixtureStatusId = x.FixtureStatusId,
+                    ClientCodes = clientCodes != null ? x.ClientCodes.Split(',').ToList().Where(x => clientCodes.Contains(x)).ToList() : x.ClientCodes.Split(',').ToList(),
+                    LeagueIds = string.IsNullOrEmpty(x.LeagueIds)
+                            ? new List<int>()
+                            : x.LeagueIds.Split(',')
+                                .Select(str => int.Parse(str))
+                                .ToList(),
+                    Timestamp = x.Timestamp
+                }).FirstOrDefault();
+
+                return new BaseResponse<ConfigTemplateModel>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ConfigTemplateModel>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString()}: {ex.Message}",
+                    Result = null
                 };
             }
         }
@@ -1462,7 +1511,7 @@ namespace Backoffice.API.Repositories
 
                 await _backofficeContext.SaveChangesAsync();
 
-                return await GetConfigTemplate(userId);
+                return await GetConfigTemplates(userId);
             }
             catch (Exception ex)
             {
@@ -1474,7 +1523,7 @@ namespace Backoffice.API.Repositories
             try
             {
                 var result = new List<ConfigClientModel>();
-                var configTemplate = await GetConfigTemplate(userId);
+                var configTemplate = await GetConfigTemplates(userId);
                 var templates = configTemplate.Result;
                 var clientList = GetTradingClientInformation();
                 var metaData = payload.MetaData;
@@ -1582,7 +1631,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var configTemplate = await GetConfigTemplate(userId, clientCodes);
+                var configTemplate = await GetConfigTemplates(userId, clientCodes);
                 var templates = configTemplate.Result;
                 var myConfiTemplates = templates.Count();
                 var assignedConfig = await GetConfigClient(userId, clientCodes, new ConfigTemplateLeagueRequest(), true);
