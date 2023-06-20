@@ -1,0 +1,64 @@
+﻿.card-block, .card-desc {
+    display: flex;
+    width: 240px;
+}
+
+.card-block {
+    height: 70px;
+}
+
+.card-desc {
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card-icon {
+    align-self: center;
+    flex-basis: 30%;
+    text-align: center;
+}
+
+    .card-icon i {
+        font-size: 2rem;
+    }
+
+.btn {
+    border-radius: 2px;
+    opacity: 1;
+    color: white;
+}
+
+.btn-cancel {
+    background: #9AA0AB 0% 0% no-repeat padding-box;
+}
+
+.btn-save, .btn-filter {
+    background: transparent linear-gradient(269deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}
+
+.card-flex, .select-div, .filter-div {
+    gap: 2rem;
+}
+
+.select-div {
+    flex-basis: 30%;
+}
+
+.btn-filter-div {
+    flex-basis: 40%;
+}
+
+.btn-activate-all {
+    color: black;
+}
+
+button.form-select {
+    background-color: #fff;
+    text-align: left;
+    border: 1px solid #ced4da;
+    width: 200px;
+}
+
+.dropdown-toggle::after {
+    content: unset;
+}

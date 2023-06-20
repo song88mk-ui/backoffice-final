@@ -1,0 +1,70 @@
+﻿<div class="col-md-12 mb-3">
+    <label class="fw-bold">Select the Clients and Leagues that you'd like to assign to this template</label>
+</div>
+
+<div class="col-md-12 mb-4">
+    <div class="d-flex justify-content-between">
+        <div class="d-flex select-div">
+            <div class="dropdown">
+                <button class="form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (Clients.Any())
+                    {
+                        if (Clients.Count - 1 == SelectedClientCount)
+                        {
+                            <span>All Clients (@SelectedClientCount)</span>
+                        }
+                        else
+                        {
+                            <span>@(SelectedClientCount == 1 ? SelectedClientName : $"Clients ({SelectedClientCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No Clients Available</span>
+                    }
+                </button>
+                @if (Clients.Any())
+                {
+                    <SelectWithCheckbox Items="Clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="client-dropdown" />
+                }
+            </div>
+
+            <div class="dropdown">
+                <button class="form-select dropdown-toggle" type="button" id="league-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (Leagues.Any())
+                    {
+                        if (Leagues.Count - 1 == SelectedLeagueCount)
+                        {
+                            <span>All Leagues (@SelectedLeagueCount)</span>
+                        }
+                        else
+                        {
+                            <span>@(SelectedLeagueCount == 1 ? SelectedLeagueName : $"Leagues ({SelectedLeagueCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No Leagues Available</span>
+                    }
+                </button>
+                @if (Leagues.Any())
+                {
+                    <SelectWithCheckbox Items="Leagues" OnCheckboxCallback="OnLeagueCheckboxClickEvent" AriaLabel="league-dropdown" />
+                }
+            </div>
+        </div>
+
+        <div class="d-flex filter-div">
+            <div class="input-group">
+                <input type="text" id="search" placeholder="Find" class="form-control search-text valid border-end-0" />
+                <span class="input-group-text border-start-0">
+                    <i class="fa fa-search"></i>
+                </span>
+            </div>
+
+            <div class="btn-filter-div">
+                <button type="button" class="btn btn-filter"><i class="fa fa-filter"></i>Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
