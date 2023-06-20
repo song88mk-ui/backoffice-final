@@ -1,5 +1,9 @@
-﻿<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
+﻿@using Backoffice.Web.ActionFilter;
+@inject AuthenticationStateProvider _authState;
+@inject ILogger<App> _logger;
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true" OnNavigateAsync="@OnNavigateAsync">
         <Found Context="routeData">
             <AuthorizeRouteView Resource="@routeData" RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
@@ -14,3 +18,25 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+
+@code{
+
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+        _logger.LogInformation("test");
+        var authState = await ((AuthStateProvider)_authState).GetAuthenticationStateAsync();
+
+        try
+        {
+            if (authState != null && authState.User == null && authState.User.Claims.Any())
+            {
+                _logger.LogInformation($"{args.Path}");
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+    }
+}

@@ -22,6 +22,10 @@ using System.Text.Json;
 using Microsoft.JSInterop;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
 
 // Telemetry
