@@ -63,7 +63,64 @@
             </div>
 
             <div class="btn-filter-div">
-                <button type="button" class="btn btn-filter"><i class="fa fa-filter"></i>Filter</button>
+                <div class="dropdown">
+                    <button type="button" class="btn btn-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false" id="dropdownMenu"><i class="fa fa-filter"></i>Filter</button>
+
+                    <ul class="dropdown-menu">
+                        <li><h6 class="dropdown-header">FILTER BY</h6></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><h6 class="dropdown-header">Markets</h6></li>
+                        <li>
+                            <button class="form-select dropdown-toggle" type="button" id="market-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                @if (Markets.Any())
+                                {
+                                    if (Markets.Count - 1 == SelectedMarketCount)
+                                    {
+                                        <span>All Markets</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@(SelectedMarketCount == 1 ? SelectedMarketName : $"Markets ({SelectedMarketCount})")</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span>No Markets Available</span>
+                                }
+                            </button>
+                            @if (Markets.Any())
+                            {
+                                <SelectWithCheckbox Items="Markets" OnCheckboxCallback="OnMarketCheckboxClickEvent" AriaLabel="market-dropdown" />
+                            }
+                        </li>
+                        <li><h6 class="dropdown-header">Config Status</h6></li>
+                        <li>
+                            <button class="form-select dropdown-toggle" type="button" id="config-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                @if (ConfigStatuses.Any())
+                                {
+                                    if (ConfigStatuses.Count - 1 == SelectedConfigStatusCount)
+                                    {
+                                        <span>All Config Status</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@(SelectedConfigStatusCount == 1 ? SelectedConfigStatusName : $"Config Status ({SelectedConfigStatusCount})")</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span>No Configs Available</span>
+                                }
+                            </button>
+                            @if (ConfigStatuses.Any())
+                            {
+                                <SelectWithCheckbox Items="ConfigStatuses" OnCheckboxCallback="OnConfigCheckboxClickEvent" AriaLabel="config-dropdown" />
+                            }
+                        </li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li class="d-flex flex-row-reverse me-2"><button type="button" class="btn btn-apply">APPLY</button></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
