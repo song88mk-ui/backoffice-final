@@ -9,9 +9,7 @@ namespace Backoffice.Shared.Models
         public string UserId { get; set; }
         public string Name { get; set; }
         public int SportId { get; set; }
-        public int FixtureStatusId { get; set; }
-        public List<string> ClientCodes { get; set; } = new List<string>();
-        public List<int> LeagueIds { get; set; } = new List<int>();
+        public int FixtureTypeId { get; set; }
         public DateTime Timestamp { get; set; }
     }
 }

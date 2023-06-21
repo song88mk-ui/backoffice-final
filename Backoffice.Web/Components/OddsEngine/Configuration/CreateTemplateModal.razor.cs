@@ -59,10 +59,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             {
                 UserId = UserModel.Id,
                 SportId = SelectedSportId,
-                FixtureStatusId = SelectedScopeId,
-                Name = TemplateName,
-                ClientCodes = new List<string>(),
-                LeagueIds = new List<int>()
+                FixtureTypeId = SelectedScopeId,
+                Name = TemplateName,                
             });
 
             if (response.StatusCode == StatusCode.Success)

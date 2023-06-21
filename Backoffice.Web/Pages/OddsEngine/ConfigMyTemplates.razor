@@ -87,9 +87,9 @@
                     <tr>
                         <th scope="row">@configTemplate.Name</th>
                         <td>@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId) != null ? $"{Sports.FirstOrDefault(e => e.Value == configTemplate.SportId).Name}" : "")</td>
-                        <td>@(((FixtureStatus)configTemplate.FixtureStatusId).ToString())</td>
-                        <td class="text-center">@(configTemplate.ClientCodes.Count == 0 ? "0 Client" : $"{configTemplate.ClientCodes.Count} Clients")</td>
-                        <td class="text-center">@(configTemplate.LeagueIds.Count == 0 ? "0 League" : $"{configTemplate.LeagueIds.Count} Leagues")</td>
+                        <td>@(((FixtureStatus)configTemplate.FixtureTypeId).ToString())</td>
+                        <td class="text-center">@($"0 Client")</td>
+                        <td class="text-center">@($"0 League")</td>
                         <td class="text-center">@(configTemplate.Timestamp.ToString("hh:mm dd/mm/yyyy"))</td>
                         <td>
                             <div class="manage-cell">

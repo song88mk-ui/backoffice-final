@@ -1374,7 +1374,7 @@ namespace Backoffice.API.Repositories
                 }
                 if (scopeIds != null && scopeIds.Count() > 0)
                 {
-                    query = query.Where(x => sportIds.Contains(x.FixtureStatusId));
+                    query = query.Where(x => sportIds.Contains(x.FixtureTypeId));
                 }
 
                 var result = query.ToList().Select(x => new ConfigTemplateModel()
@@ -1383,13 +1383,7 @@ namespace Backoffice.API.Repositories
                     UserId = x.UserId,
                     Name = x.Name,
                     SportId = x.SportId,
-                    FixtureStatusId = x.FixtureStatusId,
-                    ClientCodes = clientCodes != null ? x.ClientCodes.Split(',').ToList().Where(x => clientCodes.Contains(x)).ToList() : x.ClientCodes.Split(',').ToList(),
-                    LeagueIds = string.IsNullOrEmpty(x.LeagueIds)
-                            ? new List<int>()
-                            : x.LeagueIds.Split(',')
-                                .Select(str => int.Parse(str))
-                                .ToList(),
+                    FixtureTypeId = x.FixtureTypeId,
                     Timestamp = x.Timestamp
                 }).ToList();
 
@@ -1431,13 +1425,7 @@ namespace Backoffice.API.Repositories
                     UserId = x.UserId,
                     Name = x.Name,
                     SportId = x.SportId,
-                    FixtureStatusId = x.FixtureStatusId,
-                    ClientCodes = clientCodes != null ? x.ClientCodes.Split(',').ToList().Where(x => clientCodes.Contains(x)).ToList() : x.ClientCodes.Split(',').ToList(),
-                    LeagueIds = string.IsNullOrEmpty(x.LeagueIds)
-                            ? new List<int>()
-                            : x.LeagueIds.Split(',')
-                                .Select(str => int.Parse(str))
-                                .ToList(),
+                    FixtureTypeId = x.FixtureTypeId,
                     Timestamp = x.Timestamp
                 }).FirstOrDefault();
 
@@ -1466,9 +1454,6 @@ namespace Backoffice.API.Repositories
 
                 if (config != null)
                 {
-                    config.ClientCodes = string.Join(',', request.ClientCodes);
-                    config.LeagueIds = string.Join(',', request.LeagueIds);
-
                     _backofficeContext.ConfigTemplates.Update(config);
                 }
                 else
@@ -1486,14 +1471,11 @@ namespace Backoffice.API.Repositories
                     }
 
                     _backofficeContext.ConfigTemplates.Add(new ConfigTemplate()
-                    {
-                        Id = Guid.NewGuid(),
+                    {                        
                         UserId = request.UserId,
                         Name = request.Name,
                         SportId = request.SportId,
-                        FixtureStatusId = request.FixtureStatusId,
-                        ClientCodes = string.Join(',', request.ClientCodes),
-                        LeagueIds = string.Join(',', request.LeagueIds),
+                        FixtureTypeId = request.FixtureTypeId,                        
                         Timestamp = DateTime.UtcNow
                     });
                 }
@@ -1546,67 +1528,71 @@ namespace Backoffice.API.Repositories
                 }
 
                 if (payload.ClientCodes.Any())
+                {
                     clientCodes = payload.ClientCodes.ToList();
-
-                if (isAssigned)
-                {
-                    foreach (var template in templates)
-                    {
-                        foreach (var client in template.ClientCodes)
-                        {
-                            foreach (var league in template.LeagueIds)
-                            {
-                                result.Add(new ConfigClientModel()
-                                {
-                                    ClientCode = client.ToUpper(),
-                                    ClientName = clientList.Where(x => x.ClientCode.ToUpper() == client).Select(x => x.ClientName).FirstOrDefault(),
-                                    SportId = template.SportId,
-                                    FixtureStatusId = template.FixtureStatusId,
-                                    LeagueId = league,
-                                    TemplateId = template.Id,
-                                    TemplateName = template.Name
-                                });
-                            }
-                        }
-                    }
                 }
-                else
-                {
-                    var fixtureStatusIds = new List<int>() { (int)FixtureStatus.Prematch, (int)FixtureStatus.Live };
 
-                    var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup(string.Join(',', payload.SportIds));
-                    if (leagueLookupResponse.Result != null)
-                    {
-                        var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
-                        for (var x = 0; x < clientCodes.Count(); x++)
-                        {
-                            var client = clientCodes[x];
-                            var userLeagues = templates.Where(x => x.ClientCodes.Contains(client)).SelectMany(x => x.LeagueIds).ToList();
-                            var leagues = leagueLookup.Where(x => !userLeagues.Contains(x.LeagueId)).ToList();
+                #region OLD CODE
+                //if (isAssigned)
+                //{
+                //    foreach (var template in templates)
+                //    {
+                //        foreach (var client in template.ClientCodes)
+                //        {
+                //            foreach (var league in template.LeagueIds)
+                //            {
+                //                result.Add(new ConfigClientModel()
+                //                {
+                //                    ClientCode = client.ToUpper(),
+                //                    ClientName = clientList.Where(x => x.ClientCode.ToUpper() == client).Select(x => x.ClientName).FirstOrDefault(),
+                //                    SportId = template.SportId,
+                //                    FixtureStatusId = template.FixtureStatusId,
+                //                    LeagueId = league,
+                //                    TemplateId = template.Id,
+                //                    TemplateName = template.Name
+                //                });
+                //            }
+                //        }
+                //    }
+                //}
+                //else
+                //{
+                //    var fixtureStatusIds = new List<int>() { (int)FixtureStatus.Prematch, (int)FixtureStatus.Live };
 
-                            for (var y = 0; y < leagues.Count(); y++)
-                            {
-                                var league = leagues[y];
-                                for (var z = 0; z < fixtureStatusIds.Count; z++)
-                                {
-                                    var fixtureStatus = fixtureStatusIds[z];
-                                    if (!templates.Any(x => x.ClientCodes.Contains(client) && x.SportId == league.SportId && x.LeagueIds.Contains(league.LeagueId) && x.FixtureStatusId == fixtureStatus))
-                                    {
-                                        result.Add(new ConfigClientModel()
-                                        {
-                                            ClientCode = client.ToUpper(),
-                                            ClientName = clientList.Where(x => x.ClientCode.ToUpper() == client).Select(x => x.ClientName).FirstOrDefault(),
-                                            SportId = league.SportId,
-                                            FixtureStatusId = fixtureStatus,
-                                            LeagueId = league.LeagueId
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    }
+                //    var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup(string.Join(',', payload.SportIds));
+                //    if (leagueLookupResponse.Result != null)
+                //    {
+                //        var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
+                //        for (var x = 0; x < clientCodes.Count(); x++)
+                //        {
+                //            var client = clientCodes[x];
+                //            var userLeagues = templates.Where(x => x.ClientCodes.Contains(client)).SelectMany(x => x.LeagueIds).ToList();
+                //            var leagues = leagueLookup.Where(x => !userLeagues.Contains(x.LeagueId)).ToList();
 
-                }
+                //            for (var y = 0; y < leagues.Count(); y++)
+                //            {
+                //                var league = leagues[y];
+                //                for (var z = 0; z < fixtureStatusIds.Count; z++)
+                //                {
+                //                    var fixtureStatus = fixtureStatusIds[z];
+                //                    if (!templates.Any(x => x.ClientCodes.Contains(client) && x.SportId == league.SportId && x.LeagueIds.Contains(league.LeagueId) && x.FixtureStatusId == fixtureStatus))
+                //                    {
+                //                        result.Add(new ConfigClientModel()
+                //                        {
+                //                            ClientCode = client.ToUpper(),
+                //                            ClientName = clientList.Where(x => x.ClientCode.ToUpper() == client).Select(x => x.ClientName).FirstOrDefault(),
+                //                            SportId = league.SportId,
+                //                            FixtureStatusId = fixtureStatus,
+                //                            LeagueId = league.LeagueId
+                //                        });
+                //                    }
+                //                }
+                //            }
+                //        }
+                //    }
+
+                //}
+                #endregion
 
                 metaData.TotalCount = result.Count();
                 metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));

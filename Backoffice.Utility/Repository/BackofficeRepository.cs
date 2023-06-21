@@ -506,22 +506,14 @@ namespace Backoffice.Utility.Repository
                     UserId = x.UserId,
                     Name = x.Name,
                     SportId = x.SportId,
-                    FixtureStatusId = x.FixtureStatusId,
-                    ClientCodes = clientCodes != null ? x.ClientCodes.Split(',').ToList().Where(x => clientCodes.Contains(x)).ToList() : x.ClientCodes.Split(',').ToList(),
-                    LeagueIds = string.IsNullOrEmpty(x.LeagueIds)
-                                ? new List<int>()
-                                : x.LeagueIds.Split(',')
-                                    .Select(str => int.Parse(str))
-                                    .ToList(),
+                    FixtureTypeId = x.FixtureTypeId,
                     Timestamp = x.Timestamp
                 }).FirstOrDefault();
 
 
                 var payload = new
-                {
-                    LeagueIds = string.Join(",", configTemplate.LeagueIds),
-                    SportIds = configTemplate.SportId.ToString(),
-                    ClientCodes = string.Join(",", configTemplate.ClientCodes),
+                {                    
+                    SportIds = configTemplate.SportId.ToString(),                    
                     FileName = request.Filename,
                     UserId = request.UserId,
                     ConnectionId = request.ConnectionId

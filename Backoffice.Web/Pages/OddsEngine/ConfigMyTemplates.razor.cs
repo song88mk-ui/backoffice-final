@@ -81,7 +81,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnEditTemplateClickEvent(ConfigTemplateModel configTemplateModel)
         {
-            NavigationManager.NavigateTo($"/hk/odds-engine/config/edit/{configTemplateModel.SportId}/{configTemplateModel.FixtureStatusId}/{configTemplateModel.Name}");
+            NavigationManager.NavigateTo($"/hk/odds-engine/config/edit/{configTemplateModel.SportId}/{configTemplateModel.FixtureTypeId}/{configTemplateModel.Name}");
         }
 
         public async Task OnDeleteTemplateClickEvent(ConfigTemplateModel configTemplateModel)
