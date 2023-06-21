@@ -32,7 +32,7 @@
     background: #9AA0AB 0% 0% no-repeat padding-box;
 }
 
-.btn-save, .btn-filter {
+.btn-save, .btn-filter, .btn-apply {
     background: transparent linear-gradient(269deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
 
@@ -61,4 +61,9 @@ button.form-select {
 
 .dropdown-toggle::after {
     content: unset;
+}
+
+.dropdown-menu.w-100.show {
+    position: relative !important;
+    transform: inherit;
 }
