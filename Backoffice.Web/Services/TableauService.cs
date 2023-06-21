@@ -13,6 +13,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using Serilog;
 
 namespace Backoffice.Web.Services
 {
@@ -73,6 +74,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 this._getTableauUrlFailureCounter.Add(1);
                 return string.Empty;

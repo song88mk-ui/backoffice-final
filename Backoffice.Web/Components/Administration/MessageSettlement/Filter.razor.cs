@@ -7,6 +7,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 using System.Text.Json;
 using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.FixtureModel;
 
@@ -295,8 +296,11 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
                 await OnInitializeCallback.InvokeAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
         }
 

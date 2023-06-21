@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 
@@ -38,8 +39,11 @@ namespace Backoffice.Web.ActionFilter
 
                 return new AuthenticationState(claimsPrincipal);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
                 return _anonymous;
             }
         }

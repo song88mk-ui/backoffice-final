@@ -6,6 +6,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Serilog;
 using System.Text.Json;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
 
@@ -509,7 +510,9 @@ namespace Backoffice.Web.Components.SBC.Clients
             }
             catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
             IsPreload = false;
 

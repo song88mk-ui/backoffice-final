@@ -7,6 +7,7 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 using System.Text.Json;
 
 namespace Backoffice.Web.Components.Administration.MarketSettlement
@@ -231,6 +232,10 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex.Message);
+                    if (ex.StackTrace != null)
+                        Log.Error(ex.StackTrace.ToString());
+
                     IsPreLoader = false;
                     return;
                 }

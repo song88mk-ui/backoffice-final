@@ -7,6 +7,7 @@ using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Telemetry;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using Serilog;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Net;
@@ -186,6 +187,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<long>
                 {
                     StatusCode = StatusCode.Error,
@@ -223,6 +228,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
@@ -261,6 +270,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
@@ -299,6 +312,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<UserListResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -337,6 +354,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<LogInActivityLogResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -377,6 +398,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<UserListResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -424,6 +449,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<PermissionResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -464,6 +493,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<UserGroupListResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -501,6 +534,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<UserListResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -538,6 +575,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<UserGroupResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -575,6 +616,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
@@ -615,6 +660,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ReportRolesUrlResponse>
                 {
                     StatusCode = StatusCode.Error,

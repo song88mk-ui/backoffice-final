@@ -10,6 +10,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Serilog;
 
 namespace Backoffice.Web.Services
 {
@@ -283,6 +284,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 SendNotification(new SlackMessage { Text = $"Timestamp: {DateTime.UtcNow}\n Filename: {fileName}\n Status: Error! Please contact the administrator. \n Reason: {ex.Message}" }, _configuration["SlackWebHook"]);
 
                 return new BaseResponse<OnBulkUpdateConfigMessage>

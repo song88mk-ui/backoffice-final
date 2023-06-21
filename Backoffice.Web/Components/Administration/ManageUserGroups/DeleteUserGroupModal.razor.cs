@@ -6,6 +6,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Serilog;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -109,9 +110,11 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                     });
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
         }
 

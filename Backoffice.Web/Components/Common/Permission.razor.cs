@@ -6,6 +6,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.EntityFrameworkCore.Internal;
+using Serilog;
 using System.Collections.Generic;
 using System.Security.Claims;
 using static Backoffice.Shared.Models.PermissionTreeModel;
@@ -37,9 +38,11 @@ namespace Backoffice.Web.Components.Common
             {
                 Init();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
         }
         public async Task OnDropCategoryClickEvent(PermissionTreeModel.PermissionCategoryModel category)

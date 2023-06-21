@@ -4,6 +4,7 @@ using Backoffice.Shared.Utilities;
 using Backoffice.Web.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using RabbitMQ.Client.Events;
+using Serilog;
 using System.Drawing;
 using System.Net;
 using System.Text;
@@ -87,6 +88,9 @@ namespace Backoffice.Web.Middleware
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
         }
     }

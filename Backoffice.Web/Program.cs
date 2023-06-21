@@ -1,5 +1,4 @@
 using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Hubs;
@@ -11,22 +10,15 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.ResponseCompression;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using System.Diagnostics.Metrics;
+using Serilog;
 using System.Reflection;
-using System.Text;
-using System.Text.Json;
-using Microsoft.JSInterop;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
+
 
 // Telemetry
 Action<ResourceBuilder> configureResource = r => r.AddService(
@@ -36,6 +28,13 @@ Action<ResourceBuilder> configureResource = r => r.AddService(
     serviceInstanceId: Environment.MachineName);
 
 builder.Services.AddSingleton<Instrumentation>();
+
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+Log.Logger = logger;
 
 if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
 {
@@ -83,6 +82,7 @@ if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
 
       });
 }
+// end of telemetry
 // end of telemetry
 
 // Add services to the container.

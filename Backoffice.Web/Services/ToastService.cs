@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Timers;
 using Timer = System.Timers.Timer;
+using Serilog;
 
 namespace Backoffice.Web.Services
 {
@@ -64,6 +65,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
             }
             return false;
         }

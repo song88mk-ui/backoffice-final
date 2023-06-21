@@ -5,6 +5,7 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 
 namespace Backoffice.Web.Components.SBC.SubUser
 {
@@ -81,9 +82,11 @@ namespace Backoffice.Web.Components.SBC.SubUser
 
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
         }
 

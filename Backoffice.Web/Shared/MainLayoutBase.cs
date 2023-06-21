@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
+using Serilog;
 using System.Text.Json;
 
 namespace Backoffice.Web.Shared
@@ -226,8 +227,12 @@ namespace Backoffice.Web.Shared
 
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 NavigationManager.NavigateTo("login", true);
             }
             finally
@@ -245,6 +250,10 @@ namespace Backoffice.Web.Shared
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex.Message);
+                    if (ex.StackTrace != null)
+                        Log.Error(ex.StackTrace.ToString());
+
                     toasterService.AddToast(Toast.NewToast
                             ("Error", ex.Message));
                 }
@@ -283,7 +292,13 @@ namespace Backoffice.Web.Shared
 
             if (authResponse.StatusCode != StatusCode.Success)
             {
+                Log.Warning($"[MainLayourBase] [Unauthorized] {NavigationManager.Uri}");
+                Log.Warning($"{authResponse.StatusCode} - {authResponse.Message}");
                 NavigationManager.NavigateTo("login", true);
+            }
+            else
+            {
+                Log.Information($"[MainLayourBase] [Authorized] {NavigationManager.Uri}");
             }
         }
 
@@ -341,6 +356,10 @@ namespace Backoffice.Web.Shared
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 toasterService.AddToast(Toast.NewToast
                         ("Error Connecting to hub", ex.Message));
             }

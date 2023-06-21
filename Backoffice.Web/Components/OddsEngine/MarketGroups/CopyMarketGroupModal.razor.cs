@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 
 namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 {
@@ -119,8 +120,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     IsPreLoader = false;
                     StateHasChanged();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Log.Error(ex.Message);
+                    if (ex.StackTrace != null)
+                        Log.Error(ex.StackTrace.ToString());
                 }
             }
         }

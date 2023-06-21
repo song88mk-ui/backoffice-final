@@ -11,6 +11,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Components.OddsEngine.Configuration;
+using Serilog;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -88,9 +89,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                     await Subscribe();
                 }
             }
-            catch(Exception ex) 
+            catch(Exception ex)
             {
-
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }            
         }
 

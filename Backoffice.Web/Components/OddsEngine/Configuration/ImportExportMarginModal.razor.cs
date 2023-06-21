@@ -8,6 +8,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using Serilog;
 using System.IO.Compression;
 using System.Text.Json;
 
@@ -203,6 +204,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 });
 
                 Guid = Guid.NewGuid();
+
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
         }
 

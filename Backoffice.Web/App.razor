@@ -1,6 +1,7 @@
 ﻿@using Backoffice.Web.ActionFilter;
+@using Serilog;
 @inject AuthenticationStateProvider _authState;
-@inject ILogger<App> _logger;
+@inject NavigationManager NavigationManager
 
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true" OnNavigateAsync="@OnNavigateAsync">
@@ -20,23 +21,28 @@
 </CascadingAuthenticationState>
 
 
-@code{
+@code {
 
     private async Task OnNavigateAsync(NavigationContext args)
     {
-        _logger.LogInformation("test");
-        var authState = await ((AuthStateProvider)_authState).GetAuthenticationStateAsync();
-
         try
         {
-            if (authState != null && authState.User == null && authState.User.Claims.Any())
-            {
-                _logger.LogInformation($"{args.Path}");
-            }
+            Log.Information($"Current page: {NavigationManager.Uri}");
+            if (!string.IsNullOrEmpty(args.Path))
+                Log.Information($"{args.Path}");
+
+            var state = await ((AuthStateProvider)_authState).GetAuthenticationStateAsync();
+
+            if (state.User.Identity?.IsAuthenticated ?? false)
+                Log.Information($"[App.Razor] [Authorized] {NavigationManager.Uri}");
+            else
+                Log.Warning($"[App.Razor] [Unauthorized] {NavigationManager.Uri}");
         }
         catch (Exception ex)
         {
-            
+            Log.Error(ex.Message);
+            if (ex.StackTrace != null)
+                Log.Error(ex.StackTrace.ToString());
         }
     }
 }

@@ -5,6 +5,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Serilog;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
 
 namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
@@ -144,7 +145,9 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             }
             catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
 
             IsPreload = false;

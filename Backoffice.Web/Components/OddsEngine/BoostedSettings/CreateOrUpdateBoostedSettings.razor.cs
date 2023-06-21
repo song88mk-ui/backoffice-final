@@ -4,6 +4,7 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 
 namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 {
@@ -50,9 +51,11 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                 Cap = Client.Cap * 100;
                 CapEdit = decimal.Parse(Cap.ToString("G4"));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
         }
         public async Task OnCancelClickEvent()

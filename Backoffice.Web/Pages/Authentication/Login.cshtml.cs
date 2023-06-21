@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System.Security.Claims;
 using System.Text.Json;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
@@ -122,6 +123,10 @@ namespace Backoffice.Web.Pages.Authentication
                 catch (Exception ex)
                 {
                     SetRememberMePreference(false);
+
+                    Log.Error(ex.Message);
+                    if (ex.StackTrace != null)
+                        Log.Error(ex.StackTrace.ToString());
                 }
             }
 

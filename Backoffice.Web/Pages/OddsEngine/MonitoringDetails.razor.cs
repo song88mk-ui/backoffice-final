@@ -9,6 +9,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
+using Serilog;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -105,6 +106,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
+
+                    Log.Error(ex.Message);
+                    if (ex.StackTrace != null)
+                        Log.Error(ex.StackTrace.ToString());
                 }
             }
         }

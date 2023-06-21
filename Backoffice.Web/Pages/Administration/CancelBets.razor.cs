@@ -228,9 +228,11 @@ namespace Backoffice.Web.Pages.Administration
                 IsPreload = false;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
         }
 

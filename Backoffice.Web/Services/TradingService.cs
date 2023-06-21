@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using Serilog;
 
 namespace Backoffice.Web.Services
 {
@@ -83,6 +84,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<Models.SportsTreeModel>
                 {
                     StatusCode = StatusCode.Error,
@@ -127,6 +132,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<SportsLookupResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -170,6 +179,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<SegmentLookupResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -213,6 +226,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<LeagueLookupResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -232,6 +249,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<List<ClientInformationModel>>
                 {
                     StatusCode = StatusCode.Error,
@@ -265,6 +286,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<List<PriceBoostConfigModel>>
                 {
                     StatusCode = StatusCode.Error,
@@ -296,6 +321,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<List<BoostedSettingsModel>>
                 {
                     StatusCode = StatusCode.Error,
@@ -328,6 +357,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
@@ -360,6 +393,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<PriceBoostConfigResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -392,6 +429,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<PriceBoostConfigResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -426,6 +467,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<MarketFixtureResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -457,6 +502,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<MarketFixtureResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -488,6 +537,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<List<ClientSportOrderListResponse>>
                 {
                     StatusCode = StatusCode.Error,
@@ -519,6 +572,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<List<ClientSegmentOrderListResponse>>
                 {
                     StatusCode = StatusCode.Error,
@@ -550,6 +607,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<List<ClientLeagueOrderListResponse>>
                 {
                     StatusCode = StatusCode.Error,
@@ -581,6 +642,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<List<TierLeagueOrderModel>>
                 {
                     StatusCode = StatusCode.Error,
@@ -612,6 +677,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ClientSportSettingResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -643,6 +712,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<List<ClientSportOrderAuditResponse>>
                 {
                     StatusCode = StatusCode.Error,
@@ -662,6 +735,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ClientMarketTemplateResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -694,6 +771,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
@@ -713,6 +794,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ClientMarketTemplateGroupResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -745,6 +830,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ClientMarketTemplateResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -777,6 +866,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ClientPostMarketTemplateGroupResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -808,6 +901,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
@@ -839,6 +936,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ClientMarketTemplateGroupResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -870,6 +971,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ManualBetDetailsResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -901,6 +1006,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<string>
                 {
                     StatusCode = StatusCode.Error,
@@ -934,6 +1043,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<BetSelectionDetailsResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -966,6 +1079,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ManualMarketSettlementDetailsResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -998,6 +1115,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ManualMarketSettlementResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -1031,6 +1152,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ConfigModel>
                 {
                     StatusCode = StatusCode.Error,
@@ -1082,6 +1207,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<MarketTemplateGroupResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -1133,6 +1262,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<MarketLookupResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -1184,6 +1317,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<ClientConfigResponse>
                 {
                     StatusCode = StatusCode.Error,
@@ -1235,6 +1372,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>
                 {
                     StatusCode = StatusCode.Error,
@@ -1268,6 +1409,10 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
                 return new BaseResponse<MessageResponse>
                 {
                     StatusCode = StatusCode.Error,

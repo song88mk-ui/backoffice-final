@@ -6,6 +6,7 @@ using Backoffice.Web.Components.OddsEngine.BoostedSettings;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -35,7 +36,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {          
+        {
             THeadClass = "table-head";
             PageTitle = "Boosted Settings";
             IconClass = string.Empty;
@@ -87,9 +88,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                 IsPreLoader = false;
                 StateHasChanged();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
         }
         public async Task OnEditSetting(BoostedSettingsModel client)
@@ -106,7 +109,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
         }
         public async Task OnViewAllLogsClickEvent()
@@ -123,7 +128,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
             }
         }
 
