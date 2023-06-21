@@ -18,10 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public int MarketIndex { get; set; }
 
 
-        #region Methods                                
-        protected override async Task OnParametersSetAsync()
-        {
-        }
+        #region Methods                                        
 
         public async Task OnMarketActiveChangedEvent(ChangeEventArgs args)
         {
