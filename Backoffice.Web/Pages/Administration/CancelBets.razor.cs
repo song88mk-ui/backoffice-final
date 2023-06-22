@@ -6,6 +6,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
+using Serilog;
 
 namespace Backoffice.Web.Pages.Administration
 {
