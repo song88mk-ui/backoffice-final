@@ -3,7 +3,7 @@
 @layout OEMonitoringLayout
 
 @*@page "/{Region}/odds-engine/config/my-templates"*@
-@page "/hk/odds-engine/config/edit/{sportId:int}/{scopeId:int}/{configName}"
+@page "/hk/odds-engine/config/edit/{configTemplateId:long}"
 
 <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"></Breadcrumb>
 
@@ -11,7 +11,7 @@
     <div class="col-md-12 mb-4">
         <div class="d-flex justify-content-between mx-4">
             <div>
-                <h4 class="page-title fw-bold">@PageTitle</h4>
+                <h4 class="page-title fw-bold">@ConfigTemplate.Name</h4>
             </div>
 
             <div>
@@ -25,12 +25,12 @@
         <div class="d-flex card-flex">
             <div class="border card-block">
                 <div class="card-icon">
-                    <i class="iconfont iconfont-aussie-rules"></i>
+                    <i class=@($"iconfont iconfont-{SportIcon}")></i>
                 </div>
 
                 <div class="card-desc">
                     <label class="fw-bold">Sport</label>
-                    <label>Aussie Rules</label>
+                    <label>@SportName</label>
                 </div>
             </div>
 

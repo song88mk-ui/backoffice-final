@@ -1404,22 +1404,23 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(string userId, string templateId, List<string> clientCodes = null)
+
+        public async Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(string userId, long templateId)
         {
             try
             {
                 var query = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId).AsNoTracking();
 
-                if (clientCodes != null && clientCodes.Any())
-                {
-                    var clientList = GetTradingClientInformation();
-                    if (clientCodes.FirstOrDefault().ToUpper() == "ALL")
-                    {
-                        clientCodes = clientList.Select(x => x.ClientCode).ToList();
-                    }
-                }
+                //if (clientCodes != null && clientCodes.Any())
+                //{
+                //    var clientList = GetTradingClientInformation();
+                //    if (clientCodes.FirstOrDefault().ToUpper() == "ALL")
+                //    {
+                //        clientCodes = clientList.Select(x => x.ClientCode).ToList();
+                //    }
+                //}
 
-                var result = query.ToList().Select(x => new ConfigTemplateModel()
+                var result = query.Where(e => e.Id == templateId).Select(x => new ConfigTemplateModel()
                 {
                     Id = x.Id.ToString(),
                     UserId = x.UserId,

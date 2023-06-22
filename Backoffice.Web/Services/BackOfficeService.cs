@@ -1291,6 +1291,37 @@ namespace Backoffice.Web.Services
 
         #region Config
 
+        public async Task<BaseResponse<ConfigTemplateModel>> GetClientConfigTemplateById(string token, long configTemplateId)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"api/config/template/{configTemplateId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<ConfigTemplateModel>();
+                }
+                else
+                {
+                    return new BaseResponse<ConfigTemplateModel>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"{StatusCode.Error.ToString().Replace('_',' ')} ({response.ReasonPhrase})"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ConfigTemplateModel>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_',' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<List<ConfigTemplateModel>>> GetClientConfigTemplate(string token)
         {
             try

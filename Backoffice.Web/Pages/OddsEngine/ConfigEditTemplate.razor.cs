@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Data.Backoffice.Entities;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -19,9 +20,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private ITradingService TradingService { get; set; }
 
         [Parameter] public string Region { get; set; } = "hk";
-        [Parameter] public string ConfigName { get; set; }
-        [Parameter] public int SportId { get; set; }
-        [Parameter] public int ScopeId { get; set; }
+        [Parameter] public long ConfigTemplateId { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
@@ -30,11 +29,15 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Leagues { get; set; }
 
-        public string PageTitle { get; set; }
+        public ConfigTemplateModel ConfigTemplate { get; set; }
+        
         public int SelectedClientCount { get; set; }
         public string SelectedClientName { get; set; } = "";
         public int SelectedLeagueCount { get; set; }
         public string SelectedLeagueName { get; set; } = "";
+        public string SportIcon { get; set; } = "";
+        public string SportName { get; set; }
+        public int ScopeId { get; set; }
 
         #endregion
 
@@ -47,12 +50,12 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {
-            PageTitle = ConfigName;
+        {            
+            ConfigTemplate = new ConfigTemplateModel();
 
             Clients = new List<SelectListItemWithCheckboxModel<string>>();
             Leagues = new List<SelectListItemWithCheckboxModel<string>>();
-            MarketLookupNavigation = new List<MarketLookupNavigationModel>();
+            MarketLookupNavigation = new List<MarketLookupNavigationModel>();                        
 
             Breadcrumbs = new List<BreadcrumbModel>()
             {
@@ -61,15 +64,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                     Name = "Config",
                     Url = $"hk/odds-engine/config/my-templates",
                     IsCurrentPage = false
-                },
-                new BreadcrumbModel
-                {
-                    Name = $"{PageTitle}",
-                    Url = $"hk/odds-engine/config/edit/{SportId}/{ScopeId}/{PageTitle}",
-                    IsCurrentPage = true
-                }
+                }                
             };
-            
+
+            await LoadConfigTemplate();
             await LoadMarkets();
         }        
 
@@ -82,9 +80,34 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Utilities      
 
+        private async Task LoadConfigTemplate()
+        {
+            var response = await BackOfficeService.GetClientConfigTemplateById(UserModel.Id, ConfigTemplateId);
+
+            if (response.StatusCode == StatusCode.Success)
+            {
+                ConfigTemplate = response.Result;
+                
+                SportName = (await TradingService.GetSportLookup()).Result.SportLookup.FirstOrDefault(e => e.SportId == response.Result.SportId).SportName;
+                ScopeId = response.Result.FixtureTypeId;
+
+                SportIcon = SportName.Contains(" ") ? SportName.Replace(" ", "-").ToLower() : SportName.ToLower();
+
+                Breadcrumbs.Add(
+                    new BreadcrumbModel
+                    {
+                        Name = $"{ConfigTemplate.Name}",
+                        Url = $"hk/odds-engine/config/edit/{ConfigTemplateId}",
+                        IsCurrentPage = true
+                    });
+
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
         private async Task LoadMarkets()
         {
-            var marketTemplateGroups = await GetMarketTemplateGroup(ScopeId, SportId);
+            var marketTemplateGroups = await GetMarketTemplateGroup(ScopeId, ConfigTemplate.SportId);
             var marketTemplateGroup = marketTemplateGroups.Count > 0 && marketTemplateGroups.Any(g => g.MarketTemplateGroup.MarketTemplateGroupId == 2) ?
                 marketTemplateGroups.FirstOrDefault(g => g.MarketTemplateGroup.MarketTemplateGroupId == 2).MarketTemplateGroup :
                 new MarketTemplateGroup() { MarketTemplateGroupId = 0, MarketTemplateGroupName = string.Empty };
