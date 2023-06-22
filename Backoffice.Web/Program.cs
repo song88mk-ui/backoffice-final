@@ -19,7 +19,6 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
 
-
 // Telemetry
 Action<ResourceBuilder> configureResource = r => r.AddService(
     serviceName: "Backoffice.Web",
@@ -82,7 +81,6 @@ if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
 
       });
 }
-// end of telemetry
 // end of telemetry
 
 // Add services to the container.
