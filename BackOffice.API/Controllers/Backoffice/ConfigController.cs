@@ -55,12 +55,12 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpGet("template/{id}")]
-        public async Task<IActionResult> GetClientConfigTemplateById([FromRoute] string id)
+        public async Task<IActionResult> GetClientConfigTemplateById([FromRoute] long id)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
             var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
 
-            var result = await _backofficeRepository.GetConfigTemplateById(userId, id, clientCodes);
+            var result = await _backofficeRepository.GetConfigTemplateById(userId, id);
 
             switch (result.StatusCode)
             {
