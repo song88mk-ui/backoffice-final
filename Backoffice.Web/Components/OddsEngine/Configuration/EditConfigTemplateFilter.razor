@@ -4,55 +4,6 @@
 
 <div class="col-md-12 mb-4">
     <div class="d-flex justify-content-between">
-        <div class="d-flex select-div">
-            <div class="dropdown">
-                <button class="form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    @if (Clients.Any())
-                    {
-                        if (Clients.Count - 1 == SelectedClientCount)
-                        {
-                            <span>All Clients (@SelectedClientCount)</span>
-                        }
-                        else
-                        {
-                            <span>@(SelectedClientCount == 1 ? SelectedClientName : $"Clients ({SelectedClientCount})")</span>
-                        }
-                    }
-                    else
-                    {
-                        <span>No Clients Available</span>
-                    }
-                </button>
-                @if (Clients.Any())
-                {
-                    <SelectWithCheckbox Items="Clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="client-dropdown" />
-                }
-            </div>
-
-            <div class="dropdown">
-                <button class="form-select dropdown-toggle" type="button" id="league-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    @if (Leagues.Any())
-                    {
-                        if (Leagues.Count - 1 == SelectedLeagueCount)
-                        {
-                            <span>All Leagues (@SelectedLeagueCount)</span>
-                        }
-                        else
-                        {
-                            <span>@(SelectedLeagueCount == 1 ? SelectedLeagueName : $"Leagues ({SelectedLeagueCount})")</span>
-                        }
-                    }
-                    else
-                    {
-                        <span>No Leagues Available</span>
-                    }
-                </button>
-                @if (Leagues.Any())
-                {
-                    <SelectWithCheckbox Items="Leagues" OnCheckboxCallback="OnLeagueCheckboxClickEvent" AriaLabel="league-dropdown" />
-                }
-            </div>
-        </div>
 
         <div class="d-flex filter-div">
             <div class="input-group">
@@ -72,15 +23,15 @@
                         <li><h6 class="dropdown-header">Markets</h6></li>
                         <li>
                             <button class="form-select dropdown-toggle" type="button" id="market-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                @if (Markets.Any())
+                                @if (EditConfigTemplateFilterModel.Markets.Any())
                                 {
-                                    if (Markets.Count - 1 == SelectedMarketCount)
+                                    if (EditConfigTemplateFilterModel.Markets.Count - 1 == EditConfigTemplateFilterModel.SelectedMarketCount)
                                     {
                                         <span>All Markets</span>
                                     }
                                     else
                                     {
-                                        <span>@(SelectedMarketCount == 1 ? SelectedMarketName : $"Markets ({SelectedMarketCount})")</span>
+                                        <span>@(EditConfigTemplateFilterModel.SelectedMarketCount == 1 ? EditConfigTemplateFilterModel.SelectedMarketName : $"Markets ({EditConfigTemplateFilterModel.SelectedMarketCount})")</span>
                                     }
                                 }
                                 else
@@ -88,23 +39,23 @@
                                     <span>No Markets Available</span>
                                 }
                             </button>
-                            @if (Markets.Any())
+                            @if (EditConfigTemplateFilterModel.Markets.Any())
                             {
-                                <SelectWithCheckbox Items="Markets" OnCheckboxCallback="OnMarketCheckboxClickEvent" AriaLabel="market-dropdown" />
+                                <SelectWithCheckbox Items="EditConfigTemplateFilterModel.Markets" OnCheckboxCallback="OnMarketCheckboxClickEvent" AriaLabel="market-dropdown" />
                             }
                         </li>
                         <li><h6 class="dropdown-header">Config Status</h6></li>
                         <li>
                             <button class="form-select dropdown-toggle" type="button" id="config-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                @if (ConfigStatuses.Any())
+                                @if (EditConfigTemplateFilterModel.ConfigStatuses.Any())
                                 {
-                                    if (ConfigStatuses.Count - 1 == SelectedConfigStatusCount)
+                                    if (EditConfigTemplateFilterModel.ConfigStatuses.Count - 1 == EditConfigTemplateFilterModel.SelectedConfigStatusCount)
                                     {
                                         <span>All Config Status</span>
                                     }
                                     else
                                     {
-                                        <span>@(SelectedConfigStatusCount == 1 ? SelectedConfigStatusName : $"Config Status ({SelectedConfigStatusCount})")</span>
+                                        <span>@(EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1 ? EditConfigTemplateFilterModel.SelectedConfigStatusName : $"Config Status ({EditConfigTemplateFilterModel.SelectedConfigStatusCount})")</span>
                                     }
                                 }
                                 else
@@ -112,9 +63,9 @@
                                     <span>No Configs Available</span>
                                 }
                             </button>
-                            @if (ConfigStatuses.Any())
+                            @if (EditConfigTemplateFilterModel.ConfigStatuses.Any())
                             {
-                                <SelectWithCheckbox Items="ConfigStatuses" OnCheckboxCallback="OnConfigCheckboxClickEvent" AriaLabel="config-dropdown" />
+                                <SelectWithCheckbox Items="EditConfigTemplateFilterModel.ConfigStatuses" OnCheckboxCallback="OnConfigCheckboxClickEvent" AriaLabel="config-dropdown" />
                             }
                         </li>
                         <li><hr class="dropdown-divider" /></li>

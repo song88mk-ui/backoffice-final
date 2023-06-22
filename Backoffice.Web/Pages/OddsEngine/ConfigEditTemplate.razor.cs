@@ -30,7 +30,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<SelectListItemWithCheckboxModel<string>> Leagues { get; set; }
 
         public ConfigTemplateModel ConfigTemplate { get; set; }
-        
+        public ConfigTemplateMarginModel ConfigTemplateMargin { get; set; }
+        public EditConfigTemplateFilterModel EditConfigTemplateFilterModel { get; set; }
         public int SelectedClientCount { get; set; }
         public string SelectedClientName { get; set; } = "";
         public int SelectedLeagueCount { get; set; }
@@ -68,8 +69,19 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
 
             await LoadConfigTemplate();
+            await LoadConfigTemplateMargin();
             await LoadMarkets();
-        }        
+        }
+
+        public async Task InitConfigEditTemplate(EditConfigTemplateFilterModel model)
+        {
+            EditConfigTemplateFilterModel = model;
+
+            //SelectedContents = await GetContents();
+            //SelectedContents.ForEach(market => GetNewSettings(market));
+
+            await InvokeAsync(StateHasChanged);
+        }
 
         public void Dispose()
         {
@@ -100,10 +112,17 @@ namespace Backoffice.Web.Pages.OddsEngine
                         Url = $"hk/odds-engine/config/edit/{ConfigTemplateId}",
                         IsCurrentPage = true
                     });
-
-                await InvokeAsync(StateHasChanged);
             }
         }
+
+        private async Task LoadConfigTemplateMargin()
+        {
+            var response = await BackOfficeService.GetConfigTemplateMargin(UserModel.Id, ConfigTemplateId);
+
+            if (response.StatusCode == StatusCode.Success)
+                ConfigTemplateMargin = response.Result;
+        }
+
 
         private async Task LoadMarkets()
         {

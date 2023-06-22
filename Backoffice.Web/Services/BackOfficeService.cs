@@ -1493,6 +1493,36 @@ namespace Backoffice.Web.Services
             }
         }
 
+        public async Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(string token, long configTemplateId)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"api/config/template/margin/{configTemplateId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateMarginModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<ConfigTemplateMarginModel>();
+                }
+                else
+                {
+                    return new BaseResponse<ConfigTemplateMarginModel>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ConfigTemplateMarginModel>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
         #endregion
 
         public void Dispose()

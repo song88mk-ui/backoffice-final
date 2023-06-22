@@ -5,7 +5,7 @@
 @*@page "/{Region}/odds-engine/config/my-templates"*@
 @page "/hk/odds-engine/config/edit/{configTemplateId:long}"
 
-<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"></Breadcrumb>
+<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"/>
 
 <div class="col-md-12 mb-4">
     <div class="col-md-12 mb-4">
@@ -50,12 +50,12 @@
     <hr />
 </div>
 
-<EditConfigTemplateFilter></EditConfigTemplateFilter>
+<EditConfigTemplateFilter EditConfigTemplateFilterCallback="InitConfigEditTemplate" />
 
 <div class="d-flex justify-content-end mb-4">
     <button type="button" class="btn btn-activate-all fw-bold">ACTIVATE ALL</button>
 </div>
 
 <div class="col-md-12 mb-4">
-    <AccordionTemplateConfiguration></AccordionTemplateConfiguration>
+    <AccordionTemplateConfiguration/>
 </div>

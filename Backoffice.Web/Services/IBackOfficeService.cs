@@ -51,6 +51,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string token, string id);
         Task<BaseResponse<List<ConfigClientModel>>> GetConfigClient(string token, string type, MetaData metaData);
         Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(string token);
+        Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(string token, long configTemplateId);
 
         #endregion
 
