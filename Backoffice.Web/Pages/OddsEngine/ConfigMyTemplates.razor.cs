@@ -19,8 +19,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
 
-        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
-        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Scopes { get; set; }
+        [Parameter] public List<SelectListItemModel<string>> Sports { get; set; }
+        [Parameter] public List<SelectListItemModel<string>> Scopes { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<ConfigTemplateModel> ConfigTemplates { get; set; }
 
@@ -38,7 +38,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             IconClass = "";
 
             ConfigTemplates = new List<ConfigTemplateModel>();
-            Sports = new List<SelectListItemWithCheckboxModel<string>>();
+            Sports = new List<SelectListItemModel<string>>();
 
             Breadcrumbs = new List<BreadcrumbModel>()
             {

@@ -14,8 +14,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
-        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
-        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Scopes { get; set; }
+        [Parameter] public List<SelectListItemModel<string>> Sports { get; set; }
+        [Parameter] public List<SelectListItemModel<string>> Scopes { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
@@ -43,8 +43,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             IconClass = "";
 
             Clients = new List<SelectListItemWithCheckboxModel<string>>();
-            Sports = new List<SelectListItemWithCheckboxModel<string>>();
-            Scopes = new List<SelectListItemWithCheckboxModel<string>>();
+            Sports = new List<SelectListItemModel<string>>();
+            Scopes = new List<SelectListItemModel<string>>();
 
             MetaData = new MetaData();
 
@@ -90,15 +90,15 @@ namespace Backoffice.Web.Pages.OddsEngine
             //SelectedScopeName = SelectedScopeCount > 0 ? string.Empty : Scopes.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
         }
 
-        public async Task OnScopeCheckboxClickEvent(EventArgs e)
+        public async Task OnScopeCheckboxClickEvent(Dictionary<string, string> items)
         {
-            //SelectedScopeName = string.Empty;
-            //SelectedScopeCount = items.Count;
+            SelectedScopeName = string.Empty;
+            SelectedScopeCount = items.Count;
 
-            //if (SelectedScopeCount == 1)
-            //{
-            //    SelectedScopeName = items.FirstOrDefault().Value;
-            //}
+            if (SelectedScopeCount == 1)
+            {
+                SelectedScopeName = items.FirstOrDefault().Value;
+            }
         }
 
         public async Task SelectedPage()
@@ -159,15 +159,20 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task Init()
         {
-            await LoadAssignedLeagues();
+            await LoadLeaguesLeagues();
         }
-        private async Task LoadAssignedLeagues()
+        private async Task LoadLeaguesLeagues()
         {
             var response = await BackOfficeService.GetConfigClient(UserModel.Id, ConfigState.Assigned, MetaData);
 
             if (response.StatusCode == StatusCode.Success)
             {
+                ConfigClients = new List<ConfigClientModel>();
 
+                if (response.Result != null && response.Result.Any())
+                {
+                    ConfigClients = response.Result;
+                }
             }
         }
 

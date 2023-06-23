@@ -22,8 +22,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<ConfigTemplateModel> ConfigTemplates { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
-        public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
-        public List<SelectListItemWithCheckboxModel<string>> Scopes { get; set; }
+        public List<SelectListItemModel<string>> Sports { get; set; }
+        public List<SelectListItemModel<string>> Scopes { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -40,8 +40,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             IconClass = "";
 
             ConfigTemplates = new List<ConfigTemplateModel>();
-            Sports = new List<SelectListItemWithCheckboxModel<string>>();
-            Scopes = new List<SelectListItemWithCheckboxModel<string>>();
+            Sports = new List<SelectListItemModel<string>>();
+            Scopes = new List<SelectListItemModel<string>>();
             SelectedConfigNavMenu = ConfigTemplateNavMenu.UnAssigned;
 
             Breadcrumbs = new List<BreadcrumbModel>()
@@ -172,20 +172,21 @@ namespace Backoffice.Web.Pages.OddsEngine
             ConfigTemplates = (await BackOfficeService.GetClientConfigTemplate(UserModel.Id)).Result;
         }
 
-        private async Task<List<SelectListItemWithCheckboxModel<string>>> LoadSports()
+        private async Task<List<SelectListItemModel<string>>> LoadSports()
         {
-            var result = (await TradingService.GetSportLookup()).Result;
+            var response = (await TradingService.GetSportLookup()).Result;
+            var result = new List<SelectListItemModel<string>>();
 
             if (result == null)
-                return new List<SelectListItemWithCheckboxModel<string>>();
+                return new List<SelectListItemModel<string>>();
 
-            var sports = result.SportLookup.Select(s => new SelectListItemWithCheckboxModel<string>()
+            result = response.SportLookup.Select(s => new SelectListItemModel<string>()
             {
                 Value = s.SportId.ToString(),
                 Name = s.SportName
             }).ToList();
 
-            return sports;
+            return result;
         }
         private async Task<List<SelectListItemWithCheckboxModel<string>>> LoadClients()
         {
@@ -215,12 +216,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             return result;
         }
-        private async Task<List<SelectListItemWithCheckboxModel<string>>> LoadScopes()
+        private async Task<List<SelectListItemModel<string>>> LoadScopes()
         {
-            return new List<SelectListItemWithCheckboxModel<string>>()
+            return new List<SelectListItemModel<string>>()
             {
-                new SelectListItemWithCheckboxModel<string>() { IsChecked = true, Name = "Live", Value = ((int)Scope.Live).ToString() },
-                new SelectListItemWithCheckboxModel<string>() { IsChecked = true, Name = "Prematch", Value = ((int)Scope.Prematch).ToString() }
+                new SelectListItemModel<string>() { Name = "Live", Value = ((int)Scope.Live).ToString() },
+                new SelectListItemModel<string>() { Name = "Prematch", Value = ((int)Scope.Prematch).ToString() }
             };
         }
         #endregion

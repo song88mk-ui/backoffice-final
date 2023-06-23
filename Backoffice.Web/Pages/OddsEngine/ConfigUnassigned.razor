@@ -24,26 +24,79 @@
 <div class="col-md-12 mb-4">
     <div class="d-flex justify-content-between mx-4">
         <div class="d-flex filter-div">
-            <select class="form-select">
-                <option value="1">All Clients</option>
-                <option value="2">Client 1</option>
-                <option value="3">Client 2</option>
-                <option value="4">Client 3</option>
-            </select>
+            <div class="dropdown">
+                <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (Clients.Any())
+                    {
+                        if (Clients.Count - 1 == SelectedClientCount)
+                        {
+                            <span>All Clients (@SelectedClientCount)</span>
+                        }
+                        else
+                        {
+                            <span>@(SelectedClientCount == 1 ? SelectedClientName : $"Clients ({SelectedClientCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No Clients Available</span>
+                    }
+                </button>
+                @if (Sports.Any())
+                {
+                    <SelectWithCheckbox Items="Clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="scope-dropdown" />
+                }
+            </div>
 
-            <select class="form-select">
-                <option value="1">All Sports</option>
-                <option value="2">Sport 1</option>
-                <option value="3">Sport 2</option>
-                <option value="4">Sport 3</option>
-            </select>
+            <div class="dropdown">
+                <button class="btn form-select dropdown-toggle" type="button" id="sport-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (Sports.Any())
+                    {
+                        if (Sports.Count - 1 == SelectedSportCount)
+                        {
+                            <span>All Sports (@SelectedSportCount)</span>
+                        }
+                        else
+                        {
+                            <span>@(SelectedSportCount == 1 ? SelectedSportName : $"Sports ({SelectedSportCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No Sports Available</span>
+                    }
+                </button>
+                @if (Sports.Any())
+                {
+                    <SelectionRow Items="Sports" OnCheckboxCallback="OnSportCheckboxClickEvent" AriaLabel="scope-dropdown" />
+                }
+            </div>
 
-            <select class="form-select">
-                <option value="1">Live</option>
-                <option value="2">Prematch</option>
-            </select>
+            <div class="dropdown">
+                <button class="btn form-select dropdown-toggle" type="button" id="scope-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (Scopes.Any())
+                    {
+                        if (Scopes.Count - 1 == SelectedScopeCount)
+                        {
+                            <span>All Scopes (@SelectedScopeCount)</span>
+                        }
+                        else
+                        {
+                            <span>@(SelectedScopeCount == 1 ? SelectedScopeName : $"Scopes ({SelectedSportCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No Scopes Available</span>
+                    }
+                </button>
+                @if (Sports.Any())
+                {
+                    <SelectionRow Items="Scopes" OnCheckboxCallback="OnScopeCheckboxClickEvent" AriaLabel="scope-dropdown" />
+                }
+            </div>
 
-            <button class="btn btn-dark">
+            <button class="btn btn-dark" @onclick="OnResetClickEvent">
                 Reset
             </button>
         </div>
@@ -75,48 +128,23 @@
             </thead>
 
             <tbody>
-                <tr>
-                    <th class="text-center" scope="row">1</th>
-                    <td class="text-center">10BET Crypto</td>
-                    <td class="text-center">Volleyball</td>
-                    <td class="text-center">Live</td>
-                    <td class="text-center">Pro League</td>
-                    <td class="text-center">
-                        <select class="form-select">
-                            <option value="0">Select Template</option>
-                            <option value="1">Volleyball [Live] [Tier 1]</option>
-                            <option value="2">Volleyball [Live] [Tier 2]</option>
-                            <option value="3">Volleyball [Live] [Tier 3]</option>
-                        </select>
-                    </td>
-                    <td class="text-center">
-                        <button class="btn btn-assign-template">
-                            Assign Template
-                        </button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th class="text-center" scope="row">2</th>
-                    <td class="text-center">10BET Crypto</td>
-                    <td class="text-center">Volleyball</td>
-                    <td class="text-center">Live</td>
-                    <td class="text-center">Pro League</td>
-                    <td class="text-center">
-                        <select class="form-select">
-                            <option value="0">Select Template</option>
-                            <option value="1">Volleyball [Live] [Tier 1]</option>
-                            <option value="2">Volleyball [Live] [Tier 2]</option>
-                            <option value="3">Volleyball [Live] [Tier 3]</option>
-                        </select>
-                    </td>
-                    <td class="text-center">
-                        <button class="btn btn-assign-template">
-                            Assign Template
-                        </button>
-                    </td>
-                </tr>
+                @if (ConfigClients != null && ConfigClients.Any())
+                {
+                    foreach (var config in ConfigClients)
+                    {
+                        <ConfigStateRow Index="@(ConfigClients.IndexOf(config) + 1)" Config="config" />
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7">
+                            <NoRecordFound />
+                        </td>
+                    </tr>
+                }
             </tbody>
+            <Pagination MetaData="MetaData" Spread="2" SelectPageEvent="SelectedPage" PaginationColspan="7" />
         </table>
     </div>
 </div>
