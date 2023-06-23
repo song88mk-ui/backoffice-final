@@ -63,7 +63,10 @@ button.form-select {
     content: unset;
 }
 
-.dropdown-menu.w-100.show {
-    position: relative !important;
-    transform: inherit;
+.filter-controls {
+    gap: 3rem;
+}
+
+.d-flex.filter-controls > div {
+    position: relative;
 }

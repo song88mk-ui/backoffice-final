@@ -5,73 +5,62 @@
 <div class="col-md-12 mb-4">
     <div class="d-flex justify-content-between">
 
+        <div class="d-flex filter-controls">
+            <div>
+                <button class="form-select dropdown-toggle" type="button" id="market-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (EditConfigTemplateFilterModel.Markets.Any())
+                    {
+                        if (EditConfigTemplateFilterModel.Markets.Count - 1 == EditConfigTemplateFilterModel.SelectedMarketCount)
+                        {
+                            <span>All Markets</span>
+                        }
+                        else
+                        {
+                            <span>@(EditConfigTemplateFilterModel.SelectedMarketCount == 1 ? EditConfigTemplateFilterModel.SelectedMarketName : $"Markets ({EditConfigTemplateFilterModel.SelectedMarketCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No Markets Available</span>
+                    }
+                </button>
+                @if (EditConfigTemplateFilterModel.Markets.Any())
+                {
+                    <SelectWithCheckbox Items="EditConfigTemplateFilterModel.Markets" OnCheckboxCallback="OnMarketCheckboxClickEvent" AriaLabel="market-dropdown" />
+                }
+            </div>
+
+            <div>
+                <button class="form-select dropdown-toggle" type="button" id="config-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (EditConfigTemplateFilterModel.ConfigStatuses.Any())
+                    {
+                        if (EditConfigTemplateFilterModel.ConfigStatuses.Count - 1 == EditConfigTemplateFilterModel.SelectedConfigStatusCount)
+                        {
+                            <span>All Config Status</span>
+                        }
+                        else
+                        {
+                            <span>@(EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1 ? EditConfigTemplateFilterModel.SelectedConfigStatusName : $"Config Status ({EditConfigTemplateFilterModel.SelectedConfigStatusCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No Configs Available</span>
+                    }
+                </button>
+                @if (EditConfigTemplateFilterModel.ConfigStatuses.Any())
+                {
+                    <SelectWithCheckbox Items="EditConfigTemplateFilterModel.ConfigStatuses" OnCheckboxCallback="OnConfigCheckboxClickEvent" AriaLabel="config-dropdown" />
+                }
+            </div>
+        </div>
+
         <div class="d-flex filter-div">
             <div class="input-group">
                 <input type="text" id="search" placeholder="Find" class="form-control search-text valid border-end-0" />
                 <span class="input-group-text border-start-0">
                     <i class="fa fa-search"></i>
                 </span>
-            </div>
-
-            <div class="btn-filter-div">
-                <div class="dropdown">
-                    <button type="button" class="btn btn-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false" id="dropdownMenu"><i class="fa fa-filter"></i>Filter</button>
-
-                    <ul class="dropdown-menu">
-                        <li><h6 class="dropdown-header">FILTER BY</h6></li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li><h6 class="dropdown-header">Markets</h6></li>
-                        <li>
-                            <button class="form-select dropdown-toggle" type="button" id="market-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                @if (EditConfigTemplateFilterModel.Markets.Any())
-                                {
-                                    if (EditConfigTemplateFilterModel.Markets.Count - 1 == EditConfigTemplateFilterModel.SelectedMarketCount)
-                                    {
-                                        <span>All Markets</span>
-                                    }
-                                    else
-                                    {
-                                        <span>@(EditConfigTemplateFilterModel.SelectedMarketCount == 1 ? EditConfigTemplateFilterModel.SelectedMarketName : $"Markets ({EditConfigTemplateFilterModel.SelectedMarketCount})")</span>
-                                    }
-                                }
-                                else
-                                {
-                                    <span>No Markets Available</span>
-                                }
-                            </button>
-                            @if (EditConfigTemplateFilterModel.Markets.Any())
-                            {
-                                <SelectWithCheckbox Items="EditConfigTemplateFilterModel.Markets" OnCheckboxCallback="OnMarketCheckboxClickEvent" AriaLabel="market-dropdown" />
-                            }
-                        </li>
-                        <li><h6 class="dropdown-header">Config Status</h6></li>
-                        <li>
-                            <button class="form-select dropdown-toggle" type="button" id="config-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                @if (EditConfigTemplateFilterModel.ConfigStatuses.Any())
-                                {
-                                    if (EditConfigTemplateFilterModel.ConfigStatuses.Count - 1 == EditConfigTemplateFilterModel.SelectedConfigStatusCount)
-                                    {
-                                        <span>All Config Status</span>
-                                    }
-                                    else
-                                    {
-                                        <span>@(EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1 ? EditConfigTemplateFilterModel.SelectedConfigStatusName : $"Config Status ({EditConfigTemplateFilterModel.SelectedConfigStatusCount})")</span>
-                                    }
-                                }
-                                else
-                                {
-                                    <span>No Configs Available</span>
-                                }
-                            </button>
-                            @if (EditConfigTemplateFilterModel.ConfigStatuses.Any())
-                            {
-                                <SelectWithCheckbox Items="EditConfigTemplateFilterModel.ConfigStatuses" OnCheckboxCallback="OnConfigCheckboxClickEvent" AriaLabel="config-dropdown" />
-                            }
-                        </li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li class="d-flex flex-row-reverse me-2"><button type="button" class="btn btn-apply">APPLY</button></li>
-                    </ul>
-                </div>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 ﻿<div class="col mx-4 config-nav-container">
-    <a class="@(CurrentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.MyTemplates)">My Templates ()</a>
-    <a class="@(CurrentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.Assigned)">Assigned ()</a>
-    <a class="@(CurrentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.UnAssigned)">Unassigned ()</a>
+    <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.MyTemplates)">My Templates ()</a>
+    <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.Assigned)">Assigned ()</a>
+    <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.UnAssigned)">Unassigned ()</a>
 </div>
