@@ -22,7 +22,7 @@
                 {
                     @foreach (var item in Sports)
                     {
-                        if (item.Value == SelectedSportId)
+                        if (item.Value == SelectedSportId.ToString())
                         {
                             <option value="@item.Value" selected>@item.Name</option>
                         }
