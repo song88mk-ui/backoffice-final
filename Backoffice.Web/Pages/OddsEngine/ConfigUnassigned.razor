@@ -26,7 +26,7 @@
         <div class="d-flex filter-div">
             <div class="dropdown">
                 <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    @if (Clients.Any())
+                    @if (Clients != null && Clients.Any())
                     {
                         if (Clients.Count - 1 == SelectedClientCount)
                         {
@@ -42,59 +42,31 @@
                         <span>No Clients Available</span>
                     }
                 </button>
-                @if (Sports.Any())
+                @if (Clients != null && Clients.Any())
                 {
                     <SelectWithCheckbox Items="Clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="scope-dropdown" />
                 }
             </div>
 
-            <div class="dropdown">
-                <button class="btn form-select dropdown-toggle" type="button" id="sport-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    @if (Sports.Any())
+            @if (Sports != null && Sports.Any())
+            {
+                <select class="form-select" @onchange="OnSportCheckboxClickEvent">
+                    @foreach (var item in Sports)
                     {
-                        if (Sports.Count - 1 == SelectedSportCount)
-                        {
-                            <span>All Sports (@SelectedSportCount)</span>
-                        }
-                        else
-                        {
-                            <span>@(SelectedSportCount == 1 ? SelectedSportName : $"Sports ({SelectedSportCount})")</span>
-                        }
+                        <option value="@item.Value">@item.Name</option>
                     }
-                    else
-                    {
-                        <span>No Sports Available</span>
-                    }
-                </button>
-                @if (Sports.Any())
-                {
-                    <SelectionRow Items="Sports" OnCheckboxCallback="OnSportCheckboxClickEvent" AriaLabel="scope-dropdown" />
-                }
-            </div>
+                </select>
+            }
 
-            <div class="dropdown">
-                <button class="btn form-select dropdown-toggle" type="button" id="scope-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    @if (Scopes.Any())
+            @if (Scopes != null && Scopes.Any())
+            {
+                <select class="form-select" @onchange="OnScopeCheckboxClickEvent">
+                    @foreach (var item in Scopes)
                     {
-                        if (Scopes.Count - 1 == SelectedScopeCount)
-                        {
-                            <span>All Scopes (@SelectedScopeCount)</span>
-                        }
-                        else
-                        {
-                            <span>@(SelectedScopeCount == 1 ? SelectedScopeName : $"Scopes ({SelectedSportCount})")</span>
-                        }
+                        <option value="@item.Value">@item.Name</option>
                     }
-                    else
-                    {
-                        <span>No Scopes Available</span>
-                    }
-                </button>
-                @if (Sports.Any())
-                {
-                    <SelectionRow Items="Scopes" OnCheckboxCallback="OnScopeCheckboxClickEvent" AriaLabel="scope-dropdown" />
-                }
-            </div>
+                </select>
+            }
 
             <button class="btn btn-dark" @onclick="OnResetClickEvent">
                 Reset
@@ -128,20 +100,31 @@
             </thead>
 
             <tbody>
-                @if (ConfigClients != null && ConfigClients.Any())
-                {
-                    foreach (var config in ConfigClients)
-                    {
-                        <ConfigStateRow Index="@(ConfigClients.IndexOf(config) + 1)" Config="config" />
-                    }
-                }
-                else
+                @if (IsPreloader)
                 {
                     <tr>
                         <td colspan="7">
-                            <NoRecordFound />
+                            <Preloader />
                         </td>
                     </tr>
+                }
+                else
+                {
+                    @if (ConfigClients != null && ConfigClients.Any())
+                    {
+                        foreach (var config in ConfigClients)
+                        {
+                            <ConfigStateRow Index="@(ConfigClients.IndexOf(config) + 1)" Config="config" />
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7">
+                                <NoRecordFound />
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
             <Pagination MetaData="MetaData" Spread="2" SelectPageEvent="SelectedPage" PaginationColspan="7" />

@@ -49,7 +49,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<List<ConfigTemplateModel>>> GetClientConfigTemplate(string token);
         Task<BaseResponse<List<ConfigTemplateModel>>> AddOrUpdateConfigTemplate(string token, ConfigTemplateModel request);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string token, long id);
-        Task<BaseResponse<List<ConfigClientModel>>> GetConfigClient(string token, ConfigState state, MetaData metaData);
+        Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(string token, ConfigState state, ConfigTemplateLeagueRequest payload);
         Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(string token);
         Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(string token, long configTemplateId);
 

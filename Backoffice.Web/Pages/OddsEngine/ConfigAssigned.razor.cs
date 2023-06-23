@@ -1,5 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -29,9 +30,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public int SelectedClientCount { get; set; }
         public string SelectedClientName { get; set; } = "";
         public string SelectedSportName { get; set; } = "";
-        public int SelectedSportCount { get; set; }
         public string SelectedScopeName { get; set; } = "";
-        public int SelectedScopeCount { get; set; }
+        public bool IsPreloader { get; set; } = true;
 
         #endregion
 
@@ -39,12 +39,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            IsPreloader = true;
             PageTitle = "Assigned Leagues";
             IconClass = "";
-
-            Clients = new List<SelectListItemWithCheckboxModel<string>>();
-            Sports = new List<SelectListItemModel<string>>();
-            Scopes = new List<SelectListItemModel<string>>();
 
             MetaData = new MetaData();
 
@@ -77,28 +74,28 @@ namespace Backoffice.Web.Pages.OddsEngine
             //SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
         }
 
-        public async Task OnSportCheckboxClickEvent(Dictionary<string, string> items)
+        public async Task OnSportCheckboxClickEvent(ChangeEventArgs e)
         {
-            SelectedSportName = string.Empty;
-            SelectedSportCount = items.Count;
+            //SelectedSportName = string.Empty;
+            //SelectedSportCount = items.Count;
 
-            if (SelectedSportCount == 1)
-            {
-                SelectedSportName = items.FirstOrDefault().Value;
-            }
+            //if (SelectedSportCount == 1)
+            //{
+            //    SelectedSportName = items.FirstOrDefault().Value;
+            //}
             //SelectedScopeCount = selectedScopes.Count;
             //SelectedScopeName = SelectedScopeCount > 0 ? string.Empty : Scopes.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
         }
 
-        public async Task OnScopeCheckboxClickEvent(Dictionary<string, string> items)
+        public async Task OnScopeCheckboxClickEvent(ChangeEventArgs e)
         {
-            SelectedScopeName = string.Empty;
-            SelectedScopeCount = items.Count;
+            //SelectedScopeName = string.Empty;
+            //SelectedScopeCount = items.Count;
 
-            if (SelectedScopeCount == 1)
-            {
-                SelectedScopeName = items.FirstOrDefault().Value;
-            }
+            //if (SelectedScopeCount == 1)
+            //{
+            //    SelectedScopeName = items.FirstOrDefault().Value;
+            //}
         }
 
         public async Task SelectedPage()
@@ -159,21 +156,31 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task Init()
         {
-            await LoadLeaguesLeagues();
+            await LoadLeagues();
         }
-        private async Task LoadLeaguesLeagues()
+        private async Task LoadLeagues()
         {
-            var response = await BackOfficeService.GetConfigClient(UserModel.Id, ConfigState.Assigned, MetaData);
+            IsPreloader = true;
+
+            StateHasChanged();
+            var payload = new ConfigTemplateLeagueRequest();
+            payload.MetaData = MetaData;
+            var response = await BackOfficeService.GetConfigClient(UserModel.Id, ConfigState.Assigned, payload);
 
             if (response.StatusCode == StatusCode.Success)
             {
                 ConfigClients = new List<ConfigClientModel>();
+                MetaData = new MetaData();
 
-                if (response.Result != null && response.Result.Any())
+                if (response.Result != null)
                 {
-                    ConfigClients = response.Result;
+                    if (response.Result.ClientConfigs != null && response.Result.ClientConfigs.Any())
+                        ConfigClients = response.Result.ClientConfigs;
+                    if (response.Result.MetaData != null)
+                        MetaData = response.Result.MetaData;
                 }
             }
+            IsPreloader = false;
         }
 
         #endregion

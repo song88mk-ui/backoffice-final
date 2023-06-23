@@ -164,7 +164,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             Sports = await LoadSports();
             Scopes = await LoadScopes();
 
-            //await LoadConfigTemplates();
+            
+            await LoadConfigTemplates();
+
+            StateHasChanged();
         }
 
         private async Task LoadConfigTemplates()
