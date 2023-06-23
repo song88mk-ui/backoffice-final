@@ -19,7 +19,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
         #region Config
-        Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(string userId, List<string> clientCodes, List<int> sportIds = null, List<int> scopeIds = null);
+        Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(List<int> sportIds = null, List<int> scopeIds = null);
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(string userId, long templateId);
         Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(string userId, ConfigTemplateModel request);
         Task<BaseResponse<bool>> SetConfigState(string userId, ConfigState configState, List<ConfigClientModel> request);

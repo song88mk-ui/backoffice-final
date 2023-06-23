@@ -1354,20 +1354,12 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Config
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(string userId, List<string> clientCodes = null, List<int> sportIds = null, List<int> scopeIds = null)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(List<int> sportIds = null, List<int> scopeIds = null)
         {
             try
             {
-                var query = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId).AsNoTracking();
+                var query = _backofficeContext.ConfigTemplates.AsNoTracking();
 
-                if (clientCodes != null && clientCodes.Any())
-                {
-                    var clientList = GetTradingClientInformation();
-                    if (clientCodes.FirstOrDefault().ToUpper() == "ALL")
-                    {
-                        clientCodes = clientList.Select(x => x.ClientCode).ToList();
-                    }
-                }
                 if (sportIds != null && sportIds.Count() > 0)
                 {
                     query = query.Where(x => sportIds.Contains(x.SportId));
@@ -1583,7 +1575,7 @@ namespace Backoffice.API.Repositories
 
                 await _backofficeContext.SaveChangesAsync();
 
-                return await GetConfigTemplates(userId);
+                return await GetConfigTemplates();
             }
             catch (Exception ex)
             {
@@ -1595,7 +1587,7 @@ namespace Backoffice.API.Repositories
             try
             {
                 var result = new List<ConfigClientModel>();
-                var configTemplate = await GetConfigTemplates(userId, sportIds: request.SportId != -1 ? new List<int>() { request.SportId } : null, scopeIds: request.ScopeId != -1 ? new List<int>() { request.ScopeId } : null);
+                var configTemplate = await GetConfigTemplates(sportIds: request.SportId != -1 ? new List<int>() { request.SportId } : null, scopeIds: request.ScopeId != -1 ? new List<int>() { request.ScopeId } : null);
                 var templates = configTemplate.Result;
                 var clientList = GetTradingClientInformation();
                 var metaData = request.MetaData;
@@ -1725,7 +1717,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var configTemplate = await GetConfigTemplates(userId, clientCodes);
+                var configTemplate = await GetConfigTemplates();
                 var templates = configTemplate.Result;
                 var myConfiTemplates = templates.Count();
                 var assignedConfig = await GetConfigState(userId, clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.Assigned);

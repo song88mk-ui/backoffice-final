@@ -50,7 +50,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
 
-            await Init();
+            await LoadConfigTemplates();
         }
 
         public async Task OnLogsClickEvent()
@@ -148,11 +148,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-
-        private async Task Init()
-        {
-            await LoadConfigTemplates();
-        }
 
         private async Task LoadConfigTemplates()
         {

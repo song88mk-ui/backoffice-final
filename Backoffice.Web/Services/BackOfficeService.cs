@@ -1322,12 +1322,11 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetClientConfigTemplate(string token)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate()
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.GetAsync($"api/config/template");
+                var response = await _httpClient.GetAsync($"api/config/templates");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<List<ConfigTemplateModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
