@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Backoffice.API.ActionFilter;
+﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
