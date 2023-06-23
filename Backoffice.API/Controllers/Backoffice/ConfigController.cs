@@ -134,7 +134,7 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(new BaseResponse<List<ConfigClientModel>>() { StatusCode = BoStatusCode.Error, Message = "Invalid template type", Result = null });
             }
 
-            var result = await _backofficeRepository.GetConfigClient(userId, clientCodes, payload, isAssigned);
+            var result = await _backofficeRepository.GetConfigAssignedOrUnAssigned(userId, clientCodes, payload, isAssigned);
 
             switch (result.StatusCode)
             {
