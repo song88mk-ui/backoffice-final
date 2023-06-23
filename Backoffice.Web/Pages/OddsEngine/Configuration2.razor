@@ -11,18 +11,17 @@
     <ConfigNavMenu Region="@Region" SelectConfigNavMenuCallback="OnConfigNavMenuSelected"/>
 </div>
 
-
-@if(SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
+@if (SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
 {
-    <ConfigMyTemplates Sports="@Sports" Scopes="@Scopes"/>
+    <ConfigMyTemplates />
 }
-else if(SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
+else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
 {
-    <ConfigAssigned Clients="@Clients" Sports="@Sports" Scopes="@Scopes"/>
+    <ConfigAssigned />
 }
 else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
 {
-    <ConfigUnassigned Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />
+    <ConfigUnassigned />
 }
 
 <CustomModal/>
