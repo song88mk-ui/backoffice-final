@@ -11,6 +11,7 @@ namespace Backoffice.Shared.Data.Backoffice.Entities
         public long Id { get; set; }
         public Guid ClientId { get; set; }
         public string ClientCode { get; set; }
+        public string ClientName { get; set; }
         public int SportId { get; set; }
         public string SportName { get; set; }
         public int SegmentId { get; set; }

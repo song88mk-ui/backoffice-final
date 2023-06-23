@@ -20,7 +20,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Scopes { get; set; }
-        public List<ConfigClientModel> ConfigClients { get; set; }
+        public List<ConfigClientModel> ConfigClients { get; set; } = new List<ConfigClientModel>();
 
         public MetaData MetaData { get; set; }
 

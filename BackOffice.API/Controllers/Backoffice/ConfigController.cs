@@ -90,6 +90,7 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> AddOrUpdateConfigTemplate([FromBody] ConfigTemplateModel request)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
+            var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
 
             var result = await _backofficeRepository.AddOrUpdateConfigTemplate(userId, request);
 
@@ -134,7 +135,7 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(new BaseResponse<List<ConfigClientModel>>() { StatusCode = BoStatusCode.Error, Message = "Invalid template type", Result = null });
             }
 
-            var result = await _backofficeRepository.GetConfigAssignedOrUnAssigned(userId, clientCodes, payload, isAssigned);
+            var result = await _backofficeRepository.GetConfigState(userId, clientCodes, payload, isAssigned);
 
             switch (result.StatusCode)
             {

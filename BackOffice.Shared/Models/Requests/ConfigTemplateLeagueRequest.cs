@@ -16,8 +16,8 @@ namespace Backoffice.Shared.Models.Requests
         }
         public string SearchText { get; set; } = string.Empty;
         public List<string> ClientCodes { get; set; } = new List<string>();
-        public List<int> SportIds { get; set; } = new List<int>();
-        public List<int> ScopeIds { get; set; } = new List<int>();
+        public int SportId { get; set; } = -1;
+        public int ScopeId { get; set; } = -1;
         public MetaData MetaData { get; set; } = new MetaData();
     }
 }

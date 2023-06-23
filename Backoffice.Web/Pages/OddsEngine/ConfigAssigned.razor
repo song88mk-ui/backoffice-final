@@ -7,9 +7,9 @@
 
 <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"></Breadcrumb>
 
-<div class="col-md-12 mb-4">
+@*<div class="col-md-12 mb-4">
     <ConfigNavMenu Region="@Region" CurrentMenu="2"></ConfigNavMenu>
-</div>
+</div>*@
 
 <div class="col-md-12 mb-4">
     <div class="col-md-12 mb-4">
@@ -128,61 +128,22 @@
             </thead>
 
             <tbody>
-                @foreach(var configClient in ConfigClients)
+                @if (ConfigClients != null && ConfigClients.Any())
+                {
+                    foreach (var config in ConfigClients)
+                    {
+                        <ConfigStateRow Index="@(ConfigClients.IndexOf(config) + 1)" Config="config" />
+                    }
+                }
+                else
                 {
                     <tr>
-                        <th class="text-center" scope="row">1</th>
-                        <td class="text-center">@configClient.ClientName</td>
-                        <td class="text-center">@(Sports.FirstOrDefault(x => x.Value == configClient.SportId.ToString()) != null ? $"{Sports.FirstOrDefault(x => x.Value == configClient.SportId.ToString()).Name}" : "")</td>
-                        <td class="text-center">@(((FixtureStatus)configClient.FixtureStatusId).ToString())</td>
-                        <td class="text-center">
-                            @*<select class="form-select" @onchange="OnConfigTemplateChangedEvent">
-                                @foreach(var )
-                            </select>*@
+                        <td colspan="7">
+                            <NoRecordFound />
                         </td>
                     </tr>
-                }                
-                <tr>
-                    <th class="text-center" scope="row">1</th>
-                    <td class="text-center">10BET Crypto</td>
-                    <td class="text-center">Volleyball</td>
-                    <td class="text-center">Live</td>
-                    <td class="text-center">Pro League</td>
-                    <td class="text-center">
-                        <select class="form-select">
-                            <option value="0">Select Template</option>
-                            <option value="1">Volleyball [Live] [Tier 1]</option>
-                            <option value="2">Volleyball [Live] [Tier 2]</option>
-                            <option value="3">Volleyball [Live] [Tier 3]</option>
-                        </select>
-                    </td>
-                    <td class="text-center">
-                        <button class="btn btn-change-template">
-                            Change Template
-                        </button>
-                    </td>
-                </tr>
+                }
 
-                <tr>
-                    <th class="text-center" scope="row">2</th>
-                    <td class="text-center">10BET Crypto</td>
-                    <td class="text-center">Volleyball</td>
-                    <td class="text-center">Live</td>
-                    <td class="text-center">Pro League</td>
-                    <td class="text-center">
-                        <select class="form-select">
-                            <option value="0">Select Template</option>
-                            <option value="1">Volleyball [Live] [Tier 1]</option>
-                            <option value="2">Volleyball [Live] [Tier 2]</option>
-                            <option value="3">Volleyball [Live] [Tier 3]</option>
-                        </select>
-                    </td>
-                    <td class="text-center">
-                        <button class="btn btn-change-template">
-                            Change Template
-                        </button>
-                    </td>
-                </tr>
             </tbody>
             <Pagination MetaData="MetaData" Spread="2" SelectPageEvent="SelectedPage" PaginationColspan="7" />
         </table>

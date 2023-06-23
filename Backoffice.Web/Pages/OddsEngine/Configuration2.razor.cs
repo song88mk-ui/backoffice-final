@@ -39,6 +39,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             ConfigTemplates = new List<ConfigTemplateModel>();
             Sports = new List<SelectListItemModel<int>>();
+            SelectedConfigNavMenu = ConfigTemplateNavMenu.UnAssigned;
 
             Breadcrumbs = new List<BreadcrumbModel>()
             {
@@ -130,14 +131,14 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             SelectedSportId = int.Parse(e.Value.ToString());
 
-            await LoadConfigTemplates();
+            //await LoadConfigTemplates();
         }
 
         public async Task OnScopeChangedEvent(ChangeEventArgs e)
         {
             SelectedScopeId = int.Parse(e.Value.ToString());
 
-            await LoadConfigTemplates();
+            //await LoadConfigTemplates();
         }
 
         public async Task OnConfigNavMenuSelected(ConfigTemplateNavMenu configNavMenu)
@@ -159,7 +160,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             Sports =  await LoadSports();
             
 
-            await LoadConfigTemplates();
+            //await LoadConfigTemplates();
         }
 
         private async Task LoadConfigTemplates()
