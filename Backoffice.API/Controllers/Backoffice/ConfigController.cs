@@ -1,11 +1,13 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OpenTelemetry.Metrics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -76,7 +78,7 @@ namespace Backoffice.API.Controllers.Backoffice
             var userId = HttpContext.Items["UserId"]?.ToString();
             var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
 
-            var result = await _backofficeRepository.GetConfigTemplates(userId, clientCodes, sportId == -1 ?  null : new List<int>() { sportId}, scopeId == -1? null: new List<int>() { scopeId });
+            var result = await _backofficeRepository.GetConfigTemplates(userId, clientCodes, sportId == -1 ? null : new List<int>() { sportId }, scopeId == -1 ? null : new List<int>() { scopeId });
 
             switch (result.StatusCode)
             {
@@ -101,6 +103,29 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
+        [HttpPost("template/state/{state}")]
+        public async Task<IActionResult> ConfigTemplateSetState([FromBody] List<ConfigClientModel> request, [FromRoute] string state)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var result = new BaseResponse<bool>()
+            {
+                StatusCode = BoStatusCode.Error,
+                Message = "Invalid state type"
+            };
+
+            if (Enum.TryParse(state, out ConfigState confState))
+            {
+                result = await _backofficeRepository.SetConfigState(userId, confState, request);
+            }
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         [HttpDelete("template/{id}")]
         public async Task<IActionResult> DeleteConfigTemplate([FromRoute] string id)
         {
@@ -116,25 +141,23 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
-        [HttpPost("template/{type}")] // type = assigned / unassigned
-        public async Task<IActionResult> GetConfigClients([FromRoute] string type, [FromBody] ConfigTemplateLeagueRequest payload)
+        [HttpPost("template/{state}")] // type = assigned / unassigned
+        public async Task<IActionResult> GetConfigClients([FromRoute] string state, [FromBody] ConfigTemplateLeagueRequest payload)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
             var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
 
             var isAssigned = true;
-
-            switch (type.ToLower())
+            var result = new BaseResponse<ConfigTemplateLeagueResponse>()
             {
-                case "assigned":
-                case "unassigned":
-                    isAssigned = type.ToLower() == "assigned";
-                    break;
-                default:
-                    return BadRequest(new BaseResponse<List<ConfigClientModel>>() { StatusCode = BoStatusCode.Error, Message = "Invalid template type", Result = null });
-            }
+                StatusCode = BoStatusCode.Error,
+                Message = "Invalid state type"
+            };
 
-            var result = await _backofficeRepository.GetConfigState(userId, clientCodes, payload, isAssigned);
+            if (Enum.TryParse(state, out ConfigState confState))
+            {
+                result = await _backofficeRepository.GetConfigState(userId, clientCodes, payload, confState);
+            }
 
             switch (result.StatusCode)
             {
