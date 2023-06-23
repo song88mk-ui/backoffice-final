@@ -90,7 +90,6 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> AddOrUpdateConfigTemplate([FromBody] ConfigTemplateModel request)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
-            var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
 
             var result = await _backofficeRepository.AddOrUpdateConfigTemplate(userId, request);
 
