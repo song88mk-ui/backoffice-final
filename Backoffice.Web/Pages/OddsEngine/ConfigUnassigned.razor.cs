@@ -8,6 +8,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Properties
 
         [Parameter] public string Region { get; set; } = "hk";
+        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
+        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
+        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Scopes { get; set; }
 
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
 
@@ -32,6 +35,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
+
+            await Init();
+        }
+
+        private async Task Init()
+        {
         }
 
         public void Dispose()

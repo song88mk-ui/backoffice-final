@@ -19,9 +19,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
 
+        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
+        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Scopes { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<ConfigTemplateModel> ConfigTemplates { get; set; }
-        public List<SelectListItemModel<int>> Sports { get; set; }
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -37,7 +38,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             IconClass = "";
 
             ConfigTemplates = new List<ConfigTemplateModel>();
-            Sports = new List<SelectListItemModel<int>>();
+            Sports = new List<SelectListItemWithCheckboxModel<string>>();
 
             Breadcrumbs = new List<BreadcrumbModel>()
             {
@@ -77,7 +78,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
 
             ModalService.Open<CreateTemplateModal>($"Create Template", parameters, options);
-        }        
+        }
 
         public async Task OnEditTemplateClickEvent(ConfigTemplateModel configTemplateModel)
         {
@@ -149,32 +150,13 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Utilities
 
         private async Task Init()
-        {                       
-            Sports =  await LoadSports();
-            
-
+        {
             await LoadConfigTemplates();
         }
 
         private async Task LoadConfigTemplates()
         {
-            ConfigTemplates =  (await BackOfficeService.GetClientConfigTemplate(UserModel.Id)).Result;
-        }
-
-        private async Task<List<SelectListItemModel<int>>> LoadSports()
-        {
-            var result = (await TradingService.GetSportLookup()).Result;
-
-            if (result == null)
-                return new List<SelectListItemModel<int>>();
-
-            var sports = result.SportLookup.Select(s => new SelectListItemModel<int>()
-            {
-                Value = s.SportId,
-                Name = s.SportName
-            }).ToList();
-
-            return sports;
+            ConfigTemplates = (await BackOfficeService.GetClientConfigTemplate(UserModel.Id)).Result;
         }
 
         #endregion

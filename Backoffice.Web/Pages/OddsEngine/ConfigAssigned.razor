@@ -44,7 +44,17 @@
                 </button>
                 @if (Clients.Any())
                 {
-                    <SelectWithCheckbox Items="Clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="client-dropdown" />
+                    <ul class="dropdown-menu w-100" aria-labelledby="client-dropdown">
+                        @foreach (var item in Clients)
+                        {
+                        <li id="@item.Value">
+                            <div class="form-check ms-2">
+                                    <input type="checkbox" class="form-check-input" @onclick="() => item.IsChecked = !item.IsChecked" checked="@item.IsChecked"/>
+                                <label class="form-check-label">@item.Name</label>
+                            </div>
+                        </li>
+                        }
+                    </ul>
                 }
             </div>
 
@@ -68,7 +78,17 @@
                 </button>
                 @if (Sports.Any())
                 {
-                    <SelectWithCheckbox Items="Sports" OnCheckboxCallback="OnSportCheckboxClickEvent" AriaLabel="sport-dropdown" />
+                    <ul class="dropdown-menu w-100" aria-labelledby="client-dropdown">
+                        @foreach (var item in Clients)
+                        {
+                            <li id="@item.Value">
+                                <div class="form-check ms-2">
+                                    <input type="checkbox" class="form-check-input" @onclick="OnScopeCheckboxClickEvent" checked="@item.IsChecked" />
+                                    <label class="form-check-label">@item.Name</label>
+                                </div>
+                            </li>
+                        }
+                    </ul>
                 }
             </div>
 
@@ -90,10 +110,10 @@
                         <span>No Scopes Available</span>
                     }
                 </button>
-                @if (Sports.Any())
+                @*f (Sports.Any())
                 {
                     <SelectWithCheckbox Items="Scopes" OnCheckboxCallback="OnScopeCheckboxClickEvent" AriaLabel="scope-dropdown" />
-                }
+                }*@
             </div>
 
             <button class="btn btn-dark" @onclick="OnResetClickEvent">

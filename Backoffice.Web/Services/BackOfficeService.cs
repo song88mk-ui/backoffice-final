@@ -1425,12 +1425,12 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ConfigClientModel>>> GetConfigClient(string token, string type, MetaData metaData)
+        public async Task<BaseResponse<List<ConfigClientModel>>> GetConfigClient(string token, ConfigState state, MetaData metaData)
         {
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.PostAsync($"api/config/template/{type}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"api/config/template/{state.ToString()}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                 {

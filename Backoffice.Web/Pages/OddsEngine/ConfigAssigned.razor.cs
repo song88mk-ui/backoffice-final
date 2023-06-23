@@ -13,13 +13,13 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
 
         [Parameter] public string Region { get; set; } = "hk";
+        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
+        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
+        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Scopes { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
-        public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
-        public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
-        public List<SelectListItemWithCheckboxModel<string>> Scopes { get; set; }
         public List<ConfigClientModel> ConfigClients { get; set; } = new List<ConfigClientModel>();
 
         public MetaData MetaData { get; set; }
@@ -58,18 +58,23 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
 
-            await Init();                 
+            await Init();
         }
 
         public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
         {
             SelectedClientName = string.Empty;
-            SelectedClientCount = items.Count;            
+            SelectedClientCount = items.Count;
 
             if (SelectedClientCount == 1)
             {
                 SelectedClientName = items.FirstOrDefault().Value;
             }
+
+            //var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
+
+            //SelectedClientCount = selectedClients.Count;
+            //SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
         }
 
         public async Task OnSportCheckboxClickEvent(Dictionary<string, string> items)
@@ -81,17 +86,19 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 SelectedSportName = items.FirstOrDefault().Value;
             }
+            //SelectedScopeCount = selectedScopes.Count;
+            //SelectedScopeName = SelectedScopeCount > 0 ? string.Empty : Scopes.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
         }
 
-        public async Task OnScopeCheckboxClickEvent(Dictionary<string, string> items)
+        public async Task OnScopeCheckboxClickEvent(EventArgs e)
         {
-            SelectedScopeName = string.Empty;
-            SelectedScopeCount = items.Count;
+            //SelectedScopeName = string.Empty;
+            //SelectedScopeCount = items.Count;
 
-            if (SelectedScopeCount == 1)
-            {
-                SelectedScopeName = items.FirstOrDefault().Value;
-            }
+            //if (SelectedScopeCount == 1)
+            //{
+            //    SelectedScopeName = items.FirstOrDefault().Value;
+            //}
         }
 
         public async Task SelectedPage()
@@ -103,9 +110,47 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         }
 
+        public async Task CheckboxClicked(SelectListItemWithCheckboxModel<string> model)
+        {
+            //if (model.IsChecked == false)
+            //{
+            //    if (model.Value == "all")
+            //    {
+            //        Items.ForEach(x =>
+            //        {
+            //            x.IsChecked = true;
+            //        });
+            //    }
+            //    else
+            //    {
+            //        model.IsChecked = true;
+
+            //        if (!Items.Where(c => c.Value != "all").Any(c => c.IsChecked == false))
+            //            Items[0].IsChecked = true;
+            //    }
+            //}
+            //else
+            //{
+            //    if (model.Value == "all")
+            //    {
+            //        Items.ForEach(x =>
+            //        {
+            //            x.IsChecked = false;
+            //        });
+            //    }
+            //    else
+            //    {
+            //        model.IsChecked = false;
+            //        Items[0].IsChecked = false;
+            //    }
+            //}
+
+            //var dictionary = Items.Where(c => c.Value != "all" && c.IsChecked).ToDictionary(c => c.Value, c => c.Name);
+            //await OnCheckboxCallback.InvokeAsync(dictionary);
+        }
         public void Dispose()
         {
-            
+
         }
 
         #endregion
@@ -114,92 +159,11 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task Init()
         {
-            await LoadClients();
-            await LoadSports();
-            await LoadScopes();
             await LoadAssignedLeagues();
         }
-
-        private async Task LoadClients()
-        {
-            var response = (await BackOfficeService.GetClients()).Result;
-
-            if (response != null && response.Clients.Any())
-            {
-                if (UserModel.ClientCodes.Any())
-                    response.Clients = response.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-
-                Clients = response.Clients.Select(e => 
-                    new SelectListItemWithCheckboxModel<string>()
-                    {
-                        IsChecked = true,
-                        Name = e.ClientName,
-                        Value = e.ClientCode
-                    }).ToList();
-
-                Clients.Insert(0, new SelectListItemWithCheckboxModel<string>
-                {
-                    Value = "all",
-                    Name = "All Clients",
-                    IsChecked = true
-                });
-
-                var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
-
-                SelectedClientCount = selectedClients.Count;
-                SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
-            }
-        }
-
-        private async Task LoadSports()
-        {
-            var sports = (await BackOfficeService.GetSportsAsync()).Result;
-
-            if (sports != null && sports.SportLookup.Any())
-            {
-                Sports = sports.SportLookup.Select(s => new SelectListItemWithCheckboxModel<string>
-                {
-                    IsChecked = true,
-                    Value = s.SportId.ToString(),
-                    Name = s.SportName
-                }).ToList();
-
-                Sports.Insert(0, new SelectListItemWithCheckboxModel<string>
-                {
-                    Value = "all",
-                    Name = "All Sports",
-                    IsChecked = true
-                });
-
-                var selectedSports = Sports.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
-
-                //var sport = Sports.FirstOrDefault(c => c.Value == "1"); // soccer as initial value
-
-                SelectedSportCount = selectedSports.Count;
-                SelectedSportName = SelectedSportCount > 0 ? string.Empty : Sports.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
-            }
-        }
-
-        private async Task LoadScopes()
-        {
-            Scopes = new List<SelectListItemWithCheckboxModel<string>>()
-            {
-                new SelectListItemWithCheckboxModel<string>() { IsChecked = true, Name = "Select All", Value = "all" },
-                new SelectListItemWithCheckboxModel<string>() { IsChecked = true, Name = "Live", Value = "Live" },
-                new SelectListItemWithCheckboxModel<string>() { IsChecked = true, Name = "Prematch", Value = "Prematch" }
-            };
-
-            var selectedScopes = Scopes.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
-
-            //var sport = Sports.FirstOrDefault(c => c.Value == "1"); // soccer as initial value
-
-            SelectedScopeCount = selectedScopes.Count;
-            SelectedScopeName = SelectedScopeCount > 0 ? string.Empty : Scopes.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
-        }
-
         private async Task LoadAssignedLeagues()
         {
-            var response = await BackOfficeService.GetConfigClient(UserModel.Id, "assigned", MetaData);
+            var response = await BackOfficeService.GetConfigClient(UserModel.Id, ConfigState.Assigned, MetaData);
 
             if (response.StatusCode == StatusCode.Success)
             {

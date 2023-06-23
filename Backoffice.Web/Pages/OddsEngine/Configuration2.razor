@@ -14,15 +14,15 @@
 
 @if(SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
 {
-    <ConfigMyTemplates/>
+    <ConfigMyTemplates Sports="@Sports" Scopes="@Scopes" />
 }
 else if(SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
 {
-    <ConfigAssigned/>
+    <ConfigAssigned Clients="@Clients" Sports="@Sports" Scopes="@Scopes"/>
 }
 else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
 {
-    <ConfigUnassigned />
+    <ConfigUnassigned Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />
 }
 
 <CustomModal/>

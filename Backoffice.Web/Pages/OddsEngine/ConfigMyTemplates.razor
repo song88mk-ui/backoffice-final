@@ -39,9 +39,6 @@
             </select>
 
             <select class="form-select" @onchange="OnScopeChangedEvent">
-                <option value="-1">All Scopes</option>
-                <option value="1">Prematch</option>
-                <option value="2">Live</option>
             </select>
         </div>
 
@@ -75,7 +72,7 @@
                     {
                         <tr>
                             <th scope="row">@configTemplate.Name</th>
-                            <td>@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId) != null ? $"{Sports.FirstOrDefault(e => e.Value == configTemplate.SportId).Name}" : "")</td>
+                            <td>@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()) != null ? $"{Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()).Name}" : "")</td>
                             <td>@(((FixtureStatus)configTemplate.FixtureTypeId).ToString())</td>
                             <td class="text-center">@($"0 Client")</td>
                             <td class="text-center">@($"0 League")</td>
