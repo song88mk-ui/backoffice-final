@@ -9,9 +9,12 @@ namespace Backoffice.Shared.Models
         public string ClientCode { get; set; }
         public string ClientName { get; set; }
         public int SportId { get; set; }
+        public string SportName { get; set; }
         public int FixtureStatusId { get; set; }
+        public string FixtureStatusName { get; set; }
         public int LeagueId { get; set; }
-        public string TemplateId { get; set; } = string.Empty;
-        public string TemplateName { get; set; } = string.Empty;
+        public string LeagueName { get; set; }
+        public long TemplateId { get; set; } = -1;
+        public string TemplateName { get; set; } = "";
     }
 }

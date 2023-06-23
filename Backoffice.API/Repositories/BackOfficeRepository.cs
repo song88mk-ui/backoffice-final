@@ -7,12 +7,14 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -1472,11 +1474,11 @@ namespace Backoffice.API.Repositories
                     }
 
                     _backofficeContext.ConfigTemplates.Add(new ConfigTemplate()
-                    {                        
+                    {
                         UserId = request.UserId,
                         Name = request.Name,
                         SportId = request.SportId,
-                        FixtureTypeId = request.FixtureTypeId,                        
+                        FixtureTypeId = request.FixtureTypeId,
                         Timestamp = DateTime.UtcNow
                     });
                 }
@@ -1515,7 +1517,7 @@ namespace Backoffice.API.Repositories
             try
             {
                 var result = new List<ConfigClientModel>();
-                var configTemplate = await GetConfigTemplates(userId);
+                var configTemplate = await GetConfigTemplates(userId, sportIds: payload.SportIds != null && payload.SportIds.Any() ? payload.SportIds : null, scopeIds: payload.ScopeIds != null && payload.ScopeIds.Any() ? payload.ScopeIds : null);
                 var templates = configTemplate.Result;
                 var clientList = GetTradingClientInformation();
                 var metaData = payload.MetaData;
@@ -1530,13 +1532,32 @@ namespace Backoffice.API.Repositories
 
                 if (payload.ClientCodes.Any())
                 {
-                    clientCodes = payload.ClientCodes.ToList();
+                    clientCodes = clientCodes.Where(x => payload.ClientCodes.ToList().Contains(x)).Select(x => x.ToUpper()).ToList();
                 }
 
                 #region OLD CODE
                 if (isAssigned)
                 {
-                    var query = _backofficeContext.ConfigTemplateAssigned.ToList().Where(x => templates.Any(template => template.Id == x.ConfigTemplateId));
+                    var query = _backofficeContext.ConfigTemplateAssigned.ToList().Where(x => templates.Any(template => template.Id == x.ConfigTemplateId) && clientCodes.Contains(x.ClientCode.ToUpper()));
+
+                    if (string.IsNullOrEmpty(payload.SearchText))
+                    {
+                        query = query.Where(x => x.LeagueName.Contains(payload.SearchText));
+                    }
+
+                    result = query.Select(x => new ConfigClientModel()
+                    {
+                        ClientCode = x.ClientCode,
+                        ClientName = clientList.Where(cl => cl.ClientCode.ToUpper() == x.ClientCode.ToUpper()).Select(cl => cl.ClientName).FirstOrDefault(),
+                        SportId = x.SportId,
+                        SportName = x.SportName,
+                        FixtureStatusId = templates.Where(cl => cl.Id == x.ConfigTemplateId).Select(x => x.FixtureTypeId).FirstOrDefault(),
+                        FixtureStatusName = ((FixtureStatus)templates.Where(cl => cl.Id == x.ConfigTemplateId).Select(x => x.FixtureTypeId).FirstOrDefault()).ToString(),
+                        LeagueId = x.LeagueId,
+                        LeagueName = x.LeagueName,
+                        TemplateId = x.ConfigTemplateId,
+                        TemplateName = templates.Where(cl => cl.Id == x.ConfigTemplateId).Select(x => x.Name).FirstOrDefault()
+                    }).ToList();
                 }
                 //else
                 //{
