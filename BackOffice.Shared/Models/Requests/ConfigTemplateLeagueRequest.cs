@@ -13,7 +13,6 @@ namespace Backoffice.Shared.Models.Requests
                 CurrentPage = 0,
                 PageSize = -1
             };
-
         }
         public string SearchText { get; set; } = string.Empty;
         public List<string> ClientCodes { get; set; } = new List<string>();

@@ -502,7 +502,7 @@ namespace Backoffice.Utility.Repository
 
                 var configTemplate = query.ToList().Select(x => new ConfigTemplateModel()
                 {
-                    Id = x.Id.ToString(),
+                    Id = x.Id,
                     UserId = x.UserId,
                     Name = x.Name,
                     SportId = x.SportId,

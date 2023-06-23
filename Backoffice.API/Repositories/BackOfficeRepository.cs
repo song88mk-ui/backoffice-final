@@ -1379,7 +1379,7 @@ namespace Backoffice.API.Repositories
 
                 var result = query.ToList().Select(x => new ConfigTemplateModel()
                 {
-                    Id = x.Id.ToString(),
+                    Id = x.Id,
                     UserId = x.UserId,
                     Name = x.Name,
                     SportId = x.SportId,
@@ -1422,7 +1422,7 @@ namespace Backoffice.API.Repositories
 
                 var result = query.Where(e => e.Id == templateId).Select(x => new ConfigTemplateModel()
                 {
-                    Id = x.Id.ToString(),
+                    Id = x.Id,
                     UserId = x.UserId,
                     Name = x.Name,
                     SportId = x.SportId,
@@ -1451,7 +1451,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var config = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId && x.Id.ToString() == request.Id).AsNoTracking().FirstOrDefault();
+                var config = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId && x.Id == request.Id).AsNoTracking().FirstOrDefault();
 
                 if (config != null)
                 {
@@ -1510,7 +1510,7 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<List<ConfigTemplateModel>>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
             }
         }
-        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(string userId, List<string> clientCodes, ConfigTemplateLeagueRequest payload, bool isAssigned)
+        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigAssignedOrUnAssigned(string userId, List<string> clientCodes, ConfigTemplateLeagueRequest payload, bool isAssigned)
         {
             try
             {
@@ -1534,28 +1534,10 @@ namespace Backoffice.API.Repositories
                 }
 
                 #region OLD CODE
-                //if (isAssigned)
-                //{
-                //    foreach (var template in templates)
-                //    {
-                //        foreach (var client in template.ClientCodes)
-                //        {
-                //            foreach (var league in template.LeagueIds)
-                //            {
-                //                result.Add(new ConfigClientModel()
-                //                {
-                //                    ClientCode = client.ToUpper(),
-                //                    ClientName = clientList.Where(x => x.ClientCode.ToUpper() == client).Select(x => x.ClientName).FirstOrDefault(),
-                //                    SportId = template.SportId,
-                //                    FixtureStatusId = template.FixtureStatusId,
-                //                    LeagueId = league,
-                //                    TemplateId = template.Id,
-                //                    TemplateName = template.Name
-                //                });
-                //            }
-                //        }
-                //    }
-                //}
+                if (isAssigned)
+                {
+                    var query = _backofficeContext.ConfigTemplateAssigned.ToList().Where(x => templates.Any(template => template.Id == x.ConfigTemplateId));
+                }
                 //else
                 //{
                 //    var fixtureStatusIds = new List<int>() { (int)FixtureStatus.Prematch, (int)FixtureStatus.Live };
@@ -1630,9 +1612,9 @@ namespace Backoffice.API.Repositories
                 var configTemplate = await GetConfigTemplates(userId, clientCodes);
                 var templates = configTemplate.Result;
                 var myConfiTemplates = templates.Count();
-                var assignedConfig = await GetConfigClient(userId, clientCodes, new ConfigTemplateLeagueRequest(), true);
+                var assignedConfig = await GetConfigAssignedOrUnAssigned(userId, clientCodes, new ConfigTemplateLeagueRequest(), true);
                 var assignedTemplates = assignedConfig.Result.ClientConfigs.Count();
-                var unassignedConfig = await GetConfigClient(userId, clientCodes, new ConfigTemplateLeagueRequest(), false);
+                var unassignedConfig = await GetConfigAssignedOrUnAssigned(userId, clientCodes, new ConfigTemplateLeagueRequest(), false);
                 var unassignedTemplates = unassignedConfig.Result.ClientConfigs.Count();
 
                 return new BaseResponse<TemplateConfigCount>

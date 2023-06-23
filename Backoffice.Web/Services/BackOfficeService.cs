@@ -1388,7 +1388,7 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string token, string id)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string token, long id)
         {
             try
             {

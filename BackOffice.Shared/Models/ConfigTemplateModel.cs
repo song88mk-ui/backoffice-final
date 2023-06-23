@@ -5,7 +5,7 @@ namespace Backoffice.Shared.Models
 {
     public class ConfigTemplateModel
     {
-        public string Id { get; set; }
+        public long Id { get; set; }
         public string UserId { get; set; }
         public string Name { get; set; } = "";
         public int SportId { get; set; }
