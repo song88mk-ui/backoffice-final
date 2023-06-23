@@ -1,5 +1,5 @@
 ﻿<div class="col mx-4 config-nav-container">
-    <a href="@Region/odds-engine/config/my-templates" class="@(CurrentMenu == 1 ? "config-nav active" : "config-nav")">My Templates (@TemplateConfigCount.MyTemplatesCount)</a>
-    <a href="@Region/odds-engine/config/assigned" class="@(CurrentMenu == 2 ? "config-nav active" : "config-nav")">Assigned (@TemplateConfigCount.AssignedTemplatesCount)</a>
-    <a href="@Region/odds-engine/config/unassigned" class="@(CurrentMenu == 3 ? "config-nav active" : "config-nav")">Unassigned (@TemplateConfigCount.UnAssignedTemplatesCount)</a>
+    <a class="@(CurrentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.MyTemplates)">My Templates ()</a>
+    <a class="@(CurrentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.Assigned)">Assigned ()</a>
+    <a class="@(CurrentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.UnAssigned)">Unassigned ()</a>
 </div>

@@ -12,7 +12,7 @@
     @if (UserModel.Claims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", ".")}"))
     {
         <div class="px-2 me-2 py-3 @(IsActiveConfig ? "active" : "")">
-            <a class="header-link text-decoration-none" href="@_address/config/my-templates" @onclick='() => ActivateMenu("config")'>
+            <a class="header-link text-decoration-none" href="@_address/config-templates" @onclick='() => ActivateMenu("config")'>
                 Config
             </a>
         </div>
