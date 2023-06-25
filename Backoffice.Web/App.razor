@@ -1,5 +1,6 @@
 ﻿@using Backoffice.Web.ActionFilter;
 @using Serilog;
+@using System.Diagnostics;
 @inject AuthenticationStateProvider _authState;
 @inject NavigationManager NavigationManager
 
@@ -25,6 +26,7 @@
 
     private async Task OnNavigateAsync(NavigationContext args)
     {
+        var activity = System.Diagnostics.Activity.Current;
         try
         {
             Log.Information($"Current page: {NavigationManager.Uri}");
@@ -37,9 +39,20 @@
                 Log.Information($"[App.Razor] [Authorized] {NavigationManager.Uri}");
             else
                 Log.Warning($"[App.Razor] [Unauthorized] {NavigationManager.Uri}");
+
+            if (activity != null && activity.IsAllDataRequested) {
+              activity.SetTag("navigation.context.uri", NavigationManager.Uri);
+              activity.SetTag("navigation.context.path", args.Path);
+              activity.SetTag("sate.user.identity.authenticated", state.User.Identity?.IsAuthenticated);
+              activity.SetStatus(ActivityStatusCode.Ok);
+            }
         }
         catch (Exception ex)
         {
+            if (activity != null && activity.IsAllDataRequested)
+            {
+              activity.SetStatus(ActivityStatusCode.Error, ex.Message);
+            }
             Log.Error(ex.Message);
             if (ex.StackTrace != null)
                 Log.Error(ex.StackTrace.ToString());
