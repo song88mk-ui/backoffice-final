@@ -17,7 +17,7 @@
     <div class="d-flex justify-content-between mx-4">
         <div class="d-flex filter-div">
             <select class="form-select" @onchange="OnSportChangedEvent">
-                <option value="0">All Sports</option>
+                <option value="-1" selected="@SelectedSportId == -1">All Sports</option>
                 @if (Sports.Any())
                 {
                     @foreach (var item in Sports)
@@ -53,10 +53,6 @@
                         }
                     }
                 }
-                else
-                {
-                    <option value="0">--</option>
-                }
             </select>
         </div>
 
@@ -84,7 +80,17 @@
             </thead>
 
             <tbody>
-                @if (ConfigTemplates != null)
+                @if (IsPreloader)
+                {
+                    <tr>
+                        <td colspan="7">
+                            <Preloader />
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                @if (ConfigTemplates != null && ConfigTemplates.Any())
                 {
                     foreach (var configTemplate in ConfigTemplates)
                     {
@@ -116,6 +122,15 @@
                             </td>
                         </tr>
                     }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7">
+                            <NoRecordFound />
+                        </td>
+                    </tr>
+                }
                 }
 
             </tbody>

@@ -1308,7 +1308,7 @@ namespace Backoffice.Web.Services
                     return new BaseResponse<ConfigTemplateModel>
                     {
                         StatusCode = StatusCode.Error,
-                        Message = $"{StatusCode.Error.ToString().Replace('_',' ')} ({response.ReasonPhrase})"
+                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
                     };
                 }
             }
@@ -1317,16 +1317,27 @@ namespace Backoffice.Web.Services
                 return new BaseResponse<ConfigTemplateModel>
                 {
                     StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_',' ')} ({ex.Message})"
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
                 };
             }
         }
 
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate()
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(int sportId = -1, int scopeId = -1)
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/config/templates");
+                var path = "api/config/templates";
+
+                var queries = new List<string>();
+                if (sportId != -1)
+                    queries.Add($"sportId={sportId}");
+                if (scopeId != -1)
+                    queries.Add($"scopeId={scopeId}");
+                if (queries !=null && queries.Any() && queries.Count > 0)
+                {
+                    path += $"?{string.Join("&", queries)}";
+                }
+                var response = await _httpClient.GetAsync($"{path}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<List<ConfigTemplateModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -1354,7 +1365,7 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> AddOrUpdateConfigTemplate(string token, ConfigTemplateModel request)
+        public async Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(string token, ConfigTemplateModel request)
         {
             try
             {
@@ -1362,14 +1373,14 @@ namespace Backoffice.Web.Services
                 var Model = await _httpClient.PostAsync($"api/config/template", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (Model.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<ConfigTemplateModel>>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<List<ConfigTemplateModel>>();
+                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<bool>();
                 else
                 {
                     if (Model.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<ConfigTemplateModel>>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<List<ConfigTemplateModel>>();
+                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<bool>();
                     else
                     {
-                        return new BaseResponse<List<ConfigTemplateModel>>
+                        return new BaseResponse<bool>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
@@ -1379,7 +1390,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<ConfigTemplateModel>>
+                return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
@@ -1469,7 +1480,7 @@ namespace Backoffice.Web.Services
 
                 var response = await _httpClient.GetAsync($"api/config/template/count");
 
-                if(response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     return JsonSerializer.Deserialize<BaseResponse<TemplateConfigCount>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<TemplateConfigCount>();
                 }

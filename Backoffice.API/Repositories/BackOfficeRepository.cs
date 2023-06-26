@@ -1,12 +1,10 @@
-﻿using Azure.Core;
-using Backoffice.Shared.Data.Backoffice;
+﻿using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
-using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -20,7 +18,6 @@ using System.Transactions;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
 using static Backoffice.Shared.Models.Requests.AddOrUpdateBetConfigRequest;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Backoffice.API.Repositories
 {
@@ -1354,11 +1351,11 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Config
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(List<int> sportIds = null, List<int> scopeIds = null)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(string userId, List<int> sportIds = null, List<int> scopeIds = null)
         {
             try
             {
-                var query = _backofficeContext.ConfigTemplates.AsNoTracking();
+                var query = _backofficeContext.ConfigTemplates.Where(x => x.UserId == userId).AsNoTracking();
 
                 if (sportIds != null && sportIds.Count() > 0)
                 {
@@ -1366,7 +1363,7 @@ namespace Backoffice.API.Repositories
                 }
                 if (scopeIds != null && scopeIds.Count() > 0)
                 {
-                    query = query.Where(x => sportIds.Contains(x.FixtureTypeId));
+                    query = query.Where(x => scopeIds.Contains(x.FixtureTypeId));
                 }
 
                 var result = query.ToList().Select(x => new ConfigTemplateModel()
@@ -1575,7 +1572,7 @@ namespace Backoffice.API.Repositories
 
                 await _backofficeContext.SaveChangesAsync();
 
-                return await GetConfigTemplates();
+                return await GetConfigTemplates(userId);
             }
             catch (Exception ex)
             {
@@ -1587,7 +1584,7 @@ namespace Backoffice.API.Repositories
             try
             {
                 var result = new List<ConfigClientModel>();
-                var configTemplate = await GetConfigTemplates(sportIds: request.SportId != -1 ? new List<int>() { request.SportId } : null, scopeIds: request.ScopeId != -1 ? new List<int>() { request.ScopeId } : null);
+                var configTemplate = await GetConfigTemplates(userId, sportIds: request.SportId != -1 ? new List<int>() { request.SportId } : null, scopeIds: request.ScopeId != -1 ? new List<int>() { request.ScopeId } : null);
                 var templates = configTemplate.Result;
                 var clientList = GetTradingClientInformation();
                 var metaData = request.MetaData;
@@ -1729,7 +1726,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var configTemplate = await GetConfigTemplates();
+                var configTemplate = await GetConfigTemplates(userId);
                 var templates = configTemplate.Result;
                 var myConfiTemplates = templates.Count();
                 var assignedConfig = await GetConfigState(userId, clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.Assigned);

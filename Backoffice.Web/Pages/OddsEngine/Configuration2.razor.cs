@@ -36,7 +36,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 new BreadcrumbModel
                 {
                     Name = "Config",
-                    Url = "hk/odds-engine/config/my-templates",
+                    Url = "hk/odds-engine/config-templates",
                     IsCurrentPage = true
                 }
             };
@@ -58,6 +58,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             SelectedConfigNavMenu = configNavMenu;
         }
 
+        public async Task OnModalSavedEvent(object payload)
+        {
+            StateHasChanged();
+        }
         public void Dispose()
         {
 
@@ -71,7 +75,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var response = (await TradingService.GetSportLookup()).Result;
             var result = new List<SelectListItemModel<string>>();
 
-            if (result == null)
+            if (response == null)
                 return new List<SelectListItemModel<string>>();
 
             result = response.SportLookup.Select(s => new SelectListItemModel<string>()

@@ -53,7 +53,7 @@
                 <select class="form-select" @onchange="OnSportCheckboxClickEvent">
                     @foreach (var item in Sports)
                     {
-                        <option value="@item.Value">@item.Name</option>
+                        <option value="@item.Value" selected="@(item.Value == FilterModel.SportId.ToString())">@item.Name</option>
                     }
                 </select>
             }
@@ -63,7 +63,7 @@
                 <select class="form-select" @onchange="OnScopeCheckboxClickEvent">
                     @foreach (var item in Scopes)
                     {
-                        <option value="@item.Value">@item.Name</option>
+                        <option value="@item.Value" selected="@(item.Value == FilterModel.SportId.ToString())">@item.Name</option>
                     }
                 </select>
             }
@@ -99,6 +99,7 @@
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
+                    <th class="text-center" scope="col"></th>
                     <th class="text-center" scope="col">No.</th>
                     <th class="text-center" scope="col">Client Name</th>
                     <th class="text-center" scope="col">Sport</th>
@@ -113,7 +114,7 @@
                 @if (IsPreloader)
                 {
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             <Preloader />
                         </td>
                     </tr>
@@ -124,13 +125,13 @@
                     {
                         foreach (var config in ConfigClients)
                         {
-                            <ConfigStateRow Index="@(ConfigClients.IndexOf(config) + 1)" Config="config" />
+                            <ConfigStateRow Index="@(ConfigClients.IndexOf(config) + 1)" Config="config" ItemSelectionChangedEvent="@OnConfigSelectionChanged"/>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="7">
+                            <td colspan="8">
                                 <NoRecordFound />
                             </td>
                         </tr>

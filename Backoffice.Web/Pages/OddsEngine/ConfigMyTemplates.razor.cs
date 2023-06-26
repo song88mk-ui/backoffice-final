@@ -4,6 +4,7 @@ using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Xml.Serialization;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -24,6 +25,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<ConfigTemplateModel> ConfigTemplates { get; set; }
 
+        public bool IsPreloader { get; set; } = true;
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
         public int SelectedSportId { get; set; }
@@ -34,11 +36,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            IsPreloader = true;
             PageTitle = "My Templates";
             IconClass = "";
 
             ConfigTemplates = new List<ConfigTemplateModel>();
-            Sports = new List<SelectListItemModel<string>>();
 
             Breadcrumbs = new List<BreadcrumbModel>()
             {
@@ -49,6 +51,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
+
+            SelectedSportId = -1;
+            SelectedScopeId = int.Parse(Scopes.FirstOrDefault().Value);
 
             await LoadConfigTemplates();
         }
@@ -151,7 +156,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task LoadConfigTemplates()
         {
-            ConfigTemplates = (await BackOfficeService.GetConfigTemplate()).Result;
+            IsPreloader = true;
+            StateHasChanged();
+
+            ConfigTemplates = (await BackOfficeService.GetConfigTemplate(SelectedSportId, SelectedScopeId)).Result;
+
+            IsPreloader = false;
         }
 
         #endregion

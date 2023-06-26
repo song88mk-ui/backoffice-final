@@ -6,6 +6,7 @@ namespace Backoffice.Shared.Models
 {
     public class ConfigClientModel
     {
+        public bool IsChecked { get; set; } = false;
         public long Id { get; set; }
         public string ClientId { get; set; }
         public string ClientCode { get; set; }

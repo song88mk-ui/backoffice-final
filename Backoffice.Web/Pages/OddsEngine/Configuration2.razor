@@ -19,7 +19,7 @@ else
 
     @if (SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
     {
-	<ConfigMyTemplates Sports="@Sports" Scopes="@Scopes" />
+        <ConfigMyTemplates Sports="@Sports" Scopes="@Scopes" />
     }
     else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
     {
@@ -31,4 +31,4 @@ else
         @*<ConfigUnassigned Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />*@
     }
 }
-<CustomModal />
+<CustomModal OnSaveClickCallback="OnModalSavedEvent" />

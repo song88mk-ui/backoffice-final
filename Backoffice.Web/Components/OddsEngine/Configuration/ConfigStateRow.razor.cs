@@ -13,12 +13,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         [Parameter] public int Index { get; set; }
         [Parameter] public ConfigClientModel Config { get; set; }
+        [Parameter] public EventCallback ItemSelectionChangedEvent { get; set; }
         private bool _IsEdit = false;
 
         private List<ConfigTemplateModel> _template;
         protected override Task OnInitializedAsync()
         {
-            _template  = new List<ConfigTemplateModel>();
+            _template = new List<ConfigTemplateModel>();
 
             return base.OnInitializedAsync();
         }
@@ -49,6 +50,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
             }
+        }
+        public async Task OnCheckboxClicked(ChangeEventArgs e)
+        {
+            Config.IsChecked = (bool)e.Value;
+            await ItemSelectionChangedEvent.InvokeAsync();
         }
         #endregion
     }

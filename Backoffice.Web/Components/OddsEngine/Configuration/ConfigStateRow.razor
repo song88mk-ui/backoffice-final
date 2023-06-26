@@ -1,4 +1,7 @@
 ﻿<tr>
+    <th class="text-center checkbox" scope="row">
+        <input type="checkbox" class="form-check-input" @onchange="OnCheckboxClicked" checked="@Config.IsChecked" />
+    </th>
     <th class="text-center" scope="row">@Index</th>
     <td class="text-center">@Config.ClientName</td>
     <td class="text-center">@Config.SportName</td>

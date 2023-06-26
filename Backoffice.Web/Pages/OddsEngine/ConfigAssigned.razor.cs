@@ -138,6 +138,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             await LoadLeagues(FilterModel);
         }
+        public async Task OnConfigSelectionChanged()
+        {
+
+        }
 
         public void Dispose()
         {

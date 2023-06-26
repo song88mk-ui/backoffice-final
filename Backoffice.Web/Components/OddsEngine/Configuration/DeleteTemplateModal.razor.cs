@@ -1,5 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -13,6 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private IBackOfficeService BackofficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
         public ConfigTemplateModel ConfigTemplateModel { get; set; }
@@ -38,7 +40,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             if (response.StatusCode == StatusCode.Success)
             {
-
+                await Modal.OnSaveClickCallback.InvokeAsync(true);
             }
 
             ModalService.Cancel();
