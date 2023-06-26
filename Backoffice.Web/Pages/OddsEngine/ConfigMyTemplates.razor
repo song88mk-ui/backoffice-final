@@ -39,6 +39,24 @@
             </select>
 
             <select class="form-select" @onchange="OnScopeChangedEvent">
+                @if (Scopes.Any())
+                {
+                    @foreach (var item in Scopes)
+                    {
+                        if (item.Value == SelectedScopeId.ToString())
+                        {
+                            <option value="@item.Value" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Name</option>
+                        }
+                    }
+                }
+                else
+                {
+                    <option value="0">--</option>
+                }
             </select>
         </div>
 
@@ -99,7 +117,7 @@
                         </tr>
                     }
                 }
-                
+
             </tbody>
         </table>
     </div>
