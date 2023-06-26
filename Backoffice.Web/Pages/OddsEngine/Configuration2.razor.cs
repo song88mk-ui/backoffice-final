@@ -4,6 +4,7 @@ using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Security.Cryptography.Xml;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -20,6 +21,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public ConfigTemplateNavMenu SelectedConfigNavMenu { get; set; }
 
+        public bool IsPreleader = true;
+
         #endregion
 
         #region Methods
@@ -27,6 +30,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             SelectedConfigNavMenu = ConfigTemplateNavMenu.MyTemplates;
 
+            IsPreleader = true;
             Breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
@@ -37,9 +41,16 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
 
-            Clients = await LoadClients();
-            Sports = await LoadSports();
-            Scopes = await LoadScopes();
+            StateHasChanged();
+            var taskList = new List<Task>()
+            {
+                Task.Run(async () => {Clients = await LoadClients(); }),
+                Task.Run(async () => {Sports = await LoadSports();}),
+                Task.Run(async () => {Scopes = await LoadScopes(); })
+            };
+
+            Task.WaitAll(taskList.ToArray());
+            IsPreleader = false;
         }
 
         public async Task OnConfigNavMenuSelected(ConfigTemplateNavMenu configNavMenu)
@@ -86,7 +97,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     {
                         IsChecked = true,
                         Name = e.ClientName,
-                        Value = e.ClientId.ToString()
+                        Value = e.ClientCode.ToString()
                     }).ToList();
 
                 result.Insert(0, new SelectListItemWithCheckboxModel<string>

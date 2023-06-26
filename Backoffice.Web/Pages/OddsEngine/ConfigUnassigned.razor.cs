@@ -49,11 +49,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             SearchForm.SearchText = "";
             FilterModel = new ConfigStateFilterModel()
             {
-                ClientIds = Clients?.Where(x => x.IsChecked).Select(x => x.Value).ToList() ?? new List<string>(),
-                ScopeId = (int)Scope.Prematch,
-                SportId = 1,
+                ClientCodes = Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
+                ScopeId = int.Parse(Scopes.FirstOrDefault().Value),
+                SportId = int.Parse(Sports.FirstOrDefault().Value),
                 SearchText = SearchForm.SearchText
             };
+            SelectedClientCount = (Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>()).Count();
 
             MetaData = new MetaData();
 
@@ -67,7 +68,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
 
-            await Init();
+            await LoadLeagues(FilterModel);
         }
 
         public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
@@ -80,6 +81,13 @@ namespace Backoffice.Web.Pages.OddsEngine
                 SelectedClientName = items.FirstOrDefault().Value;
             }
 
+            FilterModel.ClientCodes = new List<string>();
+            if (items != null)
+            {
+                FilterModel.ClientCodes = items.Keys.Where(x => x.ToUpper() != "ALL").ToList();
+            }
+
+            await LoadLeagues(FilterModel);
             //var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
 
             //SelectedClientCount = selectedClients.Count;
@@ -88,26 +96,20 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnSportCheckboxClickEvent(ChangeEventArgs e)
         {
-            //SelectedSportName = string.Empty;
-            //SelectedSportCount = items.Count;
-
-            //if (SelectedSportCount == 1)
-            //{
-            //    SelectedSportName = items.FirstOrDefault().Value;
-            //}
-            //SelectedScopeCount = selectedScopes.Count;
-            //SelectedScopeName = SelectedScopeCount > 0 ? string.Empty : Scopes.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+            if (e != null)
+            {
+                FilterModel.SportId = int.Parse((e == null ? Sports.FirstOrDefault().Value : e.Value.ToString()));
+            }
+            await LoadLeagues(FilterModel);
         }
 
         public async Task OnScopeCheckboxClickEvent(ChangeEventArgs e)
         {
-            //SelectedScopeName = string.Empty;
-            //SelectedScopeCount = items.Count;
-
-            //if (SelectedScopeCount == 1)
-            //{
-            //    SelectedScopeName = items.FirstOrDefault().Value;
-            //}
+            if (e != null)
+            {
+                FilterModel.ScopeId = int.Parse((e == null ? Scopes.FirstOrDefault().Value : e.Value.ToString()));
+            }
+            await LoadLeagues(FilterModel);
         }
         public async Task OnInputSearchEvent()
         {
@@ -115,8 +117,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             await LoadLeagues(FilterModel);
         }
 
-        public async Task SelectedPage()
+        public async Task SelectedPage(int selectedPage)
         {
+            MetaData.CurrentPage = selectedPage;
+            await LoadLeagues(FilterModel);
         }
 
         public async Task OnResetClickEvent()
@@ -183,7 +187,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var payload = new ConfigTemplateLeagueRequest();
             if (filter != null)
             {
-                payload.ClientCodes = filter.ClientIds ?? new List<string>();
+                payload.ClientCodes = filter.ClientCodes ?? new List<string>();
                 payload.SportId = filter.SportId;
                 payload.ScopeId = filter.ScopeId;
                 payload.SearchText = filter.SearchText;

@@ -5,23 +5,29 @@
 @*@page "/{Region}/odds-engine/config/my-templates"*@
 @page "/hk/odds-engine/config-templates"
 
-<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"/>
+<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region" />
 
-<div class="col-md-12 mb-4">
-    <ConfigNavMenu Region="@Region" SelectConfigNavMenuCallback="OnConfigNavMenuSelected"/>
-</div>
+@if (IsPreleader)
+{
+    <Preloader />
+}
+else
+{
+    <div class="col-md-12 mb-4">
+        <ConfigNavMenu Region="@Region" SelectConfigNavMenuCallback="OnConfigNavMenuSelected" />
+    </div>
 
-@if (SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
-{
-    <ConfigMyTemplates />
+    @if (SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
+    {
+        <ConfigMyTemplates />
+    }
+    else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
+    {
+        <ConfigAssigned Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />
+    }
+    else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
+    {
+        <ConfigUnassigned Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />
+    }
 }
-else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
-{
-    <ConfigAssigned />
-}
-else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
-{
-    <ConfigUnassigned />
-}
-
-<CustomModal/>
+<CustomModal />

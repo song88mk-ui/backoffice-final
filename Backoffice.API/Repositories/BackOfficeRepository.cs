@@ -1606,14 +1606,15 @@ namespace Backoffice.API.Repositories
                 }
 
                 var query = _backofficeContext.ConfigTemplateAssigned.ToList().Where(x => x.SportId == request.SportId && templates.Any(template => template.Id == x.ConfigTemplateId) && clientCodes.Contains(x.ClientCode.ToUpper()));
+
+                if (!string.IsNullOrEmpty(request.SearchText))
+                {
+                    query = query.Where(x => x.ClientName.ToLower().Contains(request.SearchText) || x.LeagueName.ToLower().Contains(request.SearchText));
+                }
                 #region OLD CODE
                 switch (configState)
                 {
                     case ConfigState.Assigned:
-                        if (!string.IsNullOrEmpty(request.SearchText))
-                        {
-                            query = query.Where(x => x.LeagueName.Contains(request.SearchText));
-                        }
 
                         result = query.Select(x => new ConfigClientModel()
                         {
@@ -1633,12 +1634,6 @@ namespace Backoffice.API.Repositories
                         }).ToList();
                         break;
                     case ConfigState.Unsigned:
-
-                        if (!string.IsNullOrEmpty(request.SearchText))
-                        {
-                            query = query.Where(x => x.LeagueName.Contains(request.SearchText));
-                        }
-
                         query = query.ToList();
                         var fixtureStatusIds = new List<int>() { (int)FixtureStatus.Prematch, (int)FixtureStatus.Live };
 
@@ -1656,9 +1651,16 @@ namespace Backoffice.API.Repositories
                                 for (var y = 0; y < leagues.Count(); y++)
                                 {
                                     var league = leagues[y];
-                                    var template = templates.Where(x => query.Any(q => q.ConfigTemplateId == x.Id)).ToList();
 
-                                    var fixtures = fixtureStatusIds.Where(x => !template.Any(t => t.FixtureTypeId == x)).ToList();
+                                    var fixtures = new List<int>() { request.ScopeId };
+
+                                    if (request.ScopeId == -1)
+                                    {
+                                        var template = templates.Where(x => query.Any(q => q.ConfigTemplateId == x.Id)).ToList();
+
+                                        fixtures = fixtureStatusIds.Where(x => !template.Any(t => t.FixtureTypeId == x)).ToList();
+                                    }
+
                                     foreach (var item in fixtures)
                                     {
                                         result.Add(new ConfigClientModel()
@@ -1680,10 +1682,20 @@ namespace Backoffice.API.Repositories
                                 }
                             }
                         }
+
+                        if (!string.IsNullOrEmpty(request.SearchText))
+                        {
+                            result = result.Where(x => x.ClientName.ToLower().Contains(request.SearchText) || x.LeagueName.ToLower().Contains(request.SearchText)).ToList();
+                        }
                         break;
 
                 }
                 #endregion
+                result = result
+                    .OrderBy(x => x.ClientCode)
+                    .ThenBy(x => x.SportName)
+                    .ThenBy(x => x.LeagueName)
+                    .ToList();
 
                 metaData.TotalCount = result.Count();
                 metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));

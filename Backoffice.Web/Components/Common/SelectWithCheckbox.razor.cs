@@ -20,7 +20,7 @@ namespace Backoffice.Web.Components.Common
         {
             if (model.IsChecked == false)
             {
-                if (model.Value == "all")
+                if (model.Value.ToUpper() == "ALL")
                 {
                     Items.ForEach(x =>
                     {
@@ -37,7 +37,7 @@ namespace Backoffice.Web.Components.Common
             }
             else
             {
-                if (model.Value == "all")
+                if (model.Value.ToUpper() == "ALL")
                 {
                     Items.ForEach(x =>
                     {
