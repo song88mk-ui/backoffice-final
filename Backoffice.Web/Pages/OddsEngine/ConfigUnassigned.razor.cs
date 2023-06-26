@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
+using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -23,7 +24,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<ConfigClientModel> ConfigClients { get; set; } = new List<ConfigClientModel>();
 
+        public ConfigStateFilterModel FilterModel = new ConfigStateFilterModel();
         public MetaData MetaData { get; set; }
+        public SearchFormModel SearchForm { get; set; } = new SearchFormModel();
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -40,8 +43,17 @@ namespace Backoffice.Web.Pages.OddsEngine
         protected override async Task OnInitializedAsync()
         {
             IsPreloader = true;
-            PageTitle = "Assigned Leagues";
+            PageTitle = "Unassigned Leagues";
             IconClass = "";
+
+            SearchForm.SearchText = "";
+            FilterModel = new ConfigStateFilterModel()
+            {
+                ClientIds = Clients?.Where(x => x.IsChecked).Select(x => x.Value).ToList() ?? new List<string>(),
+                ScopeId = (int)Scope.Prematch,
+                SportId = 1,
+                SearchText = SearchForm.SearchText
+            };
 
             MetaData = new MetaData();
 
@@ -96,6 +108,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             //{
             //    SelectedScopeName = items.FirstOrDefault().Value;
             //}
+        }
+        public async Task OnInputSearchEvent()
+        {
+            FilterModel.SearchText = SearchForm.SearchText;
+            await LoadLeagues(FilterModel);
         }
 
         public async Task SelectedPage()
@@ -158,12 +175,19 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             await LoadLeagues();
         }
-        private async Task LoadLeagues()
+        private async Task LoadLeagues(ConfigStateFilterModel filter = null)
         {
             IsPreloader = true;
 
             StateHasChanged();
             var payload = new ConfigTemplateLeagueRequest();
+            if (filter != null)
+            {
+                payload.ClientCodes = filter.ClientIds ?? new List<string>();
+                payload.SportId = filter.SportId;
+                payload.ScopeId = filter.ScopeId;
+                payload.SearchText = filter.SearchText;
+            }
             payload.MetaData = MetaData;
             var response = await BackOfficeService.GetConfigClient(UserModel.Id, ConfigState.Unsigned, payload);
 

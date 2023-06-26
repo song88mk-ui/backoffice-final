@@ -151,7 +151,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task LoadConfigTemplates()
         {
-            ConfigTemplates = (await BackOfficeService.GetClientConfigTemplate(UserModel.Id)).Result;
+            ConfigTemplates = (await BackOfficeService.GetConfigTemplate()).Result;
         }
 
         #endregion
