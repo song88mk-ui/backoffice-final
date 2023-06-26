@@ -5,7 +5,7 @@
 @*@page "/{Region}/odds-engine/config/my-templates"*@
 @page "/hk/odds-engine/config/assigned"
 
-<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"></Breadcrumb>
+@*<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"></Breadcrumb>*@
 
 @*<div class="col-md-12 mb-4">
     <ConfigNavMenu Region="@Region" CurrentMenu="2"></ConfigNavMenu>
@@ -74,12 +74,22 @@
         </div>
 
         <div>
-            <div class="input-group">
-                <input type="text" id="search" placeholder="Search" class="form-control search-text valid border-end-0" />
-                <span class="input-group-text border-start-0">
-                    <i class="fa fa-search"></i>
-                </span>
+            <div class="input-container d-flex">
+                <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                    <div class="input-group">
+                        <InputText id="search" placeholder="Find Client" class="form-control search-text border-end-0" @bind-Value="SearchForm.SearchText" />
+                        <button class="input-group-text border-start-0">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </EditForm>
             </div>
+            @*<div class="input-group">
+            <input type="text" id="search" placeholder="Search" class="form-control search-text valid border-end-0" />
+            <span class="input-group-text border-start-0">
+            <i class="fa fa-search"></i>
+            </span>
+            </div>*@
         </div>
     </div>
 </div>
@@ -100,10 +110,10 @@
             </thead>
 
             <tbody>
-                @if(IsPreloader)
+                @if (IsPreloader)
                 {
-                        <tr>
-                            <td colspan="7">
+                    <tr>
+                        <td colspan="7">
                             <Preloader />
                         </td>
                     </tr>

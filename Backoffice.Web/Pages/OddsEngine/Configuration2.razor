@@ -23,11 +23,12 @@ else
     }
     else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
     {
-        <ConfigAssigned Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />
+        <ConfigAssigned State="ConfigState.Assigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />
     }
     else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
     {
-        <ConfigUnassigned Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />
+        <ConfigAssigned State="ConfigState.Unsigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />
+        @*<ConfigUnassigned Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />*@
     }
 }
 <CustomModal />

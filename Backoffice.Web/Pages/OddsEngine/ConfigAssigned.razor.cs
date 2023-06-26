@@ -17,13 +17,16 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Parameter] public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
         [Parameter] public List<SelectListItemModel<string>> Sports { get; set; }
         [Parameter] public List<SelectListItemModel<string>> Scopes { get; set; }
+        [Parameter] public ConfigState State { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<ConfigClientModel> ConfigClients { get; set; } = new List<ConfigClientModel>();
 
+        public ConfigStateFilterModel FilterModel = new ConfigStateFilterModel();
         public MetaData MetaData { get; set; }
+        public SearchFormModel SearchForm { get; set; } = new SearchFormModel();
 
         public string PageTitle { get; set; }
         public string IconClass { get; set; }
@@ -40,8 +43,18 @@ namespace Backoffice.Web.Pages.OddsEngine
         protected override async Task OnInitializedAsync()
         {
             IsPreloader = true;
-            PageTitle = "Assigned Leagues";
+            PageTitle = State == ConfigState.Assigned ? "Assigned Leagues" : "Unassigned Leagues";
             IconClass = "";
+
+            SearchForm.SearchText = "";
+            FilterModel = new ConfigStateFilterModel()
+            {
+                ClientCodes = Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
+                ScopeId = int.Parse(Scopes.FirstOrDefault().Value),
+                SportId = int.Parse(Sports.FirstOrDefault().Value),
+                SearchText = SearchForm.SearchText
+            };
+            SelectedClientCount = (Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>()).Count();
 
             MetaData = new MetaData();
 
@@ -50,12 +63,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                 new BreadcrumbModel
                 {
                     Name = "Config",
-                    Url = "odds-engine/config/assigned",
+                    Url = $"odds-engine/config/{(State == ConfigState.Assigned ? "assigned":"unassigned")}",
                     IsCurrentPage = true
                 }
             };
 
-            await Init();
+            await LoadLeagues(FilterModel);
         }
 
         public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
@@ -68,6 +81,13 @@ namespace Backoffice.Web.Pages.OddsEngine
                 SelectedClientName = items.FirstOrDefault().Value;
             }
 
+            FilterModel.ClientCodes = new List<string>();
+            if (items != null)
+            {
+                FilterModel.ClientCodes = items.Keys.Where(x => x.ToUpper() != "ALL").ToList();
+            }
+
+            await LoadLeagues(FilterModel);
             //var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
 
             //SelectedClientCount = selectedClients.Count;
@@ -76,75 +96,49 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnSportCheckboxClickEvent(ChangeEventArgs e)
         {
-            //SelectedSportName = string.Empty;
-            //SelectedSportCount = items.Count;
-
-            //if (SelectedSportCount == 1)
-            //{
-            //    SelectedSportName = items.FirstOrDefault().Value;
-            //}
-            //SelectedScopeCount = selectedScopes.Count;
-            //SelectedScopeName = SelectedScopeCount > 0 ? string.Empty : Scopes.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+            if (e != null)
+            {
+                FilterModel.SportId = int.Parse((e == null ? Sports.FirstOrDefault().Value : e.Value.ToString()));
+            }
+            await LoadLeagues(FilterModel);
         }
 
         public async Task OnScopeCheckboxClickEvent(ChangeEventArgs e)
         {
-            //SelectedScopeName = string.Empty;
-            //SelectedScopeCount = items.Count;
-
-            //if (SelectedScopeCount == 1)
-            //{
-            //    SelectedScopeName = items.FirstOrDefault().Value;
-            //}
+            if (e != null)
+            {
+                FilterModel.ScopeId = int.Parse((e == null ? Scopes.FirstOrDefault().Value : e.Value.ToString()));
+            }
+            await LoadLeagues(FilterModel);
+        }
+        public async Task OnInputSearchEvent()
+        {
+            FilterModel.SearchText = SearchForm.SearchText;
+            await LoadLeagues(FilterModel);
         }
 
-        public async Task SelectedPage()
+        public async Task SelectedPage(int selectedPage)
         {
+            MetaData.CurrentPage = selectedPage;
+            await LoadLeagues(FilterModel);
         }
 
         public async Task OnResetClickEvent()
         {
+            MetaData = new MetaData();
+            SearchForm.SearchText = "";
+            FilterModel = new ConfigStateFilterModel()
+            {
+                ClientCodes = Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
+                ScopeId = int.Parse(Scopes.FirstOrDefault().Value),
+                SportId = int.Parse(Sports.FirstOrDefault().Value),
+                SearchText = SearchForm.SearchText
+            };
+            SelectedClientCount = (Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>()).Count();
 
+            await LoadLeagues(FilterModel);
         }
 
-        public async Task CheckboxClicked(SelectListItemWithCheckboxModel<string> model)
-        {
-            //if (model.IsChecked == false)
-            //{
-            //    if (model.Value == "all")
-            //    {
-            //        Items.ForEach(x =>
-            //        {
-            //            x.IsChecked = true;
-            //        });
-            //    }
-            //    else
-            //    {
-            //        model.IsChecked = true;
-
-            //        if (!Items.Where(c => c.Value != "all").Any(c => c.IsChecked == false))
-            //            Items[0].IsChecked = true;
-            //    }
-            //}
-            //else
-            //{
-            //    if (model.Value == "all")
-            //    {
-            //        Items.ForEach(x =>
-            //        {
-            //            x.IsChecked = false;
-            //        });
-            //    }
-            //    else
-            //    {
-            //        model.IsChecked = false;
-            //        Items[0].IsChecked = false;
-            //    }
-            //}
-
-            //var dictionary = Items.Where(c => c.Value != "all" && c.IsChecked).ToDictionary(c => c.Value, c => c.Name);
-            //await OnCheckboxCallback.InvokeAsync(dictionary);
-        }
         public void Dispose()
         {
 
@@ -158,14 +152,21 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             await LoadLeagues();
         }
-        private async Task LoadLeagues()
+        private async Task LoadLeagues(ConfigStateFilterModel filter = null)
         {
             IsPreloader = true;
 
             StateHasChanged();
             var payload = new ConfigTemplateLeagueRequest();
+            if (filter != null)
+            {
+                payload.ClientCodes = filter.ClientCodes ?? new List<string>();
+                payload.SportId = filter.SportId;
+                payload.ScopeId = filter.ScopeId;
+                payload.SearchText = filter.SearchText;
+            }
             payload.MetaData = MetaData;
-            var response = await BackOfficeService.GetConfigClient(UserModel.Id, ConfigState.Assigned, payload);
+            var response = await BackOfficeService.GetConfigClient(UserModel.Id, State, payload);
 
             if (response.StatusCode == StatusCode.Success)
             {

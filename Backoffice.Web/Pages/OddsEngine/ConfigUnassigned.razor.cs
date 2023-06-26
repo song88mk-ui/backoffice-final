@@ -63,7 +63,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 new BreadcrumbModel
                 {
                     Name = "Config",
-                    Url = "odds-engine/config/assigned",
+                    Url = "odds-engine/config/unassigned",
                     IsCurrentPage = true
                 }
             };
@@ -125,47 +125,20 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnResetClickEvent()
         {
+            MetaData = new MetaData();
+            SearchForm.SearchText = "";
+            FilterModel = new ConfigStateFilterModel()
+            {
+                ClientCodes = Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
+                ScopeId = int.Parse(Scopes.FirstOrDefault().Value),
+                SportId = int.Parse(Sports.FirstOrDefault().Value),
+                SearchText = SearchForm.SearchText
+            };
+            SelectedClientCount = (Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>()).Count();
 
+            await LoadLeagues(FilterModel);
         }
 
-        public async Task CheckboxClicked(SelectListItemWithCheckboxModel<string> model)
-        {
-            //if (model.IsChecked == false)
-            //{
-            //    if (model.Value == "all")
-            //    {
-            //        Items.ForEach(x =>
-            //        {
-            //            x.IsChecked = true;
-            //        });
-            //    }
-            //    else
-            //    {
-            //        model.IsChecked = true;
-
-            //        if (!Items.Where(c => c.Value != "all").Any(c => c.IsChecked == false))
-            //            Items[0].IsChecked = true;
-            //    }
-            //}
-            //else
-            //{
-            //    if (model.Value == "all")
-            //    {
-            //        Items.ForEach(x =>
-            //        {
-            //            x.IsChecked = false;
-            //        });
-            //    }
-            //    else
-            //    {
-            //        model.IsChecked = false;
-            //        Items[0].IsChecked = false;
-            //    }
-            //}
-
-            //var dictionary = Items.Where(c => c.Value != "all" && c.IsChecked).ToDictionary(c => c.Value, c => c.Name);
-            //await OnCheckboxCallback.InvokeAsync(dictionary);
-        }
         public void Dispose()
         {
 
