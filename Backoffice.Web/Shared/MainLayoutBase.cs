@@ -270,8 +270,11 @@ namespace Backoffice.Web.Shared
         {
             if (_hubConnection != null)
             {
+                if(_hubConnection.State == HubConnectionState.Connected)
+                {
                 await _hubConnection.StopAsync();
                 await _hubConnection.DisposeAsync();
+                }
             }
         }
 
@@ -346,7 +349,7 @@ namespace Backoffice.Web.Shared
                 });
 
                 await _hubConnection.InvokeAsync("AddToGroup", "HK");
-                await _hubConnection.InvokeAsync("AddToGroup", "HK");
+
                 _hubConnection.On<string>("Notification", async message =>
                 {
                     var payload = JsonSerializer.Deserialize<NotificationsModel>(message);

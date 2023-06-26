@@ -157,8 +157,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (_hubConnection != null)
             {
-                await _hubConnection.StopAsync();
-                await _hubConnection.DisposeAsync();
+                if(_hubConnection.State == HubConnectionState.Connected)
+                {
+                    await _hubConnection.StopAsync();
+                    await _hubConnection.DisposeAsync();
+                }
             }
         }
         public void Dispose()
