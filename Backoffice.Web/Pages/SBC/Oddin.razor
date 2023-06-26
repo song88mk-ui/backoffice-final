@@ -1,0 +1,20 @@
+﻿@page "/oddin-poc"
+
+<h3>Oddin</h3>
+
+<PageTitle>Oddin IFrame Integration</PageTitle>
+
+<div class="pb-3">
+    <label>Client Id:</label>
+    <input type="text" @bind-value="Config.ClientId"  />
+
+    <label>Operator Token:</label>
+    <input type="text" @bind-value="Config.OperatorToken"  />
+
+    <label>Currency Code:</label>
+    <input type="text" @bind-value="Config.CurrencyCode"  />
+
+    <button type="button" @onclick="() => LoadOddin()">Load Oddin</button>
+</div>
+
+<div id="bifrost"></div>
