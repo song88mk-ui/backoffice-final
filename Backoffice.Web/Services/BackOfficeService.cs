@@ -1291,12 +1291,10 @@ namespace Backoffice.Web.Services
 
         #region Config
 
-        public async Task<BaseResponse<ConfigTemplateModel>> GetClientConfigTemplateById(string token, long configTemplateId)
+        public async Task<BaseResponse<ConfigTemplateModel>> GetClientConfigTemplateById(long configTemplateId)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
                 var response = await _httpClient.GetAsync($"api/config/template/{configTemplateId}");
 
                 if (response.IsSuccessStatusCode)
@@ -1365,11 +1363,10 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(string token, ConfigTemplateModel request)
+        public async Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(ConfigTemplateModel request)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var Model = await _httpClient.PostAsync($"api/config/template", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (Model.IsSuccessStatusCode)
@@ -1398,11 +1395,10 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string token, long id)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(long id)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.DeleteAsync($"api/config/template/{id}");
 
                 if (response.IsSuccessStatusCode)
@@ -1435,11 +1431,10 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(string token, ConfigState state, ConfigTemplateLeagueRequest payload)
+        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.PostAsync($"api/config/template/{state.ToString()}", new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
@@ -1472,12 +1467,10 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(string token)
+        public async Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount()
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
                 var response = await _httpClient.GetAsync($"api/config/template/count");
 
                 if (response.IsSuccessStatusCode)

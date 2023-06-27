@@ -55,9 +55,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             IsConfigNameExisting = false;
 
-            var response = await BackOfficeService.AddOrUpdateConfigTemplate(UserModel.Id, new ConfigTemplateModel()
+            var response = await BackOfficeService.AddOrUpdateConfigTemplate(new ConfigTemplateModel()
             {
-                UserId = UserModel.Id,
                 SportId = SelectedSportId,
                 FixtureTypeId = SelectedScopeId,
                 Name = TemplateName,                

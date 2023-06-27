@@ -1,10 +1,8 @@
-﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Models;
 using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Xml.Serialization;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -16,7 +14,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
 

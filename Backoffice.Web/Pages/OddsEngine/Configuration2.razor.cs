@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
+using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Security.Cryptography.Xml;
@@ -42,11 +43,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
 
             StateHasChanged();
+            Sports = new List<SelectListItemModel<string>>();
+            Scopes = new List<SelectListItemModel<string>>();
+
             var taskList = new List<Task>()
             {
-                Task.Run(async () => {Clients = await LoadClients(); }),
-                Task.Run(async () => {Sports = await LoadSports();}),
-                Task.Run(async () => {Scopes = await LoadScopes(); })
+                Task.Run(() => {Clients = LoadClients().Result; }),
+                Task.Run(() => {while (Sports.Count == 0){Sports = LoadSports().Result;}}),
+                Task.Run(() => {while (Scopes.Count == 0){Scopes = LoadScopes().Result;}})
             };
 
             Task.WaitAll(taskList.ToArray());

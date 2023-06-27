@@ -1,11 +1,11 @@
 ﻿<tr>
-    <th class="text-center" scope="row">
+    <th class="text-center">
         <input type="checkbox" class="form-check-input" @onchange="OnCheckboxClicked" checked="@Config.IsChecked" />
     </th>
-    <th class="text-center" scope="row">@Index</th>
-    <td class="text-center">@Config.ClientName</td>
-    <td class="text-center">@Config.SportName</td>
-    <td class="text-center">@Config.FixtureStatusName</td>
-    <td class="text-center">@Config.LeagueName</td>
-    <td class="template-name px-4">No template assigned</td>
+    <th class="text-center">@Index</th>
+    <td class="px-4">@Config.ClientName</td>
+    <td class="px-4">@Config.SportName</td>
+    <td class="px-4">@Config.FixtureStatusName</td>
+    <td class="px-4">@Config.LeagueName</td>
+    <td class="@(State == ConfigState.Unsigned ? "template-name-italic" : "") px-4">No template assigned</td>
 </tr>

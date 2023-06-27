@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -10,7 +11,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class ConfigAssigned : IDisposable
     {
         #region Properties
-
+        [Inject] private IModalService ModalService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
 
         [Parameter] public string Region { get; set; } = "hk";
@@ -22,7 +23,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
-        public List<ConfigClientModel> ConfigClients { get; set; } = new List<ConfigClientModel>();
+        public List<ConfigClientViewModel> ConfigClients { get; set; } = new List<ConfigClientViewModel>();
 
         public ConfigStateFilterModel FilterModel = new ConfigStateFilterModel();
         public MetaData MetaData { get; set; }
@@ -156,6 +157,28 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             ConfigClients.ForEach(x => x.IsChecked = true);
         }
+        public async Task OnEditTemplateClickedEvent()
+        {
+            var leagues = ConfigClients.Where(x => x.IsChecked).ToList();
+
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-show");
+            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
+            parameters.Add("Region", Region);
+
+            var options = new ModalOptions();
+
+            switch (State)
+            {
+                case ConfigState.Assigned:
+                    ModalService.Open<ModifyLeagueTemplateModal>($"Change Template", parameters, options);
+                    break;
+                case ConfigState.Unsigned:
+                    ModalService.Open<ModifyLeagueTemplateModal>($"Assign Template", parameters, options);
+                    break;
+            }
+        }
 
         public void Dispose()
         {
@@ -165,11 +188,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-
-        private async Task Init()
-        {
-            await LoadLeagues();
-        }
         private async Task LoadLeagues(ConfigStateFilterModel filter = null)
         {
             IsPreloader = true;
@@ -184,17 +202,18 @@ namespace Backoffice.Web.Pages.OddsEngine
                 payload.SearchText = filter.SearchText;
             }
             payload.MetaData = MetaData;
-            var response = await BackOfficeService.GetConfigClient(UserModel.Id, State, payload);
+            var response = await BackOfficeService.GetConfigClient(State, payload);
 
             if (response.StatusCode == StatusCode.Success)
             {
-                ConfigClients = new List<ConfigClientModel>();
+                ConfigClients = new List<ConfigClientViewModel>();
                 MetaData = new MetaData();
 
                 if (response.Result != null)
                 {
                     if (response.Result.ClientConfigs != null && response.Result.ClientConfigs.Any())
-                        ConfigClients = response.Result.ClientConfigs;
+                        ConfigClients = ConfigClientViewModel.ConvertList(response.Result.ClientConfigs);
+
                     if (response.Result.MetaData != null)
                         MetaData = response.Result.MetaData;
                 }

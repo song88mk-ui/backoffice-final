@@ -28,7 +28,7 @@
                 <div class="d-flex h-75 justify-content-end">
                     <button href="javascript:void(0)" @onclick="OnSelectAllClickedEvent" class="btn btn-selection-all px-4">Select All</button>
                     <button href="javascript:void(0)" @onclick="OnClearSelectionClickedEvent" class="btn btn-selection-clear px-4">Clear Selection</button>
-                    <button href="javascript:void(0)" class="btn btn-selection-modify px-4">Assign a template</button>
+                    <button href="javascript:void(0)" @onclick="OnEditTemplateClickedEvent" class="btn btn-selection-modify px-4">@(State == ConfigState.Assigned ? "Change template" : "Assign a template")</button>
                 </div>
             </div>
         }
@@ -115,10 +115,10 @@
                 <tr>
                     <th class="index" scope="col"></th>
                     <th class="index" scope="col">No.</th>
-                    <th class="name" scope="col">Client Name</th>
-                    <th class="name" scope="col">Sport</th>
-                    <th class="name" scope="col">Scope</th>
-                    <th class="name" scope="col">League Name</th>
+                    <th class="filter" scope="col">Client Name</th>
+                    <th class="filter" scope="col">Sport</th>
+                    <th class="filter" scope="col">Scope</th>
+                    <th class="template" scope="col">League Name</th>
                     <th class="text-center template" scope="col">Template</th>
                 </tr>
             </thead>
@@ -127,7 +127,7 @@
                 @if (IsPreloader)
                 {
                     <tr>
-                        <td colspan="8">
+                        <td colspan="7">
                             <Preloader />
                         </td>
                     </tr>
@@ -138,20 +138,20 @@
                     {
                         foreach (var config in ConfigClients)
                         {
-                            <ConfigStateRow Index="@(ConfigClients.IndexOf(config) + 1)" Config="config" ItemSelectionChangedEvent="@OnConfigSelectionChanged" />
+                            <ConfigStateRow State="State" Index="@(ConfigClients.IndexOf(config) + 1)" Config="config" ItemSelectionChangedEvent="@OnConfigSelectionChanged" />
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="8">
+                            <td colspan="7">
                                 <NoRecordFound />
                             </td>
                         </tr>
                     }
                 }
             </tbody>
-            <Pagination MetaData="MetaData" Spread="2" SelectPageEvent="SelectedPage" PaginationColspan="7" />
+            <Pagination MetaData="MetaData" Spread="2" SelectPageEvent="SelectedPage" PaginationColspan="7" RowInfColSpan="5"/>
         </table>
     </div>
 </div>

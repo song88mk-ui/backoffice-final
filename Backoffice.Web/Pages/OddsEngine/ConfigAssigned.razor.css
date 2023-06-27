@@ -59,13 +59,13 @@ button.form-select {
 }
 
 th.index {
-    width: 1vw;
+    width: 6vw;
+    text-align: center;
+}
+th.filter {
+    width: 12vw;
     text-align: center;
 }
 th.template {
-    width: 5vw;
-}
-th.filter {
-    width: 8vw;
-    text-align: center;
+    width: 26vw;
 }

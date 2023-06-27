@@ -497,13 +497,12 @@ namespace Backoffice.Utility.Repository
         {
             try
             {
-                var query = _backofficeContext.ConfigTemplates.Where(x => x.UserId == request.UserId && x.Id.ToString() == request.ConfigTemplateId);
+                var query = _backofficeContext.ConfigTemplates.Where(x => x.Id.ToString() == request.ConfigTemplateId);
                 var clientCodes = JwtParser.ParseClaimsFromJwt(request.AccessToken).Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.ToString();
 
                 var configTemplate = query.ToList().Select(x => new ConfigTemplateModel()
                 {
                     Id = x.Id,
-                    UserId = x.UserId,
                     Name = x.Name,
                     SportId = x.SportId,
                     FixtureTypeId = x.FixtureTypeId,

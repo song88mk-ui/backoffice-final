@@ -32,7 +32,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             TemplateConfigCount = new TemplateConfigCount();
 
-            TemplateConfigCount = (await BackOfficeService.GetTemplateConfigCount(UserModel.Id)).Result;
+            TemplateConfigCount = (await BackOfficeService.GetTemplateConfigCount()).Result;
 
             await SelectConfigNavMenuCallback.InvokeAsync(CurrentMenu);
         }

@@ -36,7 +36,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnApplyClickEvent()
         {
-            var response = await BackofficeService.DeleteConfigTemplate(UserModel.Id, ConfigTemplateModel.Id);
+            var response = await BackofficeService.DeleteConfigTemplate(ConfigTemplateModel.Id);
 
             if (response.StatusCode == StatusCode.Success)
             {

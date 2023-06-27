@@ -19,13 +19,13 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
         #region Config
-        Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(string userId, List<int> sportIds = null, List<int> scopeIds = null);
-        Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(string userId, long templateId);
-        Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(string userId, ConfigTemplateModel request);
-        Task<BaseResponse<bool>> SetConfigState(string userId, ConfigState configState, List<ConfigClientModel> request);
-        Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string userId, string id);
-        Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(string userId, List<string> clientCodes);
-        Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(string userId, List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState);
+        Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(List<int> sportIds = null, List<int> scopeIds = null);
+        Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long templateId);
+        Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
+        Task<BaseResponse<bool>> SetConfigState(ConfigState configState, List<ConfigClientModel> request);
+        Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string id);
+        Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(List<string> clientCodes);
+        Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState);
         #endregion
 
         #region TOP FIXTURES

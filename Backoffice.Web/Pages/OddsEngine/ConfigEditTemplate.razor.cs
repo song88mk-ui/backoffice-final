@@ -94,7 +94,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task LoadConfigTemplate()
         {
-            var response = await BackOfficeService.GetClientConfigTemplateById(UserModel.Id, ConfigTemplateId);
+            var response = await BackOfficeService.GetClientConfigTemplateById(ConfigTemplateId);
 
             if (response.StatusCode == StatusCode.Success)
             {

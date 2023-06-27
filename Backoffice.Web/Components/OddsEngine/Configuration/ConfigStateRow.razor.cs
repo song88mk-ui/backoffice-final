@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Web.Components.OddsEngine.BoostedSettings;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -11,8 +12,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
     public partial class ConfigStateRow
     {
+        [Parameter] public ConfigState State { get; set; }
         [Parameter] public int Index { get; set; }
-        [Parameter] public ConfigClientModel Config { get; set; }
+        [Parameter] public ConfigClientViewModel Config { get; set; }
         [Parameter] public EventCallback ItemSelectionChangedEvent { get; set; }
         private bool _IsEdit = false;
 
