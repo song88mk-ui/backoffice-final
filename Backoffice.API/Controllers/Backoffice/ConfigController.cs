@@ -72,7 +72,6 @@ namespace Backoffice.API.Controllers.Backoffice
         [HttpGet("templates")]
         public async Task<IActionResult> GetConfigTemplates([FromQuery] int sportId = -1, [FromQuery] int scopeId = -1)
         {
-            var userId = HttpContext.Items["UserId"]?.ToString();
             var result = await _backofficeRepository.GetConfigTemplates(sportId == -1 ? null : new List<int>() { sportId }, scopeId == -1 ? null : new List<int>() { scopeId });
 
             switch (result.StatusCode)
@@ -98,8 +97,8 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
-        [HttpPost("template/state/{state}")]
-        public async Task<IActionResult> ConfigTemplateSetState([FromBody] List<ConfigClientModel> request, [FromRoute] string state)
+        [HttpPost("template/set/{state}")]
+        public async Task<IActionResult> ConfigTemplateSetState([FromBody] ConfigSetLeagueStateRequest request, [FromRoute] string state)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
             var result = new BaseResponse<bool>()
