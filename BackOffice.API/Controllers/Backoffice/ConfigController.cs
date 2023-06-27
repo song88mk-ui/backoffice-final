@@ -57,10 +57,8 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpGet("template/{id}")]
-        public async Task<IActionResult> GetClientConfigTemplateById([FromRoute] long id)
+        public async Task<IActionResult> GetConfigTemplateById([FromRoute] long id)
         {
-            var userId = HttpContext.Items["UserId"]?.ToString();
-
             var result = await _backofficeRepository.GetConfigTemplateById(id);
 
             switch (result.StatusCode)

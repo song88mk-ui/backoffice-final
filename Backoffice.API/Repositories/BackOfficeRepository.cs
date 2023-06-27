@@ -1399,15 +1399,6 @@ namespace Backoffice.API.Repositories
             {
                 var query = _backofficeContext.ConfigTemplates.AsNoTracking();
 
-                //if (clientCodes != null && clientCodes.Any())
-                //{
-                //    var clientList = GetTradingClientInformation();
-                //    if (clientCodes.FirstOrDefault().ToUpper() == "ALL")
-                //    {
-                //        clientCodes = clientList.Select(x => x.ClientCode).ToList();
-                //    }
-                //}
-
                 var result = query.Where(e => e.Id == templateId).Select(x => new ConfigTemplateModel()
                 {
                     Id = x.Id,

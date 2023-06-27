@@ -45,13 +45,13 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<bool>> DeactivateFixtureMarkets(DeactivateFixtureMarketRequest request);
 
         #region ConfigTemplate
-        Task<BaseResponse<ConfigTemplateModel>> GetClientConfigTemplateById(long configTemplateId);
+        Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId);
         Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(int sportId = -1, int scopeId = -1);
         Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(long id);
         Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload);
         Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount();
-        Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(string token, long configTemplateId);
+        Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(long configTemplateId);
 
         #endregion
 

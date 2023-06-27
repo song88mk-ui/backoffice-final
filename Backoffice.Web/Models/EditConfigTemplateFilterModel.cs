@@ -19,10 +19,6 @@ namespace Backoffice.Web.Models
         public List<SelectListItemWithCheckboxModel<string>> Markets { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> ConfigStatuses { get; set; }
 
-        public int SelectedClientCount { get; set; }
-        public string SelectedClientName { get; set; } = "";
-        public int SelectedLeagueCount { get; set; }
-        public string SelectedLeagueName { get; set; } = "";
         public int SelectedMarketCount { get; set; }
         public string SelectedMarketName { get; set; } = "";
 

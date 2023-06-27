@@ -57,5 +57,13 @@
 </div>
 
 <div class="col-md-12 mb-4">
-    <AccordionTemplateConfiguration/>
+
+    @foreach(var market in MarketLookupNavigation)
+    {
+        <AccordionTemplateConfiguration Market="market"
+            @key="@($"{ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
+            FilterConfigStatus="@EditConfigTemplateFilterModel.SelectedConfigStatusName"
+            Scope="@ScopeId" />
+    }
+
 </div>

@@ -22,12 +22,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public long ConfigTemplateId { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<MarketLookupNavigationModel> MarketLookupNavigation { get; set; }
-        public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
-        public List<SelectListItemWithCheckboxModel<string>> Leagues { get; set; }
 
         public ConfigTemplateModel ConfigTemplate { get; set; }
         public ConfigTemplateMarginModel ConfigTemplateMargin { get; set; }
@@ -54,8 +50,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         {            
             ConfigTemplate = new ConfigTemplateModel();
 
-            Clients = new List<SelectListItemWithCheckboxModel<string>>();
-            Leagues = new List<SelectListItemWithCheckboxModel<string>>();
+            ConfigTemplateMargin = new ConfigTemplateMarginModel();
+
             MarketLookupNavigation = new List<MarketLookupNavigationModel>();                        
 
             Breadcrumbs = new List<BreadcrumbModel>()
@@ -68,19 +64,15 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }                
             };
 
-            await LoadConfigTemplate();
-            await LoadConfigTemplateMargin();
-            await LoadMarkets();
         }
 
         public async Task InitConfigEditTemplate(EditConfigTemplateFilterModel model)
         {
             EditConfigTemplateFilterModel = model;
 
-            //SelectedContents = await GetContents();
-            //SelectedContents.ForEach(market => GetNewSettings(market));
-
-            await InvokeAsync(StateHasChanged);
+            await LoadConfigTemplateById();
+            await LoadConfigTemplateMargin();
+            await LoadMarkets();
         }
 
         public void Dispose()
@@ -92,9 +84,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Utilities      
 
-        private async Task LoadConfigTemplate()
+        private async Task LoadConfigTemplateById()
         {
-            var response = await BackOfficeService.GetClientConfigTemplateById(ConfigTemplateId);
+            var response = await BackOfficeService.GetConfigTemplateById(ConfigTemplateId);
 
             if (response.StatusCode == StatusCode.Success)
             {
@@ -117,7 +109,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task LoadConfigTemplateMargin()
         {
-            var response = await BackOfficeService.GetConfigTemplateMargin(UserModel.Id, ConfigTemplateId);
+            var response = await BackOfficeService.GetConfigTemplateMargin(ConfigTemplateId);
 
             if (response.StatusCode == StatusCode.Success)
                 ConfigTemplateMargin = response.Result;

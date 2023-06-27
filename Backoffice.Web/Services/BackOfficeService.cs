@@ -1291,7 +1291,7 @@ namespace Backoffice.Web.Services
 
         #region Config
 
-        public async Task<BaseResponse<ConfigTemplateModel>> GetClientConfigTemplateById(long configTemplateId)
+        public async Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId)
         {
             try
             {
@@ -1496,12 +1496,10 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(string token, long configTemplateId)
+        public async Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(long configTemplateId)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
                 var response = await _httpClient.GetAsync($"api/config/template/margin/{configTemplateId}");
 
                 if (response.IsSuccessStatusCode)
