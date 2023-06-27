@@ -24,9 +24,10 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Ctor
-        public ExcelService(ITradingService tradingService)
+        public ExcelService(ITradingService tradingService, IConfiguration configuration)
         {
             _tradingService = tradingService;
+            _configuration = configuration;
         }
         #endregion
         #region Methods
