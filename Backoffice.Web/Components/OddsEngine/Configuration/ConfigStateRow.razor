@@ -1,5 +1,5 @@
 ﻿<tr>
-    <th class="text-center checkbox" scope="row">
+    <th class="text-center" scope="row">
         <input type="checkbox" class="form-check-input" @onchange="OnCheckboxClicked" checked="@Config.IsChecked" />
     </th>
     <th class="text-center" scope="row">@Index</th>
@@ -7,23 +7,5 @@
     <td class="text-center">@Config.SportName</td>
     <td class="text-center">@Config.FixtureStatusName</td>
     <td class="text-center">@Config.LeagueName</td>
-    <td class="text-center">
-        <select class="form-select">
-            <option value="0">Select Template</option>
-            <option value="1">Volleyball [Live] [Tier 1]</option>
-            <option value="2">Volleyball [Live] [Tier 2]</option>
-            <option value="3">Volleyball [Live] [Tier 3]</option>
-        </select>
-    </td>
-    <td class="text-center" @onclick="@OnEditClickedEvent">
-        @if (_IsEdit)
-        {
-            <button class="btn btn-cancel waves-effect">Save</button>
-            <button class="btn btn-edit waves-effect">Cancel</button>
-        }
-        else
-        {
-            <button class="btn btn-change-template">Change Template</button>
-        }
-    </td>
+    <td class="template-name px-4">No template assigned</td>
 </tr>

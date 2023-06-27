@@ -30,3 +30,42 @@ button.form-select {
 .dropdown-toggle::after {
     content: unset;
 }
+
+.btn-selection-modify {
+    color: #FFFFFFFF;
+    font-weight: 500;
+    background: transparent linear-gradient(180deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+    border-radius: 2px;
+    opacity: 1;
+}
+
+.btn-selection-clear {
+    font-weight: bold;
+    color: #E5442F;
+}
+
+.lbl-selection {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.selection-logo {
+    text-align: center;
+    font-size: 40px;
+}
+
+.fa-trophy {
+    color: #E5442F;
+}
+
+th.index {
+    width: 1vw;
+    text-align: center;
+}
+th.template {
+    width: 5vw;
+}
+th.filter {
+    width: 8vw;
+    text-align: center;
+}

@@ -35,6 +35,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string SelectedSportName { get; set; } = "";
         public string SelectedScopeName { get; set; } = "";
         public bool IsPreloader { get; set; } = true;
+        public bool IsEdit { get; set; } = false;
 
         #endregion
 
@@ -43,6 +44,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         protected override async Task OnInitializedAsync()
         {
             IsPreloader = true;
+            IsEdit = false;
             PageTitle = State == ConfigState.Assigned ? "Assigned Leagues" : "Unassigned Leagues";
             IconClass = "";
 
@@ -140,7 +142,19 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public async Task OnConfigSelectionChanged()
         {
-
+            if (ConfigClients.Any(x => x.IsChecked))
+                IsEdit = true;
+            else
+                IsEdit = false;
+        }
+        public async Task OnClearSelectionClickedEvent()
+        {
+            ConfigClients.ForEach(x => x.IsChecked = false);
+            IsEdit = false;
+        }
+        public async Task OnSelectAllClickedEvent()
+        {
+            ConfigClients.ForEach(x => x.IsChecked = true);
         }
 
         public void Dispose()
