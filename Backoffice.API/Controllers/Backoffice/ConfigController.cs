@@ -61,7 +61,7 @@ namespace Backoffice.API.Controllers.Backoffice
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
 
-            var result = await _backofficeRepository.GetConfigTemplateById(userId, id);
+            var result = await _backofficeRepository.GetConfigTemplateById(id);
 
             switch (result.StatusCode)
             {
@@ -75,7 +75,7 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> GetConfigTemplates([FromQuery] int sportId = -1, [FromQuery] int scopeId = -1)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
-            var result = await _backofficeRepository.GetConfigTemplates(userId, sportId == -1 ? null : new List<int>() { sportId }, scopeId == -1 ? null : new List<int>() { scopeId });
+            var result = await _backofficeRepository.GetConfigTemplates(sportId == -1 ? null : new List<int>() { sportId }, scopeId == -1 ? null : new List<int>() { scopeId });
 
             switch (result.StatusCode)
             {
@@ -90,7 +90,7 @@ namespace Backoffice.API.Controllers.Backoffice
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
 
-            var result = await _backofficeRepository.AddOrUpdateConfigTemplate(userId, request);
+            var result = await _backofficeRepository.AddOrUpdateConfigTemplate(request);
 
             switch (result.StatusCode)
             {
@@ -112,7 +112,7 @@ namespace Backoffice.API.Controllers.Backoffice
 
             if (Enum.TryParse(state, out ConfigState confState))
             {
-                result = await _backofficeRepository.SetConfigState(userId, confState, request);
+                result = await _backofficeRepository.SetConfigState(confState, request);
             }
 
             switch (result.StatusCode)
@@ -128,7 +128,7 @@ namespace Backoffice.API.Controllers.Backoffice
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
 
-            var result = await _backofficeRepository.DeleteConfigTemplate(userId, id);
+            var result = await _backofficeRepository.DeleteConfigTemplate(id);
 
             switch (result.StatusCode)
             {
@@ -153,7 +153,7 @@ namespace Backoffice.API.Controllers.Backoffice
 
             if (Enum.TryParse(state, out ConfigState confState))
             {
-                result = await _backofficeRepository.GetConfigState(userId, clientCodes, payload, confState);
+                result = await _backofficeRepository.GetConfigState(clientCodes, payload, confState);
             }
 
             switch (result.StatusCode)
@@ -170,7 +170,7 @@ namespace Backoffice.API.Controllers.Backoffice
             var userId = HttpContext.Items["UserId"].ToString();
             var clientCodes = HttpContext.Items["ClientCodes"].ToString().Split(',').ToList();
 
-            var result = await _backofficeRepository.GetTemplateConfigCount(userId, clientCodes);
+            var result = await _backofficeRepository.GetTemplateConfigCount(clientCodes);
 
             switch (result.StatusCode)
             {
