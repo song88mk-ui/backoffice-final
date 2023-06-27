@@ -35,6 +35,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string SportIcon { get; set; } = "";
         public string SportName { get; set; }
         public int ScopeId { get; set; }
+        public int SportId { get; set; }
 
         #endregion
 
@@ -93,6 +94,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 ConfigTemplate = response.Result;
                 
                 SportName = (await TradingService.GetSportLookup()).Result.SportLookup.FirstOrDefault(e => e.SportId == response.Result.SportId).SportName;
+                SportId = response.Result.SportId;
                 ScopeId = response.Result.FixtureTypeId;
 
                 SportIcon = SportName.Contains(" ") ? SportName.Replace(" ", "-").ToLower() : SportName.ToLower();
@@ -223,23 +225,206 @@ namespace Backoffice.Web.Pages.OddsEngine
             var marketTemplates = new List<MarketLookupNavigationModel>();
             foreach (var MarketTemplateGroup in MarketTemplateGroups)
             {
-                var marketTemplateGroupId = MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId;
+                var marketTemplateGroup = MarketTemplateGroup.MarketTemplateGroup;
                 foreach (var marketLookup in _marketLookup.MarketLookup)
                 {
-                    if (MarketTemplateGroup.MarketTemplateGroup.MarketTemplateIds.Contains(marketLookup.MarketTemplateId))
+                    if (marketTemplateGroup.MarketTemplateIds.Contains(marketLookup.MarketTemplateId))
                     {
-                        marketTemplates.Add(new MarketLookupNavigationModel()
+
+                        var newMarketTemplate = marketTemplates.FirstOrDefault(m => m.MarketLookup.MarketTemplateId == marketLookup.MarketTemplateId);
+                        if(newMarketTemplate == null)
                         {
-                            IsSelected = !marketTemplates.Where(m => m.MarketTemplateGroupId == marketTemplateGroupId && m.IsSelected).Any(),
-                            MarketTemplateGroupId = marketTemplateGroupId,
-                            MarketLookup = marketLookup,
-                            LiveSettings = new LiveSettingsModel(),
-                            PrematchSettings = new PrematchSettingsModel()
-                        });
+                            
+                            var configTemplateMargin = ConfigTemplateMargin.ConfigTemplateMargins.FirstOrDefault(c => c.MarketTemplateId == marketLookup.MarketTemplateId);
+                            if (configTemplateMargin == null)
+                            {
+                                configTemplateMargin = new Backoffice.Shared.Models.ConfigTemplateMargin()
+                                {
+                                    MarketTemplateId = marketLookup.MarketTemplateId,
+                                    IsActive = true,
+                                    FixtureTypeId = ScopeId,
+                                    SportId = SportId
+                                };
+                            }
+
+                            var prematchSettings = GetPrematchSettingsTemplate(configTemplateMargin, marketLookup.MarketTemplateId);
+                            var liveSettings = GetLiveSettingsTemplate(configTemplateMargin, marketLookup.MarketTemplateId);
+
+
+                            marketTemplates.Add(new MarketLookupNavigationModel()
+                            {
+                                IsSelected = false,
+                                MarketTemplateGroupIds = new List<int>() { marketTemplateGroup.MarketTemplateGroupId },
+                                MarketLookup = marketLookup,
+                                LiveSettings = liveSettings,
+                                PrematchSettings = prematchSettings
+                            });
+                        }
+                        else
+                        {
+                            if (!newMarketTemplate.MarketTemplateGroupIds.Contains(marketTemplateGroup.MarketTemplateGroupId))
+                                newMarketTemplate.MarketTemplateGroupIds.Add(marketTemplateGroup.MarketTemplateGroupId);
+                        }
+
                     }
                 }
             }
             return marketTemplates;
+        }
+
+        private PrematchSettingsTemplateModel GetPrematchSettingsTemplate(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, string marketTemplateId)
+        {
+            return new PrematchSettingsTemplateModel()
+            {
+                SportId = ConfigTemplate.SportId,
+                FirstKey = GetFirstKey(configTemplateMargin, true),
+                LastKey = GetLastKey(configTemplateMargin, true),
+                MarketTemplateId = marketTemplateId.ToString(),
+                Settings = MockData.PrematchSettings.Select(s => new Backoffice.Shared.Models.KeyTimeModel()
+                {
+                    Key = GetPrematchKey(s.TimeDisplay, configTemplateMargin),
+                    Time = s.Time,
+                    SortOrder = s.SortOrder,
+                    TimeDisplay = s.TimeDisplay
+                }).ToList()
+            };
+        }
+
+        public LiveSettingsTemplateModel GetLiveSettingsTemplate(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, string marketTemplateId)
+        {
+            var liveSettings = MockData.SportsLiveTimeline.Where(s => s.SportId == configTemplateMargin.SportId).FirstOrDefault();
+
+            List<KeyTimeModel> keyTime = new List<KeyTimeModel>();
+
+            if (liveSettings != null)
+            {
+                foreach (var time in liveSettings.Time)
+                {
+                    keyTime.Add(new KeyTimeModel { Key = GetLiveKey(time.ToString(), configTemplateMargin), TimeDisplay = time.ToString(), Time = time });
+                }
+            }
+            else
+            {
+                keyTime.Add(new KeyTimeModel { Key = GetLiveKey("0", configTemplateMargin), TimeDisplay = "0" });
+            }
+
+            return new LiveSettingsTemplateModel()
+            {
+                SportId = configTemplateMargin.SportId,
+                FirstKey = GetFirstKey(configTemplateMargin, false),
+                LastKey = GetLastKey(configTemplateMargin, false),
+                MarketTemplateId = configTemplateMargin.MarketTemplateId.ToString(),
+                Settings = keyTime,
+                OvertimeKey = liveSettings?.Overtime.ToString(),
+                LastTimeKey = liveSettings?.Time.Max().ToString()
+            };
+        }
+
+        private string GetFirstKey(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, bool isPrematch)
+        {
+
+            if (configTemplateMargin == null || (string.IsNullOrEmpty(configTemplateMargin.Prematch) && string.IsNullOrEmpty(configTemplateMargin.Live))) return "101";
+
+            if ((isPrematch && configTemplateMargin.Prematch?.Length == 0)
+                || (!isPrematch && configTemplateMargin.Live?.Length == 0)) return "101";
+
+            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(isPrematch ? configTemplateMargin.Prematch : configTemplateMargin.Live);
+
+            if (keyTimes == null) return "";
+
+            var firstKey = keyTimes.Where(s => s.M >= 101).FirstOrDefault()?.M;
+            return (firstKey ?? 101).ToString();
+        }
+
+        private string GetLastKey(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, bool isPrematch)
+        {
+            if (configTemplateMargin == null || (string.IsNullOrEmpty(configTemplateMargin.Prematch) && string.IsNullOrEmpty(configTemplateMargin.Live))) return "";
+
+            if ((isPrematch && configTemplateMargin.Prematch?.Length == 0)
+                || (!isPrematch && configTemplateMargin.Live?.Length == 0)) return "";
+
+            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(isPrematch ? configTemplateMargin.Prematch : configTemplateMargin.Live);
+            if (keyTimes == null) return "";
+
+            var lastKey = keyTimes.Where(s => s.M > 101).LastOrDefault()?.M;
+            return lastKey == null ? "" : lastKey.ToString();
+        }
+
+        private int? GetPrematchKey(string Time, Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin)
+        {
+
+            if (configTemplateMargin == null)
+            {
+                if (Time == "INST")
+                    return 101;
+                else
+                    return null;
+            }
+
+            if (string.IsNullOrEmpty(configTemplateMargin.Prematch))
+            {
+                if (Time == "INST")
+                    return 101;
+                else
+                    return null;
+            }
+
+
+            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(configTemplateMargin.Prematch);
+            if (keyTimes == null && Time == "INST")
+                return 101;
+
+            if (keyTimes == null)
+                return null;
+
+            var timeDisplay = MockData.PrematchSettings.Where(a => a.TimeDisplay == Time).FirstOrDefault();
+            if (timeDisplay == null) return null;
+            var keyTime = keyTimes.Where(a => a.T == timeDisplay.Time).FirstOrDefault();
+            if (keyTime == null) return null;
+            return keyTime.M;
+        }
+
+        private int? GetLiveKey(string Time, Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin)
+        {
+            ////for testing only
+            //if (config == null || string.IsNullOrEmpty(config.Live))
+            //{
+            //    if (ConfigFilterModel.ClientCode == "10C" || ConfigFilterModel.ClientCode == "10I")
+            //        if (Time == "0")
+            //            return 112;
+            //    if (ConfigFilterModel.ClientCode == "10J")
+            //        if (Time == "0")
+            //            return 109;
+            //}
+            ////end
+
+            if (configTemplateMargin == null)
+            {
+                if (Time == "0")
+                    return 101;
+                else
+                    return null;
+            }
+
+            if (string.IsNullOrEmpty(configTemplateMargin.Live))
+            {
+                if (Time == "0")
+                    return 101;
+                else
+                    return null;
+            }
+
+            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(configTemplateMargin.Live);
+            if (keyTimes == null && Time == "0")
+                return 101;
+
+            if (keyTimes == null)
+                return null;
+
+            var keyTime = keyTimes.Where(a => a.T == int.Parse(Time)).FirstOrDefault();
+            if (keyTime == null) return null;
+            return keyTime.M;
+
         }
 
         #endregion

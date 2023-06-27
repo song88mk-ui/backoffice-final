@@ -32,7 +32,7 @@
             <div class="accordion-body">
                 @{
                     var configStatus = Market.MarketLookup.IsActive ? "1" : "2";
-                    if ((FilterConfigStatus == "all" || configStatus == FilterConfigStatus))
+                    if ((string.IsNullOrEmpty(FilterConfigStatus) || FilterConfigStatus == "all" || configStatus == FilterConfigStatus))
                     {
                         if ((Scope == 99 || Scope == 0))
                         {

@@ -12,7 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ToastService? _toasterService { get; set; }
 
-        [Parameter] public Pages.OddsEngine.Configuration ConfigurationRef { get; set; }
+        //[Parameter] public Pages.OddsEngine.Configuration ConfigurationRef { get; set; }
 
         [Parameter] public string Region { get; set; }
         #endregion
@@ -54,7 +54,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-md");
             parameters.Add("Region", Region);
-            parameters.Add("OnCopyClientSettingsCallback", EventCallback.Factory.Create(this, ConfigurationRef.OnCopyClientSettingsAlert));
+            //parameters.Add("OnCopyClientSettingsCallback", EventCallback.Factory.Create(this, ConfigurationRef.OnCopyClientSettingsAlert));
 
             var options = new ModalOptions();
             ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
