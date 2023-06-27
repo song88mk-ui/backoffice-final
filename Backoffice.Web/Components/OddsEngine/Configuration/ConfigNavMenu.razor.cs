@@ -20,6 +20,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public TemplateConfigCount TemplateConfigCount { get; set; }
         public ConfigTemplateNavMenu CurrentMenu { get; set; }
+        private bool IsCounting = true;
 
         #endregion
 
@@ -28,12 +29,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         protected override async Task OnInitializedAsync()
         {
+            IsCounting = true;
             CurrentMenu = (int)ConfigTemplateNavMenu.MyTemplates;
 
             TemplateConfigCount = new TemplateConfigCount();
 
             TemplateConfigCount = (await BackOfficeService.GetTemplateConfigCount()).Result;
 
+            IsCounting = false;
             await SelectConfigNavMenuCallback.InvokeAsync(CurrentMenu);
         }
 

@@ -105,6 +105,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             await LoadLeagues(FilterModel);
         }
+        public async Task OnModalSaveEvent(object e)
+        {
+            await LoadLeagues(FilterModel);
+        }
 
         public async Task OnScopeCheckboxClickEvent(ChangeEventArgs e)
         {
@@ -163,15 +167,19 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var parameters = new ModalParameters();
 
+            parameters.Add("Leagues", leagues);
+            parameters.Add("State", State);
+            parameters.Add("SportId", FilterModel.SportId);
+            parameters.Add("ScopeId", FilterModel.ScopeId);
+            parameters.Add("Region", Region);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
-            parameters.Add("Region", Region);
-
             var options = new ModalOptions();
 
             switch (State)
             {
                 case ConfigState.Assigned:
+
                     ModalService.Open<ModifyLeagueTemplateModal>($"Change Template", parameters, options);
                     break;
                 case ConfigState.Unsigned:

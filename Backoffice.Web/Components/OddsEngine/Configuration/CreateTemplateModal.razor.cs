@@ -34,6 +34,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             Sports = new List<SelectListItemModel<int>>();
 
             Sports = await LoadSports();
+            SelectedSportId = Sports.FirstOrDefault()?.Value ?? -1;
+            SelectedScopeId = 0;
         }
 
         public async Task OnSportSelectChanged(ChangeEventArgs e)

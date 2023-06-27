@@ -1,11 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
-using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Security.Cryptography.Xml;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -41,8 +37,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
+            await Init();
+        }
 
-            StateHasChanged();
+        public async Task Init()
+        {
             Sports = new List<SelectListItemModel<string>>();
             Scopes = new List<SelectListItemModel<string>>();
 
@@ -56,7 +55,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             Task.WaitAll(taskList.ToArray());
             IsPreleader = false;
         }
-
         public async Task OnConfigNavMenuSelected(ConfigTemplateNavMenu configNavMenu)
         {
             SelectedConfigNavMenu = configNavMenu;

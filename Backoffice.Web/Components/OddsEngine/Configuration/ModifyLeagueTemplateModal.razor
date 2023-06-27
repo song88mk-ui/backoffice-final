@@ -1,29 +1,51 @@
 ﻿<div class="modal-body">
-    <div class="container px-3 pb-4 border-bottom">
-        <p class="mb-2">Leagues Selected</p>
-        <div class="row league-body">
-            @foreach (var item in Leageues)
-            {
-                <div class="col-12 mb-2 p-0">
-                    <div class="container border">
-                        <p class="fw-bold my-2">@item.LeagueName</p>
-                        <p class="mb-2">@($"{item.ClientName} | {item.SportName} | {item.FixtureStatusName}")</p>
-                    </div>
+    @if (IsPreLoader)
+    {
+        <Preloader />
+    }
+    else
+    {
+        <div class="container px-3 pb-4 border-bottom">
+            <p class="mb-2">Leagues Selected</p>
+            <div class="row league-body">
+                @if (Leagues != null && Leagues.Any())
+                {
+                    @foreach (var item in Leagues)
+                    {
+                        <div class="col-12 mb-2 p-0">
+                            <div class="container border">
+                                <p class="fw-bold my-2">@item.LeagueName</p>
+                                <p class="mb-2">@($"{item.ClientName} | {item.SportName} | {item.FixtureStatusName}")</p>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="container d-flex pt-4">
+            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">Template</label>
+            <div class="col col-sm-10">
+                <div class="dropdown">
+                    <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        @if (SelectedItem != null && !string.IsNullOrEmpty(SelectedItem.Name))
+                        {
+                            <span class="@(SelectedItem.Value==-2?"text-danger":"")">@SelectedItem.Name</span>
+                        }
+                        else
+                        {
+                            <span class="template-name-italic">Select Template</span>
+                        }
+                    </button>
+                    @if (Templates != null && Templates.Any())
+                    {
+                        <SelectWithSearch State="State" Items="Templates" AriaLabel="scope-dropdown" OnSelectionCallback="OnTemplateSelectChanged" />
+                    }
                 </div>
-            }
+            </div>
         </div>
-    </div>
-    <div class="container d-flex pt-4">
-        <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">Template</label>
-        <div class="col col-sm-10">
-            <select class="form-select" @onchange="OnScopeSelectChanged">
-                <option value="0">Prematch</option>
-                <option value="1">Live</option>
-            </select>
-        </div>
-    </div>
+    }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickEvent">Cancel</button>
-    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickEvent">Save</button>
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickedEvent" disabled="@IsPreLoader">Cancel</button>
+    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickedEvent" disabled="@IsPreLoader">Save</button>
 </div>

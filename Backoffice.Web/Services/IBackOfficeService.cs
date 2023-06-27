@@ -48,6 +48,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId);
         Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(int sportId = -1, int scopeId = -1);
         Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
+        Task<BaseResponse<bool>> SetLeagueState(ConfigState state, ConfigSetLeagueStateRequest payload);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(long id);
         Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload);
         Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount();

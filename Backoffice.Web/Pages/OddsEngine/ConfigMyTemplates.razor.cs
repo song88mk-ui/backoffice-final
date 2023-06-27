@@ -134,7 +134,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             await LoadConfigTemplates();
         }
-
+        public async Task OnModalSaveEvent(object e)
+        {
+            await LoadConfigTemplates();
+        }
         public async Task OnScopeChangedEvent(ChangeEventArgs e)
         {
             SelectedScopeId = int.Parse(e.Value.ToString());

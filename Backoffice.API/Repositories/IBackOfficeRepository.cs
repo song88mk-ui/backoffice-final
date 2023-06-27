@@ -22,7 +22,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(List<int> sportIds = null, List<int> scopeIds = null);
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long templateId);
         Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
-        Task<BaseResponse<bool>> SetConfigState(ConfigState configState, List<ConfigClientModel> request);
+        Task<BaseResponse<bool>> SetConfigState(ConfigState configState, ConfigSetLeagueStateRequest request);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string id);
         Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(List<string> clientCodes);
         Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState);
