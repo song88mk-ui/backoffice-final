@@ -15,7 +15,7 @@ using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.Backoffice
 {
-    [Authorize("SBC.OE.Config", "2")]
+    [Authorize("SBC.OE.Config", ((int)Access.View))]
     [Route("api/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class ConfigController : ControllerBase
@@ -83,7 +83,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         [HttpPost("template")]
-        [Authorize("SBC.OE.Config", "1")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> AddOrUpdateConfigTemplate([FromBody] ConfigTemplateModel request)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -99,7 +99,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         [HttpPost("template/set/{state}")]
-        [Authorize("SBC.OE.Config", "1")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> ConfigTemplateSetState([FromBody] ConfigSetLeagueStateRequest request, [FromRoute] string state)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -123,7 +123,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         [HttpDelete("template/{id}")]
-        [Authorize("SBC.OE.Config", "1")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> DeleteConfigTemplate([FromRoute] string id)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -138,7 +138,7 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
-        [HttpPost("template/{state}")] // type = assigned / unassigned
+        [HttpPost("template/{state}")]
         public async Task<IActionResult> GetConfigClients([FromRoute] string state, [FromQuery] int templateId = -1, [FromBody] ConfigTemplateLeagueRequest payload = null)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
