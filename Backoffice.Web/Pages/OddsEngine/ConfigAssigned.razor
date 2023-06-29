@@ -151,14 +151,16 @@
                         <tr>
                             <AuthorizeView Policy="sbc-config-canedit">
                                 <Authorized Context="ActivateAll">
+                                    <td colspan="7">
+                                        <NoRecordFound />
+                                    </td>
                                 </Authorized>
                                 <NotAuthorized>
-
+                                    <td colspan="6">
+                                        <NoRecordFound />
+                                    </td>
                                 </NotAuthorized>
                             </AuthorizeView>
-                            <td colspan="7">
-                                <NoRecordFound />
-                            </td>
                         </tr>
                     }
                 }

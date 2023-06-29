@@ -10,12 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.Backoffice
 {
-    [Authorize]
+    [Authorize("SBC.OE.Config", "2")]
     [Route("api/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class ConfigController : ControllerBase
@@ -83,6 +84,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         [HttpPost("template")]
+        [Authorize("SBC.OE.Config", "1")]
         public async Task<IActionResult> AddOrUpdateConfigTemplate([FromBody] ConfigTemplateModel request)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -98,6 +100,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         [HttpPost("template/set/{state}")]
+        [Authorize("SBC.OE.Config", "1")]
         public async Task<IActionResult> ConfigTemplateSetState([FromBody] ConfigSetLeagueStateRequest request, [FromRoute] string state)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -121,6 +124,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         [HttpDelete("template/{id}")]
+        [Authorize("SBC.OE.Config", "1")]
         public async Task<IActionResult> DeleteConfigTemplate([FromRoute] string id)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
