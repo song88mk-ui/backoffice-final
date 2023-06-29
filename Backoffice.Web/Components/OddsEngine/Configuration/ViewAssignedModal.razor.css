@@ -5,6 +5,11 @@
     background: transparent linear-gradient(180deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
 
+.accordion {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
 .accordion-button {
     background-color: #354156;
     color: white;
@@ -16,4 +21,8 @@
 
 .list-group > li {
     border: none;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
 }

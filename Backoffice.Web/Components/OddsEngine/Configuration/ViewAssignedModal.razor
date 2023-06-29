@@ -1,19 +1,24 @@
 ﻿<div class="modal-body">
     <div class="accordion" id="viewAssignedAccordion">
 
-        @foreach(var client in Leagues.Select(x => x.ClientCode).Distinct().ToList())
+        @foreach(var client in Leagues.Select(x => new
+        {
+            ClientId = x.ClientId,
+            ClientCode = x.ClientCode,
+            ClientName = x.ClientName
+        }).Distinct().ToList())
         {
             <div class="accordion-item">
                 <h2 class="accordion-header" id="header2">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                        @client
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@client.ClientId" aria-expanded="true" aria-controls="collapse-@client.ClientId">
+                        @client.ClientName
                     </button>
                 </h2>
 
-                <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="header2">
+                <div id="collapse-@client.ClientId" class="accordion-collapse collapse" aria-labelledby="header2">
                     <div class="accordion-body">
                         <ul class="list-group">
-                            @foreach (var item in Leagues.Where(x => x.ClientCode == client).ToList())
+                            @foreach (var item in Leagues.Where(x => x.ClientCode == client.ClientCode).ToList())
                             {
                                 <li class="list-group-item">@item.LeagueName</li>
                             }

@@ -115,6 +115,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnModalSaveEvent(object e)
         {
             await LoadLeagues(FilterModel);
+
+            IsSelectedLeagueShowing = false;
+            await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
         }
 
         public async Task OnScopeCheckboxClickEvent(ChangeEventArgs e)
