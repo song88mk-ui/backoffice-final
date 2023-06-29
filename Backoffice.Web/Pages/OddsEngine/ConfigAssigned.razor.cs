@@ -37,6 +37,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string SelectedScopeName { get; set; } = "";
         public bool IsPreloader { get; set; } = true;
         public bool IsEdit { get; set; } = false;
+        public int SelectedLeagueCount { get; set; }
 
         #endregion
 
@@ -151,6 +152,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 IsEdit = true;
             else
                 IsEdit = false;
+
+            SelectedLeagueCount = ConfigClients.Where(x => x.IsChecked).Count();
         }
         public async Task OnClearSelectionClickedEvent()
         {

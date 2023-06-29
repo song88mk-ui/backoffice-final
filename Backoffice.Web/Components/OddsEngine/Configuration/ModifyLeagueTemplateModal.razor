@@ -6,7 +6,11 @@
     else
     {
         <div class="container px-3 pb-4 border-bottom">
-            <p class="mb-2">Leagues Selected</p>
+            <div class="mb-2 d-flex justify-content-between">
+                <label class="text-secondary fw-bold">Leagues Selected</label>
+
+                <a href="javascript:void(0)" @onclick="OnShowAllClickedEvent">@(!IsShowAll ? "Show All" : "Show Less")</a>
+            </div>
             <div class="row league-body">
                 @if (Leagues != null && Leagues.Any())
                 {

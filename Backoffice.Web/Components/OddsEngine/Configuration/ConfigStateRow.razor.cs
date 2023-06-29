@@ -58,6 +58,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             Config.IsChecked = (bool)e.Value;
             await ItemSelectionChangedEvent.InvokeAsync();
         }
+
+        public async Task TestClickRow()
+        {
+
+        }
         #endregion
     }
 }
