@@ -5,6 +5,7 @@ using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -13,6 +14,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IJSRuntime JSRuntime { get; set; }
 
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
@@ -38,6 +40,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public bool IsPreloader { get; set; } = true;
         public bool IsEdit { get; set; } = false;
         public int SelectedLeagueCount { get; set; }
+        public bool IsSelectedLeagueShowing { get; set; } = false;
 
         #endregion
 
@@ -151,9 +154,21 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (ConfigClients.Any(x => x.IsChecked))
                 IsEdit = true;
             else
-                IsEdit = false;
+                IsEdit = false;           
 
             SelectedLeagueCount = ConfigClients.Where(x => x.IsChecked).Count();
+
+            if (SelectedLeagueCount > 0 && !IsSelectedLeagueShowing)
+            {
+                IsSelectedLeagueShowing = true;
+                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+            }
+
+            if (SelectedLeagueCount == 0)
+            {
+                IsSelectedLeagueShowing = false;
+                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+            }
         }
         public async Task OnClearSelectionClickedEvent()
         {
