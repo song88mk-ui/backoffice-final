@@ -136,7 +136,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         [HttpPost("template/{state}")] // type = assigned / unassigned
-        public async Task<IActionResult> GetConfigClients([FromRoute] string state, [FromBody] ConfigTemplateLeagueRequest payload)
+        public async Task<IActionResult> GetConfigClients([FromRoute] string state, [FromQuery] int templateId = -1, [FromBody] ConfigTemplateLeagueRequest payload = null)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
             var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
@@ -148,9 +148,16 @@ namespace Backoffice.API.Controllers.Backoffice
                 Message = "Invalid state type"
             };
 
-            if (Enum.TryParse(state, out ConfigState confState))
+            if (templateId != -1)
             {
-                result = await _backofficeRepository.GetConfigState(clientCodes, payload, confState);
+                result = await _backofficeRepository.GetConfigState(clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.Assigned, templateId);
+            }
+            else
+            {
+                if (Enum.TryParse(state, out ConfigState confState))
+                {
+                    result = await _backofficeRepository.GetConfigState(clientCodes, payload, confState);
+                }
             }
 
             switch (result.StatusCode)
