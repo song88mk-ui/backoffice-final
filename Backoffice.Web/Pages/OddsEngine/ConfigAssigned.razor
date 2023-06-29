@@ -18,7 +18,7 @@
                 <h4 class="page-title">@PageTitle</h4>
             </div>
         </div>
-        @if(IsEdit)
+        @if (IsEdit)
         {
             <div class="d-flex align-items-center justify-content-between mx-4 p-2 border">
                 <div class="col d-inline-flex align-items-center">
@@ -113,7 +113,12 @@
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
-                    <th class="index" scope="col"></th>
+
+                    <AuthorizeView Policy="sbc-config-canedit">
+                        <Authorized Context="ActivateAll">
+                            <th class="index" scope="col"></th>
+                        </Authorized>
+                    </AuthorizeView>
                     <th class="index" scope="col">No.</th>
                     <th class="filter" scope="col">Client Name</th>
                     <th class="filter" scope="col">Sport</th>
@@ -144,6 +149,13 @@
                     else
                     {
                         <tr>
+                            <AuthorizeView Policy="sbc-config-canedit">
+                                <Authorized Context="ActivateAll">
+                                </Authorized>
+                                <NotAuthorized>
+
+                                </NotAuthorized>
+                            </AuthorizeView>
                             <td colspan="7">
                                 <NoRecordFound />
                             </td>
@@ -151,7 +163,7 @@
                     }
                 }
             </tbody>
-            <Pagination MetaData="MetaData" Spread="2" SelectPageEvent="SelectedPage" PaginationColspan="7" RowInfColSpan="5"/>
+            <Pagination MetaData="MetaData" Spread="2" SelectPageEvent="SelectedPage" PaginationColspan="7" RowInfColSpan="5" />
         </table>
     </div>
 </div>

@@ -1,5 +1,4 @@
-﻿using Backoffice.API.Controllers;
-using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -25,7 +25,12 @@ namespace Backoffice.API.ActionFilter
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json").Build();
         private HttpClient _httpClient { get; set; }
+        private Claim _requiredClaim;
 
+        public AuthorizeAttribute(string claimType, string claimValue) : this()
+        {
+            _requiredClaim = new Claim(claimType, claimValue);
+        }
         public AuthorizeAttribute()
         {
             _httpClient = new HttpClient();
@@ -86,9 +91,31 @@ namespace Backoffice.API.ActionFilter
                 }
 
                 var parsed = JwtParser.ParseClaimsFromJwt(token);
+                if (_requiredClaim != null)
+                {
+                    var validClaim = parsed.FirstOrDefault(x => x.Type.ToUpper() == _requiredClaim.Type.ToUpper());
+
+                    if (validClaim == null)
+                    {
+                        context.Result = new JsonResult(new { title = "Unauthorized", message = result.Message }) { StatusCode = StatusCodes.Status401Unauthorized };
+                        return;
+                    }
+
+                    if (validClaim.Value == ((int)Access.NoAccess).ToString())
+                    {
+                        context.Result = new JsonResult(new { title = "Unauthorized", message = result.Message }) { StatusCode = StatusCodes.Status401Unauthorized };
+                        return;
+                    }
+                    if (_requiredClaim.Value == ((int)Access.Edit).ToString() && (validClaim.Value == ((int)Access.View).ToString()))
+                    {
+                        context.Result = new JsonResult(new { title = "Unauthorized", message = result.Message }) { StatusCode = StatusCodes.Status401Unauthorized };
+                        return;
+                    }
+                }
+
                 context.HttpContext.Items["UserToken"] = token;
                 context.HttpContext.Items["UserId"] = parsed.Where(x => x.Type.ToUpper() == "UserId".ToUpper()).FirstOrDefault()?.Value.ToString();
-                context.HttpContext.Items["UserIdRef"]  = parsed.Where(x => x.Type.ToUpper() == "UserIdRef".ToUpper()).FirstOrDefault()?.Value.ToString();
+                context.HttpContext.Items["UserIdRef"] = parsed.Where(x => x.Type.ToUpper() == "UserIdRef".ToUpper()).FirstOrDefault()?.Value.ToString();
                 context.HttpContext.Items["ClientCodes"] = parsed.Where(x => x.Type.ToUpper() == "ClientCodes".ToUpper()).FirstOrDefault()?.Value.ToString();
             }
             catch (Exception ex)
@@ -125,7 +152,7 @@ namespace Backoffice.API.ActionFilter
                         };
                     }
                 }
-            } 
+            }
             catch (Exception ex)
             {
                 return new BaseResponse<TokenModel>
