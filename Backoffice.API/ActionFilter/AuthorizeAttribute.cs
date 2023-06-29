@@ -27,7 +27,7 @@ namespace Backoffice.API.ActionFilter
         private HttpClient _httpClient { get; set; }
         private Claim _requiredClaim;
 
-        public AuthorizeAttribute(string claimType, string claimValue) : this()
+        public AuthorizeAttribute(string claimType, int claimValue) : this()
         {
             _requiredClaim = new Claim(claimType, claimValue);
         }
