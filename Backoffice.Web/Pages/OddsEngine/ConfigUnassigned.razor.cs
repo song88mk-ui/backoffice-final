@@ -166,7 +166,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 payload.SearchText = filter.SearchText;
             }
             payload.MetaData = MetaData;
-            var response = await BackOfficeService.GetConfigClient(ConfigState.Unsigned, payload);
+            var response = await BackOfficeService.GetConfigClient(ConfigState.UnAssigned, payload);
 
             if (response.StatusCode == StatusCode.Success)
             {

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net.Mail;
 using System.Text.Json;
@@ -1528,7 +1529,7 @@ namespace Backoffice.API.Repositories
                                     context.SaveChanges();
                                 }
                                 break;
-                            case ConfigState.Unsigned:
+                            case ConfigState.UnAssigned:
                                 context.ConfigTemplateAssigned.RemoveRange(configs);
                                 context.SaveChanges();
                                 break;
@@ -1611,6 +1612,7 @@ namespace Backoffice.API.Repositories
                         result = query.Select(x => new ConfigClientModel()
                         {
                             Id = x.Id,
+                            ClientId = x.ClientId.ToString(),
                             ClientCode = x.ClientCode,
                             ClientName = x.ClientName,
                             SportId = x.SportId,
@@ -1625,7 +1627,7 @@ namespace Backoffice.API.Repositories
                             TemplateName = templates.Where(cl => cl.Id == x.ConfigTemplateId).Select(x => x.Name).FirstOrDefault()
                         }).ToList();
                         break;
-                    case ConfigState.Unsigned:
+                    case ConfigState.UnAssigned:
                         query = query.ToList();
                         var fixtureStatusIds = new List<int>() { (int)FixtureStatus.Prematch, (int)FixtureStatus.Live };
 
@@ -1721,38 +1723,43 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount(List<string> clientCodes)
+        public async Task<BaseResponse<int>> GetTemplateConfigCount(List<string> clientCodes, string state)
         {
             try
             {
-                var configTemplate = await GetConfigTemplates();
-                var templates = configTemplate.Result;
-                var myConfiTemplates = templates.Count();
-                var assignedConfig = await GetConfigState(clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.Assigned);
-                var assignedTemplates = assignedConfig.Result.ClientConfigs.Count();
-                var unassignedConfig = await GetConfigState(clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.Unsigned);
-                var unassignedTemplates = unassignedConfig.Result.ClientConfigs.Count();
+                var count = 0;
+                if (state.ToUpper() == ConfigState.Assigned.ToString().ToUpper())
+                {
+                    var assignedConfig = await GetConfigState(clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.Assigned);
+                    count = assignedConfig.Result.ClientConfigs.Count();
+                }
+                else if (state.ToUpper() == ConfigState.UnAssigned.ToString().ToUpper())
+                {
+                    var unassignedConfig = await GetConfigState(clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.UnAssigned);
+                    count = unassignedConfig.Result.ClientConfigs.Count();
+                }
+                else
+                {
+                    var configTemplate = await GetConfigTemplates();
+                    var templates = configTemplate.Result;
+                    count = templates.Count();
+                }
 
-                return new BaseResponse<TemplateConfigCount>
+                return new BaseResponse<int>
                 {
                     StatusCode = StatusCode.Success,
                     Message = StatusCode.Success.ToString(),
-                    Result = new TemplateConfigCount()
-                    {
-                        MyTemplatesCount = myConfiTemplates,
-                        AssignedTemplatesCount = assignedTemplates,
-                        UnAssignedTemplatesCount = unassignedTemplates
-                    }
+                    Result = count
                 };
             }
             catch (Exception ex)
             {
 
-                return new BaseResponse<TemplateConfigCount>()
+                return new BaseResponse<int>()
                 {
                     StatusCode = StatusCode.Error,
                     Message = ex.Message,
-                    Result = null
+                    Result = -1
                 };
             }
         }

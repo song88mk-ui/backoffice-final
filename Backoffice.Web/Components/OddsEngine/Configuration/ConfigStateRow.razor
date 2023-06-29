@@ -7,5 +7,5 @@
     <td class="px-4">@Config.SportName</td>
     <td class="px-4">@Config.FixtureStatusName</td>
     <td class="px-4">@Config.LeagueName</td>
-    <td class="@(State == ConfigState.Unsigned ? "template-name-italic" : "") px-4">@(Config.TemplateId == -1 ? "No template assigned" : Config.TemplateName)</td>
+    <td class="@(State == ConfigState.UnAssigned ? "template-name-italic" : "") px-4">@(Config.TemplateId == -1 ? "No template assigned" : Config.TemplateName)</td>
 </tr>

@@ -182,7 +182,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     ModalService.Open<ModifyLeagueTemplateModal>($"Change Template", parameters, options);
                     break;
-                case ConfigState.Unsigned:
+                case ConfigState.UnAssigned:
                     ModalService.Open<ModifyLeagueTemplateModal>($"Assign Template", parameters, options);
                     break;
             }

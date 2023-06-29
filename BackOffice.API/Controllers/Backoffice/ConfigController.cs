@@ -162,12 +162,12 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         [HttpGet("template/count")]
-        public async Task<IActionResult> GetTemplateConfigCount()
+        public async Task<IActionResult> GetTemplateConfigCount([FromQuery] string state = "")
         {
             var userId = HttpContext.Items["UserId"].ToString();
             var clientCodes = HttpContext.Items["ClientCodes"].ToString().Split(',').ToList();
 
-            var result = await _backofficeRepository.GetTemplateConfigCount(clientCodes);
+            var result = await _backofficeRepository.GetTemplateConfigCount(clientCodes, state);
 
             switch (result.StatusCode)
             {

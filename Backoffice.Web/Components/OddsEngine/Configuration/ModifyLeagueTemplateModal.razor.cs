@@ -97,7 +97,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 }
                 else
                 {
-                    var response = await BackOfficeService.SetLeagueState(ConfigState.Unsigned, new ConfigSetLeagueStateRequest()
+                    var response = await BackOfficeService.SetLeagueState(ConfigState.UnAssigned, new ConfigSetLeagueStateRequest()
                     {
                         TemplateId = SelectedItem.Value,
                         Leagues = leagueRequest

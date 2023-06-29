@@ -1502,19 +1502,20 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount()
+        public async Task<BaseResponse<int>> GetTemplateConfigCount(string state = "")
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/config/template/count");
+                var query = string.IsNullOrEmpty(state) ? "" : $"?state={state}";
+                var response = await _httpClient.GetAsync($"api/config/template/count{query}");
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return JsonSerializer.Deserialize<BaseResponse<TemplateConfigCount>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<TemplateConfigCount>();
+                    return JsonSerializer.Deserialize<BaseResponse<int>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<int>();
                 }
                 else
                 {
-                    return new BaseResponse<TemplateConfigCount>
+                    return new BaseResponse<int>
                     {
                         StatusCode = StatusCode.Error,
                         Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -1523,7 +1524,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                return new BaseResponse<TemplateConfigCount>
+                return new BaseResponse<int>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

@@ -51,7 +51,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<bool>> SetLeagueState(ConfigState state, ConfigSetLeagueStateRequest payload);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(long id);
         Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload);
-        Task<BaseResponse<TemplateConfigCount>> GetTemplateConfigCount();
+        Task<BaseResponse<int>> GetTemplateConfigCount(string state = "");
         Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(long configTemplateId);
 
         #endregion
