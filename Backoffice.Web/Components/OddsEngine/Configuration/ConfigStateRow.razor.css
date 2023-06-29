@@ -6,3 +6,7 @@
     font-style: italic;
     color: #ACACAC;
 }
+
+.table-active {
+    background-color: #EEF6FF;
+}

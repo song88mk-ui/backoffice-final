@@ -62,7 +62,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 new BreadcrumbModel
                 {
                     Name = "Config",
-                    Url = $"hk/odds-engine/config/my-templates",
+                    Url = $"hk/odds-engine/config-templates",
                     IsCurrentPage = false
                 }                
             };
