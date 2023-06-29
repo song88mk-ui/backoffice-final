@@ -8,15 +8,15 @@
         <div class="d-flex filter-controls">
             <div>
                 <button class="form-select dropdown-toggle" type="button" id="market-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    @if (EditConfigTemplateFilterModel.Markets.Any())
+                    @if (EditConfigTemplateFilterModel.MarketGroups.Any())
                     {
-                        if (EditConfigTemplateFilterModel.Markets.Count - 1 == EditConfigTemplateFilterModel.SelectedMarketCount)
+                        if (EditConfigTemplateFilterModel.MarketGroups.Count - 1 == EditConfigTemplateFilterModel.SelectedMarketCount)
                         {
                             <span>All Markets</span>
                         }
                         else
                         {
-                            <span>@(EditConfigTemplateFilterModel.SelectedMarketCount == 1 ? EditConfigTemplateFilterModel.SelectedMarkets.FirstOrDefault() : $"Markets ({EditConfigTemplateFilterModel.SelectedMarketCount})")</span>
+                            <span>@(EditConfigTemplateFilterModel.SelectedMarketCount == 1 ? EditConfigTemplateFilterModel.MarketGroups.FirstOrDefault(f => f.Value == EditConfigTemplateFilterModel.SelectedMarkets.FirstOrDefault()) : $"Markets ({EditConfigTemplateFilterModel.SelectedMarketCount})")</span>
                         }
                     }
                     else
@@ -24,9 +24,9 @@
                         <span>No Markets Available</span>
                     }
                 </button>
-                @if (EditConfigTemplateFilterModel.Markets.Any())
+                @if (EditConfigTemplateFilterModel.MarketGroups.Any())
                 {
-                    <SelectWithCheckbox Items="EditConfigTemplateFilterModel.Markets" OnCheckboxCallback="OnMarketCheckboxClickEvent" AriaLabel="market-dropdown" />
+                    <SelectWithCheckbox Items="EditConfigTemplateFilterModel.MarketGroups" OnCheckboxCallback="OnMarketCheckboxClickEvent" AriaLabel="market-dropdown" />
                 }
             </div>
 
@@ -40,7 +40,7 @@
                         }
                         else
                         {
-                            <span>@(EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1 ? EditConfigTemplateFilterModel.SelectedConfigStatus.FirstOrDefault() : $"Config Status ({EditConfigTemplateFilterModel.SelectedConfigStatusCount})")</span>
+                            <span>@(EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1 ? EditConfigTemplateFilterModel.ConfigStatuses.FirstOrDefault(f => f.Value == EditConfigTemplateFilterModel.SelectedConfigStatus.FirstOrDefault() : $"Config Status ({EditConfigTemplateFilterModel.SelectedConfigStatusCount})")</span>
                         }
                     }
                     else
