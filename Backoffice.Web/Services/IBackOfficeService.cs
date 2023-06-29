@@ -50,7 +50,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
         Task<BaseResponse<bool>> SetLeagueState(ConfigState state, ConfigSetLeagueStateRequest payload);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(long id);
-        Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload);
+        Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload, int templateId= -1);
         Task<BaseResponse<int>> GetTemplateConfigCount(string state = "");
         Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(long configTemplateId);
 

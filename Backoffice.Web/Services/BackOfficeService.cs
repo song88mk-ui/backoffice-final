@@ -1331,7 +1331,7 @@ namespace Backoffice.Web.Services
                     queries.Add($"sportId={sportId}");
                 if (scopeId != -1)
                     queries.Add($"scopeId={scopeId}");
-                if (queries !=null && queries.Any() && queries.Count > 0)
+                if (queries != null && queries.Any() && queries.Count > 0)
                 {
                     path += $"?{string.Join("&", queries)}";
                 }
@@ -1466,11 +1466,12 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload)
+        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload, int templateId = -1)
         {
             try
             {
-                var response = await _httpClient.PostAsync($"api/config/template/{state.ToString()}", new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"));
+                var query = templateId != -1 ? $"?templateId={templateId}" : "";
+                var response = await _httpClient.PostAsync($"api/config/template/{state.ToString()}{query}", new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                 {

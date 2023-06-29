@@ -1,76 +1,27 @@
 ﻿<div class="modal-body">
     <div class="accordion" id="viewAssignedAccordion">
 
-        @*WIP*@
-        @*@foreach(var client in ConfigTemplateModel.ClientCodes)
+        @foreach(var client in Leagues.Select(x => x.ClientCode).Distinct().ToList())
         {
             <div class="accordion-item">
-                <h2 class="accordion-header" id="@($"{client}-header")">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="@($"#{client}Collapse")" aria-expanded="true" aria-controls="@($"{client}Collapse")">
+                <h2 class="accordion-header" id="header2">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                         @client
                     </button>
                 </h2>
 
-                <div id="" class="accordion-collapse collapse show" aria-labelledby="">
+                <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="header2">
                     <div class="accordion-body">
                         <ul class="list-group">
-                            @foreach()
+                            @foreach (var item in Leagues.Where(x => x.ClientCode == client).ToList())
+                            {
+                                <li class="list-group-item">@item.LeagueName</li>
+                            }
                         </ul>
-                    <div>
-                </div>
-
-            </div>
-        }*@
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="header1">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    10 Cric India
-                </button>
-            </h2>
-
-            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="header1">
-                <div class="accordion-body">
-                    <ul class="list-group">
-                        <li class="list-group-item">Bangladesh League</li>
-                        <li class="list-group-item">Premier League</li>
-                    </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="header2">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                    10 Bet Japan
-                </button>
-            </h2>
-
-            <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="header2">
-                <div class="accordion-body">
-                    <ul class="list-group">
-                        <li class="list-group-item">League One</li>
-                        <li class="list-group-item">League Two</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="header3">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
-                    10 Bet DRC
-                </button>
-            </h2>
-
-            <div id="collapseThree" class="accordion-collapse collapse show" aria-labelledby="header3">
-                <div class="accordion-body">
-                    <ul class="list-group">
-                        <li class="list-group-item">Championship</li>                        
-                    </ul>
-                </div>
-            </div>
-        </div>
+        }
     </div>
 </div>
 <div class="modal-footer">

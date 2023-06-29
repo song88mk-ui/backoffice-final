@@ -1367,13 +1367,19 @@ namespace Backoffice.API.Repositories
                     query = query.Where(x => scopeIds.Contains(x.FixtureTypeId));
                 }
 
-                var result = query.ToList().Select(x => new ConfigTemplateModel()
+                var result = query.ToList().Select(x =>
                 {
-                    Id = x.Id,
-                    Name = x.Name,
-                    SportId = x.SportId,
-                    FixtureTypeId = x.FixtureTypeId,
-                    Timestamp = x.Timestamp
+                    var leagues = _backofficeContext.ConfigTemplateAssigned.Where(p => p.ConfigTemplateId == x.Id).AsNoTracking().ToList();
+                    return new ConfigTemplateModel()
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        SportId = x.SportId,
+                        FixtureTypeId = x.FixtureTypeId,
+                        Timestamp = x.Timestamp,
+                        ClientsCount = leagues.Select(x => x.ClientCode).Distinct().Count(),
+                        LeaguesCount = leagues.Select(x => x.LeagueId).Distinct().Count(),
+                    };
                 }).ToList();
 
                 return new BaseResponse<List<ConfigTemplateModel>>()
@@ -1570,15 +1576,26 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<List<ConfigTemplateModel>>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
             }
         }
-        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest request, ConfigState configState)
+        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1)
         {
             try
             {
                 var result = new List<ConfigClientModel>();
-                var configTemplate = await GetConfigTemplates(sportIds: request.SportId != -1 ? new List<int>() { request.SportId } : null, scopeIds: request.ScopeId != -1 ? new List<int>() { request.ScopeId } : null);
-                var templates = configTemplate.Result;
+
+                var templates = new List<ConfigTemplateModel>();
+                if (templateId != -1)
+                {
+                    var configTemplate = await GetConfigTemplateById(templateId);
+                    templates = new List<ConfigTemplateModel>() { configTemplate.Result };
+                }
+                else
+                {
+                    var configTemplate = await GetConfigTemplates(sportIds: payload.SportId != -1 ? new List<int>() { payload.SportId } : null, scopeIds: payload.ScopeId != -1 ? new List<int>() { payload.ScopeId } : null);
+                    templates = configTemplate.Result;
+                }
+
                 var clientList = GetTradingClientInformation();
-                var metaData = request.MetaData;
+                var metaData = payload.MetaData;
 
                 if (clientCodes.Count() == 1)
                 {
@@ -1588,21 +1605,21 @@ namespace Backoffice.API.Repositories
                     }
                 }
 
-                if (request.ClientCodes.Any())
+                if (payload.ClientCodes.Any())
                 {
-                    clientCodes = clientCodes.Where(x => request.ClientCodes.ToList().Contains(x)).Select(x => x.ToUpper()).ToList();
+                    clientCodes = clientCodes.Where(x => payload.ClientCodes.ToList().Contains(x)).Select(x => x.ToUpper()).ToList();
                 }
 
                 var query = _backofficeContext.ConfigTemplateAssigned.ToList().Where(x => templates.Any(template => template.Id == x.ConfigTemplateId) && clientCodes.Contains(x.ClientCode.ToUpper()));
 
-                if (request.SportId != -1)
+                if (payload.SportId != -1)
                 {
-                    query = query.Where(x => x.SportId == request.SportId);
+                    query = query.Where(x => x.SportId == payload.SportId);
                 }
 
-                if (!string.IsNullOrEmpty(request.SearchText))
+                if (!string.IsNullOrEmpty(payload.SearchText))
                 {
-                    query = query.Where(x => x.ClientName.ToLower().Contains(request.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(request.SearchText.ToLower()));
+                    query = query.Where(x => x.ClientName.ToLower().Contains(payload.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(payload.SearchText.ToLower()));
                 }
                 #region OLD CODE
                 switch (configState)
@@ -1631,7 +1648,7 @@ namespace Backoffice.API.Repositories
                         query = query.ToList();
                         var fixtureStatusIds = new List<int>() { (int)FixtureStatus.Prematch, (int)FixtureStatus.Live };
 
-                        var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup(request.SportId == -1 ? "" : string.Join(',', request.SportId));
+                        var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup(payload.SportId == -1 ? "" : string.Join(',', payload.SportId));
                         if (leagueLookupResponse.Result != null)
                         {
                             var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
@@ -1646,9 +1663,9 @@ namespace Backoffice.API.Repositories
                                 {
                                     var league = leagues[y];
 
-                                    var fixtures = new List<int>() { request.ScopeId };
+                                    var fixtures = new List<int>() { payload.ScopeId };
 
-                                    if (request.ScopeId == -1)
+                                    if (payload.ScopeId == -1)
                                     {
                                         var template = templates.Where(x => query.Any(q => q.ConfigTemplateId == x.Id)).ToList();
 
@@ -1681,9 +1698,9 @@ namespace Backoffice.API.Repositories
                             }
                         }
 
-                        if (!string.IsNullOrEmpty(request.SearchText))
+                        if (!string.IsNullOrEmpty(payload.SearchText))
                         {
-                            result = result.Where(x => x.ClientName.ToLower().Contains(request.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(request.SearchText.ToLower())).ToList();
+                            result = result.Where(x => x.ClientName.ToLower().Contains(payload.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(payload.SearchText.ToLower())).ToList();
                         }
                         break;
 

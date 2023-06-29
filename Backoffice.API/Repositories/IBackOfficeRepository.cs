@@ -25,7 +25,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<bool>> SetConfigState(ConfigState configState, ConfigSetLeagueStateRequest request);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string id);
         Task<BaseResponse<int>> GetTemplateConfigCount(List<string> clientCodes, string state);
-        Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState);
+        Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1);
         #endregion
 
         #region TOP FIXTURES

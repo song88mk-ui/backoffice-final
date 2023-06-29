@@ -90,47 +90,47 @@
                 }
                 else
                 {
-                @if (ConfigTemplates != null && ConfigTemplates.Any())
-                {
-                    foreach (var configTemplate in ConfigTemplates)
+                    @if (ConfigTemplates != null && ConfigTemplates.Any())
+                    {
+                        foreach (var configTemplate in ConfigTemplates)
+                        {
+                            var isReadOnly = !(configTemplate.ClientsCount > 0 && configTemplate.LeaguesCount > 0);
+                            <tr>
+                                <th scope="row">@configTemplate.Name</th>
+                                <td>@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()) != null ? $"{Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()).Name}" : "")</td>
+                                <td>@(((FixtureStatus)configTemplate.FixtureTypeId).ToString())</td>
+                                <td class="text-center">@($"{configTemplate.ClientsCount} Client{(configTemplate.ClientsCount > 1 ? "s": "")}")</td>
+                                <td class="text-center">@($"{configTemplate.LeaguesCount} League{(configTemplate.LeaguesCount > 1 ? "s" : "")}")</td>
+                                <td class="text-center">@(configTemplate.Timestamp.ToString("hh:mm dd/mm/yyyy"))</td>
+                                <td>
+                                    <div class="manage-cell">
+                                        <a href="javascript:void(0)" @onclick="() => OnEditTemplateClickEvent(configTemplate)" title="Edit Template">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+
+                                        <a href="javascript:void(0)" @onclick="() => OnDeleteTemplateClickEvent(configTemplate)" title="Delete Template">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+
+                                        <a href="javascript:void(0)" @onclick="OnExportTemplateClickEvent" title="Export Template">
+                                            <i class="fa fa-file-archive-o"></i>
+                                        </a>
+                                        <a href="javascript:void(0)" @onclick="() => OnViewAssignedClickEvent(configTemplate)" title="View Assigned" class="@(isReadOnly ? "disabled" : "")">
+                                            <i class="fa fa-list"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <th scope="row">@configTemplate.Name</th>
-                            <td>@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()) != null ? $"{Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()).Name}" : "")</td>
-                            <td>@(((FixtureStatus)configTemplate.FixtureTypeId).ToString())</td>
-                            <td class="text-center">@($"0 Client")</td>
-                            <td class="text-center">@($"0 League")</td>
-                            <td class="text-center">@(configTemplate.Timestamp.ToString("hh:mm dd/mm/yyyy"))</td>
-                            <td>
-                                <div class="manage-cell">
-                                    <a href="javascript:void(0)" @onclick="() => OnEditTemplateClickEvent(configTemplate)" title="Edit Template">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-
-                                    <a href="javascript:void(0)" @onclick="() => OnDeleteTemplateClickEvent(configTemplate)" title="Delete Template">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-
-                                    <a href="javascript:void(0)" @onclick="OnExportTemplateClickEvent" title="Export Template">
-                                        <i class="fa fa-file-archive-o"></i>
-                                    </a>
-
-                                    <a href="javascript:void(0)" @onclick="() => OnViewAssignedClickEvent(configTemplate)" title="View Assigned">
-                                        <i class="fa fa-list"></i>
-                                    </a>
-                                </div>
+                            <td colspan="7">
+                                <NoRecordFound />
                             </td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="7">
-                            <NoRecordFound />
-                        </td>
-                    </tr>
-                }
                 }
 
             </tbody>

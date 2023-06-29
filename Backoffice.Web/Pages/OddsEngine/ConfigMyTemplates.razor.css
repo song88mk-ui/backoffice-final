@@ -16,6 +16,10 @@
     gap: 2rem;
     flex-basis: 25%;
 }
+a.disabled {
+    pointer-events: none;
+    color: #d3d3d3 !important;
+}
 
 .btn-create {
     color: white;
