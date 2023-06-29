@@ -9,7 +9,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         [Parameter] public MarketLookupNavigationModel Market { get; set; }
         //[Parameter] public EventCallback<MarketLookupNavigationModel> OnMarketChangedCallback { get; set; }
-        [Parameter] public string FilterConfigStatus { get; set; }
+        [Parameter] public List<string> FilterConfigStatus { get; set; }
         [Parameter] public int Scope { get; set; }
         
 
