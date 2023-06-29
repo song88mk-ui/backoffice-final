@@ -31,7 +31,7 @@ namespace Backoffice.Web.Components.Common
         {
             SelectedItem = new SelectListItemModel<long>()
             {
-                Value = -2,
+                Value = -1,
                 Name = "Remove Current Template"
             };
             OnSelectionCallback.InvokeAsync(SelectedItem);

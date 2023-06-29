@@ -147,7 +147,8 @@
                     {
                         foreach (var config in ConfigClients)
                         {
-                            <ConfigStateRow State="State" Index="@(ConfigClients.IndexOf(config) + 1)" Config="config" ItemSelectionChangedEvent="@OnConfigSelectionChanged" />
+                            var index = (ConfigClients.IndexOf(config) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                            <ConfigStateRow State="State" Index="@index" Config="config" ItemSelectionChangedEvent="@OnConfigSelectionChanged" />
                         }
                     }
                     else

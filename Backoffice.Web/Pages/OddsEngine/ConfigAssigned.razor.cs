@@ -58,7 +58,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 ClientCodes = Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
                 ScopeId = int.Parse(Scopes.FirstOrDefault().Value),
+                ScopeName = Scopes.FirstOrDefault().Name,
                 SportId = int.Parse(Sports.FirstOrDefault().Value),
+                SportName = Sports.FirstOrDefault().Name,
                 SearchText = SearchForm.SearchText
             };
             SelectedClientCount = (Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>()).Count();
@@ -106,6 +108,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (e != null)
             {
                 FilterModel.SportId = int.Parse((e == null ? Sports.FirstOrDefault().Value : e.Value.ToString()));
+                FilterModel.SportName = e == null ? Sports.FirstOrDefault().Name : Sports.FirstOrDefault(x => x.Value == e.Value.ToString()).Name;
             }
             await LoadLeagues(FilterModel);
         }
@@ -119,6 +122,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (e != null)
             {
                 FilterModel.ScopeId = int.Parse((e == null ? Scopes.FirstOrDefault().Value : e.Value.ToString()));
+                FilterModel.ScopeName = e == null ? Scopes.FirstOrDefault().Name : Scopes.FirstOrDefault(x => x.Value == e.Value.ToString()).Name;
             }
             await LoadLeagues(FilterModel);
         }
@@ -142,7 +146,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 ClientCodes = Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
                 ScopeId = int.Parse(Scopes.FirstOrDefault().Value),
+                ScopeName = Scopes.FirstOrDefault().Name,
                 SportId = int.Parse(Sports.FirstOrDefault().Value),
+                SportName = Sports.FirstOrDefault().Name,
                 SearchText = SearchForm.SearchText
             };
             SelectedClientCount = (Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>()).Count();
@@ -188,7 +194,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Leagues", leagues);
             parameters.Add("State", State);
             parameters.Add("SportId", FilterModel.SportId);
+            parameters.Add("SportName", FilterModel.SportName);
             parameters.Add("ScopeId", FilterModel.ScopeId);
+            parameters.Add("Scopename", FilterModel.ScopeName);
             parameters.Add("Region", Region);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
@@ -197,7 +205,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             switch (State)
             {
                 case ConfigState.Assigned:
-
                     ModalService.Open<ModifyLeagueTemplateModal>($"Change Template", parameters, options);
                     break;
                 case ConfigState.UnAssigned:

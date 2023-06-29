@@ -12,6 +12,17 @@ table thead {
     background-color: #354156;
 }
 
+div.league-state-edit {
+    visibility: hidden;
+    height: 0;
+    transition: height 0.5s;
+}
+
+div.league-state-edit.active {
+    visibility: visible;
+    height: fit-content;
+}
+
 .btn-change-template {
     color: white;
     font-weight: 500;
@@ -64,11 +75,13 @@ th.index {
     padding-right: 1.5rem !important;
     padding-left: 1.5rem !important;
 }
+
 th.filter {
     width: 12vw;
     padding-right: 1.5rem !important;
     padding-left: 1.5rem !important;
 }
+
 th.template {
     width: 26vw;
     padding-right: 1.5rem !important;

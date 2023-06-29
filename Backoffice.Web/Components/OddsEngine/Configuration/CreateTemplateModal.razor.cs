@@ -1,8 +1,10 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -15,10 +17,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
 
         [Parameter] public EventCallback<bool> CreateTemplateCallback { get; set; }
-
+        [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public List<SelectListItemModel<int>> Sports { get; set; }
+        public List<SelectListItemModel<int>> Scopes { get; set; }
 
         public int SelectedSportId { get; set; }
         public int SelectedScopeId { get; set; }
@@ -32,10 +35,23 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         protected override async Task OnInitializedAsync()
         {
             Sports = new List<SelectListItemModel<int>>();
+            Scopes = new List<SelectListItemModel<int>>()
+            {
+                new SelectListItemModel<int>()
+                {
+                    Value = (int)Scope.Prematch,
+                    Name = Scope.Prematch.ToString()
+                },
+                new SelectListItemModel<int>()
+                {
+                    Value = (int)Scope.Live,
+                    Name = Scope.Live.ToString()
+                }
+            };
 
             Sports = await LoadSports();
             SelectedSportId = Sports.FirstOrDefault()?.Value ?? -1;
-            SelectedScopeId = 0;
+            SelectedScopeId = 1;
         }
 
         public async Task OnSportSelectChanged(ChangeEventArgs e)
@@ -56,17 +72,31 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public async Task OnSaveClickEvent()
         {
             IsConfigNameExisting = false;
-
-            var response = await BackOfficeService.AddOrUpdateConfigTemplate(new ConfigTemplateModel()
+            var payload = new ConfigTemplateModel()
             {
                 SportId = SelectedSportId,
                 FixtureTypeId = SelectedScopeId,
-                Name = TemplateName,                
-            });
+                Name = TemplateName,
+            };
+
+            var response = await BackOfficeService.AddOrUpdateConfigTemplate(payload);
 
             if (response.StatusCode == StatusCode.Success)
-            {                
-                await CreateTemplateCallback.InvokeAsync(true);
+            {
+                var activityLog = new ActivityLogModel()
+                {
+                    Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
+                    Payload = $"{Sports.FirstOrDefault(x => x.Value == SelectedSportId)?.Name}.{Scopes.FirstOrDefault(x => x.Value == SelectedSportId)?.Name}.{payload.Name}.T",
+                    From = "-",
+                    To = JsonSerializer.Serialize(payload),
+                    Activity = Activity.Create.ToString(),
+                    UserId = UserModel.Id,
+                    UserName = UserModel.UserName,
+                    TimeStamp = DateTime.UtcNow
+                };
+                await BackOfficeService.AddActivityLog(activityLog);
+
+                await Modal.OnSaveClickCallback.InvokeAsync(true);
                 ModalService.Cancel();
             }
             else

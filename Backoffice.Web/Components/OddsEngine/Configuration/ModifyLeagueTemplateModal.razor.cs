@@ -5,7 +5,9 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using RabbitMQ.Client.Apigen.Attributes;
+using System.Security.Claims;
+using System.Text.Json;
+using System.Threading;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -29,6 +31,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private ConfigState State = ConfigState.Assigned;
         private bool IsPreLoader = false;
         private bool IsShowAll = false;
+        private string ActivityLogPayload = "";
         #endregion
 
         #region Methods
@@ -43,7 +46,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             Leagues = ModalParameters.TryGet<List<ConfigClientViewModel>>("Leagues");
             State = ModalParameters.TryGet<ConfigState>("State");
             var sportId = ModalParameters.TryGet<int>("SportId");
+            var sportName = ModalParameters.TryGet<string>("SportName");
             var scopeId = ModalParameters.TryGet<int>("ScopeId");
+            var scopeName = ModalParameters.TryGet<string>("ScopeName");
+            ActivityLogPayload = $"{sportName}.{scopeName}";
             Templates = await Gettemplates(sportId, scopeId);
         }
 
@@ -90,25 +96,72 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     TemplateId = x.TemplateId,
                     TemplateName = x.TemplateName
                 }).ToList();
+                var state = ConfigState.UnAssigned;
 
                 if (SelectedItem.Value > 0)
                 {
-                    var response = await BackOfficeService.SetLeagueState(ConfigState.Assigned, new ConfigSetLeagueStateRequest()
-                    {
-                        TemplateId = SelectedItem.Value,
-                        Leagues = leagueRequest
-                    });
-                }
-                else
-                {
-                    var response = await BackOfficeService.SetLeagueState(ConfigState.UnAssigned, new ConfigSetLeagueStateRequest()
-                    {
-                        TemplateId = SelectedItem.Value,
-                        Leagues = leagueRequest
-                    });
+                    state = ConfigState.Assigned;
                 }
 
-                await Modal.OnSaveClickCallback.InvokeAsync();
+                var response = await BackOfficeService.SetLeagueState(state, new ConfigSetLeagueStateRequest()
+                {
+                    TemplateId = SelectedItem.Value,
+                    Leagues = leagueRequest
+                });
+
+                if (response.StatusCode == StatusCode.Success)
+                {
+                    var distinctTemplates = Leagues.Select(x => new
+                    {
+                        Id = x.TemplateId.ToString(),
+                        Name = x.TemplateName
+                    }).Distinct().ToList();
+
+                    var cancellationTokenSource = new CancellationTokenSource();
+
+                    Parallel.ForEach(distinctTemplates, async (item) =>
+                    {
+                        var leagues = Leagues.Where(x => x.TemplateId.ToString() == item.Id).ToList();
+
+                        var from = "";
+                        var to = "";
+                        from = JsonSerializer.Serialize(new ConfigTemplateActivityLogModel()
+                        {
+                            TemplateName = item.Id != "-1" ? item.Name : "Unassigned",
+                            Payloads = leagueRequest.Select(x => new ConfigTemplateActivityLogPayloadModel()
+                            {
+                                Clients = leagues.Select(x => x.ClientName).Distinct().ToList(),
+                                Leagues = leagues.Select(x => x.LeagueName).Distinct().ToList()
+                            }).ToList()
+                        });
+                        to = JsonSerializer.Serialize(new ConfigTemplateActivityLogModel()
+                        {
+                            TemplateName = SelectedItem.Value.ToString() != "-1" ? SelectedItem.Name : "Unassigned",
+                            Payloads = leagueRequest.Select(x => new ConfigTemplateActivityLogPayloadModel()
+                            {
+                                Clients = new List<string>(),
+                                Leagues = new List<string>()
+                            }).ToList()
+                        });
+
+                        var activityLog = new ActivityLogModel()
+                        {
+                            Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
+                            Payload = $"{ActivityLogPayload}.{SelectedItem.Name}.T",
+                            From = from,
+                            To = to,
+                            Activity = Activity.Update.ToString(),
+                            UserId = UserModel.Id,
+                            UserName = UserModel.UserName,
+                            TimeStamp = DateTime.UtcNow
+                        };
+
+                        await BackOfficeService.AddActivityLog(activityLog);
+                    });
+
+                    await Modal.OnSaveClickCallback.InvokeAsync();
+                }
+
             }
 
             IsPreLoader = true;
