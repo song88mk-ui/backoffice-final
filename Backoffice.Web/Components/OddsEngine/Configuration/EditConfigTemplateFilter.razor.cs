@@ -37,26 +37,16 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnMarketCheckboxClickEvent(Dictionary<string, string> items)
         {
-            EditConfigTemplateFilterModel.SelectedMarketName = string.Empty;
+            EditConfigTemplateFilterModel.SelectedMarkets = items.Any() ? items.Where(i => i.Value != "all").Select(i => i.Value).ToList() : new List<string>();
             EditConfigTemplateFilterModel.SelectedMarketCount = items.Count;
-
-            if (EditConfigTemplateFilterModel.SelectedMarketCount == 1)
-            {
-                EditConfigTemplateFilterModel.SelectedMarketName = items.FirstOrDefault().Value;
-            }
 
             await EditConfigTemplateFilterCallback.InvokeAsync(EditConfigTemplateFilterModel);
         }
 
         public async Task OnConfigCheckboxClickEvent(Dictionary<string, string> items)
         {
-            EditConfigTemplateFilterModel.SelectedConfigStatusName = string.Empty;
+            EditConfigTemplateFilterModel.SelectedConfigStatus = items.Any() ? items.Where(i => i.Value != "all").Select(i => i.Value).ToList() : new List<string>();
             EditConfigTemplateFilterModel.SelectedConfigStatusCount = items.Count;
-
-            if (EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1)
-            {
-                EditConfigTemplateFilterModel.SelectedConfigStatusName = items.FirstOrDefault().Value;
-            }
 
             await EditConfigTemplateFilterCallback.InvokeAsync(EditConfigTemplateFilterModel);
         }
@@ -86,32 +76,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var selectedMarkets = EditConfigTemplateFilterModel.Markets.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
 
             EditConfigTemplateFilterModel.SelectedMarketCount = selectedMarkets.Count;
-            EditConfigTemplateFilterModel.SelectedMarketName = EditConfigTemplateFilterModel.SelectedMarketCount > 0 ? string.Empty : EditConfigTemplateFilterModel.Markets.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+            EditConfigTemplateFilterModel.SelectedMarkets = EditConfigTemplateFilterModel.SelectedMarketCount > 0 ? EditConfigTemplateFilterModel.Markets.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList() : new List<string>();
 
-            //var response = (await TradingService.GetLeagueLookup(21, 0)).Result;
-
-            //if (response != null && response.LeagueLookup.Any())
-            //{
-            //    Leagues = response.LeagueLookup.Select(e =>
-            //        new SelectListItemWithCheckboxModel<string>()
-            //        {
-            //            IsChecked = true,
-            //            Name = e.LeagueName,
-            //            Value = e.LeagueId.ToString()
-            //        }).ToList();
-
-            //    Leagues.Insert(0, new SelectListItemWithCheckboxModel<string>
-            //    {
-            //        Value = "all",
-            //        Name = "All Leagues",
-            //        IsChecked = true
-            //    });
-
-            //    var selectedLeagues = Leagues.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
-
-            //    SelectedLeagueCount = selectedLeagues.Count;
-            //    SelectedLeagueName = SelectedLeagueCount > 0 ? string.Empty : Leagues.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
-            //}
         }
 
         private async Task LoadConfigStatuses()
@@ -126,7 +92,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var selectedConfigs = EditConfigTemplateFilterModel.ConfigStatuses.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
 
             EditConfigTemplateFilterModel.SelectedConfigStatusCount = selectedConfigs.Count;
-            EditConfigTemplateFilterModel.SelectedConfigStatusName = EditConfigTemplateFilterModel.SelectedConfigStatusCount > 0 ? string.Empty : EditConfigTemplateFilterModel.ConfigStatuses.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+            EditConfigTemplateFilterModel.SelectedConfigStatus = EditConfigTemplateFilterModel.SelectedConfigStatusCount > 0 ? EditConfigTemplateFilterModel.ConfigStatuses.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList() : new List<string>();
         }
 
         #endregion

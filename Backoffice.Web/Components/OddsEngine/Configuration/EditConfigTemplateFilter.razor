@@ -16,7 +16,7 @@
                         }
                         else
                         {
-                            <span>@(EditConfigTemplateFilterModel.SelectedMarketCount == 1 ? EditConfigTemplateFilterModel.SelectedMarketName : $"Markets ({EditConfigTemplateFilterModel.SelectedMarketCount})")</span>
+                            <span>@(EditConfigTemplateFilterModel.SelectedMarketCount == 1 ? EditConfigTemplateFilterModel.SelectedMarkets.FirstOrDefault() : $"Markets ({EditConfigTemplateFilterModel.SelectedMarketCount})")</span>
                         }
                     }
                     else
@@ -40,7 +40,7 @@
                         }
                         else
                         {
-                            <span>@(EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1 ? EditConfigTemplateFilterModel.SelectedConfigStatusName : $"Config Status ({EditConfigTemplateFilterModel.SelectedConfigStatusCount})")</span>
+                            <span>@(EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1 ? EditConfigTemplateFilterModel.SelectedConfigStatus.FirstOrDefault() : $"Config Status ({EditConfigTemplateFilterModel.SelectedConfigStatusCount})")</span>
                         }
                     }
                     else

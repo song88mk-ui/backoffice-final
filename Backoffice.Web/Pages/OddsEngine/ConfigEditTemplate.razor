@@ -57,13 +57,29 @@
 </div>
 
 <div class="col-md-12 mb-4">
-
-    @foreach(var market in MarketLookupNavigation)
+    @if(IsPreloader)
     {
-        <AccordionTemplateConfiguration Market="market"
-            @key="@($"{ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
-            FilterConfigStatus="@EditConfigTemplateFilterModel.SelectedConfigStatusName"
-            Scope="@ScopeId" />
+        <Preloader />
+    }
+    else
+    {
+        if (MarketLookupNavigation != null && MarketLookupNavigation.Any())
+        {
+            foreach (var market in MarketLookupNavigation)
+            {
+                <AccordionTemplateConfiguration Market="market"
+                        @key="@($"{ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
+                        FilterConfigStatus="@EditConfigTemplateFilterModel.SelectedConfigStatus"
+                        Scope="@ScopeId" />
+            }
+        }
+        else
+        {
+            <NoRecordFound />
+        }
     }
 
+
 </div>
+
+<CustomModal />

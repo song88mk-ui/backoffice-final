@@ -36,7 +36,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string SportName { get; set; }
         public int ScopeId { get; set; }
         public int SportId { get; set; }
-
+        public bool IsPreloader { get; set; } = true;
         #endregion
 
         #region Fields
@@ -48,7 +48,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {            
+        {
+            IsPreloader = true; 
+
             ConfigTemplate = new ConfigTemplateModel();
 
             ConfigTemplateMargin = new ConfigTemplateMarginModel();
@@ -69,11 +71,16 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task InitConfigEditTemplate(EditConfigTemplateFilterModel model)
         {
+            IsPreloader = true;
+            await InvokeAsync(StateHasChanged);
+
             EditConfigTemplateFilterModel = model;
 
             await LoadConfigTemplateById();
             await LoadConfigTemplateMargin();
             await LoadMarkets();
+
+            IsPreloader = false;
         }
 
         public void Dispose()

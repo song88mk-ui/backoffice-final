@@ -15,16 +15,20 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
+
         [Parameter] public EventCallback<object> OnSaveClickCallback { get; set; }
+
         public List<ConfigClientViewModel> Leagues { get; set; }
         public List<SelectListItemModel<long>> Templates { get; set; }
 
         public SelectListItemModel<long> SelectedItem { get; set; }
         private ConfigState State = ConfigState.Assigned;
         private bool IsPreLoader = false;
+        private bool IsShowAll = false;
         #endregion
 
         #region Methods
@@ -109,6 +113,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             IsPreLoader = true;
             ModalService.Cancel();
+        }
+
+        public async Task OnShowAllClickedEvent()
+        {
+            IsShowAll = !IsShowAll;
         }
 
         public void Dispose()
