@@ -61,12 +61,16 @@ button.form-select {
 
 th.index {
     width: 6vw;
-    text-align: center;
+    padding-right: 1.5rem !important;
+    padding-left: 1.5rem !important;
 }
 th.filter {
     width: 12vw;
-    text-align: center;
+    padding-right: 1.5rem !important;
+    padding-left: 1.5rem !important;
 }
 th.template {
     width: 26vw;
+    padding-right: 1.5rem !important;
+    padding-left: 1.5rem !important;
 }

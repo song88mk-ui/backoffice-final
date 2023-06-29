@@ -80,7 +80,7 @@
                         <option value="@item.Value" selected="@(item.Value == FilterModel.SportId.ToString())">@item.Name</option>
                     }
                 </select>
-            }            
+            }
         </div>
 
         <div>
@@ -120,7 +120,7 @@
                     <th class="filter" scope="col">Sport</th>
                     <th class="filter" scope="col">Scope</th>
                     <th class="template" scope="col">League Name</th>
-                    <th class="text-center template" scope="col">Template</th>
+                    <th class="template" scope="col">Template</th>
                 </tr>
             </thead>
 
@@ -128,9 +128,18 @@
                 @if (IsPreloader)
                 {
                     <tr>
-                        <td colspan="7">
-                            <Preloader />
-                        </td>
+                        <AuthorizeView Policy="sbc-config-canedit">
+                            <Authorized Context="ActivateAll">
+                                <td colspan="7">
+                                    <Preloader />
+                                </td>
+                            </Authorized>
+                            <NotAuthorized>
+                                <td colspan="6">
+                                    <Preloader />
+                                </td>
+                            </NotAuthorized>
+                        </AuthorizeView>
                     </tr>
                 }
                 else
