@@ -40,7 +40,7 @@
                         }
                         else
                         {
-                            <span>@(EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1 ? EditConfigTemplateFilterModel.ConfigStatuses.FirstOrDefault(f => f.Value == EditConfigTemplateFilterModel.SelectedConfigStatus.FirstOrDefault() : $"Config Status ({EditConfigTemplateFilterModel.SelectedConfigStatusCount})")</span>
+                            <span>@(EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1 ? EditConfigTemplateFilterModel.ConfigStatuses.FirstOrDefault(f => f.Value == EditConfigTemplateFilterModel.SelectedConfigStatus.FirstOrDefault()) : $"Config Status ({EditConfigTemplateFilterModel.SelectedConfigStatusCount})")</span>
                         }
                     }
                     else

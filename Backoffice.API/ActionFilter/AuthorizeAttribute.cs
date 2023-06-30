@@ -29,7 +29,7 @@ namespace Backoffice.API.ActionFilter
 
         public AuthorizeAttribute(string claimType, int claimValue) : this()
         {
-            _requiredClaim = new Claim(claimType, claimValue);
+            _requiredClaim = new Claim(claimType, claimValue.ToString());
         }
         public AuthorizeAttribute()
         {
