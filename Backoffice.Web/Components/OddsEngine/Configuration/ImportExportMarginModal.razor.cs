@@ -37,15 +37,17 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public static HashSet<string> SelectedSportsSet { get; set; }
 
         public string Region { get; set; }
-        public bool IsImportTab { get; set; }
-        public bool IsUploading { get; set; }        
-
         public string SelectedClient { get; set; }
+        public string CurrentFileInProcess { get; set; } = string.Empty;
+        public string ProcessingMessage { get; set; } = string.Empty;
+        public bool IsImportTab { get; set; }
+        public bool IsUploading { get; set; }                            
 
         public const string ImportSelect = "import-select";
         public const string ExportSelect = "export-select";
 
         public Guid Guid { get; set; }
+
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
@@ -153,8 +155,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     foreach (var fileStream in files)
                     {
                         processCount++;
-                        //AlertStatus = $"Processing {fileStream.Key}";
-                        //AlertMessage = $"Processing {processCount} of {files.Count} file/s..";
+                        CurrentFileInProcess = $"Processing {fileStream.Key}";
+                        ProcessingMessage = $"Processing {processCount} of {files.Count} file/s..";
 
                         StateHasChanged();
 
@@ -169,7 +171,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                                 return;
                             }
-                        }
+                        }                        
                     }
 
                     IsUploading = false;

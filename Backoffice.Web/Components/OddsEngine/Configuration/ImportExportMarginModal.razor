@@ -10,11 +10,11 @@
     <div class="row mb-3">
         <div class="col-12">
             <div class="d-inline-block">
-                <input type="radio" class="btn-check" name="options" id="importRadio" autocomplete="off" @onclick="OnImportRadioClickEvent" checked />
+                <input type="radio" class="btn-check" name="options" id="importRadio" autocomplete="off" @onclick="OnImportRadioClickEvent" checked disabled="@IsUploading"/>
                 <label class="btn" for="importRadio">Import</label>
             </div>
             <div class="d-inline-block">
-                <input type="radio" class="btn-check" name="options" id="exportRadio" autocomplete="off" @onclick="OnExportRadioClickEvent">
+                <input type="radio" class="btn-check" name="options" id="exportRadio" autocomplete="off" @onclick="OnExportRadioClickEvent" disabled="@IsUploading">
                 <label class="btn" for="exportRadio">Export</label>
             </div>
         </div>
@@ -22,13 +22,21 @@
 
     @if (IsImportTab)
     {
-        <select class="form-select import-select d-block" multiple="multiple">
+        <select class="form-select import-select d-block" multiple="multiple" disabled="@IsUploading">
             <option value="0" selected>All Clients</option>
             @foreach (var client in Clients)
             {
                 <option value="@client.Value">@client.Name</option>
             }
         </select>
+
+
+        @if (IsUploading)
+        {
+            <div class="mt-3">
+                <span class="fst-italic text-success">@($"{ProcessingMessage} - {CurrentFileInProcess}")</span>
+            </div>
+        }
     }
     else
     {
