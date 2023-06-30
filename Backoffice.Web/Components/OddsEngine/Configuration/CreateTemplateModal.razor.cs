@@ -86,7 +86,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 var activityLog = new ActivityLogModel()
                 {
                     Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                    Payload = $"{Sports.FirstOrDefault(x => x.Value == SelectedSportId)?.Name}.{Scopes.FirstOrDefault(x => x.Value == SelectedSportId)?.Name}.{payload.Name}.T",
+                    Payload = $"{SelectedSportId}.{SelectedScopeId}.{payload.Name}.T".Replace(" ", "_"),
                     From = "-",
                     To = JsonSerializer.Serialize(payload),
                     Activity = Activity.Create.ToString(),

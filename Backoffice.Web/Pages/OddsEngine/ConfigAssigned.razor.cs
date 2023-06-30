@@ -112,14 +112,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             await LoadLeagues(FilterModel);
         }
-        public async Task OnModalSaveEvent(object e)
-        {
-            await LoadLeagues(FilterModel);
-
-            IsSelectedLeagueShowing = false;
-            await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
-        }
-
         public async Task OnScopeCheckboxClickEvent(ChangeEventArgs e)
         {
             if (e != null)
@@ -129,6 +121,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             await LoadLeagues(FilterModel);
         }
+        public async Task OnModalSaveEvent(object e)
+        {
+            await LoadLeagues(FilterModel);
+
+            IsSelectedLeagueShowing = false;
+            await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+        }
+
         public async Task OnInputSearchEvent()
         {
             FilterModel.SearchText = SearchForm.SearchText;
@@ -203,9 +203,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Leagues", leagues);
             parameters.Add("State", State);
             parameters.Add("SportId", FilterModel.SportId);
-            parameters.Add("SportName", FilterModel.SportName);
             parameters.Add("ScopeId", FilterModel.ScopeId);
-            parameters.Add("Scopename", FilterModel.ScopeName);
             parameters.Add("Region", Region);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");

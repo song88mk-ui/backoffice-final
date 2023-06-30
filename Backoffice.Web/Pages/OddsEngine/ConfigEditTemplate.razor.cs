@@ -15,7 +15,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class ConfigEditTemplate : IDisposable
     {
         #region Properties
-        
+
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
 
@@ -45,22 +45,20 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            IsPreloader = true; 
+            IsPreloader = true;
 
             ConfigTemplateMargin = new ConfigTemplateMarginModel();
 
-            MarketLookupNavigation = new List<MarketLookupNavigationModel>();                        
-
+            MarketLookupNavigation = new List<MarketLookupNavigationModel>();
             Breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
                 {
                     Name = "Config",
-                    Url = $"hk/odds-engine/config/edit/{ConfigTemplateId}",
+                    Url = $"hk/odds-engine/config-templates",
                     IsCurrentPage = false
-                }                
+                },
             };
-
         }
 
         public async Task InitConfigEditTemplate(EditConfigTemplateFilterModel model)
@@ -70,20 +68,26 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             EditConfigTemplateFilterModel = model;
 
-
-            SportIcon = EditConfigTemplateFilterModel.SportName.Contains(" ") ? EditConfigTemplateFilterModel.SportName.Replace(" ", "-").ToLower() : EditConfigTemplateFilterModel.    SportName.ToLower();
-            SportName = EditConfigTemplateFilterModel.SportName;
-            ConfigTemplateName = EditConfigTemplateFilterModel.ConfigTemplate.Name;
-            Scope = ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId).ToString();
-
-            Breadcrumbs.Clear();
-            Breadcrumbs.Add(
+            Breadcrumbs = new List<BreadcrumbModel>()
+            {
+                new BreadcrumbModel
+                {
+                    Name = "Config",
+                    Url = $"hk/odds-engine/config-templates",
+                    IsCurrentPage = false
+                },
                 new BreadcrumbModel
                 {
                     Name = $"{EditConfigTemplateFilterModel.ConfigTemplate.Name}",
-                    Url = $"hk/odds-engine/config/edit/{ConfigTemplateId}",
+                    Url = $"hk/odds-engine/config-templates/edit/{ConfigTemplateId}",
                     IsCurrentPage = true
-                });
+                }
+            };
+
+            SportIcon = EditConfigTemplateFilterModel.SportName.Contains(" ") ? EditConfigTemplateFilterModel.SportName.Replace(" ", "-").ToLower() : EditConfigTemplateFilterModel.SportName.ToLower();
+            SportName = EditConfigTemplateFilterModel.SportName;
+            ConfigTemplateName = EditConfigTemplateFilterModel.ConfigTemplate.Name;
+            Scope = ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId).ToString();
 
             await LoadConfigTemplateMargin();
             await LoadMarkets();
@@ -93,14 +97,14 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
-            
+
         }
 
         #endregion
 
         #region Utilities      
 
-        
+
         private async Task LoadConfigTemplateMargin()
         {
             var response = await BackOfficeService.GetConfigTemplateMargin(ConfigTemplateId);
@@ -115,11 +119,11 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (EditConfigTemplateFilterModel.MarketTemplateGroups.Count > 0)
             {
-                MarketLookupNavigation =  await GetMarketTemplate(EditConfigTemplateFilterModel.MarketTemplateGroups);
+                MarketLookupNavigation = await GetMarketTemplate(EditConfigTemplateFilterModel.MarketTemplateGroups);
             }
         }
 
-        
+
         private async Task<List<MarketLookupNavigationModel>> GetMarketTemplate(List<MarketGroupNavigationModel> MarketTemplateGroups)
         {
             var marketTemplates = new List<MarketLookupNavigationModel>();
@@ -135,9 +139,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                     {
 
                         var newMarketTemplate = marketTemplates.FirstOrDefault(m => m.MarketLookup.MarketTemplateId == marketLookup.MarketTemplateId);
-                        if(newMarketTemplate == null)
+                        if (newMarketTemplate == null)
                         {
-                            
+
                             var configTemplateMargin = ConfigTemplateMargin.ConfigTemplateMargins.FirstOrDefault(c => c.MarketTemplateId == marketLookup.MarketTemplateId);
                             if (configTemplateMargin == null)
                             {

@@ -16,6 +16,7 @@
     gap: 2rem;
     flex-basis: 25%;
 }
+
 a.disabled {
     pointer-events: none;
     color: #d3d3d3 !important;
@@ -50,5 +51,5 @@ table tbody > tr {
 
     .manage-cell > a {
         color: black;
-        text-decoration: none;        
+        text-decoration: none;
     }

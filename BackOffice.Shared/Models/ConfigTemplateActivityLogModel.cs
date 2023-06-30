@@ -4,13 +4,13 @@ using System.Text;
 
 namespace Backoffice.Shared.Models
 {
-    public class ConfigTemplateActivityLogModel
+    public class ConfigTemplateLogModel
     {
         public string TemplateName { get; set; }
-        public List<ConfigTemplateActivityLogPayloadModel> Payloads { get; set; }
+        public ConfigTemplateLogPayloadModel Payloads { get; set; }
     }
 
-    public class ConfigTemplateActivityLogPayloadModel
+    public class ConfigTemplateLogPayloadModel
     {
         public List<string> Clients { get; set; }
         public List<string> Leagues { get; set; }

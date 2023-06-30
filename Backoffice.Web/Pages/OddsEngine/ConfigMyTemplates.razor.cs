@@ -59,6 +59,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             var parameters = new ModalParameters();
 
+            parameters.Add("Sports", Sports);
+            parameters.Add("Scopes", Scopes);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
             parameters.Add("DialogStyle", "max-width:1500px");
@@ -73,6 +75,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             var parameters = new ModalParameters();
 
+            parameters.Add("Sports", Sports);
+            parameters.Add("Scopes", Scopes);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
             parameters.Add("Region", Region);
@@ -84,7 +88,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnEditTemplateClickEvent(ConfigTemplateModel configTemplateModel)
         {
-            NavigationManager.NavigateTo($"/hk/odds-engine/config/edit/{configTemplateModel.Id}");
+            NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{configTemplateModel.Id}");
         }
 
         public async Task OnDeleteTemplateClickEvent(ConfigTemplateModel configTemplateModel)

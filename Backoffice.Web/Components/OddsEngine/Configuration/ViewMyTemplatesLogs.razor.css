@@ -22,3 +22,7 @@ table thead {
     background-color: #354156;
     color: white;
 }
+
+.table-logs thead tr > th {
+    padding-left: 1.5rem !important;
+}

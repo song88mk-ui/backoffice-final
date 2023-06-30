@@ -50,10 +50,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             Leagues = ModalParameters.TryGet<List<ConfigClientViewModel>>("Leagues");
             State = ModalParameters.TryGet<ConfigState>("State");
             var sportId = ModalParameters.TryGet<int>("SportId");
-            var sportName = ModalParameters.TryGet<string>("SportName");
             var scopeId = ModalParameters.TryGet<int>("ScopeId");
-            var scopeName = ModalParameters.TryGet<string>("ScopeName");
-            ActivityLogPayload = $"{sportName}.{scopeName}";
+            ActivityLogPayload = $"{sportId}.{scopeId}";
             Templates = await GetTemplates(sportId, scopeId);
         }
 
@@ -136,29 +134,29 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                         var from = "";
                         var to = "";
-                        from = JsonSerializer.Serialize(new ConfigTemplateActivityLogModel()
+                        from = JsonSerializer.Serialize(new ConfigTemplateLogModel()
                         {
                             TemplateName = item.Id != "-1" ? item.Name : "Unassigned",
-                            Payloads = leagueRequest.Select(x => new ConfigTemplateActivityLogPayloadModel()
+                            Payloads =  new ConfigTemplateLogPayloadModel()
                             {
                                 Clients = leagues.Select(x => x.ClientName).Distinct().ToList(),
                                 Leagues = leagues.Select(x => x.LeagueName).Distinct().ToList()
-                            }).ToList()
+                            }
                         });
-                        to = JsonSerializer.Serialize(new ConfigTemplateActivityLogModel()
+                        to = JsonSerializer.Serialize(new ConfigTemplateLogModel()
                         {
                             TemplateName = SelectedItem.Value.ToString() != "-1" ? SelectedItem.Name : "Unassigned",
-                            Payloads = leagueRequest.Select(x => new ConfigTemplateActivityLogPayloadModel()
+                            Payloads =  new ConfigTemplateLogPayloadModel()
                             {
                                 Clients = new List<string>(),
                                 Leagues = new List<string>()
-                            }).ToList()
+                            }
                         });
 
                         var activityLog = new ActivityLogModel()
                         {
                             Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                            Payload = $"{ActivityLogPayload}.{SelectedItem.Name}.T",
+                            Payload = $"{ActivityLogPayload}.{SelectedItem.Name}.T".Replace(" ", "_"),
                             From = from,
                             To = to,
                             Activity = Activity.Update.ToString(),

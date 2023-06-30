@@ -264,6 +264,11 @@ namespace Backoffice.API.Repositories
                         TimeStamp = s.TimeStamp,
                     }).ToList();
 
+                if(!string.IsNullOrEmpty(request.SearchText))
+                {
+                    activityLogs = activityLogs.Where(x => x.From.ToUpper().Contains(request.SearchText.ToUpper()) || x.To.ToUpper().Contains(request.SearchText.ToUpper()) || x.UserName.ToUpper().Contains(request.SearchText.ToUpper())).ToList();
+                }
+
                 if (metaData == null)
                 {
                     metaData = new MetaData()

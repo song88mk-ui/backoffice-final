@@ -16,6 +16,7 @@ namespace Backoffice.Shared.Models.Requests
         public DateTime DateTo { get; set; }
         public DateTime TimeStamp { get; set; }
         public MetaData MetaData { get; set; }
+        public string SearchText { get; set; } = "";
     }
 
     public class PriceboostActivityLogRequest : ActivityLogRequest
