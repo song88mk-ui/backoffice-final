@@ -33,7 +33,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         public int SelectedLeagueCount { get; set; }
         public string SelectedLeagueName { get; set; } = "";
         public string SportIcon { get; set; } = "";
-        
+        private string ConfigTemplateName { get; set; } = "";
+        private string SportName { get; set; } = "";
+        private string Scope { get; set; } = "";
+
         public bool IsPreloader { get; set; } = true;
         #endregion
 
@@ -69,6 +72,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
 
             SportIcon = EditConfigTemplateFilterModel.SportName.Contains(" ") ? EditConfigTemplateFilterModel.SportName.Replace(" ", "-").ToLower() : EditConfigTemplateFilterModel.    SportName.ToLower();
+            SportName = EditConfigTemplateFilterModel.SportName;
+            ConfigTemplateName = EditConfigTemplateFilterModel.ConfigTemplate.Name;
+            Scope = ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId).ToString();
 
             Breadcrumbs.Clear();
             Breadcrumbs.Add(
@@ -119,6 +125,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             var marketTemplates = new List<MarketLookupNavigationModel>();
             foreach (var MarketTemplateGroup in MarketTemplateGroups)
             {
+                if (!EditConfigTemplateFilterModel.SelectedMarkets.Contains(MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId.ToString()))
+                    continue;
+
                 var marketTemplateGroup = MarketTemplateGroup.MarketTemplateGroup;
                 foreach (var marketLookup in EditConfigTemplateFilterModel.MarketLookup.MarketLookup)
                 {

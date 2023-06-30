@@ -91,7 +91,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             {
                 EditConfigTemplateFilterModel.MarketGroups = new List<SelectListItemWithCheckboxModel<string>>();
                 EditConfigTemplateFilterModel.MarketGroups.AddRange(EditConfigTemplateFilterModel.MarketTemplateGroups.Select(s =>
-                    new SelectListItemWithCheckboxModel<string> { IsChecked = true, Name = s.MarketTemplateGroup.MarketTemplateGroupName, Value = s.MarketTemplateGroup.MarketTemplateGroupId.ToString() }));
+                    new SelectListItemWithCheckboxModel<string> { IsChecked = true, Name = s.MarketTemplateGroup.MarketTemplateGroupName, Value = s.MarketTemplateGroup.MarketTemplateGroupId.ToString(), IsSelectAll = s.MarketTemplateGroup.MarketTemplateGroupId == 1 }));
             }
 
             var selectedMarkets = EditConfigTemplateFilterModel.MarketGroups.Where(c => c.Value != "1" &&  c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();

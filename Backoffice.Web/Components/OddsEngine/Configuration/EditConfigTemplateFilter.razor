@@ -16,7 +16,7 @@
                         }
                         else
                         {
-                            <span>@(EditConfigTemplateFilterModel.SelectedMarketCount == 1 ? EditConfigTemplateFilterModel.MarketGroups.FirstOrDefault(f => f.Value == EditConfigTemplateFilterModel.SelectedMarkets.FirstOrDefault()) : $"Markets ({EditConfigTemplateFilterModel.SelectedMarketCount})")</span>
+                            <span>@(EditConfigTemplateFilterModel.SelectedMarketCount == 1 ? EditConfigTemplateFilterModel.MarketGroups.FirstOrDefault(f => f.Value == EditConfigTemplateFilterModel.SelectedMarkets.FirstOrDefault()).Name : $"Markets ({EditConfigTemplateFilterModel.SelectedMarketCount})")</span>
                         }
                     }
                     else
@@ -40,7 +40,7 @@
                         }
                         else
                         {
-                            <span>@(EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1 ? EditConfigTemplateFilterModel.ConfigStatuses.FirstOrDefault(f => f.Value == EditConfigTemplateFilterModel.SelectedConfigStatus.FirstOrDefault()) : $"Config Status ({EditConfigTemplateFilterModel.SelectedConfigStatusCount})")</span>
+                            <span>@(EditConfigTemplateFilterModel.SelectedConfigStatusCount == 1 ? EditConfigTemplateFilterModel.ConfigStatuses.FirstOrDefault(f => f.Value == EditConfigTemplateFilterModel.SelectedConfigStatus.FirstOrDefault()).Name : $"Config Status ({EditConfigTemplateFilterModel.SelectedConfigStatusCount})")</span>
                         }
                     }
                     else
