@@ -52,7 +52,7 @@
             @if (IsRemoveCurrentTemplate)
             {
                 <div class="d-flex align-items-baseline flex-gap">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i><span class="fst-italic">By removing the currently assigned template, the leagues you have selected will be moved to the Unassigned page.</span>
+                    <i class="fa fa-info-circle" aria-hidden="true"></i><span class="fst-italic fw-bold">By removing the currently assigned template, the leagues you have selected will be moved to the Unassigned page.</span>
                 </div>
             }
         </div>
@@ -60,5 +60,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickedEvent" disabled="@IsPreLoader">Cancel</button>
-    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickedEvent" disabled="@IsPreLoader">Save</button>
+    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickedEvent" disabled="@IsPreLoader">Apply</button>
 </div>

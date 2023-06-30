@@ -13,6 +13,7 @@
     overflow-y: auto;
     margin: 0;
     padding: 0;
+    scroll-behavior: smooth;
 }
 .league-name {
     font-weight: bold;
@@ -45,4 +46,10 @@ button.form-select {
     gap: 0.5rem;
     color: #9AA0AB;
     font-size: 12px;
+}
+
+.modal-btn {
+    width: 120px;
+    height: 40px;
+    font-size: 15px;
 }
