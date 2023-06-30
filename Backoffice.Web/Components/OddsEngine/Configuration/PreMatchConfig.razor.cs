@@ -7,7 +7,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
         [Parameter] public PrematchSettingsTemplateModel PrematchSettings { get; set; } 
-        [Parameter] public EventCallback<PrematchSettingsTemplateModel> PrematchSettingsChanged { get; set; }
+        //[Parameter] public EventCallback<PrematchSettingsTemplateModel> PrematchSettingsChanged { get; set; }
         #endregion
         #region Methods
         public void Dispose()

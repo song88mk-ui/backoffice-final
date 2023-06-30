@@ -37,13 +37,13 @@
                         if ((Scope == 99 || Scope == 0))
                         {
                             //prematch
-                            <PreMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "prematch") @bind-PrematchSettings="Market.PrematchSettings" />
+                            <PreMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "prematch") PrematchSettings="@Market.NewPrematchSettings" />
                         }
 
                         if ((Scope == 99 || Scope == 1))
                         {
                             //live
-                            <LiveMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "live") @bind-LiveSettings="Market.NewLiveSettings" />
+                            <LiveMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "live") LiveSettings="@Market.NewLiveSettings" />
                         }
                     }
                 }

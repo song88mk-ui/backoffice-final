@@ -164,7 +164,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 MarketTemplateGroupIds = new List<int>() { marketTemplateGroup.MarketTemplateGroupId },
                                 MarketLookup = marketLookup,
                                 LiveSettings = liveSettings,
-                                PrematchSettings = prematchSettings
+                                NewLiveSettings = liveSettings,
+                                PrematchSettings = prematchSettings,
+                                NewPrematchSettings = prematchSettings
                             });
                         }
                         else
