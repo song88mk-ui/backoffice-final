@@ -26,14 +26,14 @@
                 }
             </div>
         </div>
-        <div class="container d-flex pt-4">
+        <div class="d-flex my-3 ms-2">
             <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">Template</label>
             <div class="col col-sm-10">
                 <div class="dropdown">
-                    <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn w-100 form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         @if (SelectedItem != null && !string.IsNullOrEmpty(SelectedItem.Name))
                         {
-                            <span class="@(SelectedItem.Value==-2?"text-danger":"")">@SelectedItem.Name</span>
+                            <span class="@(SelectedItem.Value == -1 ? "text-danger":"")">@SelectedItem.Name</span>
                         }
                         else
                         {
@@ -45,7 +45,16 @@
                         <SelectWithSearch State="State" Items="Templates" AriaLabel="scope-dropdown" OnSelectionCallback="OnTemplateSelectChanged" />
                     }
                 </div>
-            </div>
+            </div>            
+        </div>
+
+        <div class="col-sm-12 ms-2">
+            @if (IsRemoveCurrentTemplate)
+            {
+                <div class="d-flex align-items-baseline flex-gap">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i><span class="fst-italic">By removing the currently assigned template, the leagues you have selected will be moved to the Unassigned page.</span>
+                </div>
+            }
         </div>
     }
 </div>

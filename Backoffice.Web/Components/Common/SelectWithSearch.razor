@@ -14,7 +14,11 @@
         @if (State == ConfigState.Assigned)
         {
             <li class="p-1">
-                <a class="btn w-100 text-start" @onclick="OnRemoveTemplateClickedEvent"><span class="back-button" aria-hidden="true"></span><span class="template-remove">Remove Current Template</span></a>
+                <a class="btn w-100 text-start" @onclick="OnRemoveTemplateClickedEvent">
+                    <span class="template-remove">
+                        <i class="fa fa-times ico-font-size" aria-hidden="true"></i>Remove Current Template
+                    </span>
+                </a>
             </li>
         }
     }

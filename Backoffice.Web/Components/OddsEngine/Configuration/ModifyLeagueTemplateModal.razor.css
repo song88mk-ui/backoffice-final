@@ -40,3 +40,9 @@ button.form-select {
     font-style: italic;
     color: #ACACAC;
 }
+
+.flex-gap {
+    gap: 0.5rem;
+    color: #9AA0AB;
+    font-size: 12px;
+}

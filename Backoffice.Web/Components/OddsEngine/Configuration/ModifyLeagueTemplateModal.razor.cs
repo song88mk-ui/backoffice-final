@@ -28,10 +28,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public List<SelectListItemModel<long>> Templates { get; set; }
 
         public SelectListItemModel<long> SelectedItem { get; set; }
+
+        public bool IsRemoveCurrentTemplate { get; set; } = false;
+
         private ConfigState State = ConfigState.Assigned;
         private bool IsPreLoader = false;
-        private bool IsShowAll = false;
+        private bool IsShowAll = false;        
         private string ActivityLogPayload = "";
+
         #endregion
 
         #region Methods
@@ -50,7 +54,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var scopeId = ModalParameters.TryGet<int>("ScopeId");
             var scopeName = ModalParameters.TryGet<string>("ScopeName");
             ActivityLogPayload = $"{sportName}.{scopeName}";
-            Templates = await Gettemplates(sportId, scopeId);
+            Templates = await GetTemplates(sportId, scopeId);
         }
 
         public async Task OnTemplateSelectChangedv2(ConfigTemplateModel e)
@@ -61,6 +65,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             SelectedItem = new SelectListItemModel<long>();
             SelectedItem = e;
+
+            IsRemoveCurrentTemplate = false;
+
+            if (SelectedItem != null && SelectedItem.Value == -1)
+            {
+                IsRemoveCurrentTemplate = true;
+            }            
         }
         public async Task OnRemoveTemplateClickedEvent()
         {
@@ -181,7 +192,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         #region Utilities
 
-        private async Task<List<SelectListItemModel<long>>> Gettemplates(int sportId, int scopeId)
+        private async Task<List<SelectListItemModel<long>>> GetTemplates(int sportId, int scopeId)
         {
             IsPreLoader = true;
             var response = await BackOfficeService.GetConfigTemplate(sportId, scopeId);

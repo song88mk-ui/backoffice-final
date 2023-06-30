@@ -183,10 +183,16 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             ConfigClients.ForEach(x => x.IsChecked = false);
             IsEdit = false;
+            SelectedLeagueCount = 0;
+            IsSelectedLeagueShowing = false;
+
+            await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
         }
         public async Task OnSelectAllClickedEvent()
         {
             ConfigClients.ForEach(x => x.IsChecked = true);
+
+            SelectedLeagueCount = ConfigClients.Where(x => x.IsChecked).Count();
         }
         public async Task OnEditTemplateClickedEvent()
         {
