@@ -167,6 +167,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
 
             var response = await TradingService.AddOrUpdateClientMarketTemplatesOrder(request);
+
+            if(response.StatusCode != StatusCode.Success)
+            {
+                AlertMessage = $"{response.Message}";
+                AlertStatus = AlertStatus.Error;
+            }
         }
 
         public async Task OnMarketGroupClickEvent(string name)
