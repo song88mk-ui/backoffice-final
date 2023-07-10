@@ -26,5 +26,6 @@ resources:
 extends:
   template: dotnetservice.yml@bt
   parameters:
+    autoToFeeds: false
     projects:
       - Backoffice.Web
