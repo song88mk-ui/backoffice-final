@@ -5,6 +5,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using RabbitMQ.Client.Apigen.Attributes;
 using System.Text;
 using System.Text.Json;
 
@@ -166,6 +167,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }).ToList()
             };
 
+
+            AlertMessage = $"Updating..";
+            AlertStatus = AlertStatus.Success;
+            await InvokeAsync(StateHasChanged);
+
             var response = await TradingService.AddOrUpdateClientMarketTemplatesOrder(request);
 
             if(response.StatusCode != StatusCode.Success)
@@ -173,6 +179,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                 AlertMessage = $"{response.Message}";
                 AlertStatus = AlertStatus.Error;
             }
+
+            AlertMessage = AlertStatus.Success.ToString();
+            AlertStatus = AlertStatus.Success;
         }
 
         public async Task OnMarketGroupClickEvent(string name)

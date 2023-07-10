@@ -810,7 +810,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.PostAsync($"api/v1/trading/client/markettemplate", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"api/trading/client/markettemplate", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
