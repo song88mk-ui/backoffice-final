@@ -100,7 +100,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 if (IsUpdate)
                 {
-                    if (SelectedMarketGroupName.ToLower() == "all markets")
+                    if (SelectedMarketGroupName.ToLower().Replace(" ", "").Trim() == "allmarkets")
                     {
                         await EnableSortingAndSelect2();
                     }

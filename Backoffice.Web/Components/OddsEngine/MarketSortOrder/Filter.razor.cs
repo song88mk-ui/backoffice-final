@@ -46,7 +46,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
             if (UserModel.ClientCodes != null)
             {
-                var clients = (await TradingService.GetClientList()).Result;
+                var response = await TradingService.GetClientList();
+
+                var clients = response.Result;
                 var roleName = UserModel.RoleName;
 
                 if (roleName != "Super Admin")
