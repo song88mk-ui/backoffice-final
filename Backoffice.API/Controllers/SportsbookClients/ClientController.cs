@@ -18,8 +18,6 @@ namespace Backoffice.API.Controllers.SportsbookClients
     public class ClientController : Controller
     {
         private readonly IBackofficeRepository _backofficeRepository;
-
-        //repush update
         public ClientController(IBackofficeRepository backofficeRepository)
         {
             _backofficeRepository = backofficeRepository;
