@@ -7,20 +7,20 @@
 <AuthorizeView Policy="sbc-market-sortorder">
     <Authorized>
         <div class="col-md-12">
-            <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"/>
+            <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region" />
         </div>
         <div class="col-md-12">
             <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
         </div>
         <div class="col-md-12">
-            <Filter @bind-IsUpdate="IsUpdate" OnUpdateCallback="OnUpdateClickEvent" OnCancelCallback="OnCancelClickEvent" OnSaveCallback="OnSaveClickEvent" MarketSortOrderModelCallback="PrepareMarketSortOrderModel" OnMarketGroupCallback="OnMarketGroupClickEvent" Region="Region"/>
+            <Filter @bind-IsUpdate="IsUpdate" @bind-IsPreLoader="IsPreLoader" OnUpdateCallback="OnUpdateClickEvent" OnCancelCallback="OnCancelClickEvent" OnSaveCallback="OnSaveClickEvent" MarketSortOrderModelCallback="PrepareMarketSortOrderModel" OnMarketGroupCallback="OnMarketGroupClickEvent" Region="Region" />
         </div>
 
         @if (!string.IsNullOrEmpty(AlertMessage))
         {
             <div class="col-md-12">
                 <div class="mt-4 mx-3">
-                    <AlertMessage AlertMessageStr="@AlertMessage" AlertStatus="@(AlertStatus.ToString())" AlwaysShow="false" Opacity="1"/>
+                    <AlertMessage AlertMessageStr="@AlertMessage" AlertStatus="@(AlertStatus.ToString())" AlwaysShow="false" Opacity="1" />
                 </div>
             </div>
         }
@@ -37,35 +37,46 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var model in FilteredMarketTemplates)
+                            @if(IsPreLoader)
                             {
-                                <tr @key="@($"row-sp:{MarketSortOrderModel.SportId}-fist:{MarketSortOrderModel.FixtureStatusId}-mate:{model.MarketTemplateId}")" class="@(IsUpdate ? "" : "row-disabled")" id="name-@model.MarketTemplateId" data-sort-order="@model.SortOrder">
-                                    <td>@model.MarketTemplateName</td>
-                                    <td>
-                                        <div @key="@($"select-sp:{MarketSortOrderModel.SportId}-fist:{MarketSortOrderModel.FixtureStatusId}-mate:{model.MarketTemplateId}")" class="d-flex justify-content-center">
-                                            <select id="select-@model.MarketTemplateId" class="@SelectClass form-select d-block" multiple="multiple">
-                                                @foreach (var group in MarketGroups)
-                                                {
-                                                    if (model.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(group.Name.ToLower()))
-                                                    {
-                                                        <option value="@group.Value" selected>@group.Name</option>
-                                                    }
-                                                    else
-                                                    {
-                                                        <option value="@group.Value">@group.Name</option>
-                                                    }
-                                                }
-                                            </select>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex justify-content-center">
-                                            <a class="link-bars me-2 drag-handle" href="javascript:(0)">
-                                                <i class="fa fa-bars"></i>
-                                            </a>
-                                        </div>
+                                <tr>
+                                    <td colspan="3">
+                                        <Preloader/>
                                     </td>
                                 </tr>
+                            }
+                            else
+                            {
+                                @foreach (var model in FilteredMarketTemplates)
+                                {
+                                    <tr @key="@($"row-sp:{MarketSortOrderModel.SportId}-fist:{MarketSortOrderModel.FixtureStatusId}-mate:{model.MarketTemplateId}")" class="@(IsUpdate ? "" : "row-disabled")" id="name-@model.MarketTemplateId" data-sort-order="@model.SortOrder">
+                                        <td>@model.MarketTemplateName</td>
+                                        <td>
+                                            <div @key="@($"select-sp:{MarketSortOrderModel.SportId}-fist:{MarketSortOrderModel.FixtureStatusId}-mate:{model.MarketTemplateId}")" class="d-flex justify-content-center">
+                                                <select id="select-@model.MarketTemplateId" class="@SelectClass form-select d-block" multiple="multiple">
+                                                    @foreach (var group in MarketGroups)
+                                                    {
+                                                        if (model.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(group.Name.ToLower()))
+                                                        {
+                                                            <option value="@group.Value" selected>@group.Name</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@group.Value">@group.Name</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <a class="link-bars me-2 drag-handle" href="javascript:(0)">
+                                                    <i class="fa fa-bars"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                             }
                         </tbody>
                     </table>
