@@ -21,6 +21,8 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         [Parameter] public EventCallback<string> OnMarketGroupCallback { get; set; }
         [Parameter] public EventCallback<bool> IsUpdateChanged { get; set; }
         [Parameter] public bool IsUpdate { get; set; }
+        [Parameter] public EventCallback<bool> IsPreLoaderChanged { get; set; }
+        [Parameter] public bool IsPreLoader { get; set; }
         [Parameter] public string Region { get; set; }
 
         public List<SelectListItemModel<string>> Clients { get; set; }
@@ -38,6 +40,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         protected override async Task OnInitializedAsync()
         {
+            IsPreLoader = true;
+            await InvokeAsync(StateHasChanged);
+
             Clients = new List<SelectListItemModel<string>>();
             Sports = new List<SelectListItemModel<int>>();
             FixtureStatuses = new List<SelectListItemModel<int>>();
@@ -114,6 +119,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
+            IsPreLoader = true;
+            await InvokeAsync(StateHasChanged);
+
             SelectedClientCode = e.Value.ToString();
             IsUpdate = false;
 
@@ -123,6 +131,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         public async void OnSportChangedEvent(ChangeEventArgs e)
         {
+            IsPreLoader = true;
+            await InvokeAsync(StateHasChanged);
+
             SelectedSportId = int.Parse(e.Value.ToString());
             IsUpdate = false;
 
@@ -132,6 +143,8 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         public async void OnFixtureStatusChangedEvent(ChangeEventArgs e)
         {
+            IsPreLoader = true;
+            await InvokeAsync(StateHasChanged);
             SelectedFixtureStatusId = int.Parse(e.Value.ToString());
             IsUpdate = false;
 
@@ -211,7 +224,14 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
         private async Task PrepareMarketSortOrderModel()
         {
-            if (!string.IsNullOrEmpty(SelectedClientCode) &&  SelectedClientCode != "NA" && SelectedSportId != 0)
+            if(!IsPreLoader)
+            {
+                IsPreLoader = true;
+                await IsPreLoaderChanged.InvokeAsync(IsPreLoader);
+                await InvokeAsync(StateHasChanged);
+            }
+
+            if (!string.IsNullOrEmpty(SelectedClientCode) && SelectedClientCode != "NA" && SelectedSportId != 0)
             {
                 var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId)).Result;
                 var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId)).Result;
@@ -235,7 +255,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                         MarketTemplateGroupNames = s.MarketTemplateGroupNames,
                         MarketTemplateId = s.MarketTemplateId,
                         MarketTemplateName = s.MarketTemplateName,
-                        SortOrder = s.SortOrder > 1000 ? index + 1 : s.SortOrder
+                        SortOrder = s.SortOrder
                     }).ToList();
 
                 await MarketSortOrderModelCallback.InvokeAsync(new MarketSortOrderModel
@@ -249,6 +269,8 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                     MarketTemplateGroups = ClientMarketTemplateGroups
                 });
             }
+            IsPreLoader = false;
+            await IsPreLoaderChanged.InvokeAsync(IsPreLoader);
         }
 
         #endregion

@@ -5,7 +5,6 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using RabbitMQ.Client.Apigen.Attributes;
 using System.Text;
 using System.Text.Json;
 
@@ -33,6 +32,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public bool InitSortingAndSelect2 { get; set; }
         public bool IsMarketGroupClicked { get; set; }        
         public bool IsUpdate { get; set; }
+        public bool IsPreLoader { get; set; }
 
         public static MarketSortOrderModel MarketSortOrderModel { get; set; }
         public List<MarketSortOrderModel.ClientMarketTemplate> FilteredMarketTemplates { get; set; }
@@ -47,7 +47,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {            
+        {
             TradingService.Region = Region.ToUpper();
             MarketSortOrderModel = new MarketSortOrderModel();
 
@@ -60,6 +60,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             InitSortingAndSelect2 = false;
             IsMarketGroupClicked = false;
             IsUpdate = false;
+            IsPreLoader = true;
 
             Breadcrumbs = new List<BreadcrumbModel>();
 
@@ -136,11 +137,16 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             IsUpdate = false;
 
+            if(!IsPreLoader)
+            {
+                IsPreLoader = true;
+            }
+
             var marketTemplates = await GetMarketTemplates();
 
             if (!marketTemplates.Any())
                 return;
-
+             
             MarketSortOrderModel.MarketTemplates = MarketSortOrderModel.MarketTemplates.Join(marketTemplates,
                 ma => ma.MarketTemplateId,
                 so => so.RowId.Split('-')[1],
@@ -167,9 +173,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }).ToList()
             };
 
-
-            AlertMessage = $"Updating..";
-            AlertStatus = AlertStatus.Success;
             await InvokeAsync(StateHasChanged);
 
             var response = await TradingService.AddOrUpdateClientMarketTemplatesOrder(request);
@@ -182,6 +185,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             AlertMessage = AlertStatus.Success.ToString();
             AlertStatus = AlertStatus.Success;
+
+
+            IsPreLoader = false;
         }
 
         public async Task OnMarketGroupClickEvent(string name)
