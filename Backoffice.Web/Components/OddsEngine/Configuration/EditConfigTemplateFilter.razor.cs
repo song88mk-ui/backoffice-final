@@ -19,6 +19,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public EventCallback<EditConfigTemplateFilterModel> EditConfigTemplateFilterCallback { get; set; }
         [Parameter] public long ConfigTemplateId { get; set; }
 
+        public SearchFormModel SearchForm { get; set; }
         public EditConfigTemplateFilterModel EditConfigTemplateFilterModel { get; set; }
 
 
@@ -34,6 +35,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         protected override async Task OnInitializedAsync()
         {
+            SearchForm = new SearchFormModel();
             EditConfigTemplateFilterModel = new EditConfigTemplateFilterModel();
             EditConfigTemplateFilterModel.MarketGroups = new List<SelectListItemWithCheckboxModel<string>>();
             EditConfigTemplateFilterModel.ConfigStatuses = new List<SelectListItemWithCheckboxModel<string>>();
@@ -60,6 +62,17 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             await EditConfigTemplateFilterCallback.InvokeAsync(EditConfigTemplateFilterModel);
         }
+
+        public async Task OnInputSearchEvent()
+        {
+            if (!string.IsNullOrEmpty(SearchForm.SearchText) && SearchForm.SearchText.Length == 1)
+                return;
+
+            EditConfigTemplateFilterModel.SearchText = SearchForm.SearchText;
+
+            await EditConfigTemplateFilterCallback.InvokeAsync(EditConfigTemplateFilterModel);
+        }
+
 
         public void Dispose()
         {

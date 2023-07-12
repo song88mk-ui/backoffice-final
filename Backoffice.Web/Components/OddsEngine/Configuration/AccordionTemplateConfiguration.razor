@@ -11,9 +11,9 @@
                     <Authorized Context="ActivateAll">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox"
-                                   id="@($"Market-{Market.MarketLookup.MarketTemplateId}Toggle")" role="switch"
-                                   aria-label="@($"{Market.MarketLookup.MarketTemplateName} Toggle Switch")"
-                            @bind="Market.MarketLookup.IsActive" @oninput="OnMarketActiveChangedEvent" />
+                                   id="@($"Market-{Market.NewMarketLookup.MarketTemplateId}Toggle")" role="switch"
+                                   aria-label="@($"{Market.NewMarketLookup.MarketTemplateName} Toggle Switch")"
+                            @bind="Market.NewMarketLookup.IsActive" @oninput="OnMarketActiveChangedEvent" />
                         </div>
                     </Authorized>
                     <NotAuthorized Context="ActivateAll">

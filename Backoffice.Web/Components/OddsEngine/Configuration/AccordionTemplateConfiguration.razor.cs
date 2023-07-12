@@ -18,7 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public async Task OnMarketActiveChangedEvent(ChangeEventArgs args)
         {
 
-            Market.MarketLookup.IsActive = (bool)args.Value;
+            Market.NewMarketLookup.IsActive = (bool)args.Value;
 
             //await OnMarketChangedCallback.InvokeAsync(Market);
         }

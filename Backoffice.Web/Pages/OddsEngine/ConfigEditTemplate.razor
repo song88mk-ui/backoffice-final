@@ -53,8 +53,19 @@
 <EditConfigTemplateFilter ConfigTemplateId="@ConfigTemplateId" EditConfigTemplateFilterCallback="InitConfigEditTemplate" />
 
 <div class="d-flex justify-content-end mb-4">
-    <button type="button" class="btn btn-activate-all fw-bold">ACTIVATE ALL</button>
+    <button type="button" class="btn btn-activate-all fw-bold" @onclick="OnAllMarketStatusClickEvent">@AllMarketStatusName</button>
 </div>
+@*<div class="col-md-12 mb-2">
+    <AuthorizeView Policy="sbc-config-canedit">
+        <Authorized Context="ActivateAll">
+            <button type="button" class="btn float-end" @onclick="OnAllMarketStatusClickEvent">@AllMarketStatusName</button>
+        </Authorized>
+        <NotAuthorized Context="ActivateAll">
+            <button type="button" class="btn float-end" disabled>@AllMarketStatusName</button>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+*@
 
 <div class="col-md-12 mb-4">
     @if (IsPreloader)
@@ -68,9 +79,9 @@
             foreach (var market in MarketLookupNavigation)
             {
                 <AccordionTemplateConfiguration Market="market"
-                @key="@($"{EditConfigTemplateFilterModel.ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
-                                                FilterConfigStatus="@EditConfigTemplateFilterModel.SelectedConfigStatus"
-                                                Scope="@EditConfigTemplateFilterModel.ScopeId" />
+                    @key="@($"{EditConfigTemplateFilterModel.ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
+                    FilterConfigStatus="@EditConfigTemplateFilterModel.SelectedConfigStatus"
+                    Scope="@EditConfigTemplateFilterModel.ScopeId" />
             }
         }
         else

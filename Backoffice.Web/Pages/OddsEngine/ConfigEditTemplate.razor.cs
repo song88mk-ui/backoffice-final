@@ -36,7 +36,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string ConfigTemplateName { get; set; } = "";
         private string SportName { get; set; } = "";
         private string Scope { get; set; } = "";
-
+        private string AllMarketStatusName { get; set; } = "ACTIVATE ALL";
         public bool IsPreloader { get; set; } = true;
         #endregion
 
@@ -64,8 +64,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task InitConfigEditTemplate(EditConfigTemplateFilterModel model)
         {
             IsPreloader = true;
-            await InvokeAsync(StateHasChanged);
-
+            
             EditConfigTemplateFilterModel = model;
 
             Breadcrumbs = new List<BreadcrumbModel>()
@@ -93,6 +92,36 @@ namespace Backoffice.Web.Pages.OddsEngine
             await LoadMarkets();
 
             IsPreloader = false;
+        }
+
+        public async Task OnAllMarketStatusClickEvent()
+        {
+            //MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
+
+            //SelectedContents = await GetContents();
+            //SelectedContents.ForEach(market => GetNewSettings(market));
+
+            if (AllMarketStatusName == "ACTIVATE ALL")
+            {
+                //var allDisabled = MarketLookupNavigation.Where(market => market.MarketLookup.IsActive == false).ToList();
+
+                //MarketLookupNavigationModelsTemp.AddRange(allDisabled);
+
+                MarketLookupNavigation.ForEach(market => market.NewMarketLookup.IsActive = true);
+            }
+            else
+            {
+                //var allEnabled = MarketLookupNavigation.Where(market => market.MarketLookup.IsActive == true).ToList();
+
+                //MarketLookupNavigationModelsTemp.AddRange(allEnabled);
+
+                MarketLookupNavigation.ForEach(market => market.NewMarketLookup.IsActive = false);
+            }
+
+            //IsMarketEditing = true;
+
+            AllMarketStatusName = AllMarketStatusName == "DEACTIVATE ALL" ? "ACTIVATE ALL" : "DEACTIVATE ALL";
+            //AllMarketStatus = AllMarketStatusName == "Deactivate All" ? 1 : 0;
         }
 
         public void Dispose()
@@ -137,6 +166,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     if (marketTemplateGroup.MarketTemplateIds.Contains(marketLookup.MarketTemplateId))
                     {
+                        if (!(string.IsNullOrEmpty(EditConfigTemplateFilterModel.SearchText) || marketLookup.MarketTemplateName.Contains(EditConfigTemplateFilterModel.SearchText, StringComparison.OrdinalIgnoreCase)))
+                            continue;
 
                         var newMarketTemplate = marketTemplates.FirstOrDefault(m => m.MarketLookup.MarketTemplateId == marketLookup.MarketTemplateId);
                         if (newMarketTemplate == null)
@@ -148,11 +179,18 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 configTemplateMargin = new Backoffice.Shared.Models.ConfigTemplateMargin()
                                 {
                                     MarketTemplateId = marketLookup.MarketTemplateId,
-                                    IsActive = true,
+                                    IsActive = false,
                                     FixtureTypeId = EditConfigTemplateFilterModel.ScopeId,
                                     SportId = EditConfigTemplateFilterModel.SportId
                                 };
                             }
+                            else
+                            {
+                                marketLookup.IsActive = configTemplateMargin.IsActive;
+                            }
+
+                            if (!EditConfigTemplateFilterModel.SelectedConfigStatus.Contains(marketLookup.IsActive ? "1" : "2"))
+                                continue;
 
                             var prematchSettings = GetPrematchSettingsTemplate(configTemplateMargin, marketLookup.MarketTemplateId);
                             var liveSettings = GetLiveSettingsTemplate(configTemplateMargin, marketLookup.MarketTemplateId);
@@ -163,6 +201,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 IsSelected = false,
                                 MarketTemplateGroupIds = new List<int>() { marketTemplateGroup.MarketTemplateGroupId },
                                 MarketLookup = marketLookup,
+                                NewMarketLookup = marketLookup,
                                 LiveSettings = liveSettings,
                                 NewLiveSettings = liveSettings,
                                 PrematchSettings = prematchSettings,
