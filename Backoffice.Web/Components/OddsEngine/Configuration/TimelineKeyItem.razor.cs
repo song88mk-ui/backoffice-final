@@ -7,7 +7,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
         [Parameter] public List<KeyTimeModel> Settings { get; set; }
-        [Parameter] public EventCallback<List<KeyTimeModel>> SettingsChanged { get; set; }
+        //[Parameter] public EventCallback<List<KeyTimeModel>> SettingsChanged { get; set; }
         #endregion
         #region Methods
         public void Dispose()

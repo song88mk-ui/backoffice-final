@@ -1,0 +1,12 @@
+﻿table tbody > tr > th{
+    font-weight : normal !important;
+}
+
+.template-name-italic {
+    font-style: italic;
+    color: #ACACAC;
+}
+
+.table-active {
+    background-color: #EEF6FF;
+}

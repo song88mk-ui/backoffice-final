@@ -1,0 +1,231 @@
+﻿
+/* Tooltip content */
+.tooltipcontent {
+    background-color: #f7f7f7;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-style: normal;
+    font-weight: 400;
+    text-align: left;
+    padding: 5px 0;
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,.2);
+    box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.3);
+    display: block;
+    max-width: 500px;
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 9999 !important;
+    margin-left: 0px;
+    opacity: 0;
+    text-indent: initial;
+    color: #404E67;
+    font-size: initial;
+    text-transform: initial;
+}
+
+    /* Tooltip arrow */
+    .tooltipcontent.down::after {
+        content: "";
+        position: absolute;
+        top: -14px;
+        left: 5%;
+        margin-left: -5px;
+        border-width: 7px;
+        border-style: solid;
+        border-color: transparent transparent #f7f7f7 transparent;
+    }
+
+    .tooltipcontent.down::before {
+        content: "";
+        border-width: 11px;
+    }
+
+    .tooltipcontent.up.left::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        right: 15px;
+        margin-left: -5px;
+        border-width: 7px;
+        border-style: solid;
+        border-color: #f7f7f7 transparent transparent transparent;
+    }
+
+    .tooltipcontent.up.left::before {
+        content: "";
+        border-width: 11px;
+    }
+
+    .tooltipcontent.up.right::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 5%;
+        margin-left: -5px;
+        border-width: 7px;
+        border-style: solid;
+        border-color: #f7f7f7 transparent transparent transparent;
+    }
+
+    .tooltipcontent.up.right::before {
+        content: "";
+        border-width: 11px;
+    }
+
+    .tooltipcontent.show {
+        visibility: visible;
+        opacity: 1 !important;
+        transition: opacity 0.3s;
+    }
+
+    .tooltipcontent.hide {
+        visibility: hidden;
+        opacity: 0 !important;
+        transition: opacity 0.3s;
+    }
+
+    /* tooltip for Match page */
+    .tooltipcontent.down.match {
+        top: 45px;
+        height: 300%;
+    }
+
+    .tooltipcontent.down.right.match {
+        left: 20%;
+    }
+
+    .tooltipcontent.down.left.match {
+        right: 20%;
+    }
+
+    .tooltipcontent.up.match {
+        bottom: 125%;
+    }
+
+    .tooltipcontent.up.right.match {
+        left: 15px;
+    }
+
+    .tooltipcontent.up.left.match {
+        right: 25%;
+    }
+
+    /* tooltip for Match Detail page */
+    .tooltipcontent.down.matchdetail {
+        top: 45px;
+        height: 300%;
+    }
+
+    .tooltipcontent.down.right.matchdetail {
+        left: 20%;
+    }
+
+    .tooltipcontent.down.left.matchdetail {
+        right: 20%;
+    }
+
+    .tooltipcontent.up.matchdetail {
+        margin-top: -210px;
+    }
+
+    .tooltipcontent.up.right.matchdetail {
+        margin-left: -18px;
+    }
+
+    .tooltipcontent.up.left.matchdetail {
+        right: 25%;
+    }
+
+
+    /* tooltip for Config PreMatch page */
+    .tooltipcontent.down.configmatch {
+        top: 45px;
+        height: 300%;
+        width: 190px;
+    }
+
+    .tooltipcontent.down.right.configmatch {
+        left: 20%;
+    }
+
+    .tooltipcontent.down.left.configmatch {
+        right: 20%;
+    }
+
+    .tooltipcontent.up.configmatch {
+        bottom: 60px;
+        width: 190px;
+    }
+
+    .tooltipcontent.up.right.configmatch {
+        margin-left: 150px;
+    }
+
+    .tooltipcontent.up.left.configmatch {
+        margin-right: 150px;
+    }
+
+    .tooltipcontent.up.right.configmatch::after {
+        left: 15px;
+    }
+
+    /* tooltip for Config LIVE Match page */
+    .tooltipcontent.down.configlivematch {
+        top: 45px;
+        height: 300%;
+        width: 190px;
+    }
+
+    .tooltipcontent.down.right.configlivematch {
+        left: 20%;
+    }
+
+    .tooltipcontent.down.left.configlivematch {
+        right: 20%;
+    }
+
+    .tooltipcontent.up.configlivematch {
+        bottom: 40px;
+        width: 190px;
+    }
+
+    .tooltipcontent.up.right.configlivematch {
+        margin-left: 150px;
+    }
+
+    .tooltipcontent.up.left.configlivematch {
+        margin-left: -150px;
+    }
+
+    .tooltipcontent.up.right.configlivematch::after {
+        left: 15px;
+    }
+
+/*end tooltip*/
+
+
+.popover {
+    max-width: 500px;
+    box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.3);
+    border: 0px;
+}
+
+.popover:hover {
+    display: block;
+}
+
+.popover-header {
+    padding: 8px 14px;
+    margin-bottom: 0;
+    font-size: 1rem;
+    color: #404E67;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ebebeb;
+    border-top-left-radius: calc(.3rem - 1px);
+    border-top-right-radius: calc(.3rem - 1px);
+}
+
+.popover-body {
+    padding: 9px 14px;
+    color: #212529;
+}

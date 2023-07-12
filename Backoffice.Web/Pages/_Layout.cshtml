@@ -78,5 +78,42 @@
             }
         }).observe(document.body, { childList: true, subtree: true });
  </script>
+    <script type="text/javascript">
+        function getDimensions(element, maxwidth) {
+            var e = element.getBoundingClientRect();
+
+            var result = {
+                'bottom': e.bottom,
+                'height': e.height,
+                'left': e.left,
+                'right': e.right,
+                'top': e.top,
+                'width': e.width,
+                'x': e.x,
+                'y': e.y,
+                'position': positionString(element, maxwidth)
+            }
+
+            return JSON.stringify(result);
+        }
+
+        function positionString(element, maxwidth) {
+            var offset = $(element).offset();
+            var height = $(element).outerHeight();
+
+            var position = 'up';
+            if ((offset.top + height) > ($(window).height() + window.pageYOffset)) {
+                position = 'up';
+            }
+
+            if ((offset.left + maxwidth) > ($(window).width() + window.pageXOffset)) {
+                position = position + ' left';
+            }
+            else {
+                position = position + ' right';
+            }
+            return position;
+        }
+    </script>
 </body>
 </html>

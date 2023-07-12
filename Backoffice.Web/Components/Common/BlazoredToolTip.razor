@@ -1,0 +1,18 @@
+﻿@if (IsVisible)
+{
+<div @ref="TooltipReference" class="tooltipcontent @(!IsVisible ? "hide" : "show") @ComponentPosition @ComponentClass" 
+      @onclick:preventDefault="true" @onclick:stopPropagation="true"
+      @onmouseleave:preventDefault="true" @onmouseleave:stopPropagation="true">
+    @if (Content != null)
+    {
+        <h3 class="popover-header">@Title</h3>
+        <div class="popover-body">
+            <CascadingValue Value="this">
+                <CascadingValue Value="@Parameters">
+                    @Content
+                </CascadingValue>
+            </CascadingValue>
+        </div>
+    }
+</div>
+}

@@ -10,5 +10,6 @@ namespace Backoffice.Shared.Models
         public int Time { get; set; }
         public string TimeDisplay { get; set; }
         public int? Key { get; set; }
+        public bool IsTooltipVisible { get; set; } = false;
     }
 }

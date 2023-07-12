@@ -5,6 +5,7 @@ using Backoffice.Web.Components.Administration.CancelBets;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 using System.Text.Json;
 using Serilog;
 

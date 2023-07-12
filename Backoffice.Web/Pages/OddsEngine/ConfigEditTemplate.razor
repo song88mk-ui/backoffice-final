@@ -1,0 +1,85 @@
+﻿@using Backoffice.Web.Components.OddsEngine.Configuration
+
+@layout OEMonitoringLayout
+
+@*@page "/{Region}/odds-engine/config/my-templates"*@
+@page "/hk/odds-engine/config-templates/edit/{configTemplateId:long}"
+
+<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region" />
+
+<div class="col-md-12 mb-4">
+    <div class="col-md-12 mb-4">
+        <div class="d-flex justify-content-between mx-4">
+            <div>
+                <h4 class="page-title fw-bold">@ConfigTemplateName</h4>
+            </div>
+
+            <div>
+                <button type="button" class="btn btn-cancel">Cancel</button>
+                <button type="button" class="btn btn-save">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 mb-4">
+        <div class="d-flex card-flex">
+            <div class="border card-block">
+                <div class="card-icon">
+                    <i class=@($"iconfont iconfont-{SportIcon}")></i>
+                </div>
+
+                <div class="card-desc">
+                    <label class="fw-bold">Sport</label>
+                    <label>@SportName</label>
+                </div>
+            </div>
+
+            <div class="border card-block">
+                <div class="card-icon">
+                    <i class="ico ico-top-leagues"></i>
+                </div>
+
+                <div class="card-desc">
+                    <label class="fw-bold">Scope</label>
+                    <label>@($"{Scope}")</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+</div>
+
+<EditConfigTemplateFilter ConfigTemplateId="@ConfigTemplateId" EditConfigTemplateFilterCallback="InitConfigEditTemplate" />
+
+<div class="d-flex justify-content-end mb-4">
+    <button type="button" class="btn btn-activate-all fw-bold">ACTIVATE ALL</button>
+</div>
+
+<div class="col-md-12 mb-4">
+    @if (IsPreloader)
+    {
+        <Preloader />
+    }
+    else
+    {
+        if (MarketLookupNavigation != null && MarketLookupNavigation.Any())
+        {
+            foreach (var market in MarketLookupNavigation)
+            {
+                <AccordionTemplateConfiguration Market="market"
+                @key="@($"{EditConfigTemplateFilterModel.ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
+                                                FilterConfigStatus="@EditConfigTemplateFilterModel.SelectedConfigStatus"
+                                                Scope="@EditConfigTemplateFilterModel.ScopeId" />
+            }
+        }
+        else
+        {
+            <NoRecordFound />
+        }
+    }
+
+
+</div>
+
+<CustomModal />

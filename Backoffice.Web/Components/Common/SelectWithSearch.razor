@@ -1,0 +1,25 @@
+﻿
+<ul class="dropdown-menu w-100 pt-0">
+    @if (Items != null && Items.Any())
+    {
+        <li>
+            <input class="w-100 border p-2 px-3 search-text" placeholder="Select Template" @onchange="OnSearchTextChanged" />
+        </li>
+        @foreach (var item in Items.Where(x => x.Name.ToUpper().Contains(SearchText.ToUpper())))
+        {
+            <li id="@item.Value" class="p-2">
+                <button class="btn w-100 text-start px-2" @onclick="() => OnSelectTemplateClickedEvent(item)">@item.Name</button>
+            </li>
+        }
+        @if (State == ConfigState.Assigned)
+        {
+            <li class="p-1 border-top">
+                <a class="btn w-100 text-start" @onclick="OnRemoveTemplateClickedEvent">
+                    <span class="template-remove">
+                        <i class="fa fa-times ico-font-size" aria-hidden="true"></i>Remove Current Template
+                    </span>
+                </a>
+            </li>
+        }
+    }
+</ul>

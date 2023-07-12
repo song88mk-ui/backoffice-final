@@ -1,0 +1,30 @@
+﻿.template-remove {
+    color: #E5442F;
+}
+li:hover {
+    background-color: #1E90FF !important;
+}
+
+::-webkit-input-placeholder {
+    font-style: italic;
+    color: #ACACAC;
+}
+
+:-moz-placeholder {
+    font-style: italic;
+    color: #ACACAC;
+}
+
+::-moz-placeholder {
+    font-style: italic;
+    color: #ACACAC;
+}
+
+:-ms-input-placeholder {
+    font-style: italic;
+    color: #ACACAC;
+}
+
+.ico-font-size {
+    margin-right: 0.5rem;
+}

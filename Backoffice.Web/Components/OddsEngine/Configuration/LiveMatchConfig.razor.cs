@@ -6,8 +6,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class LiveMatchConfig : IDisposable
     {
         #region Properties        
-        [Parameter] public LiveSettingsModel LiveSettings { get; set; }
-        [Parameter] public EventCallback<LiveSettingsModel> LiveSettingsChanged { get; set; }
+        [Parameter] public LiveSettingsTemplateModel LiveSettings { get; set; }
+        //[Parameter] public EventCallback<LiveSettingsTemplateModel> LiveSettingsChanged { get; set; }
         
         #endregion
 

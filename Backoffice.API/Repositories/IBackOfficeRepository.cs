@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using System.Collections.Generic;
@@ -17,6 +18,15 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs);
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
+        #region Config
+        Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(List<int> sportIds = null, List<int> scopeIds = null);
+        Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long templateId);
+        Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
+        Task<BaseResponse<bool>> SetConfigState(ConfigState configState, ConfigSetLeagueStateRequest request);
+        Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string id);
+        Task<BaseResponse<int>> GetTemplateConfigCount(List<string> clientCodes, string state);
+        Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1);
+        #endregion
 
         #region TOP FIXTURES
         Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);

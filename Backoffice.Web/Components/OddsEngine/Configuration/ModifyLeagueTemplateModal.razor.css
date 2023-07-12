@@ -1,0 +1,55 @@
+﻿.btn-modal {   
+    border-radius: 2px;
+    opacity: 1;
+}
+
+.btn-save {
+    background: transparent linear-gradient(180deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+    color: white;
+}
+
+.league-body {
+    max-height: 30vh;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+}
+.league-name {
+    font-weight: bold;
+    font-size: 14px;
+}
+.league-desc {
+    font-size: 12px;
+}
+::-webkit-scrollbar{
+    width: 10px;
+}
+
+
+button.form-select {
+    background-color: #fff;
+    text-align: left;
+    border: 1px solid #ced4da;
+    width: 200px;
+}
+
+.dropdown-toggle::after {
+    content: unset;
+}
+.template-name-italic {
+    font-style: italic;
+    color: #ACACAC;
+}
+
+.flex-gap {
+    gap: 0.5rem;
+    color: #9AA0AB;
+    font-size: 12px;
+}
+
+.modal-btn {
+    width: 120px;
+    height: 40px;
+    font-size: 15px;
+}

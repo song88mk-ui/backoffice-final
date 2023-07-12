@@ -25,6 +25,8 @@ using System.Text;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.Query;
+using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 
 namespace Backoffice.Utility.Repository
 {
@@ -489,6 +491,38 @@ namespace Backoffice.Utility.Repository
             finally
             {
                 excel.Dispose();
+            }
+        }
+        public async Task ProcessOnGetOeConfigTemplate(OnGetOeConfigTemplateMessage request, IMessageBroker messageBroker)
+        {
+            try
+            {
+                var query = _backofficeContext.ConfigTemplates.Where(x => x.Id.ToString() == request.ConfigTemplateId);
+                var clientCodes = JwtParser.ParseClaimsFromJwt(request.AccessToken).Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.ToString();
+
+                var configTemplate = query.ToList().Select(x => new ConfigTemplateModel()
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    SportId = x.SportId,
+                    FixtureTypeId = x.FixtureTypeId,
+                    Timestamp = x.Timestamp
+                }).FirstOrDefault();
+
+
+                var payload = new
+                {                    
+                    SportIds = configTemplate.SportId.ToString(),                    
+                    FileName = request.Filename,
+                    UserId = request.UserId,
+                    ConnectionId = request.ConnectionId
+                };
+
+                messageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet3", $"r.oe.web.config.ongetmarginspreadsheet3", Guid.NewGuid().ToString(), "HK");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{DateTime.Now} : " + ex.Message);
             }
         }
 
