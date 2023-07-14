@@ -92,8 +92,8 @@ builder.Services.AddAuthorizationCore();
 
 builder.Services.AddAuthorization(options =>
 {
+    options.AddPolicy("disabled", policy => policy.RequireClaim($"-D!5@bl3d-"));
     #region SBC
-    options.AddPolicy("dissabled", policy => policy.RequireClaim($"-D!5s@bl3d-"));
     options.AddPolicy("sbc-dashboard", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Dashboard.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     options.AddPolicy("sbc-drilldown", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Reports_DrillDownReport.ToString().Replace('_', '.')}",
