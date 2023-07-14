@@ -187,6 +187,21 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
+
+        [HttpGet("template/margin/{id}")]
+        public async Task<IActionResult> GetConfigTemplateMarginById([FromRoute] long id)
+        {
+            var result = await _backofficeRepository.GetConfigTemplateMarginById(id);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpPost("template/margin")]
         [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> AddOrUpdateConfigTemplateMargin([FromBody] ConfigTemplateMarginModel request)

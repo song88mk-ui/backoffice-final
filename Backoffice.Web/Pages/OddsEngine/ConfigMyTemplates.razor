@@ -15,6 +15,15 @@
             </div>
         </div>
 
+        @if (!string.IsNullOrEmpty(AlertModel.Message))
+        {
+            <div class="col-md-12 mb-3">
+                <div class="mt-4 mx-3">
+                    <AlertMessage AlertMessageStr="@AlertModel.Message" AlertStatus="@AlertModel.Status" AlwaysShow="false" Opacity="@AlertModel.Opacity" />
+                </div>
+            </div>
+        }
+
         <div class="col-md-12 mb-4">
             <div class="d-flex justify-content-between mx-4">
                 <div class="d-flex filter-div">

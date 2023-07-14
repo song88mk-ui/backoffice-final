@@ -1785,6 +1785,43 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        public async Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMarginById(long templateId)
+        {
+            try
+            {
+                var query = _backofficeContext.ConfigTemplateMargin.AsNoTracking();
+
+                var result = query.Where(e => e.ConfigTemplateId == templateId).Select(x => new Shared.Models.ConfigTemplateMargin()
+                {
+                    ConfigTemplateId = x.ConfigTemplateId,
+                    MarketTemplateId = x.MarketTemplateId,
+                    SportId = x.SportId,
+                    FixtureTypeId = x.FixtureTypeId,
+                    IsActive = x.IsActive,
+                    Prematch = x.Prematch,
+                    Live = x.Live,
+                }).ToList();
+
+                return new BaseResponse<ConfigTemplateMarginModel>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new ConfigTemplateMarginModel()
+                    {
+                        ConfigTemplateMargins = result ?? new List<Shared.Models.ConfigTemplateMargin>()
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ConfigTemplateMarginModel>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString()}: {ex.Message}",
+                    Result = null
+                };
+            }
+        }
         public async Task<BaseResponse<bool>> AddOrUpdateConfigTemplateMargin(ConfigTemplateMarginModel request)
         {
             try

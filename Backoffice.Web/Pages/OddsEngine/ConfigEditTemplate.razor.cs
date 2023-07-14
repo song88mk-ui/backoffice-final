@@ -15,6 +15,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class ConfigEditTemplate : IDisposable
     {
         #region Properties
+        [Inject] public NavigationManager NavigationManager { get; set; }
 
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
 
@@ -181,9 +182,14 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var result = await BackOfficeService.AddOrUpdateConfigTemplateMargin(request);
                 if (result.StatusCode == StatusCode.Success)
                 {
-
+                    NavigationManager.NavigateTo($"hk/odds-engine/config-templates?message=Successfully updated");
                 }
             }
+        }
+
+        public async Task OnCancelMarginTemplate()
+        {
+            NavigationManager.NavigateTo($"hk/odds-engine/config-templates");
         }
 
         public void Dispose()

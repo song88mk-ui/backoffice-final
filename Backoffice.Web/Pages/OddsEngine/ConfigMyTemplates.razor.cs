@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -10,6 +11,10 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
         [Parameter] public string Region { get; set; } = "hk";
+
+        [Parameter]
+        [SupplyParameterFromQuery(Name = "mess")] 
+        public string? Mess { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
@@ -27,7 +32,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string IconClass { get; set; }
         public int SelectedSportId { get; set; }
         public int SelectedScopeId { get; set; }
-
+        private AlertModel AlertModel { get; set; }
         #endregion
 
         #region Methods
@@ -36,6 +41,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsPreloader = true;
             PageTitle = "My Templates";
             IconClass = "";
+
+            AlertModel = new AlertModel();
+            if(!string.IsNullOrEmpty(Mess))
+            {
+                AlertModel.Message = Mess;
+                AlertModel.Status = AlertStatus.Success.ToString();
+                AlertModel.Opacity = 1.0m;
+            }
 
             ConfigTemplates = new List<ConfigTemplateModel>();
 
@@ -51,6 +64,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             SelectedSportId = -1;
             SelectedScopeId = int.Parse(Scopes.FirstOrDefault().Value);
+
 
             await LoadConfigTemplates();
         }
