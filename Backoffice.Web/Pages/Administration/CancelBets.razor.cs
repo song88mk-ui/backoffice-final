@@ -38,7 +38,6 @@ namespace Backoffice.Web.Pages.Administration
             CancelBetModel = new CancelBetModel();
             CancelBetModel.BetReferenceIds.Add(new CancelBetModel.BetReferenceModel
             {
-                Num = 1,
                 BetReferenceId = string.Empty
             });
 
@@ -54,7 +53,6 @@ namespace Backoffice.Web.Pages.Administration
             {
                 CancelBetModel.BetReferenceIds.Add(new CancelBetModel.BetReferenceModel
                 {
-                    Num = CancelBetModel.BetReferenceIds.Count + 1,
                     BetReferenceId = string.Empty
                 });
             }
@@ -89,7 +87,6 @@ namespace Backoffice.Web.Pages.Administration
             CancelBetModel.BetReferenceIds.Clear();
             CancelBetModel.BetReferenceIds.Add(new CancelBetModel.BetReferenceModel
             {
-                Num = 1,
                 BetReferenceId = string.Empty
             });
 
@@ -111,10 +108,8 @@ namespace Backoffice.Web.Pages.Administration
 
                 var notRunningBets = betDetails.Bets.Where(b => b.BetStatusId != (int)BetStatus.Running).ToList();
 
-                var ctr = 0;
                 foreach(var bet in CancelBetModel.BetReferenceIds)
                 {
-                    ctr++;
                     if (string.IsNullOrEmpty(bet.BetReferenceId))
                         continue;
 
@@ -125,7 +120,7 @@ namespace Backoffice.Web.Pages.Administration
                             Status = AlertStatus.Error.ToString(),
                             Message = $"Your request to cancel this Bet Reference ID did not proceed. Only 'Running' bets can be settled as 'Cancelled'.",
                             Opacity = 1.0m,
-                            Control = $"{ctr}"
+                            Control = $"{CancelBetModel.BetReferenceIds.IndexOf(bet)}"
                         });
                         IsPreload = false;
                     }
@@ -192,7 +187,7 @@ namespace Backoffice.Web.Pages.Administration
                         {
                             new CancelBetModel.BetReferenceModel()
                             {
-                                Num = 1,
+                                //Num = 1,
                                 BetReferenceId = ""
                             }
                         }
@@ -283,7 +278,7 @@ namespace Backoffice.Web.Pages.Administration
                         });
                     }
 
-                    var existingBet = CancelBetModel.BetReferenceIds.FirstOrDefault(b => b.Num != bet.Num && b.BetReferenceId.Trim() == bet.BetReferenceId.Trim());
+                    var existingBet = CancelBetModel.BetReferenceIds.FirstOrDefault(b => b.BetReferenceId.Trim() == bet.BetReferenceId.Trim());
                     if (existingBet != null)
                     {
                         if (!Alerts.Any(a => a.Message.Contains($"Duplicate Bet Reference Id found. {bet.BetReferenceId.Trim()}")))

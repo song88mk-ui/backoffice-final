@@ -51,9 +51,9 @@
                                         foreach (var bet in CancelBetModel.BetReferenceIds)
                                         {
                                             <tr>
-                                                <td class="text-center">@bet.Num</td>
+                                                <td class="text-center">@(CancelBetModel.BetReferenceIds.IndexOf(bet) + 1)</td>
                                                 <td>
-                                                    <div class="input-group @(!IsPreload && Alerts.Any(a => a.Control == bet.Num.ToString()) ? "border-danger" : "") ">
+                                                    <div class="input-group @(!IsPreload && Alerts.Any(a => a.Control == CancelBetModel.BetReferenceIds.IndexOf(bet).ToString()) ? "border-danger" : "") ">
                                                         <input type="text" class="form-control" @bind-value="bet.BetReferenceId" />
                                                         @if (!IsPreload && !string.IsNullOrEmpty(bet.BetReferenceId))
                                                         {
