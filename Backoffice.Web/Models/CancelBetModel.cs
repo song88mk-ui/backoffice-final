@@ -11,7 +11,6 @@
 
         public class BetReferenceModel
         {
-            public int Num { get; set; }
             public string BetReferenceId { get; set; }
         }
     }
