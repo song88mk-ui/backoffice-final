@@ -2,9 +2,9 @@
     <div class="timeline-axis-line"></div>
     <span class="timeline-axis-label label-prematch">Prematch</span>    
 
-    @foreach(var setting in Settings)
+    @foreach(var setting in PrematchSettings.Settings)
     {
-        if (Settings.First() == setting)
+        if (PrematchSettings.Settings.First() == setting)
         {
             <div class="timeline-axis-item my-3 first-axis">
                 <a id="timeline-@setting.TimeDisplay" class="waves-effect waves-light timeline-axis-item-key-container" 

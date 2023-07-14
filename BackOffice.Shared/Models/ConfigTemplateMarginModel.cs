@@ -14,7 +14,7 @@ namespace Backoffice.Shared.Models
 
     public class ConfigTemplateMargin
     {
-        public string Id { get; set; }
+        public long ConfigTemplateId { get; set; }
         public int SportId { get; set; }
         public string MarketTemplateId { get; set; }
         public int FixtureTypeId { get; set; }

@@ -1785,6 +1785,46 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        public async Task<BaseResponse<bool>> AddOrUpdateConfigTemplateMargin(ConfigTemplateMarginModel request)
+        {
+            try
+            {
+                var existingConfig = _backofficeContext.ConfigTemplateMargin.Where(x => x.ConfigTemplateId == request.ConfigTemplateMargins.FirstOrDefault().ConfigTemplateId).AsNoTracking();
+
+                if (existingConfig != null)
+                {
+                    _backofficeContext.ConfigTemplateMargin.RemoveRange(existingConfig);
+                    //await _backofficeContext.SaveChangesAsync();
+                }
+
+                foreach(var config in request.ConfigTemplateMargins)
+                {
+                    _backofficeContext.ConfigTemplateMargin.Add(new Shared.Data.Backoffice.Entities.ConfigTemplateMargin()
+                    {
+                        ConfigTemplateId = config.ConfigTemplateId,
+                        FixtureTypeId = config.FixtureTypeId,
+                        MarketTemplateId = config.MarketTemplateId,
+                        SportId = config.SportId,
+                        Prematch = config.Prematch,
+                        Live = config.Live,
+                        IsActive = config.IsActive
+                    });
+                }
+
+                await _backofficeContext.SaveChangesAsync();
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>() { StatusCode = StatusCode.Error, Message = ex.Message };
+            }
+        }
         #endregion
 
         #region Methods - Top Fixtures

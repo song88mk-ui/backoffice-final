@@ -37,13 +37,13 @@
                         if ((Scope == 99 || Scope == 0))
                         {
                             //prematch
-                            <PreMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "prematch") PrematchSettings="@Market.NewPrematchSettings" />
+                            <PreMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "prematch") PrematchSettings="@Market.NewPrematchSettings" OnMarginChangeCallback="OnTemplateMarginChangeCallback" />
                         }
 
                         if ((Scope == 99 || Scope == 1))
                         {
                             //live
-                            <LiveMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "live") LiveSettings="@Market.NewLiveSettings" />
+                            <LiveMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "live") LiveSettings="@Market.NewLiveSettings" OnMarginChangeCallback="OnMarginChangedEvent" />
                         }
                     }
                 }

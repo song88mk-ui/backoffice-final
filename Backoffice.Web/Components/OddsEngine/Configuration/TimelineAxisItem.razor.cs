@@ -10,9 +10,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
         [Inject] public IModalService Modal { get; set; }
-        [Parameter] public List<KeyTimeModel> Settings { get; set; }
         [Parameter] public PrematchSettingsTemplateModel PrematchSettings { get; set; }
-        //[Parameter] public EventCallback<List<KeyTimeModel>> SettingsChanged { get; set; }
+        [Parameter] public EventCallback OnMarginChangeCallback { get; set; }
         public Type ContentComponent { get; set; }
         public ModalParameters Parameters { get; set; }
         private Dictionary<string,ElementReference> ElementReferenceDict { get; set; }
@@ -23,6 +22,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             ElementReferenceDict = new Dictionary<string, ElementReference>();
             ContentComponent = typeof(ModalConfig);
+            Modal.OnClose += Modal_OnClose;
         }
 
         public async Task OnAddKeyClickEvent(KeyTimeModel settings)
@@ -45,7 +45,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             Modal.Cancel();
         }
-
+        
         public void Dispose()
         {
             
@@ -53,16 +53,24 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #endregion
 
         #region Utilities
-        private void LoadModalParam(KeyTimeModel settings)
+        private async void Modal_OnClose(ModalResult obj)
+        {
+            if (!obj.Cancelled)
+            {
+                await OnMarginChangeCallback.InvokeAsync();
+            }
+        }
+
+        private void LoadModalParam(KeyTimeModel setting)
         {
             string Title = "Add Config";
 
-            if (settings.Key != null && PrematchSettings.Settings.Where(a => a.Key == settings.Key && a.Time == settings.Time).Count() > 0)
+            if (setting.Key != null && PrematchSettings.Settings.Where(a => a.Key == setting.Key && a.Time == setting.Time).Count() > 0)
             { Title = "Edit Config"; }
 
             Parameters = new ModalParameters();
             Parameters.Add("IsPrematch", true);
-            Parameters.Add("Setting", settings);
+            Parameters.Add("Setting", setting);
             Parameters.Add("Settings", PrematchSettings);
             Parameters.Add("Class", "configmatch");
             Parameters.Add("MaxWidth", 400);

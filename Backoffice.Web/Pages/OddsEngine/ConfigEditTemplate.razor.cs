@@ -17,7 +17,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Properties
 
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
-        [Inject] private ITradingService TradingService { get; set; }
 
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public long ConfigTemplateId { get; set; }
@@ -38,6 +37,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string Scope { get; set; } = "";
         private string AllMarketStatusName { get; set; } = "ACTIVATE ALL";
         public bool IsPreloader { get; set; } = true;
+        public bool HasChanges { get; set; } = false;
         #endregion
 
 
@@ -46,6 +46,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         protected override async Task OnInitializedAsync()
         {
             IsPreloader = true;
+
+            HasChanges = false;
 
             ConfigTemplateMargin = new ConfigTemplateMarginModel();
 
@@ -64,7 +66,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task InitConfigEditTemplate(EditConfigTemplateFilterModel model)
         {
             IsPreloader = true;
-            
+
             EditConfigTemplateFilterModel = model;
 
             Breadcrumbs = new List<BreadcrumbModel>()
@@ -122,6 +124,66 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             AllMarketStatusName = AllMarketStatusName == "DEACTIVATE ALL" ? "ACTIVATE ALL" : "DEACTIVATE ALL";
             //AllMarketStatus = AllMarketStatusName == "Deactivate All" ? 1 : 0;
+
+            await OnTemplateMarginChange();
+        }
+
+        public async Task OnTemplateMarginChange()
+        {
+            HasChanges = false;
+            foreach (var market in MarketLookupNavigation)
+            {
+                HasChanges = !DeepCompare(market.MarketLookup, market.NewMarketLookup);
+                if (HasChanges)
+                    break;
+
+                HasChanges = !DeepCompare(market.PrematchSettings, market.NewPrematchSettings);
+                if (HasChanges)
+                    break;
+
+            }
+        }
+
+        public async Task OnSaveMarginTemplate()
+        {
+            if (HasChanges)
+            {
+                ConfigTemplateMarginModel request = new ConfigTemplateMarginModel();
+
+                foreach (var market in MarketLookupNavigation)
+                {
+                    var livematchSettings = new List<MarketMargin>();
+                    var liveSettings = market.NewLiveSettings.Settings.Where(a => a.Key != null);
+                    if (liveSettings != null)
+                        livematchSettings = liveSettings.Select(a => new MarketMargin { T = a.Time, M = (int)a.Key }).ToList();
+                    else
+                        livematchSettings = new List<MarketMargin>();
+
+                    var prematchSettings = new List<MarketMargin>();
+                    var preSettings = market.NewPrematchSettings.Settings.Where(a => a.Key != null);
+                    if (preSettings != null)
+                        prematchSettings = preSettings.Select(a => new MarketMargin { T = a.Time, M = (int)a.Key }).ToList();
+                    else
+                        prematchSettings = new List<MarketMargin>();
+
+                    request.ConfigTemplateMargins.Add(new Backoffice.Shared.Models.ConfigTemplateMargin
+                    {
+                        ConfigTemplateId = ConfigTemplateId,
+                        SportId = EditConfigTemplateFilterModel.SportId,
+                        MarketTemplateId = market.MarketLookup.MarketTemplateId,
+                        FixtureTypeId = EditConfigTemplateFilterModel.ScopeId,
+                        IsActive = market.NewMarketLookup.IsActive,
+                        Prematch = JsonSerializer.Serialize(prematchSettings),
+                        Live = JsonSerializer.Serialize(livematchSettings)
+                    });
+                }
+
+                var result = await BackOfficeService.AddOrUpdateConfigTemplateMargin(request);
+                if (result.StatusCode == StatusCode.Success)
+                {
+
+                }
+            }
         }
 
         public void Dispose()
@@ -201,11 +263,46 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 IsSelected = false,
                                 MarketTemplateGroupIds = new List<int>() { marketTemplateGroup.MarketTemplateGroupId },
                                 MarketLookup = marketLookup,
-                                NewMarketLookup = marketLookup,
+                                NewMarketLookup = new MarketLookupModel
+                                {
+                                    IsActive = marketLookup.IsActive,
+                                    MarketTemplateId = marketLookup.MarketTemplateId,
+                                    MarketTemplateName = marketLookup.MarketTemplateName
+                                },
                                 LiveSettings = liveSettings,
-                                NewLiveSettings = liveSettings,
+                                NewLiveSettings = new LiveSettingsTemplateModel
+                                {
+                                    MarketTemplateId = liveSettings.MarketTemplateId,
+                                    FirstKey = liveSettings.FirstKey,
+                                    LastKey = liveSettings.LastKey,
+                                    LastTimeKey = liveSettings.LastTimeKey,
+                                    OvertimeKey = liveSettings.OvertimeKey,
+                                    SportId = liveSettings.SportId,
+                                    Settings = liveSettings.Settings.Select(s => new KeyTimeModel
+                                    {
+                                        IsTooltipVisible = s.IsTooltipVisible,
+                                        Key = s.Key,
+                                        SortOrder = s.SortOrder,
+                                        Time = s.Time,
+                                        TimeDisplay = s.TimeDisplay
+                                    }).ToList()
+                                },
                                 PrematchSettings = prematchSettings,
-                                NewPrematchSettings = prematchSettings
+                                NewPrematchSettings = new PrematchSettingsTemplateModel
+                                {
+                                    FirstKey = prematchSettings.FirstKey,
+                                    LastKey = prematchSettings.LastKey,
+                                    MarketTemplateId = prematchSettings.MarketTemplateId,
+                                    SportId = prematchSettings.SportId,
+                                    Settings = prematchSettings.Settings.Select(s => new KeyTimeModel
+                                    {
+                                        TimeDisplay = s.TimeDisplay,
+                                        IsTooltipVisible = s.IsTooltipVisible,
+                                        Key = s.Key,
+                                        SortOrder = s.SortOrder,
+                                        Time = s.Time
+                                    }).ToList()
+                                }
                             });
                         }
                         else
@@ -286,7 +383,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private string GetLastKey(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, bool isPrematch)
         {
-            if (configTemplateMargin == null || (string.IsNullOrEmpty(configTemplateMargin.Prematch) && string.IsNullOrEmpty(configTemplateMargin.Live))) return "";
+            if (configTemplateMargin == null || (string.IsNullOrEmpty(configTemplateMargin.Prematch) && string.IsNullOrEmpty(configTemplateMargin.Live))) return "101";
 
             if ((isPrematch && configTemplateMargin.Prematch?.Length == 0)
                 || (!isPrematch && configTemplateMargin.Live?.Length == 0)) return "";
@@ -374,6 +471,46 @@ namespace Backoffice.Web.Pages.OddsEngine
             return keyTime.M;
 
         }
+
+        protected bool DeepCompare(object obj, object another)
+        {
+            if (ReferenceEquals(obj, another)) return true;
+            if ((obj == null) || (another == null)) return false;
+            //Compare two object's class, return false if they are difference
+            if (obj.GetType() != another.GetType()) return false;
+
+            var result = true;
+            //Get all properties of obj
+            //And compare each other
+            foreach (var property in obj.GetType().GetProperties())
+            {
+                var objValue = property.GetValue(obj);
+                var anotherValue = property.GetValue(another);
+                if (objValue == null && anotherValue == null)
+                    continue;
+
+                if (objValue.GetType() == typeof(List<KeyTimeModel>) && anotherValue.GetType() == typeof(List<KeyTimeModel>))
+                {
+                    foreach (var item in (List<KeyTimeModel>)objValue)
+                    {
+                        foreach (var anotherItem in (List<KeyTimeModel>)anotherValue)
+                        {
+                            if (item.Time == anotherItem.Time)
+                            {
+                                if (!item.Key.Equals(anotherItem.Key))
+                                    result = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else if (!objValue.Equals(anotherValue))
+                    result = false;
+            }
+
+            return result;
+        }
+
 
         #endregion
     }
