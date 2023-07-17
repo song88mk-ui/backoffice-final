@@ -1,5 +1,6 @@
 ﻿using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using System.Security.Claims;
 
 namespace Backoffice.Web.Shared.OddsEngine
 {
@@ -7,20 +8,17 @@ namespace Backoffice.Web.Shared.OddsEngine
     {
         #region Properties
 
-        [Inject] public NavigationManager NavigationManager { get; set; }
-
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [Inject] public NavigationManager? NavigationManager { get; set; }
+        [CascadingParameter(Name = "UserClaims")] public List<Claim>? UserClaims { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
 
-        public bool ShowPriceBoostMenu { get; set; }
-        public bool ShowMarketSettingsMenu { get; set; }
-
-        public bool IsActiveMonitoring { get; set; }
-        public bool IsActiveConfig { get; set; }
-        public bool IsActivePriceBoost { get; set; }
-        public bool IsActiveSportSettings { get; set; }
-        public bool IsActiveMarketSettings { get; set; }
-
+        private bool _showPriceBoostMenu;
+        private bool _showMarketSettingsMenu;
+        private bool _isActiveMonitoring;
+        private bool _isActiveConfig;
+        private bool _isActivePriceBoost;
+        private bool _isActiveSportSettings;
+        private bool _isActiveMarketSettings;
         private string _address = string.Empty;
         #endregion
 
@@ -28,38 +26,13 @@ namespace Backoffice.Web.Shared.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
-            _address = $"{Region.ToLower()}/odds-engine";
+            var page = NavigationManager?.Uri.Replace(NavigationManager.BaseUri, "");
             ActivateMenu(page);
-
-            HideAllMenu();
-
         }
-
-        public async Task OnPriceBoostClickEvent()
+        protected override async Task OnParametersSetAsync()
         {
-            if (!ShowPriceBoostMenu)
-            {
-                HideAllMenu();
-
-                ShowPriceBoostMenu = true;
-            }
-            else
-                ShowPriceBoostMenu = false;
+            _address = $"{Region.ToLower()}/odds-engine";
         }
-
-        public async Task OnMarketSettingsClickEvent()
-        {
-            if (!ShowMarketSettingsMenu)
-            {
-                HideAllMenu();
-
-                ShowMarketSettingsMenu = true;
-            }
-            else
-                ShowMarketSettingsMenu = false;
-        }
-
         public void ActivateMenu(string? menu = null)
         {
             HideAllMenu();
@@ -81,28 +54,48 @@ namespace Backoffice.Web.Shared.OddsEngine
                 {
                     case "":
                     case "MONITORING":
-                        IsActiveMonitoring = true;
+                        _isActiveMonitoring = true;
                         break;
                     case "CONFIG":
-                        IsActiveConfig = true;
+                        _isActiveConfig = true;
                         break;
                     case "PRICEBOOST":
                     case "MAMAGE-BOOST":
                     case "BOOSTED-SETTINGS":
-                        IsActivePriceBoost = true;
+                        _isActivePriceBoost = true;
                         break;
                     case "SPORT-SETTINGS":
-                        IsActiveSportSettings = true;
+                        _isActiveSportSettings = true;
                         break;
                     case "MARKET-SETTINGS":
                     case "MARKET-SORT-ORDER":
                     case "MARKET-GROUPS":
-                        IsActiveMarketSettings = true;
+                        _isActiveMarketSettings = true;
                         break;
                 }
             }
         }
+        private async Task OnPriceBoostClickEvent()
+        {
+            if (!_showPriceBoostMenu)
+            {
+                HideAllMenu();
+                _showPriceBoostMenu = true;
+            }
+            else
+                _showPriceBoostMenu = false;
+        }
+        private async Task OnMarketSettingsClickEvent()
+        {
+            if (!_showMarketSettingsMenu)
+            {
+                HideAllMenu();
 
+                _showMarketSettingsMenu = true;
+            }
+            else
+                _showMarketSettingsMenu = false;
+        }
         public void Dispose()
         {
         }
@@ -113,17 +106,16 @@ namespace Backoffice.Web.Shared.OddsEngine
 
         private void HideAllMenu()
         {
-            ShowPriceBoostMenu = false;
-            ShowMarketSettingsMenu = false;
+            _showPriceBoostMenu = false;
+            _showMarketSettingsMenu = false;
         }
-
         private void InActiveAllMenu()
         {
-            IsActiveMonitoring = false;
-            IsActiveConfig = false;
-            IsActivePriceBoost = false;
-            IsActiveSportSettings = false;
-            IsActiveMarketSettings = false;
+            _isActiveMonitoring = false;
+            _isActiveConfig = false;
+            _isActivePriceBoost = false;
+            _isActiveSportSettings = false;
+            _isActiveMarketSettings = false;
         }
 
         #endregion

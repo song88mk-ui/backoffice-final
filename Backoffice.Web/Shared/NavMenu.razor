@@ -22,15 +22,15 @@ else if (NavMenuAccess == PermissionCategory.OE)
 }
 
 <div class="middle-bottom-row d-flex flex-column justify-content-between">
-    <div class="middle-row mt-3" @onclick="ToggleNavMenu">
+    <div class="middle-row mt-3" @onclick="() => collapseNavMenu = !collapseNavMenu">
         @if (NavMenuAccess == PermissionCategory.Admin || NavMenuAccess == PermissionCategory.SBC)
         {
             <nav class="flex-column">
 
-                @if (NavMenus != null && NavMenus.Menus.Any())
+                @if (_navMenus != null && _navMenus.Menus.Any())
                 {
-                    foreach (var menu in NavMenus.Menus)
-                     {
+                    foreach (var menu in _navMenus.Menus)
+                    {
                         if (menu.SubMenus.Any())
                         {
                             <div class="nav-item px-3">
@@ -83,17 +83,17 @@ else if (NavMenuAccess == PermissionCategory.OE)
                         <span class="nav-menu-text">All Sports</span>
                     </NavLink>
                 </div>
-                @if (Menu != null && Menu.Sports.Count > 0)
+                @if (_menu != null && _menu.Sports.Any())
                 {
-                    @foreach (var sport in Menu.Sports)
+                    @foreach (var sport in _menu.Sports)
                     {
                         <div class="nav-item px-3">
                             <NavLink class="nav-link" @onclick="_ => OnSportClickEvent(sport.SportId)">
                                 <span class="@($"iconfont iconfont-{sport.SportName.ToLower().Replace(' ', '-')}")" aria-hidden="true"></span>
                                 <span class="nav-menu-text">@sport.SportName</span>
-                                <span class="@(sport.SportId == SelectedSport.SportId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
+                                <span class="@(sport.SportId == _selectedSport.SportId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
                             </NavLink>
-                            @if (sport.SportId == SelectedSport.SportId)
+                            @if (sport.SportId == _selectedSport.SportId)
                             {
                                 <div class="sub-menu-oddsengine ms-3 show">
                                     <nav class="flex-column">
@@ -103,9 +103,9 @@ else if (NavMenuAccess == PermissionCategory.OE)
                                                 <NavLink class="nav-link" @onclick="_ => OnSegmentClickEvent(segment.SegmentId)">
                                                     <span class="fa fa-chevron-right me-2"></span>
                                                     <span class="nav-menu-text">@segment.SegmentName</span>
-                                                    <span class="@(sport.SportId == SelectedSport.SportId && segment.SegmentId == SelectedSport.SegmentId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
+                                                    <span class="@(sport.SportId == _selectedSport.SportId && segment.SegmentId == _selectedSport.SegmentId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
                                                 </NavLink>
-                                                @if (sport.SportId == SelectedSport.SportId && segment.SegmentId == SelectedSport.SegmentId)
+                                                @if (sport.SportId == _selectedSport.SportId && segment.SegmentId == _selectedSport.SegmentId)
                                                 {
                                                     <div class="sub-menu-oddsengine ms-3 show">
                                                         @foreach (var league in segment.Leagues)
@@ -149,7 +149,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
                     <span class="ico ico-key" aria-hidden="true"></span>
                 </NavLink>
             </div>
-            @if (ShowSwitchAccess)
+            @if (_showSwitchAccess)
             {
                 <div class="nav-item px-3">
                     <NavLink class="nav-link switch-access justify-content-center" href="choose-access">

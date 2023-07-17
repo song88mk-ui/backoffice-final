@@ -16,8 +16,7 @@ namespace Backoffice.Shared.Models.Response
         public int TotalPage { get; set; }
         public List<Client> Clients { get; set; }
 
-        #region Nested Class
-
+        #region Nested
         public class Client
         {
             public Client()

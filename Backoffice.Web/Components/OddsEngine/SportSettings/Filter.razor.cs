@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using ClientInformationModel = Backoffice.Shared.Models.ClientInformationModel;
 
 namespace Backoffice.Web.Components.OddsEngine.SportSettings
 {
@@ -11,10 +12,10 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         [Inject] public ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
 
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
-        [Parameter] public EventCallback OnUpdateClickCallback {get;set; }
+        [Parameter] public EventCallback OnUpdateClickCallback { get; set; }
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCopyClickCallback { get; set; }
@@ -39,8 +40,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             if (clientResponse.StatusCode == StatusCode.Success)
             {
-                if (UserModel.ClientCodes.Any())
-                    clientResponse.Result = clientResponse.Result.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                clientResponse.Result = UserClientCodes != null && UserClientCodes.Any() ? clientResponse.Result.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
 
                 Clients = clientResponse.Result.Select(s => new SelectListItemModel<string>
                 {

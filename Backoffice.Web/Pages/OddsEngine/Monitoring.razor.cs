@@ -25,7 +25,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
@@ -78,15 +78,15 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 ClientModel = new ClientModel
                 {
-                    Clients = UserModel.ClientCodes.Any() ?
-                        clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()))
-                        .Select(s => new ClientModel.Client
+                    Clients = UserClientCodes != null && UserClientCodes.Any() ?
+                        clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()))
+                        .Select(s => new Client
                         {
                             ClientCode = s.ClientCode,
                             ClientName = s.ClientName,
-                            Region = Configuration["Region"]
+                            Region = Configuration?["Region"] ?? "HK"
                         })
-                        .ToList() : new List<ClientModel.Client>()
+                        .ToList() : new List<Client>()
                 };
             }
 
@@ -118,7 +118,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     PassParametersToModel = false;
                 }
-
             }
         }
 
@@ -147,14 +146,13 @@ namespace Backoffice.Web.Pages.OddsEngine
             PageTitle = $"{SelectedSport.SportName} - {SelectedSport.SegmentName} - {SelectedSport.LeagueName}";
             IconClass = $"iconfont iconfont-{SelectedSport.SportName.ToLower().Replace(" ", "-")}";
 
-            IsPreloader = true;
-
             // if user selected a new sport OnInitEvent will be triggered by MonitoringCallback
             if (SelectedSport.SportId != MonitoringCallbackModel.SportId)
             {
                 FixtureMarkets = new List<FixtureMarketModel>();
                 return;
             }
+            IsPreloader = true;
 
             FixtureMarkets = await GetFixtures(new MarketFixtureRequest
             {

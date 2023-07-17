@@ -5,7 +5,7 @@ namespace Backoffice.Web.Shared.OddsEngine
     public partial class OEMonitoringLayout : IDisposable
     {
         #region Properties        
-        public string Region { get; set; }                
+        public string? Region { get; set; }                
         #endregion
 
         #region Methods

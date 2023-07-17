@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Serilog;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace Backoffice.Web.Shared
@@ -28,7 +29,7 @@ namespace Backoffice.Web.Shared
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
-        [Parameter] public SportClickCallbackModel SelectedSport { get; set; }
+        public SportClickCallbackModel SelectedSport { get; set; }
 
         private ToastService toasterService => _toasterService!;
 
@@ -36,6 +37,8 @@ namespace Backoffice.Web.Shared
         public HeaderNavMenu HeaderNavMenuReference { get; set; }
 
         public UserModel UserModel { get; set; } = new UserModel();
+        public List<Claim>? UserClaims { get; set; } = new List<Claim>();
+        public List<string>? UserClientCodes { get; set; } = new List<string>();
         public string Region { get; set; } = null;
         public LogInModel Model { get; set; }
         public NavMenuModel NavMenus { get; set; }
@@ -97,18 +100,18 @@ namespace Backoffice.Web.Shared
                     if (Clients.Clients.Any())
                     {
                         if (isSuperAdmin)
-                            UserModel.ClientCodes = Clients.Clients.Select(c => c.ClientCode).ToList();
+                            UserClientCodes = Clients.Clients.Select(c => c.ClientCode).ToList();
                         else
                         {
-                            UserModel.ClientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>();
-                            Clients.Clients = Clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                            UserClientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>();
+                            Clients.Clients = Clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                         }
                     }
 
                     UserModel.Id = userClaims.Where(x => x.Type.ToUpper() == "USERID").FirstOrDefault()?.Value ?? "";
                     UserModel.UserName = userClaims.Where(x => x.Type.ToUpper() == "TOKENNAME").FirstOrDefault()?.Value ?? "";
                     UserModel.MainUserId = userClaims.Where(x => x.Type.ToUpper() == "MAINUSERID").FirstOrDefault()?.Value ?? "";
-                    UserModel.Claims = userClaims.Where(x => !otherPermissions.Contains(x.Type.ToUpper())).ToList();
+                    UserClaims = userClaims.Where(x => !otherPermissions.Contains(x.Type.ToUpper())).ToList();
                     UserModel.RoleId = roleId;
                     UserModel.RoleName = role;
                 }
@@ -131,7 +134,7 @@ namespace Backoffice.Web.Shared
 
                 permissions.Permissions = permissions.Permissions.OrderBy(o => o.CategoryId).ThenBy(o => o.SortOrder).ToList();
 
-                if (UserModel != null && UserModel.Claims != null)
+                if (UserClaims != null)
                 {
                     var permissionSubCategory = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.')).Select(s => s.SubCategoryName).Distinct();
                     //// Temporary Hide Settlement
@@ -144,7 +147,7 @@ namespace Backoffice.Web.Shared
 
                         if (subMenus.Count() == 1)
                         {
-                            var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
+                            var claim = UserClaims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
                             if (claim != null && claim.Value != "0")
                             {
                                 if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel?.MainUserId))
@@ -160,7 +163,7 @@ namespace Backoffice.Web.Shared
                         else
                         {
                             var categoryId = category.ToLower().Replace(" ", "-").Replace("&", "");
-                            var menu = new NavMenuModel.MenuModel
+                            var menu = new MenuModel
                             {
                                 Id = $"sub-menu-{categoryId}",
                                 Name = category,
@@ -175,7 +178,7 @@ namespace Backoffice.Web.Shared
 
                             foreach (var subMenu in subMenus)
                             {
-                                var claim = UserModel.Claims.FirstOrDefault(c => c.Type == subMenu.ClaimType);
+                                var claim = UserClaims.FirstOrDefault(c => c.Type == subMenu.ClaimType);
                                 if (claim != null && claim.Value != "0")
                                 {
                                     if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel?.MainUserId))
@@ -183,22 +186,22 @@ namespace Backoffice.Web.Shared
 
                                     if (claim.Type == SportsbookClientPermission.SBC_OE.ToString().Replace("_", "."))
                                     {
-                                        var menu2 = new NavMenuModel.MenuModel
+                                        var menu2 = new MenuModel
                                         {
                                             Id = $"sub-menu-odds-engine",
                                             Name = "Odds Engine",
                                             IconName = "odds-engine",
                                             Url = $"#sub-menu-odds-engine",
-                                            SubMenus = new List<NavMenuModel.MenuModel>()
+                                            SubMenus = new List<MenuModel>()
                                             {
-                                                new NavMenuModel.MenuModel()
+                                                new MenuModel()
                                                 {
                                                     Id = $"menu.odds-engine.hk",
                                                     Name = "Asia",
                                                     IconName = "location",
                                                     Url = $"hk/odds-engine",
                                                 },
-                                                //new NavMenuModel.MenuModel()
+                                                //new MenuModel()
                                                 //{
                                                 //    Id = $"menu.odds-engine.sa",
                                                 //    Name = "South Africa",
@@ -270,10 +273,10 @@ namespace Backoffice.Web.Shared
         {
             if (_hubConnection != null)
             {
-                if(_hubConnection.State == HubConnectionState.Connected)
+                if (_hubConnection.State == HubConnectionState.Connected)
                 {
-                await _hubConnection.StopAsync();
-                await _hubConnection.DisposeAsync();
+                    await _hubConnection.StopAsync();
+                    await _hubConnection.DisposeAsync();
                 }
             }
         }
@@ -375,7 +378,7 @@ namespace Backoffice.Web.Shared
                         (message.Page, message.Details, true));
             }
         }
-        
+
 
         private async Task<PermissionResponse> GetPermissionList()
         {

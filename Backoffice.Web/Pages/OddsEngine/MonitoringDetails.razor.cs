@@ -24,7 +24,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         [Parameter] public string Region { get; set; } = "hk";
@@ -80,15 +80,15 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 ClientModel = new ClientModel
                 {
-                    Clients = UserModel.ClientCodes.Any() ?
-                        clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()))
-                        .Select(s => new ClientModel.Client
+                    Clients = UserClientCodes !=null && UserClientCodes.Any() ?
+                        clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()))
+                        .Select(s => new Client
                         {
                             ClientCode = s.ClientCode,
                             ClientName = s.ClientName,
                             Region = Configuration["Region"]
                         })
-                        .ToList() : new List<ClientModel.Client>()
+                        .ToList() : new List<Client>()
                 };
             }
 

@@ -18,7 +18,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Parameter] public string Region { get; set; } = "hk";
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public List<PriceBoostConfigModel> PriceBoostList { get; set; }
@@ -252,7 +252,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     var query = priceBoostConfigResponse.Result.AsQueryable();
 
-                    query = query.Where(c => UserModel.ClientCodes.Contains(c.ClientCode));
+                    query = query.Where(c => UserClientCodes !=null && UserClientCodes.Contains(c.ClientCode));
 
                     if (!string.IsNullOrEmpty(_search))
                     {

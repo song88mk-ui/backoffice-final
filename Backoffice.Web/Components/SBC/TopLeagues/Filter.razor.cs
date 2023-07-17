@@ -8,9 +8,9 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
     public partial class Filter : IDisposable
     {
         #region Properties
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }        
+        [Inject] public IBackOfficeService BackOfficeService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnFilterCallback { get; set; }
 
@@ -23,7 +23,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         public int SelectedClientCount { get; set; }
         public string SelectedClientName { get; set; }
 
-        private TopLeaguesFilterModel DefaultFilter { get; set; }
+        //private TopLeaguesFilterModel DefaultFilter { get; set; }
         #endregion
 
         #region Methods
@@ -33,7 +33,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             Clients = new List<SelectListItemWithCheckboxModel<string>>();
             Sports = new List<SelectListItemModel<string>>();
             TopLeaguesFilterModel = new TopLeaguesFilterModel();
-            DefaultFilter = new TopLeaguesFilterModel();
+            //DefaultFilter = new TopLeaguesFilterModel();
 
             SearchForm = new SearchFormModel()
             {
@@ -45,8 +45,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
             if (clients != null && clients.Clients.Any())
             {
-                if (UserModel.ClientCodes.Any())
-                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                clients.Clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
 
                 TopLeaguesFilterModel.Clients = clients.Clients
                     .Select(s => new TopLeaguesFilterModel.Client
@@ -112,12 +111,12 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 TopLeaguesFilterModel.SportName = sport.Name;
             }
 
-            DefaultFilter = new TopLeaguesFilterModel()
-            {
-                SportId = TopLeaguesFilterModel.SportId,
-                SportName = TopLeaguesFilterModel.SportName,
-                ClientIds = TopLeaguesFilterModel.ClientIds
-            };
+            //DefaultFilter = new TopLeaguesFilterModel()
+            //{
+            //    SportId = TopLeaguesFilterModel.SportId,
+            //    SportName = TopLeaguesFilterModel.SportName,
+            //    ClientIds = TopLeaguesFilterModel.ClientIds
+            //};
 
             await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
         }
