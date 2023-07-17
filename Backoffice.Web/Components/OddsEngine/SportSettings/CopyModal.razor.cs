@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
 
         public List<ClientInformationModel> ClientInformations { get; set; }
         public List<SelectListItemModel<string>> Clients { get; set; }
@@ -41,8 +41,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             if (clientResponse.StatusCode == StatusCode.Success)
             {
-                if (UserModel.ClientCodes.Any())
-                    clientResponse.Result = clientResponse.Result.Where(c => UserModel.ClientCodes.Contains(c.ClientCode)).ToList();
+                clientResponse.Result = UserClientCodes != null && UserClientCodes.Any() ? clientResponse.Result.Where(c => UserClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
 
                 ClientInformations = clientResponse.Result;
 

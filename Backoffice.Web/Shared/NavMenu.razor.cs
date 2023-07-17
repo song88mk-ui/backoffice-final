@@ -3,6 +3,10 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
+using System.Security.Policy;
+using System.Xml.Linq;
 
 namespace Backoffice.Web.Shared
 {
@@ -13,123 +17,161 @@ namespace Backoffice.Web.Shared
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public INavMenuModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel? UserModel { get; set; }
+        [CascadingParameter(Name = "UserClaims")] public List<Claim>? UserClaims { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public PermissionCategory NavMenuAccess { get; set; }
-        [Parameter] public NavMenuModel NavMenus { get; set; }
+        [Parameter] public NavMenuModel? NavMenus { get; set; }
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
-        [Parameter] public string Region { get; set; } = "hk";
-        public SportClickCallbackModel SelectedSport { get; set; }
+        [Parameter] public string? Region { get; set; }
 
-        public SportsTreeModel Menu { get; set; }
-        public bool ShowSwitchAccess { get; set; }
         #endregion
 
         #region Fields
 
         private bool collapseNavMenu = true;
-
+        private PermissionCategory _navMenuAccess;
+        private SportsTreeModel _menu;
+        private SportClickCallbackModel _selectedSport;
+        private bool _showSwitchAccess;
+        private string _page;
+        private NavMenuModel _navMenus;
         #endregion
 
         #region Methods
 
         protected override async void OnInitialized()
         {
-            Menu = new SportsTreeModel();
-            SelectedSport = new SportClickCallbackModel();
+            _menu = new SportsTreeModel();
+            _selectedSport = new SportClickCallbackModel();
 
-            var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
-            var splitVal = page.Split("/").FirstOrDefault();
+            _page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+            var splitVal = _page.Split("/").FirstOrDefault();
 
-            if (splitVal != null)
+            if (splitVal != null && splitVal.Any() && Region != null)
             {
                 var regions = new List<string>() { "HK", "SA" };
                 Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToUpper() : null;
             }
 
-            if (NavMenuAccess == PermissionCategory.OE)
-            {
-                await GetSportsTreeMenu();
-
-                var sport = Menu.Sports.FirstOrDefault();
-
-                if (sport != null)
-                {
-                    SelectedSport.SportId = sport.SportId;
-                    SelectedSport.SportName = sport.SportName;
-
-                    var segment = sport.Segments.FirstOrDefault();
-
-                    if (segment != null)
-                    {
-                        SelectedSport.SegmentId = segment.SegmentId;
-                        SelectedSport.SegmentName = segment.SegmentName;
-
-                        var league = segment.Leagues.FirstOrDefault();
-
-                        if (league != null)
-                        {
-                            SelectedSport.LeagueId = league.LeagueId;
-                            SelectedSport.LeagueName = league.LeagueName;
-                        }
-                    }
-                }
-
-                switch (page.ToLower())
-                {
-                    //case "sa/odds-engine":
-                    case "hk/odds-engine":
-                    //case "sa/odds-engine/monitoring":
-                    case "hk/odds-engine/monitoring":
-                        await OnSportClickCallback.InvokeAsync(SelectedSport);
-                        break;
-                }
-            }
-
             var permissionCategories = new string[] { nameof(PermissionCategory.Admin), nameof(PermissionCategory.SBC) };
             var access = new string[] { ((int)Access.View).ToString(), ((int)Access.Edit).ToString() };
 
-            var categories = UserModel.Claims.Where(c => access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
-            categories = categories.Where(c => permissionCategories.Contains(c)).ToList();
+            var categories = UserClaims?.Where(c => access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
+            categories = categories?.Where(c => permissionCategories.Contains(c)).ToList();
 
-            if (categories.Count > 1)
-                ShowSwitchAccess = true;
+            if (categories != null && categories.Count > 1)
+                _showSwitchAccess = true;
         }
-        public void ToggleNavMenu()
+        protected override async Task OnParametersSetAsync()
         {
-            collapseNavMenu = !collapseNavMenu;
-        }
+            await InvokeAsync(StateHasChanged);
 
-        public async Task OnSportClickEvent(int sportId)
-        {
-            if (SelectedSport.SportId != sportId)
+            if (NavMenuAccess != _navMenuAccess)
             {
-                var sport = Menu.Sports.FirstOrDefault(c => c.SportId == sportId);
+                _navMenuAccess = NavMenuAccess;
+                if (_navMenuAccess == PermissionCategory.OE)
+                {
+                    _menu.Sports = await GetSportsTreeMenu();
+                    var sport = _menu.Sports.FirstOrDefault();
 
-                SelectedSport.SportId = sport.SportId;
-                SelectedSport.SportName = sport.SportName;
+                    if (sport != null)
+                    {
+                        _selectedSport.SportId = sport.SportId;
+                        _selectedSport.SportName = sport.SportName;
+
+                        var segment = sport.Segments.FirstOrDefault();
+
+                        if (segment != null)
+                        {
+                            _selectedSport.SegmentId = segment.SegmentId;
+                            _selectedSport.SegmentName = segment.SegmentName;
+
+                            var league = segment.Leagues.FirstOrDefault();
+
+                            if (league != null)
+                            {
+                                _selectedSport.LeagueId = league.LeagueId;
+                                _selectedSport.LeagueName = league.LeagueName;
+                            }
+                        }
+                    }
+
+                    switch (_page?.ToLower() ?? string.Empty)
+                    {
+                        //case "sa/odds-engine":
+                        case "hk/odds-engine":
+                        //case "sa/odds-engine/monitoring":
+                        case "hk/odds-engine/monitoring":
+                            await OnSportClickCallback.InvokeAsync(_selectedSport);
+                            break;
+                    }
+                }
+            }
+
+            if (_navMenus == null)
+            {
+                _navMenus = new NavMenuModel()
+                {
+                    Menus = NavMenus?.Menus?.Select(x => new MenuModel()
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        IconName = x.IconName,
+                        Url = x.Url,
+                        SubMenus = x.SubMenus
+                    }).ToList() ?? new List<MenuModel>()
+                };
+            }
+
+            if (!_navMenus.Equals(NavMenus))
+            {
+                _navMenus = new NavMenuModel()
+                {
+                    Menus = NavMenus?.Menus?.Select(x => new MenuModel()
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        IconName = x.IconName,
+                        Url = x.Url,
+                        SubMenus = x.SubMenus
+                    }).ToList() ?? new List<MenuModel>()
+                };
+            }
+        }
+        private void OnSportClickEvent(int sportId)
+        {
+            if (_selectedSport.SportId != sportId)
+            {
+                var sport = _menu.Sports.FirstOrDefault(c => c.SportId == sportId);
+
+                if (sport != null)
+                {
+                    _selectedSport.SportId = sport.SportId;
+                    _selectedSport.SportName = sport.SportName;
+                }
             }
             else
             {
-                SelectedSport.SportId = 0;
-                SelectedSport.SportName = string.Empty;
+                _selectedSport.SportId = 0;
+                _selectedSport.SportName = string.Empty;
             }
 
             // reset selected segment and league if new sport has been selected. 
-            SelectedSport.SegmentId = 0;
-            SelectedSport.SegmentName = string.Empty;
+            _selectedSport.SegmentId = 0;
+            _selectedSport.SegmentName = string.Empty;
 
-            SelectedSport.LeagueId = 0;
-            SelectedSport.LeagueName = string.Empty;
+            _selectedSport.LeagueId = 0;
+            _selectedSport.LeagueName = string.Empty;
         }
 
-        public async Task OnSegmentClickEvent(int segmentId)
+        private async Task OnSegmentClickEvent(int segmentId)
         {
-            if (SelectedSport.SegmentId != segmentId)
+            if (_selectedSport.SegmentId != segmentId)
             {
-                var sport = Menu.Sports.FirstOrDefault(c => c.SportId == SelectedSport.SportId);
-                var segment = sport.Segments.FirstOrDefault(c => c.SegmentId == segmentId);
+                var sport = _menu.Sports.FirstOrDefault(c => c.SportId == _selectedSport.SportId);
+                var segment = sport?.Segments.FirstOrDefault(c => c.SegmentId == segmentId);
 
                 if (segment != null)
                 {
@@ -144,16 +186,16 @@ namespace Backoffice.Web.Shared
             }
         }
 
-        public async Task OnLeagueClickEvent(int leagueId)
+        private async Task OnLeagueClickEvent(int leagueId)
         {
-            if (SelectedSport.LeagueId != leagueId)
+            if (_selectedSport.LeagueId != leagueId)
             {
-                var sport = Menu.Sports.FirstOrDefault(c => c.SportId == SelectedSport.SportId);
-                var segment = sport.Segments.FirstOrDefault(c => c.SegmentId == SelectedSport.SegmentId);
-                var league = segment.Leagues.FirstOrDefault(c => c.LeagueId == leagueId);
+                var sport = _menu.Sports.FirstOrDefault(c => c.SportId == _selectedSport.SportId);
+                var segment = sport?.Segments.FirstOrDefault(c => c.SegmentId == _selectedSport.SegmentId);
+                var league = segment?.Leagues.FirstOrDefault(c => c.LeagueId == leagueId);
 
-                SelectedSport.LeagueId = league.LeagueId;
-                SelectedSport.LeagueName = league.LeagueName;
+                _selectedSport.LeagueId = league.LeagueId;
+                _selectedSport.LeagueName = league.LeagueName;
 
                 // verify if you're in the monitoring page, if not then the user will be navigated.
                 var slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
@@ -163,16 +205,16 @@ namespace Backoffice.Web.Shared
                     NavigationManager.NavigateTo($"/{Region}/odds-engine");
                 }
 
-                await OnSportClickCallback.InvokeAsync(SelectedSport);
+                await OnSportClickCallback.InvokeAsync(_selectedSport);
             }
         }
 
-        public async Task OnLogoutClickEvent()
+        private void OnLogoutClickEvent()
         {
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");            
+            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
             parameters.Add("ModalHeaderClass", "text-center");
             parameters.Add("TitleClass", "w-100");
 
@@ -180,12 +222,12 @@ namespace Backoffice.Web.Shared
             ModalService.Open<ConfirmLogoutModal>("Logout", parameters, options);
         }
 
-        public async Task OnChangePasswordClickEvent()
+        private void OnChangePasswordClickEvent()
         {
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");            
+            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
             parameters.Add("TitleClass", "w-100");
 
             var options = new ModalOptions();
@@ -201,24 +243,25 @@ namespace Backoffice.Web.Shared
 
         #region Utilities
 
-        private async Task GetSportsTreeMenu()
+        private async Task<List<SportModel>> GetSportsTreeMenu()
         {
             var response = await BackOfficeService.GetSportsTreeAsync((int)FixtureType.Match);
+            var result = new List<SportModel>();
 
             if (response.StatusCode == StatusCode.Success)
             {
-                Menu.Sports = response.Result.Sports
-                    .Select(sp => new SportsTreeModel.SportModel
+                result = response.Result.Sports
+                    .Select(sp => new SportModel
                     {
                         SportId = sp.SportId,
                         SportName = sp.SportName,
                         SortOrder = sp.SortOrder,
-                        Segments = sp.Segments.Select(se => new SportsTreeModel.SegmentModel
+                        Segments = sp.Segments.Select(se => new SegmentModel
                         {
                             SegmentId = se.SegmentId,
                             SegmentName = se.SegmentName,
                             SortOrder = se.SortOrder,
-                            Leagues = se.Leagues.Select(le => new SportsTreeModel.LeagueModel
+                            Leagues = se.Leagues.Select(le => new LeagueModel
                             {
                                 LeagueId = le.LeagueId,
                                 LeagueName = le.LeagueName,
@@ -231,6 +274,7 @@ namespace Backoffice.Web.Shared
                     .OrderBy(o => o.SportName)
                     .ToList();
             }
+            return result;
         }
 
         #endregion

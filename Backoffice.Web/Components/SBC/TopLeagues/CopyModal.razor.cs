@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
 
         [Parameter] public CopyTopLeaguesModel CopyTopLeaguesModel { get; set; }
 
@@ -39,7 +39,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             ClientIdErrorMessage = string.Empty;
             Clients = new List<SelectListItemWithCheckboxModel<string>>();
 
-            var topLeagues = ModalParameters.TryGet<List<TopLeaguesModel.TopLeague>>("CopyFromClientTopLeagues") ?? new List<TopLeaguesModel.TopLeague>();
+            var topLeagues = ModalParameters.TryGet<List<TopLeague>>("CopyFromClientTopLeagues") ?? new List<TopLeague>();
 
             CopyTopLeaguesModel = new CopyTopLeaguesModel
             {
@@ -64,8 +64,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
             if (clients != null)
             {
-                if (UserModel.ClientCodes.Any())
-                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != CopyTopLeaguesModel.CopyFromClientId).ToList();
+                clients.Clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != CopyTopLeaguesModel.CopyFromClientId).ToList() : new List<Client>();
 
                 CopyTopLeaguesModel.ClientIdSelectedModel = clients.Clients.Select(s => new ClientIdSelectedModel
                 {

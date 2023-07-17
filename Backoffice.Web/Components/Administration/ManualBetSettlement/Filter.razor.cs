@@ -4,6 +4,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
+using System.Security.Claims;
 
 namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 {
@@ -20,7 +21,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
         [Parameter] public bool IsExportDisabled { get; set; }
         [Parameter] public EventCallback<bool> IsExportDisabledChanged { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] private List<string> UserClientCodes { get; set; }
 
         public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
@@ -254,8 +255,8 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
             if (clients != null && clients.Clients.Any())
             {
-                if (UserModel.ClientCodes.Any())
-                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                if (UserClientCodes != null && UserClientCodes.Any())
+                    clients.Clients = clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
                 Clients = clients.Clients.Select(s => new SelectListItemWithCheckboxModel<string>
                 {
@@ -303,7 +304,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
                     Value = 1001.ToString(),
                     Name = "Virtual Soccer"
                 },
-                new SelectListItemWithCheckboxModel<string> 
+                new SelectListItemWithCheckboxModel<string>
                 {
                     IsChecked = true,
                     Value = 1002.ToString(),

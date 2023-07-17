@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
 
         [Parameter] public EventCallback OnInitCallback { get; set; }
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
@@ -88,7 +88,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("DialogStyle","max-width: 85rem;");
+            parameters.Add("DialogStyle", "max-width: 85rem;");
             //parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);
             parameters.Add("SelectedPage", SportsbookClientPermission.SBC_OE_PriceBoost_Manage);
             parameters.Add("Region", _region);
@@ -155,32 +155,31 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #region Utilities
         private async Task<List<SelectListItemModel<string>>> LoadClients()
         {
-            var response = await TradingService.GetClientList();
+            var result = new List<SelectListItemModel<string>>();
+            var response = (await TradingService.GetClientList()).Result;
 
-            var clientList = response.Result;
-            if (clientList == null)
+            if (response != null)
             {
-                return new();
+                response = UserClientCodes != null && UserClientCodes.Any() ? response.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+
+                result = response?.Select(s => new SelectListItemModel<string>
+                {
+                    Name = s.ClientName,
+                    Value = s.ClientCode
+                }).OrderBy(x => x.Name).ToList();
+
+                if (result == null)
+                    result = new List<SelectListItemModel<string>>();
+
+                result.Insert(0, new SelectListItemModel<string>
+                {
+                    Value = string.Empty,
+                    Name = "All Clients"
+                });
             }
 
-            clientList = UserClientCodes != null && UserClientCodes.Any() ? clientList.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
 
-            var result = clientList?.Select(s => new SelectListItemModel<string>
-            {
-                Name = s.ClientName,
-                Value = s.ClientCode
-            }).OrderBy(x => x.Name).ToList();
-
-            if (result == null)
-                result = new List<SelectListItemModel<string>>();
-
-            result.Insert(0, new()
-            {
-                Value = string.Empty,
-                Name = "All Clients"
-            });
-
-            return clients;
+            return result;
         }
 
         private async Task<List<SelectListItemModel<int>>> LoadSports()

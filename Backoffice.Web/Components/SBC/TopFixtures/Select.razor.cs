@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using SportModel = Backoffice.Web.Models.SportModel;
 
 namespace Backoffice.Web.Components.SBC.TopFixtures
 {
@@ -8,7 +9,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
     {
         #region Properties
 
-        [Parameter] public List<SportsTreeModel.SportModel> SportsTree { get; set; }
+        [Parameter] public List<SportModel> SportsTree { get; set; }
         [Parameter] public List<string> CurrentTopFixtures { get; set; }
         [Parameter] public string SelectedTopFixture { get; set; }
         [Parameter] public int RowCount { get; set; }

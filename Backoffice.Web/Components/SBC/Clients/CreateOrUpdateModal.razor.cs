@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Serilog;
 using System.Text.Json;
-using static Backoffice.Shared.Models.Response.ClientListResponse;
 
 namespace Backoffice.Web.Components.SBC.Clients
 {
@@ -22,7 +21,7 @@ namespace Backoffice.Web.Components.SBC.Clients
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
 
-        public Client Client { get; set; }
+        public ClientListResponse.Client Client { get; set; }
         public SportsLookupModel RealSports { get; set; }
         public SportsLookupModel VirtualSports { get; set; }
 
@@ -38,7 +37,7 @@ namespace Backoffice.Web.Components.SBC.Clients
         public bool SportsbookTierOption { get; set; }
         public bool IsEdit { get; set; }
         public string SelectedCurrency { get; set; }
-        public BetSetting SelectedBetSetting { get; set; }
+        public ClientListResponse.BetSetting SelectedBetSetting { get; set; }
         public List<AlertModel> Alerts { get; set; }
         private EditContext EditContext { get; set; }
         public bool IsPreload { get; set; }
@@ -72,7 +71,7 @@ namespace Backoffice.Web.Components.SBC.Clients
             JackpotTier.AboveTierPercentage = 50m;
 
             Alerts = new List<AlertModel>();
-            Client = ModalParameters.TryGet<Client>("Client");
+            Client = ModalParameters.TryGet<ClientListResponse.Client>("Client");
             RealSports = ModalParameters.TryGet<SportsLookupModel>("RealSports");
             VirtualSports = ModalParameters.TryGet<SportsLookupModel>("VirtualSports");
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
@@ -127,36 +126,36 @@ namespace Backoffice.Web.Components.SBC.Clients
 
             if (!IsEdit)
             {
-                Client.BetSettings = new List<BetSetting>();
+                Client.BetSettings = new List<ClientListResponse.BetSetting>();
                 foreach (var currency in Currencies)
                 {
                     decimal suggestedMinimumBet = await GetSuggestedMinimumBet(currency);
                     decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
 
-                    Client.BetSettings.Add(new BetSetting
+                    Client.BetSettings.Add(new ClientListResponse.BetSetting
                     {
                         CurrencyCode = currency,
-                        BetSettingAllSports = new BetSettingAllSports
+                        BetSettingAllSports = new ClientListResponse.BetSettingAllSports
                         {
                             MinPerTicket = suggestedMinimumBet,
                             MaxPerTicket = suggestedMaximumBet,
                         },
-                        BetSettingBetBuilder = new BetSettingBetBuilder
+                        BetSettingBetBuilder = new ClientListResponse.BetSettingBetBuilder
                         {
                             MinStake = suggestedMinimumBet,
                             MaxStake = suggestedMaximumBet,
                         },
-                        BetSettingCricket = new BetSettingCricket
+                        BetSettingCricket = new ClientListResponse.BetSettingCricket
                         {
                             MinPerTicket = suggestedMinimumBet,
                             MaxPerTicket = suggestedMaximumBet,
                         },
-                        BetSettingSoccer = new BetSettingSoccer
+                        BetSettingSoccer = new ClientListResponse.BetSettingSoccer
                         {
                             MinPerTicket = suggestedMinimumBet,
                             MaxPerTicket = suggestedMaximumBet,
                         },
-                        BetSettingParlay = new BetSettingParlay
+                        BetSettingParlay = new ClientListResponse.BetSettingParlay
                         {
                             MinPerTicket = suggestedMinimumBet,
                             MaxPerTicket = suggestedMaximumBet,
@@ -174,30 +173,30 @@ namespace Backoffice.Web.Components.SBC.Clients
                     decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
                     if (!existingCurrencies.Contains(currency))
                     {
-                        Client.BetSettings.Add(new BetSetting
+                        Client.BetSettings.Add(new ClientListResponse.BetSetting
                         {
                             CurrencyCode = currency,
-                            BetSettingAllSports = new BetSettingAllSports
+                            BetSettingAllSports = new ClientListResponse.BetSettingAllSports
                             {
                                 MinPerTicket = suggestedMinimumBet,
                                 MaxPerTicket = suggestedMaximumBet,
                             },
-                            BetSettingBetBuilder = new BetSettingBetBuilder
+                            BetSettingBetBuilder = new ClientListResponse.BetSettingBetBuilder
                             {
                                 MinStake = suggestedMinimumBet,
                                 MaxStake = suggestedMaximumBet,
                             },
-                            BetSettingCricket = new BetSettingCricket
+                            BetSettingCricket = new ClientListResponse.BetSettingCricket
                             {
                                 MinPerTicket = suggestedMinimumBet,
                                 MaxPerTicket = suggestedMaximumBet,
                             },
-                            BetSettingSoccer = new BetSettingSoccer
+                            BetSettingSoccer = new ClientListResponse.BetSettingSoccer
                             {
                                 MinPerTicket = suggestedMinimumBet,
                                 MaxPerTicket = suggestedMaximumBet,
                             },
-                            BetSettingParlay = new BetSettingParlay
+                            BetSettingParlay = new ClientListResponse.BetSettingParlay
                             {
                                 MinPerTicket = suggestedMinimumBet,
                                 MaxPerTicket = suggestedMaximumBet,
@@ -378,7 +377,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                     return;
                 }
 
-                var clientRequest = new Client()
+                var clientRequest = new ClientListResponse.Client()
                 {
                     ClientId = Client.ClientId,
                     ClientCode = Client.ClientCode ?? string.Empty,
@@ -396,7 +395,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                     TierJackpotShare = Client.TierJackpotShare,
                     TierSportsbookShare = Client.TierSportsbookShare,
                     Website = Client.Website ?? string.Empty,
-                    RevenueShare = new RevenueShare
+                    RevenueShare = new ClientListResponse.RevenueShare
                     {
                         JackpotShare = Client.RevenueShare.JackpotShare,
                         SportsbookShare = Client.RevenueShare.SportsbookShare,
@@ -418,7 +417,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                 if (SelectedVirtualSportsWin.Any())
                     selectedWinningSports.AddRange(SelectedVirtualSportsWin);
 
-                clientRequest.TaxConfig = new TaxConfig
+                clientRequest.TaxConfig = new ClientListResponse.TaxConfig
                 {
                     ExcludeWinningsSportTypes = selectedWinningSports.Any() ? string.Join(",", selectedWinningSports) : string.Empty,
                     ExcludeStakeSportTypes = selectedStakeSports.Any() ? string.Join(",", selectedStakeSports) : string.Empty,
@@ -708,7 +707,7 @@ namespace Backoffice.Web.Components.SBC.Clients
 
             if (Client.IsTierRevenue)
             {
-                Client.RevenueShare = new RevenueShare();
+                Client.RevenueShare = new ClientListResponse.RevenueShare();
             }
             else
             {

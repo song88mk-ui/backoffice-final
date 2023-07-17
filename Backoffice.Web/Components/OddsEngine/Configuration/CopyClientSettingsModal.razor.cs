@@ -12,7 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
         private EventCallback OnCopyClientSettingsCallback { get; set; }
@@ -22,7 +22,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private List<SelectListItemModel<string>> ToClients { get; set; }
         private string Region { get; set; }
 
-        private KeyValuePair<string,string> SelectedFromClient { get; set; }
+        private KeyValuePair<string, string> SelectedFromClient { get; set; }
         private KeyValuePair<string, string> SelectedToClient { get; set; }
         #endregion
         #region Methods
@@ -85,7 +85,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         }
         public void Dispose()
         {
-            
+
         }
         #endregion
 
@@ -96,18 +96,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             clients = (await TradingService.GetClientList()).Result;
             if (clients != null)
             {
-
-                if (UserModel.ClientCodes.Any())
-                {
-                    clients = clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-                }
+                clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
             }
 
-            return clients.Select(x => new SelectListItemModel<string>()
+            return clients?.Select(x => new SelectListItemModel<string>()
             {
                 Name = x.ClientName,
                 Value = x.ClientCode
-            }).ToList();
+            }).ToList() ?? new List<SelectListItemModel<string>>();
         }
         #endregion
     }
