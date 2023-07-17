@@ -3,6 +3,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Serilog;
+using SportModel = Backoffice.Web.Models.SportModel;
 
 namespace Backoffice.Web.Components.SBC.TopFixtures
 {
@@ -16,9 +17,9 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
         [Parameter] public EventCallback<EditTopFixturesModel> OnInitCallback { get; set; }
 
         public SportsTreeModel SportsTree { get; set; }
-        public SportsTreeModel.SportModel SelectedSport { get; set; }
-        public SportsTreeModel.SegmentModel SelectedSegment { get; set; }
-        public SportsTreeModel.LeagueModel SelectedLeague { get; set; }
+        public SportModel SelectedSport { get; set; }
+        public SegmentModel SelectedSegment { get; set; }
+        public LeagueModel SelectedLeague { get; set; }
         public FixtureModel SelectedGameFilter { get; set; }
 
         public string SortFilter { get; set; }
@@ -31,9 +32,9 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
         {
             try
             {
-                SelectedSport = new SportsTreeModel.SportModel();
-                SelectedSegment = new SportsTreeModel.SegmentModel();
-                SelectedLeague = new SportsTreeModel.LeagueModel();
+                SelectedSport = new SportModel();
+                SelectedSegment = new SegmentModel();
+                SelectedLeague = new LeagueModel();
                 SelectedGameFilter = new FixtureModel();
                 SportsTree = new SportsTreeModel();
                 SortFilter = "1";
@@ -63,10 +64,10 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
             SelectedSport = SportsTree.Sports.FirstOrDefault(c => c.SportId == Convert.ToInt32(e.Value));
             if (SelectedSport == null)
-                SelectedSport = new SportsTreeModel.SportModel();
+                SelectedSport = new SportModel();
 
-            SelectedSegment = new SportsTreeModel.SegmentModel();
-            SelectedLeague = new SportsTreeModel.LeagueModel();
+            SelectedSegment = new SegmentModel();
+            SelectedLeague = new LeagueModel();
             SelectedGameFilter = new FixtureModel();
 
             var model = new EditTopFixturesModel
@@ -84,9 +85,9 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
         {
             SelectedSegment = SelectedSport.Segments.FirstOrDefault(c => c.SegmentId == Convert.ToInt32(e.Value));
             if (SelectedSegment == null)
-                SelectedSegment = new SportsTreeModel.SegmentModel();
+                SelectedSegment = new SegmentModel();
 
-            SelectedLeague = new SportsTreeModel.LeagueModel();
+            SelectedLeague = new LeagueModel();
             SelectedGameFilter = new FixtureModel();
 
             var model = new EditTopFixturesModel
@@ -105,7 +106,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
         {
             SelectedLeague = SelectedSegment.Leagues.FirstOrDefault(c => c.LeagueId == Convert.ToInt32(e.Value));
             if (SelectedLeague == null)
-                SelectedLeague = new SportsTreeModel.LeagueModel();
+                SelectedLeague = new LeagueModel();
             SelectedGameFilter = new FixtureModel();
             var model = new EditTopFixturesModel
             {

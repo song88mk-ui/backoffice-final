@@ -6,12 +6,12 @@ namespace Backoffice.Web.Models
     {
         public EditTopFixturesModel()
         {
-            Sports = new List<SportsTreeModel.SportModel>();
+            Sports = new List<SportModel>();
         }
-        public List<SportsTreeModel.SportModel> Sports { get; set; }
-        public SportsTreeModel.SportModel SelectedSport { get; set; }
-        public SportsTreeModel.SegmentModel SelectedSegment { get; set; }
-        public SportsTreeModel.LeagueModel SelectedLeague { get; set; }
+        public List<SportModel> Sports { get; set; }
+        public SportModel SelectedSport { get; set; }
+        public SegmentModel SelectedSegment { get; set; }
+        public LeagueModel SelectedLeague { get; set; }
         public FixtureModel SelectedGameFilter { get; set; }
         public FixtureModel SelectedGame { get; set; }
         public string SortFilter { get; set; }

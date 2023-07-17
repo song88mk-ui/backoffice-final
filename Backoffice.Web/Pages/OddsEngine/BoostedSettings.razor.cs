@@ -20,7 +20,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Parameter] public string THeadClass { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
 
-        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] List<string>? UserClientCodes { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         protected List<BoostedSettingsModel> ClientsView { get; set; }
@@ -73,15 +73,15 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             try
             {
-                if(!IsPreLoader)
+                if (!IsPreLoader)
                 {
                     IsPreLoader = true;
                 }
 
-                
+
                 var result = await TradingService.GetBoostedSettings(new BoostedSettingsRequest()
                 {
-                    ClientCodes = UserModel.ClientCodes.ToList(),
+                    ClientCodes = UserClientCodes != null && UserClientCodes.Any() ? UserClientCodes.ToList() : new List<string>(),
                     Search = SearchForm.SearchText ?? string.Empty
                 });
                 ClientsView = result.Result;
@@ -103,7 +103,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 parameters.Add("Client", client);
                 parameters.Add("Region", Region);
-                
+
                 var options = new ModalOptions();
                 ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
             }

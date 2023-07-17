@@ -17,13 +17,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class ImportExportMarginModal : IDisposable
     {
         #region Properties
-        [Inject] private IModalService ModalService { get; set; }        
+        [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
         [Inject] private IExcelService ExcelService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel? UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
         public EventCallback OnExportMarginCallback { get; set; }
@@ -41,7 +42,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public string CurrentFileInProcess { get; set; } = string.Empty;
         public string ProcessingMessage { get; set; } = string.Empty;
         public bool IsImportTab { get; set; }
-        public bool IsUploading { get; set; }                            
+        public bool IsUploading { get; set; }
 
         public const string ImportSelect = "import-select";
         public const string ExportSelect = "export-select";
@@ -68,25 +69,25 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             Guid = new Guid();
 
             Clients = await LoadClients();
-            
+
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (IsImportTab)
             {
-                await JSRuntime.InvokeVoidAsync("initSelect2", $".{ImportSelect}", "OnImportSelectChanged", true);                
+                await JSRuntime.InvokeVoidAsync("initSelect2", $".{ImportSelect}", "OnImportSelectChanged", true);
             }
             else
             {
                 SelectedClient = Clients.FirstOrDefault().Value;
-                await JSRuntime.InvokeVoidAsync("initSelect2", $".{ExportSelect}", "OnExportSelectChanged", true);                
+                await JSRuntime.InvokeVoidAsync("initSelect2", $".{ExportSelect}", "OnExportSelectChanged", true);
             }
         }
         public async Task OnImportRadioClickEvent()
         {
             IsImportTab = true;
-            SelectedClientsSet = new HashSet<string>();            
-            await JSRuntime.InvokeVoidAsync("destroySelect2",$"{ExportSelect}");
+            SelectedClientsSet = new HashSet<string>();
+            await JSRuntime.InvokeVoidAsync("destroySelect2", $"{ExportSelect}");
         }
         public async Task OnExportRadioClickEvent()
         {
@@ -110,7 +111,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     var stream = new MemoryStream();
                     await e.File.OpenReadStream(long.MaxValue).CopyToAsync(stream);
 
-                    var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(stream, e.File.Name, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
+                    var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(stream, e.File.Name, UserModel?.Id ?? string.Empty, string.Join(",", SelectedClientsSet), MessageBroker);
 
 
                     IsUploading = false;
@@ -162,7 +163,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                         using (MemoryStream ms = new MemoryStream(fileStream.Value))
                         {
-                            var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(ms, fileStream.Key, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
+                            var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(ms, fileStream.Key, UserModel?.Id ?? string.Empty, string.Join(",", SelectedClientsSet), MessageBroker);
 
                             if (payload.StatusCode == StatusCode.Error)
                             {
@@ -171,7 +172,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                                 return;
                             }
-                        }                        
+                        }
                     }
 
                     IsUploading = false;
@@ -225,7 +226,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             var payload = new OnExportConfigMarginMessage()
             {
-                UserId = UserModel.Id,
+                UserId = UserModel?.Id ?? string.Empty,
                 ClientCode = SelectedClient,
                 SportIds = string.Join(",", SelectedSportsSet)
             };
@@ -233,7 +234,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet2", "r.oe.web.config.ongetmarginspreadsheet2", Guid.NewGuid().ToString(), Region);
 
             IsUploading = false;
-            
+
             ModalService.Cancel();
 
             await OnExportMarginCallback.InvokeAsync();
@@ -256,7 +257,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             }
             else
             {
-                if (model.SelectedOptionId == "0") 
+                if (model.SelectedOptionId == "0")
                 {
                     return;
                 }
@@ -304,7 +305,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public void Dispose()
         {
-            
+
         }
         #endregion
 
@@ -313,20 +314,17 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             var clients = new List<ClientInformationModel>();
             clients = (await TradingService.GetClientList()).Result;
+
             if (clients != null)
             {
-
-                if (UserModel.ClientCodes.Any())
-                {
-                    clients = clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-                }
+                clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
             }
 
-            return clients.Select(x => new SelectListItemModel<string>()
+            return clients?.Select(x => new SelectListItemModel<string>()
             {
                 Name = x.ClientName,
                 Value = x.ClientCode
-            }).ToList();
+            }).ToList() ?? new List<SelectListItemModel<string>>();
         }
 
         private async Task<List<SelectListItemModel<int>>> LoadSports()

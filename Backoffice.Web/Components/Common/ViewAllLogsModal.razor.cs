@@ -20,8 +20,9 @@ namespace Backoffice.Web.Components.Common
         [Inject] IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
+
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
 
         protected bool IsPreLoader { get; set; } = false;
         public SportsbookClientPermission CurrentPage { get; set; }
@@ -39,7 +40,7 @@ namespace Backoffice.Web.Components.Common
             TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             IsPreLoader = true;
             CurrentPage = ModalParameters.TryGet<SportsbookClientPermission>("SelectedPage");
-            UserClients = UserModel.ClientCodes;
+            UserClients = UserClientCodes != null && UserClientCodes.Any() ? UserClientCodes : new List<string>();
             WithAdministrationPagesAccess = false;
             BoostedSettingsActivityLogs = new List<ActivityLogModel>();
 

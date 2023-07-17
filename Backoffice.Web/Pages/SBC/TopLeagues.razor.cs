@@ -73,7 +73,7 @@ namespace Backoffice.Web.Pages.SBC
             await GetContent(model);
         }
 
-        public async Task OnEditClickEvent(TopLeaguesModel.ClientTopLeague model)
+        public async Task OnEditClickEvent(ClientTopLeague model)
         {
             var parameters = new ModalParameters();
 
@@ -88,7 +88,7 @@ namespace Backoffice.Web.Pages.SBC
             ModalService.Open<EditModal>($"Set the Top Leagues of {model.ClientName} ({FilterModel.SportName})", parameters, options);
         }
 
-        public async Task OnCopyClickEvent(TopLeaguesModel.ClientTopLeague model)
+        public async Task OnCopyClickEvent(ClientTopLeague model)
         {
             var parameters = new ModalParameters();
 
@@ -172,7 +172,7 @@ namespace Backoffice.Web.Pages.SBC
                 TopLeaguesList.ClientTopLeagues = TopLeaguesList.ClientTopLeagues.Join(model.Clients,
                     le => le.ClientIdRef,
                     c => c.ClientId,
-                    (le, c) => new TopLeaguesModel.ClientTopLeague
+                    (le, c) => new ClientTopLeague
                     {
                         ClientIdRef = le.ClientIdRef,
                         ClientName = c.ClientName,
@@ -193,7 +193,7 @@ namespace Backoffice.Web.Pages.SBC
             else
             {
                 TopLeaguesList = new TopLeaguesModel();
-                TopLeaguesList.ClientTopLeagues = new List<TopLeaguesModel.ClientTopLeague>();
+                TopLeaguesList.ClientTopLeagues = new List<ClientTopLeague>();
             }
 
             MetaData.TotalCount = TopLeaguesList.ClientTopLeagues.Count;
@@ -205,7 +205,7 @@ namespace Backoffice.Web.Pages.SBC
             {
                 TopLeaguesList.ClientTopLeagues = TopLeaguesList.ClientTopLeagues
                     .Skip(skip).Take(MetaData.PageSize)
-                    .Select((s, index) => new TopLeaguesModel.ClientTopLeague
+                    .Select((s, index) => new ClientTopLeague
                     {
                         RowNo = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
                         ClientIdRef = s.ClientIdRef,

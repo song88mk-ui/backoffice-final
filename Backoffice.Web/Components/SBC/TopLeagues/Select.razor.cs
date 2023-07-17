@@ -9,11 +9,11 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         #region Properties
 
         [Parameter] public List<SportModel> SportsTree { get; set; }
-        [Parameter] public List<TopLeaguesModel.TopLeague> CurrentTopLeagues { get; set; }
+        [Parameter] public List<TopLeague> CurrentTopLeagues { get; set; }
         [Parameter] public int SelectedTopLeagues { get; set; }
         [Parameter] public int RowCount { get; set; }
         [Parameter] public int SportId { get; set; }
-        [Parameter] public EventCallback<TopLeaguesModel.TopLeague> OnSelectedLeague { get; set; }
+        [Parameter] public EventCallback<TopLeague> OnSelectedLeague { get; set; }
 
         #endregion
 
@@ -21,7 +21,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
         public async void OnSelectedLeagueEvent(LeagueModel league, SegmentModel segmentResponse)
         {
-            var model = new TopLeaguesModel.TopLeague
+            var model = new TopLeague
             {
                 SegmentId = segmentResponse.SegmentId,
                 SegmentName = segmentResponse.SegmentName,

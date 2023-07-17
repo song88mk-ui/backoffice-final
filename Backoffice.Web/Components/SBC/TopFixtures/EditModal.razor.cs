@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Text;
 using System.Text.Json;
+using SportModel = Backoffice.Web.Models.SportModel;
 
 namespace Backoffice.Web.Components.SBC.TopFixtures
 {
@@ -25,7 +26,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
         public ClientTopFixtureModel.OrderedClientTopFixture TopFixture { get; set; }
         public ClientTopFixtureModel.OrderedClientTopFixture NewTopFixture { get; set; }
-        public List<SportsTreeModel.SportModel> SportsTree { get; set; }
+        public List<SportModel> SportsTree { get; set; }
         public List<string> CurrentTopFixtures { get; set; }
 
         public int SelectedRow { get; set; }
@@ -39,7 +40,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
         protected override async Task OnInitializedAsync()
         {
-            SportsTree = new List<SportsTreeModel.SportModel>();
+            SportsTree = new List<SportModel>();
             TableClass = "table-edit-top-fixture";
 
             TopFixture = ModalParameters.TryGet<ClientTopFixtureModel.OrderedClientTopFixture>("TopFixture");

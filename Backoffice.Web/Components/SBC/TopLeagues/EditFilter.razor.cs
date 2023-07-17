@@ -15,9 +15,9 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         [Parameter] public EventCallback<EditTopLeaguesModel> OnInitCallback { get; set; }
 
         public SportsTreeModel SportsTree { get; set; }
-        public SportsTreeModel.SportModel SelectedSport { get; set; }
-        public SportsTreeModel.SegmentModel SelectedSegment { get; set; }
-        public SportsTreeModel.LeagueModel SelectedLeague { get; set; }
+        public SportModel SelectedSport { get; set; }
+        public SegmentModel SelectedSegment { get; set; }
+        public LeagueModel SelectedLeague { get; set; }
 
         #endregion
 
@@ -25,9 +25,9 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
         protected override async Task OnInitializedAsync()
         {
-            SelectedSport = new SportsTreeModel.SportModel();
-            SelectedSegment = new SportsTreeModel.SegmentModel();
-            SelectedLeague = new SportsTreeModel.LeagueModel();
+            SelectedSport = new SportModel();
+            SelectedSegment = new SegmentModel();
+            SelectedLeague = new LeagueModel();
             SportsTree = new SportsTreeModel();
 
             SportsTree = (await BackOfficeService.GetSportstreeByClientId(ClientId)).Result;
@@ -37,7 +37,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
             var model = new EditTopLeaguesModel
             {
-                Sports = SportsTree.Sports ?? new List<SportsTreeModel.SportModel>(),
+                Sports = SportsTree.Sports ?? new List<SportModel>(),
                 SelectedSport = SelectedSport,
                 SelectedSegment = SelectedSegment,
                 SelectedLeague = SelectedLeague
@@ -49,7 +49,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         public async void OnSegmentChangedEvent(ChangeEventArgs e)
         {
             SelectedSegment = SelectedSport.Segments.FirstOrDefault(s => s.SegmentId == Convert.ToInt32(e.Value));
-            SelectedLeague = new SportsTreeModel.LeagueModel();
+            SelectedLeague = new LeagueModel();
 
             var model = new EditTopLeaguesModel
             {

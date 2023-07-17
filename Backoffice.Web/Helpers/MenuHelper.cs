@@ -6,9 +6,9 @@ namespace Backoffice.Web.Helpers
 {
     public static class MenuHelper
     {
-        public static async Task<NavMenuModel.MenuModel> GetMenu(Claim claim, string name)
+        public static async Task<MenuModel> GetMenu(Claim claim, string name)
         {
-            var menu = new NavMenuModel.MenuModel
+            var menu = new MenuModel
             {
                 Id = $"menu.{claim.Type.ToLower()}",
                 Name = claim.Value == "2" ? $"{name} (Readonly)" : $"{name}",

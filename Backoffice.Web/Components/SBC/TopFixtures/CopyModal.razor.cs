@@ -12,13 +12,13 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
     public partial class CopyModal : IDisposable
     {
         #region Properties   
-        
+
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string> UserClientCodes { get; set; }
 
         public List<ClientIdSelectedModel> ClientIdSelectedModel { get; set; }
         public ClientTopFixtureModel.OrderedClientTopFixture TopFixture { get; set; }
@@ -37,8 +37,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 var clients = (await BackOfficeService.GetClients()).Result;
                 if (clients != null)
                 {
-                    if (UserModel.ClientCodes.Any())
-                        clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != TopFixture.ClientIdRef).ToList();
+                    clients.Clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != TopFixture.ClientIdRef).ToList() : new List<Client>();
 
                     ClientIdSelectedModel = clients.Clients.Select(s => new ClientIdSelectedModel
                     {

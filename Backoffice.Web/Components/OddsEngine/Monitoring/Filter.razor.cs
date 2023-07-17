@@ -38,17 +38,23 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         {
             TopMarketTemplates = new List<MainMarketTemplateResponse>();
             SearchForm = new SearchFormModel();
+
+            await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
+            {
+                SportId = SportId,
+                SelectedMarketTemplateId = MarketTemplateId,
+                SearchText = SearchForm.SearchText
+            });
         }
 
         protected override async Task OnParametersSetAsync()
         {
             if (_sportId != SportId)
             {
-
                 TopMarketTemplates = (await BackOfficeService.GetTopMarkets(SportId)).Result;
 
                 if (TopMarketTemplates != null && TopMarketTemplates.Any())
-                    MarketTemplateId = TopMarketTemplates.FirstOrDefault().MainMarketTemplateId;
+                    MarketTemplateId = TopMarketTemplates.FirstOrDefault()?.MainMarketTemplateId ?? string.Empty;
 
                 await PrepareMonitoringData();
             }

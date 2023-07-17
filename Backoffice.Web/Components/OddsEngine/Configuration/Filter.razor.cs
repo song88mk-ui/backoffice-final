@@ -13,7 +13,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties        
         [Inject] private ITradingService TradingService { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+
         [Parameter] public EventCallback<ConfigFilterModel> ConfigFilterCallback { get; set; }
         [Parameter] public EventCallback IsMarketEditingChanged { get; set; }
         [Parameter] public FixtureType FixtureType { get; set; }
@@ -113,14 +115,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             await ConfigFilterCallback.InvokeAsync(ConfigFilterModel);
             _isPreloader = false;
-            StateHasChanged();   
+            StateHasChanged();
         }
 
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
-            await IsMarketEditingChanged.InvokeAsync();            
+            await IsMarketEditingChanged.InvokeAsync();
 
             await Task.Delay(100);
 
@@ -158,7 +160,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
-            await IsMarketEditingChanged.InvokeAsync();            
+            await IsMarketEditingChanged.InvokeAsync();
 
             await Task.Delay(100);
 
@@ -190,7 +192,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
-            await IsMarketEditingChanged.InvokeAsync();            
+            await IsMarketEditingChanged.InvokeAsync();
 
             await Task.Delay(100);
 
@@ -219,7 +221,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             _isPreloader = true;
             ConfigFilterModel.MarketTemplates = null;
-            await IsMarketEditingChanged.InvokeAsync();            
+            await IsMarketEditingChanged.InvokeAsync();
 
             await Task.Delay(100);
 
@@ -387,13 +389,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             var result = (await TradingService.GetClientList()).Result;
 
-            var clients = UserModel.ClientCodes.Any() ? result.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()))
+            var clients = UserClientCodes != null && UserClientCodes.Any() ? result.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()))
                 .Select(a => new ClientInformationModel
                 {
                     ClientCode = a.ClientCode,
                     ClientId = a.ClientId,
                     ClientName = a.ClientName
-                }).OrderBy(x => x.ClientName).ToList() 
+                }).OrderBy(x => x.ClientName).ToList()
                 : new List<ClientInformationModel>();
 
             return clients;

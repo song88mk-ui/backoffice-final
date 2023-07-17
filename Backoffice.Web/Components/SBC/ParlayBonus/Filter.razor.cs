@@ -21,7 +21,7 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
         [Parameter] public EventCallback<bool> IsUpdatingChanged { get; set; }
-        [Parameter] public List<SelectListItemModel<ClientModel.Client>> Clients { get; set; }
+        [Parameter] public List<SelectListItemModel<Client>> Clients { get; set; }
         [Parameter] public bool IsUpdating { get; set; }
 
         public ElementReference ParlayBonusMinOddsElementReference { get; set; }

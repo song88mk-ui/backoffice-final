@@ -16,7 +16,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public ConfigLogsFilterModel ConfigLogsFilterModel { get; set; }
         [Parameter] public EventCallback<ConfigLogsFilterModel> ConfigLogsFilterModelChanged { get; set; }
         [Parameter] public EventCallback GetContentCallback { get; set; }
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         private bool IsFilterButtonDisabled { get; set; }
         #endregion
         #region Methods
@@ -150,7 +151,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private async Task<List<SelectListItemModel<Guid>>> GetClients()
         {
-            return (await TradingService.GetClientList()).Result.Where(x => UserModel.ClientCodes.Contains(x.ClientCode)).Select(c => new SelectListItemModel<Guid>()
+            return (await TradingService.GetClientList()).Result.Where(x => UserClientCodes != null && UserClientCodes.Contains(x.ClientCode)).Select(c => new SelectListItemModel<Guid>()
             {
                 Value = c.ClientId,
                 Name = c.ClientName

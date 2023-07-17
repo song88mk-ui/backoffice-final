@@ -28,11 +28,11 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         [Parameter] public int SportId { get; set; }
         [Parameter] public string SportName { get; set; }
 
-        public List<SportsTreeModel.SportModel> SportsTree { get; set; }
+        public List<SportModel> SportsTree { get; set; }
         public GetAllLeaguesRequest GetAllLeaguesRequest { get; set; }
-        public List<TopLeaguesModel.TopLeague> CurrentTopLeagues { get; set; }
-        public List<TopLeaguesModel.TopLeague> NewTopLeagues { get; set; }
-        public List<TopLeaguesModel.TopLeague> TempNewTopLeagues { get; set; }
+        public List<TopLeague> CurrentTopLeagues { get; set; }
+        public List<TopLeague> NewTopLeagues { get; set; }
+        public List<TopLeague> TempNewTopLeagues { get; set; }
         public PostTopLeaguesRequest PostTopLeaguesRequest { get; set; }
 
         public string TableClass { get; set; }
@@ -51,9 +51,9 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             SportId = !string.IsNullOrWhiteSpace(ModalParameters.TryGet<string>("SportId")) ? int.Parse(ModalParameters.TryGet<string>("SportId")) : 1;
             SportName = !string.IsNullOrWhiteSpace(ModalParameters.TryGet<string>("SportName")) ? ModalParameters.TryGet<string>("SportName") : "Soccer";
 
-            CurrentTopLeagues = ModalParameters.TryGet<List<TopLeaguesModel.TopLeague>>("CurrentTopLeagues");
+            CurrentTopLeagues = ModalParameters.TryGet<List<TopLeague>>("CurrentTopLeagues");
             AlertStatus = AlertStatus.Success;
-            TempNewTopLeagues = new List<TopLeaguesModel.TopLeague>();
+            TempNewTopLeagues = new List<TopLeague>();
             //SelectedRow = -1;
 
             GetAllLeaguesRequest = new GetAllLeaguesRequest()
@@ -76,7 +76,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
         public async Task OnInitCallback(EditTopLeaguesModel model)
         {
-            NewTopLeagues = new List<TopLeaguesModel.TopLeague>();
+            NewTopLeagues = new List<TopLeague>();
 
             if (CurrentTopLeagues.Any())
             {
@@ -89,7 +89,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 }
                 else
                 {
-                    NewTopLeagues = CurrentTopLeagues.Select(x => new TopLeaguesModel.TopLeague()
+                    NewTopLeagues = CurrentTopLeagues.Select(x => new TopLeague()
                     {
                         LeagueId = x.LeagueId,
                         LeagueName = x.LeagueName,
@@ -102,16 +102,16 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                         Status = x.Status
                     }).ToList();
                 }
-                    //NewTopLeagues = CurrentTopLeagues;
+                //NewTopLeagues = CurrentTopLeagues;
             }
 
             if (NewTopLeagues == null || !NewTopLeagues.Any())
             {
-                NewTopLeagues = new List<TopLeaguesModel.TopLeague>
+                NewTopLeagues = new List<TopLeague>
                 {
-                    new TopLeaguesModel.TopLeague 
-                    { 
-                        SortOrder = 1 
+                    new TopLeague
+                    {
+                        SortOrder = 1
                     }
                 };
             }
@@ -131,7 +131,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             }
         }
 
-        public async Task OnSelectedLeagueEvent(TopLeaguesModel.TopLeague model)
+        public async Task OnSelectedLeagueEvent(TopLeague model)
         {
             foreach (var league in NewTopLeagues)
             {
@@ -149,7 +149,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 }
             }
 
-            CurrentTopLeagues = NewTopLeagues.Any() ? NewTopLeagues.ToList() : new List<TopLeaguesModel.TopLeague>();
+            CurrentTopLeagues = NewTopLeagues.Any() ? NewTopLeagues.ToList() : new List<TopLeague>();
             SelectedRow = 0;
         }
 
@@ -157,26 +157,26 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         {
             if (NewTopLeagues.Count < 50)
             {
-                var newTopLeague = new TopLeaguesModel.TopLeague()
+                var newTopLeague = new TopLeague()
                 {
                     SortOrder = count + 1
                 };
 
-                NewTopLeagues.Insert(count, newTopLeague);                
+                NewTopLeagues.Insert(count, newTopLeague);
 
                 SortOrderRow();
             }
         }
 
-        public async Task OnDeleteClickEvent(TopLeaguesModel.TopLeague model)
+        public async Task OnDeleteClickEvent(TopLeague model)
         {
             NewTopLeagues.Remove(model);
 
             if (!NewTopLeagues.Any())
             {
-                NewTopLeagues.Add(new TopLeaguesModel.TopLeague 
-                { 
-                    SortOrder = 1 
+                NewTopLeagues.Add(new TopLeague
+                {
+                    SortOrder = 1
                 });
             }
             else
@@ -186,7 +186,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         private async Task SortOrderRow()
         {
             NewTopLeagues = NewTopLeagues
-                .Select((s, index) => new TopLeaguesModel.TopLeague
+                .Select((s, index) => new TopLeague
                 {
                     SportId = s.SportId,
                     SportName = s.SportName,
@@ -226,10 +226,10 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 AlertStatus = AlertStatus.Error;
 
                 return;
-            }            
+            }
 
             if (NewTopLeagues.Count == 1 && NewTopLeagues.Any(c => c.LeagueId == 0))
-                NewTopLeagues = new List<TopLeaguesModel.TopLeague>();
+                NewTopLeagues = new List<TopLeague>();
             else
                 NewTopLeagues.ForEach(c => c.SportName = SportName);
 
