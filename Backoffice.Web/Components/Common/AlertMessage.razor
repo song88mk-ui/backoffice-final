@@ -1,15 +1,15 @@
 ﻿@using Backoffice.Web.Models;
-@if (!string.IsNullOrEmpty(AlertStatus) && !string.IsNullOrEmpty(AlertMessageStr) && Opacity > 0)
+@if (!string.IsNullOrEmpty(AlertModel.Status) && !string.IsNullOrEmpty(AlertModel.Message) && AlertModel.Opacity > 0)
 {
     <div>
-        <div class=@($"alert {(AlertStatus.Contains("Success") ? "alert-success" : AlertStatus.Contains("Error") || AlertStatus.Contains("Danger") ? "alert-danger" : "alert-primary")} text-left") role="alert" style="@(Opacity == 0 ? $"display: none; opacity: {Opacity}" : $"display: block; opacity: {Opacity}")">
+        <div class=@($"alert {(AlertModel.Status.Contains("Success") ? "alert-success" : AlertModel.Status.Contains("Error") || AlertModel.Status.Contains("Danger") ? "alert-danger" : "alert-primary")} text-left") role="alert" style="@(AlertModel.Opacity == 0 ? $"display: none; opacity: {AlertModel.Opacity}" : $"display: block; opacity: {AlertModel.Opacity}")">
             @if (IsHtmlMessage)
             {
-                @((MarkupString)AlertMessageStr)
+                @((MarkupString)AlertModel.Message)
             }
             else
             {
-                @AlertMessageStr
+                @AlertModel.Message
             }
         </div>
     </div>
@@ -18,44 +18,44 @@
 
 
 @code {
-    [Parameter] public decimal Opacity { get; set; }
     [Parameter] public EventCallback<decimal> OpacityChanged { get; set; }
-    [Parameter] public string AlertStatus { get; set; }
-    [Parameter] public string AlertMessageStr { get; set; }
-    [Parameter] public bool AlwaysShow { get; set; } = false;    
+    [Parameter] public AlertModel AlertModel { get; set; }
     [Parameter] public Guid Guid { get; set; }
     [Parameter] public bool IsHtmlMessage { get; set; } = false;
 
     #region Methods
     protected override async Task OnParametersSetAsync()
     {
-        if (!AlwaysShow)
+        if(AlertModel !=null)
         {
-            if (Opacity > 0m)
+            if (!AlertModel.IsAlwaysShown)
             {
-                while (Opacity >= 0m)
+                if (AlertModel.Opacity > 0m)
                 {
-                    if (Opacity > 0.9m)
+                    while (AlertModel.Opacity >= 0m)
                     {
-                        Opacity -= 0.05m;
-                        await Task.Delay(2000);
-                    }
-                    else
-                    {
-                        Opacity -= 0.03m;
-                        await Task.Delay(10);
-                    }
+                        if (AlertModel.Opacity > 0.9m)
+                        {
+                            AlertModel.Opacity -= 0.05m;
+                            await Task.Delay(2000);
+                        }
+                        else
+                        {
+                            AlertModel.Opacity -= 0.03m;
+                            await Task.Delay(10);
+                        }
 
-                    StateHasChanged();
+                        StateHasChanged();
+                    }
+                    AlertModel.Opacity = 0.0m;
+                    AlertModel.Message = string.Empty;
+                    await OpacityChanged.InvokeAsync(AlertModel.Opacity);
                 }
-                Opacity = 0.0m;
-                AlertMessageStr = string.Empty;
-                await OpacityChanged.InvokeAsync(Opacity);
             }
-        }
-        else
-        {
-            Opacity = 1.00m;
+            else
+            {
+                AlertModel.Opacity = 1.00m;
+            }
         }
     }
 

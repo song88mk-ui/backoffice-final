@@ -26,17 +26,22 @@ namespace Backoffice.Web.Pages.Administration
         public ClientModel ClientModel { get; set; }
         public List<AlertModel> Alerts { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public decimal Opacity { get; set; }
         public bool IsPreLoader { get; set; }
 
         #endregion
 
+        private PageHeaderModel _pageHeaderModel;
+
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            _pageHeaderModel = new()
+            {
+                Title = "Manage User Group",
+                IconClass = "ico ico-manage-user-group"
+            };
             Opacity = 0m;
             IsPreLoader = true;
             Alerts = new List<AlertModel>();
@@ -64,9 +69,6 @@ namespace Backoffice.Web.Pages.Administration
                     Clients = clients.Clients.OrderBy(x => x.ClientName).ToList()
                 };
             }
-
-            PageTitle = "Manage User Group";
-            IconClass = "ico ico-manage-user-group";
         }
 
         public async Task OnInitEvent(UserGroupCallbackModel request)
@@ -84,13 +86,13 @@ namespace Backoffice.Web.Pages.Administration
         public async Task OnCreateUserGroupClickEvent()
         {
             Permissions = await GetPermissionList();
-            
+
             var parameters = new ModalParameters();
 
             var userGroup = new UserGroupResponse()
             {
                 UserGroupId = "",
-                Claims = new List<ClaimModel> { 
+                Claims = new List<ClaimModel> {
                     new ClaimModel()
                     {
                         ClaimType = AdminPermission.Admin_Dashboard.ToString().Replace("_","."),
@@ -169,7 +171,7 @@ namespace Backoffice.Web.Pages.Administration
             parameters.Add("DialogStyle", "max-width: 30rem;");
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
-            parameters.Add("Users", users.Select((u, index) => new UserResponse { UserId = (index + 1).ToString(), UserName = u.UserName } ).ToList());
+            parameters.Add("Users", users.Select((u, index) => new UserResponse { UserId = (index + 1).ToString(), UserName = u.UserName }).ToList());
             parameters.Add("UserGroupName", userGroup.UserGroupName);
             parameters.Add("ModalContentStyle", "max-height: 90vh");
 
@@ -183,7 +185,7 @@ namespace Backoffice.Web.Pages.Administration
 
             var message = "User Group successfully created";
 
-            if(item.ToString() == "EDIT")
+            if (item.ToString() == "EDIT")
                 message = "User Group successfully updated";
             else if (item.ToString() == "DELETE")
                 message = "User Group successfully deleted";

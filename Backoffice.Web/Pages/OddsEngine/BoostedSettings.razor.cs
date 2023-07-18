@@ -26,20 +26,23 @@ namespace Backoffice.Web.Pages.OddsEngine
         protected List<BoostedSettingsModel> ClientsView { get; set; }
         protected SearchFormModel SearchForm { get; set; } = new SearchFormModel();
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
-
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public bool IsPreLoader { get; set; } = true;
 
         #endregion
+
+        private PageHeaderModel _pageHeaderModel;
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
             THeadClass = "table-head";
-            PageTitle = "Boosted Settings";
-            IconClass = string.Empty;
+            _pageHeaderModel = new()
+            {
+                Title = "Boosted Settings",
+                IconClass = string.Empty
+            };
+
             TradingService.Region = Region.ToUpper();
 
             Breadcrumbs = new List<BreadcrumbModel>()

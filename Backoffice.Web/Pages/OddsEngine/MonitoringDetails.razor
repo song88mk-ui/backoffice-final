@@ -10,11 +10,11 @@
         <div class="col-md-12">
             @if (Breadcrumbs.Any())
             {
-                <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"/>
+                <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region" />
             }
         </div>
         <div class="col-md-12">
-            <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+            <PageHeader PageHeaderModel="_pageHeaderModel" />
         </div>
         <div class="col-md-12">
             @if (SportId != 0)
@@ -30,16 +30,25 @@
                             <th class="th-start-date py-3"></th>
                             <th class="th-fixture-name py-3"></th>
                             <th class="th-master py-3">BR CTRL</th>
-                            @foreach (var client in ClientModel.Clients)
+                            @if (_clients != null && _clients.Any())
                             {
-                                <th class="th-client py-3">@client.ClientName</th>
+                                foreach (var client in _clients)
+                                {
+                                    <th class="th-client py-3">@client.ClientName</th>
+                                }
                             }
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var market in FixtureMarkets)
+                        @if (_isPreLoader)
                         {
-                            <FixtureRow @key="@market.ProviderMarketId" Clients="ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" Region="@Region" IsMonitoringPage=false/>
+                            <Preloader />
+                        }
+                        else
+                        {
+                            <Virtualize Items="FixtureMarkets" Context="market" OverscanCount="5">
+                                <FixtureRow @key="@market.ProviderMarketId" Clients="_clients" Market="market" Region="@Region" IsMonitoringPage=false />
+                            </Virtualize>
                         }
                     </tbody>
                 </table>
@@ -61,14 +70,14 @@
                         <MarketFilter MarketTemplates="filteredMarketTemplateNavigation" OnMarketTemplateClickCallback="OnMarketTemplateClickEvent" />
                     </div>
                     <div class="market-template-fixture-container align-self-start">
-                    @if (filteredMarketTemplateNavigation.Any() && FixtureMarketTemplates.Any())
+                        @if (filteredMarketTemplateNavigation.Any() && FixtureMarketTemplates.Any())
                         {
                             <table class="table table-hover table-bordered mb-0">
                                 <thead class="table-head">
                                     <tr>
                                         <th></th>
                                         <th class="th-master">BR CTRL</th>
-                                        @foreach (var client in ClientModel.Clients)
+                                        @foreach (var client in _clients)
                                         {
                                             <th class="th-client py-3">@client.ClientName</th>
                                         }
@@ -85,7 +94,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        @foreach (var client in ClientModel.Clients)
+                                        @foreach (var client in _clients)
                                         {
                                             <td>
                                                 <div class="d-flex justify-content-center">
@@ -106,13 +115,12 @@
                                     </tr>
                                     <!-- End Table Row Margin -->
                                     <!-- Table Row Odds-->
-                                    @foreach (var market in FixtureMarketTemplates)
-                                    {
-                                        foreach (var selection in market.Selections)
+                                    <Virtualize Items="FixtureMarketTemplates" Context="market" OverscanCount="20">
+                                        @foreach (var selection in market.Selections)
                                         {
-                                            <MatchDetailSelectionRow Selection="selection" Market="@market" ClientModel="ClientModel" />
+                                            <MatchDetailSelectionRow Selection="selection" Market="@market" Clients="_clients" />
                                         }
-                                    }
+                                    </Virtualize>
                                     <!-- End Table Row Odds -->
                                 </tbody>
                             </table>

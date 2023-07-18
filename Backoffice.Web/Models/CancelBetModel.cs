@@ -1,17 +1,12 @@
 ﻿namespace Backoffice.Web.Models
 {
-    public class CancelBetModel
+    public class CancelBetReferenceModel
     {
-        public CancelBetModel()
+        public CancelBetReferenceModel()
         {
-            BetReferenceIds = new List<BetReferenceModel>();
+            BetReferenceIds = new List<string>();
         }
         public string Reason { get; set; }
-        public List<BetReferenceModel> BetReferenceIds { get; set; }
-
-        public class BetReferenceModel
-        {
-            public string BetReferenceId { get; set; }
-        }
+        public List<string> BetReferenceIds { get; set; }
     }
 }

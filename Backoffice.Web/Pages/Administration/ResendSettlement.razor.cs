@@ -20,26 +20,28 @@ namespace Backoffice.Web.Pages.Administration
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public List<AlertModel> Alerts { get; set; }
-        private List<ResendSettlementBetDetailModel> ResendSettlementModel { get; set; }        
-
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }        
+        private List<ResendSettlementBetDetailModel> ResendSettlementModel { get; set; }
         public bool IsAddDisabled { get; set; }
         public bool IsActionDisabled { get; set; }
         public Guid Guid { get; set; }
 
         #endregion
 
+        private PageHeaderModel _pageHeaderModel;
+
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            PageTitle = "Resend Settlement";
-            IconClass = "ico ico-resend-settlement";
+            _pageHeaderModel = new()
+            {
+                Title = "Resend Settlement",
+                IconClass = "ico ico-resend-settlement"
+            };
             IsAddDisabled = true;
             IsActionDisabled = false;
             Guid = new Guid();
-            
+
             ResendSettlementModel = new List<ResendSettlementBetDetailModel>();
             Alerts = new List<AlertModel>();
 
@@ -59,11 +61,11 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task OnReferenceIdOnChangeEvent(ChangeEventArgs e, ResendSettlementBetDetailModel betDetailModel, int index)
         {
-            Guid betId;           
+            Guid betId;
 
             if (string.IsNullOrEmpty(e.Value.ToString()))
-            {                
-                ResendSettlementModel[index] = new ResendSettlementBetDetailModel();                
+            {
+                ResendSettlementModel[index] = new ResendSettlementBetDetailModel();
             }
             else
             {
@@ -103,15 +105,15 @@ namespace Backoffice.Web.Pages.Administration
                         }
                         else
                         {
-                            ResendSettlementModel[index] = new ResendSettlementBetDetailModel() 
+                            ResendSettlementModel[index] = new ResendSettlementBetDetailModel()
                             {
                                 Bet = new ResendSettlementBetDetailResponse.ResendSettlementBetDetail()
                                 {
                                     BetId = betId
                                 }
-                            };                            
+                            };
                         }
-                    }                                                            
+                    }
                 }
 
                 IsActionDisabled = false;
@@ -132,7 +134,7 @@ namespace Backoffice.Web.Pages.Administration
         public async Task OnResendSettlementClickEvent()
         {
             if (ResendSettlementModel != null && ResendSettlementModel.Any())
-            {                
+            {
                 if (ResendSettlementModel.Any(x => x.Bet.BetStatusId == (int)BetStatus.Rejected))
                 {
                     Alerts.Add(new AlertModel()
@@ -153,13 +155,13 @@ namespace Backoffice.Web.Pages.Administration
 
                     var options = new ModalOptions();
                     ModalService.Open<ConfirmationModal>("Resend Settlement", parameters, options);
-                }                
+                }
             }
         }
 
         public async Task OnResetSettlementClickEvent()
         {
-            var parameters = new ModalParameters();            
+            var parameters = new ModalParameters();
             parameters.Add("ModalDialogClass", "modal-lg");
 
             var options = new ModalOptions();
@@ -167,13 +169,13 @@ namespace Backoffice.Web.Pages.Administration
         }
 
         public async Task ResetSettlementEntries()
-        {            
-            ResendSettlementModel = new List<ResendSettlementBetDetailModel>() { new ResendSettlementBetDetailModel() };            
+        {
+            ResendSettlementModel = new List<ResendSettlementBetDetailModel>() { new ResendSettlementBetDetailModel() };
         }
 
         public async Task OnBetDelete(ResendSettlementBetDetailModel bet)
         {
-            ResendSettlementModel.Remove(bet);             
+            ResendSettlementModel.Remove(bet);
         }
 
         public async Task OnResendSettlementCallback(BaseResponse<ResendSettlementResponse> response)

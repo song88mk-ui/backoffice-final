@@ -23,15 +23,13 @@ namespace Backoffice.Web.Pages.Administration
         public List<ManualMarketSettlementAuditModel> ManualMarketSettlements { get; set; }
         public MetaData MetaData { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         private bool IsPreLoader { get; set; }
 
         #endregion
 
         #region Fields
-
         private ToastService _toasterService => ToasterService!;
+        private PageHeaderModel _pageHeaderModel;
 
         #endregion
 
@@ -39,6 +37,11 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
+            _pageHeaderModel = new()
+            {
+                Title = "Market Settlement",
+                IconClass = "ico ico-market-settlement"
+            };
             MetaData = new MetaData()
             {
                 CurrentPage = 1,
@@ -55,14 +58,11 @@ namespace Backoffice.Web.Pages.Administration
             };
 
             await AuthenticateAccess.InvokeAsync();
-
-            PageTitle = "Market Settlement";
-            IconClass = "ico ico-market-settlement";
         }
 
         public async Task GetContent()
         {
-            IsPreLoader = true;            
+            IsPreLoader = true;
 
             var fromDate = Convert.ToDateTime(ModalFilter.FromDate.ToString("yyyy-MM-dd 00:00:00"));
             var toDate = Convert.ToDateTime(ModalFilter.ToDate.ToString("yyyy-MM-dd 23:59:59"));
@@ -70,7 +70,7 @@ namespace Backoffice.Web.Pages.Administration
             var filterSegmentId = ModalFilter.SegmentId == 0 ? "%%" : ModalFilter.SegmentId.ToString();
             var filterLeagueId = ModalFilter.LeagueId == 0 ? "%%" : ModalFilter.LeagueId.ToString();
             var filterFixtureId = string.IsNullOrEmpty(ModalFilter.FixtureId) ? "%" : ModalFilter.FixtureId;
-            
+
             var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),

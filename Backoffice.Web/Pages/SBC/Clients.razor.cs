@@ -23,17 +23,21 @@ namespace Backoffice.Web.Pages.SBC
         public ClientListCallbackModel ClientListCallbackModel { get; set; }
         public List<AlertModel> Alerts { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public bool IsPreload { get; set; }
         public decimal Opacity { get; set; }
 
         #endregion
+        private PageHeaderModel _pageHeaderModel;
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            _pageHeaderModel = new()
+            {
+                Title = "Manage Clients",
+                IconClass = "ico ico-clients"
+            };
             Opacity = 0m;
             Alerts = new List<AlertModel>();
             ClientListModel = new ClientListResponse();
@@ -48,9 +52,6 @@ namespace Backoffice.Web.Pages.SBC
             };
 
             await AuthenticateAccess.InvokeAsync();
-
-            PageTitle = "Manage Clients";
-            IconClass = "ico ico-clients";
         }
 
         public async Task OnInitEvent(ClientListCallbackModel request)
@@ -200,7 +201,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public async Task OnViewBetSettingClickEvent(ClientListResponse.Client client)
         {
-            
+
             client.BetSettings = (await BackOfficeService.GetBetSetting(new BetSettingRequest
             {
                 ClientId = client.ClientId

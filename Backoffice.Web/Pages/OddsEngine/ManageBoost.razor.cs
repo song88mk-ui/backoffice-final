@@ -25,10 +25,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
 
         public Filter FilterReference { get; set; }
-
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }                
-                
         private bool IsPreLoader { get; set; }
         private decimal Opacity { get; set; } = 0;
         private string AlertMessage { get; set; }
@@ -37,8 +33,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Fields
+        private PageHeaderModel _pageHeaderModel;
         public LanguagesModel _languagesModel { get; set; }
-        private string _search { get; set; }        
+        private string _search { get; set; }
         public string _clientCode { get; set; }
         public int _sportId { get; set; }
         public int _segmentId { get; set; }
@@ -48,11 +45,13 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {            
-            TradingService.Region = Region.ToUpper();
-            PageTitle = "Manage Boost";
-            IconClass = string.Empty;
+        {
             IsPreLoader = true;
+            TradingService.Region = Region.ToUpper();
+            _pageHeaderModel = new()
+            {
+                Title = "Manage Boost"
+            };
             TradingService.Region = Region.ToUpper();
             Breadcrumbs = new List<BreadcrumbModel>()
             {
@@ -78,13 +77,13 @@ namespace Backoffice.Web.Pages.OddsEngine
             _languagesModel = new LanguagesModel();
 
             _languagesModel.Languages = _languagesModel.Languages.Where(c => !priceboost.BoostedSelectionTranslations
-            .Select(s => s.Language.LanguageCode).ToList().Contains(c.LanguageCode)).ToList();            
+            .Select(s => s.Language.LanguageCode).ToList().Contains(c.LanguageCode)).ToList();
 
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
-            parameters.Add("DialogStyle", "max-width: 90rem;top:50%;transform:translateY(-50%)");            
+            parameters.Add("DialogStyle", "max-width: 90rem;top:50%;transform:translateY(-50%)");
             parameters.Add("PriceBoostConfigModel", priceboost);
             parameters.Add("PriceBoostConfigModelSerialized", JsonSerializer.Serialize(priceboost));
             parameters.Add("Languages", _languagesModel);
@@ -129,7 +128,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             await GetContents();
         }
-        
+
         public async Task OnClientChangedEvent(string clientCode)
         {
             _clientCode = clientCode;
@@ -252,7 +251,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     var query = priceBoostConfigResponse.Result.AsQueryable();
 
-                    query = query.Where(c => UserClientCodes !=null && UserClientCodes.Contains(c.ClientCode));
+                    query = query.Where(c => UserClientCodes != null && UserClientCodes.Contains(c.ClientCode));
 
                     if (!string.IsNullOrEmpty(_search))
                     {

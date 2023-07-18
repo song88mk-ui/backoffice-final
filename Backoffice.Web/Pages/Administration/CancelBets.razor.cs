@@ -20,11 +20,10 @@ namespace Backoffice.Web.Pages.Administration
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
-        public CancelBetModel CancelBetModel { get; set; }
-        public List<AlertModel> Alerts { get; set; }
+        private CancelBetReferenceModel BetRefenceModel;
+        private List<CancelBetAlertModel> Alerts;
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
+        private PageHeaderModel _pageHeaderModel;
         public bool IsPreload { get; set; }
         public bool IsReasonRequired { get; set; }
 
@@ -33,30 +32,26 @@ namespace Backoffice.Web.Pages.Administration
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            Alerts = new List<AlertModel>();
-            CancelBetModel = new CancelBetModel();
-            CancelBetModel.BetReferenceIds.Add(new CancelBetModel.BetReferenceModel
+            Alerts = new();
+            BetRefenceModel = new()
             {
-                BetReferenceId = string.Empty
-            });
+                BetReferenceIds = new() { string.Empty }
+            };
 
             await AuthenticateAccess.InvokeAsync();
 
-            PageTitle = "Cancel Bets";
-            IconClass = "ico ico-cancel-bets";
+            _pageHeaderModel.Title = "Cancel Bets";
+            _pageHeaderModel.IconClass = "ico ico-cancel-bets";
         }
 
-        public async Task OnAddBetReferenceIdCallbackEvent()
+        private void OnAddBetReferenceIdCallbackEvent()
         {
-            if (CancelBetModel.BetReferenceIds.Count() <= 9)
+            if (BetRefenceModel.BetReferenceIds != null && BetRefenceModel.BetReferenceIds.Any() && BetRefenceModel.BetReferenceIds.Count() <= 9)
             {
-                CancelBetModel.BetReferenceIds.Add(new CancelBetModel.BetReferenceModel
-                {
-                    BetReferenceId = string.Empty
-                });
+                BetRefenceModel.BetReferenceIds.Add(string.Empty);
             }
         }
-        public async Task OnCancelBetCallbackEvent()
+        private void OnCancelBetCallbackEvent()
         {
             IsPreload = true;
 
@@ -76,19 +71,14 @@ namespace Backoffice.Web.Pages.Administration
             var options = new ModalOptions();
             ModalService.Open<ConfirmCancelBetModal>("Cancel Bets", parameters, options);
         }
-        public async Task OnResetCallbackEvent()
+        private void OnResetCallbackEvent()
         {
             IsPreload = false;
             IsReasonRequired = false;
 
             Alerts.Clear();
-            CancelBetModel = new CancelBetModel();
-            CancelBetModel.BetReferenceIds.Clear();
-            CancelBetModel.BetReferenceIds.Add(new CancelBetModel.BetReferenceModel
-            {
-                BetReferenceId = string.Empty
-            });
-
+            BetRefenceModel.BetReferenceIds.Clear();
+            BetRefenceModel.BetReferenceIds.Add(string.Empty);
         }
 
         public async Task OnConfirmCancelBetEvent()
@@ -98,28 +88,26 @@ namespace Backoffice.Web.Pages.Administration
                 IsPreload = true;
                 Alerts.Clear();
 
-                var betIds = CancelBetModel.BetReferenceIds.Where(b => !string.IsNullOrEmpty(b.BetReferenceId)).Select(s => s.BetReferenceId).ToList();
+                var betIds = BetRefenceModel.BetReferenceIds.Where(x => !string.IsNullOrEmpty(x)).Select(x => x).ToList();
 
-                var betDetails = (await BackOfficeService.GetManualBetDetails(new ManualBetDetailsRequest
-                {
-                    BetIds = betIds,
-                })).Result;
+                var manualBetDetailsResponse = await BackOfficeService.GetManualBetDetails(new() { BetIds = betIds });
+                var betDetails = manualBetDetailsResponse.Result;
 
                 var notRunningBets = betDetails.Bets.Where(b => b.BetStatusId != (int)BetStatus.Running).ToList();
 
-                foreach(var bet in CancelBetModel.BetReferenceIds)
+                foreach (var bet in BetRefenceModel.BetReferenceIds)
                 {
-                    if (string.IsNullOrEmpty(bet.BetReferenceId))
+                    if (string.IsNullOrEmpty(bet))
                         continue;
 
-                    if(notRunningBets.Any(b => b.BetId == Guid.Parse(bet.BetReferenceId)))
+                    if (notRunningBets.Any(b => b.BetId == Guid.Parse(bet)))
                     {
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
                             Status = AlertStatus.Error.ToString(),
                             Message = $"Your request to cancel this Bet Reference ID did not proceed. Only 'Running' bets can be settled as 'Cancelled'.",
                             Opacity = 1.0m,
-                            Control = $"{CancelBetModel.BetReferenceIds.IndexOf(bet)}"
+                            Control = $"{BetRefenceModel.BetReferenceIds.IndexOf(bet)}"
                         });
                         IsPreload = false;
                     }
@@ -128,35 +116,34 @@ namespace Backoffice.Web.Pages.Administration
                 if (Alerts.Any())
                     return;
 
-                var request = new BetModifyRequest
+                var reason = BetRefenceModel.Reason;
+                var response = (await BackOfficeService.CancelBet(new()
                 {
                     BetIds = betIds,
                     NewStatus = BetStatus.Cancelled,
-                    Reason = CancelBetModel.Reason,
+                    Reason = BetRefenceModel.Reason,
                     ModifiedByUserId = 0,
-                };
-
-                var response = (await BackOfficeService.CancelBet(request));
+                }));
 
                 if (response.StatusCode == StatusCode.Success)
                 {
 
                     //activity log
-                    var message = new OnActivityLogListMessage();
+                    OnActivityLogListMessage message = new();
                     foreach (var data in response.Result.Data)
                     {
                         var betData = betDetails.Bets.FirstOrDefault(b => b.BetId == Guid.Parse(data.BetId));
 
                         if (betData != null)
                         {
-                            betData.Reason = request.Reason;
+                            betData.Reason = reason;
                             betData.SettlementDate = DateTime.UtcNow;
 
                             if (betData.Selections.Any())
                             {
                                 foreach (var selection in betData.Selections)
                                 {
-                                    message.OnActivityLogMessages.Add(new OnActivityLogMessage
+                                    message.OnActivityLogMessages.Add(new()
                                     {
                                         Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                                         Payload = $"{UserModel.UserName}.{data.BetId}.{selection.BetSelectionId}.{betData.UserId}.{betData.ClientName}",
@@ -173,23 +160,16 @@ namespace Backoffice.Web.Pages.Administration
 
                     await BackOfficeService.AddActivityLogList(message);
 
-                    Alerts.Add(new AlertModel
+                    Alerts.Add(new()
                     {
                         Status = AlertStatus.Success.ToString(),
                         Message = "Bet Reference IDs has been successfully cancelled",
                         Opacity = 1.0m
                     });
 
-                    CancelBetModel = new CancelBetModel()
+                    BetRefenceModel = new()
                     {
-                        BetReferenceIds = new List<CancelBetModel.BetReferenceModel>()
-                        {
-                            new CancelBetModel.BetReferenceModel()
-                            {
-                                //Num = 1,
-                                BetReferenceId = ""
-                            }
-                        }
+                        BetReferenceIds = new() { "" }
                     };
 
                 }
@@ -197,23 +177,20 @@ namespace Backoffice.Web.Pages.Administration
                 {
                     if (response.Result != null && response.Result.Data != null)
                     {
-                        foreach (var data in response.Result.Data)
+                        foreach (var data in response.Result.Data.Where(x => !x.IsSuccess))
                         {
-                            if (data.IsSuccess == false)
+                            Alerts.Add(new()
                             {
-                                Alerts.Add(new AlertModel
-                                {
-                                    Status = AlertStatus.Error.ToString(),
-                                    Message = $"{data.Message}",
-                                    Opacity = 1.0m
-                                });
-                            }
+                                Status = AlertStatus.Error.ToString(),
+                                Message = $"{data.Message}",
+                                Opacity = 1.0m
+                            });
 
                         }
                     }
                     else
                     {
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
                             Status = AlertStatus.Error.ToString(),
                             Message = $"{response.Message}",
@@ -231,24 +208,10 @@ namespace Backoffice.Web.Pages.Administration
                     Log.Error(ex.StackTrace.ToString());
             }
         }
-
-        public async Task OnClearBetReferenceClickEvent(CancelBetModel.BetReferenceModel model)
-        {
-            model.BetReferenceId = string.Empty;
-        }
-
-        public async Task OnDeleteBetReferenceClickEvent(CancelBetModel.BetReferenceModel model)
-        {
-            if(CancelBetModel.BetReferenceIds.Count > 1)
-                CancelBetModel.BetReferenceIds.Remove(model);
-        }
-
         public void Dispose()
         {
-            CancelBetModel = null;
-            Alerts = null;
-
-            BackOfficeService.Dispose();
+            BetRefenceModel = new();
+            Alerts = new();
 
             GC.SuppressFinalize(this);
         }
@@ -261,30 +224,30 @@ namespace Backoffice.Web.Pages.Administration
             Alerts.Clear();
             IsReasonRequired = false;
             var count = 0;
-            foreach (var bet in CancelBetModel.BetReferenceIds)
+            foreach (var bet in BetRefenceModel.BetReferenceIds)
             {
-                if (!string.IsNullOrEmpty(bet.BetReferenceId.Trim()))
+                if (!string.IsNullOrEmpty(bet.Trim()))
                 {
-                    var isValid = Guid.TryParse(bet.BetReferenceId.Trim(), out var betId);
+                    var isValid = Guid.TryParse(bet.Trim(), out var betId);
                     if (!isValid)
                     {
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
                             Status = AlertStatus.Error.ToString(),
-                            Message = $"Invalid Bet Reference Id {bet.BetReferenceId.Trim()}",
+                            Message = $"Invalid Bet Reference Id {bet.Trim()}",
                             Opacity = 1.0m,
-                            Control = $"{count+1}"
+                            Control = $"{count + 1}"
                         });
                     }
 
-                    var existingBet = CancelBetModel.BetReferenceIds.FirstOrDefault(b => b.BetReferenceId.Trim() == bet.BetReferenceId.Trim());
+                    var existingBet = BetRefenceModel.BetReferenceIds.FirstOrDefault(b => b.Trim() == bet.Trim());
                     if (existingBet != null)
                     {
-                        if (!Alerts.Any(a => a.Message.Contains($"Duplicate Bet Reference Id found. {bet.BetReferenceId.Trim()}")))
-                            Alerts.Add(new AlertModel
+                        if (!Alerts.Any(a => a.Message.Contains($"Duplicate Bet Reference Id found. {bet.Trim()}")))
+                            Alerts.Add(new()
                             {
                                 Status = AlertStatus.Error.ToString(),
-                                Message = $"Duplicate Bet Reference Id found. {bet.BetReferenceId.Trim()}",
+                                Message = $"Duplicate Bet Reference Id found. {bet.Trim()}",
                                 Opacity = 1.0m,
                                 Control = $"{count + 1}"
                             });
@@ -294,27 +257,27 @@ namespace Backoffice.Web.Pages.Administration
                 }
             }
 
-            if (count == 0 || string.IsNullOrEmpty(CancelBetModel.Reason))
+            if (count == 0 || string.IsNullOrEmpty(BetRefenceModel.Reason))
             {
                 var message = "";
-                if (count == 0 && string.IsNullOrEmpty(CancelBetModel.Reason))
+                if (count == 0 && string.IsNullOrEmpty(BetRefenceModel.Reason))
                     message = "Please enter 'Bet Reference ID' and 'Reason for Cancelling Bets' to proceed";
-                else if (count == 0 && !string.IsNullOrEmpty(CancelBetModel.Reason))
+                else if (count == 0 && !string.IsNullOrEmpty(BetRefenceModel.Reason))
                     message = "Please enter 'Bet Reference ID' to proceed";
-                else if (count > 0 && string.IsNullOrEmpty(CancelBetModel.Reason))
+                else if (count > 0 && string.IsNullOrEmpty(BetRefenceModel.Reason))
                     message = "Please enter 'Reason for Cancelling Bets' to proceed";
 
                 if (!string.IsNullOrEmpty(message))
                 {
-                    Alerts.Add(new AlertModel
+                    Alerts.Add(new()
                     {
                         Status = AlertStatus.Error.ToString(),
                         Message = message,
                         Opacity = 1.0m,
-                        Control = count == 0? $"1" : ""
+                        Control = count == 0 ? $"1" : ""
                     });
                 }
-                if (string.IsNullOrEmpty(CancelBetModel.Reason))
+                if (string.IsNullOrEmpty(BetRefenceModel.Reason))
                     IsReasonRequired = true;
             }
 

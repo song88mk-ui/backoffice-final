@@ -8,7 +8,7 @@
             <div class="main-content col-md-12 mb-4 pb-3">
                 <div class="row">
                     <div class="col-md-12">
-                        <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+                        <PageHeader PageHeaderModel="@_pageHeaderModel"/>
                     </div>
                     @if (Alerts != null && Alerts.Any())
                     {
@@ -46,24 +46,24 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (CancelBetModel != null && CancelBetModel.BetReferenceIds.Any())
+                                    @if (BetRefenceModel != null && BetRefenceModel.BetReferenceIds.Any())
                                     {
-                                        foreach (var bet in CancelBetModel.BetReferenceIds)
+                                        for (var i = 0; i < BetRefenceModel.BetReferenceIds.Count; i++)
                                         {
                                             <tr>
-                                                <td class="text-center">@(CancelBetModel.BetReferenceIds.IndexOf(bet) + 1)</td>
+                                                <td class="text-center">@(i + 1)</td>
                                                 <td>
-                                                    <div class="input-group @(!IsPreload && Alerts.Any(a => a.Control == CancelBetModel.BetReferenceIds.IndexOf(bet).ToString()) ? "border-danger" : "") ">
-                                                        <input type="text" class="form-control" @bind-value="bet.BetReferenceId" />
-                                                        @if (!IsPreload && !string.IsNullOrEmpty(bet.BetReferenceId))
+                                                    <div class="input-group @(!IsPreload && Alerts != null && Alerts.Any(a => a.Control == i.ToString()) ? "border-danger" : "") ">
+                                                        <input type="text" class="form-control" @bind-value="@BetRefenceModel.BetReferenceIds[i]" />
+                                                        @if (!IsPreload && !string.IsNullOrEmpty(BetRefenceModel.BetReferenceIds[i]))
                                                         {
-                                                            <span class="input-group-text form-clear" @onclick="() => OnClearBetReferenceClickEvent(bet)"><i class="fa fa-remove"></i></span>
+                                                            <span class="input-group-text form-clear" @onclick="() => BetRefenceModel.BetReferenceIds[i] = string.Empty"><i class="fa fa-remove"></i></span>
                                                         }
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="d-flex justify-content-center">
-                                                        <a class="link-trash me-2" href="javascript:(0)" @onclick="() => OnDeleteBetReferenceClickEvent(bet)">
+                                                        <a class="link-trash me-2" href="javascript:(0)" @onclick="() => BetRefenceModel.BetReferenceIds.RemoveAt(i)">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
                                                     </div>
@@ -87,9 +87,9 @@
                                     <tr>
                                         <td>
                                             <div class="form-floating">
-                                                @if (CancelBetModel != null)
+                                                @if (BetRefenceModel != null)
                                                 {
-                                                    <textarea class="form-control input-reason @(!IsPreload && IsReasonRequired ? "border-danger" : "")" @bind="CancelBetModel.Reason" />
+                                                    <textarea class="form-control input-reason @(!IsPreload && IsReasonRequired ? "border-danger" : "")" @bind="BetRefenceModel.Reason" />
                                                 }
                                             </div>
                                         </td>

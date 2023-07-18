@@ -11,73 +11,70 @@
 <AuthorizeView Policy="sbc-monitoring-match">
     <Authorized>
         <div class="col-md-12">
-            <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"/>
+            <Breadcrumb Breadcrumbs="_breadcrumbs" Region="@_region" />
         </div>
         <div class="col-md-12">
-            <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+            <PageHeader PageHeaderModel="@_pageHeaderModel" />
         </div>
         <div class="col-md-12">
-            @if (SelectedSport != null)
-            {
-                <Filter OnInitCallback="MonitoringCallback" SportId="SelectedSport.SportId" SegmentId="SelectedSport.SegmentId" LeagueId="SelectedSport.LeagueId" />
-            }
+            <Filter SportId="_sportId"
+                    OnInitCallback="MonitoringCallback" />
         </div>
 
-        @if (!string.IsNullOrEmpty(AlertModel.Message))
+        @if (!string.IsNullOrEmpty(_alertModel.Message))
         {
             <div class="col-md-12">
                 <div class="mt-4 mx-3">
-                    <AlertMessage AlertMessageStr="@AlertModel.Message" AlertStatus="@AlertModel.Status" Opacity="@AlertModel.Opacity" />
+                    <AlertMessage AlertModel="@_alertModel" />
                 </div>
             </div>
         }
         <div class="col-md-12">
-            @if (IsPreloader)
-            {
-                <Preloader />
-            }
-            else
-            {
-                if (FixtureMarkets != null && !FixtureMarkets.Any())
+            <div class="table-container mt-4 mx-3">
+                @if (_isPreloader)
                 {
-                    <NoRecordFound />
+                    <Preloader />
                 }
                 else
                 {
-                    <div class="table-container mt-4 mx-3">
-                        <table class="table table-hover table-bordered mb-0">
-                            <thead class="table-head">
-                                <tr>
-                                    <th class="th-start-date py-3"></th>
-                                    <th class="th-fixture-name py-3"></th>
-                                    <AuthorizeView Policy="sbc-monitoring-match-canedit">
-                                        <Authorized Context="ActivateAll">
-                                            <th class="th-close-match py-3"></th>
-                                        </Authorized>
-                                    </AuthorizeView>
-                                    <th class="th-master py-3">BTR CTRL</th>
-                                    @foreach (var client in ClientModel.Clients)
+                    <table class="table table-hover table-bordered mb-0">
+                        <thead class="table-head">
+                            <tr>
+                                <th class="th-start-date py-3"></th>
+                                <th class="th-fixture-name py-3"></th>
+                                <AuthorizeView Policy="sbc-monitoring-match-canedit">
+                                    <Authorized Context="ActivateAll">
+                                        <th class="th-close-match py-3"></th>
+                                    </Authorized>
+                                </AuthorizeView>
+                                <th class="th-master py-3">BTR CTRL</th>
+                                @if (_clients != null && _clients.Any())
+                                {
+                                    foreach (var client in _clients)
                                     {
                                         <th class="th-client py-3">@client.ClientName</th>
                                     }
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (FixtureMarkets != null && FixtureMarkets.Any())
-                                {
-                                    foreach (var market in FixtureMarkets)
-                                    {
-                                        <FixtureRow @key="@market.ProviderMarketId" Clients="@ClientModel.Clients" MainMarketName="@market.MarketName" Market="market" Region="@Region" IsMonitoringPage=true />
-                                    }
                                 }
-                            </tbody>
-                        </table>
-                    </div>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (_fixtureMarkets != null && _fixtureMarkets.Any())
+                            {
+                                <Virtualize Items="_fixtureMarkets" Context="market" OverscanCount="5">
+                                    <FixtureRow @key="@market.ProviderMarketId" Clients="@_clients" Market="market" Region="@_region" IsMonitoringPage=true />
+                                </Virtualize>
+                            }
+                            else
+                            {
+                                <NoRecordFound />
+                            }
+                        </tbody>
+                    </table>
                 }
-            }
+            </div>
         </div>
 
-        <CustomModal OnSaveClickCallback="OnSaveClickedEvent"/>
+        <CustomModal OnSaveClickCallback="OnSaveClickedEvent" />
     </Authorized>
     <NotAuthorized>
         <RedirectToPage FromPage="@SportsbookClientPermission.SBC_OE_Monitoring_MatchType.ToString().Replace('_', '.')" />

@@ -20,8 +20,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Properties
         [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private ITradingService TradingService { get; set; }        
-        [Inject] private IConfiguration AppConfiguration { get; set; }        
+        [Inject] private ITradingService TradingService { get; set; }
+        [Inject] private IConfiguration AppConfiguration { get; set; }
         [Inject] public ToastService? ToastService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
         [Parameter] public string Region { get; set; } = "hk";
@@ -30,19 +30,17 @@ namespace Backoffice.Web.Pages.OddsEngine
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public List<MarketLookupNavigationModel> SelectedContents;
-        public List<BreadcrumbModel> Breadcrumbs { get; set; }        
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<MarketLookupNavigationModel> MarketLookupNavigationModelsTemp { get; set; }
         public List<AlertModel> Alerts { get; set; }
-        
-        public ConfigFilterModel ConfigFilterModel { get; set; }                           
+
+        public ConfigFilterModel? ConfigFilterModel { get; set; }
 
         public FixtureType FixtureType { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public int? AllMarketStatus { get; set; }
-        public string AllMarketStatusName { get; set; }                                        
-        public bool IsMarketEditing { get; set; }        
+        public string AllMarketStatusName { get; set; }
+        public bool IsMarketEditing { get; set; }
         private Guid Guid { get; set; }
 
         #endregion
@@ -51,13 +49,16 @@ namespace Backoffice.Web.Pages.OddsEngine
         private HubConnection _hubConnection;
         private bool _isConnected => _hubConnection.State == HubConnectionState.Connected;
         private ToastService _toasterService => ToastService!;
+        private PageHeaderModel _pageHeaderModel;
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
-        {            
-            PageTitle = "Config";
-            IconClass = "";            
+        {
+            _pageHeaderModel = new()
+            {
+                Title = "Config"
+            };
             ConfigFilterModel = null;
             IsMarketEditing = false;
             AllMarketStatusName = "Deactivate All";
@@ -82,19 +83,19 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            try 
+            try
             {
                 if (firstRender)
                 {
                     await Subscribe();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Error(ex.Message);
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
-            }            
+            }
         }
 
         public async Task ConfigFilterCallback(ConfigFilterModel model)
@@ -107,7 +108,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
 
         public async Task OnMarketChangedEvent(MarketLookupNavigationModel market)
-        {           
+        {
             if (!MarketLookupNavigationModelsTemp.Contains(market))
             {
                 MarketLookupNavigationModelsTemp.Add(market);
@@ -125,7 +126,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             else
             {
                 IsMarketEditing = false;
-            }            
+            }
         }
 
         public async Task OnMarketEditingCancelClickEvent()
@@ -133,7 +134,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-lg");            
+            parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("MarketChangedCount", MarketLookupNavigationModelsTemp.Count);
             parameters.Add("OnCancelCallback", EventCallback.Factory.Create(this, UndoEditedMarkets));
             parameters.Add("Region", Region);
@@ -148,16 +149,16 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
 
         public async Task UndoEditedMarkets()
-        {            
+        {
             MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
-            IsMarketEditing = false;            
+            IsMarketEditing = false;
         }
 
         public async ValueTask DisposeAsync()
         {
             if (_hubConnection != null)
             {
-                if(_hubConnection.State == HubConnectionState.Connected)
+                if (_hubConnection.State == HubConnectionState.Connected)
                 {
                     await _hubConnection.StopAsync();
                     await _hubConnection.DisposeAsync();
@@ -209,7 +210,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                                                                         && c.SegmentId == ConfigFilterModel.SegmentId
                                                                         && c.LeagueId == ConfigFilterModel.LeagueId
                                                                         && c.MarketTemplateId == market.MarketLookup.MarketTemplateId).IsActive;
-                }                    
+                }
             }
             if (!MarketLookupNavigationModelsTemp.Contains(market))
             {
@@ -341,7 +342,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
 
         public async Task OnAllMarketStatusClickEvent()
-        {            
+        {
             MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
 
             SelectedContents = await GetContents();
@@ -367,7 +368,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsMarketEditing = true;
 
             AllMarketStatusName = AllMarketStatusName == "Deactivate All" ? "Activate All" : "Deactivate All";
-            AllMarketStatus = AllMarketStatusName == "Deactivate All" ? 1 : 0;                  
+            AllMarketStatus = AllMarketStatusName == "Deactivate All" ? 1 : 0;
         }
 
         public async Task OnSaveAllSettings()
@@ -521,7 +522,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         IsActive = -99
                     })).Result;
 
-                    if (_isConnected) await _hubConnection.SendAsync("OnConfigChange", data);                    
+                    if (_isConnected) await _hubConnection.SendAsync("OnConfigChange", data);
                 }
                 else
                 {
@@ -783,9 +784,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
 
                 StateHasChanged();
-            }            
+            }
         }
-        private async Task ProcessNotification(NotificationsModel message) 
+        private async Task ProcessNotification(NotificationsModel message)
         {
             if (message != null)
             {
