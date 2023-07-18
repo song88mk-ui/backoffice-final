@@ -5,6 +5,5 @@
         public bool IsSelected { get; set; }
         public string MarketTemplateId { get; set; }
         public string MarketName { get; set; }
-        public int MarketTemplateGroupId { get; set; }
     }
 }

@@ -16,26 +16,27 @@ namespace Backoffice.Web.Pages.Administration
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public string IFrameSrc { get; set; }
 
         #endregion
+
+        private PageHeaderModel _pageHeaderModel;
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            _pageHeaderModel = new()
+            {
+                Title = "Sports",
+                IconClass = "ico ico-sports"
+            };
             await AuthenticateAccess.InvokeAsync();
 
-            PageTitle = "Sports";
-            IconClass = "ico ico-sports";
-
-
-            await Initialize();
+            await OnInitializeEvent();
         }
 
-        private async Task Initialize()
+        private async Task OnInitializeEvent()
         {
             var reportRoles = (await AuthenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
             {

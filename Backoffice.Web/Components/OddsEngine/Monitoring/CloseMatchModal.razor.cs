@@ -21,28 +21,31 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
-        protected FixtureMarketModel Fixture { get; set; }
-        protected bool IsPreload { get; set; }
+        private string _fixtureName { get; set; }
+        private string _providerFixtureId { get; set; }
+        private bool _isPreload { get; set; }
         #endregion        
 
         #region Methods
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
-            Fixture = ModalParameters.TryGet<FixtureMarketModel>("Market");
+            _fixtureName = ModalParameters.TryGet<string>("FixtureName");
+            _providerFixtureId = ModalParameters.TryGet<string>("ProviderFixtureId");
         }
 
-        public async Task OnCancelClickEvent()
+        public void OnCancelClickEvent()
         {
             ModalService.Cancel();
         }
 
         public async Task OnConfirmClickEvent()
         {
-            IsPreload = true;
+            _isPreload = true;
+            await Console.Out.WriteLineAsync("Test");
 
             var request = new DeactivateFixtureMarketRequest
             {
-                ProviderFixtureId = Fixture.ProviderFixtureId,
+                ProviderFixtureId = _providerFixtureId,
                 Raw = string.Empty,
             };
 
@@ -51,19 +54,18 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
             await Modal.OnSaveClickCallback.InvokeAsync(new DeactivateFixtureCallbackModel
             {
                 Result = result.Result,
-                FixtureName = Fixture.FixtureName
+                FixtureName = _fixtureName
             });
 
             ModalService.Cancel();
 
-            IsPreload = false;
+            _isPreload = false;
         }
 
         public void Dispose()
         {
 
         }
-
         #endregion        
     }
 }

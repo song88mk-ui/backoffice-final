@@ -17,20 +17,23 @@ namespace Backoffice.Web.Pages.SBC
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public string IFrameSrc { get; set; }
 
         #endregion
+
+        private PageHeaderModel _pageHeaderModel;
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            _pageHeaderModel = new()
+            {
+                Title = "Monitor Users",
+                IconClass = "ico ico-monitor-users"
+            };
             await AuthenticateAccess.InvokeAsync();
 
-            PageTitle = "Monitor Users";
-            IconClass = "ico ico-monitor-users";
 
 
             await Initialize();

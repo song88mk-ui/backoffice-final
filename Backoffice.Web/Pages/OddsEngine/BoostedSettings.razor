@@ -11,7 +11,7 @@
                 <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"/>
             </div>
             <div class="col-md-12">
-                <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+                <PageHeader PageHeaderModel="_pageHeaderModel" />
             </div>
             @if (_alertModel != null && !string.IsNullOrEmpty(_alertModel.Message))
             {

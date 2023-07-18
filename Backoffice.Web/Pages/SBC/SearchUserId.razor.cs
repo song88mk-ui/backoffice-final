@@ -17,20 +17,22 @@ namespace Backoffice.Web.Pages.SBC
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public string IFrameSrc { get; set; }
 
         #endregion
+
+        private PageHeaderModel _pageHeaderModel;
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            _pageHeaderModel = new()
+            {
+                Title = "Search User Id",
+                IconClass = "ico ico-search-user"
+            };
             await AuthenticateAccess.InvokeAsync();
-
-            PageTitle = "Search User Id";
-            IconClass = "ico ico-search-user";
 
             await Initialize();
         }

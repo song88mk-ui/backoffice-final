@@ -27,8 +27,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Parameter] public string Region { get; set; } = "hk";
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public string TableClass { get; set; }
         public string ClientCode { get; set; }
 
@@ -49,7 +47,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Fields
-
+        private PageHeaderModel _pageHeaderModel;
         public static Func<int, int, Task> OnSegmentActionAsync;
         public static Func<string, int, Task> OnUpdateSortOrderActionAsync;
 
@@ -60,8 +58,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         protected override async Task OnInitializedAsync()
         {
             TradingService.Region = Region.ToUpper();
-            PageTitle = "Sport Settings";
-            IconClass = string.Empty;
+            _pageHeaderModel = new()
+            {
+                Title = "Sport Settings"
+            };
+
             TableClass = "sport-setting-table";
 
             ClientSportsSettingsModel = new ClientSportsSettingsModel();
@@ -427,7 +428,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     await JSRuntime.InvokeVoidAsync("loadLeagueItems", $"#segment-{model.SportId}-{model.SegmentId}", leagues);
                 }
             }
-            
+
         }
 
         public async Task OnUpdateSortOrder(string id, int index)
@@ -524,12 +525,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 ClientSegmentOrders = clientSegmentResponse.Result
                     .Select(s => new ClientSegmentSortOrderModel
-                    { 
+                    {
                         ClientCode = s.ClientCode,
                         ClientId = s.ClientId,
                         ClientName = s.ClientName,
-                        SportId= s.SportId,
-                        SportName= s.SportName,
+                        SportId = s.SportId,
+                        SportName = s.SportName,
                         SegmentId = s.SegmentId,
                         SegmentName = s.SegmentName.TrimEnd(),
                         SortOrder = s.SortOrder
@@ -618,7 +619,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     .ToList();
             }
 
-            ModifiedClientSportsSettingsModel = ClientSportsSettingsModel;            
+            ModifiedClientSportsSettingsModel = ClientSportsSettingsModel;
         }
 
         private async Task InitializeSortTable(string rowSelector, string categorySelector)

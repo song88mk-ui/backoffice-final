@@ -7,7 +7,7 @@
 <AuthorizeView Policy="admin-usergroups">
     <Authorized>
         <div class="col-md-12">
-            <PageHeader PageTitle="@PageTitle" IconClass="@IconClass" />
+            <PageHeader PageHeaderModel="_pageHeaderModel" />
         </div>
         @if (Alerts != null && Alerts.Any())
         {
@@ -92,11 +92,11 @@
                             }
                             else
                             {
-                                        <tr>
-                                            <td colspan="5">
-                                                <NoRecordFound />
-                                            </td>
-                                        </tr>
+                                <tr>
+                                    <td colspan="5">
+                                        <NoRecordFound />
+                                    </td>
+                                </tr>
                             }
                         }
                     </tbody>

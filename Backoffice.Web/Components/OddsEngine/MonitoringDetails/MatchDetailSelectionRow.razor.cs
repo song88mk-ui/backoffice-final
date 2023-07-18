@@ -12,12 +12,32 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
         [Parameter] public SelectionModel Selection { get; set; }
         [Parameter] public FixtureMarketModel Market { get; set; }
-        [Parameter] public ClientModel ClientModel { get; set; }
+        [Parameter] public List<Client>? Clients { get; set; }
 
         #endregion
 
-        #region Methods
+        private List<Client>? _clients;
+        private bool _isBetStopGlobal;
+        private int _marketStatusId;
+        private string _clientCode;
+        private string _clientCodeMargin;
 
+        #region Methods
+        protected override async Task OnParametersSetAsync()
+        {
+            if (Clients != null && !(_clients?.Equals(Clients) ?? false))
+            {
+                _clients = new List<Client>(Clients);
+            }
+
+            if(Market != null)
+            {
+                _isBetStopGlobal = Market.IsBetStopGlobal;
+                _marketStatusId = Market.MarketStatusId;
+                _clientCode = Market.ClientCode;
+                _clientCodeMargin = Market.ClientCodeMargin;
+            }
+        }
         public string GetClientOdds(string clientCode)
         {
             if (Selection.ClientOdds != null && Selection.ClientOdds.Any(c => c.ClientCode == clientCode))
@@ -47,9 +67,10 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         {
             var color = "odds-bg-default";
 
-            if (Market.IsBetStopGlobal || Market.MarketStatusId != (int)MarketStatus.Active)
+
+            if (_isBetStopGlobal || _marketStatusId != (int)MarketStatus.Active)
             {
-                if (Market.MarketStatusId == (int)MarketStatus.Inactive)
+                if (_marketStatusId == (int)MarketStatus.Inactive)
                 {
                     color = "odds-bg-inactive";
                 }

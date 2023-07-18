@@ -177,30 +177,12 @@ namespace Backoffice.Web.Shared
                 {
                     _selectedSport.SegmentId = segment.SegmentId;
                     _selectedSport.SegmentName = segment.SegmentName;
-
-                    var league = segment.Leagues.FirstOrDefault();
-
-                    _selectedSport.LeagueId = league.LeagueId;
-                    _selectedSport.LeagueName = league.LeagueName;
-
-                    // verify if you're in the monitoring page, if not then the user will be navigated.
-                    var slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
-
-                    if (slugs.Count != 1 && slugs[1].ToLower() != "monitoring")
-                    {
-                        NavigationManager.NavigateTo($"/{Region}/odds-engine");
-                    }
-
-                    await OnSportClickCallback.InvokeAsync(_selectedSport);
                 }
             }
             else
             {
                 _selectedSport.SegmentId = 0;
                 _selectedSport.SegmentName = string.Empty;
-
-                _selectedSport.LeagueId = 0;
-                _selectedSport.LeagueName = string.Empty;
             }
         }
 

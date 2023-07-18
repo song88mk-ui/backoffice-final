@@ -1,29 +1,22 @@
 ﻿<div class="content-filter mx-3">
     <div class="w-100 d-flex justify-content-between">
         <div class="select-container">
-            @if (TopMarketTemplates != null && TopMarketTemplates.Any())
+            @if (_topMarketTemplates != null && _topMarketTemplates.Any())
             {
                 <select class="form-select d-block" @onchange="OnMarketChangedEvent">
-                    @foreach (var item in TopMarketTemplates)
+                    @foreach (var item in _topMarketTemplates)
                     {
-                        if (item.MainMarketTemplateId.ToString() == MarketTemplateId)
-                        {
-                            <option value="@item.MainMarketTemplateId" selected>@item.Name</option>
-                        }
-                        else
-                        {
-                            <option value="@item.MainMarketTemplateId">@item.Name</option>
-                        }
+                        <option value="@item.MainMarketTemplateId" selected="@(item.MainMarketTemplateId.ToString() == _marketTemplateId)">@item.Name</option>
                     }
                 </select>
             }
         </div>
         <div>
-            @if (TopMarketTemplates != null)
+            @if (_topMarketTemplates != null)
             {
-                <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                     <div class="input-group">
-                        <InputText id="search" placeholder="Search" class="form-control search-text valid border-end-0" @bind-Value="SearchForm.SearchText" />
+                        <InputText id="search" placeholder="Search" class="form-control search-text valid border-end-0" @bind-Value="_searchForm.SearchText" />
                         <span class="input-group-text border-start-0">
                             <i class="fa fa-search"></i>
                         </span>

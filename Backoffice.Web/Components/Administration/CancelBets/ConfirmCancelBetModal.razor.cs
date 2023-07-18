@@ -13,7 +13,7 @@ namespace Backoffice.Web.Components.Administration.CancelBets
         [Inject] private IModalService ModalService { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
 
-        public CancelBetModel CancelBetModel { get; set; }
+        public CancelBetReferenceModel CancelBetModel { get; set; }
         #endregion
 
         #region Methods

@@ -29,9 +29,6 @@ namespace Backoffice.Web.Pages.Administration
 
         public MetaData MetaData { get; set; }
         public ManualBetSettlementCallbackModel CallbackModel { get; set; }
-
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }        
         private bool IsPreloader { get; set; }
         private bool IsExportDisabled { get; set; }
         private Guid Guid { get; set; }
@@ -39,8 +36,8 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         #region Fields
-
         private ToastService _toasterService => ToasterService!;
+        private PageHeaderModel _pageHeaderModel;
 
         #endregion
 
@@ -48,8 +45,11 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
-            PageTitle = "Manual Bet Settlement";
-            IconClass = "ico ico-manual-bet-settlement";
+            _pageHeaderModel = new()
+            {
+                Title = "Manual Bet Settlement",
+                IconClass = "ico ico-manual-bet-settlement"
+            };
 
             Alerts = new List<AlertModel>();
             IsPreloader = true;
@@ -160,7 +160,7 @@ namespace Backoffice.Web.Pages.Administration
             });
 
             if (response.Result.ActivityLogs.Any())
-            {               
+            {
                 IsExportDisabled = false;
             }
 

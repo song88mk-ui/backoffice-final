@@ -28,8 +28,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public IJSStreamReference? DataReference { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
         public bool IsSelectAll { get; set; }
         public string TableClass { get; set; }
@@ -40,7 +38,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Fields
-
+        private PageHeaderModel _pageHeaderModel;
         private bool _isDelete = false;
         private bool _isUpdate = false;
         private int _tempUpdateGroupId = -1;
@@ -49,8 +47,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Methods
         protected override async Task OnInitializedAsync()
-        {            
+        {
             TradingService.Region = Region.ToUpper();
+            _pageHeaderModel = new()
+            {
+                Title = "Market Groups"
+            };
             TableClass = "table-edit-market-group";
             IsPreLoader = true;
             Breadcrumbs = new List<BreadcrumbModel>()
@@ -229,7 +231,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (item is not null)
                 {
                     var group = MarketGroupModel.MarketTemplateGroups.Where(x => x.MarketTemplateGroupId == _tempUpdateGroupId).FirstOrDefault();
-                    if(group != null)
+                    if (group != null)
                     {
                         group.Name = item.ToString();
                         StateHasChanged();
@@ -329,8 +331,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task OnInit()
         {
-            PageTitle = "Market Groups";
-            IconClass = string.Empty;
             IsPreLoader = true;
 
             MarketGroupModel.IsUpdate = false;

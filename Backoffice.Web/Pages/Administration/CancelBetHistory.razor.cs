@@ -25,15 +25,13 @@ namespace Backoffice.Web.Pages.Administration
         public CancelBetHistoryModel CancelBets { get; set; }
         public MetaData MetaData { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public bool IsPreload { get; set; }
 
         #endregion
 
         #region Fields
-
         private ToastService _toasterService => ToasterService!;
+        private PageHeaderModel _pageHeaderModel;
 
         #endregion
 
@@ -53,9 +51,11 @@ namespace Backoffice.Web.Pages.Administration
             };
 
             await AuthenticateAccess.InvokeAsync();
-
-            PageTitle = "Cancel Bet History";
-            IconClass = "ico ico-cancel-bet-history";
+            _pageHeaderModel = new()
+            {
+                Title = "Cancel Bet History",
+                IconClass = "ico ico-cancel-bet-history"
+            };
         }
         public async Task OnInitEvent(CancelBetHistoryCallbackModel request)
         {
@@ -131,14 +131,14 @@ namespace Backoffice.Web.Pages.Administration
                 foreach (var item in temp)
                 {
                     var betDetails = JsonSerializer.Deserialize<CancelBetHistoryModel.BetDetails>(item.From);
-                    if(betDetails != null)
+                    if (betDetails != null)
                     {
                         betDetails.CancelledBy = item.UserName;
 
                         var betSelectionDetails = JsonSerializer.Deserialize<CancelBetHistoryModel.BetSelectionDetails>(item.To);
                         betDetails.Selections = new List<CancelBetHistoryModel.BetSelectionDetails>();
 
-                        if(betSelectionDetails != null)
+                        if (betSelectionDetails != null)
                             betDetails.Selections.Add(betSelectionDetails);
 
                         cancelBets.CancelBets.Add(betDetails);

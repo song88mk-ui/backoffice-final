@@ -16,51 +16,85 @@ namespace Backoffice.Web.Components.Common
 
         [Parameter] public List<Client> Clients { get; set; }
         [Parameter] public FixtureMarketModel Market { get; set; }
-        [Parameter] public string MainMarketName { get; set; }
         [Parameter] public string Region { get; set; }
-        [Parameter] public bool IsMonitoringPage { get; set; } 
+        [Parameter] public bool IsMonitoringPage { get; set; }
 
-        public string MarketLine { get; set; }
-        public bool IsBetStop { get; set; }
-        public bool HasLine { get; set; }
-        public string ColumnSize { get; set; }
+        #endregion
+
+        #region Fields
+        private string _mainMarketName = string.Empty;
+        private bool _isBetStop = false;
+        private bool _hasLine;
+        private string _marketLine;
+        private string _columnSize;
+        private string _fixtureName;
+        private int _fixtureStatusId;
+        private string _currentPeriod;
+        private string _currentMinute;
+        private string _homeName;
+        private string _awayName;
+        private string _score;
+        private DateTime _fixtureStartDate;
+        private string _providerFixtureId;
+        private int _marketStatusId;
+        private string _clientCode;
+        private string _clientCodeMargin;
+        private List<SelectionModel> _selections;
         #endregion
 
         #region Methods
-
-        protected override async Task OnInitializedAsync()
+        protected override void OnParametersSet()
         {
-            HasLine = MainMarketName.ToUpper().Contains("HANDICAP") || MainMarketName.ToUpper().Contains("TOTAL") ? true : false;
-
-            var columns = 1;
-            columns += !HasLine ? 0 : 1;
-            columns += Market != null ? Market.Selections.Count : 0;
-
-            // divide number of column size by 12 (max size of col in bootstrap)
-            ColumnSize = $"col-xs-{12 / columns}";
-
-            if (HasLine)
-                GetMarketLine(MainMarketName);
-        }
-        protected override async Task OnParametersSetAsync()
-        {
-            IsBetStop = false;
-
-            if (Market.IsBetStopGlobal)
+            if (Market != null)
             {
-                IsBetStop = true;
-            }
-            else if (Market.BetStop != null)
-            {
-                IsBetStop = Market.BetStop.Count > 0 && Market.BetStop.FirstOrDefault() == 1 ? true : false;
+                _fixtureName = Market.FixtureName;
+                _fixtureStatusId = Market.FixtureStatusId;
+                _currentPeriod = Market.CurrentPeriod;
+                _currentMinute = Market.CurrentMinute;
+                _homeName = Market.HomeName;
+                _awayName = Market.AwayName;
+                _score = Market.Score;
+                _fixtureStartDate = Market.FixtureStartDate;
+                _providerFixtureId = Market.ProviderFixtureId;
+                _marketStatusId = Market.MarketStatusId;
+                _clientCode = Market.ClientCode;
+                _clientCodeMargin = Market.ClientCodeMargin;
+                _selections = Market.Selections;
+
+                if (_mainMarketName != Market.MarketName)
+                {
+                    _mainMarketName = Market.MarketName;
+
+                    _hasLine = _mainMarketName.ToUpper().Contains("HANDICAP") || _mainMarketName.ToUpper().Contains("TOTAL");
+
+                    var columns = 1;
+                    columns += !_hasLine ? 0 : 1;
+                    columns += Market != null ? Market.Selections.Count : 0;
+
+                    // divide number of column size by 12 (max size of col in bootstrap)
+                    _columnSize = $"col-xs-{12 / columns}";
+
+                    if (_hasLine)
+                        _marketLine = GetMarketLine(_mainMarketName, Market.Line);
+                }
+
+                if (Market.IsBetStopGlobal)
+                {
+                    _isBetStop = true;
+                }
+                else if (Market.BetStop != null)
+                {
+                    _isBetStop = Market.BetStop.Count > 0 && Market.BetStop.FirstOrDefault() == 1 ? true : false;
+                }
             }
         }
 
-        public async Task OnCloseMatchClickEvent()
+        private void OnCloseMatchClickEvent()
         {
             ModalParameters parameters = new ModalParameters();
             parameters.Add("ModalDialogClass", "modal-dialog-centered modal-lg");
-            parameters.Add("Market", Market);
+            parameters.Add("FixtureName", _fixtureName);
+            parameters.Add("ProviderFixtureId", _providerFixtureId);
 
             ModalOptions options = new ModalOptions();
 
@@ -76,17 +110,18 @@ namespace Backoffice.Web.Components.Common
         #region Utilities
         private string GetClientOdds(SelectionModel selection, string clientCode)
         {
-            if (selection.ClientOdds != null && selection.ClientOdds.Any(c => c.ClientCode == clientCode))
+            if (selection != null && selection.ClientOdds != null && selection.ClientOdds.Any(c => c.ClientCode == clientCode))
             {
-                return selection.ClientOdds.Where(c => c.ClientCode == clientCode && c.SelectionTemplateId == selection.SelectionTemplateId).FirstOrDefault().Odds.ToString();
+                return selection.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == selection.SelectionTemplateId)?.Odds.ToString() ?? string.Empty;
             }
-            return selection.DecimalOdds;
+
+            return selection?.DecimalOdds ?? string.Empty;
         }
 
         public string GetClientMargin(string clientCode, string clientCodeMargin, List<SelectionModel> selections)
         {
             var clients = string.IsNullOrEmpty(clientCodeMargin) ? new List<Tuple<string, decimal>>() : clientCodeMargin.Split('|').Select(s => new Tuple<string, decimal>(s.Split(':').First(), Convert.ToDecimal(s.Split(':').Last()))).ToList();
-            var client = clients.Where(c => c.Item1 == clientCode).FirstOrDefault();
+            var client = clients.FirstOrDefault(c => c.Item1 == clientCode);
 
             if (client == null)
             {
@@ -99,7 +134,7 @@ namespace Backoffice.Web.Components.Common
             var newMargin = ((int)((client.Item2 * 100) + 100)).ToString();
 
             var newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
-            var computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId).Odds)) - 100) + 100}";
+            var computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId)?.Odds ?? 1)) - 100) + 100}";
 
             if (newMargin != computedMargin)
             {
@@ -109,32 +144,28 @@ namespace Backoffice.Web.Components.Common
             return newMargin;
         }
 
-        private void GetMarketLine(string marketName)
+        private string GetMarketLine(string marketName, string marketLine)
         {
+            var result = string.Empty;
             if (!string.IsNullOrEmpty(marketName))
             {
-                if (Market?.Line == null)
+                if (marketLine == null)
                 {
-                    MarketLine = "-.-";
+                    result = "-.-";
                 }
                 else
                 {
                     if (marketName.ToUpper().Contains("TOTAL"))
-                        MarketLine = $"o {decimal.Parse(Market?.Line)} u";
+                        result = $"o {decimal.Parse(marketLine ?? string.Empty)} u";
 
                     if (marketName.ToUpper().Contains("HANDICAP"))
-                        MarketLine = $"h {decimal.Parse(Market?.Line)} a";
+                        result = $"h {decimal.Parse(marketLine ?? string.Empty)} a";
                 }
             }
+            return result;
         }
         public bool HasClientConfig(string clientCode, string marketClientCode, string marketClientMargin)
         {
-            if (string.IsNullOrEmpty(marketClientCode))
-                marketClientCode = string.Empty;
-
-            if (string.IsNullOrEmpty(marketClientMargin))
-                marketClientMargin = string.Empty;
-
             if (marketClientCode.Split("|").Contains(clientCode) || marketClientMargin.Contains(clientCode))
                 return true;
 

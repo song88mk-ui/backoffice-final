@@ -1,34 +1,33 @@
-﻿
-<tr>
+﻿<tr>
     <td>
-        @if (Market.FixtureStatusId == 1)
+        @if (_fixtureStatusId == 1)
         {
-            <span class="m-1">@Market.CurrentPeriod</span>
-            @if (!string.IsNullOrEmpty(Market.CurrentMinute) && int.Parse(Market.CurrentMinute) > 0)
+            <span class="m-1">@_currentPeriod</span>
+            @if (!string.IsNullOrEmpty(_currentMinute) && int.Parse(_currentMinute) > 0)
             {
-                <span class="fw-bold">@Market.CurrentMinute</span>
+                <span class="fw-bold">@_currentMinute</span>
             }
         }
         else
         {
             <span>
-                @Market.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")
+                @_fixtureStartDate.ToLocalTime().ToString("dd/MM/yy")
                 <br>
-                <strong>@Market.FixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
+                <strong>@_fixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
             </span>
         }
 
     </td>
     <td>
         <div class="d-flex justify-content-between px-2">
-            <a href="@($"hk/odds-engine/monitoring-details/{Market.ProviderFixtureId}")" class="fixture-details text-decoration-none">
-                <span class="fw-bold">@Market.HomeName.ToUpper()</span>
+            <a href="@($"hk/odds-engine/monitoring-details/{_providerFixtureId}")" class="fixture-details text-decoration-none">
+                <span class="fw-bold">@_homeName?.ToUpper()</span>
                 <br />
-                <span>@Market.AwayName.ToUpper()</span>
+                <span>@_awayName?.ToUpper()</span>
             </a>
-            @if (Market.FixtureStatusId == 1)
+            @if (_fixtureStatusId == 1)
             {
-                <span class="score-info py-2 px-2">@Market.Score</span>
+                <span class="score-info py-2 px-2">@_score</span>
             }
         </div>
     </td>
@@ -47,32 +46,28 @@
     <!-- BR CTRL -->
     <td>
         <div class="d-flex justify-content-left">
-            @if (Market != null && Market.Selections.Any())
+            @if (Market != null && _selections.Any())
             {
-                var hasLine = HasLine;
-
-                foreach (var selection in Market?.Selections)
+                foreach (var selection in _selections)
                 {
                     var selectionKey = $"br-{selection.ProviderSelectionId}";
 
-                    <SelectionRow @key="selectionKey" Selection="selection" ColumnSize="@ColumnSize" IsBetStop="IsBetStop" CurrentMarketStatus="@Market.MarketStatusId" HasClientConfig="true" Region="@Region"/>
+                    <SelectionRow @key="selectionKey" Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop" CurrentMarketStatus="@_marketStatusId" HasClientConfig="true" Region="@Region"/>
 
-                    if (hasLine)
+                    if (_hasLine)
                     {
                         <div>
                             <div class="margin-value me-2 py-1">
-                                <span class="d-block text-center">@MarketLine</span>
+                                <span class="d-block text-center">@_marketLine</span>
                             </div>
                         </div>
-
-                        hasLine = false;
                     }
                 }
 
-                if (Market != null && Market.Selections.Any())
+                if (Market != null && _selections.Any())
                 {
                     <div class="py-1 px-1 ">
-                        <span class="text-nowrap">@GetClientMargin(string.Empty, string.Empty, Market.Selections)</span>
+                        <span class="text-nowrap">@GetClientMargin(string.Empty, string.Empty, _selections)</span>
                     </div>
                 }
             }
@@ -97,29 +92,27 @@
     {
         foreach (var client in Clients)
         {
-            var hasLine = HasLine;
-
             <td>
                 <div class="d-flex justify-content-left">
-                    @if (Market != null && Market.Selections.Any())
+                    @if (Market != null && _selections.Any())
                     {
-                        foreach (var selection in Market?.Selections)
+                        foreach (var selection in _selections)
                         {
-                            var selectionKey = $"{client.ClientCode.ToLower()}-{selection.ProviderSelectionId}";
-                            var hasClientConfig = HasClientConfig(client.ClientCode, Market.ClientCode, Market.ClientCodeMargin);
+                            @*var selectionKey = $"{client.ClientCode.ToLower()}-{selection.ProviderSelectionId}";*@
+                            var hasClientConfig = HasClientConfig(client.ClientCode, _clientCode, _clientCodeMargin);
 
                             <SelectionRow @key="selection.ProviderSelectionId" CurrentClientCode="@client.ClientCode"
-                              Selection="selection" ColumnSize="@ColumnSize" IsBetStop="IsBetStop"
-                              CurrentMarketStatus="@GetMarketStatusId(client, Market.ClientCode, Market.MarketStatusId)"
+                              Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop"
+                              CurrentMarketStatus="@GetMarketStatusId(client, _clientCode, _marketStatusId)"
                               HasClientConfig="hasClientConfig" />
 
-                            if (hasLine)
+                            if (_hasLine)
                             {
                                 if (hasClientConfig)
                                 {
                                     <div>
                                         <div class="margin-value me-2 py-1">
-                                            <span class="d-block text-center">@MarketLine</span>
+                                            <span class="d-block text-center">@_marketLine</span>
                                         </div>
                                     </div>
                                 }
@@ -131,17 +124,15 @@
                                         </div>
                                     </div>
                                 }
-
-                                hasLine = false;
                             }
                         }
 
-                        if (Market != null && Market.Selections.Any())
+                        if (Market != null && _selections.Any())
                         {
-                            if (HasClientConfig(client.ClientCode, Market.ClientCode, Market.ClientCodeMargin))
+                            if (HasClientConfig(client.ClientCode, _clientCode, _clientCodeMargin))
                             {
                                 <div class="py-1 px-1">
-                                    <span class ="text-nowrap">@GetClientMargin(client.ClientCode, Market.ClientCodeMargin, Market.Selections)</span>
+                                    <span class ="text-nowrap">@GetClientMargin(client.ClientCode, _clientCodeMargin, _selections)</span>
                                 </div>
                             }
                             else

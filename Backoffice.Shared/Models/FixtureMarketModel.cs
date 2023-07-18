@@ -27,10 +27,12 @@ namespace Backoffice.Shared.Models
         public string MarketName { get; set; }
         public string Line { get; set; }
         public int MarketStatusId { get; set; }
-        public string MarketStatusName { get; set; }
-        public string MarketSpecifier { get; set; }
+        //public string MarketStatusName { get; set; }
+        //public string MarketSpecifier { get; set; }
         public string ClientCode { get; set; }
         public string ClientCodeMargin { get; set; }
         public List<SelectionModel> Selections { get; set; }
     }
+
+
 }

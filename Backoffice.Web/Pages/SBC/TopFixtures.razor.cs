@@ -26,17 +26,19 @@ namespace Backoffice.Web.Pages.SBC
         public TopFixturesModel TopFixturesModel { get; set; }
         public bool IsPreLoader { get; set; } = true;
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         #endregion
+        private PageHeaderModel _pageHeaderModel;
         private ToastService _toasterService => ToasterService!;
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            PageTitle = "Top Fixtures";
-            IconClass = "ico ico-top-fixtures";
+            _pageHeaderModel = new()
+            {
+                Title = "Top Fixtures",
+                IconClass = "ico ico-top-fixtures"
+            };
             IsPreLoader = true;
 
             MetaData = new MetaData()
