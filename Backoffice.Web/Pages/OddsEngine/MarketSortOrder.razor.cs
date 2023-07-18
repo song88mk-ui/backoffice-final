@@ -23,14 +23,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public IJSStreamReference? DataReference { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public string TableClass { get; set; }
         public string SelectClass { get; set; }
         public string SelectedMarketGroupName { get; set; }
 
         public bool InitSortingAndSelect2 { get; set; }
-        public bool IsMarketGroupClicked { get; set; }        
+        public bool IsMarketGroupClicked { get; set; }
         public bool IsUpdate { get; set; }
         public bool IsPreLoader { get; set; }
 
@@ -44,15 +42,19 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #endregion
 
+        private PageHeaderModel _pageHeaderModel;
+
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            _pageHeaderModel = new()
+            {
+                Title = "Market Sort Order"
+            };
             TradingService.Region = Region.ToUpper();
             MarketSortOrderModel = new MarketSortOrderModel();
 
-            PageTitle = "Market Sort Order";
-            IconClass = string.Empty;
             TableClass = "market-sort-order-table";
             SelectClass = "market-group-select";
             SelectedMarketGroupName = string.Empty;
@@ -128,7 +130,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnCancelClickEvent()
         {
-            IsUpdate= false;
+            IsUpdate = false;
 
             await DisableSortingAndSelect2();
         }
@@ -137,7 +139,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             IsUpdate = false;
 
-            if(!IsPreLoader)
+            if (!IsPreLoader)
             {
                 IsPreLoader = true;
             }
@@ -146,7 +148,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (!marketTemplates.Any())
                 return;
-             
+
             MarketSortOrderModel.MarketTemplates = MarketSortOrderModel.MarketTemplates.Join(marketTemplates,
                 ma => ma.MarketTemplateId,
                 so => so.RowId.Split('-')[1],
@@ -177,7 +179,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var response = await TradingService.AddOrUpdateClientMarketTemplatesOrder(request);
 
-            if(response.StatusCode != StatusCode.Success)
+            if (response.StatusCode != StatusCode.Success)
             {
                 AlertMessage = $"{response.Message}";
                 AlertStatus = AlertStatus.Error;

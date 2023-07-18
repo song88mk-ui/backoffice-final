@@ -15,8 +15,6 @@ namespace Backoffice.Web.Pages.Administration
 
         private bool OldIsMaintenance { get; set; }
         public AlertModel AlertModel { get; set; }
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
         public bool IsMaintenance
         {
@@ -24,6 +22,7 @@ namespace Backoffice.Web.Pages.Administration
             set
             {
                 if (value == _isMaintenance) return;
+
                 OnMaintenanceClickEvent(value);
             }
         }
@@ -31,9 +30,8 @@ namespace Backoffice.Web.Pages.Administration
         #endregion
 
         #region Fields
-
         private bool _isMaintenance;
-
+        private PageHeaderModel _pageHeaderModel;
         #endregion
 
         #region Methods
@@ -42,16 +40,19 @@ namespace Backoffice.Web.Pages.Administration
         {
             //IsPreLoader = true;
             AlertModel = new AlertModel();
+            _pageHeaderModel = new()
+            {
+                Title = "Maintenance",
+                IconClass = "ico ico-maintenance"
+            };
 
             await AuthenticateAccess.InvokeAsync();
 
-            PageTitle = "Maintenance";
-            IconClass = "ico ico-maintenance";
 
             await GetContent();
         }
 
-        public async Task OnMaintenanceClickEvent(bool value)
+        public void OnMaintenanceClickEvent(bool value)
         {
             var parameters = new ModalParameters();
             parameters.Add("IsMaintenance", (bool)value);
@@ -61,9 +62,9 @@ namespace Backoffice.Web.Pages.Administration
 
             ModalService.Open<ConfirmationModal>("Maintenance", parameters, options);
         }
-        public async Task OnSaveClickedEvent()
+        public void OnSaveClickedEvent()
         {
-            if(_isMaintenance != OldIsMaintenance)
+            if (_isMaintenance != OldIsMaintenance)
             {
                 OldIsMaintenance = _isMaintenance;
             }

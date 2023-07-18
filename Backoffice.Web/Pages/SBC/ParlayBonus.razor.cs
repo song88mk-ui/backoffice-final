@@ -21,9 +21,6 @@ namespace Backoffice.Web.Pages.SBC
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
         [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
-
         public MetaData MetaData { get; set; }
         public ClientParlayBonusModel ClientParlayBonusModel { get; set; }
         public List<ParlayBonusConfig> TempConfig { get; set; }
@@ -41,7 +38,7 @@ namespace Backoffice.Web.Pages.SBC
         #endregion
 
         #region Fields
-
+        private PageHeaderModel _pageHeaderModel;
         public const string ToastTitle = "Parlay Bonus";
         public static Func<decimal, string, Task> OnDisableSaveActionAsync;
 
@@ -51,8 +48,11 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnInitializedAsync()
         {
-            PageTitle = "Parlay Bonus";
-            IconClass = "ico ico-parlay-bonus";
+            _pageHeaderModel = new()
+            {
+                Title = "Parlay Bonus",
+                IconClass = "ico ico-parlay-bonus"
+            };
             ClientParlayBonusModel = new ClientParlayBonusModel() { ParlayBonusMinOdds = 1.20m };
             Clients = new List<SelectListItemModel<ClientModel.Client>>();
 

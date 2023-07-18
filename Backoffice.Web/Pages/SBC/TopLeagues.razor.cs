@@ -22,8 +22,6 @@ namespace Backoffice.Web.Pages.SBC
         [CascadingParameter(Name = "UserModel")] protected UserModel UserModel { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public bool IsPreLoader { get; set; } = true;
 
         public GetTopLeaguesRequest GetTopLeaguesRequest { get; set; }
@@ -32,14 +30,18 @@ namespace Backoffice.Web.Pages.SBC
         public MetaData MetaData { get; set; } = new MetaData();
 
         #endregion
+        private PageHeaderModel _pageHeaderModel;
         private ToastService _toasterService => ToasterService!;
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            PageTitle = "Top Leagues";
-            IconClass = "ico ico-top-leagues";
+            _pageHeaderModel = new()
+            {
+                Title = "Top Leagues",
+                IconClass = "ico ico-top-leagues"
+            };
             IsPreLoader = true;
 
             GetTopLeaguesRequest = new GetTopLeaguesRequest();

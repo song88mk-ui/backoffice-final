@@ -28,17 +28,14 @@ namespace Backoffice.Web.Pages.Administration
         public List<MessageSettlementModel> MessageSettlementModel { get; set; }
         public MetaData MetaData { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
-        private bool IsPreLoader { get; set; }
-        private long CursorId { get; set; }
-        private int PreviousPage { get; set; }
-
         #endregion
 
         #region Fields
-
         private ToastService _toasterService => ToasterService!;
+        private PageHeaderModel _pageHeaderModel;
+        private bool IsPreLoader { get; set; }
+        private long CursorId { get; set; }
+        private int PreviousPage { get; set; }
 
         #endregion
 
@@ -47,8 +44,11 @@ namespace Backoffice.Web.Pages.Administration
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = true;
-            PageTitle = "Message Settlement";
-            IconClass = "ico ico-message-settlement";
+            _pageHeaderModel = new()
+            {
+                Title = "Message Settlement",
+                IconClass = "ico ico-message-settlement"
+            };
 
             MetaData = new MetaData
             {
@@ -80,7 +80,7 @@ namespace Backoffice.Web.Pages.Administration
         public async Task OnExportClickedEvent()
         {
             _toasterService.AddToast(Toast.NewToast
-                    ("Message Settlement", 
+                    ("Message Settlement",
                     $"Success! Excel file is being generated system will notify once done."));
         }
 

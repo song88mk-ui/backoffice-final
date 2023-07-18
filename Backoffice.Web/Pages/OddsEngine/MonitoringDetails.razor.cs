@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using Serilog;
+using RabbitMQ.Client.Apigen.Attributes;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -32,36 +33,34 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private HubConnection _hubConnection { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
-
-        public ClientModel ClientModel { get; set; }
-        public List<BreadcrumbModel> Breadcrumbs { get; set; }
-        public MarketFixtureResponse.FixtureModel Fixture { get; set; }
-        public List<FixtureMarketModel> FixtureMarkets { get; set; }
-        public List<FixtureMarketModel> FixtureMarketTemplates { get; set; }
-        public List<MarketNavigationModel2> MarketTemplateNavigation { get; set; }
-        public MarketModel MarginMarket { get; set; }
-        public int SportId { get; set; }
-        public string Search { get; set; }
-        public string MarketTemplateId { get; set; }
-        public List<AlertModel> Alerts { get; set; }
-        public decimal Opacity { get; set; }
+        private List<BreadcrumbModel> Breadcrumbs { get; set; }
+        private MarketFixtureResponse.FixtureModel Fixture { get; set; }
+        private List<FixtureMarketModel> FixtureMarkets { get; set; }
+        private List<FixtureMarketModel> FixtureMarketTemplates { get; set; }
+        private List<MarketNavigationModel2> MarketTemplateNavigation { get; set; }
+        private MarketModel MarginMarket { get; set; }
+        private int SportId { get; set; }
+        private string Search { get; set; }
+        private string MarketTemplateId { get; set; }
+        private List<AlertModel> Alerts { get; set; }
+        private decimal Opacity { get; set; }
 
         #endregion
 
         #region Fields
-
-        public bool _isPlayerProps;
-
+        private bool _isPreLoader;
+        private PageHeaderModel _pageHeaderModel;
+        private bool _isPlayerProps;
+        private List<Client>? _clients;
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            _isPreLoader = true;
+            _pageHeaderModel = new();
             TradingService.Region = Region.ToUpper();
-            ClientModel = new ClientModel();
             Breadcrumbs = new List<BreadcrumbModel>();
             Fixture = new MarketFixtureResponse.FixtureModel();
             FixtureMarkets = new List<FixtureMarketModel>();
@@ -69,27 +68,21 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarketTemplateNavigation = new List<MarketNavigationModel2>();
             MarginMarket = new MarketModel();
 
-            PageTitle = string.Empty;
-            IconClass = string.Empty;
-
             await AuthenticateAccess.InvokeAsync();
 
             var clients = (await TradingService.GetClientList()).Result;
 
             if (clients != null)
             {
-                ClientModel = new ClientModel
-                {
-                    Clients = UserModel.ClientCodes.Any() ?
-                        clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()))
-                        .Select(s => new ClientModel.Client
+                _clients = UserClientCodes != null && UserClientCodes.Any() ?
+                        clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()))
+                        .Select(s => new Client
                         {
                             ClientCode = s.ClientCode,
                             ClientName = s.ClientName,
-                            Region = Configuration["Region"]
+                            Region = Configuration["Region"] ?? string.Empty
                         })
-                        .ToList() : new List<ClientModel.Client>()
-                };
+                        .ToList() : new List<Client>();
             }
 
             await PrepareMonitoringDetails();
@@ -116,15 +109,18 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnMarketChangedEvent(string marketTemplateId)
         {
+            _isPreLoader = true;
+            await InvokeAsync(StateHasChanged);
             MarketTemplateId = marketTemplateId;
 
             var markets = Fixture.Markets.Where(c => c.MarketTemplateId == MarketTemplateId).ToList();
-            FixtureMarkets = PrepareFixtureMarkets(markets);
+            FixtureMarkets = await PrepareFixtureMarkets(markets);
 
-            MarginMarket = markets.FirstOrDefault();
+            MarginMarket = markets.FirstOrDefault() ?? new();
+            _isPreLoader = false;
         }
 
-        public async Task OnCloseMarkeEvent()
+        public void OnCloseMarkeEvent()
         {
             var parameters = new ModalParameters();
 
@@ -155,10 +151,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             // display list of markets available on the selected group
             MarketTemplateNavigation = markets.Select((s, index) => new MarketNavigationModel2
             {
-                IsSelected = index == 0 ? true: false,
+                IsSelected = index == 0 ? true : false,
                 MarketTemplateId = s.MarketTemplateId,
                 MarketName = s.MarketName,
-                MarketTemplateGroupId = model.MarketTemplateGroup.MarketTemplateGroupId
             })
             .DistinctBy(d => new { d.MarketTemplateId, d.MarketName })
             .ToList();
@@ -211,50 +206,56 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task PrepareMonitoringDetails()
         {
+            if (!_isPreLoader)
+                _isPreLoader = true;
+
             var marketFixtureResponse = await BackOfficeService.GetMarketFixtureDetails(Id);
 
             if (marketFixtureResponse.StatusCode == StatusCode.Success)
             {
                 Fixture = marketFixtureResponse.Result.Fixture;
                 SportId = Fixture.SportId;
-
-                PageTitle = $"{Fixture.SportName} - {Fixture.SegmentName} - {Fixture.LeagueName}";
-                IconClass = $"iconfont iconfont-{Fixture.SportName.ToLower().Replace(" ", "-")}";
-
-                Breadcrumbs.Add(new BreadcrumbModel
+                _pageHeaderModel = new()
                 {
-                    Name = "Monitoring",
-                    Url = $"{Region}/odds-engine/monitoring",
-                    IsCurrentPage = false
-                });
+                    Title = $"{Fixture.SportName} - {Fixture.SegmentName} - {Fixture.LeagueName}",
+                    IconClass = $"iconfont iconfont-{Fixture.SportName.ToLower().Replace(" ", "-")}"
+                };
 
-                Breadcrumbs.Add(new BreadcrumbModel
+                Breadcrumbs = new()
                 {
-                    Name = Fixture.SportName,
-                    //Url = $"odds-engine/monitoring/{Fixture.SportId}",
-                    Url = "",
-                    IsCurrentPage = false
-                });
-
-                Breadcrumbs.Add(new BreadcrumbModel
-                {
-                    Name = Fixture.SegmentName,
-                    //Url = $"odds-engine/monitoring/{Fixture.SportId}/{Fixture.SegmentId}",
-                    Url = "",
-                    IsCurrentPage = false
-                });
-
-                Breadcrumbs.Add(new BreadcrumbModel
-                {
-                    Name = Fixture.LeagueName,
-                    //Url = $"odds-engine/monitoring/{Fixture.SportId}/{Fixture.SegmentId}/{Fixture.LeagueId}",
-                    Url = "",
-                    IsCurrentPage = true
-                });
+                    new BreadcrumbModel
+                    {
+                        Name = "Monitoring",
+                        Url = $"{Region}/odds-engine/monitoring",
+                        IsCurrentPage = false
+                    },
+                    new BreadcrumbModel
+                    {
+                        Name = Fixture.SportName,
+                        //Url = $"odds-engine/monitoring/{Fixture.SportId}",
+                        Url = "",
+                        IsCurrentPage = false
+                    },
+                    new BreadcrumbModel
+                    {
+                        Name = Fixture.SegmentName,
+                        //Url = $"odds-engine/monitoring/{Fixture.SportId}/{Fixture.SegmentId}",
+                        Url = "",
+                        IsCurrentPage = false
+                    },new BreadcrumbModel
+                    {
+                        Name = Fixture.LeagueName,
+                        //Url = $"odds-engine/monitoring/{Fixture.SportId}/{Fixture.SegmentId}/{Fixture.LeagueId}",
+                        Url = "",
+                        IsCurrentPage = true
+                    }
+                };
             }
+
+            _isPreLoader = false;
         }
 
-        private List<FixtureMarketModel> PrepareFixtureMarkets(List<MarketModel> markets)
+        private async Task<List<FixtureMarketModel>> PrepareFixtureMarkets(List<MarketModel> markets)
         {
             return markets.Select(s => new FixtureMarketModel
             {
@@ -275,9 +276,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                 IsBetStopGlobal = Fixture.IsBetStopGlobal,
                 Score = Fixture.Score,
                 Line = s.Line,
-                MarketSpecifier = s.MarketSpecifier,
+                //MarketSpecifier = s.MarketSpecifier,
                 MarketStatusId = s.MarketStatusId,
-                MarketStatusName = s.MarketStatusName,
+                //MarketStatusName = s.MarketStatusName,
                 MarketTemplateId = s.MarketTemplateId,
                 Selections = s.Selections.Select(se => new SelectionModel
                 {
@@ -329,7 +330,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             MarginMarket = filteredMarkets.FirstOrDefault();
 
-            return PrepareFixtureMarkets(filteredMarkets.ToList());
+            return PrepareFixtureMarkets(filteredMarkets.ToList()).Result;
         }
 
         private async Task Subscribe()
@@ -557,7 +558,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (newMarketTemplateIds.Contains(MarketTemplateId))
                 {
                     var markets = Fixture.Markets.Where(c => c.MarketTemplateId == MarketTemplateId).ToList();
-                    FixtureMarkets = PrepareFixtureMarkets(markets);
+                    FixtureMarkets = await PrepareFixtureMarkets(markets);
                 }
 
                 if (newMarketTemplateIds.Contains(selectedNavigation.MarketTemplateId))

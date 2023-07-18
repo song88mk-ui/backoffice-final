@@ -27,18 +27,21 @@ namespace Backoffice.Web.Pages.SBC
         public UserListResponse SubUsers { get; set; }
         public MetaData MetaData { get; set; }
         public List<AlertModel> Alerts { get; set; }
-
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public bool IsPreload { get; set; }
         public decimal Opacity { get; set; }
 
         #endregion
+        private PageHeaderModel _pageHeaderModel;
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            _pageHeaderModel = new()
+            {
+                Title = "Sub Users",
+                IconClass = "ico ico-sub-user"
+            };
             Opacity = 0m;
             Alerts = new List<AlertModel>();
             PermissionResponse = new PermissionResponse();
@@ -55,8 +58,6 @@ namespace Backoffice.Web.Pages.SBC
 
             await AuthenticateAccess.InvokeAsync();
 
-            PageTitle = "Sub Users";
-            IconClass = "ico ico-sub-user";
         }
 
         public async Task OnInitEvent(SubUserCallbackModel model)

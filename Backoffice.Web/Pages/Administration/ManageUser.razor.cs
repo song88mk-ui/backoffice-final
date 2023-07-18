@@ -24,20 +24,22 @@ namespace Backoffice.Web.Pages.Administration
         public List<UserResponse> UserList { get; set; }
         public List<AlertModel> Alerts { get; set; }
 
-        public string PageTitle { get; set; }
-        public string IconClass { get; set; }
         public bool IsPreLoader { get; set; }
         public decimal Opacity { get; set; }
 
         #endregion
 
-        #region Methods
+        private PageHeaderModel _pageHeaderModel;
 
+        #region Methods
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = true;
-            PageTitle = "Manage User";
-            IconClass = "ico ico-manage-user";
+            _pageHeaderModel = new()
+            {
+                Title = "Manage User",
+                IconClass = "ico ico-manage-user"
+            };
             Opacity = 0m;
 
             MetaData = new MetaData()
@@ -71,7 +73,7 @@ namespace Backoffice.Web.Pages.Administration
             parameters.Add("Permissions", Permissions);
             parameters.Add("IsEdit", false);
             parameters.Add("UserModel", new UserRegisterModel());
-            parameters.Add("DialogStyle", "max-width: 65rem;");            
+            parameters.Add("DialogStyle", "max-width: 65rem;");
 
             var options = new ModalOptions();
 

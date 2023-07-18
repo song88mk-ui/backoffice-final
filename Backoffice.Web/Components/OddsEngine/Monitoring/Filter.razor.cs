@@ -11,75 +11,66 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         #region Properties
 
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-
         [Parameter] public EventCallback<MonitoringCallbackModel> OnInitCallback { get; set; }
         [Parameter] public int SportId { get; set; }
-        [Parameter] public int SegmentId { get; set; }
-        [Parameter] public int LeagueId { get; set; }
-
-        public SearchFormModel SearchForm { get; set; }
-        public List<MainMarketTemplateResponse> TopMarketTemplates { get; set; }
-
-        public string MarketTemplateId { get; set; } = string.Empty;
-
         #endregion
 
         #region Fields
-
-        protected int _sportId;
-        protected int _segmentId;
-        protected int _leagueId;
-
+        private int _sportId;
+        private SearchFormModel _searchForm;
+        private List<MainMarketTemplateResponse> _topMarketTemplates;
+        private string _marketTemplateId = string.Empty;
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            TopMarketTemplates = new List<MainMarketTemplateResponse>();
-            SearchForm = new SearchFormModel();
+            _topMarketTemplates = new List<MainMarketTemplateResponse>();
+            _searchForm = new SearchFormModel();
         }
 
         protected override async Task OnParametersSetAsync()
         {
             if (_sportId != SportId)
             {
+                _sportId = SportId;
 
-                TopMarketTemplates = (await BackOfficeService.GetTopMarkets(SportId)).Result;
+                var topMarketsResponse = await BackOfficeService.GetTopMarkets(_sportId);
+                _topMarketTemplates = topMarketsResponse.Result;
+                _marketTemplateId = _topMarketTemplates.FirstOrDefault()?.MainMarketTemplateId ?? string.Empty;
 
-                if (TopMarketTemplates != null && TopMarketTemplates.Any())
-                    MarketTemplateId = TopMarketTemplates.FirstOrDefault().MainMarketTemplateId;
-
-                await PrepareMonitoringData();
-            }
-            else if (_sportId != SportId || _segmentId != SegmentId || _leagueId != LeagueId)
-            {
-                await PrepareMonitoringData();
+                if (!string.IsNullOrEmpty(_marketTemplateId))
+                {
+                    await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
+                    {
+                        SearchText = _searchForm.SearchText,
+                        SelectedMarketTemplateId = _marketTemplateId
+                    });
+                }
             }
         }
 
-        public async void OnMarketChangedEvent(ChangeEventArgs e)
+        private async void OnMarketChangedEvent(ChangeEventArgs e)
         {
-            MarketTemplateId = e.Value.ToString();
+            _marketTemplateId = e?.Value?.ToString() ?? string.Empty;
 
             await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
             {
-                SportId = SportId,
-                SelectedMarketTemplateId = MarketTemplateId,
-                SearchText = SearchForm.SearchText
+                SelectedMarketTemplateId = _marketTemplateId,
+                SearchText = _searchForm.SearchText
             });
         }
 
-        public async Task OnInputSearchEvent()
+        private async Task OnInputSearchEvent()
         {
-            if (!string.IsNullOrEmpty(SearchForm.SearchText) && SearchForm.SearchText.Length == 1)
+            if (!string.IsNullOrEmpty(_searchForm.SearchText) && _searchForm.SearchText.Length == 1)
                 return;
 
             await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
             {
-                SportId = SportId,
-                SearchText = SearchForm.SearchText,
-                SelectedMarketTemplateId = MarketTemplateId 
+                SearchText = _searchForm.SearchText,
+                SelectedMarketTemplateId = _marketTemplateId
             });
         }
 
@@ -90,21 +81,6 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         #endregion
 
         #region Utilities
-
-        private async Task PrepareMonitoringData()
-        {
-            _sportId = SportId;
-            _segmentId = SegmentId;
-            _leagueId = LeagueId;
-
-            await OnInitCallback.InvokeAsync(new MonitoringCallbackModel
-            {
-                SportId = SportId,
-                SearchText = string.Empty,
-                SelectedMarketTemplateId = MarketTemplateId
-            });
-        }
-
         #endregion
     }
 }
