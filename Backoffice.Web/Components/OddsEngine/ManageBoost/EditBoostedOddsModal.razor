@@ -21,40 +21,40 @@ else
             </thead>
             <tbody>
                 <tr>
-                    <th scope="row">@PriceBoostConfigModel.ClientName</th>
-                    <td>@PriceBoostConfigModel.SportName</td>
+                    <th scope="row">@_priceBoostConfigModel.ClientName</th>
+                    <td>@_priceBoostConfigModel.SportName</td>
                     <td class="d-flex flex-column">
-                        <span><b>@PriceBoostConfigModel.SelectionName</b></span>
-                        <span>@PriceBoostConfigModel.MarketName</span>
-                        <span>@PriceBoostConfigModel.SegmentName</span>
-                        <span>@PriceBoostConfigModel.LeagueName</span>
-                        <span>@PriceBoostConfigModel.FixtureName</span>
-                        @if (PriceBoostConfigModel.FixtureStatusId == (int)FixtureStatus.Live)
+                        <span><b>@_priceBoostConfigModel.SelectionName</b></span>
+                        <span>@_priceBoostConfigModel.MarketName</span>
+                        <span>@_priceBoostConfigModel.SegmentName</span>
+                        <span>@_priceBoostConfigModel.LeagueName</span>
+                        <span>@_priceBoostConfigModel.FixtureName</span>
+                        @if (_priceBoostConfigModel.FixtureStatusId == (int)FixtureStatus.Live)
                         {
-                            <span class="period">@PriceBoostConfigModel.CurrentPeriod</span>
-                            if (!string.IsNullOrEmpty(PriceBoostConfigModel.CurrentMinute) && int.Parse(PriceBoostConfigModel.CurrentMinute) > 0)
+                            <span class="period">@_priceBoostConfigModel.CurrentPeriod</span>
+                            if (!string.IsNullOrEmpty(_priceBoostConfigModel.CurrentMinute) && int.Parse(_priceBoostConfigModel.CurrentMinute) > 0)
                             {
-                                <span class="time">@PriceBoostConfigModel.CurrentMinute</span>
+                                <span class="time">@_priceBoostConfigModel.CurrentMinute</span>
                             }
                         }
                         else
                         {
-                            <span>@PriceBoostConfigModel.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")</span>
-                            <span>@PriceBoostConfigModel.FixtureStartDate.ToLocalTime().ToString("HH:mm")</span>
+                            <span>@_priceBoostConfigModel.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")</span>
+                            <span>@_priceBoostConfigModel.FixtureStartDate.ToLocalTime().ToString("HH:mm")</span>
                         }
                     </td>
-                    <td class="text-center">@PriceBoostConfigModel.BROdds.ToString("0.00")</td>
-                    <td class="text-center">@PriceBoostConfigModel.ClientOdds.ToString("0.00")</td>
+                    <td class="text-center">@_priceBoostConfigModel.BROdds.ToString("0.00")</td>
+                    <td class="text-center">@_priceBoostConfigModel.ClientOdds.ToString("0.00")</td>
                     <td class="pe-3">
                         <div class="row selection-width">
                             <div class="col">
                                 <div class="row align-items-center">
                                     <div class="col-2 p-0">
                                         <div class="dropdown">
-                                            <button class="btn dropdown-toggle fs-3" type="button" id="@PriceBoostConfigModel.SelectionName" data-bs-toggle="dropdown" aria-expanded="false" disabled>
+                                            <button class="btn dropdown-toggle fs-3" type="button" id="@_priceBoostConfigModel.SelectionName" data-bs-toggle="dropdown" aria-expanded="false" disabled>
                                                 <i class="flag-en"></i>
                                             </button>
-                                            <ul class="dropdown-menu" aria-labelledby="@PriceBoostConfigModel.SelectionName">
+                                            <ul class="dropdown-menu" aria-labelledby="@_priceBoostConfigModel.SelectionName">
                                                 <li>
                                                     <a class="dropdown-item" href="#"></a>
                                                 </li>
@@ -63,7 +63,7 @@ else
                                     </div>
                                     <div class="col p-0">
                                         <div>
-                                            <input type="text" class="form-control" @bind-value="PriceBoostConfigModel.SelectionName" />
+                                            <input type="text" class="form-control" @bind-value="_priceBoostConfigModel.SelectionName" />
                                         </div>
                                     </div>
                                     <div class="col-1 p-0">
@@ -79,16 +79,16 @@ else
                                 </div>
                             </div>
                         </div>
-                        @if (PriceBoostConfigModel.BoostedSelectionTranslations != null && PriceBoostConfigModel.BoostedSelectionTranslations.Any())
+                        @if (_priceBoostConfigModel.BoostedSelectionTranslations != null && _priceBoostConfigModel.BoostedSelectionTranslations.Any())
                         {
-                            <EditBoostedOddsModalRow BoostedSelectionTranslationModel="@PriceBoostConfigModel.BoostedSelectionTranslations" LanguagesModel="@Languages"
+                            <EditBoostedOddsModalRow BoostedSelectionTranslationModel="@_priceBoostConfigModel.BoostedSelectionTranslations" LanguagesModel="@_languages"
                                              OnAddSelectionCallback="OnAddSelection"
                                              OnDeleteSelectionCallback="OnDeleteSelection"
                                              OnSelectLanguageCallback="OnSelectLanguage" />
                         }
                     </td>
                     <td>
-                        <input type="number" class="form-control text-center" @bind-value="PriceBoostConfigModel.BoostedOddsStr" />
+                        <input type="number" class="form-control text-center" @bind-value="_priceBoostConfigModel.BoostedOddsStr" />
                     </td>
                 </tr>
             </tbody>
@@ -96,6 +96,6 @@ else
     </div>
 }
 <div class="modal-footer mx-4 pe-0">
-    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick" disabled="@IsPreloader">Cancel</button>
-    <button type="button" class="btn modal-btn modal-save" @onclick="OnSaveModalClick" disabled="@IsPreloader">Save</button>
+    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick" disabled="@_isPreloader">Cancel</button>
+    <button type="button" class="btn modal-btn modal-save" @onclick="OnSaveModalClick" disabled="@_isPreloader">Save</button>
 </div>

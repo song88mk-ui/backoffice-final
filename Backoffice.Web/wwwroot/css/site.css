@@ -321,3 +321,8 @@ table .fa-chevron-down {
 .tableau-iframe {
     height: 85vh;
 }
+
+a.disabled {
+    pointer-events: none;
+    opacity: .65;
+}

@@ -66,10 +66,9 @@ namespace Backoffice.Web.Shared.OddsEngine
             {
                 if (menu.Contains("hk/odds-engine/"))
                     menu = menu.Replace("hk/odds-engine/", "");
-                if (menu.Contains("hk/odds-engine"))
-                    menu = menu.Replace("hk/odds-engine", "");
+                //if (menu.Contains("hk/odds-engine"))
+                //    menu = menu.Replace("hk/odds-engine", "");
 
-                Console.WriteLine($" = = = = ={_menu} > {menu}");
                 switch (menu.ToUpper())
                 {
                     case "":

@@ -4,6 +4,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Web.Components.Common;
+using System.Drawing;
 
 namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 {
@@ -24,45 +25,48 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [Parameter] public EventCallback<string> OnInputSearchCallback { get; set; }
         [Parameter] public string Region { get; set; }
 
-        public List<SelectListItemModel<string>> Clients { get; set; }
-        public string SelectedClientCode { get; set; }
-        public List<SelectListItemModel<int>> Sports { get; set; }
-        public int SelectedSportId { get; set; }
-        public List<SelectListItemModel<int>> Segments { get; set; }
-        public int SelectedSegmentId { get; set; }
-        public List<SelectListItemModel<int>> Leagues { get; set; }
-        public int SelectedLeagueId { get; set; }
-
-        public SearchFormModel SearchForm { get; set; }
-
+        private string _region;
+        private List<SelectListItemModel<string>> _clients;
+        public string _selectedClientCode;
+        public List<SelectListItemModel<int>> _sports;
+        public int _selectedSportId;
+        public List<SelectListItemModel<int>> _segments;
+        public int _selectedSegmentId;
+        public List<SelectListItemModel<int>> _leagues;
+        public int _selectedLeagueId;
+        public SearchFormModel _searchForm;
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            Clients = new List<SelectListItemModel<string>>();
-            Sports = new List<SelectListItemModel<int>>();
-            Segments = new List<SelectListItemModel<int>>();
-            Leagues = new List<SelectListItemModel<int>>();
+            _clients = new List<SelectListItemModel<string>>();
+            _sports = new List<SelectListItemModel<int>>();
+            _segments = new List<SelectListItemModel<int>>();
+            _leagues = new List<SelectListItemModel<int>>();
 
-            TradingService.Region = Region.ToUpper();
-            SearchForm = new SearchFormModel();
+            _searchForm = new SearchFormModel();
 
-            Clients = await LoadClients();
-            SelectedClientCode = Clients.FirstOrDefault().Value;
 
-            Sports = await LoadSports();
-            SelectedSportId = 0;
+            _clients = await LoadClients();
+            _selectedClientCode = _clients.FirstOrDefault().Value;
+            _sports = await LoadSports();
+            _selectedSportId = 0;
+            _segments = await LoadSegments(_selectedSportId);
+            _selectedSegmentId = 0;
+            _leagues = await LoadLeagues(_selectedSportId, _selectedSegmentId);
+            _selectedLeagueId = 0;
 
-            Segments = await LoadSegments(SelectedSportId);
-            SelectedSegmentId = 0;
-
-            Leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
-            SelectedLeagueId = 0;
-
-            //await PriceboostFilterModelChanged.InvokeAsync(PriceboostFilterModel);
             await OnInitCallback.InvokeAsync();
+        }
+        protected override async Task OnParametersSetAsync()
+        {
+            if (_region != Region.ToUpper())
+            {
+                _region = Region.ToUpper();
+                TradingService.Region = _region;
+            }
         }
 
         public async Task OnAddBoostedOdds()
@@ -71,7 +75,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
-            parameters.Add("Region", Region);
+            parameters.Add("Region", _region);
             //parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);            
 
             var options = new ModalOptions();
@@ -87,7 +91,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             parameters.Add("DialogStyle","max-width: 85rem;");
             //parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);
             parameters.Add("SelectedPage", SportsbookClientPermission.SBC_OE_PriceBoost_Manage);
-            parameters.Add("Region", Region);
+            parameters.Add("Region", _region);
 
             var options = new ModalOptions();
             ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);
@@ -95,53 +99,53 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
-            SelectedClientCode = e.Value.ToString();
+            _selectedClientCode = e.Value.ToString();
 
-            await OnClientChangedCallback.InvokeAsync(SelectedClientCode);
+            await OnClientChangedCallback.InvokeAsync(_selectedClientCode);
         }
 
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {
-            SelectedSportId = int.Parse(e.Value.ToString());
+            _selectedSportId = int.Parse(e.Value.ToString());
 
-            Segments = await LoadSegments(SelectedSportId);
-            SelectedSegmentId = 0;
+            _segments = await LoadSegments(_selectedSportId);
+            _selectedSegmentId = 0;
 
-            Leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
-            SelectedLeagueId = 0;
+            _leagues = await LoadLeagues(_selectedSportId, _selectedSegmentId);
+            _selectedLeagueId = 0;
 
-            await OnSportChangedCallback.InvokeAsync(SelectedSportId);
+            await OnSportChangedCallback.InvokeAsync(_selectedSportId);
         }
 
         public async Task OnSegmentChangedEvent(ChangeEventArgs e)
         {
-            SelectedSegmentId = int.Parse(e.Value.ToString());
+            _selectedSegmentId = int.Parse(e.Value.ToString());
 
-            Leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
-            SelectedLeagueId = 0;
+            _leagues = await LoadLeagues(_selectedSportId, _selectedSegmentId);
+            _selectedLeagueId = 0;
 
-            await OnSegmentChangedCallback.InvokeAsync(SelectedSegmentId);
+            await OnSegmentChangedCallback.InvokeAsync(_selectedSegmentId);
         }
 
         public async Task OnLeagueChangedEvent(ChangeEventArgs e)
         {
-            SelectedLeagueId = int.Parse(e.Value.ToString());
+            _selectedLeagueId = int.Parse(e.Value.ToString());
 
-            await OnLeagueChangedCallback.InvokeAsync(SelectedLeagueId);
+            await OnLeagueChangedCallback.InvokeAsync(_selectedLeagueId);
         }
 
         public async Task OnInputSearchEvent()
         {
-            await OnInputSearchCallback.InvokeAsync(SearchForm.SearchText);
+            await OnInputSearchCallback.InvokeAsync(_searchForm.SearchText);
         }
 
         public void Dispose()
         {
-            Clients = null;
-            Sports = null;
-            Segments = null;
-            Leagues = null;
-            SearchForm = null;
+            _clients = new();
+            _sports = new();
+            _segments = new();
+            _leagues = new();
+            _searchForm = new();
 
             GC.SuppressFinalize(this);
         }
@@ -149,98 +153,103 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #endregion
 
         #region Utilities
-
         private async Task<List<SelectListItemModel<string>>> LoadClients()
         {
-            var result = (await TradingService.GetClientList()).Result;
+            var response = await TradingService.GetClientList();
 
-            if (result != null)
+            var clientList = response.Result;
+            if (clientList == null)
             {
-                if (UserModel.ClientCodes.Any())
-                {
-                    result = result.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-                }
+                return new();
             }
-            var clients = result.Select(s => new SelectListItemModel<string>
+
+            clientList = UserClientCodes != null && UserClientCodes.Any() ? clientList.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+
+            var result = clientList?.Select(s => new SelectListItemModel<string>
             {
                 Name = s.ClientName,
                 Value = s.ClientCode
             }).OrderBy(x => x.Name).ToList();
 
-            clients.Insert(0, new SelectListItemModel<string>
+            if (result == null)
+                result = new List<SelectListItemModel<string>>();
+
+            result.Insert(0, new()
             {
                 Value = string.Empty,
                 Name = "All Clients"
             });
-
 
             return clients;
         }
 
         private async Task<List<SelectListItemModel<int>>> LoadSports()
         {
-            var result = (await TradingService.GetSportLookup()).Result;
+            var response = await TradingService.GetSportLookup();
 
-            if (result == null)
-                return new List<SelectListItemModel<int>>();
+            var sportsLookup = response.Result;
+            if (sportsLookup == null)
+                return new();
 
-            var sports = result.SportLookup.Select(s => new SelectListItemModel<int>()
+            var result = sportsLookup.SportLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.SportId,
                 Name = s.SportName
             }).ToList();
 
-            sports.Insert(0, new SelectListItemModel<int> 
-            { 
+            result.Insert(0, new()
+            {
                 Value = 0,
                 Name = "All Sports"
             });
 
-            return sports;
+            return result;
         }
 
         private async Task<List<SelectListItemModel<int>>> LoadSegments(int sportId)
         {
-            var result = (await TradingService.GetSegmentLookup(sportId)).Result;
+            var response = await TradingService.GetSegmentLookup(sportId);
 
-            if (result == null)
-                return new List<SelectListItemModel<int>>();
+            var segmentsLookup = response.Result;
+            if (segmentsLookup == null)
+                return new();
 
-            var segments = result.SegmentLookup.Select(s => new SelectListItemModel<int>()
+            var result = segmentsLookup.SegmentLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.SegmentId,
                 Name = s.SegmentName
             }).ToList();
 
-            segments.Insert(0, new SelectListItemModel<int>
+            result.Insert(0, new()
             {
                 Value = 0,
                 Name = "All Segments"
             });
 
-            return segments;
+            return result;
         }
 
         private async Task<List<SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
         {
-            var result = (await TradingService.GetLeagueLookup(sportId, segmentId)).Result;
+            var response = await TradingService.GetLeagueLookup(sportId, segmentId);
 
-            if (result == null)
-                return new List<SelectListItemModel<int>>();
+            var leaguesLookup = response.Result;
+            if (leaguesLookup == null)
+                return new();
 
-            var leagues = result.LeagueLookup.Select(s => new SelectListItemModel<int>()
+            var result = leaguesLookup.LeagueLookup.Select(s => new SelectListItemModel<int>()
             {
                 Value = s.LeagueId,
                 Name = s.LeagueName
             }).Take(100).ToList();
 
-            leagues.Insert(0, new SelectListItemModel<int>
+            result.Insert(0, new()
             {
                 Value = 0,
                 Name = "All Leagues"
             });
 
-            return leagues;
+            return result;
         }
 
         #endregion
