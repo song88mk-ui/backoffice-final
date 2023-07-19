@@ -155,29 +155,30 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #region Utilities
         private async Task<List<SelectListItemModel<string>>> LoadClients()
         {
-            var result = new List<SelectListItemModel<string>>();
-            var response = (await TradingService.GetClientList()).Result;
+            var response = await TradingService.GetClientList();
 
-            if (response != null)
+            var clientList = response.Result;
+            if (clientList == null)
             {
-                response = UserClientCodes != null && UserClientCodes.Any() ? response.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
-
-                result = response?.Select(s => new SelectListItemModel<string>
-                {
-                    Name = s.ClientName,
-                    Value = s.ClientCode
-                }).OrderBy(x => x.Name).ToList();
-
-                if (result == null)
-                    result = new List<SelectListItemModel<string>>();
-
-                result.Insert(0, new SelectListItemModel<string>
-                {
-                    Value = string.Empty,
-                    Name = "All Clients"
-                });
+                return new();
             }
 
+            clientList = UserClientCodes != null && UserClientCodes.Any() ? clientList.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+
+            var result = clientList?.Select(s => new SelectListItemModel<string>
+            {
+                Name = s.ClientName,
+                Value = s.ClientCode
+            }).OrderBy(x => x.Name).ToList();
+
+            if (result == null)
+                result = new List<SelectListItemModel<string>>();
+
+            result.Insert(0, new()
+            {
+                Value = string.Empty,
+                Name = "All Clients"
+            });
 
             return result;
         }
