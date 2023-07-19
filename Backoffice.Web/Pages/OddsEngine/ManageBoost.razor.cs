@@ -20,59 +20,62 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
-
-        public List<PriceBoostConfigModel> PriceBoostList { get; set; }
-        public List<BreadcrumbModel> Breadcrumbs { get; set; }
-
-        public Filter FilterReference { get; set; }
-        private bool IsPreLoader { get; set; }
-        private decimal Opacity { get; set; } = 0;
-        private string AlertMessage { get; set; }
-        private AlertStatus AlertStatus { get; set; }
-
         #endregion
 
         #region Fields
+        private string _region;
         private PageHeaderModel _pageHeaderModel;
-        public LanguagesModel _languagesModel { get; set; }
-        private string _search { get; set; }
-        public string _clientCode { get; set; }
-        public int _sportId { get; set; }
-        public int _segmentId { get; set; }
-        public int _leagueId { get; set; }
+        public LanguagesModel _languagesModel;
+        private AlertModel _alertModel;
+        private string _search;
+        private string _clientCode;
+        private int _sportId;
+        private int _segmentId;
+        private int _leagueId;
+        private List<PriceBoostConfigModel> _priceBoostList;
+        private List<BreadcrumbModel> _breadcrumbs;
+        private Filter _filterReference;
+        private bool _isPreLoader;
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            IsPreLoader = true;
-            TradingService.Region = Region.ToUpper();
+            _isPreLoader = true;
+            _alertModel = new();
             _pageHeaderModel = new()
             {
                 Title = "Manage Boost"
             };
-            TradingService.Region = Region.ToUpper();
-            Breadcrumbs = new List<BreadcrumbModel>()
+            _breadcrumbs = new();
+            await AuthenticateAccess.InvokeAsync();
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            if(_region != Region.ToUpper())
             {
-                new BreadcrumbModel
+                _region = Region.ToUpper();
+                TradingService.Region = _region;
+                _breadcrumbs = new()
+            {
+                new()
                 {
                     Name = "Price Boost",
                     Url = string.Empty,
                     IsCurrentPage = false
                 },
-                new BreadcrumbModel
+                new()
                 {
-                Name = "Manage Boost",
-                    Url = $"{Region}/odds-engine/manage-boost",
+                    Name = "Manage Boost",
+                    Url = $"{_region}/odds-engine/manage-boost",
                     IsCurrentPage = true
                 }
             };
-
-            await AuthenticateAccess.InvokeAsync();
+            }
         }
-
-        public async Task OnEditClickEvent(PriceBoostConfigModel priceboost)
+        public void OnEditClickEvent(PriceBoostConfigModel priceboost)
         {
             _languagesModel = new LanguagesModel();
 
@@ -87,28 +90,28 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("PriceBoostConfigModel", priceboost);
             parameters.Add("PriceBoostConfigModelSerialized", JsonSerializer.Serialize(priceboost));
             parameters.Add("Languages", _languagesModel);
-            parameters.Add("Region", Region);
+            parameters.Add("Region", _region);
 
             var options = new ModalOptions();
 
             ModalService.Open<EditBoostedOddsModal>($"Edit Boosted Odds", parameters, options);
         }
 
-        public async Task OnViewLogClickEvent(PriceBoostConfigModel priceboost)
+        public void OnViewLogClickEvent(PriceBoostConfigModel priceboost)
         {
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("PriceBoostConfigModel", priceboost);
-            parameters.Add("Region", Region);
+            parameters.Add("Region", _region);
 
             var options = new ModalOptions();
 
             ModalService.Open<ViewLogsBoostedModal>($"View Logs", parameters, options);
         }
 
-        public async Task OnDeleteClickEvent(PriceBoostConfigModel priceboost)
+        public void OnDeleteClickEvent(PriceBoostConfigModel priceboost)
         {
             var parameters = new ModalParameters();
 
@@ -117,7 +120,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("DialogStyle", "max-width: 80rem;top:50%;transform:translateY(-50%)");
             parameters.Add("PriceBoostConfigModel", priceboost);
             parameters.Add("PriceBoostConfigModelSerialized", JsonSerializer.Serialize(priceboost));
-            parameters.Add("Region", Region);
+            parameters.Add("Region", _region);
 
             var options = new ModalOptions();
 
@@ -167,7 +170,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             await GetContents();
         }
 
-        public async Task OnModalSave(object message)
+        public async Task OnSaveCallback(object message)
         {
             _clientCode = string.Empty;
             _sportId = 0;
@@ -175,46 +178,50 @@ namespace Backoffice.Web.Pages.OddsEngine
             _leagueId = 0;
             _search = string.Empty;
 
-            FilterReference.SelectedClientCode = _clientCode;
-            FilterReference.SelectedSportId = _sportId;
-            FilterReference.SelectedSegmentId = _segmentId;
-            FilterReference.SelectedLeagueId = _leagueId;
-            FilterReference.SearchForm.SearchText = _search;
+            _filterReference._selectedClientCode = _clientCode;
+            _filterReference._selectedSportId = _sportId;
+            _filterReference._selectedSegmentId = _segmentId;
+            _filterReference._selectedLeagueId = _leagueId;
+            _filterReference._searchForm.SearchText = _search;
 
-            Opacity = 100;
-            AlertMessage = $"Price Boost has been {(string)message}!";
-            AlertStatus = AlertStatus.Success;
+            _alertModel = new()
+            {
+                Message = $"Price Boost has been {(string)message}!",
+                Status = AlertStatus.Success.ToString(),
+                Opacity = 1m
+            };
 
             await GetContents();
         }
 
-        public async Task OnModalBack(object addPriceBoostFilterModel)
+        public void OnCancelCallback(object addPriceBoostFilterModel)
         {
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("AddPriceBoostFilterModel", (AddPriceBoostFilterModel)addPriceBoostFilterModel);
-            parameters.Add("Region", Region);
+            parameters.Add("Region", _region);
 
             var options = new ModalOptions();
 
             ModalService.Open<AddBoostedOddsModal>($"Add Boosted Odds", parameters, options);
         }
-        public async Task OpacityChanged(decimal opacity)
+        public void OpacityChanged(decimal opacity)
         {
-            Opacity = opacity;
-
-            if (opacity == 0)
-                AlertMessage = string.Empty;
+            if (_alertModel != null)
+            {
+                _alertModel.Opacity = opacity;
+                _alertModel.Message = string.Empty;
+            }
         }
 
         public void Dispose()
         {
-            PriceBoostList = null;
-            Breadcrumbs = null;
-            FilterReference = null;
-            _languagesModel = null;
+            _priceBoostList = new();
+            _breadcrumbs = new();
+            _filterReference = new();
+            _languagesModel = new();
 
             GC.SuppressFinalize(this);
         }
@@ -225,8 +232,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task GetContents()
         {
-            IsPreLoader = true;
-            StateHasChanged();
+            _isPreLoader = true;
+            await InvokeAsync(StateHasChanged);
 
             var priceBoostConfigResponse = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
             {
@@ -245,13 +252,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 if (priceBoostConfigResponse.Result == null || !priceBoostConfigResponse.Result.Any())
                 {
-                    PriceBoostList = new List<PriceBoostConfigModel>();
+                    _priceBoostList = new List<PriceBoostConfigModel>();
                 }
                 else
                 {
-                    var query = priceBoostConfigResponse.Result.AsQueryable();
-
-                    query = query.Where(c => UserClientCodes != null && UserClientCodes.Contains(c.ClientCode));
+                    var query = priceBoostConfigResponse.Result.AsQueryable().Where(c => UserClientCodes != null && UserClientCodes.Contains(c.ClientCode));
 
                     if (!string.IsNullOrEmpty(_search))
                     {
@@ -262,11 +267,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                         || c.SelectionName.ToLower().Contains(_search));
                     }
 
-                    PriceBoostList = query.ToList();
+                    _priceBoostList = query.ToList();
                 }
             }
 
-            IsPreLoader = false;
+            _isPreLoader = false;
         }
 
         #endregion

@@ -9,102 +9,94 @@
 <AuthorizeView Policy="sbc-priceboost-manage">
     <Authorized>
         <div class="col-md-12">
-            <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"/>
+            <Breadcrumb Breadcrumbs="_breadcrumbs" Region="Region" />
         </div>
         <div class="col-md-12">
             <PageHeader PageHeaderModel="_pageHeaderModel" />
         </div>
-
-        @if (!string.IsNullOrEmpty(AlertMessage))
+        @if (!string.IsNullOrEmpty(_alertModel.Message))
         {
             <div class="col-md-12 mb-3">
                 <div class="mt-4 mx-3">
-                    <AlertMessage AlertMessageStr="@AlertMessage" AlertStatus="@(AlertStatus.ToString())" Opacity=Opacity OpacityChanged="OpacityChanged" />
+                    <AlertMessage AlertModel="_alertModel" OpacityChanged="OpacityChanged" />
                 </div>
             </div>
         }
-
         <div class="col-md-12">
-            <Filter @ref="FilterReference" OnClientChangedCallback="OnClientChangedEvent" OnSportChangedCallback="OnSportChangedEvent" OnSegmentChangedCallback="OnSegmentChangedEvent" OnLeagueChangedCallback="OnLeagueChangedEvent" OnInitCallback="OnInitCallback" OnInputSearchCallback="OnInputSearchEvent" Region="Region"/>
+            <Filter @ref="_filterReference" OnClientChangedCallback="OnClientChangedEvent" OnSportChangedCallback="OnSportChangedEvent" OnSegmentChangedCallback="OnSegmentChangedEvent" OnLeagueChangedCallback="OnLeagueChangedEvent" OnInitCallback="OnInitCallback" OnInputSearchCallback="OnInputSearchEvent" Region="Region" />
         </div>
 
         <div class="col-md-12">
             <div class="mx-3 mt-4">
-                @if (IsPreLoader)
+                @if (_isPreLoader)
                 {
                     <Preloader />
                 }
                 else
                 {
-                    @if (PriceBoostList != null && PriceBoostList.Any())
+                    @if (_priceBoostList != null && _priceBoostList.Any())
                     {
-                        <AuthorizeView Policy="sbc-priceboost-manage-canedit">
-                            <Authorized Context="ActivateAll">
-                                <table class="table table-hover table-bordered">
-                                    <thead class="table-head">
-                                        <tr>
-                                            <th class="th-client-name py-3">Client Name</th>
-                                            <th class="th-sports py-3">Sports</th>
-                                            <th class="th-details py-3">Details</th>
-                                            <th class="th-br-ctrl py-3">BR Ctrl</th>
-                                            <th class="th-current-odds py-3">Current Odds</th>
-                                            <th class="th-boosted-odds py-3">Boosted Odds</th>
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-head">
+                                <tr>
+                                    <th class="th-client-name py-3">Client Name</th>
+                                    <th class="th-sports py-3">Sports</th>
+                                    <th class="th-details py-3">Details</th>
+                                    <th class="th-br-ctrl py-3">BR Ctrl</th>
+                                    <th class="th-current-odds py-3">Current Odds</th>
+                                    <th class="th-boosted-odds py-3">Boosted Odds</th>
+                                    <AuthorizeView Policy="sbc-priceboost-manage-canedit">
+                                        <Authorized Context="ActivateAll">
                                             <th class="th-manage py-3">Manage</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var priceboost in PriceBoostList)
-                                        {
-                                            <tr class="@(priceboost.FixtureStatusId >= (int)FixtureStatus.Live ? "disabled" : "")">
-                                                <td>@priceboost.ClientName</td>
-                                                <td>@priceboost.SportName</td>
-                                                <td>
-                                                    <span class="d-block selection-name fw-bold">@priceboost.SelectionName</span>
-                                                    <span class="d-block market">@priceboost.MarketName</span>
-                                                    <span class="d-block segment">@priceboost.SegmentName</span>
-                                                    <span class="d-block league">@priceboost.LeagueName</span>
-                                                    <span class="d-block date">@priceboost.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")</span>
-                                                    <span class="d-block time">@priceboost.FixtureStartDate.ToLocalTime().ToString("HH:mm")</span>
-                                                    @if (priceboost.FixtureStatusId == (int)FixtureStatus.Live)
-                                                    {
-                                                        <span class="d-block score">@priceboost.Score</span>
-                                                    }
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-center">
-                                                        <div class="odds-container py-1 px-3">
-                                                            <span>@priceboost.BROdds.ToString("0.00")</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-center">
-                                                        <div class="odds-container py-1 px-3">
-                                                            <span>@priceboost.ClientOdds.ToString("0.00")</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-center">
-                                                        <div class="odds-container py-1 px-3">
-                                                            <span>@priceboost.BoostedOdds.ToString("0.00")</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
+                                        </Authorized>
+                                    </AuthorizeView>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <Virtualize Items="_priceBoostList" Context="priceboost" OverscanCount="20">
+                                    <tr class="@(priceboost.FixtureStatusId >= (int)FixtureStatus.Live ? "disabled" : "")">
+                                        <td>@priceboost.ClientName</td>
+                                        <td>@priceboost.SportName</td>
+                                        <td>
+                                            <span class="d-block selection-name fw-bold">@priceboost.SelectionName</span>
+                                            <span class="d-block market">@priceboost.MarketName</span>
+                                            <span class="d-block segment">@priceboost.SegmentName</span>
+                                            <span class="d-block league">@priceboost.LeagueName</span>
+                                            <span class="d-block date">@priceboost.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")</span>
+                                            <span class="d-block time">@priceboost.FixtureStartDate.ToLocalTime().ToString("HH:mm")</span>
+                                            @if (priceboost.FixtureStatusId == (int)FixtureStatus.Live)
+                                            {
+                                                <span class="d-block score">@priceboost.Score</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <div class="odds-container py-1 px-3">
+                                                    <span>@priceboost.BROdds.ToString("0.00")</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <div class="odds-container py-1 px-3">
+                                                    <span>@priceboost.ClientOdds.ToString("0.00")</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <div class="odds-container py-1 px-3">
+                                                    <span>@priceboost.BoostedOdds.ToString("0.00")</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <AuthorizeView Policy="sbc-priceboost-manage-canedit">
+                                            <Authorized Context="ActivateAll">
                                                 <td class="action">
                                                     <div class="d-flex justify-content-center">
-                                                        @if (priceboost.FixtureStatusId < (int)FixtureStatus.Live)
-                                                        {
-                                                            <a class="link-edit me-3" @onclick="_ => OnEditClickEvent(priceboost)" href="javascript:(0)">
-                                                                <i class="fa fa-edit"></i>
-                                                            </a>
-                                                        }
-                                                        else
-                                                        {
-                                                            <a class="link-edit me-3" href="javascript:(0)" disabled>
-                                                                <i class="fa fa-edit"></i>
-                                                            </a>
-                                                        }
+                                                        <a class="link-edit me-3 @(priceboost.FixtureStatusId < (int)FixtureStatus.Live ? "" : "disabled")" @onclick="_ => OnEditClickEvent(priceboost)" href="javascript:(0)">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
                                                         <a class="link-logs me-3" @onclick="_ => OnViewLogClickEvent(priceboost)" href="javascript:(0)">
                                                             <i class="fa fa-list"></i>
                                                         </a>
@@ -113,68 +105,12 @@
                                                         </a>
                                                     </div>
                                                 </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </Authorized>
-                            <NotAuthorized Context="ActivateAll">
-                                <table class="table table-hover table-bordered">
-                                    <thead class="table-head">
-                                        <tr>
-                                            <th class="th-client-name py-3">Client Name</th>
-                                            <th class="th-sports py-3">Sports</th>
-                                            <th class="th-details py-3">Details</th>
-                                            <th class="th-br-ctrl py-3">BR Ctrl</th>
-                                            <th class="th-current-odds py-3">Current Odds</th>
-                                            <th class="th-boosted-odds py-3">Boosted Odds</th>                                            
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var priceboost in PriceBoostList)
-                                        {
-                                            <tr class="@(priceboost.FixtureStatusId >= (int)FixtureStatus.Live ? "disabled" : "")">
-                                                <td>@priceboost.ClientName</td>
-                                                <td>@priceboost.SportName</td>
-                                                <td>
-                                                    <span class="d-block selection-name fw-bold">@priceboost.SelectionName</span>
-                                                    <span class="d-block market">@priceboost.MarketName</span>
-                                                    <span class="d-block segment">@priceboost.SegmentName</span>
-                                                    <span class="d-block league">@priceboost.LeagueName</span>
-                                                    <span class="d-block date">@priceboost.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")</span>
-                                                    <span class="d-block time">@priceboost.FixtureStartDate.ToLocalTime().ToString("HH:mm")</span>
-                                                    @if (priceboost.FixtureStatusId == (int)FixtureStatus.Live)
-                                                    {
-                                                        <span class="d-block score">@priceboost.Score</span>
-                                                    }
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-center">
-                                                        <div class="odds-container py-1 px-3">
-                                                            <span>@priceboost.BROdds.ToString("0.00")</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-center">
-                                                        <div class="odds-container py-1 px-3">
-                                                            <span>@priceboost.ClientOdds.ToString("0.00")</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-center">
-                                                        <div class="odds-container py-1 px-3">
-                                                            <span>@priceboost.BoostedOdds.ToString("0.00")</span>
-                                                        </div>
-                                                    </div>
-                                                </td>   
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </NotAuthorized>
-                        </AuthorizeView>
+                                            </Authorized>
+                                        </AuthorizeView>
+                                    </tr>
+                                </Virtualize>
+                            </tbody>
+                        </table>
                     }
                     else
                     {
@@ -184,7 +120,7 @@
             </div>
         </div>
         <div>
-            <CustomModal OnSaveClickCallback="OnModalSave" OnCancelClickCallback="OnModalBack" />
+            <CustomModal OnSaveClickCallback="OnSaveCallback" OnCancelClickCallback="OnCancelCallback" />
         </div>
     </Authorized>
     <NotAuthorized>

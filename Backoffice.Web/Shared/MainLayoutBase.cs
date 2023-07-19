@@ -186,6 +186,8 @@ namespace Backoffice.Web.Shared
 
                                     if (claim.Type == SportsbookClientPermission.SBC_OE.ToString().Replace("_", "."))
                                     {
+                                        var sbsFirstClaim = UserClaims.FirstOrDefault(x => x.Type.ToUpper().Contains($"{SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".").ToUpper()}."));
+
                                         var menu2 = new MenuModel
                                         {
                                             Id = $"sub-menu-odds-engine",
@@ -199,15 +201,8 @@ namespace Backoffice.Web.Shared
                                                     Id = $"menu.odds-engine.hk",
                                                     Name = "Asia",
                                                     IconName = "location",
-                                                    Url = $"hk/odds-engine",
-                                                },
-                                                //new MenuModel()
-                                                //{
-                                                //    Id = $"menu.odds-engine.sa",
-                                                //    Name = "South Africa",
-                                                //    IconName = "location",
-                                                //    Url = $"sa/odds-engine",
-                                                //},
+                                                    Url = $"hk/odds-engine{await GetPermissionLinks(sbsFirstClaim?.Type.ToString() ?? string.Empty)}",
+                                                }
                                             }
                                         };
 
@@ -407,7 +402,29 @@ namespace Backoffice.Web.Shared
                 Permissions = permissions,
             };
         }
+        private async Task<string> GetPermissionLinks(string permission)
+        {
+            var result = string.Empty;
 
+            if (permission.Equals("SBC.OE.Monitoring.Outrights", StringComparison.InvariantCultureIgnoreCase))
+                result = string.Empty;
+            else if (permission.Equals("SBC.OE.FastOdds", StringComparison.InvariantCultureIgnoreCase))
+                result = string.Empty;
+            else if (permission.Equals("SBC.OE.Config", StringComparison.InvariantCultureIgnoreCase))
+                result = "/config";
+            else if (permission.Equals("SBC.OE.SportsSettings", StringComparison.InvariantCultureIgnoreCase))
+                result = "/sport-settings";
+            else if (permission.Equals("SBC.OE.MarketSetting.SortOrder", StringComparison.InvariantCultureIgnoreCase))
+                result = "/market-sort-order";
+            else if (permission.Equals("SBC.OE.MarketSetting.Group", StringComparison.InvariantCultureIgnoreCase))
+                result = "/market-groups";
+            else if (permission.Equals("SBC.OE.PriceBoost.Manage", StringComparison.InvariantCultureIgnoreCase))
+                result = "/manage-boost";
+            else if (permission.Equals("SBC.OE.PriceBoost.Settings", StringComparison.InvariantCultureIgnoreCase))
+                result = "/boosted-settings";
+
+            return result;
+        }
         #endregion
     }
 }
