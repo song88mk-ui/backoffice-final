@@ -8,6 +8,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Text.Json;
+using System.Transactions;
 
 namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 {
@@ -48,14 +49,13 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public async Task OnConfigBoostedInputChangedEvent(KeyboardEventArgs args)
         {
-            if (!AddPriceBoostFilterModel.PriceBoostConfigList.Any(c => !string.IsNullOrEmpty(c.BoostedOddsStr)))
+            IsSaveDisabled = true;
+            if (AddPriceBoostFilterModel.PriceBoostConfigList.Any(c => !string.IsNullOrEmpty(c.BoostedOddsStr)))
             {
-                IsSaveDisabled = true;
+                IsSaveDisabled = AddPriceBoostFilterModel.PriceBoostConfigList.Where(x => !string.IsNullOrEmpty(x.BoostedOddsStr)).Any(x => double.TryParse(x.BoostedOddsStr, out double result) && result <= 1);
             }
-            else
-            {
-                IsSaveDisabled = false;
-            }
+            
+            await InvokeAsync(StateHasChanged);
         }
 
         public async Task OnCancelModalClick()
