@@ -2,7 +2,7 @@
 {
     <Preloader InlineCss="@InlineCss" />
 }
-<div class="modal-body">    
+<div class="modal-body">
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -27,22 +27,22 @@
                         <span>@(AddPriceBoostFilterModel.PriceBoostConfigList.FirstOrDefault()?.TimeStamp.ToString("HH:mm"))</span>
                     </div>
                 </th>
-                <td rowspan="@(AddPriceBoostFilterModel.PriceBoostConfigList.Count+1)">@AddPriceBoostFilterModel.SportName</td>                
+                <td rowspan="@(AddPriceBoostFilterModel.PriceBoostConfigList.Count+1)">@AddPriceBoostFilterModel.SportName</td>
             </tr>
-            @foreach(var config in AddPriceBoostFilterModel.PriceBoostConfigList)
+            @foreach (var config in AddPriceBoostFilterModel.PriceBoostConfigList)
             {
                 <tr scope="row">
                     <td>@config.ClientName</td>
                     <td>@config.BROdds.ToString("0.00")</td>
                     <td>@config.ClientOdds.ToString("0.00")</td>
-                    <td>                        
+                    <td>
                         @{
                             Placeholder = config.BoostedOdds == 0 ? "-.-" : config.BoostedOdds.ToString("0.00");
                         }
 
                         @if (config.ClientOdds == 0)
                         {
-                            <input type="number" class="form-control" @bind-value="@config.BoostedOddsStr" placeholder="@Placeholder" disabled/>
+                            <input type="number" class="form-control" @bind-value="@config.BoostedOddsStr" placeholder="@Placeholder" disabled />
                         }
                         else
                         {
@@ -50,7 +50,7 @@
                         }
                     </td>
                 </tr>
-            }           
+            }
         </tbody>
     </table>
 </div>
