@@ -64,7 +64,10 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         }
         public async Task OnSaveClickEvent()
         {
+            var isClosing = true;
+            ShowAlertMessage = false;
             IsPreLoader = true;
+            await InvokeAsync(StateHasChanged);
 
             if (Cap != CapEdit)
             {
@@ -76,15 +79,9 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                     Cap = this.CapEdit != 0 ? this.CapEdit / 100 : 0
                 }, UserModel.Id);
 
-                if (result.StatusCode == StatusCode.Success)
+                if (result.StatusCode != StatusCode.Success)
                 {
-                    ShowAlertMessage = false;
-                    AlertMessage = "% Cap has been successfully updated!";
-                    AlertStatus = "Success!";
-                    Opacity = 1.0m;
-                }
-                else
-                {
+                    isClosing = false;
                     ShowAlertMessage = true;
                     AlertMessage = result.Message.ToString();
                     AlertStatus = "Error!";
@@ -92,10 +89,12 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                 }
             }
 
-            await Modal.OnSaveClickCallback.InvokeAsync(true);
-            ModalService.Cancel();
-
             IsPreLoader = false;
+            if (isClosing)
+            {
+                await Modal.OnSaveClickCallback.InvokeAsync(true);
+                ModalService.Cancel();
+            }
         }
         public void Dispose()
         {

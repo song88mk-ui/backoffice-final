@@ -32,6 +32,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public bool IsPreLoader { get; set; } = true;
 
         #endregion
+        private AlertModel _alertModel;
 
         #region Methods
 
@@ -41,6 +42,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             PageTitle = "Boosted Settings";
             IconClass = string.Empty;
             TradingService.Region = Region.ToUpper();
+            _alertModel = new();
 
             Breadcrumbs = new List<BreadcrumbModel>()
             {
@@ -66,6 +68,13 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnSaveSettingClickEvent(object item)
         {
+            _alertModel = new()
+            {
+                Message = "% Cap has been successfully updated!",
+                Status = AlertStatus.Success.ToString(),
+                Opacity = 1
+            };
+
             await GetContent();
         }
 
@@ -73,12 +82,12 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             try
             {
-                if(!IsPreLoader)
+                if (!IsPreLoader)
                 {
                     IsPreLoader = true;
                 }
 
-                
+
                 var result = await TradingService.GetBoostedSettings(new BoostedSettingsRequest()
                 {
                     ClientCodes = UserModel.ClientCodes.ToList(),
@@ -103,7 +112,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 parameters.Add("Client", client);
                 parameters.Add("Region", Region);
-                
+
                 var options = new ModalOptions();
                 ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
             }
@@ -134,6 +143,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
+        private void OpacityChanged(decimal opacity)
+        {
+            _alertModel = new();
+        }
         public void Dispose()
         {
             TradingService.Dispose();
