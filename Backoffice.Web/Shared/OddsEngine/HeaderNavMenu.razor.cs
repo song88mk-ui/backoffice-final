@@ -45,10 +45,15 @@ namespace Backoffice.Web.Shared.OddsEngine
                 //    menu = menu.Replace("sa/odds-engine", "");
                 if (menu.Contains("hk/odds-engine/"))
                     menu = menu.Replace("hk/odds-engine/", "");
-                if (menu.Contains("hk/odds-engine"))
-                    menu = menu.Replace("hk/odds-engine", "");
+                //if (menu.Contains("hk/odds-engine"))
+                //    menu = menu.Replace("hk/odds-engine", "");
 
                 InActiveAllMenu();
+
+                if (string.IsNullOrEmpty(menu))
+                {
+
+                }
 
                 switch (menu.ToUpper())
                 {

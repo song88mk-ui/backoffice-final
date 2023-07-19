@@ -31,8 +31,3 @@
 .btn-save {
     background-color: #0AC282;
 }
-
-a.disabled {
-    pointer-events: none;
-    opacity: .65;
-}

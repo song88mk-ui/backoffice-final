@@ -21,28 +21,25 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
-        public LanguagesModel Languages { get; set; }
-        public PriceBoostConfigModel PriceBoostConfigModel { get; set; }
-
-        public bool IsPreloader { get; set; }
 
         #endregion
 
         #region Fields
-
         public const string InlineCss = "top:50%";
-
+        private LanguagesModel _languages;
+        private PriceBoostConfigModel _priceBoostConfigModel;
+        private bool _isPreloader;
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            IsPreloader = true;
-            Languages = ModalParameters.TryGet<LanguagesModel>("Languages");
-            PriceBoostConfigModel = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
+            _isPreloader = true;
+            _languages = ModalParameters.TryGet<LanguagesModel>("Languages");
+            _priceBoostConfigModel = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
             TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
-            IsPreloader = false;
+            _isPreloader = false;
         }
 
         public async Task OnSelectLanguage(Tuple<int, Language> args)
@@ -51,27 +48,27 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             var prevLanguage = new Language
             {
-                LanguageCode = PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].Language.LanguageCode,
-                LanguageName = PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].Language.LanguageName
+                LanguageCode = _priceBoostConfigModel.BoostedSelectionTranslations[args.Item1].Language.LanguageCode,
+                LanguageName = _priceBoostConfigModel.BoostedSelectionTranslations[args.Item1].Language.LanguageName
             };
 
-            PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].SelectLanguage = false;
-            PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].Language = args.Item2;
+            _priceBoostConfigModel.BoostedSelectionTranslations[args.Item1].SelectLanguage = false;
+            _priceBoostConfigModel.BoostedSelectionTranslations[args.Item1].Language = args.Item2;
 
-            if (!string.IsNullOrEmpty(PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].BoostedSelectionName))
-                PriceBoostConfigModel.BoostedSelectionTranslations[args.Item1].IsRequired = false;
+            if (!string.IsNullOrEmpty(_priceBoostConfigModel.BoostedSelectionTranslations[args.Item1].BoostedSelectionName))
+                _priceBoostConfigModel.BoostedSelectionTranslations[args.Item1].IsRequired = false;
 
-            Languages.Languages.Remove(args.Item2);
+            _languages.Languages.Remove(args.Item2);
             if (!string.IsNullOrEmpty(prevLanguage.LanguageCode))
-                Languages.Languages.Add(prevLanguage);
+                _languages.Languages.Add(prevLanguage);
         }
 
         public async Task OnAddSelection()
         {
-            PriceBoostConfigModel.BoostedSelectionTranslations.Add(new BoostedSelectionTranslation
+            _priceBoostConfigModel.BoostedSelectionTranslations.Add(new BoostedSelectionTranslation
             {
                 BoostedSelectionName = string.Empty,
-                ClientCode = PriceBoostConfigModel.ClientCode,
+                ClientCode = _priceBoostConfigModel.ClientCode,
                 Language = new Language
                 {
                     LanguageCode = string.Empty,
@@ -84,7 +81,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public async Task OnDeleteSelection(BoostedSelectionTranslation selection)
         {
-            PriceBoostConfigModel.BoostedSelectionTranslations.Remove(selection);
+            _priceBoostConfigModel.BoostedSelectionTranslations.Remove(selection);
 
             await InvokeAsync(StateHasChanged);
         }
@@ -96,11 +93,12 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public async Task OnSaveModalClick()
         {
-            IsPreloader = true;
+            _isPreloader = true;
+            await InvokeAsync(StateHasChanged);
 
-            if (PriceBoostConfigModel.BoostedSelectionTranslations.Any())
+            if (_priceBoostConfigModel.BoostedSelectionTranslations.Any())
             {
-                foreach (var selection in PriceBoostConfigModel.BoostedSelectionTranslations)
+                foreach (var selection in _priceBoostConfigModel.BoostedSelectionTranslations)
                 {
                     if (string.IsNullOrEmpty(selection.Language.LanguageCode) || string.IsNullOrEmpty(selection.BoostedSelectionName))
                     {
@@ -111,13 +109,13 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 }
             }
 
-            PriceBoostConfigModel.UserId = UserModel.Id;
-            PriceBoostConfigModel.UserName = UserModel.UserName;
+            _priceBoostConfigModel.UserId = UserModel.Id;
+            _priceBoostConfigModel.UserName = UserModel.UserName;
 
             string currentPriceBoostString = ModalParameters.TryGet<string>("PriceBoostConfigModelSerialized");
             var region = ModalParameters.TryGet<string>("Region") ?? string.Empty;
 
-            var result = await TradingService.AddOrUpdatePriceBoost(new List<PriceBoostConfigModel>() { PriceBoostConfigModel });
+            var result = await TradingService.AddOrUpdatePriceBoost(new List<PriceBoostConfigModel>() { _priceBoostConfigModel });
             if (result.StatusCode == StatusCode.Success)
             {
                 //remove existing from mongodb
@@ -173,13 +171,13 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 var clientBoostedSelectionNames2 = new List<ClientBoostedSelectionNameMessage>();
                 clientBoostedSelectionNames2.Add(new ClientBoostedSelectionNameMessage()
                 {
-                    ClientCode = PriceBoostConfigModel.ClientCode,
-                    BoostedSelectionName = PriceBoostConfigModel.BoostedSelectionName
+                    ClientCode = _priceBoostConfigModel.ClientCode,
+                    BoostedSelectionName = _priceBoostConfigModel.BoostedSelectionName
                 });
 
                 var clientBoostedSelectionNameTranslations2 = new List<ClientBoostedSelectionTranslationMessage>();
-                if (PriceBoostConfigModel.BoostedSelectionTranslations != null && PriceBoostConfigModel.BoostedSelectionTranslations.Any())
-                    clientBoostedSelectionNameTranslations2.AddRange(PriceBoostConfigModel.BoostedSelectionTranslations.Select(s => new ClientBoostedSelectionTranslationMessage
+                if (_priceBoostConfigModel.BoostedSelectionTranslations != null && _priceBoostConfigModel.BoostedSelectionTranslations.Any())
+                    clientBoostedSelectionNameTranslations2.AddRange(_priceBoostConfigModel.BoostedSelectionTranslations.Select(s => new ClientBoostedSelectionTranslationMessage
                     {
                         LanguageCode = s.Language.LanguageCode,
                         ClientCode = s.ClientCode,
@@ -188,16 +186,16 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
                 var payload2 = new OnPriceBoostMessage
                 {
-                    ClientCode = PriceBoostConfigModel.ClientCode,
-                    SportId = PriceBoostConfigModel.SportId,
-                    SegmentId = PriceBoostConfigModel.SegmentId,
-                    LeagueId = PriceBoostConfigModel.LeagueId,
-                    FixtureTypeId = PriceBoostConfigModel.FixtureTypeId,
-                    ProviderFixtureId = PriceBoostConfigModel.ProviderFixtureId,
-                    MarketTemplateId = PriceBoostConfigModel.MarketTemplateId,
-                    SelectionTemplateId = PriceBoostConfigModel.SelectionTemplateId,
-                    SelectionSpecifier = PriceBoostConfigModel.SelectionSpecifier,
-                    BoostedOdds = string.IsNullOrEmpty(PriceBoostConfigModel.BoostedOddsStr) ? 0 : Convert.ToDecimal(PriceBoostConfigModel.BoostedOddsStr),
+                    ClientCode = _priceBoostConfigModel.ClientCode,
+                    SportId = _priceBoostConfigModel.SportId,
+                    SegmentId = _priceBoostConfigModel.SegmentId,
+                    LeagueId = _priceBoostConfigModel.LeagueId,
+                    FixtureTypeId = _priceBoostConfigModel.FixtureTypeId,
+                    ProviderFixtureId = _priceBoostConfigModel.ProviderFixtureId,
+                    MarketTemplateId = _priceBoostConfigModel.MarketTemplateId,
+                    SelectionTemplateId = _priceBoostConfigModel.SelectionTemplateId,
+                    SelectionSpecifier = _priceBoostConfigModel.SelectionSpecifier,
+                    BoostedOdds = string.IsNullOrEmpty(_priceBoostConfigModel.BoostedOddsStr) ? 0 : Convert.ToDecimal(_priceBoostConfigModel.BoostedOddsStr),
                     IsBoosted = result.Result.IsBoosted,
                     ClientBoosted = result.Result.ClientBoosted,
                     ClientMarketBoosted = result.Result.ClientMarketBoosted,
@@ -234,25 +232,25 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
                 Backoffice.Shared.Models.PriceBoostLogModel priceBoostLogModelTo = new Backoffice.Shared.Models.PriceBoostLogModel()
                 {
-                    ClientName = PriceBoostConfigModel.ClientName,
-                    ClientCode = PriceBoostConfigModel.ClientCode,
-                    SelectionName = PriceBoostConfigModel.BoostedSelectionName,
-                    MarketName = PriceBoostConfigModel.MarketName,
-                    SportName = PriceBoostConfigModel.SportName,
-                    SegmentName = PriceBoostConfigModel.SegmentName,
-                    LeagueName = PriceBoostConfigModel.LeagueName,
-                    Odds = decimal.Parse(PriceBoostConfigModel.BoostedOddsStr),
-                    FixtureName = PriceBoostConfigModel.FixtureName,
-                    UserName = PriceBoostConfigModel.UserName,
-                    SelectionTemplateId = PriceBoostConfigModel.SelectionTemplateId,
-                    MarketSpecifier = PriceBoostConfigModel.MarketSpecifier,
-                    Translations = PriceBoostConfigModel.BoostedSelectionTranslations
+                    ClientName = _priceBoostConfigModel.ClientName,
+                    ClientCode = _priceBoostConfigModel.ClientCode,
+                    SelectionName = _priceBoostConfigModel.BoostedSelectionName,
+                    MarketName = _priceBoostConfigModel.MarketName,
+                    SportName = _priceBoostConfigModel.SportName,
+                    SegmentName = _priceBoostConfigModel.SegmentName,
+                    LeagueName = _priceBoostConfigModel.LeagueName,
+                    Odds = decimal.Parse(_priceBoostConfigModel.BoostedOddsStr),
+                    FixtureName = _priceBoostConfigModel.FixtureName,
+                    UserName = _priceBoostConfigModel.UserName,
+                    SelectionTemplateId = _priceBoostConfigModel.SelectionTemplateId,
+                    MarketSpecifier = _priceBoostConfigModel.MarketSpecifier,
+                    Translations = _priceBoostConfigModel.BoostedSelectionTranslations
                 };
 
                 var updateLogResponse = await BackOfficeService.AddActivityLog(new ActivityLogModel()
                 {
                     Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace('_', '.'),
-                    Payload = $"{PriceBoostConfigModel.ClientCode}.{PriceBoostConfigModel.SportId}.{PriceBoostConfigModel.SegmentId}.{PriceBoostConfigModel.LeagueId}",
+                    Payload = $"{_priceBoostConfigModel.ClientCode}.{_priceBoostConfigModel.SportId}.{_priceBoostConfigModel.SegmentId}.{_priceBoostConfigModel.LeagueId}",
                     Activity = Activity.Update.ToString(),
                     From = JsonSerializer.Serialize(priceBoostLogModelFrom),
                     To = JsonSerializer.Serialize(priceBoostLogModelTo),
@@ -262,7 +260,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 });
             }
 
-            IsPreloader = false;
+            _isPreloader = false;
 
             await Modal.OnSaveClickCallback.InvokeAsync("updated");
 
