@@ -12,10 +12,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Properties
         [Parameter] public string Region { get; set; } = "hk";
 
-        [Parameter]
-        [SupplyParameterFromQuery(Name = "mess")] 
-        public string? Mess { get; set; }
-
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Inject] private IModalService ModalService { get; set; }
@@ -24,6 +20,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Parameter] public List<SelectListItemModel<string>> Sports { get; set; }
         [Parameter] public List<SelectListItemModel<string>> Scopes { get; set; }
+        [Parameter] public string QueryMessage { get; set; }
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<ConfigTemplateModel> ConfigTemplates { get; set; }
 
@@ -32,7 +29,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string IconClass { get; set; }
         public int SelectedSportId { get; set; }
         public int SelectedScopeId { get; set; }
-        private AlertModel AlertModel { get; set; }
+        public AlertModel AlertModel { get; set; }
         #endregion
 
         #region Methods
@@ -41,14 +38,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsPreloader = true;
             PageTitle = "My Templates";
             IconClass = "";
-
-            AlertModel = new AlertModel();
-            if(!string.IsNullOrEmpty(Mess))
-            {
-                AlertModel.Message = Mess;
-                AlertModel.Status = AlertStatus.Success.ToString();
-                AlertModel.Opacity = 1.0m;
-            }
 
             ConfigTemplates = new List<ConfigTemplateModel>();
 
@@ -68,7 +57,16 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             await LoadConfigTemplates();
         }
-
+        protected override void OnParametersSet()
+        {
+            if (QueryMessage != null && !string.IsNullOrEmpty(QueryMessage))
+            {
+                AlertModel = new AlertModel();
+                AlertModel.Message = QueryMessage;
+                AlertModel.Status = AlertStatus.Success.ToString();
+                AlertModel.Opacity = 1.0m;
+            }
+        }
         public async Task OnLogsClickEvent()
         {
             var parameters = new ModalParameters();

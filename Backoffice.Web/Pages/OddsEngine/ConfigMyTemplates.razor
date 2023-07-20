@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        @if (!string.IsNullOrEmpty(AlertModel.Message))
+        @if (AlertModel != null && !string.IsNullOrEmpty(AlertModel.Message))
         {
             <div class="col-md-12 mb-3">
                 <div class="mt-4 mx-3">

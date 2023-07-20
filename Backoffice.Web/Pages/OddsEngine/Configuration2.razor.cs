@@ -10,6 +10,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Properties
         [Inject] private ITradingService TradingService { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
+
+        [Parameter]
+        [SupplyParameterFromQuery(Name = "M")]
+        public string? QueryMessage { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
         public List<SelectListItemModel<string>> Sports { get; set; }
@@ -19,7 +23,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         public ConfigTemplateNavMenu SelectedConfigNavMenu { get; set; }
 
         public bool IsPreleader = true;
-
         #endregion
 
         #region Methods
