@@ -8,17 +8,16 @@
     <Authorized>
         <CascadingValue Name="Region" Value="@Region">
             <div class="col-md-12">
-                <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"/>
+                <Breadcrumb Breadcrumbs="_breadcrumbs" Region="@Region" />
             </div>
             <div class="col-md-12">
                 <PageHeader PageHeaderModel="_pageHeaderModel" />
             </div>
             <div class="col-md-12">
-                <Filter @bind-SearchForm="@SearchForm" OnInitializeCallback="GetContent" OnViewAllLogsCallback="OnViewAllLogsClickEvent" />
+                <Filter OnInitializeCallback="GetContent" OnViewAllLogsCallback="OnViewAllLogsClickEvent" />
             </div>
             <div class="col-md-12">
                 <div class="mx-3 mt-4">
-
                     <table class="table table-bordered mt-3">
                         <thead>
                             <tr>
@@ -28,7 +27,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (IsPreLoader)
+                            @if (_isPreLoader)
                             {
                                 <tr>
                                     <td colspan="3">
@@ -38,20 +37,21 @@
                             }
                             else
                             {
-                                @if (ClientsView == null)
+                                @if (_clientsView != null && _clientsView.Any())
+                                {
+                                    <Virtualize Items="_clientsView" Context="client" OverscanCount="20">
+                                        <ItemContent>
+                                            <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" />
+                                        </ItemContent>
+                                    </Virtualize>
+                                }
+                                else
                                 {
                                     <tr>
                                         <td colspan="3">
                                             <NoRecordFound />
                                         </td>
                                     </tr>
-                                }
-                                else
-                                {
-                                    @foreach (var client in ClientsView)
-                                    {
-                                        <BoostedSettingsRow BoostedSettings="client" ClientId="client.ClientId" />
-                                    }
                                 }
                             }
                         </tbody>
