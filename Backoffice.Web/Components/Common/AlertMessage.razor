@@ -27,12 +27,12 @@
     protected override async Task OnParametersSetAsync()
     {
 
-        if(AlertModel !=null)
+        if (AlertModel != null)
         {
             if (AlertModel.Opacity > 1)
                 AlertModel.Opacity = 1;
 
-            if (!AlertModel.IsAlwaysShown)
+            if (!AlertModel.IsAlwaysShow)
             {
                 if (AlertModel.Opacity > 0m)
                 {
@@ -49,16 +49,6 @@
                             await Task.Delay(10);
                         }
 
-                    await InvokeAsync(StateHasChanged);
-                }
-                Opacity = 0.0m;
-                AlertMessageStr = string.Empty;
-                await OpacityChanged.InvokeAsync(Opacity);
-            }
-        }
-        else
-        {
-            Opacity = 1.00m;
                         StateHasChanged();
                     }
                     AlertModel.Opacity = 0.0m;
