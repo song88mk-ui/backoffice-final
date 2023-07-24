@@ -7,76 +7,62 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Text;
-using System.Text.Json;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class SportSettings : IAsyncDisposable, IDisposable
     {
         #region Properties
-
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
-
-        public IJSStreamReference? DataReference { get; set; }
-
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
-
         [Parameter] public string Region { get; set; } = "hk";
 
-        public string TableClass { get; set; }
-        public string ClientCode { get; set; }
-
-        public List<BreadcrumbModel> Breadcrumbs { get; set; }
-        public ClientSportsSettingsModel ModifiedClientSportsSettingsModel { get; set; }
-        public ClientSportsSettingsModel ClientSportsSettingsModel { get; set; }
-        public List<ClientSegmentSortOrderModel> ClientSegmentOrders { get; set; }
-        public List<ClientLeagueSortOrderModel> ClientLeagueOrders { get; set; }
-        public SegmentLookupResponse SegmentLookupResponse { get; set; }
-        public LeagueLookupResponse LeagueLookupResponse { get; set; }
-
-        public bool IsUpdate { get; set; }
-        public bool IsPreload { get; set; }
-
-        public string AlertMessage { get; set; }
-        public AlertStatus AlertStatus { get; set; }
-
+        public IJSStreamReference? DataReference { get; set; }
         #endregion
 
         #region Fields
         private PageHeaderModel _pageHeaderModel;
-        public static Func<int, int, Task> OnSegmentActionAsync;
-        public static Func<string, int, Task> OnUpdateSortOrderActionAsync;
-
+        private static Func<int, int, Task> OnSegmentActionAsync;
+        private static Func<string, int, Task> OnUpdateSortOrderActionAsync;
+        private List<BreadcrumbModel> _breadcrumbs;
+        private List<SportSettingSport> _modifiedClientSportsSettingsModel;
+        private List<SportSettingSport> _clientSportsSettingsModel;
+        private Task<BaseResponse<SegmentLookupResponse>> SegmentLookupTask;
+        private Task<BaseResponse<LeagueLookupResponse>> LeagueLookupTask;
+        private string _tableClass;
+        private string _clientCode;
+        private AlertModel _alertModel;
+        private bool _isUpdate;
+        private bool _isPreload;
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = Region.ToUpper();
             _pageHeaderModel = new()
             {
                 Title = "Sport Settings"
             };
 
-            TableClass = "sport-setting-table";
+            _tableClass = "sport-setting-table";
 
-            ClientSportsSettingsModel = new ClientSportsSettingsModel();
-            ModifiedClientSportsSettingsModel = new ClientSportsSettingsModel();
+            _clientSportsSettingsModel = new();
+            _modifiedClientSportsSettingsModel = new();
+            _alertModel = new();
 
-            ClientSegmentOrders = new List<ClientSegmentSortOrderModel>();
-            ClientLeagueOrders = new List<ClientLeagueSortOrderModel>();
 
             OnSegmentActionAsync = OnSegmentClickEvent;
             OnUpdateSortOrderActionAsync = OnUpdateSortOrder;
 
-            Breadcrumbs = new List<BreadcrumbModel>();
+            _breadcrumbs = new List<BreadcrumbModel>();
 
-            Breadcrumbs.Add(new BreadcrumbModel
+            _breadcrumbs.Add(new BreadcrumbModel
             {
                 Name = "Sport Settings",
                 Url = $"{Region}/odds-engine/sport-settings",
@@ -85,76 +71,66 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             await AuthenticateAccess.InvokeAsync();
 
-            //ClientInformations = (await TradingService.GetClientList()).Result;
-
-            SegmentLookupResponse = (await TradingService.GetSegmentLookup(0)).Result;
-            LeagueLookupResponse = (await TradingService.GetLeagueLookup(0, 0)).Result;
+            SegmentLookupTask = Task.Run(() => TradingService.GetSegmentLookup(0));
+            LeagueLookupTask = Task.Run(() => TradingService.GetLeagueLookup(0, 0));
         }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override void OnParametersSet()
         {
-            AlertMessage = string.Empty;
+            if (TradingService != null && Region != TradingService.Region)
+            {
+                TradingService.Region = Region.ToUpper();
+            }
         }
-
         public async Task OnClientChangedEvent(string clientCode)
         {
-            ClientCode = clientCode;
+            _clientCode = clientCode;
 
-            IsPreload = true;
+            _isPreload = true;
 
             await GetSports();
 
-            IsPreload = false;
+            _isPreload = false;
         }
 
         public async Task OnUpdateClickEvent()
         {
-            IsUpdate = true;
+            _isUpdate = true;
 
-            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
-            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{_tableClass}", ".segment-row");
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{_tableClass}", ".league-row");
 
             await InitializeSortTable("> tr.sport-row", ".sport-row");
-            await JSRuntime.InvokeVoidAsync("enableSort", $".{TableClass}");
+            await JSRuntime.InvokeVoidAsync("enableSort", $".{_tableClass}");
         }
 
         public async Task OnSaveClickEvent()
         {
-            IsPreload = true;
-            IsUpdate = false;
+            _isPreload = true;
+            _isUpdate = false;
 
-            var request = new ClientSportSettingRequest
+            var response = await TradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
             {
-                ClientCode = ClientCode,
+                ClientCode = _clientCode,
                 UserId = UserModel.Id,
                 UserName = UserModel.UserName,
                 TimeStamp = DateTime.UtcNow,
                 SportsSortOrder = GetSportSortOrder(),
-            };
-
-            var response = await TradingService.AddOrUpdateClientSportSettings(request);
+            });
 
             if (response.StatusCode == StatusCode.Success)
             {
-                ClientSportsSettingsModel = new ClientSportsSettingsModel();
-
-                Thread.Sleep(1000);
-
-                ClientSportsSettingsModel.Sports = ModifiedClientSportsSettingsModel.Sports
-                .Select((s, spIndex) => new ClientSportsSettingsModel.Sport
+                _clientSportsSettingsModel = new();
+                _clientSportsSettingsModel = _modifiedClientSportsSettingsModel
+                .Select((s, spIndex) => new SportSettingSport
                 {
                     SportId = s.SportId,
                     SportName = s.SportName,
                     SortOrder = spIndex + 1,
-                    Segments = s.Segments.Select((se, seIndex) => new ClientSportsSettingsModel.Segment
+                    Segments = s.Segments.Select((se, seIndex) => new SportSettingSegment
                     {
-                        SportId = s.SportId,
-                        SegmentId = se.SegmentId,
                         SegmentName = se.SegmentName,
-                        Leagues = se.Leagues.Select((le, leIndex) => new ClientSportsSettingsModel.League
+                        Leagues = se.Leagues.Select((le, leIndex) => new SportSettingLeague
                         {
-                            SportId = s.SportId,
-                            SegmentId = se.SegmentId,
                             LeagueId = le.LeagueId,
                             LeagueName = le.LeagueName,
                             SortOrder = leIndex + 1,
@@ -168,44 +144,50 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsOpen = s.IsOpen
                 }).ToList();
 
-                AlertMessage = "Successfully saved Sport - Segment - League ordering.";
-                AlertStatus = AlertStatus.Success;
+                _alertModel = new()
+                {
+                    Status = StatusCode.Success.ToString(),
+                    Message = "Successfully saved Sport - Segment - League ordering."
+                };
             }
             else
             {
-                AlertMessage = response.Message;
-                AlertStatus = AlertStatus.Error;
+                _alertModel = new()
+                {
+                    Status = StatusCode.Error.ToString(),
+                    Message = response.Message
+                };
             }
 
 
-            IsPreload = false;
+            _isPreload = false;
         }
 
         public async Task OnCancelClickEvent()
         {
-            IsUpdate = false;
+            _isUpdate = false;
 
-            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
-            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{_tableClass}", ".segment-row");
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{_tableClass}", ".league-row");
 
-            await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
+            await JSRuntime.InvokeVoidAsync("destroySort", $".{_tableClass}");
 
-            IsPreload = true;
+            _isPreload = true;
 
             StateHasChanged();
 
             await GetSports();
 
-            IsPreload = false;
+            _isPreload = false;
         }
 
         public async Task OnCopyClickEvent()
         {
             var parameters = new ModalParameters();
 
-            parameters.Add("FromClientCode", ClientCode);
+            parameters.Add("FromClientCode", _clientCode);
 
-            var sports = ClientSportsSettingsModel.Sports
+            var sports = _clientSportsSettingsModel
                 .Select(s => new SportsSortOrder
                 {
                     SportId = s.SportId,
@@ -237,13 +219,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }).ToList();
 
             parameters.Add("Sports", sports);
-
             parameters.Add("DialogStyle", "max-width: 600px;");
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-
-            //var client = ClientInformations.FirstOrDefault(c => c.ClientCode == ClientCode);
 
             ModalService.Open<CopyModal>($"Copy Sports Settings", parameters, options);
         }
@@ -252,7 +231,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             var parameters = new ModalParameters();
 
-            parameters.Add("ClientCode", ClientCode);
+            parameters.Add("ClientCode", _clientCode);
 
             parameters.Add("DialogStyle", "max-width: 1300px !important;");
             parameters.Add("ModalClass", "show logs-modal");
@@ -267,7 +246,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             var isActive = (bool)e.Value;
 
-            ClientSportsSettingsModel.Sports = ClientSportsSettingsModel.Sports
+            _clientSportsSettingsModel = _clientSportsSettingsModel
                 .Select(s =>
                 {
                     s.IsActive = (bool)e.Value;
@@ -276,29 +255,29 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }).ToList();
         }
 
-        public async Task OnSportClickEvent(ClientSportsSettingsModel.Sport model)
+        public async Task OnSportClickEvent(SportSettingSport model)
         {
-            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
-            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{_tableClass}", ".segment-row");
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{_tableClass}", ".league-row");
 
             // verify if there are any open rows for segment
             // if there is open then close it.
-            if (ClientSportsSettingsModel.Sports.Any(c => c.SportId != model.SportId && c.IsOpen))
+            if (_clientSportsSettingsModel.Any(c => c.SportId != model.SportId && c.IsOpen))
             {
-                var sport = ClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId != model.SportId && c.IsOpen);
+                var sport = _clientSportsSettingsModel.FirstOrDefault(c => c.SportId != model.SportId && c.IsOpen);
                 sport.IsOpen = false;
             }
 
-            if (IsUpdate)
+            if (_isUpdate)
             {
-                await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
+                await JSRuntime.InvokeVoidAsync("destroySort", $".{_tableClass}");
 
                 if (model.IsOpen)
                 {
                     model.IsOpen = false;
 
                     await JSRuntime.InvokeVoidAsync("collapseButton", ".sport-row");
-                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
+                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{_tableClass}", ".segment-row");
 
                     await InitializeSortTable("> tr.sport-row", ".sport-row");
                 }
@@ -307,7 +286,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     model.IsOpen = true;
 
                     // fetch the records on ModifiedClientSportsSettingsModel since this is the record that's being modified
-                    var modSport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
+                    var modSport = _modifiedClientSportsSettingsModel.FirstOrDefault(c => c.SportId == model.SportId);
                     var segments = modSport.Segments.Select((s, index) => new
                     {
                         Id = $"segment-{s.SportId}-{s.SegmentId}",
@@ -327,13 +306,13 @@ namespace Backoffice.Web.Pages.OddsEngine
                     model.IsOpen = false;
 
                     await JSRuntime.InvokeVoidAsync("collapseButton", ".sport-row");
-                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".segment-row");
+                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{_tableClass}", ".segment-row");
                 }
                 else
                 {
                     model.IsOpen = true;
 
-                    var modSport = ClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
+                    var modSport = _clientSportsSettingsModel.FirstOrDefault(c => c.SportId == model.SportId);
                     var segments = modSport.Segments.Select((s, index) => new
                     {
                         Id = $"segment-{s.SportId}-{s.SegmentId}",
@@ -349,35 +328,38 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnSaveCopyClickEvent()
         {
-            AlertMessage = "Sport settings copied successfully.";
-            AlertStatus = AlertStatus.Success;
+            _alertModel = new()
+            {
+                Status = StatusCode.Success.ToString(),
+                Message = "Sport settings copied successfully."
+            };
         }
 
         public async Task OnSegmentClickEvent(int sportId, int segmentId)
         {
-            await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+            await JSRuntime.InvokeVoidAsync("unloadItems", $".{_tableClass}", ".league-row");
 
-            var sport = ClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == sportId);
+            var sport = _clientSportsSettingsModel.FirstOrDefault(c => c.SportId == sportId);
             var model = sport.Segments.FirstOrDefault(c => c.SegmentId == segmentId);
 
             // verify if there are any open rows for leagues
             // if there is open then close it.
-            if (sport.Segments.Any(c => c.SportId != model.SportId && c.SegmentId != model.SegmentId && c.IsOpen))
+            var segment = sport.Segments.Where(c => c.SegmentId != model.SegmentId && c.IsOpen).ToList();
+            if (segment != null)
             {
-                var segment = sport.Segments.FirstOrDefault(c => c.SportId != model.SportId && c.SegmentId != model.SegmentId && c.IsOpen);
-                segment.IsOpen = false;
+                segment.ForEach(x => x.IsOpen = false);
             }
 
-            if (IsUpdate)
+            if (_isUpdate)
             {
-                await JSRuntime.InvokeVoidAsync("destroySort", $".{TableClass}");
+                await JSRuntime.InvokeVoidAsync("destroySort", $".{_tableClass}");
 
                 if (model.IsOpen)
                 {
                     model.IsOpen = false;
 
                     await JSRuntime.InvokeVoidAsync("collapseButton", ".segment-row");
-                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{_tableClass}", ".league-row");
 
                     await InitializeSortTable("> tr.segment-row", ".segment-row");
                 }
@@ -386,18 +368,18 @@ namespace Backoffice.Web.Pages.OddsEngine
                     model.IsOpen = true;
 
                     // fetch the records on ModifiedClientSportsSettingsModel since this is the record that's being modified
-                    var modSport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
+                    var modSport = _modifiedClientSportsSettingsModel.FirstOrDefault(c => c.SportId == sportId);
                     var modSegment = modSport.Segments.FirstOrDefault(c => c.SegmentId == model.SegmentId);
 
                     var leagues = modSegment.Leagues.Select((s, index) => new
                     {
-                        Id = $"league-{s.SportId}-{s.SegmentId}-{s.LeagueId}",
+                        Id = $"league-{sportId}-{model.SegmentId}-{s.LeagueId}",
                         LeagueName = s.LeagueName,
                         SortOrder = s.SortOrder,
                         RowClass = "league-row"
                     }).ToList();
 
-                    await JSRuntime.InvokeVoidAsync("loadLeagueItems", $"#segment-{model.SportId}-{model.SegmentId}", leagues);
+                    await JSRuntime.InvokeVoidAsync("loadLeagueItems", $"#segment-{sportId}-{model.SegmentId}", leagues);
                     await InitializeSortTable("> tr.league-row", ".league-row");
                 }
             }
@@ -408,46 +390,44 @@ namespace Backoffice.Web.Pages.OddsEngine
                     model.IsOpen = false;
 
                     await JSRuntime.InvokeVoidAsync("collapseButton", ".segment-row");
-                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{TableClass}", ".league-row");
+                    await JSRuntime.InvokeVoidAsync("unloadItems", $".{_tableClass}", ".league-row");
                 }
                 else
                 {
                     model.IsOpen = true;
 
-                    var modSport = ClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == model.SportId);
+                    var modSport = _clientSportsSettingsModel.FirstOrDefault(c => c.SportId == sportId);
                     var modSegment = modSport.Segments.FirstOrDefault(c => c.SegmentId == model.SegmentId);
 
                     var leagues = modSegment.Leagues.Select((s, index) => new
                     {
-                        Id = $"league-{s.SportId}-{s.SegmentId}-{s.LeagueId}",
+                        Id = $"league-{sportId}-{model.SegmentId}-{s.LeagueId}",
                         LeagueName = s.LeagueName,
                         SortOrder = s.SortOrder,
                         RowClass = "league-row"
                     }).ToList();
 
-                    await JSRuntime.InvokeVoidAsync("loadLeagueItems", $"#segment-{model.SportId}-{model.SegmentId}", leagues);
+                    await JSRuntime.InvokeVoidAsync("loadLeagueItems", $"#segment-{sportId}-{model.SegmentId}", leagues);
                 }
             }
-
         }
 
         public async Task OnUpdateSortOrder(string id, int index)
         {
             // update the index of an element inside the list which is (ModifiedClientSportsSettingsModel)
             var splitId = id.Split('-');
-
             if (splitId[0].ToLower() == "sport")
             {
                 var sportId = int.Parse(splitId[1]);
-                var sport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == sportId);
+                var sport = _modifiedClientSportsSettingsModel.FirstOrDefault(c => c.SportId == sportId);
 
-                ModifiedClientSportsSettingsModel.Sports.Remove(sport);
-                ModifiedClientSportsSettingsModel.Sports.Insert(index, sport);
+                _modifiedClientSportsSettingsModel.Remove(sport);
+                _modifiedClientSportsSettingsModel.Insert(index, sport);
             }
             else if (splitId[0].ToLower() == "segment")
             {
                 var sportId = int.Parse(splitId[1]);
-                var sport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == sportId);
+                var sport = _modifiedClientSportsSettingsModel.FirstOrDefault(c => c.SportId == sportId);
 
                 var segmentId = int.Parse(splitId[2]);
                 var segment = sport.Segments.FirstOrDefault(c => c.SegmentId == segmentId);
@@ -458,7 +438,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             else if (splitId[0].ToLower() == "league")
             {
                 var sportId = int.Parse(splitId[1]);
-                var sport = ModifiedClientSportsSettingsModel.Sports.FirstOrDefault(c => c.SportId == sportId);
+                var sport = _modifiedClientSportsSettingsModel.FirstOrDefault(c => c.SportId == sportId);
 
                 var segmentId = int.Parse(splitId[2]);
                 var segment = sport.Segments.FirstOrDefault(c => c.SegmentId == segmentId);
@@ -510,20 +490,22 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task GetSports()
         {
-            if (string.IsNullOrEmpty(ClientCode))
+            var clientSports = new List<SportSettingSport>();
+            if (string.IsNullOrEmpty(_clientCode))
             {
-                ClientSportsSettingsModel.Sports = new List<ClientSportsSettingsModel.Sport>();
+                _clientSportsSettingsModel = new List<SportSettingSport>();
                 return;
             }
 
             var clientSegmentResponse = await TradingService.GetClientSegmentOrderList(new ClientSegmentOrderListRequest
             {
-                ClientCode = ClientCode
+                ClientCode = _clientCode
             });
 
+            var clientSegmentOrders = new List<ClientSegmentSortOrderModel>();
             if (clientSegmentResponse.StatusCode == StatusCode.Success)
             {
-                ClientSegmentOrders = clientSegmentResponse.Result
+                clientSegmentOrders = clientSegmentResponse.Result
                     .Select(s => new ClientSegmentSortOrderModel
                     {
                         ClientCode = s.ClientCode,
@@ -539,12 +521,13 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var clientLeagueResponse = await TradingService.GetClientLeagueOrderList(new ClientLeagueOrderListRequest
             {
-                ClientCode = ClientCode
+                ClientCode = _clientCode
             });
 
+            var clientLeagueOrders = new List<ClientLeagueSortOrderModel>();
             if (clientLeagueResponse.StatusCode == StatusCode.Success)
             {
-                ClientLeagueOrders = clientLeagueResponse.Result
+                clientLeagueOrders = clientLeagueResponse.Result
                     .Select(s => new ClientLeagueSortOrderModel
                     {
                         ClientCode = s.ClientCode,
@@ -562,19 +545,23 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var clientSportsOrderResponse = await TradingService.GetClientSportOrderList(new ClientSportOrderListRequest
             {
-                ClientCode = ClientCode
+                ClientCode = _clientCode
             });
+
+            await Task.WhenAll(LeagueLookupTask, SegmentLookupTask);
+
+            var leagueLookupResponse = LeagueLookupTask.Result.Result;
+            var segmentLookupResponse = SegmentLookupTask.Result.Result;
 
             if (clientSportsOrderResponse.StatusCode == StatusCode.Success)
             {
-
-                var leagues = LeagueLookupResponse.LeagueLookup.GroupJoin(ClientLeagueOrders,
+                var leagues = leagueLookupResponse.LeagueLookup.GroupJoin(clientLeagueOrders,
                         le => new { le.SportId, le.SegmentId, le.LeagueId },
                         so => new { so.SportId, so.SegmentId, so.LeagueId },
                         (le, so) => new { Lookup = le, LookupOrder = so })
                         .SelectMany(
                         temp => temp.LookupOrder.DefaultIfEmpty(),
-                        (temp, s) => new ClientSportsSettingsModel.League
+                        (temp, s) => new SportSettingLeague
                         {
                             SportId = temp.Lookup.SportId,
                             SegmentId = temp.Lookup.SegmentId,
@@ -586,13 +573,13 @@ namespace Backoffice.Web.Pages.OddsEngine
                         .OrderBy(o => o.SortOrder)
                         .ToList();
 
-                var segments = SegmentLookupResponse.SegmentLookup.GroupJoin(ClientSegmentOrders,
+                var segments = segmentLookupResponse.SegmentLookup.GroupJoin(clientSegmentOrders,
                     seg => new { seg.SportId, seg.SegmentId },
                     lp => new { lp.SportId, lp.SegmentId },
                     (seg, lp) => new { Lookup = seg, LookupOrder = lp })
                     .SelectMany(
                     temp => temp.LookupOrder.DefaultIfEmpty(),
-                    (temp, s) => new ClientSportsSettingsModel.Segment
+                    (temp, s) => new SportSettingSegment
                     {
                         SportId = temp.Lookup.SportId,
                         SegmentId = temp.Lookup.SegmentId,
@@ -605,8 +592,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     .OrderBy(o => o.SortOrder)
                     .ToList();
 
-                ClientSportsSettingsModel.Sports = clientSportsOrderResponse.Result
-                    .Select(sp => new ClientSportsSettingsModel.Sport
+                _clientSportsSettingsModel = clientSportsOrderResponse.Result
+                    .Select(sp => new SportSettingSport
                     {
                         SportId = sp.SportId,
                         SportName = sp.SportName.TrimEnd(),
@@ -619,17 +606,17 @@ namespace Backoffice.Web.Pages.OddsEngine
                     .ToList();
             }
 
-            ModifiedClientSportsSettingsModel = ClientSportsSettingsModel;
+            _modifiedClientSportsSettingsModel = _clientSportsSettingsModel;
         }
 
         private async Task InitializeSortTable(string rowSelector, string categorySelector)
         {
-            await JSRuntime.InvokeVoidAsync("initSortItems", $".{TableClass}", rowSelector, ".drag-handle", categorySelector);
+            await JSRuntime.InvokeVoidAsync("initSortItems", $".{_tableClass}", rowSelector, ".drag-handle", categorySelector);
         }
 
         private List<SportsSortOrder> GetSportSortOrder()
         {
-            var result = ModifiedClientSportsSettingsModel.Sports
+            var result = _modifiedClientSportsSettingsModel
                 .Select((s, spIndex) => new SportsSortOrder
                 {
                     SportId = s.SportId,

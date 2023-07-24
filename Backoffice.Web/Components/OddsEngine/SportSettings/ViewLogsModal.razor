@@ -20,8 +20,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var model in ClientSportOrderAudit)
-                            {
+                            <Virtualize Items="ClientSportOrderAudit" Context="model">
                                 <tr>
                                     <td>
                                         @model.TimeStamp.ToLocalTime().ToString("MM/dd/yyyy") <br>
@@ -36,7 +35,7 @@
                                     </td>
                                     <td>@model.UserName</td>
                                 </tr>
-                            }
+                            </Virtualize>
                         </tbody>
                     </table>
                 }

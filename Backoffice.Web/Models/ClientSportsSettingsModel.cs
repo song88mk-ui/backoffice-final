@@ -1,58 +1,58 @@
-﻿namespace Backoffice.Web.Models
+﻿using Backoffice.Shared.Models;
+
+namespace Backoffice.Web.Models
 {
     public class ClientSportsSettingsModel
     {
         public ClientSportsSettingsModel()
         {
-            Sports = new List<Sport>();
+            Sports = new List<SportSettingSport>();
         }
 
-        public List<Sport> Sports { get; set; }
-
-        #region Nested Class
-
-        public class Sport
+        public List<SportSettingSport> Sports { get; set; }
+    }
+    public class SportSettingSport
+    {
+        public SportSettingSport()
         {
-            public Sport()
-            {
-                Segments = new List<Segment>();
-            }
-
-            public int SportId { get; set; }
-            public string SportName { get; set; }
-            public List<Segment> Segments { get; set; }
-            public int SortOrder { get; set; }
-            public bool IsActive { get; set; }
-            public bool IsOpen { get; set; }
-
+            Segments = new List<SportSettingSegment>();
         }
 
-        public class Segment
+        public int SportId { get; set; }
+
+        public string SportName { get; set; }
+
+        public int SortOrder { get; set; }
+
+        public List<SportSettingSegment> Segments { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsOpen { get; set; }
+
+    }
+
+    public class SportSettingSegment
+    {
+        public SportSettingSegment()
         {
-            public Segment()
-            {
-                Leagues = new List<League>();
-            }
-
-            public int SportId { get; set; }
-            public int SegmentId { get; set; }
-            public string SegmentName { get; set; }
-            public List<League> Leagues { get; set; }
-            public int SortOrder { get; set; }
-            public bool IsActive { get; set; }
-            public bool IsOpen { get; set; }
+            Leagues = new List<SportSettingLeague>();
         }
 
-        public class League
-        {
-            public int SportId { get; set; }
-            public int SegmentId { get; set; }
-            public int LeagueId { get; set; }
-            public string LeagueName { get; set; }
-            public int SortOrder { get; set; }
-            public bool IsActive { get; set; }
-        }
+        public int SportId { get; set; }
+        public int SegmentId { get; set; }
+        public string SegmentName { get; set; }
+        public int SortOrder { get; set; }
+        public List<SportSettingLeague> Leagues { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsOpen { get; set; }
+    }
 
-        #endregion
+    public class SportSettingLeague
+    {
+        public int SportId { get; set; }
+        public int SegmentId { get; set; }
+        public int LeagueId { get; set; }
+        public string LeagueName { get; set; }
+        public int SortOrder { get; set; }
+        public bool IsActive { get; set; }
     }
 }
