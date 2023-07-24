@@ -7,39 +7,39 @@
 <AuthorizeView Policy="sbc-sports-setting">
     <Authorized>
         <div class="col-md-12">
-            <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"/>
+            <Breadcrumb Breadcrumbs="_breadcrumbs" Region="@Region" />
         </div>
         <div class="col-md-12">
             <PageHeader PageHeaderModel="_pageHeaderModel" />
         </div>
 
-        @if (!string.IsNullOrEmpty(AlertMessage))
+        @if (_alertModel != null && !string.IsNullOrEmpty(_alertModel.Message))
         {
             <div class="col-md-12">
                 <div class="mt-4 mx-3">
-                    <AlertMessage AlertMessageStr="@AlertMessage" AlertStatus="@(AlertStatus.ToString())" AlwaysShow="true" />
+                    <AlertMessage AlertModel="@_alertModel" />
                 </div>
             </div>
         }
 
         <div class="col-md-12">
-            <Filter OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickCallback="OnCancelClickEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyClickCallback="OnCopyClickEvent" OnViewLogsCallback="OnViewLogsClickEvent" IsPreload="IsPreload" Region="Region"/>
+            <Filter OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickCallback="OnCancelClickEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyClickCallback="OnCopyClickEvent" OnViewLogsCallback="OnViewLogsClickEvent" IsPreload="_isPreload" Region="Region" />
         </div>
         <div class="col-md-12">
             <div class="mx-3 mt-4">
-                @if (IsPreload)
+                @if (_isPreload)
                 {
                     <Preloader />
                 }
                 else
                 {
-                    <table class="table table-hover table-bordered @TableClass">
+                    <table class="table table-hover table-bordered @_tableClass">
                         <thead class="table-head">
                             <tr>
                                 <th class="th-no py-3">#</th>
                                 <th class="th-checkbox py-3">
                                     <div class="form-check d-flex justify-content-center">
-                                        <input class="form-check-input" type="checkbox" @onchange="e => OnActiveHeaderChangedEvent(e)" disabled="@(!IsUpdate)">
+                                        <input class="form-check-input" type="checkbox" @onchange="e => OnActiveHeaderChangedEvent(e)" disabled="@(!_isUpdate)">
                                     </div>
                                 </th>
                                 <th class="th-sports py-3">Sports</th>
@@ -47,22 +47,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (ClientSportsSettingsModel.Sports.Any())
+                            @if (_clientSportsSettingsModel.Any())
                             {
-
-                                foreach (var sport in ClientSportsSettingsModel.Sports)
-                                {
+                                <Virtualize Items="_clientSportsSettingsModel" Context="sport">
                                     <tr @key="@($"sport-{sport.SportId}")" id="sport-@sport.SportId" class="sport-row">
                                         <td class="text-center fw-bold">@sport.SortOrder</td>
                                         <td>
                                             <div class="form-check d-flex justify-content-center">
-                                                <input class="form-check-input" type="checkbox" @bind="sport.IsActive" disabled="@(!IsUpdate)">
+                                                <input class="form-check-input" type="checkbox" @bind="sport.IsActive" disabled="@(!_isUpdate)">
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex justify-content-between">
                                                 <span>@sport.SportName</span>
-                                                <span class="dropdown-cat dropdown-segment @(IsUpdate ? "" : "disabled")">
+                                                <span class="dropdown-cat dropdown-segment @(_isUpdate ? "" : "disabled")">
                                                     <i class="fa fa-chevron-down" @onclick="() => OnSportClickEvent(sport)"></i>
                                                 </span>
                                             </div>
@@ -73,7 +71,7 @@
                                             </a>
                                         </td>
                                     </tr>
-                                }
+                                </Virtualize>
                             }
                         </tbody>
                     </table>
