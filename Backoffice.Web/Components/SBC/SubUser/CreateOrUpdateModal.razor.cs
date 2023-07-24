@@ -180,7 +180,7 @@ namespace Backoffice.Web.Components.SBC.SubUser
             {
                 Alerts.Add(new AlertModel
                 {
-                    Status = "Error",
+                    Status = AlertStatus.Error,
                     Message = "Sub Username is required",
                     Opacity = Opacity
                 });
@@ -190,7 +190,7 @@ namespace Backoffice.Web.Components.SBC.SubUser
             {
                 Alerts.Add(new AlertModel
                 {
-                    Status = "Error",
+                    Status = AlertStatus.Error,
                     Message = "Nickname is required",
                     Opacity = Opacity
                 });
@@ -200,7 +200,7 @@ namespace Backoffice.Web.Components.SBC.SubUser
             {
                 Alerts.Add(new AlertModel
                 {
-                    Status = "Error",
+                    Status = AlertStatus.Error,
                     Message = "Password is required",
                     Opacity = Opacity
                 });
@@ -209,7 +209,7 @@ namespace Backoffice.Web.Components.SBC.SubUser
             {
                 Alerts.Add(new AlertModel
                 {
-                    Status = "Error",
+                    Status = AlertStatus.Error,
                     Message = "Password length must be between 8 to 15",
                     Opacity = Opacity
 
@@ -261,7 +261,7 @@ namespace Backoffice.Web.Components.SBC.SubUser
                 {
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = $"{response.Message}",
                         Opacity = Opacity
                     });
@@ -281,7 +281,7 @@ namespace Backoffice.Web.Components.SBC.SubUser
                 {
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = $"{response.Message}",
                         Opacity = Opacity
                     });

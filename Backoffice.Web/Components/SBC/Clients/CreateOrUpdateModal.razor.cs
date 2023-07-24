@@ -289,7 +289,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                         {
                             Alerts.Add(new AlertModel
                             {
-                                Status = "Error",
+                                Status = AlertStatus.Error,
                                 Message = $"{message}",
                                 Opacity = Opacity
                             });
@@ -303,7 +303,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                 {
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Business Name is required",
                         Opacity = Opacity
                     });
@@ -313,7 +313,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                 {
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Brand Name is required",
                         Opacity = Opacity
                     });
@@ -334,7 +334,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                         {
                             Alerts.Add(new AlertModel
                             {
-                                Status = "Error",
+                                Status = AlertStatus.Error,
                                 Message = message,
                                 Opacity = Opacity
                             });
@@ -348,7 +348,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                         {
                             Alerts.Add(new AlertModel
                             {
-                                Status = "Error",
+                                Status = AlertStatus.Error,
                                 Message = message,
                                 Opacity = Opacity
                             });
@@ -362,7 +362,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                         {
                             Alerts.Add(new AlertModel
                             {
-                                Status = "Error",
+                                Status = AlertStatus.Error,
                                 Message = message,
                                 Opacity = Opacity
                             });
@@ -501,7 +501,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                 {
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = $"{response.Message}",
                         Opacity = Opacity
                     });

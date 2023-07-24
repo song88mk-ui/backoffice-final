@@ -169,7 +169,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     _alertModel = new AlertModel
                     {
                         Opacity = 1m,
-                        Status = AlertStatus.Success.ToString(),
+                        Status = AlertStatus.Success,
                         Message = $"{model.FixtureName} has been successfully closed."
                     };
                 }
@@ -178,7 +178,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     _alertModel = new AlertModel
                     {
                         Opacity = 1m,
-                        Status = AlertStatus.Error.ToString(),
+                        Status = AlertStatus.Error,
                         Message = $"{model.FixtureName} is NOT closed successfully."
                     };
                 }

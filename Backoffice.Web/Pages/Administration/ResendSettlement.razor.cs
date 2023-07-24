@@ -82,9 +82,9 @@ namespace Backoffice.Web.Pages.Administration
                     {
                         Alerts = new List<AlertModel>();
 
-                        Alerts.Add(new AlertModel()
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
+                            Status = AlertStatus.Error,
                             Message = "Duplicate BetId's are not allowed",
                             Opacity = 1.0m
                         });
@@ -139,7 +139,7 @@ namespace Backoffice.Web.Pages.Administration
                 {
                     Alerts.Add(new AlertModel()
                     {
-                        Status = StatusCode.Error.ToString(),
+                        Status = AlertStatus.Error,
                         Message = "Rejected bet are not allowed to be resent to Operator",
                         Opacity = 1.0m
                     });
@@ -186,7 +186,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 Alerts.Add(new AlertModel()
                 {
-                    Status = StatusCode.Error.ToString(),
+                    Status = AlertStatus.Error,
                     Message = StatusCode.Resend_Attempt_Not_Successful_Please_Try_Again.ToString().Replace('_', ' '),
                     Opacity = 1.0m
                 });
@@ -197,7 +197,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 Alerts.Add(new AlertModel()
                 {
-                    Status = response.StatusCode.ToString(),
+                    Status = AlertStatus.Error,
                     Message = response.Result.Data.FirstOrDefault().Message,
                     Opacity = 1.0m
                 });
@@ -208,7 +208,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 Alerts.Add(new AlertModel()
                 {
-                    Status = response.StatusCode.ToString(),
+                    Status = AlertStatus.Success,
                     Message = "Resend to operator of bet settlement, cashout, and/or cancellation successful",
                     Opacity = 1.0m
                 });

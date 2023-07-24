@@ -1,4 +1,5 @@
-﻿using Backoffice.Web.Components.Administration.Maintenance;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Components.Administration.Maintenance;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -97,11 +98,10 @@ namespace Backoffice.Web.Pages.Administration
             }
             else
             {
-                AlertModel = new AlertModel()
+                AlertModel = new()
                 {
-                    Status = "Error",
+                    Status = AlertStatus.Error,
                     Message = result.Message,
-                    Opacity = 1m
                 };
             }
 

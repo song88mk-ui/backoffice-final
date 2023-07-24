@@ -175,7 +175,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             Alerts.Clear();
             Alerts.Add(new AlertModel
             {
-                Status = "Success",
+                Status = AlertStatus.Success,
                 Message = (bool)item ? "Selected Market has been closed successfully" : "Client successfully created",
                 Opacity = Opacity
             });

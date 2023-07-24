@@ -192,7 +192,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
                     Alerts.Add(new AlertModel()
                     {
-                        Status = AlertStatus.Error.ToString(),
+                        Status = AlertStatus.Error,
                         Message = "Rejected, Cancelled and Cashout bets cannot be resettled!",
                         Opacity = 1.0m
                     });
@@ -206,7 +206,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
                     Alerts.Add(new AlertModel()
                     {
-                        Status = AlertStatus.Error.ToString(),
+                        Status = AlertStatus.Error,
                         Message = "Duplicate BetId's are not allowed",
                         Opacity = 1.0m
                     });

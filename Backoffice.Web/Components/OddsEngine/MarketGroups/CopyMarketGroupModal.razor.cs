@@ -157,7 +157,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             if (string.IsNullOrEmpty(SelectedClientCode) || SelectedSportId <= 0 || SelectedFixtureStatusId <= -1)
             {
                 AlertModel.Message = "Please select all options in order to copy Market Group.";
-                AlertModel.Status = "Error!";
+                AlertModel.Status = AlertStatus.Error;
                 AlertModel.Opacity = 1.0m;
                 IsPreLoader = false;
                 return;

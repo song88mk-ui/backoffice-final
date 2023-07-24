@@ -110,18 +110,18 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
                 if (string.IsNullOrEmpty(UserGroup.UserGroupName))
                 {
-                    Alerts.Add(new AlertModel
+                    Alerts.Add(new()
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "User Group Name is required",
                         Opacity = Opacity
                     });
                 }
                 else if (UserGroup.UserGroupName.ToLower().Equals("super admin") || UserGroup.UserGroupName.ToLower().Equals("superadmin"))
                 {
-                    Alerts.Add(new AlertModel
+                    Alerts.Add(new()
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Invalid User Group Name ",
                         Opacity = Opacity
                     });
@@ -187,9 +187,9 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 }
                 else
                 {
-                    Alerts.Add(new AlertModel
+                    Alerts.Add(new()
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = $"{response.Message}",
                         Opacity = Opacity
                     });

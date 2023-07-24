@@ -70,7 +70,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _alertModel = new()
             {
                 Message = "% Cap has been successfully updated!",
-                Status = AlertStatus.Success.ToString(),
+                Status = AlertStatus.Success,
                 Opacity = 1
             };
 

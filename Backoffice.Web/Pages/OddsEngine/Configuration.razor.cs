@@ -803,7 +803,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             Alerts.Add(new AlertModel()
             {
-                Status = status.ToString(),
+                Status = status,
                 Message = message,
                 Opacity = 1.0m
             });
@@ -817,9 +817,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             Alerts.Clear();
 
-            Alerts.Add(new AlertModel()
+            Alerts.Add(new()
             {
-                Status = AlertStatus.Success.ToString(),
+                Status = AlertStatus.Success,
                 Message = "Success! Copy Client Settings is being generated. System will notify once done.",
                 Opacity = 1.0m
             });

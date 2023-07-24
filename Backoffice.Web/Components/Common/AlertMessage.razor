@@ -1,8 +1,8 @@
 ﻿@using Backoffice.Web.Models;
-@if (!string.IsNullOrEmpty(AlertModel.Status) && !string.IsNullOrEmpty(AlertModel.Message) && AlertModel.Opacity > 0)
+@if (!string.IsNullOrEmpty(AlertModel.Message) && AlertModel.Opacity > 0)
 {
     <div>
-        <div class=@($"alert {(AlertModel.Status.Contains("Success") ? "alert-success" : AlertModel.Status.Contains("Error") || AlertModel.Status.Contains("Danger") ? "alert-danger" : "alert-primary")} text-left") role="alert" style="@(AlertModel.Opacity == 0 ? $"display: none; opacity: {AlertModel.Opacity}" : $"display: block; opacity: {AlertModel.Opacity}")">
+        <div class="alert @_alertClass text-left" role="alert" style="@(AlertModel.Opacity == 0 ? $"display: none;" : $"display: block;") opacity: {AlertModel.Opacity}">
             @if (IsHtmlMessage)
             {
                 @((MarkupString)AlertModel.Message)
@@ -19,16 +19,29 @@
 
 @code {
     [Parameter] public EventCallback<decimal> OpacityChanged { get; set; }
-    [Parameter] public AlertModel AlertModel { get; set; }
+    [Parameter] public AlertModel AlertModel { get; set; } = new();
     [Parameter] public Guid Guid { get; set; }
     [Parameter] public bool IsHtmlMessage { get; set; } = false;
+    private string _alertClass = "";
 
     #region Methods
     protected override async Task OnParametersSetAsync()
     {
-
         if (AlertModel != null)
         {
+            switch (AlertModel.Status)
+            {
+                case AlertStatus.Success:
+                    _alertClass = "alert-success";
+                    break;
+                case AlertStatus.Error:
+                    _alertClass = "alert-danger";
+                    break;
+                default:
+                    _alertClass = "alert-primary";
+                    break;
+            }
+
             if (AlertModel.Opacity > 1)
                 AlertModel.Opacity = 1;
 

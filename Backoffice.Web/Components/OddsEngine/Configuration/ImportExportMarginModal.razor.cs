@@ -142,7 +142,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                         Alerts.Add(new AlertModel()
                         {
-                            Status = AlertStatus.Error.ToString(),
+                            Status = AlertStatus.Error,
                             Message = "Error! Please zip an excel file only",
                             Opacity = 1.0m
                         });
@@ -183,7 +183,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                     Alerts.Add(new AlertModel()
                     {
-                        Status = AlertStatus.Error.ToString(),
+                        Status = AlertStatus.Error,
                         Message = $"Invalid file type",
                         Opacity = 1.0m
                     });
@@ -201,7 +201,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                 Alerts.Add(new AlertModel()
                 {
-                    Status = AlertStatus.Error.ToString(),
+                    Status = AlertStatus.Error,
                     Message = $"{ex.Message}",
                     Opacity = 1.0m
                 });
