@@ -225,7 +225,7 @@ namespace Backoffice.Web.Pages.SBC
             Alerts.Clear();
             Alerts.Add(new AlertModel
             {
-                Status = "Success",
+                Status = AlertStatus.Success,
                 Message = (bool)item ? "Client successfully updated" : "Client successfully created",
                 Opacity = Opacity
             });

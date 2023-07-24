@@ -88,7 +88,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 Alerts.Add(new AlertModel()
                 {
-                    Status = response.StatusCode.ToString(),
+                    Status = AlertStatus.Success,
                     Message = "BetId's have been successfully settled",
                     Opacity = 1.0m
                 });
@@ -99,7 +99,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 Alerts.Add(new AlertModel()
                 {
-                    Status = response.StatusCode.ToString(),
+                    Status = AlertStatus.Error,
                     Message = response.Message,
                     Opacity = 1.0m
                 });

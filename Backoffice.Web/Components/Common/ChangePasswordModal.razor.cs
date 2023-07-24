@@ -52,7 +52,7 @@ namespace Backoffice.Web.Components.Common
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = AlertStatus.Success.ToString(),
+                        Status = AlertStatus.Success,
                         Message = "Password successfully updated",
                         Opacity = 1.0m
                     });
@@ -66,7 +66,7 @@ namespace Backoffice.Web.Components.Common
 
                     Alerts.Add(new AlertModel() 
                     {
-                        Status = AlertStatus.Error.ToString(),
+                        Status = AlertStatus.Error,
                         Message = $"An error has occured: {response.Message}",
                         Opacity = 1.0m
                     });
@@ -102,7 +102,7 @@ namespace Backoffice.Web.Components.Common
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password must match",
                         Opacity = 1.0m
                     });
@@ -115,7 +115,7 @@ namespace Backoffice.Web.Components.Common
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password must be between 8 to 15 character long.",
                         Opacity = 1.0m
                     });
@@ -128,7 +128,7 @@ namespace Backoffice.Web.Components.Common
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password should contain lowercase characters.",
                         Opacity = 1.0m
                     });
@@ -140,7 +140,7 @@ namespace Backoffice.Web.Components.Common
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password should contain uppercase characters.",
                         Opacity = 1.0m
                     });
@@ -152,7 +152,7 @@ namespace Backoffice.Web.Components.Common
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password should contain any digit from 0-9.",
                         Opacity = 1.0m
                     });
@@ -166,7 +166,7 @@ namespace Backoffice.Web.Components.Common
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password must include at least one special character.",
                         Opacity = 1.0m
                     });
@@ -179,7 +179,7 @@ namespace Backoffice.Web.Components.Common
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password should not contain spaces.",
                         Opacity = 1.0m
                     });
@@ -192,7 +192,7 @@ namespace Backoffice.Web.Components.Common
 
                 Alerts.Add(new AlertModel
                 {
-                    Status = "Error",
+                    Status = AlertStatus.Error,
                     Message = "Password must not be empty.",
                     Opacity = 1.0m
                 });
@@ -206,7 +206,7 @@ namespace Backoffice.Web.Components.Common
 
                 Alerts.Add(new AlertModel
                 {
-                    Status = "Error",
+                    Status = AlertStatus.Error,
                     Message = "Password must be 8-15 characters long, which should contain uppercase and lowercase characters, with any digit from 0-9, and must include at least one special character.",
                     Opacity = 1.0m
                 });

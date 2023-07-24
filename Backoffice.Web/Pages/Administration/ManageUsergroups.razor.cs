@@ -26,7 +26,6 @@ namespace Backoffice.Web.Pages.Administration
         public ClientModel ClientModel { get; set; }
         public List<AlertModel> Alerts { get; set; }
 
-        public decimal Opacity { get; set; }
         public bool IsPreLoader { get; set; }
 
         #endregion
@@ -42,7 +41,6 @@ namespace Backoffice.Web.Pages.Administration
                 Title = "Manage User Group",
                 IconClass = "ico ico-manage-user-group"
             };
-            Opacity = 0m;
             IsPreLoader = true;
             Alerts = new List<AlertModel>();
             UserGroupListModel = new UserGroupListResponse();
@@ -181,8 +179,6 @@ namespace Backoffice.Web.Pages.Administration
 
         public async Task OnSaveClickEvent(object item)
         {
-            Opacity = Opacity == 1m ? 0.99m : 1m;
-
             var message = "User Group successfully created";
 
             if (item.ToString() == "EDIT")
@@ -193,9 +189,8 @@ namespace Backoffice.Web.Pages.Administration
             Alerts.Clear();
             Alerts.Add(new AlertModel
             {
-                Status = "Success",
+                Status = AlertStatus.Success,
                 Message = message,
-                Opacity = Opacity
             });
 
             UserGroupListModel = await GetUserGroupList(UserGroupCallbackModel.SearchText, UserGroupCallbackModel.SortBy, MetaData.CurrentPage);

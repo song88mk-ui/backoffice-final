@@ -19,7 +19,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IBackOfficeService BackOfficeService { get; set; }
-        [Inject] public IJSRuntime JSRuntime { get; set; }        
+        [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
@@ -88,7 +88,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password must be between 8 to 15 character long.",
                         Opacity = 1.0m
                     });
@@ -101,7 +101,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password should contain lowercase characters.",
                         Opacity = 1.0m
                     });
@@ -113,7 +113,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password should contain uppercase characters.",
                         Opacity = 1.0m
                     });
@@ -125,7 +125,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password should contain any digit from 0-9.",
                         Opacity = 1.0m
                     });
@@ -139,7 +139,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password must include at least one special character.",
                         Opacity = 1.0m
                     });
@@ -152,7 +152,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Password should not contain spaces.",
                         Opacity = 1.0m
                     });
@@ -169,7 +169,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
                         Alerts.Add(new AlertModel
                         {
-                            Status = "Error",
+                            Status = AlertStatus.Error,
                             Message = "Password must be between 8 to 15 character long.",
                             Opacity = 1.0m
                         });
@@ -180,11 +180,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         IsValidPassword = false;
                         passwordErrorCount++;
 
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
-                            Message = "Password should contain lowercase characters.",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = "Password should contain lowercase characters."
                         });
                     }
                     if (!UserRegister.Password.Any(char.IsUpper))
@@ -192,11 +191,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         IsValidPassword = false;
                         passwordErrorCount++;
 
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
-                            Message = "Password should contain uppercase characters.",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = "Password should contain uppercase characters."
                         });
                     }
                     if (!UserRegister.Password.Any(char.IsDigit))
@@ -204,11 +202,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         IsValidPassword = false;
                         passwordErrorCount++;
 
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
-                            Message = "Password should contain any digit from 0-9.",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = "Password should contain any digit from 0-9."
                         });
                     }
 
@@ -218,11 +215,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         IsValidPassword = false;
                         passwordErrorCount++;
 
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
-                            Message = "Password must include at least one special character.",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = "Password must include at least one special character."
                         });
                     }
 
@@ -231,11 +227,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         IsValidPassword = false;
                         passwordErrorCount++;
 
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
-                            Message = "Password should not contain spaces.",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = "Password should not contain spaces."
                         });
                     }
                 }
@@ -279,7 +274,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     {
                         await InvokeAsync(StateHasChanged);
                         await Task.Delay(3500);
-                        
+
                         await Modal.OnSaveClickCallback.InvokeAsync(new Tuple<UserRegisterRequest, bool>(request, false));
                         ModalService.Cancel();
                     }
@@ -287,7 +282,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     {
                         Alerts.Add(new AlertModel
                         {
-                            Status = "Error",
+                            Status = AlertStatus.Error,
                             Message = $"{response.Message}",
                             Opacity = 1.0m
                         });
@@ -301,7 +296,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     {
 
                         await InvokeAsync(StateHasChanged);
-                        await Task.Delay(3500);                        
+                        await Task.Delay(3500);
 
                         await Modal.OnSaveClickCallback.InvokeAsync(new Tuple<UserRegisterRequest, bool>(request, false));
                         ModalService.Cancel();
@@ -310,7 +305,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     {
                         Alerts.Add(new AlertModel
                         {
-                            Status = "Error",
+                            Status = AlertStatus.Error,
                             Message = $"{response.Message}",
                             Opacity = 1.0m
                         });
@@ -424,11 +419,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
             {
                 IsValidUsername = false;
 
-                Alerts.Add(new AlertModel
+                Alerts.Add(new()
                 {
-                    Status = "Error",
-                    Message = "Username is empty.",
-                    Opacity = 1.0m
+                    Status = AlertStatus.Error,
+                    Message = "Username is empty."
                 });
             }
 
@@ -441,11 +435,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         IsValidPassword = false;
                         passwordErrorCount++;
 
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
-                            Message = "Password must be between 8 to 15 character long.",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = "Password must be between 8 to 15 character long."
                         });
                     }
 
@@ -454,11 +447,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         IsValidPassword = false;
                         passwordErrorCount++;
 
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
-                            Message = "Password should contain lowercase characters.",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = "Password should contain lowercase characters."
                         });
                     }
                     if (!UserRegister.Password.Any(char.IsUpper))
@@ -466,11 +458,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         IsValidPassword = false;
                         passwordErrorCount++;
 
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
-                            Message = "Password should contain uppercase characters.",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = "Password should contain uppercase characters."
                         });
                     }
                     if (!UserRegister.Password.Any(char.IsDigit))
@@ -478,11 +469,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         IsValidPassword = false;
                         passwordErrorCount++;
 
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
-                            Message = "Password should contain any digit from 0-9.",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = "Password should contain any digit from 0-9."
                         });
                     }
 
@@ -492,11 +482,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         IsValidPassword = false;
                         passwordErrorCount++;
 
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
-                            Message = "Password must include at least one special character.",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = "Password must include at least one special character."
                         });
                     }
 
@@ -505,11 +494,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                         IsValidPassword = false;
                         passwordErrorCount++;
 
-                        Alerts.Add(new AlertModel
+                        Alerts.Add(new()
                         {
-                            Status = "Error",
-                            Message = "Password should not contain spaces.",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = "Password should not contain spaces."
                         });
                     }
                 }
@@ -521,11 +509,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                     IsValidPassword = false;
                     passwordErrorCount++;
 
-                    Alerts.Add(new AlertModel
+                    Alerts.Add(new()
                     {
-                        Status = "Error",
-                        Message = "Password is empty.",
-                        Opacity = 1.0m
+                        Status = AlertStatus.Error,
+                        Message = "Password is empty."
                     });
                 }
                 else
@@ -537,11 +524,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                             IsValidPassword = false;
                             passwordErrorCount++;
 
-                            Alerts.Add(new AlertModel
+                            Alerts.Add(new()
                             {
-                                Status = "Error",
-                                Message = "Password must be between 8 to 15 character long.",
-                                Opacity = 1.0m
+                                Status = AlertStatus.Error,
+                                Message = "Password must be between 8 to 15 character long."
                             });
                         }
 
@@ -550,11 +536,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                             IsValidPassword = false;
                             passwordErrorCount++;
 
-                            Alerts.Add(new AlertModel
+                            Alerts.Add(new()
                             {
-                                Status = "Error",
-                                Message = "Password should contain lowercase characters.",
-                                Opacity = 1.0m
+                                Status = AlertStatus.Error,
+                                Message = "Password should contain lowercase characters."
                             });
                         }
                         if (!UserRegister.Password.Any(char.IsUpper))
@@ -562,11 +547,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                             IsValidPassword = false;
                             passwordErrorCount++;
 
-                            Alerts.Add(new AlertModel
+                            Alerts.Add(new()
                             {
-                                Status = "Error",
-                                Message = "Password should contain uppercase characters.",
-                                Opacity = 1.0m
+                                Status = AlertStatus.Error,
+                                Message = "Password should contain uppercase characters."
                             });
                         }
                         if (!UserRegister.Password.Any(char.IsDigit))
@@ -574,11 +558,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                             IsValidPassword = false;
                             passwordErrorCount++;
 
-                            Alerts.Add(new AlertModel
+                            Alerts.Add(new()
                             {
-                                Status = "Error",
-                                Message = "Password should contain any digit from 0-9.",
-                                Opacity = 1.0m
+                                Status = AlertStatus.Error,
+                                Message = "Password should contain any digit from 0-9."
                             });
                         }
 
@@ -588,11 +571,10 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                             IsValidPassword = false;
                             passwordErrorCount++;
 
-                            Alerts.Add(new AlertModel
+                            Alerts.Add(new()
                             {
-                                Status = "Error",
-                                Message = "Password must include at least one special character.",
-                                Opacity = 1.0m
+                                Status = AlertStatus.Error,
+                                Message = "Password must include at least one special character."
                             });
                         }
 
@@ -601,26 +583,25 @@ namespace Backoffice.Web.Components.Administration.ManageUser
                             IsValidPassword = false;
                             passwordErrorCount++;
 
-                            Alerts.Add(new AlertModel
+                            Alerts.Add(new()
                             {
-                                Status = "Error",
-                                Message = "Password should not contain spaces.",
-                                Opacity = 1.0m
+                                Status = AlertStatus.Error,
+                                Message = "Password should not contain spaces."
                             });
                         }
                     }
                 }
             }
 
-            if(!string.IsNullOrWhiteSpace(userModel.Email))
+            if (!string.IsNullOrWhiteSpace(userModel.Email))
             {
                 IsValidEmail = Regex.IsMatch(userModel.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
 
-                if(!IsValidEmail)
+                if (!IsValidEmail)
                 {
                     Alerts.Add(new AlertModel
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Email is invalid",
                         Opacity = 1.0m
                     });
@@ -633,7 +614,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
 
                 Alerts.Add(new AlertModel
                 {
-                    Status = "Error",
+                    Status = AlertStatus.Error,
                     Message = "Password must be 8-15 characters long, which should contain uppercase and lowercase characters, with any digit from 0-9, and must include at least one special character.",
                     Opacity = 1.0m
                 });

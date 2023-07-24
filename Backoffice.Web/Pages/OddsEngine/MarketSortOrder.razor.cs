@@ -23,27 +23,20 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public IJSStreamReference? DataReference { get; set; }
 
-        public string TableClass { get; set; }
-        public string SelectClass { get; set; }
-        public string SelectedMarketGroupName { get; set; }
-
-        public bool InitSortingAndSelect2 { get; set; }
-        public bool IsMarketGroupClicked { get; set; }
-        public bool IsUpdate { get; set; }
-        public bool IsPreLoader { get; set; }
-
-        public static MarketSortOrderModel MarketSortOrderModel { get; set; }
-        public List<MarketSortOrderModel.ClientMarketTemplate> FilteredMarketTemplates { get; set; }
-        public static List<SelectListItemModel<int>> MarketGroups { get; set; }
-        public List<BreadcrumbModel> Breadcrumbs { get; set; }
-
-        public string AlertMessage { get; set; }
-        public AlertStatus AlertStatus { get; set; }
-
         #endregion
-
+        private string _tableClass;
+        private string _selectClass;
+        private string _selectedMarketGroupName;
+        private bool _initSortingAndSelect;
+        private bool _isMarketGroupClicked;
+        private bool _isUpdate;
+        private bool _isPreLoader;
         private PageHeaderModel _pageHeaderModel;
-
+        private static MarketSortOrderModel _marketSortOrderModel;
+        private List<MarketSortOrderModel.ClientMarketTemplate> _filteredMarketTemplates;
+        private static List<SelectListItemModel<int>> _marketGroups;
+        private List<BreadcrumbModel> _breadcrumbs;
+        private AlertModel _alertModel;
         #region Methods
 
         protected override async Task OnInitializedAsync()
@@ -53,27 +46,28 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Title = "Market Sort Order"
             };
             TradingService.Region = Region.ToUpper();
-            MarketSortOrderModel = new MarketSortOrderModel();
+            _marketSortOrderModel = new MarketSortOrderModel();
 
-            TableClass = "market-sort-order-table";
-            SelectClass = "market-group-select";
-            SelectedMarketGroupName = string.Empty;
+            _tableClass = "market-sort-order-table";
+            _selectClass = "market-group-select";
+            _selectedMarketGroupName = string.Empty;
 
-            InitSortingAndSelect2 = false;
-            IsMarketGroupClicked = false;
-            IsUpdate = false;
-            IsPreLoader = true;
+            _initSortingAndSelect = false;
+            _isMarketGroupClicked = false;
+            _isUpdate = false;
+            _isPreLoader = true;
 
-            Breadcrumbs = new List<BreadcrumbModel>();
+            _alertModel = new();
+            _breadcrumbs = new List<BreadcrumbModel>();
 
-            Breadcrumbs.Add(new BreadcrumbModel
+            _breadcrumbs.Add(new BreadcrumbModel
             {
                 Name = "Market Settings",
                 Url = string.Empty,
                 IsCurrentPage = false
             });
 
-            Breadcrumbs.Add(new BreadcrumbModel
+            _breadcrumbs.Add(new BreadcrumbModel
             {
                 Name = "Market Sort Order",
                 Url = string.Empty,
@@ -85,25 +79,25 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (InitSortingAndSelect2)
+            if (_initSortingAndSelect)
             {
-                await JSRuntime.InvokeVoidAsync("initSort", $".{TableClass}", ".drag-handle");
-                await JSRuntime.InvokeVoidAsync("disableSort", $".{TableClass}");
+                await JSRuntime.InvokeVoidAsync("initSort", $".{_tableClass}", ".drag-handle");
+                await JSRuntime.InvokeVoidAsync("disableSort", $".{_tableClass}");
 
-                await JSRuntime.InvokeVoidAsync("initSelect2", $".{SelectClass}", "OnMarketGroupChangedEvent");
-                await JSRuntime.InvokeVoidAsync("disableSelect2", $".{SelectClass}");
+                await JSRuntime.InvokeVoidAsync("initSelect2", $".{_selectClass}", "OnMarketGroupChangedEvent");
+                await JSRuntime.InvokeVoidAsync("disableSelect2", $".{_selectClass}");
 
-                InitSortingAndSelect2 = false;
+                _initSortingAndSelect = false;
             }
 
-            if (IsMarketGroupClicked)
+            if (_isMarketGroupClicked)
             {
-                await JSRuntime.InvokeVoidAsync("initSort", $".{TableClass}", ".drag-handle");
-                await JSRuntime.InvokeVoidAsync("initSelect2", $".{SelectClass}", "OnMarketGroupChangedEvent");
+                await JSRuntime.InvokeVoidAsync("initSort", $".{_tableClass}", ".drag-handle");
+                await JSRuntime.InvokeVoidAsync("initSelect2", $".{_selectClass}", "OnMarketGroupChangedEvent");
 
-                if (IsUpdate)
+                if (_isUpdate)
                 {
-                    if (SelectedMarketGroupName.ToLower().Replace(" ", "").Trim() == "allmarkets")
+                    if (_selectedMarketGroupName.ToLower().Replace(" ", "").Trim() == "allmarkets")
                     {
                         await EnableSortingAndSelect2();
                     }
@@ -117,31 +111,31 @@ namespace Backoffice.Web.Pages.OddsEngine
                     await DisableSortingAndSelect2();
                 }
 
-                IsMarketGroupClicked = false;
+                _isMarketGroupClicked = false;
             }
         }
 
         public async Task OnUpdateClickEvent()
         {
-            IsUpdate = true;
+            _isUpdate = true;
 
             await EnableSortingAndSelect2();
         }
 
         public async Task OnCancelClickEvent()
         {
-            IsUpdate = false;
+            _isUpdate = false;
 
             await DisableSortingAndSelect2();
         }
 
         public async Task OnSaveClickEvent()
         {
-            IsUpdate = false;
+            _isUpdate = false;
 
-            if (!IsPreLoader)
+            if (!_isPreLoader)
             {
-                IsPreLoader = true;
+                _isPreLoader = true;
             }
 
             var marketTemplates = await GetMarketTemplates();
@@ -149,7 +143,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (!marketTemplates.Any())
                 return;
 
-            MarketSortOrderModel.MarketTemplates = MarketSortOrderModel.MarketTemplates.Join(marketTemplates,
+            _marketSortOrderModel.MarketTemplates = _marketSortOrderModel.MarketTemplates.Join(marketTemplates,
                 ma => ma.MarketTemplateId,
                 so => so.RowId.Split('-')[1],
                 (ma, so) => new MarketSortOrderModel.ClientMarketTemplate
@@ -163,10 +157,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var request = new ClientMarketTemplateRequest
             {
-                ClientId = MarketSortOrderModel.ClientId,
-                SportId = MarketSortOrderModel.SportId,
-                FixtureStatusId = MarketSortOrderModel.FixtureStatusId,
-                MarketTemplates = MarketSortOrderModel.MarketTemplates.Select(s => new ClientMarketTemplateModel
+                ClientId = _marketSortOrderModel.ClientId,
+                SportId = _marketSortOrderModel.SportId,
+                FixtureStatusId = _marketSortOrderModel.FixtureStatusId,
+                MarketTemplates = _marketSortOrderModel.MarketTemplates.Select(s => new ClientMarketTemplateModel
                 {
                     MarketTemplateId = s.MarketTemplateId,
                     MarketTemplateName = s.MarketTemplateName,
@@ -181,39 +175,44 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (response.StatusCode != StatusCode.Success)
             {
-                AlertMessage = $"{response.Message}";
-                AlertStatus = AlertStatus.Error;
+                _alertModel = new()
+                {
+                    Status = AlertStatus.Error,
+                    Message = response.Message
+                };
             }
 
-            AlertMessage = AlertStatus.Success.ToString();
-            AlertStatus = AlertStatus.Success;
+            _alertModel = new()
+            {
+                Status = AlertStatus.Success,
+                Message = AlertStatus.Success.ToString()
+            };
 
-
-            IsPreLoader = false;
+            _isPreLoader = false;
         }
 
         public async Task OnMarketGroupClickEvent(string name)
         {
-            SelectedMarketGroupName = name;
-            FilteredMarketTemplates = MarketSortOrderModel.MarketTemplates;
+            _selectedMarketGroupName = name;
+            _filteredMarketTemplates = _marketSortOrderModel.MarketTemplates;
 
-            if (SelectedMarketGroupName.ToLower() != "all markets")
+            if (_selectedMarketGroupName.ToLower() != "all markets")
             {
-                FilteredMarketTemplates = FilteredMarketTemplates.Where(c => c.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(SelectedMarketGroupName.ToLower())).ToList();
+                _filteredMarketTemplates = _filteredMarketTemplates.Where(c => c.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(_selectedMarketGroupName.ToLower())).ToList();
             }
 
-            IsMarketGroupClicked = true;
+            _isMarketGroupClicked = true;
         }
 
         public async Task PrepareMarketSortOrderModel(MarketSortOrderModel model)
         {
-            MarketSortOrderModel = model;
+            _marketSortOrderModel = model;
 
-            FilteredMarketTemplates = MarketSortOrderModel.MarketTemplates;
-            SelectedMarketGroupName = "All Markets";
+            _filteredMarketTemplates = _marketSortOrderModel.MarketTemplates;
+            _selectedMarketGroupName = "All Markets";
 
-            MarketGroups = MarketSortOrderModel.MarketTemplateGroups
-                .Where(s => s.Name.ToLower() != SelectedMarketGroupName.ToLower())
+            _marketGroups = _marketSortOrderModel.MarketTemplateGroups
+                .Where(s => s.Name.ToLower() != _selectedMarketGroupName.ToLower())
                 .Select(s => new SelectListItemModel<int>
                 {
                     Value = s.MarketTemplateGroupId,
@@ -221,14 +220,14 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }).ToList();
 
             // set InitMultipleSelect to true to enable multiple select2.
-            InitSortingAndSelect2 = true;
+            _initSortingAndSelect = true;
         }
 
         [JSInvokable("OnMarketGroupChangedEvent")]
         public static void OnMarketGroupChangedEvent(SelectedModel model)
         {
             var marketGroupId = int.Parse(model.SelectedOptionId);
-            var marketGroup = MarketGroups.FirstOrDefault(c => c.Value == marketGroupId);
+            var marketGroup = _marketGroups.FirstOrDefault(c => c.Value == marketGroupId);
 
             if (marketGroup != null)
             {
@@ -236,7 +235,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 if (model.IsSelect)
                 {
-                    foreach (var market in MarketSortOrderModel.MarketTemplates.Where(c => c.MarketTemplateId == marketTemplateId))
+                    foreach (var market in _marketSortOrderModel.MarketTemplates.Where(c => c.MarketTemplateId == marketTemplateId))
                     {
                         if (!market.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(marketGroup.Name.ToLower()))
                             market.MarketTemplateGroupNames.Add(marketGroup.Name);
@@ -244,7 +243,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
                 else
                 {
-                    foreach (var market in MarketSortOrderModel.MarketTemplates.Where(c => c.MarketTemplateId == marketTemplateId))
+                    foreach (var market in _marketSortOrderModel.MarketTemplates.Where(c => c.MarketTemplateId == marketTemplateId))
                     {
                         if (market.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(marketGroup.Name.ToLower()))
                             market.MarketTemplateGroupNames.Remove(marketGroup.Name);
@@ -255,28 +254,31 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnModalDiscardChanges()
         {
-            MarketSortOrderModel.MarketTemplates = new List<MarketSortOrderModel.ClientMarketTemplate>();
-            FilteredMarketTemplates = new List<MarketSortOrderModel.ClientMarketTemplate>();
+            _marketSortOrderModel.MarketTemplates = new List<MarketSortOrderModel.ClientMarketTemplate>();
+            _filteredMarketTemplates = new List<MarketSortOrderModel.ClientMarketTemplate>();
 
             await InvokeAsync(StateHasChanged);
             await Task.Delay(500);
 
-            MarketSortOrderModel.MarketTemplates = MarketSortOrderModel.OriginalMarketTemplates;
-            FilteredMarketTemplates = MarketSortOrderModel.MarketTemplates;
+            _marketSortOrderModel.MarketTemplates = _marketSortOrderModel.OriginalMarketTemplates;
+            _filteredMarketTemplates = _marketSortOrderModel.MarketTemplates;
 
-            if (SelectedMarketGroupName.ToLower() != "all markets")
+            if (_selectedMarketGroupName.ToLower() != "all markets")
             {
-                FilteredMarketTemplates = FilteredMarketTemplates.Where(c => c.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(SelectedMarketGroupName.ToLower())).ToList();
+                _filteredMarketTemplates = _filteredMarketTemplates.Where(c => c.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(_selectedMarketGroupName.ToLower())).ToList();
             }
 
-            InitSortingAndSelect2 = true;
-            IsUpdate = false;
+            _initSortingAndSelect = true;
+            _isUpdate = false;
         }
 
         public async Task OnSaveCopyClickEvent()
         {
-            AlertMessage = "Market Sort Order settings copied successfully.";
-            AlertStatus = AlertStatus.Success;
+            _alertModel = new()
+            {
+                Status = AlertStatus.Success,
+                Message = "Market Sort Order settings copied successfully."
+            };
         }
 
         public async ValueTask DisposeAsync()
@@ -302,21 +304,21 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task EnableSortingAndSelect2()
         {
-            await JSRuntime.InvokeVoidAsync("enableSort", $".{TableClass}");
-            await JSRuntime.InvokeVoidAsync("enableSelect2", $".{SelectClass}");
+            await JSRuntime.InvokeVoidAsync("enableSort", $".{_tableClass}");
+            await JSRuntime.InvokeVoidAsync("enableSelect2", $".{_selectClass}");
         }
 
         private async Task DisableSortingAndSelect2()
         {
-            await JSRuntime.InvokeVoidAsync("disableSort", $".{TableClass}");
-            await JSRuntime.InvokeVoidAsync("disableSelect2", $".{SelectClass}");
+            await JSRuntime.InvokeVoidAsync("disableSort", $".{_tableClass}");
+            await JSRuntime.InvokeVoidAsync("disableSelect2", $".{_selectClass}");
         }
 
         private async Task<List<SortOrderModel>> GetMarketTemplates()
         {
             var marketTemplates = new List<SortOrderModel>();
 
-            DataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getSortOrder", $".{TableClass}");
+            DataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getSortOrder", $".{_tableClass}");
 
             using (var stream = await DataReference.OpenReadStreamAsync(maxAllowedSize: 10_000_000))
             {

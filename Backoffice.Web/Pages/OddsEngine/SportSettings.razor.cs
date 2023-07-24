@@ -146,7 +146,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 _alertModel = new()
                 {
-                    Status = StatusCode.Success.ToString(),
+                    Status = AlertStatus.Success,
                     Message = "Successfully saved Sport - Segment - League ordering."
                 };
             }
@@ -154,7 +154,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 _alertModel = new()
                 {
-                    Status = StatusCode.Error.ToString(),
+                    Status = AlertStatus.Error,
                     Message = response.Message
                 };
             }
@@ -330,7 +330,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             _alertModel = new()
             {
-                Status = StatusCode.Success.ToString(),
+                Status = AlertStatus.Success,
                 Message = "Sport settings copied successfully."
             };
         }

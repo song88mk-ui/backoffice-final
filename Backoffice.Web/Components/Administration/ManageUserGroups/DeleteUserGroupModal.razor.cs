@@ -27,8 +27,6 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
         public UserGroupResponse UserGroup { get; set; }
         public List<AlertModel> Alerts { get; set; }
-
-        public decimal Opacity { get; set; }
         public bool IsPreload { get; set; }
 
         #endregion
@@ -37,7 +35,6 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
         protected override async Task OnInitializedAsync()
         {
-            Opacity = 0m;
             Alerts = new List<AlertModel>();
             UserGroup = ModalParameters.TryGet<UserGroupResponse>("UserGroup");
         }
@@ -57,16 +54,13 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 if (IsPreload)
                     return;
 
-                Opacity = Opacity == 1m ? 0.99m : 1m;
-
                 Alerts.Clear();
                 if (UserGroup.UserGroupName.ToLower().Equals("default"))
                 {
-                    Alerts.Add(new AlertModel
+                    Alerts.Add(new()
                     {
-                        Status = "Error",
-                        Message = "Cannot delete this user group",
-                        Opacity = Opacity
+                        Status = AlertStatus.Error,
+                        Message = "Cannot delete this user group"
                     });
                 }
 
@@ -102,11 +96,10 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                 }
                 else
                 {
-                    Alerts.Add(new AlertModel
+                    Alerts.Add(new()
                     {
-                        Status = "Error",
-                        Message = $"{response.Message}",
-                        Opacity = Opacity
+                        Status = AlertStatus.Error,
+                        Message = $"{response.Message}"
                     });
                 }
             }

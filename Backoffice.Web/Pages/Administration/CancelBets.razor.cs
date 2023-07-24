@@ -105,7 +105,7 @@ namespace Backoffice.Web.Pages.Administration
                     {
                         Alerts.Add(new()
                         {
-                            Status = AlertStatus.Error.ToString(),
+                            Status = AlertStatus.Error,
                             Message = $"Your request to cancel this Bet Reference ID did not proceed. Only 'Running' bets can be settled as 'Cancelled'.",
                             Opacity = 1.0m,
                             Control = $"{BetRefenceModel.BetReferenceIds.IndexOf(bet)}"
@@ -163,9 +163,8 @@ namespace Backoffice.Web.Pages.Administration
 
                     Alerts.Add(new()
                     {
-                        Status = AlertStatus.Success.ToString(),
-                        Message = "Bet Reference IDs has been successfully cancelled",
-                        Opacity = 1.0m
+                        Status = AlertStatus.Success,
+                        Message = "Bet Reference IDs has been successfully cancelled"
                     });
 
                     BetRefenceModel = new()
@@ -182,9 +181,8 @@ namespace Backoffice.Web.Pages.Administration
                         {
                             Alerts.Add(new()
                             {
-                                Status = AlertStatus.Error.ToString(),
-                                Message = $"{data.Message}",
-                                Opacity = 1.0m
+                                Status = AlertStatus.Error,
+                                Message = $"{data.Message}"
                             });
 
                         }
@@ -193,9 +191,8 @@ namespace Backoffice.Web.Pages.Administration
                     {
                         Alerts.Add(new()
                         {
-                            Status = AlertStatus.Error.ToString(),
-                            Message = $"{response.Message}",
-                            Opacity = 1.0m
+                            Status = AlertStatus.Error,
+                            Message = $"{response.Message}"
                         });
                     }
                 }
@@ -234,7 +231,7 @@ namespace Backoffice.Web.Pages.Administration
                     {
                         Alerts.Add(new()
                         {
-                            Status = AlertStatus.Error.ToString(),
+                            Status = AlertStatus.Error,
                             Message = $"Invalid Bet Reference Id {bet.Trim()}",
                             Opacity = 1.0m,
                             Control = $"{count + 1}"
@@ -247,7 +244,7 @@ namespace Backoffice.Web.Pages.Administration
                         if (!Alerts.Any(a => a.Message.Contains($"Duplicate Bet Reference Id found. {bet.Trim()}")))
                             Alerts.Add(new()
                             {
-                                Status = AlertStatus.Error.ToString(),
+                                Status = AlertStatus.Error,
                                 Message = $"Duplicate Bet Reference Id found. {bet.Trim()}",
                                 Opacity = 1.0m,
                                 Control = $"{count + 1}"
@@ -272,9 +269,8 @@ namespace Backoffice.Web.Pages.Administration
                 {
                     Alerts.Add(new()
                     {
-                        Status = AlertStatus.Error.ToString(),
+                        Status = AlertStatus.Error,
                         Message = message,
-                        Opacity = 1.0m,
                         Control = count == 0 ? $"1" : ""
                     });
                 }

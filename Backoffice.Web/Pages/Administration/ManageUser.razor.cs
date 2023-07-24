@@ -138,7 +138,7 @@ namespace Backoffice.Web.Pages.Administration
             Alerts.Clear();
             Alerts.Add(new AlertModel
             {
-                Status = "Success",
+                Status = AlertStatus.Success,
                 Message = message,
                 Opacity = Opacity
             });

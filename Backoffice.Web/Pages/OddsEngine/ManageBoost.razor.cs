@@ -178,17 +178,16 @@ namespace Backoffice.Web.Pages.OddsEngine
             _leagueId = 0;
             _search = string.Empty;
 
-            _filterReference._selectedClientCode = _clientCode;
-            _filterReference._selectedSportId = _sportId;
-            _filterReference._selectedSegmentId = _segmentId;
-            _filterReference._selectedLeagueId = _leagueId;
-            _filterReference._searchForm.SearchText = _search;
+            _filterReference.SelectedClientCode = _clientCode;
+            _filterReference.SelectedSportId = _sportId;
+            _filterReference.SelectedSegmentId = _segmentId;
+            _filterReference.SelectedLeagueId = _leagueId;
+            _filterReference.SearchForm.SearchText = _search;
 
             _alertModel = new()
             {
                 Message = $"Price Boost has been {(string)message}!",
-                Status = AlertStatus.Success.ToString(),
-                Opacity = 1m
+                Status = AlertStatus.Success,
             };
 
             await GetContents();

@@ -129,7 +129,7 @@ namespace Backoffice.Web.Pages.SBC
             Alerts.Clear();
             Alerts.Add(new AlertModel
             {
-                Status = "Success",
+                Status = AlertStatus.Success,
                 Message = (bool)item ? "Sub user successfully updated" : "Sub user successfully created",
                 Opacity = Opacity
             });

@@ -316,7 +316,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 {
                     AlertModel = new AlertModel()
                     {
-                        Status = "Error",
+                        Status = AlertStatus.Error,
                         Message = "Error! All fields cannot be empty. Please fill in accordingly or remove the empty row",
                         Opacity = 1.0m,
                     };
@@ -479,7 +479,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 IsPreLoader = false;
                 AlertModel = new AlertModel()
                 {
-                    Status = "Success",
+                    Status = AlertStatus.Success,
                     Message = $"Markets {string.Join(",", request.Select(x => x.MarketName).ToList())} has been successfully settled.",
                     Opacity = 1.0m
                 };
@@ -495,7 +495,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 IsPreLoader = false;
                 AlertModel = new AlertModel()
                 {
-                    Status = "Error",
+                    Status = AlertStatus.Error,
                     Message = "Market Settlement Failed!",
                     Opacity = 1.0m,
                 };

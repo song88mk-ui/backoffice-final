@@ -69,7 +69,7 @@ namespace Backoffice.Web.Components.Administration.Maintenance
                 timer.Stop();
                 AlertModel = new AlertModel()
                 {
-                    Status = StatusCode.Success.ToString(),
+                    Status = AlertStatus.Success,
                     Message = StatusCode.Success.ToString(),
                     Opacity = 1m
                 };
@@ -83,7 +83,7 @@ namespace Backoffice.Web.Components.Administration.Maintenance
                 timer.Stop();
                 AlertModel = new AlertModel()
                 {
-                    Status = "Error",
+                    Status = AlertStatus.Error,
                     Message = result.Message,
                     Opacity = 1m
                 };
