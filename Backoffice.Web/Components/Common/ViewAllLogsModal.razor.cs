@@ -37,10 +37,8 @@ namespace Backoffice.Web.Components.Common
 
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
-            IsPreLoader = true;
-            CurrentPage = ModalParameters.TryGet<SportsbookClientPermission>("SelectedPage");
-            UserClients = UserClientCodes != null && UserClientCodes.Any() ? UserClientCodes : new List<string>();
+            _isPreLoader = true;
+            _userClients = UserClientCodes != null && UserClientCodes.Any() ? UserClientCodes : new List<string>();
             WithAdministrationPagesAccess = false;
             _boostedSettingsActivityLogs = new List<ActivityLogModel>();
 
