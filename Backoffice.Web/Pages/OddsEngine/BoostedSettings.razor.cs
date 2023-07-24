@@ -16,28 +16,27 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] IModalService ModalService { get; set; }
-
-        [Parameter] public string THeadClass { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
-
         [CascadingParameter(Name = "UserClientCodes")] List<string>? UserClientCodes { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
-        protected List<BoostedSettingsModel> ClientsView { get; set; }
-        protected SearchFormModel SearchForm { get; set; } = new SearchFormModel();
-        public List<BreadcrumbModel> Breadcrumbs { get; set; }
-        public bool IsPreLoader { get; set; } = true;
-
+        //protected SearchFormModel SearchForm { get; set; } = new SearchFormModel();
         #endregion
         private AlertModel _alertModel;
 
+        private bool _isPreLoader;
         private PageHeaderModel _pageHeaderModel;
+        private List<BreadcrumbModel> _breadcrumbs;
+        private string _tHeadClass;
+        private string _searchText;
+        protected List<BoostedSettingsModel> _clientsView;
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            THeadClass = "table-head";
+            _isPreLoader = true;
+            _tHeadClass = "table-head";
             _pageHeaderModel = new()
             {
                 Title = "Boosted Settings",
@@ -47,7 +46,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             TradingService.Region = Region.ToUpper();
             _alertModel = new();
 
-            Breadcrumbs = new List<BreadcrumbModel>()
+            _breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
                 {
@@ -62,11 +61,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
-            ClientsView = new List<BoostedSettingsModel>();
 
             await AuthenticateAccess.InvokeAsync();
-
-            await GetContent();
         }
 
         public async Task OnSaveSettingClickEvent(object item)
@@ -81,24 +77,23 @@ namespace Backoffice.Web.Pages.OddsEngine
             await GetContent();
         }
 
-        private async Task GetContent()
+        private async Task GetContent(string search = "")
         {
             try
             {
-                if (!IsPreLoader)
+                if (!_isPreLoader)
                 {
-                    IsPreLoader = true;
+                    _isPreLoader = true;
                 }
-
+                _searchText = search ?? string.Empty;
 
                 var result = await TradingService.GetBoostedSettings(new BoostedSettingsRequest()
                 {
                     ClientCodes = UserClientCodes != null && UserClientCodes.Any() ? UserClientCodes.ToList() : new List<string>(),
-                    Search = SearchForm.SearchText ?? string.Empty
+                    Search = _searchText
                 });
-                ClientsView = result.Result;
-                IsPreLoader = false;
-                StateHasChanged();
+                _clientsView = result.Result;
+                _isPreLoader = false;
             }
             catch (Exception ex)
             {

@@ -1,8 +1,8 @@
 ﻿@using Backoffice.Shared.Enums
 
 <div class="modal-body">
-    <ViewAllLogsFilter @bind-FilterModel="PriceBoostLogFilterModel" SelectedPage="CurrentPage" OnFilterChangedEventCallback="OnFilterChanged" />
-    @if (IsPreLoader)
+    <ViewAllLogsFilter @bind-FilterModel="_priceBoostLogFilterModel" SelectedPage="CurrentPage" OnFilterChangedEventCallback="OnFilterChanged" />
+    @if (_isPreLoader)
     {
         <Preloader />
     }
@@ -10,7 +10,7 @@
     {
         @if (CurrentPage == SportsbookClientPermission.SBC_OE_PriceBoost_Settings)
         {
-            @if (BoostedSettingsActivityLogs != null)
+            @if (_boostedSettingsActivityLogs != null)
             {
                 <table class="table table-bordered mt-3">
                     <thead>
@@ -25,21 +25,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in BoostedSettingsActivityLogs)
-                        {
-                            int RowCount = (BoostedSettingsActivityLogs.IndexOf(item) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                        <Virtualize Items="_boostedSettingsActivityLogs" Context="activityLog">
                             <tr>
-                                <td>@RowCount</td>
-                                <td>@item.TimeStamp.ToLocalTime().ToString("dd/MM/yy") @item.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
-                                <td>@GetClientName(item.Payload)</td>
-                                <td>@item.Activity</td>
-                                <td>@((MarkupString)EvaluateBoostedSettingsActivity(item.From))</td>
-                                <td>@((MarkupString)EvaluateBoostedSettingsActivity(item.To))</td>
-                                <td>@item.UserName</td>
+                                <td>@GetRowNumber(_boostedSettingsActivityLogs.IndexOf(activityLog))</td>
+                                <td>@activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy\nHH:mm")</td>
+                                <td>@activityLog.Payload</td>
+                                <td>@activityLog.Activity</td>
+                                <td>@((MarkupString)activityLog.From)</td>
+                                <td>@((MarkupString)activityLog.To)</td>
+                                <td>@activityLog.UserName</td>
                             </tr>
-                        }
+                        </Virtualize>
                     </tbody>
-                    <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="7" />
+                    <Pagination MetaData="_metaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="7" />
                 </table>
             }
             else
@@ -49,9 +47,9 @@
         }
         @if (CurrentPage == SportsbookClientPermission.SBC_OE_PriceBoost_Manage)
         {
-            @if (PriceBoostActivityLogs != null)
+            @if (_priceBoostActivityLogs != null)
             {
-                @if (PriceBoostActivityLogs.Any())
+                @if (_priceBoostActivityLogs.Any())
                 {
                     <table class="table table-bordered mt-3">
                         <thead>
@@ -68,35 +66,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var log in PriceBoostActivityLogs)
-                            {
-                                int RowCount = (PriceBoostActivityLogs.IndexOf(log) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                            <Virtualize Items="_priceBoostActivityLogs" Context="activityLog">
                                 <tr>
-                                    <td>@RowCount</td>
-                                    <td>@log.TimeStamp.ToLocalTime().ToString("dd/MM/yy") @log.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
-                                    <td>@GetClientName(log.Payload)</td>
-                                    <td>@GetSportName(log)</td>
-                                    <td>
-                                        @(
-                                            (MarkupString)GetDetails(log)
-                                            )
-                                    </td>
-                                    <td>@log.Activity</td>
-                                    <td>
-                                        @(
-                                            (MarkupString)log.From.HtmlDetail
-                                            )
-                                    </td>
-                                    <td>
-                                        @(
-                                            (MarkupString)log.To.HtmlDetail
-                                            )
-                                    </td>
-                                    <td>@log.Username</td>
+                                    <td>@GetRowNumber(_priceBoostActivityLogs.IndexOf(activityLog))</td>
+                                    <td>@activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy\nHH:mm")</td>
+                                    <td>@GetClientName(activityLog.Payload)</td>
+                                    <td>@GetSportName(activityLog)</td>
+                                    <td>@((MarkupString)GetDetails(activityLog))</td>
+                                    <td>@activityLog.Activity</td>
+                                    <td>@((MarkupString)activityLog.From.HtmlDetail)</td>
+                                    <td>@((MarkupString)activityLog.To.HtmlDetail)</td>
+                                    <td>@activityLog.Username</td>
                                 </tr>
-                            }
+                            </Virtualize>
                         </tbody>
-                        <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="7" />
+                        <Pagination MetaData="_metaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="7" />
                     </table>
                 }
                 else

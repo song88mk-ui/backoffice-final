@@ -24,27 +24,25 @@ namespace Backoffice.Web.Components.Common
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
 
-        protected bool IsPreLoader { get; set; } = false;
+        private bool _isPreLoader;
         public SportsbookClientPermission CurrentPage { get; set; }
-        public MetaData MetaData { get; set; } = new MetaData();
-        public List<string> UserClients { get; set; }
-        public PriceBoostLogFilterModel PriceBoostLogFilterModel { get; set; } = new PriceBoostLogFilterModel();
-        public List<PriceBoostActivityLog> PriceBoostActivityLogs { get; set; }
-        public List<ActivityLogModel> BoostedSettingsActivityLogs { get; set; }
+        public MetaData _metaData { get; set; } = new MetaData();
+        public List<string> _userClients { get; set; }
+        public PriceBoostLogFilterModel _priceBoostLogFilterModel { get; set; } = new PriceBoostLogFilterModel();
+        public List<PriceBoostActivityLog> _priceBoostActivityLogs { get; set; }
+        public List<ActivityLogModel> _boostedSettingsActivityLogs { get; set; }
         public bool WithAdministrationPagesAccess { get; set; }
         private string _region = string.Empty;
         #endregion
 
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
-            IsPreLoader = true;
-            CurrentPage = ModalParameters.TryGet<SportsbookClientPermission>("SelectedPage");
-            UserClients = UserClientCodes != null && UserClientCodes.Any() ? UserClientCodes : new List<string>();
+            _isPreLoader = true;
+            _userClients = UserClientCodes != null && UserClientCodes.Any() ? UserClientCodes : new List<string>();
             WithAdministrationPagesAccess = false;
-            BoostedSettingsActivityLogs = new List<ActivityLogModel>();
+            _boostedSettingsActivityLogs = new List<ActivityLogModel>();
 
-            PriceBoostLogFilterModel = new PriceBoostLogFilterModel()
+            _priceBoostLogFilterModel = new PriceBoostLogFilterModel()
             {
                 Clients = new List<KeyValuePair<string, string>>(),
                 Tab = CurrentPage,
@@ -60,7 +58,7 @@ namespace Backoffice.Web.Components.Common
                 SearchText = string.Empty
             };
 
-            MetaData = new MetaData()
+            _metaData = new MetaData()
             {
                 CurrentPage = 1,
                 PageSize = 20,
@@ -70,61 +68,65 @@ namespace Backoffice.Web.Components.Common
 
             await GetContent();
         }
+        protected override async Task OnParametersSetAsync()
+        {
+            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            CurrentPage = ModalParameters.TryGet<SportsbookClientPermission>("SelectedPage");
+        }
         #region Methods
         public async Task GetContent()
         {
             string payload = BuildPayload();
 
-            if (!string.IsNullOrEmpty(PriceBoostLogFilterModel?.SearchText))
+            if (!string.IsNullOrEmpty(_priceBoostLogFilterModel?.SearchText))
             {
-                MetaData.PageSize = int.MaxValue;
+                _metaData.PageSize = int.MaxValue;
             }
 
-            var response = (await BackOfficeService.GetPriceboostActivityLogs(new PriceboostActivityLogRequest
+            var response = await BackOfficeService.GetPriceboostActivityLogs(new PriceboostActivityLogRequest
             {
                 Page = CurrentPage.ToString().Replace("_", "."),
                 Payload = payload,
-                MetaData = MetaData,
-                DateFrom = PriceBoostLogFilterModel.DateFrom.Date.Add(new TimeSpan(0, 0, 0)),
-                DateTo = PriceBoostLogFilterModel.DateTo.Date.Add(new TimeSpan(23, 59, 59)),
-                UserClients = UserClients
-            }, _region)).Result;
+                MetaData = _metaData,
+                DateFrom = _priceBoostLogFilterModel.DateFrom.Date.Add(new TimeSpan(0, 0, 0)),
+                DateTo = _priceBoostLogFilterModel.DateTo.Date.Add(new TimeSpan(23, 59, 59)),
+                UserClients = _userClients
+            }, _region);
 
-            PriceBoostActivityLogs = new List<PriceBoostActivityLog>();
-            BoostedSettingsActivityLogs = new List<ActivityLogModel>();
+            _priceBoostActivityLogs = new List<PriceBoostActivityLog>();
+            _boostedSettingsActivityLogs = new List<ActivityLogModel>();
 
-            if (response != null && response.ActivityLogs != null && response.ActivityLogs.Any())
+            var activityLogs = response.Result;
+            if (activityLogs != null && activityLogs.ActivityLogs != null && activityLogs.ActivityLogs.Any())
             {
-                if (CurrentPage == SportsbookClientPermission.SBC_OE_PriceBoost_Manage)
+                switch (CurrentPage)
                 {
-                    if (response.ActivityLogs != null && response.ActivityLogs.Any())
-                    {
-                        PriceBoostActivityLogs = response.ActivityLogs
-                        .Select(x => new PriceBoostActivityLog()
+                    case SportsbookClientPermission.SBC_OE_PriceBoost_Manage:
+                        if (activityLogs.ActivityLogs != null && activityLogs.ActivityLogs.Any())
                         {
-                            Id = x.Id,
-                            Page = x.Page,
-                            Payload = x.Payload,
-                            Activity = x.Activity,
-                            From = !string.IsNullOrEmpty(x.From) && x.From != "-" ? JsonConvert.DeserializeObject<PriceBoostLogModel>(x.From) : new PriceBoostLogModel(),
-                            To = !string.IsNullOrEmpty(x.To) && x.To != "-" ? JsonConvert.DeserializeObject<PriceBoostLogModel>(x.To) : new PriceBoostLogModel(),
-                            UserId = x.UserId,
-                            Username = WithAdministrationPagesAccess ? "Administrator" : x.UserName,
-                            TimeStamp = x.TimeStamp
-                        }).ToList();
+                            _priceBoostActivityLogs = activityLogs.ActivityLogs
+                            .Select(x => new PriceBoostActivityLog()
+                            {
+                                Id = x.Id,
+                                Page = x.Page,
+                                Payload = x.Payload,
+                                Activity = x.Activity,
+                                From = !string.IsNullOrEmpty(x.From) && x.From != "-" ? JsonConvert.DeserializeObject<PriceBoostLogModel>(x.From) : new(),
+                                To = !string.IsNullOrEmpty(x.To) && x.To != "-" ? JsonConvert.DeserializeObject<PriceBoostLogModel>(x.To) : new(),
+                                UserId = x.UserId,
+                                Username = WithAdministrationPagesAccess ? "Administrator" : x.UserName,
+                                TimeStamp = x.TimeStamp
+                            }).ToList();
 
-                        //build log summary
-                        foreach (var log in PriceBoostActivityLogs)
-                        {
-                            BuildSummary(log);
+                            //build log summary
+                            foreach (var log in _priceBoostActivityLogs)
+                            {
+                                BuildSummary(log);
+                            }
                         }
-                    }
-                }
-                else
-                {
-                    foreach (var activityLog in response.ActivityLogs)
-                    {
-                        if (UserClients.Contains(activityLog.Payload))
+                        break;
+                    case SportsbookClientPermission.SBC_OE_PriceBoost_Settings:
+                        foreach (var activityLog in activityLogs.ActivityLogs.Where(x => _userClients.Contains(payload)))
                         {
                             var activity = "Increased Cap %";
 
@@ -136,26 +138,26 @@ namespace Backoffice.Web.Components.Common
                                     activity = "Decrease Cap %";
                             }
 
-                            BoostedSettingsActivityLogs.Add(new ActivityLogModel()
+                            _boostedSettingsActivityLogs.Add(new ActivityLogModel()
                             {
                                 Id = activityLog.Id,
                                 Page = activityLog.Page,
-                                Payload = activityLog.Payload,
+                                Payload = GetClientName(activityLog.Payload),
                                 Activity = activity,
-                                From = activityLog.From,
-                                To = activityLog.To,
+                                From = EvaluateBoostedSettingsActivity(activityLog.From),
+                                To = EvaluateBoostedSettingsActivity(activityLog.To),
                                 UserId = activityLog.UserId,
                                 UserName = WithAdministrationPagesAccess ? "Administrator" : activityLog.UserName,
                                 TimeStamp = activityLog.TimeStamp
                             });
                         }
-                    }
+                        break;
                 }
 
-                MetaData = response.MetaData;
+                _metaData = activityLogs.MetaData;
             }
 
-            IsPreLoader = false;
+            _isPreLoader = false;
         }
         private async Task<List<KeyValuePair<string, string>>> GetClients()
         {
@@ -167,7 +169,7 @@ namespace Backoffice.Web.Components.Common
             {
                 foreach (var client in response.Result)
                 {
-                    if (UserClients.Contains(client.ClientCode, StringComparer.OrdinalIgnoreCase))
+                    if (_userClients.Contains(client.ClientCode, StringComparer.OrdinalIgnoreCase))
                     {
                         KeyValuePair<string, string> Client = new KeyValuePair<string, string>(client.ClientCode, client.ClientName);
 
@@ -183,14 +185,14 @@ namespace Backoffice.Web.Components.Common
         {
             if (CurrentPage == SportsbookClientPermission.SBC_OE_PriceBoost_Manage)
             {
-                return $"%{(PriceBoostLogFilterModel.ClientCode.ToUpper() != "ALL" ? PriceBoostLogFilterModel.ClientCode : "")}%." +
-                $"%{(PriceBoostLogFilterModel.SportId != 0 ? PriceBoostLogFilterModel.SportId : "")}%." +
-                $"%{(PriceBoostLogFilterModel.SegmentId != 0 ? PriceBoostLogFilterModel.SegmentId : "")}%." +
-                $"%{(PriceBoostLogFilterModel.LeagueId != 0 ? PriceBoostLogFilterModel.LeagueId : "")}%";
+                return $"%{(_priceBoostLogFilterModel.ClientCode.ToUpper() != "ALL" ? _priceBoostLogFilterModel.ClientCode : "")}%." +
+                $"%{(_priceBoostLogFilterModel.SportId != 0 ? _priceBoostLogFilterModel.SportId : "")}%." +
+                $"%{(_priceBoostLogFilterModel.SegmentId != 0 ? _priceBoostLogFilterModel.SegmentId : "")}%." +
+                $"%{(_priceBoostLogFilterModel.LeagueId != 0 ? _priceBoostLogFilterModel.LeagueId : "")}%";
             }
             else
             {
-                return $"{(PriceBoostLogFilterModel?.ClientCode != "ALL" ? PriceBoostLogFilterModel?.ClientCode : "%")}";
+                return $"{(_priceBoostLogFilterModel?.ClientCode != "ALL" ? _priceBoostLogFilterModel?.ClientCode : "%")}";
             }
         }
         private void BuildSummary(PriceBoostActivityLog log)
@@ -283,10 +285,10 @@ namespace Backoffice.Web.Components.Common
 
         public async Task OnFilterChanged(PriceBoostLogFilterModel item)
         {
-            PriceBoostLogFilterModel = item;
+            _priceBoostLogFilterModel = item;
             CurrentPage = item.Tab;
 
-            MetaData = new MetaData()
+            _metaData = new MetaData()
             {
                 CurrentPage = 1,
                 PageSize = 20,
@@ -305,12 +307,15 @@ namespace Backoffice.Web.Components.Common
         }
         #endregion
         #region Utilities
+        private int GetRowNumber(int index)
+        {
+            return (index + 1) + ((_metaData.CurrentPage * _metaData.PageSize) - _metaData.PageSize);
+        }
         public async Task SelectPage(int page)
         {
-            MetaData.CurrentPage = page;
+            _metaData.CurrentPage = page;
             await GetContent();
         }
-
         public string GetSportName(PriceBoostActivityLog activityLog)
         {
             var splitPayload = activityLog.Payload.Split(".");
@@ -355,7 +360,7 @@ namespace Backoffice.Web.Components.Common
         {
             var payloadSplit = payload.Split(".");
 
-            return PriceBoostLogFilterModel.Clients
+            return _priceBoostLogFilterModel.Clients
                 .Where(x => x.Key == payloadSplit[0]).FirstOrDefault()
                 .Value;
         }

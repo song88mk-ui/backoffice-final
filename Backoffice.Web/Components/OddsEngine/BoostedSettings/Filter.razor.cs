@@ -13,12 +13,12 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
-        [Parameter] public SearchFormModel SearchForm { get; set; }
-        [Parameter] public EventCallback<SearchFormModel> SearchFormChanged { get; set; }
-        [Parameter] public EventCallback OnInitializeCallback { get; set; }
+        //[Parameter] public EventCallback<SearchFormModel> SearchFormChanged { get; set; }
+        [Parameter] public EventCallback<string> OnInitializeCallback { get; set; }
         [Parameter] public EventCallback OnViewAllLogsCallback { get; set; }
 
         public SportsbookClientPermission CurrentPage { get; set; }
+        private SearchFormModel _searchForm { get; set; }
 
         public bool ShowManageBoostMenu { get; set; }
         public bool ShowBoostedSettingsMenu { get; set; }
@@ -42,14 +42,14 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                 CurrentPage = SportsbookClientPermission.SBC_OE_PriceBoost_Settings;
             }
 
-            SearchForm = new SearchFormModel();
-            await SearchFormChanged.InvokeAsync(SearchForm);
+            _searchForm = new SearchFormModel();
+            //await SearchFormChanged.InvokeAsync(_searchForm);
             await OnInitializeCallback.InvokeAsync();
         }
         public async Task OnInputSearchEvent()
         {
-            await SearchFormChanged.InvokeAsync(SearchForm);
-            await OnInitializeCallback.InvokeAsync();
+            //await SearchFormChanged.InvokeAsync(SearchForm);
+            await OnInitializeCallback.InvokeAsync(_searchForm.SearchText);
         }
 
         public async void OnViewLogsClickEvent()
