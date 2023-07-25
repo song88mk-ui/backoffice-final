@@ -22,7 +22,7 @@
                             }
                         </select>
                     }
-                    <BlazorDateRangePicker.DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" LinkedCalendars="true" StartDate="FilterModel.DateFrom" EndDate="FilterModel.DateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDatePickerClickEvent"></BlazorDateRangePicker.DateRangePicker>
+                    <BlazorDateRangePicker.DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" StartDate="FilterModel.DateFrom" EndDate="FilterModel.DateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDatePickerClickEvent"></BlazorDateRangePicker.DateRangePicker>
                 </div>
 
                 <EditForm Model="FilterModel" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
@@ -66,12 +66,11 @@
                     {
                         if (ActivitLogs != null && ActivitLogs.Any())
                         {
-                            foreach (var item in ActivitLogs)
-                            {
+                            <Virtualize Items="ActivitLogs" Context="item">
                                 <tr>
                                     @((MarkupString)GetLogDetails(item))
                                 </tr>
-                            }
+                            </Virtualize>
                         }
                         else
                         {

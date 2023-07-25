@@ -51,7 +51,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<bool>> SetLeagueState(ConfigState state, ConfigSetLeagueStateRequest payload);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(long id);
         Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload, int templateId= -1);
-        Task<BaseResponse<int>> GetTemplateConfigCount(string state = "");
+        Task<BaseResponse<int>> GetTemplateConfigCount(string state = "", CancellationToken token = default);
         Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(long configTemplateId);
         Task<BaseResponse<bool>> AddOrUpdateConfigTemplateMargin(ConfigTemplateMarginModel request);
 

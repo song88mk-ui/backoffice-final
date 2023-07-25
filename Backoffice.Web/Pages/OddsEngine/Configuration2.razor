@@ -14,20 +14,19 @@
 else
 {
     <div class="col-md-12 mb-4">
-        <ConfigNavMenu Region="@Region" SelectConfigNavMenuCallback="OnConfigNavMenuSelected" />
+        <ConfigNavMenu Region="@Region" MyTemplatesCount="@_myTemplatesCount" AssignedLeaguesCount="@_assignedLeaguesCount" UnAssignedLeaguesCount="@_unAssignedLeaguesCount" SelectConfigNavMenuCallback="OnConfigNavMenuSelected" />
     </div>
 
     @if (SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
     {
-        <ConfigMyTemplates Sports="@Sports" Scopes="@Scopes" QueryMessage="@QueryMessage"/>
+        <ConfigMyTemplates Sports="@Sports" Scopes="@Scopes" QueryMessage="@QueryMessage" />
     }
     else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
     {
-        <ConfigAssigned State="ConfigState.Assigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />
+        <ConfigAssigned State="ConfigState.Assigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" OnStateHasChanged="@OnNavMenuCallback" />
     }
-    else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
+    if (SelectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
     {
-        <ConfigAssigned State="ConfigState.UnAssigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" />
+        <ConfigAssigned State="@ConfigState.UnAssigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" OnStateHasChanged="@OnNavMenuCallback" />
     }
 }
-@*<CustomModal OnSaveClickCallback="OnModalSavedEvent" />*@

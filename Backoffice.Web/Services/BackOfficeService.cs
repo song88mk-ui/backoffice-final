@@ -1503,12 +1503,12 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<int>> GetTemplateConfigCount(string state = "")
+        public async Task<BaseResponse<int>> GetTemplateConfigCount(string state = "", CancellationToken token = default)
         {
             try
             {
                 var query = string.IsNullOrEmpty(state) ? "" : $"?state={state}";
-                var response = await _httpClient.GetAsync($"api/config/template/count{query}");
+                var response = await _httpClient.GetAsync($"api/config/template/count{query}", token);
 
                 if (response.IsSuccessStatusCode)
                 {

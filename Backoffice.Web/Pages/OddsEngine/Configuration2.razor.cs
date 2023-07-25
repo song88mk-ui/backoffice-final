@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Threading;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -9,6 +10,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
         [Inject] private ITradingService TradingService { get; set; }
+        [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
 
         [Parameter]
@@ -24,11 +26,18 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public bool IsPreleader = true;
         #endregion
+        private int? _myTemplatesCount;
+        private int? _assignedLeaguesCount;
+        private int? _unAssignedLeaguesCount;
+
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
             SelectedConfigNavMenu = ConfigTemplateNavMenu.MyTemplates;
+            _myTemplatesCount = null;
+            _assignedLeaguesCount = null;
+            _unAssignedLeaguesCount = null;
 
             IsPreleader = true;
             Breadcrumbs = new List<BreadcrumbModel>()
@@ -40,6 +49,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
+
+            CalculateConfigCounts();
             await Init();
         }
 
@@ -48,14 +59,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             Sports = new List<SelectListItemModel<string>>();
             Scopes = new List<SelectListItemModel<string>>();
 
-            var taskList = new List<Task>()
-            {
-                Task.Run(() => {Clients = LoadClients().Result; }),
-                Task.Run(() => {while (Sports.Count == 0){Sports = LoadSports().Result;}}),
-                Task.Run(() => {while (Scopes.Count == 0){Scopes = LoadScopes().Result;}})
-            };
-
-            Task.WaitAll(taskList.ToArray());
+            await Task.WhenAll(new[] {
+                Task.Run(async () => { Clients = await LoadClients(); }),
+                Task.Run(async () => { Sports = await  LoadSports(); }),
+                Task.Run(async () => { Scopes = await LoadScopes();})
+            });
             IsPreleader = false;
         }
         public async Task OnConfigNavMenuSelected(ConfigTemplateNavMenu configNavMenu)
@@ -63,6 +71,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             SelectedConfigNavMenu = configNavMenu;
         }
 
+        public async Task OnNavMenuCallback()
+        {
+            CalculateConfigCounts();
+        }
         public async Task OnModalSavedEvent(object payload)
         {
             StateHasChanged();
@@ -75,6 +87,27 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
+        private async void CalculateConfigCounts()
+        {
+            await InvokeAsync(async () =>
+            {
+                var response = await BackOfficeService.GetTemplateConfigCount();
+                _myTemplatesCount = response.Result;
+                StateHasChanged();
+            });
+            await InvokeAsync(async () =>
+            {
+                var response = await BackOfficeService.GetTemplateConfigCount(ConfigState.Assigned.ToString());
+                _assignedLeaguesCount = response.Result;
+                StateHasChanged();
+            });
+            await InvokeAsync(async () =>
+            {
+                var response = await BackOfficeService.GetTemplateConfigCount(ConfigState.UnAssigned.ToString());
+                _unAssignedLeaguesCount = response.Result;
+                StateHasChanged();
+            });
+        }
         private async Task<List<SelectListItemModel<string>>> LoadSports()
         {
             var response = (await TradingService.GetSportLookup()).Result;

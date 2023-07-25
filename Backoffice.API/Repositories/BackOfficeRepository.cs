@@ -264,7 +264,7 @@ namespace Backoffice.API.Repositories
                         TimeStamp = s.TimeStamp,
                     }).ToList();
 
-                if(!string.IsNullOrEmpty(request.SearchText))
+                if (!string.IsNullOrEmpty(request.SearchText))
                 {
                     activityLogs = activityLogs.Where(x => x.From.ToUpper().Contains(request.SearchText.ToUpper()) || x.To.ToUpper().Contains(request.SearchText.ToUpper()) || x.UserName.ToUpper().Contains(request.SearchText.ToUpper())).ToList();
                 }
@@ -1658,22 +1658,18 @@ namespace Backoffice.API.Repositories
                         {
                             var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
 
-                            for (var x = 0; x < clientCodes.Count(); x++)
+                            foreach (var clientCode in clientCodes)
                             {
-                                var clientCode = clientCodes[x];
                                 var userLeagues = query.Where(x => x.ClientCode == clientCode).Select(x => x.LeagueId).ToList();
                                 var leagues = leagueLookup.Where(x => !userLeagues.Contains(x.LeagueId)).ToList();
 
-                                for (var y = 0; y < leagues.Count(); y++)
+                                foreach (var league in leagues)
                                 {
-                                    var league = leagues[y];
-
                                     var fixtures = new List<int>() { payload.ScopeId };
 
                                     if (payload.ScopeId == -1)
                                     {
                                         var template = templates.Where(x => query.Any(q => q.ConfigTemplateId == x.Id)).ToList();
-
                                         fixtures = fixtureStatusIds.Where(x => !template.Any(t => t.FixtureTypeId == x)).ToList();
                                     }
 
@@ -1834,7 +1830,7 @@ namespace Backoffice.API.Repositories
                     //await _backofficeContext.SaveChangesAsync();
                 }
 
-                foreach(var config in request.ConfigTemplateMargins)
+                foreach (var config in request.ConfigTemplateMargins)
                 {
                     _backofficeContext.ConfigTemplateMargin.Add(new Shared.Data.Backoffice.Entities.ConfigTemplateMargin()
                     {

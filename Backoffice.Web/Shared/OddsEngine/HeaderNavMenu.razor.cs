@@ -84,6 +84,7 @@ namespace Backoffice.Web.Shared.OddsEngine
                         IsActiveMonitoring = true;
                         break;
                     case "CONFIG":
+                    case "CONFIG-TEMPLATES":
                         IsActiveConfig = true;
                         break;
                     case "PRICEBOOST":

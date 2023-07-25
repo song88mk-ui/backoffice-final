@@ -175,7 +175,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         if (result.StatusCode == StatusCode.Success)
                         {
 
-                            OnLeagueConfigMessage messageLeague = new OnLeagueConfigMessage
+                            var messageLeague = new OnLeagueConfigMessage
                             {
                                 ClientCode = league.ClientCode,
                                 ClientId = Guid.Parse(league.ClientId),
@@ -193,7 +193,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 Payload = JsonSerializer.Serialize(messageLeague)
                             });
 
-                            OnMarketConfigMessage messageMarket = new OnMarketConfigMessage
+                            var messageMarket = new OnMarketConfigMessage
                             {
                                 ClientCode = league.ClientCode,
                                 ClientId = Guid.Parse(league.ClientId),
