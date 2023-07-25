@@ -1,0 +1,62 @@
+﻿<EditForm EditContext="@_editContext" class="form-horizontal" >
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <div class="form-group row">
+        <label class="col-sm-5 col-form-label">Key</label>
+        <div class="col-sm-7">
+            @{ 
+                var classText = "form-control number-control " + ValidationClass;
+            }
+            <InputNumber type="number" class="@classText" onkeydown="return event.keyCode !== 69" @bind-Value="@NewSetting.Key" min="101" max="999" maxlength="3" required />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-5 col-form-label">Time</label>
+        <div class="col-sm-7">
+            <InputSelect name="select" class="form-control " @bind-Value="NewSetting.Time">
+                @if (IsPrematch)
+                {
+                    @foreach (var setting in SettingsPrematch.Settings)
+                    {
+                        if (setting.Time == NewSetting.Time)
+                        {
+                            <option value="@setting.Time">@setting.TimeDisplay</option>
+                        }
+                        else
+                        {
+                            <option value="@setting.Time">@setting.TimeDisplay</option>
+                        }
+                    }
+                }
+                else
+                {
+                    @foreach (var setting in SettingsLive.Settings)
+                    {
+                        if (setting.Time == NewSetting.Time)
+                        {
+                            <option value="@setting.Time" selected>@setting.TimeDisplay</option>
+                        }
+                        else
+                        {
+                            <option value="@setting.Time">@setting.TimeDisplay</option>
+                        }
+                    }
+                }
+            </InputSelect>
+        </div>
+    </div>
+    <hr size="1" />
+    @if (Setting.Key != null && !(Setting.TimeDisplay == "INST" && IsPrematch))
+    {
+        <div class="form-group row">
+            <label class="col-sm-12 col-form-label"><a href="" @onclick="@(_ => DeleteKey())" @onclick:preventDefault class="text-danger"><i class="fa fa-trash"></i> Delete the key</a></label>
+        </div>
+    }
+
+    <div class="form-group row">
+        <div class="col-sm-12" align="center">
+            <button type="reset" class="btn btn-cancel-option btn-inline btn-default btn-sm m-b-0" @onclick="@(_ => CloseModal())">Cancel</button>
+            <button type="submit" @onclick="@(_ => UpdateSetting())" class="btn btn-success btn-inline btn-sm m-b-0">Apply</button>
+        </div>
+    </div>
+</EditForm>

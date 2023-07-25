@@ -43,6 +43,20 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ResendSettlementResponse>> ResendSettlement(ResendSettlementRequest request);
         Task<BaseResponse<BetModifyResponse>> CancelBet(BetModifyRequest request);
         Task<BaseResponse<bool>> DeactivateFixtureMarkets(DeactivateFixtureMarketRequest request);
+
+        #region ConfigTemplate
+        Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId);
+        Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(int sportId = -1, int scopeId = -1);
+        Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
+        Task<BaseResponse<bool>> SetLeagueState(ConfigState state, ConfigSetLeagueStateRequest payload);
+        Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(long id);
+        Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload, int templateId= -1);
+        Task<BaseResponse<int>> GetTemplateConfigCount(string state = "");
+        Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(long configTemplateId);
+        Task<BaseResponse<bool>> AddOrUpdateConfigTemplateMargin(ConfigTemplateMarginModel request);
+
+        #endregion
+
         void Dispose();
     }
 }

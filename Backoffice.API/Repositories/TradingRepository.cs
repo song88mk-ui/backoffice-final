@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Azure.Core;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using JsonSerializer = System.Text.Json.JsonSerializer;
-using System.Text.Json;
-using Newtonsoft.Json;
-using Backoffice.Shared.Data.Backoffice.Entities;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Backoffice.API.Repositories
 {
@@ -94,8 +94,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-
-        public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region)
+        public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region = "")
         {
             try
             {
@@ -161,7 +160,7 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Segment
-        public async Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string region)
+        public async Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string region = "")
         {
             try
             {
@@ -195,7 +194,41 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region League
-        public async Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string region)
+        public async Task<BaseResponse<LeagueLookupResponseV2>> GetAllLeagueLookup(string sportIds, string region = "")
+        {
+            try
+            {
+                var payload = new {
+                    SportIds = sportIds
+                };
+                var response = await GetHttpClient(region).PostAsync($"league/lookup", new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<LeagueLookupResponseV2>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<LeagueLookupResponseV2>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<LeagueLookupResponseV2>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<LeagueLookupResponseV2>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+        public async Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string region = "")
         {
             try
             {
@@ -423,6 +456,37 @@ namespace Backoffice.API.Repositories
             }
         }
         public async Task<BaseResponse<ConfigModel>> GetClientConfig(ClientConfigRequest request, string region)
+        {
+            try
+            {
+                var response = await GetHttpClient(region).PostAsync($"client/config/all", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ConfigModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<ConfigModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<ConfigModel>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ConfigModel>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+        public async Task<BaseResponse<ConfigModel>> GetClientConfigv2(ClientConfigRequestv2 request, string region)
         {
             try
             {

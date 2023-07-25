@@ -1,0 +1,169 @@
+﻿@using Backoffice.Web.Components.OddsEngine.Configuration
+
+@layout OEMonitoringLayout
+
+<div class="col-md-12">
+    <div class="col-md-12 mb-4">
+        <div class="d-flex justify-content-between m-4">
+            <div>
+                <h4 class="page-title">@PageTitle</h4>
+            </div>
+        </div>
+        <div id="selectedLeagueWrapper" style="display: none">
+            <div class="d-flex align-items-center justify-content-between mx-4 p-2 border">
+                <div class="col d-inline-flex align-items-center">
+                    <div class="selection-logo"><i class="ico ico-top-leagues mx-4" aria-hidden="true"></i></div>
+                    <p class="lbl-selection m-0">@(SelectedLeagueCount >= 2 ? $"{SelectedLeagueCount} Leagues selected" : $"{SelectedLeagueCount} League selected")</p>
+                </div>
+                <div class="d-flex h-75 justify-content-end">
+                    <button href="javascript:void(0)" @onclick="OnSelectAllClickedEvent" class="btn btn-selection-all px-4">Select All</button>
+                    <button href="javascript:void(0)" @onclick="OnClearSelectionClickedEvent" class="btn btn-selection-clear px-4">Clear Selection</button>
+                    <button href="javascript:void(0)" @onclick="OnEditTemplateClickedEvent" class="btn btn-selection-modify px-4">@(State == ConfigState.Assigned ? "Change template" : "Assign a template")</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12 mb-4">
+    <div class="d-flex justify-content-between mx-4">
+        <div class="d-flex filter-div">
+            <div class="dropdown">
+                <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (Clients != null && Clients.Any())
+                    {
+                        if (Clients.Count - 1 == SelectedClientCount)
+                        {
+                            <span>All Clients (@SelectedClientCount)</span>
+                        }
+                        else
+                        {
+                            <span>@(SelectedClientCount == 1 ? SelectedClientName : $"Clients ({SelectedClientCount})")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No Clients Available</span>
+                    }
+                </button>
+                @if (Clients != null && Clients.Any())
+                {
+                    <SelectWithCheckbox Items="Clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="scope-dropdown" />
+                }
+            </div>
+
+            @if (Sports != null && Sports.Any())
+            {
+                <select class="form-select" @onchange="OnSportCheckboxClickEvent">
+                    @foreach (var item in Sports)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == FilterModel.SportId.ToString())">@item.Name</option>
+                    }
+                </select>
+            }
+
+            @if (Scopes != null && Scopes.Any())
+            {
+                <select class="form-select" @onchange="OnScopeCheckboxClickEvent">
+                    @foreach (var item in Scopes)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == FilterModel.SportId.ToString())">@item.Name</option>
+                    }
+                </select>
+            }
+        </div>
+
+        <div>
+            <div class="input-container d-flex">
+                <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                    <div class="input-group">
+                        <InputText id="search" placeholder="Find Client" class="form-control search-text border-end-0" @bind-Value="SearchForm.SearchText" />
+                        <button class="input-group-text border-start-0">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+            @*<div class="input-group">
+            <input type="text" id="search" placeholder="Search" class="form-control search-text valid border-end-0" />
+            <span class="input-group-text border-start-0">
+            <i class="fa fa-search"></i>
+            </span>
+            </div>*@
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="mx-4">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+
+                    <AuthorizeView Policy="sbc-config-canedit">
+                        <Authorized Context="ActivateAll">
+                            <th class="index" scope="col"></th>
+                        </Authorized>
+                    </AuthorizeView>
+                    <th class="index" scope="col">No.</th>
+                    <th class="filter" scope="col">Client Name</th>
+                    <th class="filter" scope="col">Sport</th>
+                    <th class="filter" scope="col">Scope</th>
+                    <th class="template" scope="col">League Name</th>
+                    <th class="template" scope="col">Template</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (IsPreloader)
+                {
+                    <tr>
+                        <AuthorizeView Policy="sbc-config-canedit">
+                            <Authorized Context="ActivateAll">
+                                <td colspan="7">
+                                    <Preloader />
+                                </td>
+                            </Authorized>
+                            <NotAuthorized>
+                                <td colspan="6">
+                                    <Preloader />
+                                </td>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </tr>
+                }
+                else
+                {
+                    @if (ConfigClients != null && ConfigClients.Any())
+                    {
+                        foreach (var config in ConfigClients)
+                        {
+                            var index = (ConfigClients.IndexOf(config) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
+                            <ConfigStateRow State="State" Index="@index" Config="config" ItemSelectionChangedEvent="@OnConfigSelectionChanged" />
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <AuthorizeView Policy="sbc-config-canedit">
+                                <Authorized Context="ActivateAll">
+                                    <td colspan="7">
+                                        <NoRecordFound />
+                                    </td>
+                                </Authorized>
+                                <NotAuthorized>
+                                    <td colspan="6">
+                                        <NoRecordFound />
+                                    </td>
+                                </NotAuthorized>
+                            </AuthorizeView>
+                        </tr>
+                    }
+                }
+            </tbody>
+            <Pagination MetaData="MetaData" Spread="2" SelectPageEvent="SelectedPage" PaginationColspan="7" RowInfColSpan="5" />
+        </table>
+    </div>
+</div>
+
+<CustomModal OnSaveClickCallback="OnModalSaveEvent" />

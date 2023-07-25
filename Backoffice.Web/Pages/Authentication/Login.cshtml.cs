@@ -68,7 +68,7 @@ namespace Backoffice.Web.Pages.Authentication
 
                     var preference = JsonSerializer.Deserialize<TokenModel>(Request.Cookies["RememberMePreference"]?.ToString());
 
-                    if (preference.AccessToken == null)
+                    if (preference?.AccessToken == null)
                     {
                         SetRememberMePreference(false);
                     }
