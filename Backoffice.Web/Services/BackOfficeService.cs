@@ -1399,7 +1399,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.DeleteAsync($"api/config/template/{id}");
+                var response = await _httpClient.PostAsync($"api/config/template/delete/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {

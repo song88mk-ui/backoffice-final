@@ -122,7 +122,7 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
-        [HttpDelete("template/{id}")]
+        [HttpPost("template/delete/{id}")]
         [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> DeleteConfigTemplate([FromRoute] string id)
         {
