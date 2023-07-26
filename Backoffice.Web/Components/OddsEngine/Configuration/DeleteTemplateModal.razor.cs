@@ -21,12 +21,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public ConfigTemplateModel ConfigTemplateModel { get; set; }
 
         #endregion
-
+        private bool _isPreloader;
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            _isPreloader = false;
             ConfigTemplateModel = ModalParameters.TryGet<ConfigTemplateModel>("ConfigTemplateModel");
         }
 
@@ -37,6 +38,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnApplyClickEvent()
         {
+            _isPreloader = true;
             var response = await BackofficeService.DeleteConfigTemplate(ConfigTemplateModel.Id);
 
             if (response.StatusCode == StatusCode.Success)
@@ -56,6 +58,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 await Modal.OnSaveClickCallback.InvokeAsync(true);
             }
 
+            _isPreloader = false;
             ModalService.Cancel();
         }
 
