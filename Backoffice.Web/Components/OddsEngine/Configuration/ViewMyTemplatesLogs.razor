@@ -1,0 +1,92 @@
+﻿<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <div class="d-flex justify-content-between log-filter">
+                <div class="d-flex">
+                    @if (Sports != null && Sports.Any())
+                    {
+                        <select class="form-select" @onchange="OnSportClickEvent">
+                            @foreach (var item in Sports)
+                            {
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.SelectedSportId.ToString())">@item.Name</option>
+                            }
+                        </select>
+                    }
+
+                    @if (Scopes != null && Scopes.Any())
+                    {
+                        <select class="form-select" @onchange="OnScopeClickEvent">
+                            @foreach (var item in Scopes)
+                            {
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.SelectedScopeId.ToString())">@item.Name</option>
+                            }
+                        </select>
+                    }
+                    <BlazorDateRangePicker.DateRangePicker class="form-control" DateFormat="MM/dd/yyyy" StartDate="FilterModel.DateFrom" EndDate="FilterModel.DateTo" MaxDate="DateTime.Today" OnRangeSelect="OnDatePickerClickEvent"></BlazorDateRangePicker.DateRangePicker>
+                </div>
+
+                <EditForm Model="FilterModel" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                    <div class="input-group">
+                        <input id="search" placeholder="Search" class="form-control search-text valid border-end-0" @bind-value="FilterModel.SearchText" />
+                        <span class="input-group-text border-start-0">
+                            <i class="fa fa-search"></i>
+                        </span>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered table-striped table-logs">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Sports</th>
+                        <th scope="col">Scope</th>
+                        <th scope="col">Template</th>
+                        <th scope="col">Changes Made</th>
+                        <th scope="col">From</th>
+                        <th scope="col">To</th>
+                        <th scope="col">Updated By</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (IsPreLoader)
+                    {
+                        <tr>
+                            <td colspan="8">
+                                <Preloader />
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        if (ActivitLogs != null && ActivitLogs.Any())
+                        {
+                            <Virtualize Items="ActivitLogs" Context="item">
+                                <tr>
+                                    @((MarkupString)GetLogDetails(item))
+                                </tr>
+                            </Virtualize>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8">
+                                    <NoRecordFound />
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                <Pagination MetaData="MetaData" Spread="3" SelectPageEvent="SelectPage" PaginationColspan="7" />
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn" @onclick="OnCloseClickEvent">Close</button>
+</div>

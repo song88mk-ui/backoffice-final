@@ -1,0 +1,26 @@
+﻿using System.Text.Json.Serialization;
+
+namespace Backoffice.Web.Models
+{
+    public class DimensionModel
+    {
+        [JsonPropertyName("x")]
+        public decimal X { get; set; }
+        [JsonPropertyName("y")]
+        public decimal Y { get; set; }
+        [JsonPropertyName("width")]
+        public decimal Width { get; set; }
+        [JsonPropertyName("height")]
+        public decimal Height { get; set; }
+        [JsonPropertyName("top")]
+        public decimal Top { get; set; }
+        [JsonPropertyName("right")]
+        public decimal Right { get; set; }
+        [JsonPropertyName("bottom")]
+        public decimal Bottom { get; set; }
+        [JsonPropertyName("left")]
+        public decimal Left { get; set; }
+        [JsonPropertyName("position")]
+        public string Position { get; set; }
+    }
+}

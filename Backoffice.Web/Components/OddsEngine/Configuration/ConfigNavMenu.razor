@@ -1,0 +1,5 @@
+﻿<div class="col mx-4 config-nav-container">
+    <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.MyTemplates)">My Templates (@(MyTemplatesCount is null ? "Calculating..." : MyTemplatesCount))</a>
+    <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.Assigned)">Assigned (@(AssignedLeaguesCount is null ? "Calculating..." : AssignedLeaguesCount))</a>
+    <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.UnAssigned)">Unassigned (@(UnAssignedLeaguesCount is null ? "Calculating..." : UnAssignedLeaguesCount))</a>
+</div>

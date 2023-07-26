@@ -1,0 +1,89 @@
+﻿﻿.page-title {
+    font-weight: bold;
+}
+
+.filter-div {
+    gap: 2rem;
+    flex-basis: 45%;
+}
+
+table thead {
+    color: white;
+    background-color: #354156;
+}
+
+div.league-state-edit {
+    visibility: hidden;
+    height: 0;
+    transition: height 0.5s;
+}
+
+div.league-state-edit.active {
+    visibility: visible;
+    height: fit-content;
+}
+
+.btn-change-template {
+    color: white;
+    font-weight: 500;
+    background: transparent linear-gradient(180deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+    border-radius: 2px;
+    opacity: 1;
+}
+
+button.form-select {
+    background-color: #fff;
+    text-align: left;
+    border: 1px solid #ced4da;
+    width: 200px;
+}
+
+.dropdown-toggle::after {
+    content: unset;
+}
+
+.btn-selection-modify {
+    color: #FFFFFFFF;
+    font-weight: 500;
+    background: transparent linear-gradient(180deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+    border-radius: 2px;
+    opacity: 1;
+}
+
+.btn-selection-clear {
+    font-weight: bold;
+    color: #E5442F;
+}
+
+.lbl-selection {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.selection-logo {
+    text-align: center;
+    font-size: 40px;
+    color: #E64832;
+}
+
+.fa-trophy {
+    color: #E5442F;
+}
+
+th.index {
+    width: 6vw;
+    padding-right: 1.5rem !important;
+    padding-left: 1.5rem !important;
+}
+
+th.filter {
+    width: 12vw;
+    padding-right: 1.5rem !important;
+    padding-left: 1.5rem !important;
+}
+
+th.template {
+    width: 26vw;
+    padding-right: 1.5rem !important;
+    padding-left: 1.5rem !important;
+}

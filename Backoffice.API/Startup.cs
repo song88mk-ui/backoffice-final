@@ -21,6 +21,7 @@ using System.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Backoffice.API
 {
@@ -48,48 +49,48 @@ namespace Backoffice.API
             if (Convert.ToBoolean(Configuration["Telemetry:Enabled"]))
             {
 
-              services
-                .AddOpenTelemetry()
-                .ConfigureResource(configureResource)
-                .WithTracing(tracing =>
-                {
-                  tracing
-                    .AddSource(Instrumentation.ActivitySourceName)
-                    .SetSampler(new AlwaysOnSampler())
-                    .AddHttpClientInstrumentation()
-                    .AddAspNetCoreInstrumentation((aspCoreOpts) => aspCoreOpts.Filter = httpContext =>
+                services
+                  .AddOpenTelemetry()
+                  .ConfigureResource(configureResource)
+                  .WithTracing(tracing =>
+                  {
+                      tracing
+                      .AddSource(Instrumentation.ActivitySourceName)
+                      .SetSampler(new AlwaysOnSampler())
+                      .AddHttpClientInstrumentation()
+                      .AddAspNetCoreInstrumentation((aspCoreOpts) => aspCoreOpts.Filter = httpContext =>
+                      {
+                          return (
+                            httpContext.Request.Path.ToString().StartsWith("/api") ||
+                            httpContext.Request.Path.ToString().StartsWith("/sportsbook")
+                            );
+                      })
+                      .AddSqlClientInstrumentation();
+
+                      services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("Telemetry:AspNetCoreInstrumentation"));
+
+                      tracing.AddOtlpExporter(exporterOpts =>
                     {
-                      return (
-                          httpContext.Request.Path.ToString().StartsWith("/api") ||
-                          httpContext.Request.Path.ToString().StartsWith("/sportsbook")
-                          );
-                    })
-                    .AddSqlClientInstrumentation();
+                        exporterOpts.Protocol = OtlpExportProtocol.HttpProtobuf;
+                        exporterOpts.Endpoint = new Uri(Configuration["Telemetry:Collector"] + "/v1/traces");
+                    });
 
-                  services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("Telemetry:AspNetCoreInstrumentation"));
-
-                  tracing.AddOtlpExporter(exporterOpts =>
+                  })
+                  .WithMetrics(metrics =>
                   {
-                    exporterOpts.Protocol = OtlpExportProtocol.HttpProtobuf;
-                    exporterOpts.Endpoint = new Uri(Configuration["Telemetry:Collector"]+"/v1/traces");
+                      metrics
+                      .AddMeter(Instrumentation.MeterName)
+                      .AddRuntimeInstrumentation()
+                      .AddHttpClientInstrumentation()
+                      .AddAspNetCoreInstrumentation();
+
+                      metrics.AddOtlpExporter(exporterOpts =>
+                    {
+                        exporterOpts.Protocol = OtlpExportProtocol.HttpProtobuf;
+                        exporterOpts.Endpoint = new Uri(Configuration["Telemetry:Collector"] + "/v1/metrics");
+                    });
+
                   });
-
-                })
-                .WithMetrics(metrics =>
-                {
-                  metrics
-                    .AddMeter(Instrumentation.MeterName)
-                    .AddRuntimeInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddAspNetCoreInstrumentation();
-
-                  metrics.AddOtlpExporter(exporterOpts =>
-                  {
-                    exporterOpts.Protocol = OtlpExportProtocol.HttpProtobuf;
-                    exporterOpts.Endpoint = new Uri(Configuration["Telemetry:Collector"]+"/v1/metrics");
-                  });
-
-                });
 
             } //if telemetry enabled
 
@@ -128,7 +129,6 @@ namespace Backoffice.API
                 var requirement = new OpenApiSecurityRequirement { { key, new List<string>() } };
                 option.AddSecurityRequirement(requirement);
             });
-
             services.AddControllers().AddJsonOptions(opt =>
             {
                 opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());

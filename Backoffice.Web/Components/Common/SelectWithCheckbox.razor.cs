@@ -20,7 +20,7 @@ namespace Backoffice.Web.Components.Common
         {
             if (model.IsChecked == false)
             {
-                if (model.Value == "all")
+                if (model.IsSelectAll || model.Value.ToUpper() == "ALL")
                 {
                     Items.ForEach(x =>
                     {
@@ -31,13 +31,13 @@ namespace Backoffice.Web.Components.Common
                 {
                     model.IsChecked = true;
 
-                    if (!Items.Where(c => c.Value != "all").Any(c => c.IsChecked == false))
+                    if (!Items.Where(c => c.IsSelectAll == false && c.Value != "all").Any(c => c.IsChecked == false))
                         Items[0].IsChecked = true;
                 }
             }
             else
             {
-                if (model.Value == "all")
+                if (model.IsSelectAll || model.Value.ToUpper() == "ALL")
                 {
                     Items.ForEach(x =>
                     {

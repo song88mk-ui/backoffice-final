@@ -1,0 +1,40 @@
+﻿<div class="modal-body">
+    <div class="d-flex flex-column justify-content-center p-5">
+        <div class="text-center">
+            <icon class="ico ico-warning"></icon>
+        </div>
+        <div class="text-center">
+            Are you sure want to delete "<span class="fw-bold">@ConfigTemplateModel.Name</span>"
+            <br />
+            Please be certain as this cannot be undone
+        </div>
+        @*@if (!ConfigTemplateModel.ClientCodes.Any() && !ConfigTemplateModel.LeagueIds.Any())
+        {
+            <div class="text-center">
+                Are you sure want to delete "<span class="fw-bold">@ConfigTemplateModel.Name</span>"
+                <br />
+                Please be certain as this cannot be undone
+            </div>
+        }
+        else
+        {
+            <div class="text-center">
+                Please remove the assigned clients and leagues before deleting the template
+            </div>
+        }*@
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn modal-btn modal-cancel" @onclick="OnCancelClickEvent">Cancel</button>
+    <button class="btn modal-btn modal-apply" @onclick="OnApplyClickEvent">Apply</button>
+    @*@if (!ConfigTemplateModel.ClientCodes.Any() && !ConfigTemplateModel.LeagueIds.Any())
+    {
+        <button class="btn modal-btn modal-cancel" @onclick="OnCancelClickEvent">Cancel</button>
+        <button class="btn modal-btn modal-apply" @onclick="OnApplyClickEvent">Apply</button>
+    }
+    else
+    {        
+        <button class="btn modal-btn modal-apply" @onclick="OnCloseClickEvent">Close</button>
+    }*@
+    
+</div>

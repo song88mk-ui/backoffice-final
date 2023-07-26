@@ -1,0 +1,15 @@
+﻿<tr class="@(Config.IsChecked ? "table-active" :"")">
+    <AuthorizeView Policy="sbc-config-canedit">
+        <Authorized Context="ActivateAll">
+            <th class="text-center">
+                <input type="checkbox" class="form-check-input" @onchange="OnCheckboxClicked" checked="@Config.IsChecked" />
+            </th>
+        </Authorized>
+    </AuthorizeView>
+    <th class="text-center font-weight-normal">@Index</th>
+    <td class="px-4">@Config.ClientName</td>
+    <td class="px-4">@Config.SportName</td>
+    <td class="px-4">@Config.FixtureStatusName</td>
+    <td class="px-4">@Config.LeagueName</td>
+    <td class="@(State == ConfigState.UnAssigned ? "template-name-italic" : "") px-4">@(Config.TemplateId == -1 ? "No template assigned" : Config.TemplateName)</td>
+</tr>

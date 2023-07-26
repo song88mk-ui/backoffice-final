@@ -10,6 +10,7 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public int Spread { get; set; }
         [Parameter] public EventCallback<int> SelectPageEvent { get; set; }
         [Parameter] public int PaginationColspan { get; set; }
+        [Parameter] public int RowInfColSpan { get; set; } = 2;
 
         protected List<PagingLink> _links;
         protected int ToRow => GetToRow();

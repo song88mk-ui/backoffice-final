@@ -3,15 +3,19 @@ using Backoffice.API.Repositories;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.Backoffice
 {
-    [Authorize]
+    [Authorize("SBC.OE.Config", ((int)Access.View))]
     [Route("api/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class ConfigController : ControllerBase
@@ -42,6 +46,167 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> GetMaintenance()
         {
             var result = await _maintenanceRepository.GetMaintenance();
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("template/{id}")]
+        public async Task<IActionResult> GetConfigTemplateById([FromRoute] long id)
+        {
+            var result = await _backofficeRepository.GetConfigTemplateById(id);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpGet("templates")]
+        public async Task<IActionResult> GetConfigTemplates([FromQuery] int sportId = -1, [FromQuery] int scopeId = -1)
+        {
+            var result = await _backofficeRepository.GetConfigTemplates(sportId == -1 ? null : new List<int>() { sportId }, scopeId == -1 ? null : new List<int>() { scopeId });
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("template")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        public async Task<IActionResult> AddOrUpdateConfigTemplate([FromBody] ConfigTemplateModel request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+
+            var result = await _backofficeRepository.AddOrUpdateConfigTemplate(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("template/set/{state}")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        public async Task<IActionResult> ConfigTemplateSetState([FromBody] ConfigSetLeagueStateRequest request, [FromRoute] string state)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var result = new BaseResponse<bool>()
+            {
+                StatusCode = BoStatusCode.Error,
+                Message = "Invalid state type"
+            };
+
+            if (Enum.TryParse(state, out ConfigState confState))
+            {
+                result = await _backofficeRepository.SetConfigState(confState, request);
+            }
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpDelete("template/{id}")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        public async Task<IActionResult> DeleteConfigTemplate([FromRoute] string id)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+
+            var result = await _backofficeRepository.DeleteConfigTemplate(id);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("template/{state}")]
+        public async Task<IActionResult> GetConfigClients([FromRoute] string state, [FromQuery] int templateId = -1, [FromBody] ConfigTemplateLeagueRequest payload = null)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+            var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
+
+            var isAssigned = true;
+            var result = new BaseResponse<ConfigTemplateLeagueResponse>()
+            {
+                StatusCode = BoStatusCode.Error,
+                Message = "Invalid state type"
+            };
+
+            if (templateId != -1)
+            {
+                result = await _backofficeRepository.GetConfigState(clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.Assigned, templateId);
+            }
+            else
+            {
+                if (Enum.TryParse(state, out ConfigState confState))
+                {
+                    result = await _backofficeRepository.GetConfigState(clientCodes, payload, confState);
+                }
+            }
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpGet("template/count")]
+        public async Task<IActionResult> GetTemplateConfigCount([FromQuery] string state = "")
+        {
+            var userId = HttpContext.Items["UserId"].ToString();
+            var clientCodes = HttpContext.Items["ClientCodes"].ToString().Split(',').ToList();
+
+            var result = await _backofficeRepository.GetTemplateConfigCount(clientCodes, state);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("template/margin/{id}")]
+        public async Task<IActionResult> GetConfigTemplateMarginById([FromRoute] long id)
+        {
+            var result = await _backofficeRepository.GetConfigTemplateMarginById(id);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("template/margin")]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        public async Task<IActionResult> AddOrUpdateConfigTemplateMargin([FromBody] ConfigTemplateMarginModel request)
+        {
+            var result = await _backofficeRepository.AddOrUpdateConfigTemplateMargin(request);
 
             switch (result.StatusCode)
             {

@@ -5,5 +5,6 @@
         public T Value { get; set; }
         public string Name { get; set; }
         public bool IsChecked { get; set; }
+        public bool IsSelectAll { get; set; } = false;
     }
 }

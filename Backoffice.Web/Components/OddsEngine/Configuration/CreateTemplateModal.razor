@@ -1,0 +1,68 @@
+﻿<div class="modal-body">
+    <div class="row mb-3">
+        <label for="nameTemplate" class="col-sm-2 col-form-label">Name:</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="nameTemplate" @bind-value="TemplateName"/>
+            @if (IsConfigNameExisting)
+            {
+                <span class="fst-italic text-danger">Sorry, that name already exists!</span>
+            }
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="sportsSelect" class="col-sm-2 col-form-label">Sports:</label>
+        <div class="col-sm-10">
+            <select class="form-select" @onchange="OnSportSelectChanged">
+                @if (Sports.Any())
+                {
+                    @foreach (var item in Sports)
+                    {
+                        if (item.Value == SelectedSportId)
+                        {
+                            <option value="@item.Value" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Name</option>
+                        }
+                    }
+                }
+                else
+                {
+                    <option value="-1">--</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="scopeSelect" class="col-sm-2 col-form-label">Scope:</label>
+        <div class="col-sm-10">
+            <select class="form-select" @onchange="OnScopeSelectChanged">
+                @if (Sports.Any())
+                {
+                    @foreach (var item in Scopes)
+                    {
+                        if (item.Value == SelectedScopeId)
+                        {
+                            <option value="@item.Value" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Name</option>
+                        }
+                    }
+                }
+                else
+                {
+                    <option value="-1">--</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickEvent">Cancel</button>
+    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickEvent">Save</button>
+</div>

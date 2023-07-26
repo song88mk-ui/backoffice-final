@@ -40,4 +40,12 @@ namespace Backoffice.Web.Models
 
         public string SearchText { get; set; }
     }
+    public class ConfigActivityLogFilterModel
+    {
+        public string SelectedSportId { get; set; }
+        public string SelectedScopeId { get; set; }
+        public DateTime DateFrom { get; set; }
+        public DateTime DateTo { get; set; }
+        public string SearchText { get; set; } = "";
+    }
 }

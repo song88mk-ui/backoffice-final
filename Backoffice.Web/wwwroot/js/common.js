@@ -454,3 +454,7 @@ window.scrollToTopOfElement = (className, speed) => {
 window.scrollIntoElement = (elementId) => {
     $(elementId)[0].scrollIntoView();
 }
+
+window.showSelectedLeagueCount = () => {
+    $('#selectedLeagueWrapper').slideToggle("fast");
+}

@@ -1,0 +1,32 @@
+﻿@using Backoffice.Web.Components.OddsEngine.Configuration
+
+@layout OEMonitoringLayout
+
+@*@page "/{Region}/odds-engine/config/my-templates"*@
+@page "/hk/odds-engine/config-templates"
+
+<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region" />
+
+@if (IsPreleader)
+{
+    <Preloader />
+}
+else
+{
+    <div class="col-md-12 mb-4">
+        <ConfigNavMenu Region="@Region" MyTemplatesCount="@_myTemplatesCount" AssignedLeaguesCount="@_assignedLeaguesCount" UnAssignedLeaguesCount="@_unAssignedLeaguesCount" SelectConfigNavMenuCallback="OnConfigNavMenuSelected" />
+    </div>
+
+    @if (SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
+    {
+        <ConfigMyTemplates Sports="@Sports" Scopes="@Scopes" QueryMessage="@QueryMessage" />
+    }
+    else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
+    {
+        <ConfigAssigned State="ConfigState.Assigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" OnStateHasChanged="@OnNavMenuCallback" />
+    }
+    if (SelectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
+    {
+        <ConfigAssigned State="@ConfigState.UnAssigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" OnStateHasChanged="@OnNavMenuCallback" />
+    }
+}
