@@ -12,7 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
     public partial class ConfigStateRow
     {
-        [Parameter] public ConfigState State { get; set; }
+        [Parameter] public ConfigState? State { get; set; }
         [Parameter] public int Index { get; set; }
         [Parameter] public ConfigClientViewModel Config { get; set; }
         [Parameter] public EventCallback ItemSelectionChangedEvent { get; set; }

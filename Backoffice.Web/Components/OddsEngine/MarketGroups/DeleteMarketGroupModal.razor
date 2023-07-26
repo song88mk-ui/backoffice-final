@@ -20,9 +20,9 @@
             </div>
         }
     </div>
-    @if (ShowErrorMessage)
+    @if (_alertModel != null && string.IsNullOrEmpty(_alertModel.Message))
     {
-        <AlertMessage AlertStatus="@AlertStatus" AlertMessageStr="@ErrorMessage" @bind-Opacity="@Opacity" />
+        <AlertMessage AlertModel="@_alertModel" />
     }
 </div>
 <div class="modal-footer">

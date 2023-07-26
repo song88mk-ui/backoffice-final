@@ -18,7 +18,7 @@
                 <div class="d-flex h-75 justify-content-end">
                     <button href="javascript:void(0)" @onclick="OnSelectAllClickedEvent" class="btn btn-selection-all px-4">Select All</button>
                     <button href="javascript:void(0)" @onclick="OnClearSelectionClickedEvent" class="btn btn-selection-clear px-4">Clear Selection</button>
-                    <button href="javascript:void(0)" @onclick="OnEditTemplateClickedEvent" class="btn btn-selection-modify px-4">@(State == ConfigState.Assigned ? "Change template" : "Assign a template")</button>
+                    <button href="javascript:void(0)" @onclick="OnEditTemplateClickedEvent" class="btn btn-selection-modify px-4">@(_state == ConfigState.Assigned ? "Change template" : "Assign a template")</button>
                 </div>
             </div>
         </div>
@@ -30,15 +30,15 @@
         <div class="d-flex filter-div">
             <div class="dropdown">
                 <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    @if (Clients != null && Clients.Any())
+                    @if (_clients != null && _clients.Any())
                     {
-                        if (Clients.Count - 1 == _selectedClientCount)
+                        if (_clients.Count - 1 == _selectedClientCount)
                         {
                             <span>All Clients (@_selectedClientCount)</span>
                         }
                         else
                         {
-                            <span>@(_selectedClientCount == 1 ? SelectedClientName : $"Clients ({_selectedClientCount})")</span>
+                            <span>@(_selectedClientCount == 1 ? _selectedClientName : $"Clients ({_selectedClientCount})")</span>
                         }
                     }
                     else
@@ -46,26 +46,26 @@
                         <span>No Clients Available</span>
                     }
                 </button>
-                @if (Clients != null && Clients.Any())
+                @if (_clients != null && _clients.Any())
                 {
-                    <SelectWithCheckbox Items="Clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="scope-dropdown" />
+                    <SelectWithCheckbox Items="_clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="scope-dropdown" />
                 }
             </div>
 
-            @if (Sports != null && Sports.Any())
+            @if (_sports != null && _sports.Any())
             {
                 <select class="form-select" @onchange="OnSportCheckboxClickEvent">
-                    @foreach (var item in Sports)
+                    @foreach (var item in _sports)
                     {
                         <option value="@item.Value" selected="@(item.Value == _filterModel.SportId.ToString())">@item.Name</option>
                     }
                 </select>
             }
 
-            @if (Scopes != null && Scopes.Any())
+            @if (_scopes != null && _scopes.Any())
             {
                 <select class="form-select" @onchange="OnScopeCheckboxClickEvent">
-                    @foreach (var item in Scopes)
+                    @foreach (var item in _scopes)
                     {
                         <option value="@item.Value" selected="@(item.Value == _filterModel.SportId.ToString())">@item.Name</option>
                     }
@@ -139,7 +139,7 @@
                         foreach (var config in ConfigClients)
                         {
                             var index = (ConfigClients.IndexOf(config) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
-                            <ConfigStateRow State="State" Index="@index" Config="config" ItemSelectionChangedEvent="@OnConfigSelectionChanged" />
+                            <ConfigStateRow State="_state" Index="@index" Config="config" ItemSelectionChangedEvent="@OnConfigSelectionChanged" />
                         }
                     }
                     else

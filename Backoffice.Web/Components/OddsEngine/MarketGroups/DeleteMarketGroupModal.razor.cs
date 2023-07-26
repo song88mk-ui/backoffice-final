@@ -27,12 +27,9 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         public MarketGroupModel MarketGroupModel { get; set; }
 
         protected bool IsPreLoader { get; set; } = false;
-        public string ErrorMessage { get; set; }
-        public string AlertStatus { get; set; }
-        public decimal Opacity { get; set; } = 0.0m;
-        protected bool ShowErrorMessage { get; set; } = false;
 
         #endregion
+        private AlertModel _alertModel;
 
         #region Methods
 
@@ -66,10 +63,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
             if (MarketTemplateGroup.Name.ToLower() == "all markets")
             {
-                ErrorMessage = "Group name \"All Markets\" cannot be deleted.";
-                AlertStatus = "Error!";
-                Opacity = 1.0m;
-                ShowErrorMessage = true;
+                _alertModel = new AlertModel()
+                {
+                    Status = AlertStatus.Error,
+                    Message = "Group name \"All Markets\" cannot be deleted."
+                };
 
                 IsPreLoader = false;
 
@@ -87,7 +85,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
             if (marketTemplateGroupResponse.StatusCode == StatusCode.Success)
             {
-                ErrorMessage = $"Market group {MarketTemplateGroup.Name} is successfully deleted.";
+                _alertModel = new AlertModel()
+                {
+                    Status = AlertStatus.Success,
+                    Message = $"Market group {MarketTemplateGroup.Name} is successfully deleted."
+                };
 
                 //activity log
                 await BackOfficeService.AddActivityLog(new ActivityLogModel
@@ -106,10 +108,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             }
             else
             {
-                ErrorMessage = $"Error in deleting {MarketTemplateGroup.Name}.";
-                AlertStatus = "Error!";
-                Opacity = 1.0m;
-                ShowErrorMessage = true;
+                _alertModel = new AlertModel()
+                {
+                    Status = AlertStatus.Error,
+                    Message = $"Error in deleting {MarketTemplateGroup.Name}."
+                };
             }
 
             IsPreLoader = false;

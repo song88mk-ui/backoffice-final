@@ -37,11 +37,10 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
         public string TableClass { get; set; }
         public int SelectedRow { get; set; }
-        public string AlertMessage { get; set; }
-        public AlertStatus AlertStatus { get; set; }
 
         #endregion
 
+        private AlertModel _alert;
         #region Methods
 
         protected override async Task OnInitializedAsync()
@@ -52,7 +51,6 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             SportName = !string.IsNullOrWhiteSpace(ModalParameters.TryGet<string>("SportName")) ? ModalParameters.TryGet<string>("SportName") : "Soccer";
 
             CurrentTopLeagues = ModalParameters.TryGet<List<TopLeague>>("CurrentTopLeagues");
-            AlertStatus = AlertStatus.Success;
             TempNewTopLeagues = new List<TopLeague>();
             //SelectedRow = -1;
 
@@ -209,21 +207,26 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
         public async Task OnSaveClickEvent()
         {
-            AlertMessage = string.Empty;
-
+            _alert = new();
             //validate
             if (NewTopLeagues.Count == 1 && NewTopLeagues.Any(x => string.IsNullOrEmpty(x.SegmentName) || string.IsNullOrEmpty(x.LeagueName)))
             {
-                AlertMessage = "Select atleast 1 League";
-                AlertStatus = AlertStatus.Error;
+                _alert = new()
+                {
+                    Status = AlertStatus.Error,
+                    Message = "Select atleast 1 League"
+                };
 
                 return;
             }
 
             if (NewTopLeagues.Count > 1 && NewTopLeagues.Any(x => string.IsNullOrEmpty(x.SegmentName) || string.IsNullOrEmpty(x.LeagueName)))
             {
-                AlertMessage = "Please remove empty row";
-                AlertStatus = AlertStatus.Error;
+                _alert = new()
+                {
+                    Status = AlertStatus.Error,
+                    Message = "Please remove empty row"
+                };
 
                 return;
             }
@@ -269,8 +272,11 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 await Modal.OnSaveClickCallback.InvokeAsync();
                 await Task.Delay(1000);
 
-                AlertMessage = "Top League Saved!";
-                AlertStatus = AlertStatus.Success;
+                _alert = new()
+                {
+                    Status = AlertStatus.Success,
+                    Message = "Top League Saved!"
+                };
 
                 await InvokeAsync(StateHasChanged);
                 await Task.Delay(2000);
@@ -279,15 +285,18 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             }
             else
             {
-                AlertMessage = "Error when saving top leagues.";
-                AlertStatus = AlertStatus.Error;
+                _alert = new()
+                {
+                    Status = AlertStatus.Error,
+                    Message = "TopError when saving top leagues."
+                };
             }
 
         }
 
         public async ValueTask DisposeAsync()
         {
-
+            _alert = new();
             if (DataReference is not null)
                 await DataReference.DisposeAsync();
 

@@ -83,10 +83,10 @@
             }
         </tbody>
     </table>
-    @if (!string.IsNullOrEmpty(AlertMessage))
+    @if (_alert != null && !string.IsNullOrEmpty(_alert.Message))
     {
         <div class="mt-3">
-            <AlertMessage AlertMessageStr="@AlertMessage" AlertStatus="@(AlertStatus.ToString())" AlwaysShow="true" />
+            <AlertMessage AlertModel="@_alert" />
         </div>
     }
 </div>
