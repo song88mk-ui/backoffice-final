@@ -17,11 +17,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public List<ConfigClientModel> Leagues { get; set; }
         #endregion
+        private bool _isPreloader;
+
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
+            _isPreloader = true;
             var configTemplateModel = ModalParameters.TryGet<ConfigTemplateModel>("ConfigTemplateModel");
             Leagues = new List<ConfigClientModel>();
 
@@ -30,6 +33,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             {
                 Leagues = assignedLeagues.Result?.ClientConfigs ?? new List<ConfigClientModel>();
             }
+            _isPreloader = false;
         }
 
         public async Task OnCloseClickEvent()
