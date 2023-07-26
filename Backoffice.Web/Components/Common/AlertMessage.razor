@@ -62,17 +62,7 @@
                             await Task.Delay(10);
                         }
 
-                    await InvokeAsync(StateHasChanged);
-                }
-                Opacity = 0.0m;
-                AlertMessageStr = string.Empty;
-                await OpacityChanged.InvokeAsync(Opacity);
-            }
-        }
-        else
-        {
-            Opacity = 1.00m;
-                        StateHasChanged();
+                        await InvokeAsync(StateHasChanged);
                     }
                     AlertModel.Opacity = 0.0m;
                     AlertModel.Message = string.Empty;
@@ -82,7 +72,11 @@
             else
             {
                 AlertModel.Opacity = 1.00m;
+                StateHasChanged();
             }
+            AlertModel.Opacity = 0.0m;
+            AlertModel.Message = string.Empty;
+            await OpacityChanged.InvokeAsync(AlertModel.Opacity);
         }
     }
 
@@ -90,6 +84,5 @@
     {
 
     }
-
     #endregion
 }

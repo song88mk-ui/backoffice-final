@@ -63,7 +63,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 AlertModel = new AlertModel();
                 AlertModel.Message = QueryMessage;
-                AlertModel.Status = AlertStatus.Success.ToString();
+                AlertModel.Status = AlertStatus.Success;
                 AlertModel.Opacity = 1.0m;
             }
         }
