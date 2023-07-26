@@ -97,6 +97,7 @@ namespace Backoffice.API
             services.AddControllers();
             services.AddCors(options =>
             {
+                options.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
                 options.AddPolicy("AllowAllOrigins",
                     builder =>
                     {
