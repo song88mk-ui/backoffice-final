@@ -1,5 +1,9 @@
-﻿using Backoffice.Web.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using RabbitMQ.Client.Apigen.Attributes;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Backoffice.Web.Shared.OddsEngine
 {
@@ -15,14 +19,10 @@ namespace Backoffice.Web.Shared.OddsEngine
         public bool ShowPriceBoostMenu { get; set; }
         public bool ShowMarketSettingsMenu { get; set; }
 
-        public bool IsActiveMonitoring { get; set; }
-        public bool IsActiveConfig { get; set; }
-        public bool IsActivePriceBoost { get; set; }
-        public bool IsActiveSportSettings { get; set; }
-        public bool IsActiveMarketSettings { get; set; }
-
         private string _address = string.Empty;
         #endregion
+
+        private OeNavMenu _menu;
 
         #region Methods
 
@@ -30,10 +30,8 @@ namespace Backoffice.Web.Shared.OddsEngine
         {
             var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
             _address = $"{Region.ToLower()}/odds-engine";
+            Console.WriteLine(" = = = = = Initialize");
             ActivateMenu(page);
-
-            HideAllMenu();
-
         }
 
         public async Task OnPriceBoostClickEvent()
@@ -60,45 +58,40 @@ namespace Backoffice.Web.Shared.OddsEngine
                 ShowMarketSettingsMenu = false;
         }
 
-        public void ActivateMenu(string? menu = null)
+        public async void ActivateMenu(string? menu = null)
         {
             HideAllMenu();
 
             if (menu != null)
             {
-                //if (menu.Contains("sa/odds-engine/"))
-                //    menu = menu.Replace("sa/odds-engine/", "");
-                //if (menu.Contains("sa/odds-engine"))
-                //    menu = menu.Replace("sa/odds-engine", "");
                 if (menu.Contains("hk/odds-engine/"))
                     menu = menu.Replace("hk/odds-engine/", "");
                 if (menu.Contains("hk/odds-engine"))
                     menu = menu.Replace("hk/odds-engine", "");
 
-                InActiveAllMenu();
-
+                Console.WriteLine($" = = = = ={_menu} > {menu}");
                 switch (menu.ToUpper())
                 {
                     case "":
                     case "MONITORING":
-                        IsActiveMonitoring = true;
+                        _menu = OeNavMenu.Monitoring;
                         break;
                     case "CONFIG":
                     case "CONFIG-TEMPLATES":
-                        IsActiveConfig = true;
+                        _menu = OeNavMenu.Config;
                         break;
                     case "PRICEBOOST":
                     case "MAMAGE-BOOST":
                     case "BOOSTED-SETTINGS":
-                        IsActivePriceBoost = true;
+                        _menu = OeNavMenu.PriceBoost;
                         break;
                     case "SPORT-SETTINGS":
-                        IsActiveSportSettings = true;
+                        _menu = OeNavMenu.SportSettings;
                         break;
                     case "MARKET-SETTINGS":
                     case "MARKET-SORT-ORDER":
                     case "MARKET-GROUPS":
-                        IsActiveMarketSettings = true;
+                        _menu = OeNavMenu.MarketSettings;
                         break;
                 }
             }
@@ -116,15 +109,6 @@ namespace Backoffice.Web.Shared.OddsEngine
         {
             ShowPriceBoostMenu = false;
             ShowMarketSettingsMenu = false;
-        }
-
-        private void InActiveAllMenu()
-        {
-            IsActiveMonitoring = false;
-            IsActiveConfig = false;
-            IsActivePriceBoost = false;
-            IsActiveSportSettings = false;
-            IsActiveMarketSettings = false;
         }
 
         #endregion

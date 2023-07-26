@@ -7,7 +7,9 @@ using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Linq;
 using System.Text.Json;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 using static System.Formats.Asn1.AsnWriter;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -19,6 +21,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
 
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public long ConfigTemplateId { get; set; }
 
@@ -151,6 +154,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 ConfigTemplateMarginModel request = new ConfigTemplateMarginModel();
 
+                var activityLog = new List<ActivityLogModel>();
+                var oldConfigMarginsLogs = new List<ConfigMarginActivityLogModel>();
+                var newConfigMarginsLogs = new List<ConfigMarginActivityLogModel>();
+                var oldMarketState = new List<ConfigMarginActivityLogModel>();
+                var newMarketState = new List<ConfigMarginActivityLogModel>();
+
                 foreach (var market in MarketLookupNavigation)
                 {
                     var livematchSettings = new List<MarketMargin>();
@@ -167,6 +176,60 @@ namespace Backoffice.Web.Pages.OddsEngine
                     else
                         prematchSettings = new List<MarketMargin>();
 
+                    switch ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId)
+                    {
+                        case FixtureStatus.Prematch:
+                            if(market.NewPrematchSettings.Settings.Any(x => market.PrematchSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)))
+                            {
+                                oldConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
+                                {
+                                    MarketTemplateId = market.MarketLookup.MarketTemplateId,
+                                    MarketTemplateName = market.MarketLookup.MarketTemplateName,
+                                    Payload = market.PrematchSettings.Settings.Where(x => market.NewPrematchSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {x.Key}").ToList()
+                                });
+                                newConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
+                                {
+                                    MarketTemplateId = market.MarketLookup.MarketTemplateId,
+                                    MarketTemplateName = market.MarketLookup.MarketTemplateName,
+                                    Payload = market.NewPrematchSettings.Settings.Where(x => market.PrematchSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {x.Key}").ToList()
+                                });
+                            }
+                            break;
+                        case FixtureStatus.Live:
+                            if (market.NewLiveSettings.Settings.Any(x => market.LiveSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)))
+                            {
+                                oldConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
+                                {
+                                    MarketTemplateId = market.MarketLookup.MarketTemplateId,
+                                    MarketTemplateName = market.MarketLookup.MarketTemplateName,
+                                    Payload = market.LiveSettings.Settings.Where(x => market.NewLiveSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {x.Key}").ToList()
+                                });
+                                newConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
+                                {
+                                    MarketTemplateId = market.MarketLookup.MarketTemplateId,
+                                    MarketTemplateName = market.MarketLookup.MarketTemplateName,
+                                    Payload = market.NewLiveSettings.Settings.Where(x => market.LiveSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {x.Key}").ToList()
+                                });
+                            }
+                            break;
+                    }
+
+                    if (market.MarketLookup.IsActive != market.NewMarketLookup.IsActive)
+                    {
+                        oldMarketState.Add(new ConfigMarginActivityLogModel()
+                        {
+                            MarketTemplateId = market.MarketLookup.MarketTemplateId,
+                            MarketTemplateName = market.MarketLookup.MarketTemplateName,
+                            Payload = new List<string>() { market.MarketLookup.IsActive ? "Active" : "Inactive" }
+                        });
+                        newMarketState.Add(new ConfigMarginActivityLogModel()
+                        {
+                            MarketTemplateId = market.MarketLookup.MarketTemplateId,
+                            MarketTemplateName = market.MarketLookup.MarketTemplateName,
+                            Payload = new List<string>() { market.NewMarketLookup.IsActive ? "Active" : "Inactive" }
+                        });
+                    }
+
                     request.ConfigTemplateMargins.Add(new Backoffice.Shared.Models.ConfigTemplateMargin
                     {
                         ConfigTemplateId = ConfigTemplateId,
@@ -176,6 +239,35 @@ namespace Backoffice.Web.Pages.OddsEngine
                         IsActive = market.NewMarketLookup.IsActive,
                         Prematch = JsonSerializer.Serialize(prematchSettings),
                         Live = JsonSerializer.Serialize(livematchSettings)
+                    });
+                }
+
+                if (new[] { oldConfigMarginsLogs, newConfigMarginsLogs }.All(x => x != null && x.Any()) && !oldConfigMarginsLogs.Equals(newConfigMarginsLogs))
+                {
+                    await BackOfficeService.AddActivityLog(new ActivityLogModel()
+                    {
+                        Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
+                        Payload = $"{EditConfigTemplateFilterModel.SportId}.{EditConfigTemplateFilterModel.ScopeId}.{EditConfigTemplateFilterModel.ConfigTemplate.Name}.Modified_Margins.M".Replace(" ", "_"),
+                        From = JsonSerializer.Serialize(oldConfigMarginsLogs),
+                        To = JsonSerializer.Serialize(newConfigMarginsLogs),
+                        Activity = Activity.Update.ToString(),
+                        UserId = UserModel.Id,
+                        UserName = UserModel.UserName,
+                        TimeStamp = DateTime.UtcNow
+                    });
+                }
+                if (new[] { oldMarketState, newMarketState }.All(x => x != null && x.Any()) && !oldMarketState.Equals(newMarketState))
+                {
+                    await BackOfficeService.AddActivityLog(new ActivityLogModel()
+                    {
+                        Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
+                        Payload = $"{EditConfigTemplateFilterModel.SportId}.{EditConfigTemplateFilterModel.ScopeId}.{EditConfigTemplateFilterModel.ConfigTemplate.Name}.Changed_Market_State.M".Replace(" ", "_"),
+                        From = JsonSerializer.Serialize(oldMarketState),
+                        To = JsonSerializer.Serialize(newMarketState),
+                        Activity = Activity.Update.ToString(),
+                        UserId = UserModel.Id,
+                        UserName = UserModel.UserName,
+                        TimeStamp = DateTime.UtcNow
                     });
                 }
 
@@ -260,7 +352,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             if (!EditConfigTemplateFilterModel.SelectedConfigStatus.Contains(marketLookup.IsActive ? "1" : "2"))
                                 continue;
 
-                            var prematchSettings = GetPrematchSettingsTemplate(configTemplateMargin, marketLookup.MarketTemplateId);
+                            var prematchSettings = GetPrematchSettingsTemplate(configTemplateMargin, marketLookup.MarketTemplateId, marketLookup.MarketTemplateName);
                             var liveSettings = GetLiveSettingsTemplate(configTemplateMargin, marketLookup.MarketTemplateId);
 
 
@@ -323,14 +415,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             return marketTemplates;
         }
 
-        private PrematchSettingsTemplateModel GetPrematchSettingsTemplate(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, string marketTemplateId)
+        private PrematchSettingsTemplateModel GetPrematchSettingsTemplate(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, string marketTemplateId, string marketTemplateName)
         {
             return new PrematchSettingsTemplateModel()
             {
                 SportId = EditConfigTemplateFilterModel.ConfigTemplate.SportId,
                 FirstKey = GetFirstKey(configTemplateMargin, true),
                 LastKey = GetLastKey(configTemplateMargin, true),
-                MarketTemplateId = marketTemplateId.ToString(),
+                MarketTemplateId = marketTemplateId,
                 Settings = MockData.PrematchSettings.Select(s => new Backoffice.Shared.Models.KeyTimeModel()
                 {
                     Key = GetPrematchKey(s.TimeDisplay, configTemplateMargin),

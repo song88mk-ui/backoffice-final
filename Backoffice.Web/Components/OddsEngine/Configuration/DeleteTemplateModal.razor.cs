@@ -4,6 +4,7 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -40,6 +41,18 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             if (response.StatusCode == StatusCode.Success)
             {
+                await BackofficeService.AddActivityLog(new ActivityLogModel()
+                {
+                    Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
+                    Payload = $"{ConfigTemplateModel.SportId}.{ConfigTemplateModel.FixtureTypeId}.{ConfigTemplateModel.Name}.T".Replace(" ", "_"),
+                    From = JsonSerializer.Serialize(ConfigTemplateModel),  
+                    To = "-",
+                    Activity = Activity.Delete.ToString(),
+                    UserId = UserModel.Id,
+                    UserName = UserModel.UserName,
+                    TimeStamp = DateTime.UtcNow
+                });
+
                 await Modal.OnSaveClickCallback.InvokeAsync(true);
             }
 

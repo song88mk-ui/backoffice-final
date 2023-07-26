@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IBackOfficeService BackofficeService { get; set; }
 
         [Parameter] public EventCallback<bool> CreateTemplateCallback { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
@@ -79,11 +79,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 Name = TemplateName,
             };
 
-            var response = await BackOfficeService.AddOrUpdateConfigTemplate(payload);
+            var response = await BackofficeService.AddOrUpdateConfigTemplate(payload);
 
             if (response.StatusCode == StatusCode.Success)
             {
-                var activityLog = new ActivityLogModel()
+                await BackofficeService.AddActivityLog(new ActivityLogModel()
                 {
                     Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                     Payload = $"{SelectedSportId}.{SelectedScopeId}.{payload.Name}.T".Replace(" ", "_"),
@@ -93,8 +93,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     UserId = UserModel.Id,
                     UserName = UserModel.UserName,
                     TimeStamp = DateTime.UtcNow
-                };
-                await BackOfficeService.AddActivityLog(activityLog);
+                });
 
                 await Modal.OnSaveClickCallback.InvokeAsync(true);
                 ModalService.Cancel();

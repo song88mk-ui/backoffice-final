@@ -15,4 +15,11 @@ namespace Backoffice.Shared.Models
         public List<string> Clients { get; set; }
         public List<string> Leagues { get; set; }
     }
+
+    public class ConfigMarginActivityLogModel
+    {
+        public string MarketTemplateId { get; set; }
+        public string MarketTemplateName { get; set; }
+        public List<string> Payload { get; set; }
+    }
 }

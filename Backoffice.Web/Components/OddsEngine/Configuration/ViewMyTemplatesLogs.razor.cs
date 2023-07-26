@@ -94,39 +94,69 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             if (activityLog.Activity == Activity.Create.ToString())
             {
                 stringBuilder.Append($"<td class=\"px-4\">Added New Template</td>");
-                stringBuilder.Append($"<td class=\"px-4\">-</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{activityLog.From}</td>");
                 var toPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.To);
                 stringBuilder.Append($"<td class=\"px-4\">{toPaylaod?.Name ?? "-"}</td>");
+            }
+            else if (activityLog.Activity == Activity.Delete.ToString())
+            {
+                stringBuilder.Append($"<td class=\"px-4\">Deleted Template</td>");
+                var fromPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.From);
+                stringBuilder.Append($"<td class=\"px-4\">{fromPaylaod?.Name ?? "-"}</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{activityLog.To}</td>");
             }
             else
             {
                 if (payloads.Count() > 3)
                 {
-                    switch (payloads[3].ToUpper())
+                    switch (payloads.LastOrDefault()?.ToUpper())
                     {
                         case "T":
-                            var fromPayload = JsonSerializer.Deserialize<ConfigTemplateLogModel>(activityLog.From);
-                            var toPayload = JsonSerializer.Deserialize<ConfigTemplateLogModel>(activityLog.To);
+                            var tFromPayload = JsonSerializer.Deserialize<ConfigTemplateLogModel>(activityLog.From);
+                            var tToPayload = JsonSerializer.Deserialize<ConfigTemplateLogModel>(activityLog.To);
 
                             stringBuilder.Append($"<td class=\"px-4\">");
                             stringBuilder.Append($"<strong>Clients</strong>");
                             stringBuilder.Append($"<br>");
-                            foreach (var client in fromPayload.Payloads.Clients)
+                            foreach (var client in tFromPayload.Payloads.Clients)
                             {
                                 stringBuilder.Append($"<span>{client}</span>");
                                 stringBuilder.Append($"<br>");
                             }
+                            stringBuilder.Append($"<br>");
                             stringBuilder.Append($"<strong>Leagues</strong>");
-                            foreach (var league in fromPayload.Payloads.Leagues)
+                            foreach (var league in tFromPayload.Payloads.Leagues)
                             {
                                 stringBuilder.Append($"<br>");
                                 stringBuilder.Append($"<span>{league}</span>");
                             }
                             stringBuilder.Append($"</td>");
-                            stringBuilder.Append($"<td class=\"px-4\">{fromPayload.TemplateName}</td>");
-                            stringBuilder.Append($"<td class=\"px-4\">{toPayload.TemplateName}</td>");
+                            stringBuilder.Append($"<td class=\"px-4\">{tFromPayload.TemplateName}</td>");
+                            stringBuilder.Append($"<td class=\"px-4\">{tToPayload.TemplateName}</td>");
                             break;
                         case "M":
+                            var mFromPayload = JsonSerializer.Deserialize<List<ConfigMarginActivityLogModel>>(activityLog.From) ?? new List<ConfigMarginActivityLogModel>();
+                            var mToPayload = JsonSerializer.Deserialize<List<ConfigMarginActivityLogModel>>(activityLog.To) ?? new List<ConfigMarginActivityLogModel>(); ;
+
+                            stringBuilder.Append($"<td class=\"px-4\">{payloads[3]}</td>");
+                            stringBuilder.Append($"<td class=\"px-4\">");
+                            foreach (var item in mFromPayload)
+                            {
+                                stringBuilder.Append($"<strong>{item.MarketTemplateName}</strong>");
+                                stringBuilder.Append($"<br>");
+                                stringBuilder.Append(string.Join("", item.Payload.Select(x => $"<span>{x}</span><br>").ToList()));
+                                stringBuilder.Append($"<br>");
+                            }
+                            stringBuilder.Append($"</td>");
+                            stringBuilder.Append($"<td class=\"px-4\">");
+                            foreach (var item in mToPayload)
+                            {
+                                stringBuilder.Append($"<strong>{item.MarketTemplateName}</strong>");
+                                stringBuilder.Append($"<br>");
+                                stringBuilder.Append(string.Join("", item.Payload.Select(x => $"<span>{x}</span><br>").ToList()));
+                                stringBuilder.Append($"<br>");
+                            }
+                            stringBuilder.Append($"</td>");
                             break;
                         default:
                             stringBuilder.Append($"<td class=\"px-4\">-</td>");
@@ -189,7 +219,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             {
                 IsPreLoader = true;
                 StateHasChanged();
-            }    
+            }
 
             ActivitLogs = new List<ActivityLogModel>();
             var response = await BackOfficeService.GetActivityLogs(new ActivityLogRequest
