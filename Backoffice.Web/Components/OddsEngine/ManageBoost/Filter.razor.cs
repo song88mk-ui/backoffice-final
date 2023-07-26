@@ -24,17 +24,17 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [Parameter] public EventCallback<int> OnLeagueChangedCallback { get; set; }
         [Parameter] public EventCallback<string> OnInputSearchCallback { get; set; }
         [Parameter] public string Region { get; set; }
+        public string SelectedClientCode { get; set; }
+        public int SelectedSportId { get; set; }
+        public int SelectedSegmentId { get; set; }
+        public int SelectedLeagueId { get; set; }
+        public SearchFormModel SearchForm { get; set; }
 
         private string _region;
         private List<SelectListItemModel<string>> _clients;
-        public string _selectedClientCode;
-        public List<SelectListItemModel<int>> _sports;
-        public int _selectedSportId;
-        public List<SelectListItemModel<int>> _segments;
-        public int _selectedSegmentId;
-        public List<SelectListItemModel<int>> _leagues;
-        public int _selectedLeagueId;
-        public SearchFormModel _searchForm;
+        private List<SelectListItemModel<int>> _sports;
+        private List<SelectListItemModel<int>> _segments;
+        private List<SelectListItemModel<int>> _leagues;
         #endregion
 
         #region Methods
@@ -46,17 +46,17 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             _segments = new List<SelectListItemModel<int>>();
             _leagues = new List<SelectListItemModel<int>>();
 
-            _searchForm = new SearchFormModel();
+            SearchForm = new SearchFormModel();
 
 
             _clients = await LoadClients();
-            _selectedClientCode = _clients.FirstOrDefault().Value;
+            SelectedClientCode = _clients.FirstOrDefault().Value;
             _sports = await LoadSports();
-            _selectedSportId = 0;
-            _segments = await LoadSegments(_selectedSportId);
-            _selectedSegmentId = 0;
-            _leagues = await LoadLeagues(_selectedSportId, _selectedSegmentId);
-            _selectedLeagueId = 0;
+            SelectedSportId = 0;
+            _segments = await LoadSegments(SelectedSportId);
+            SelectedSegmentId = 0;
+            _leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
+            SelectedLeagueId = 0;
 
             await OnInitCallback.InvokeAsync();
         }
@@ -99,44 +99,44 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
-            _selectedClientCode = e.Value.ToString();
+            SelectedClientCode = e.Value.ToString();
 
-            await OnClientChangedCallback.InvokeAsync(_selectedClientCode);
+            await OnClientChangedCallback.InvokeAsync(SelectedClientCode);
         }
 
         public async Task OnSportChangedEvent(ChangeEventArgs e)
         {
-            _selectedSportId = int.Parse(e.Value.ToString());
+            SelectedSportId = int.Parse(e.Value.ToString());
 
-            _segments = await LoadSegments(_selectedSportId);
-            _selectedSegmentId = 0;
+            _segments = await LoadSegments(SelectedSportId);
+            SelectedSegmentId = 0;
 
-            _leagues = await LoadLeagues(_selectedSportId, _selectedSegmentId);
-            _selectedLeagueId = 0;
+            _leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
+            SelectedLeagueId = 0;
 
-            await OnSportChangedCallback.InvokeAsync(_selectedSportId);
+            await OnSportChangedCallback.InvokeAsync(SelectedSportId);
         }
 
         public async Task OnSegmentChangedEvent(ChangeEventArgs e)
         {
-            _selectedSegmentId = int.Parse(e.Value.ToString());
+            SelectedSegmentId = int.Parse(e.Value.ToString());
 
-            _leagues = await LoadLeagues(_selectedSportId, _selectedSegmentId);
-            _selectedLeagueId = 0;
+            _leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
+            SelectedLeagueId = 0;
 
-            await OnSegmentChangedCallback.InvokeAsync(_selectedSegmentId);
+            await OnSegmentChangedCallback.InvokeAsync(SelectedSegmentId);
         }
 
         public async Task OnLeagueChangedEvent(ChangeEventArgs e)
         {
-            _selectedLeagueId = int.Parse(e.Value.ToString());
+            SelectedLeagueId = int.Parse(e.Value.ToString());
 
-            await OnLeagueChangedCallback.InvokeAsync(_selectedLeagueId);
+            await OnLeagueChangedCallback.InvokeAsync(SelectedLeagueId);
         }
 
         public async Task OnInputSearchEvent()
         {
-            await OnInputSearchCallback.InvokeAsync(_searchForm.SearchText);
+            await OnInputSearchCallback.InvokeAsync(SearchForm.SearchText);
         }
 
         public void Dispose()
@@ -145,7 +145,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             _sports = new();
             _segments = new();
             _leagues = new();
-            _searchForm = new();
+            SearchForm = new();
 
             GC.SuppressFinalize(this);
         }
