@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Threading;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -90,24 +91,27 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Utilities
         private async void CalculateConfigCounts()
         {
+            _myTemplatesCount = null;
+            _assignedLeaguesCount = null;
+            _unAssignedLeaguesCount = null;
+
             await InvokeAsync(async () =>
             {
                 var response = await BackOfficeService.GetTemplateConfigCount();
                 _myTemplatesCount = response.Result;
-                StateHasChanged();
             });
             await InvokeAsync(async () =>
             {
                 var response = await BackOfficeService.GetTemplateConfigCount(ConfigState.Assigned.ToString());
                 _assignedLeaguesCount = response.Result;
-                StateHasChanged();
             });
             await InvokeAsync(async () =>
             {
                 var response = await BackOfficeService.GetTemplateConfigCount(ConfigState.UnAssigned.ToString());
                 _unAssignedLeaguesCount = response.Result;
-                StateHasChanged();
             });
+
+            await InvokeAsync(StateHasChanged);
         }
         private async Task<List<SelectListItemModel<string>>> LoadSports()
         {
