@@ -263,7 +263,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     var message = "";
                     if (state == ConfigState.UnAssigned)
                     {
-                        message = "Template successfully removed. Selected leagues has been moved to 'Unassigned' page.";
+                        message = "Template successfully removed. Selected leagues have been moved to the 'Unassigned' page.";
                     }
                     else
                     {
