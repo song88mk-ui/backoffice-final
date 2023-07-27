@@ -231,7 +231,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 SportIds = string.Join(",", SelectedSportsSet)
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet2", "r.oe.web.config.ongetmarginspreadsheet2", Guid.NewGuid().ToString(), Region);
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet2", "r.oe.web.config.ongetmarginspreadsheet2", Guid.NewGuid().ToString());
 
             IsUploading = false;
 

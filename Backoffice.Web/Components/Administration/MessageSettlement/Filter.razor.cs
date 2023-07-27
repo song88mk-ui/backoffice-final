@@ -229,7 +229,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
                 SettledBy = FilterModel.SettledBy
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMessageSettlementHistory", $"r.bo.util.export", Guid.NewGuid().ToString(), "HK");
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMessageSettlementHistory", $"r.bo.util.export", Guid.NewGuid().ToString());
 
             await OnExportCallback.InvokeAsync();
         }

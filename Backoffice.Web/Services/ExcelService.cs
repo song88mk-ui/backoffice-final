@@ -264,7 +264,7 @@ namespace Backoffice.Web.Services
                                         IsLastMessage = isLastMessage
                                     };
 
-                                    messageBroker.Publish(JsonSerializer.Serialize(message), "OnBulkUpdateConfig2", "r.oe.web.config.onbulkupdateconfig2", Guid.NewGuid().ToString(), "HK");
+                                    messageBroker.Publish(JsonSerializer.Serialize(message), "OnBulkUpdateConfig2", "r.oe.web.config.onbulkupdateconfig2", Guid.NewGuid().ToString());
                                 }
 
                             }

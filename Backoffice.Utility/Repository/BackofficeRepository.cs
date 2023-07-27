@@ -518,7 +518,7 @@ namespace Backoffice.Utility.Repository
                     ConnectionId = request.ConnectionId
                 };
 
-                messageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet3", $"r.oe.web.config.ongetmarginspreadsheet3", Guid.NewGuid().ToString(), "HK");
+                messageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet3", $"r.oe.web.config.ongetmarginspreadsheet3", Guid.NewGuid().ToString());
             }
             catch (Exception ex)
             {

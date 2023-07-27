@@ -6,10 +6,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
-using System.Net;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.Json;
 
@@ -54,7 +51,7 @@ namespace Backoffice.Shared.Utilities
         private string _externalConsumerName = string.Empty;
         private string _externalRoutingKey = string.Empty;
 
-        private Dictionary<string, MessageBrokerCredentialModel> _credentials { get; set; }
+        MessageBrokerCredentialModel _credential { get;set; }
 
         private static readonly ActivitySource _activitySource = new ActivitySource(nameof(MessageBroker));
         private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
@@ -63,8 +60,8 @@ namespace Backoffice.Shared.Utilities
         {
             _messageBrokerName = $"MessageBroker";
             _configuration = configuration;
-            _credentials = new Dictionary<string, MessageBrokerCredentialModel>();
-            _credentials.Add("HK", configuration.GetSection("MessageBroker:HK").Get<MessageBrokerCredentialModel>());
+            _credential = new MessageBrokerCredentialModel();
+            _credential = configuration.GetSection("MessageBroker:HK").Get<MessageBrokerCredentialModel>();
             //_credentials.Add("SA", configuration.GetSection("MessageBroker:SA").Get<MessageBrokerCredentialModel>());
             //ConnectRegions();
         }
@@ -113,7 +110,7 @@ namespace Backoffice.Shared.Utilities
         public void ConnectRegions()
         {
             #region HK
-            var messageBroker = _credentials["HK"];
+            var messageBroker = _credential;
             try
             {
                 var connectionFactory = new ConnectionFactory
@@ -183,78 +180,6 @@ namespace Backoffice.Shared.Utilities
             catch (Exception ex)
             {
             }
-            #endregion
-            #region Sa
-            //messageBroker = _credentials["SA"];
-            //try
-            //{
-            //    var connectionFactory = new ConnectionFactory
-            //    {
-            //        HostName = messageBroker.Host,
-            //        Port = 5672,
-            //        UserName = messageBroker.Username,
-            //        Password = messageBroker.Password,
-            //        VirtualHost = messageBroker.VirtualHost,
-            //        RequestedHeartbeat = 60,
-            //        NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
-            //    };
-
-            //    _modelSa = connectionFactory.CreateConnection().CreateModel();
-
-            //    if (!string.IsNullOrEmpty(messageBroker.Queue))
-            //    {
-            //        _modelSa.ExchangeDeclare(messageBroker.Exchange, "topic", true, false, null);
-
-            //        if (messageBroker.IsExclusive)
-            //        {
-            //            if (messageBroker.IsPriority)
-            //            {
-            //                var dictionary = new Dictionary<string, object>();
-            //                dictionary.Add("x-max-priority", 10);
-
-            //                _modelSa.QueueDeclare(messageBroker.Queue, true, true, true, dictionary);
-            //            }
-            //            else
-            //                _modelSa.QueueDeclare(messageBroker.Queue, true, true, true, null);
-            //        }
-            //        else
-            //        {
-            //            if (messageBroker.IsPriority)
-            //            {
-            //                var dictionary = new Dictionary<string, object>();
-            //                dictionary.Add("x-max-priority", 10);
-
-            //                _modelSa.QueueDeclare(messageBroker.Queue, true, false, false, dictionary);
-            //            }
-            //            else
-            //                _modelSa.QueueDeclare(messageBroker.Queue, true, false, false, null);
-            //        }
-
-            //        foreach (var routingKey in messageBroker.RoutingKey.Split('|'))
-            //            _modelSa.QueueBind(messageBroker.Queue, messageBroker.Exchange, routingKey.ToLower(), null);
-
-            //        _modelSa.BasicQos(0, Convert.ToUInt16(messageBroker.PrefetchCount), false);
-            //        var consumer = new EventingBasicConsumer(_modelSa);
-            //        consumer.Received += (sender, e) =>
-            //        {
-            //            try
-            //            {
-            //                MessageReceived(sender, e);
-
-            //                consumer.Model.BasicAck(e.DeliveryTag, false);
-            //            }
-            //            catch (Exception)
-            //            {
-            //                consumer.Model.BasicNack(e.DeliveryTag, false, true);
-            //            };
-            //        };
-
-            //        _modelSa.BasicConsume(messageBroker.Queue, false, $"{messageBroker.Consumer}.{Guid.NewGuid()}", consumer);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //}
             #endregion
         }
         public void Connect(MessageBrokerCredentialModel messageBroker = null)
@@ -442,7 +367,7 @@ namespace Backoffice.Shared.Utilities
             _externalModel.BasicPublish(_externalExchange, routingKey, properties, payloadBytes);
         }
 
-        public void Publish<T>(T payload, string messageType, string routingKey, string correlationId, string region = "")
+        public void Publish<T>(T payload, string messageType, string routingKey, string correlationId)
         {
             try
             {
@@ -468,7 +393,7 @@ namespace Backoffice.Shared.Utilities
 
               var payloadBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload));
 
-              BasicPublish(region, routingKey, properties, payloadBytes);
+              BasicPublish(routingKey, properties, payloadBytes);
             }
             catch (Exception)
             {
@@ -476,7 +401,7 @@ namespace Backoffice.Shared.Utilities
             }
         }
 
-        public void Publish(string payload, string messageType, string routingKey, string correlationId, string region = "")
+        public void Publish(string payload, string messageType, string routingKey, string correlationId)
         {
             try
             {
@@ -502,7 +427,7 @@ namespace Backoffice.Shared.Utilities
 
               var payloadBytes = Encoding.UTF8.GetBytes(payload);
 
-              BasicPublish(region, routingKey, properties, payloadBytes);
+              BasicPublish(routingKey, properties, payloadBytes);
             }
             catch (Exception)
             {
@@ -537,21 +462,9 @@ namespace Backoffice.Shared.Utilities
             if (_connection != null)
                 _connection.Dispose();
         }
-        private void BasicPublish(string region, string routingKey, IBasicProperties properties, byte[] payloadBytes)
+        private void BasicPublish(string routingKey, IBasicProperties properties, byte[] payloadBytes)
         {
-            switch (region.ToUpper())
-            {
-                case "HK":
-                    _model.BasicPublish(_credentials["HK"].Exchange, routingKey, properties, payloadBytes);
-                    //_modelHk.BasicPublish(_credentials["HK"].Exchange, routingKey, properties, payloadBytes);
-                    break;
-                //case "SA":
-                //    _modelSa.BasicPublish(_credentials["SA"].Exchange, routingKey, properties, payloadBytes);
-                //    break;
-                default:
-                    _model.BasicPublish(_exchange, routingKey, properties, payloadBytes);
-                    break;
-            }
+            _model.BasicPublish(_exchange, routingKey, properties, payloadBytes);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 ToClientCode = SelectedToClient.Key
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnCopyClientSettings", "r.oe.web.config.oncopyclientsettings", Guid.NewGuid().ToString(), Region);
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnCopyClientSettings", "r.oe.web.config.oncopyclientsettings", Guid.NewGuid().ToString());
 
             ModalService.Cancel();
 

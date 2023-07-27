@@ -118,7 +118,7 @@ namespace Backoffice.Web.Pages.Administration
                 ConnectionId = UserModel.ConnectionId
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportManualBetSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString(), "HK");
+            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportManualBetSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
 
             _toasterService.AddToast(Toast.NewToast
                     ("Manual Bet Settlement",

@@ -44,14 +44,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             {
                 ConnectionId = ModalParameters.TryGet<string>("ConnectionId"),
                 UserId = ModalParameters.TryGet<string>("UserId"),
-                ConfigTemplateId = ModalParameters.TryGet<string>("ConfigTemplateId"),
+                ConfigTemplateId = ModalParameters.TryGet<long>("ConfigTemplateId").ToString(),
                 Filename = Path.GetFileNameWithoutExtension(_filename),
                 AccessToken = HttpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty
             };
 
             await Task.Run(() =>
             {
-                MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportOeConfigTemplate", $"r.bo.util.export", Guid.NewGuid().ToString(), "HK");
+                MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportOeConfigTemplate", $"r.bo.util.export", Guid.NewGuid().ToString());
             });
 
             ModalService.Cancel();
