@@ -5,6 +5,12 @@
     background: transparent linear-gradient(180deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
 
+.assigned-message {
+    color: #d3d3d3 !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
 .accordion {
     max-height: 60vh;
     overflow-y: auto;

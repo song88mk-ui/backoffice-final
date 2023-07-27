@@ -6,6 +6,7 @@ namespace Backoffice.Shared.Models.Response
 {
     public class ConfigTemplateLeagueResponse
     {
+        public bool IsComplete { get; set; }
         public List<ConfigClientModel> ClientConfigs { get; set; }
         public MetaData MetaData { get; set; }
     }

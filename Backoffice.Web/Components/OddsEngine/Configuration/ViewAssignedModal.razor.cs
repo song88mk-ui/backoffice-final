@@ -18,7 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public List<ConfigClientModel> Leagues { get; set; }
         #endregion
         private bool _isPreloader;
-
+        private bool _isComplete = false;
 
         #region Methods
 
@@ -32,6 +32,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             if (assignedLeagues.StatusCode == StatusCode.Success)
             {
                 Leagues = assignedLeagues.Result?.ClientConfigs ?? new List<ConfigClientModel>();
+                _isComplete = assignedLeagues.Result?.IsComplete ?? false;
             }
             _isPreloader = false;
         }

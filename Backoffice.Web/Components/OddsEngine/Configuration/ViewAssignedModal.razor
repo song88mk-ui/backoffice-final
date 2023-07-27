@@ -5,8 +5,16 @@
     }
     else
     {
+        if (!_isComplete)
+        {
+            <div class="assigned-message">
+                <span>
+                    <icon class="fa fa-warning mx-2" />
+                    Some parts are restricted due to account limits. Please contact admin if needed.
+                </span>
+            </div>
+        }
         <div class="accordion" id="viewAssignedAccordion">
-
             @foreach (var client in Leagues.Select(x => new
             {
                 ClientId = x.ClientId,
@@ -14,7 +22,7 @@
                 ClientName = x.ClientName
             }).Distinct().ToList())
             {
-                <div class="accordion-item">
+                <div class="accordion-item mb-2">
                     <h2 class="accordion-header" id="header2">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@client.ClientId" aria-expanded="true" aria-controls="collapse-@client.ClientId">
                             @client.ClientName

@@ -1586,6 +1586,7 @@ namespace Backoffice.API.Repositories
             try
             {
                 var result = new List<ConfigClientModel>();
+                var isCompleteClient = false;
 
                 var templates = new List<ConfigTemplateModel>();
                 if (templateId != -1)
@@ -1610,13 +1611,19 @@ namespace Backoffice.API.Repositories
                     }
                 }
 
+                var query = _backofficeContext.ConfigTemplateAssigned.ToList().Where(x => templates.Any(template => template.Id == x.ConfigTemplateId));
+
+                if(query.Any())
+                {
+                    isCompleteClient = !query.Select(x => x.ClientCode).Distinct().ToList().Any(x => !clientCodes.Contains(x));
+                }
+
                 if (payload.ClientCodes.Any())
                 {
                     clientCodes = clientCodes.Where(x => payload.ClientCodes.ToList().Contains(x)).Select(x => x.ToUpper()).ToList();
                 }
 
-                var query = _backofficeContext.ConfigTemplateAssigned.ToList().Where(x => templates.Any(template => template.Id == x.ConfigTemplateId) && clientCodes.Contains(x.ClientCode.ToUpper()));
-
+                query = query.Where(x => clientCodes.Contains(x.ClientCode.ToUpper()));
                 if (payload.SportId != -1)
                 {
                     query = query.Where(x => x.SportId == payload.SportId);
@@ -1730,6 +1737,7 @@ namespace Backoffice.API.Repositories
                     Message = StatusCode.Success.ToString(),
                     Result = new ConfigTemplateLeagueResponse()
                     {
+                        IsComplete = isCompleteClient,
                         ClientConfigs = result,
                         MetaData = metaData
                     }
