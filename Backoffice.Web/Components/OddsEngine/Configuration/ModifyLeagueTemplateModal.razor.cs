@@ -41,13 +41,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private string ActivityLogPayload = "";
         private int SportId = 0;
         private int ScopeId = 0;
+        private AlertModel _alertModel;
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-
             IsPreLoader = true;
             Templates = new List<SelectListItemModel<long>>();
             Leagues = new List<ConfigClientViewModel>();
@@ -125,7 +125,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                 if (response.StatusCode == StatusCode.Success)
                 {
-
                     List<MarketConfig> marketConfig = new List<MarketConfig>();
                     var marketTemplateId = SelectedItem.Value > 0 ? SelectedItem.Value : leagueRequest.FirstOrDefault().TemplateId;
                     var configTemplateMargins = await GetConfigTemplateMargin(marketTemplateId);
@@ -141,7 +140,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             FixtureTypeId = margin.FixtureTypeId
                         });
                     }
-
 
                     foreach (var league in leagueRequest)
                     {
@@ -214,8 +212,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         }
                     }
 
-
-
                     var distinctTemplates = Leagues.Select(x => new
                     {
                         Id = x.TemplateId.ToString(),
@@ -264,7 +260,21 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         await BackOfficeService.AddActivityLog(activityLog);
                     });
 
-                    await Modal.OnSaveClickCallback.InvokeAsync();
+                    var message = "";
+                    if (state == ConfigState.UnAssigned)
+                    {
+                        message = "Template successfully removed. Selected leagues has been moved to 'Unassigned' page.";
+                    }
+                    else
+                    {
+                        message = $"{SelectedItem.Name} template has successfully been assigned to selected leagues.";
+                    }
+                    _alertModel = new()
+                    {
+                        Status = AlertStatus.Success,
+                        Message = message,
+                    };
+                    await Modal.OnSaveClickCallback.InvokeAsync(_alertModel);
                 }
 
             }

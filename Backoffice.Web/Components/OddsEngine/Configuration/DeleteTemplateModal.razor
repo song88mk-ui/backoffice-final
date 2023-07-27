@@ -1,8 +1,8 @@
 ﻿<div class="modal-body">
 
-    @if(_isPreloader)
+    @if (_isPreloader)
     {
-        <Preloader/>
+        <Preloader />
     }
     else
     {
@@ -10,30 +10,27 @@
             <div class="text-center">
                 <icon class="ico ico-warning"></icon>
             </div>
-            <div class="text-center">
-                Are you sure want to delete "<span class="fw-bold">@ConfigTemplateModel.Name</span>"
-                <br />
-                Please be certain as this cannot be undone
-            </div>
-            @*@if (!ConfigTemplateModel.ClientCodes.Any() && !ConfigTemplateModel.LeagueIds.Any())
-        {
-        <div class="text-center">
-        Are you sure want to delete "<span class="fw-bold">@ConfigTemplateModel.Name</span>"
-        <br />
-        Please be certain as this cannot be undone
-        </div>
-        }
-        else
-        {
-        <div class="text-center">
-        Please remove the assigned clients and leagues before deleting the template
-        </div>
-        }*@
+            @if (_isEmptyLeagues)
+            {
+                <div class="text-center">
+                    Are you sure want to delete "<span class="fw-bold">@ConfigTemplateModel.Name</span>"
+                    <br />
+                    You can't undo this action.
+                </div>
+            }
+            else
+            {
+                <div class="text-center">
+                    Please remove the assigned clients and leagues before deleting the template.
+                </div>
+            }
         </div>
     }
 </div>
 <div class="modal-footer">
-    <button class="btn modal-btn modal-cancel" @onclick="OnCancelClickEvent" disabled="@_isPreloader">Cancel</button>
-    <button class="btn modal-btn modal-apply" @onclick="OnApplyClickEvent" disabled="@_isPreloader">Apply</button>
-    
+    <button class="btn modal-btn modal-@(_isEmptyLeagues ? "cancel" : "apply")" @onclick="OnCancelClickEvent" disabled="@_isPreloader">Cancel</button>
+    @if (!_isEmptyLeagues)
+    {
+        <button class="btn modal-btn modal-apply" @onclick="OnApplyClickEvent" disabled="@_isPreloader">Apply</button>
+    }
 </div>

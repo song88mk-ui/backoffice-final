@@ -22,6 +22,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         #endregion
         private bool _isPreloader;
+        private bool _isEmptyLeagues;
 
         #region Methods
 
@@ -29,6 +30,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             _isPreloader = false;
             ConfigTemplateModel = ModalParameters.TryGet<ConfigTemplateModel>("ConfigTemplateModel");
+            _isEmptyLeagues = !(ConfigTemplateModel.ClientsCount > 0 || ConfigTemplateModel.LeaguesCount > 0);
         }
 
         public async Task OnCancelClickEvent()
@@ -47,7 +49,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 {
                     Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                     Payload = $"{ConfigTemplateModel.SportId}.{ConfigTemplateModel.FixtureTypeId}.{ConfigTemplateModel.Name}.T".Replace(" ", "_"),
-                    From = JsonSerializer.Serialize(ConfigTemplateModel),  
+                    From = JsonSerializer.Serialize(ConfigTemplateModel),
                     To = "-",
                     Activity = Activity.Delete.ToString(),
                     UserId = UserModel.Id,
@@ -55,7 +57,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     TimeStamp = DateTime.UtcNow
                 });
 
-                await Modal.OnSaveClickCallback.InvokeAsync(true);
+                await Modal.OnSaveClickCallback.InvokeAsync($"{ConfigTemplateModel.Name} has successfully been removed.");
             }
 
             _isPreloader = false;
@@ -69,7 +71,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public void Dispose()
         {
-            
+
         }
         #endregion
     }

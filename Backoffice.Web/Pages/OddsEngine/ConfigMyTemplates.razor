@@ -1,7 +1,9 @@
 ﻿<AuthorizeView Policy="sbc-config">
     <Authorized>
         <div class="col-md-12 mb-4">
-            <div class="d-flex justify-content-between mx-4">
+            <AlertMessage AlertClass="mx-3" AlertModel="@_alertModel"></AlertMessage>
+            <div class="d-flex justify-content-between m-4">
+
                 <div>
                     <h4 class="page-title">@PageTitle</h4>
                 </div>
@@ -14,15 +16,6 @@
                 </div>
             </div>
         </div>
-
-        @if (AlertModel != null && !string.IsNullOrEmpty(AlertModel.Message))
-        {
-            <div class="col-md-12 mb-3">
-                <div class="mt-4 mx-3">
-                    <AlertMessage AlertModel="@AlertModel" />
-                </div>
-            </div>
-        }
 
         <div class="col-md-12 mb-4">
             <div class="d-flex justify-content-between mx-4">
@@ -87,10 +80,10 @@
                             <th class="px-4" scope="col">Template Name</th>
                             <th class="px-4" scope="col">Sports</th>
                             <th class="px-4" scope="col">Scope</th>
-                            <th  class="text-center" scope="col">Client Assigned</th>
-                            <th  class="text-center" scope="col">League Assigned</th>
-                            <th  class="text-center" scope="col">Date Created</th>
-                            <th  class="text-center" scope="col">Manage</th>
+                            <th class="text-center" scope="col">Client Assigned</th>
+                            <th class="text-center" scope="col">League Assigned</th>
+                            <th class="text-center" scope="col">Date Created</th>
+                            <th class="text-center" scope="col">Manage</th>
                         </tr>
                     </thead>
 
@@ -114,7 +107,7 @@
                                         <th class="px-4" scope="row" @onclick="() => OnEditTemplateClickEvent(configTemplate)">@configTemplate.Name</th>
                                         <td class="px-4" @onclick="() => OnEditTemplateClickEvent(configTemplate)">@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()) != null ? $"{Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()).Name}" : "")</td>
                                         <td class="px-4" @onclick="() => OnEditTemplateClickEvent(configTemplate)">@(((FixtureStatus)configTemplate.FixtureTypeId).ToString())</td>
-                                        <td  @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@($"{configTemplate.ClientsCount} Client{(configTemplate.ClientsCount > 1 ? "s" : "")}")</td>
+                                        <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@($"{configTemplate.ClientsCount} Client{(configTemplate.ClientsCount > 1 ? "s" : "")}")</td>
                                         <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@($"{configTemplate.LeaguesCount} League{(configTemplate.LeaguesCount > 1 ? "s" : "")}")</td>
                                         <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@(configTemplate.Timestamp.ToString("hh:mm dd/mm/yyyy"))</td>
                                         <td>

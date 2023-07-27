@@ -29,7 +29,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string IconClass { get; set; }
         public int SelectedSportId { get; set; }
         public int SelectedScopeId { get; set; }
-        public AlertModel AlertModel { get; set; }
+        private AlertModel _alertModel { get; set; }
         #endregion
 
         #region Methods
@@ -61,10 +61,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (QueryMessage != null && !string.IsNullOrEmpty(QueryMessage))
             {
-                AlertModel = new AlertModel();
-                AlertModel.Message = QueryMessage;
-                AlertModel.Status = AlertStatus.Success;
-                AlertModel.Opacity = 1.0m;
+                _alertModel = new AlertModel();
+                _alertModel.Message = QueryMessage;
+                _alertModel.Status = AlertStatus.Success;
+                _alertModel.Opacity = 1.0m;
             }
         }
         public async Task OnLogsClickEvent()
@@ -156,6 +156,17 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public async Task OnModalSaveEvent(object e)
         {
+            if(e is string)
+            {
+                if(!string.IsNullOrEmpty((string)e))
+                {
+                    _alertModel = new()
+                    {
+                        Status = AlertStatus.Success,
+                        Message =(string)e
+                    };
+                }
+            }
             await LoadConfigTemplates();
         }
         public async Task OnScopeChangedEvent(ChangeEventArgs e)

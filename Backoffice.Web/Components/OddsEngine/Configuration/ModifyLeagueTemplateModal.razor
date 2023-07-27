@@ -14,7 +14,8 @@
             <div class="row league-body">
                 @if (Leagues != null && Leagues.Any())
                 {
-                    @foreach (var item in Leagues)
+                    var leagues = IsShowAll ? Leagues : Leagues.Take(3);
+                    @foreach (var item in leagues)
                     {
                         <div class="col-12 mb-2 p-0">
                             <div class="container border">

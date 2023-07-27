@@ -95,7 +95,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     TimeStamp = DateTime.UtcNow
                 });
 
-                await Modal.OnSaveClickCallback.InvokeAsync(true);
+                await Modal.OnSaveClickCallback.InvokeAsync($"{TemplateName} has successfully been added");
                 ModalService.Cancel();
             }
             else

@@ -48,6 +48,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private int _selectedClientCount;
         private string _region;
         private string _selectedClientName;
+        private AlertModel _alertModel;
         #region Methods
 
         protected override async Task OnInitializedAsync()
@@ -60,6 +61,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _scopes = new();
             _clients = new();
             _searchForm = new();
+            _alertModel = new();
 
             _filterModel = new();
             MetaData = new();
@@ -173,8 +175,14 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public async Task OnModalSaveEvent(object e)
         {
+            _alertModel = new();
             await OnStateHasChanged.InvokeAsync();
             await LoadLeagues(_filterModel);
+
+            if(e is AlertModel)
+            {
+                _alertModel = (AlertModel)e;
+            }
 
             IsSelectedLeagueShowing = false;
             await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
