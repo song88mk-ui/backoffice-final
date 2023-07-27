@@ -327,6 +327,11 @@ namespace Backoffice.Web.Shared
                     .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
                     .Build();
 
+                _hubConnection.On<NotificationsModel>("Notification", async message =>
+                {
+                    await ProcessNotification(message);
+                });
+
                 _hubConnection.Closed += async (error) =>
                 {
                     await Task.Delay(new Random().Next(0, 5) * 1000);
@@ -347,13 +352,6 @@ namespace Backoffice.Web.Shared
                 });
 
                 await _hubConnection.InvokeAsync("AddToGroup", "HK");
-
-                _hubConnection.On<string>("Notification", async message =>
-                {
-                    var payload = JsonSerializer.Deserialize<NotificationsModel>(message);
-                    await ProcessNotification(payload);
-                });
-
             }
             catch (Exception ex)
             {

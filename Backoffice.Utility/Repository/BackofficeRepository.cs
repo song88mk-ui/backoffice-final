@@ -497,25 +497,29 @@ namespace Backoffice.Utility.Repository
         {
             try
             {
-                var query = _backofficeContext.ConfigTemplates.Where(x => x.Id.ToString() == request.ConfigTemplateId);
+                var assignedLeagues = _backofficeContext.ConfigTemplateAssigned.Where(x => x.ConfigTemplateId.ToString() == request.ConfigTemplateId).ToList()
+                    .GroupBy(x => x.SportId).Select(x => new KeyValuePair<int, List<MyTemplateExportPayloadModel>>(x.Key, x.GroupBy(y => y.ClientCode).Select(y => new MyTemplateExportPayloadModel()
+                    {
+                        ClientCode = y.Key,
+                        LeagueIds = y.Select(league => league.LeagueId).ToList()
+                    }).ToList()));
+
+                //var templates = _backofficeContext.ConfigTemplates.Where(x => assignedLeagues.Any(y => y.ConfigTemplateId == x.Id));
                 var clientCodes = JwtParser.ParseClaimsFromJwt(request.AccessToken).Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.ToString();
 
-                var configTemplate = query.ToList().Select(x => new ConfigTemplateModel()
+                var payloads = new Dictionary<int, List<MyTemplateExportPayloadModel>>();
+
+                foreach (var itemLeague in assignedLeagues)
                 {
-                    Id = x.Id,
-                    Name = x.Name,
-                    SportId = x.SportId,
-                    FixtureTypeId = x.FixtureTypeId,
-                    Timestamp = x.Timestamp
-                }).FirstOrDefault();
+                    payloads.Add(itemLeague.Key, itemLeague.Value);
+                }
 
-
-                var payload = new
-                {                    
-                    SportIds = configTemplate.SportId.ToString(),                    
+                var payload = new OnConfigMyTemplateExportMessage()
+                {
                     FileName = request.Filename,
                     UserId = request.UserId,
-                    ConnectionId = request.ConnectionId
+                    ConnectionId = request.ConnectionId,
+                    SportPayloads = payloads
                 };
 
                 messageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet3", $"r.oe.web.config.ongetmarginspreadsheet3", Guid.NewGuid().ToString());
@@ -907,7 +911,7 @@ namespace Backoffice.Utility.Repository
         private string GetNewBetStatusName(ManualBetDetails betDetails)
         {
             if (string.IsNullOrEmpty(betDetails.NewBetStatusName))
-            {                
+            {
                 return ((BetStatus)int.Parse(betDetails.NewBetStatusId)).ToString();
             }
             else

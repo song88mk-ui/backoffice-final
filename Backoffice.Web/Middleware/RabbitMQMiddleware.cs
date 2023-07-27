@@ -7,6 +7,7 @@ using RabbitMQ.Client.Events;
 using Serilog;
 using System.Drawing;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
@@ -81,8 +82,22 @@ namespace Backoffice.Web.Middleware
                         hubClients.SendAsync("onsignin", signin).Wait();
                         break;
                     case "OnNewNotification":
-                        var notificationsModel = JsonSerializer.Deserialize<NotificationsModel>(payload);
-                        hubClients.SendAsync("onnewnotification", notificationsModel).Wait();
+                        var notificationsModel = JsonSerializer.Deserialize<NotificationsDetailsModel>(payload);
+                        var date = DateTime.UtcNow.ToString();
+                        var notifPayload = new NotificationsModel
+                        {
+                            Id = notificationsModel.Id,
+                            Timestamp = date,
+                            Page = notificationsModel.Page,
+                            Details = notificationsModel.Details,
+                            PageRedirect = notificationsModel.PageRedirect,
+                            IsRead = false,
+                            UserId = notificationsModel.UserId.ToString(),
+                            DateText = date,
+                            ClaimsType = notificationsModel.ClaimType,
+                            ClientCode = notificationsModel.ClientCode,
+                        };
+                        hubClients.SendAsync("Notification", notifPayload).Wait();
                         break;
                 }
             }
