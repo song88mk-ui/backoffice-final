@@ -1669,7 +1669,7 @@ namespace Backoffice.API.Repositories
 
                                     if (payload.ScopeId == -1)
                                     {
-                                        var template = templates.Where(x => query.Any(q => q.ConfigTemplateId == x.Id)).ToList();
+                                        var template = templates.Where(x => query.Any(q => q.ConfigTemplateId == x.Id && q.LeagueId == league.LeagueId && q.ClientCode == clientCode)).ToList();
                                         fixtures = fixtureStatusIds.Where(x => !template.Any(t => t.FixtureTypeId == x)).ToList();
                                     }
 
