@@ -1361,7 +1361,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var query = _backofficeContext.ConfigTemplates.AsNoTracking();
+                var query = _backofficeContext.ConfigTemplates.OrderBy(x => x.Name).AsNoTracking();
 
                 if (sportIds != null && sportIds.Count() > 0)
                 {

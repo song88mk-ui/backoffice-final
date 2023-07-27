@@ -117,13 +117,17 @@ namespace Backoffice.Web.Pages.OddsEngine
             ModalService.Open<DeleteTemplateModal>($"Delete Template", parameters, options);
         }
 
-        public async Task OnExportTemplateClickEvent()
+        public async Task OnExportTemplateClickEvent(ConfigTemplateModel configTemplate)
         {
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
             parameters.Add("Region", Region);
+            parameters.Add("ConnectionId", UserModel.ConnectionId);
+            parameters.Add("UserId", UserModel.Id);
+            parameters.Add("ConfigTemplateId", configTemplate.Id);
+            parameters.Add("ConfigTemplateName", configTemplate.Name);
 
             var options = new ModalOptions();
 

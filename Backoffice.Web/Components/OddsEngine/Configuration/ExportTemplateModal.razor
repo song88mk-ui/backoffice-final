@@ -2,7 +2,11 @@
     <div class="row">
         <label for="fileNameInput" class="col-md-3 col-form-label">File Name:</label>
         <div class="col-md-9">
-            <input type="text" class="form-control" id="fileNameInput" />
+            <input type="text" class="form-control" id="fileNameInput" @bind-value="_filename" placeholder="Please enter a file name" />
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <span class="fst-italic text-danger">@_errorMessage</span>
+            }
         </div>
     </div>
 </div>
