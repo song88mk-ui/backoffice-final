@@ -51,17 +51,17 @@
                 {
                     while (AlertModel.Opacity >= 0m)
                     {
-                        if (AlertModel.Opacity > 0.9m)
+                        if (AlertModel.Opacity > 0.8m)
                         {
                             AlertModel.Opacity -= 0.05m;
                             await InvokeAsync(StateHasChanged);
-                            await Task.Delay(2000);
+                            await Task.Delay(1000);
                         }
                         else
                         {
-                            AlertModel.Opacity -= 0.03m;
+                            AlertModel.Opacity -= 0.05m;
                             await InvokeAsync(StateHasChanged);
-                            await Task.Delay(1000);
+                            await Task.Delay(100);
                         }
                     }
                     AlertModel.Opacity = 0.0m;
