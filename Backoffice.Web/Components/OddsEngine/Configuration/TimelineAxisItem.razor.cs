@@ -14,13 +14,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public EventCallback OnMarginChangeCallback { get; set; }
         public Type ContentComponent { get; set; }
         public ModalParameters Parameters { get; set; }
-        private Dictionary<string,ElementReference> ElementReferenceDict { get; set; }
+        //private Dictionary<string,ElementReference> ElementReferenceDict { get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            ElementReferenceDict = new Dictionary<string, ElementReference>();
+            //ElementReferenceDict = new Dictionary<string, ElementReference>();
             ContentComponent = typeof(ModalConfig);
             Modal.OnClose += Modal_OnClose;
         }

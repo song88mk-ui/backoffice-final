@@ -7,8 +7,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties        
         [Parameter] public LiveSettingsTemplateModel LiveSettings { get; set; }
-        [Parameter] public EventCallback<bool> OnMarginChangeCallback { get; set; }
-        
+        [Parameter] public EventCallback OnMarginChangeCallback { get; set; }
+
         #endregion
 
         #region Methods
