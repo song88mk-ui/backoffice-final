@@ -305,7 +305,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task LoadMarkets()
         {
-
             if (EditConfigTemplateFilterModel.MarketTemplateGroups.Count > 0)
             {
                 MarketLookupNavigation = await GetMarketTemplate(EditConfigTemplateFilterModel.MarketTemplateGroups);
