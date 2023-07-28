@@ -159,7 +159,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var marketTemplateGroupNames = tempMarketTemplateGroup.Select(s => s.MarketTemplateGroupName).Distinct().ToList();
 
             var MarketTemplateGroups = new List<MarketGroupNavigationModel>();
-            EditConfigTemplateFilterModel.MarketLookup = (await TradingService.GetMarketLookup(new MarketLookupRequest { FixtureTypeId = (int)EditConfigTemplateFilterModel.ScopeId, SportId = sportId })).Result;
+            EditConfigTemplateFilterModel.MarketLookup = (await TradingService.GetMarketLookup(new MarketLookupRequest { FixtureTypeId = (int)FixtureType.Match, SportId = sportId })).Result;
 
             if (EditConfigTemplateFilterModel.MarketLookup != null)
             {
