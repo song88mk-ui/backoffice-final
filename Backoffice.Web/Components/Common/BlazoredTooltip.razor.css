@@ -190,7 +190,7 @@
     }
 
     .tooltipcontent.up.right.configlivematch {
-        margin-left: 150px;
+        left: 0px;
     }
 
     .tooltipcontent.up.left.configlivematch {
