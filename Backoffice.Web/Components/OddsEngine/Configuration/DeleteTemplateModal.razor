@@ -28,8 +28,8 @@
     }
 </div>
 <div class="modal-footer">
-    <button class="btn modal-btn modal-@(_isEmptyLeagues ? "cancel" : "apply")" @onclick="OnCancelClickEvent" disabled="@_isPreloader">Cancel</button>
-    @if (!_isEmptyLeagues)
+    <button class="btn modal-btn modal-@(!_isEmptyLeagues ? "apply" : "cancel" )" @onclick="OnCancelClickEvent" disabled="@_isPreloader">Cancel</button>
+    @if (_isEmptyLeagues)
     {
         <button class="btn modal-btn modal-apply" @onclick="OnApplyClickEvent" disabled="@_isPreloader">Apply</button>
     }
