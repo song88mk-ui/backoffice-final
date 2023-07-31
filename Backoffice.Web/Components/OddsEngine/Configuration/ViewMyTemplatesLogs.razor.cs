@@ -242,8 +242,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         }
         private string BuildPayload(ConfigActivityLogFilterModel filterModel)
         {
-            return $"%{(filterModel.SelectedSportId != "-1" ? filterModel.SelectedSportId : "")}%." +
-            $"%{(filterModel.SelectedScopeId != "-1" ? filterModel.SelectedScopeId : "")}%." +
+            return $"{(filterModel.SelectedSportId != "-1" ? filterModel.SelectedSportId : "%%")}." +
+            $"{(filterModel.SelectedScopeId != "-1" ? filterModel.SelectedScopeId : "%%")}." +
             $"%%.%";
         }
         #endregion
