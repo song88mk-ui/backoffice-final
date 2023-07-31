@@ -220,7 +220,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 IsPreLoader = true;
                 StateHasChanged();
             }
-
+            MetaData.CurrentPage = 1;
             ActivitLogs = new List<ActivityLogModel>();
             var response = await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
