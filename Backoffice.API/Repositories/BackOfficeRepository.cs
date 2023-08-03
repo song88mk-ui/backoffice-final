@@ -1665,7 +1665,7 @@ namespace Backoffice.API.Repositories
                         {
                             var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
 
-                            foreach (var clientCode in clientCodes)
+                            Parallel.ForEach(clientCodes, clientCode =>
                             {
                                 var userLeagues = query.Where(x => x.ClientCode == clientCode).Select(x => x.LeagueId).ToList();
                                 var leagues = leagueLookup.Where(x => !userLeagues.Contains(x.LeagueId)).ToList();
@@ -1703,7 +1703,7 @@ namespace Backoffice.API.Repositories
                                         }
                                     }
                                 }
-                            }
+                            });
                         }
 
                         if (!string.IsNullOrEmpty(payload.SearchText))
