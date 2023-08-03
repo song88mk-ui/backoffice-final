@@ -136,7 +136,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             MarketTemplateId = margin.MarketTemplateId,
                             Live = margin.Live,
                             Prematch = margin.Prematch,
-                            IsActive = state == ConfigState.Assigned,
+                            IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
                             FixtureTypeId = margin.FixtureTypeId
                         });
                     }
@@ -163,7 +163,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         {
                             new LeagueConfigModel
                             {
-                                IsActive = state == ConfigState.Assigned,
+                                IsActive = state == ConfigState.Assigned ? data.MarketConfig.Any(m => m.IsActive) : false,
                                 LeagueId = league.LeagueId,
                                 SegmentId = league.SegmentId
                             }
