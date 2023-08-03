@@ -18,6 +18,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
 
+        [Parameter] public EventCallback OnStateHasChanged { get; set; }
         [Parameter] public List<SelectListItemModel<string>> Sports { get; set; }
         [Parameter] public List<SelectListItemModel<string>> Scopes { get; set; }
         [Parameter] public string QueryMessage { get; set; }
@@ -156,6 +157,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public async Task OnModalSaveEvent(object e)
         {
+            await OnStateHasChanged.InvokeAsync();
+
             if(e is string)
             {
                 if(!string.IsNullOrEmpty((string)e))

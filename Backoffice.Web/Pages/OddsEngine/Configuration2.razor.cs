@@ -36,9 +36,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         protected override async Task OnInitializedAsync()
         {
             SelectedConfigNavMenu = ConfigTemplateNavMenu.MyTemplates;
-            _myTemplatesCount = null;
-            _assignedLeaguesCount = null;
-            _unAssignedLeaguesCount = null;
 
             IsPreleader = true;
             Breadcrumbs = new List<BreadcrumbModel>()
@@ -90,22 +87,38 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Utilities
         private async void CalculateConfigCounts()
         {
+            _myTemplatesCount = null;
+            _assignedLeaguesCount = null;
+            _unAssignedLeaguesCount = null;
+
             await InvokeAsync(async () =>
             {
                 var response = await BackOfficeService.GetTemplateConfigCount();
                 _myTemplatesCount = response.Result;
+                if (response.StatusCode == StatusCode.Success)
+                    _myTemplatesCount = response.Result;
+                else
+                    _myTemplatesCount = -1;
                 StateHasChanged();
             });
             await InvokeAsync(async () =>
             {
                 var response = await BackOfficeService.GetTemplateConfigCount(ConfigState.Assigned.ToString());
                 _assignedLeaguesCount = response.Result;
+                if (response.StatusCode == StatusCode.Success)
+                    _assignedLeaguesCount = response.Result;
+                else
+                    _assignedLeaguesCount = -1;
                 StateHasChanged();
             });
             await InvokeAsync(async () =>
             {
                 var response = await BackOfficeService.GetTemplateConfigCount(ConfigState.UnAssigned.ToString());
-                _unAssignedLeaguesCount = response.Result;
+                if (response.StatusCode == StatusCode.Success)
+                    _unAssignedLeaguesCount = response.Result;
+                else
+                    _unAssignedLeaguesCount = -1;
+
                 StateHasChanged();
             });
         }

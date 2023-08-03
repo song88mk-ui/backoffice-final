@@ -47,11 +47,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     Value = (int)Scope.Live,
                     Name = Scope.Live.ToString()
                 }
-            };
+            }.OrderBy(x => x.Name).ToList();
 
             Sports = await LoadSports();
             SelectedSportId = Sports.FirstOrDefault()?.Value ?? -1;
-            SelectedScopeId = 1;
+            SelectedScopeId = Scopes.FirstOrDefault()?.Value ?? -1;
         }
 
         public async Task OnSportSelectChanged(ChangeEventArgs e)

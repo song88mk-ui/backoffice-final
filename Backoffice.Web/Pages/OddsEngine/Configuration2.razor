@@ -19,7 +19,7 @@ else
 
     @if (SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
     {
-        <ConfigMyTemplates Sports="@Sports" Scopes="@Scopes" QueryMessage="@QueryMessage" />
+        <ConfigMyTemplates Sports="@Sports" Scopes="@Scopes" QueryMessage="@QueryMessage" OnStateHasChanged="@OnNavMenuCallback" />
     }
     else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
     {
