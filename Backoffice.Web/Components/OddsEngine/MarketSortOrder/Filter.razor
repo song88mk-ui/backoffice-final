@@ -6,7 +6,7 @@
                     <select class="form-select d-block" @onchange="OnClientChangedEvent">
                         @foreach (var client in Clients)
                         {
-                            if (SelectedClientCode == client.Value)
+                            if (_filterModel.SelectedClientCode == client.Value)
                             {
                                 <option value="@client.Value" selected>@client.Name</option>
                             }
@@ -21,7 +21,7 @@
                     <select class="form-select d-block" @onchange="OnSportChangedEvent">
                         @foreach (var sport in Sports)
                         {
-                            @if (SelectedSportId == sport.Value)
+                            @if (_filterModel.SelectedSportId == sport.Value)
                             {
                                 <option value="@sport.Value" selected>@sport.Name</option>
                             }
@@ -36,7 +36,7 @@
                     <select class="form-select d-block" @onchange="OnFixtureStatusChangedEvent">
                         @foreach (var fixtureStatus in FixtureStatuses)
                         {
-                            @if (SelectedFixtureStatusId == fixtureStatus.Value)
+                            @if (_filterModel.SelectedFixtureStatusId == fixtureStatus.Value)
                             {
                                 <option value="@fixtureStatus.Value" selected>@fixtureStatus.Name</option>
                             }
@@ -98,22 +98,5 @@
                 </AuthorizeView>
             </div>
         </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        @if (ClientMarketTemplateGroups.Any())
-        {
-            <div class="d-flex mx-3 mt-3">
-                @foreach (var model in ClientMarketTemplateGroups)
-                {
-                    <div class="me-2">
-                        <a href="javascript:void(0)" class="btn btn-market-group @(SelectedMarketTemplateGroupId == model.MarketTemplateGroupId ? "active" : "") px-3" id="mtg-@model.MarketTemplateGroupId" @onclick="() => OnMarketGroupClickEvent(model.MarketTemplateGroupId)">
-                            @model.Name
-                        </a>
-                    </div>
-                }
-            </div>
-        }
     </div>
 </div>

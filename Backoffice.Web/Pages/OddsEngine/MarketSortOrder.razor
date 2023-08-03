@@ -13,7 +13,33 @@
             <PageHeader PageHeaderModel="_pageHeaderModel" />
         </div>
         <div class="col-md-12">
-            <Filter @bind-IsUpdate="_isUpdate" @bind-IsPreLoader="_isPreLoader" OnUpdateCallback="OnUpdateClickEvent" OnCancelCallback="OnCancelClickEvent" OnSaveCallback="OnSaveClickEvent" MarketSortOrderModelCallback="PrepareMarketSortOrderModel" OnMarketGroupCallback="OnMarketGroupClickEvent" Region="Region" />
+            <Filter @bind-IsUpdate="_isUpdate" @bind-IsPreLoader="_isPreLoader" OnInitializeEventCallback="PrepareMarketSortOrderModel" OnUpdateCallback="OnUpdateClickEvent" OnCancelCallback="OnCancelClickEvent" OnSaveCallback="OnSaveClickEvent" Region="Region" />
+            <div class="row">
+                @if (_isPreLoader || _isMarketPreLoader)
+                {
+                    <div class="col-md-12 justify-content-center">
+                        <Preloader />
+                    </div>
+                }
+                else
+                {
+                    <div class="col-md-12">
+                        @if (_clientMarketTemplateGroupsRef != null && _clientMarketTemplateGroupsRef.Any())
+                        {
+                            <div class="d-flex mx-3 mt-3">
+                                @foreach (var model in _clientMarketTemplateGroupsRef)
+                                {
+                                    <div class="me-2">
+                                        <a href="javascript:void(0)" class="btn btn-market-group @(_selectedMarketGroupId == model.Id ? "active" : "") px-3" id="mtg-@model.Id" @onclick="() => OnMarketGroupClickEvent(model.Id)">
+                                            @model.Name
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
         </div>
 
         @if (_alertModel != null && !string.IsNullOrEmpty(_alertModel.Message))
@@ -26,44 +52,37 @@
         }
         <div class="col-md-12">
             <div class="mx-3 mt-4">
-                @if (_marketSortOrderModel.MarketTemplates.Any())
-                {
-                    <table class="table @(_isUpdate ? "table-hover": "") table-bordered market-sort-order-table">
-                        <thead class="table-head">
+                <table class="table @(_isUpdate ? "table-hover": "") table-bordered market-sort-order-table">
+                    <thead class="table-head">
+                        <tr>
+                            <th class="th-market">Market</th>
+                            <th class="th-market-group">Market Group</th>
+                            <th class="th-action"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (_isPreLoader || _isMarketPreLoader)
+                        {
                             <tr>
-                                <th class="th-market">Market</th>
-                                <th class="th-market-group">Market Group</th>
-                                <th class="th-action"></th>
+                                <td colspan="3">
+                                    <Preloader />
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @if(_isPreLoader)
+                        }
+                        else
+                        {
+                            if (_marketTemplates != null && _marketTemplates.Any())
                             {
-                                <tr>
-                                    <td colspan="3">
-                                        <Preloader/>
-                                    </td>
-                                </tr>
-                            }
-                            else
-                            {
-                                @foreach (var model in _filteredMarketTemplates)
+                                @foreach (var model in _marketTemplates.OrderBy(x => x.SortOrder))
                                 {
-                                    <tr @key="@($"row-sp:{_marketSortOrderModel.SportId}-fist:{_marketSortOrderModel.FixtureStatusId}-mate:{model.MarketTemplateId}")" class="@(_isUpdate ? "" : "row-disabled")" id="name-@model.MarketTemplateId" data-sort-order="@model.SortOrder">
+                                    <tr @key="@($"row-sp:{_filterModel.SelectedSportId}-fist:{_filterModel.SelectedFixtureStatusId}-mate:{model.MarketTemplateId}")" class="@(_isUpdate ? "" : "row-disabled")" id="name-@model.MarketTemplateId" data-sort-order="@model.SortOrder">
                                         <td>@model.MarketTemplateName</td>
                                         <td>
-                                            <div @key="@($"select-sp:{_marketSortOrderModel.SportId}-fist:{_marketSortOrderModel.FixtureStatusId}-mate:{model.MarketTemplateId}")" class="d-flex justify-content-center">
+                                            <div @key="@($"select-sp:{_filterModel.SelectedSportId}-fist:{_filterModel.SelectedFixtureStatusId}-mate:{model.MarketTemplateId}")" class="d-flex justify-content-center">
                                                 <select id="select-@model.MarketTemplateId" class="@_selectClass form-select d-block" multiple="multiple">
                                                     @foreach (var group in _marketGroups)
                                                     {
-                                                        if (model.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(group.Name.ToLower()))
-                                                        {
-                                                            <option value="@group.Value" selected>@group.Name</option>
-                                                        }
-                                                        else
-                                                        {
-                                                            <option value="@group.Value">@group.Name</option>
-                                                        }
+                                                        <option value="@group.Value" selected=@(model.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(group.Name.ToLower()))>@group.Name</option>
                                                     }
                                                 </select>
                                             </div>
@@ -78,10 +97,17 @@
                                     </tr>
                                 }
                             }
-                        </tbody>
-                    </table>
-
-                }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3">
+                                        <NoRecordFound />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
         <CustomModal OnSaveClickCallback="OnSaveCopyClickEvent" OnCancelClickCallback="OnModalDiscardChanges" />

@@ -13,9 +13,16 @@
     vertical-align: middle;
 }
 
-/*table thead th {
-    text-align: center;
-}*/
+.btn-market-group {
+    background-color: #F5F5F5;
+    color: #1F1F1F;
+}
+
+    .btn-market-group.active {
+        background-color: #E4422E;
+        color: #FFF;
+    }
+
 
 table thead th:first-child {
     border-top-left-radius: 3px;
