@@ -30,7 +30,7 @@ namespace Backoffice.API.Controllers.Backoffice
 
         [HttpPost("maintenance/{isMaintenance}")]
         public async Task<IActionResult> SetMaintenance([FromRoute] bool isMaintenance)
-        {
+        {//
             var result = await _maintenanceRepository.SetMaintenance(isMaintenance);
 
             switch (result.StatusCode)

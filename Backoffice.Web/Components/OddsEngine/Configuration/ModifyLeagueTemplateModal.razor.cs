@@ -7,10 +7,7 @@ using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Security.Claims;
 using System.Text.Json;
-using System.Threading;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
