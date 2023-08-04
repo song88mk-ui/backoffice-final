@@ -65,6 +65,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = false
                 },
             };
+
+            await LoadConfigTemplateMargin();
         }
 
         public async Task InitConfigEditTemplate(EditConfigTemplateFilterModel model)
@@ -94,8 +96,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             ConfigTemplateName = EditConfigTemplateFilterModel.ConfigTemplate.Name;
             Scope = ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId).ToString();
 
-            await LoadConfigTemplateMargin();
             await LoadMarkets();
+
+            AllMarketStatusName = MarketLookupNavigation.Any(m => m.IsVisible && m.NewMarketLookup.IsActive == false) ? "ACTIVATE ALL" : "DEACTIVATE ALL";
 
             IsPreloader = false;
         }
@@ -113,7 +116,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 //MarketLookupNavigationModelsTemp.AddRange(allDisabled);
 
-                MarketLookupNavigation.ForEach(market => market.NewMarketLookup.IsActive = true);
+                MarketLookupNavigation.Where(m => m.IsVisible).ToList().ForEach(market => market.NewMarketLookup.IsActive = true);
             }
             else
             {
@@ -121,7 +124,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 //MarketLookupNavigationModelsTemp.AddRange(allEnabled);
 
-                MarketLookupNavigation.ForEach(market => market.NewMarketLookup.IsActive = false);
+                MarketLookupNavigation.Where(m => m.IsVisible).ToList().ForEach(market => market.NewMarketLookup.IsActive = false);
             }
 
             //IsMarketEditing = true;
@@ -142,6 +145,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                     break;
 
                 HasChanges = !DeepCompare(market.PrematchSettings, market.NewPrematchSettings);
+                if (HasChanges)
+                    break;
+
+                HasChanges = !DeepCompare(market.LiveSettings, market.NewLiveSettings);
                 if (HasChanges)
                     break;
 
@@ -307,28 +314,32 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (EditConfigTemplateFilterModel.MarketTemplateGroups.Count > 0)
             {
-                MarketLookupNavigation = await GetMarketTemplate(EditConfigTemplateFilterModel.MarketTemplateGroups);
+                await GetMarketTemplate(EditConfigTemplateFilterModel.MarketTemplateGroups);
             }
         }
 
 
-        private async Task<List<MarketLookupNavigationModel>> GetMarketTemplate(List<MarketGroupNavigationModel> MarketTemplateGroups)
+        private async Task GetMarketTemplate(List<MarketGroupNavigationModel> MarketTemplateGroups)
         {
-            var marketTemplates = new List<MarketLookupNavigationModel>();
+            
             foreach (var MarketTemplateGroup in MarketTemplateGroups)
             {
-                if (!EditConfigTemplateFilterModel.SelectedMarkets.Contains(MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId.ToString()))
-                    continue;
+                //if (!EditConfigTemplateFilterModel.SelectedMarkets.Contains(MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId.ToString()))
+                //    continue;
 
                 var marketTemplateGroup = MarketTemplateGroup.MarketTemplateGroup;
                 foreach (var marketLookup in EditConfigTemplateFilterModel.MarketLookup.MarketLookup)
                 {
                     if (marketTemplateGroup.MarketTemplateIds.Contains(marketLookup.MarketTemplateId))
                     {
-                        if (!(string.IsNullOrEmpty(EditConfigTemplateFilterModel.SearchText) || marketLookup.MarketTemplateName.Contains(EditConfigTemplateFilterModel.SearchText, StringComparison.OrdinalIgnoreCase)))
-                            continue;
+                        //if (!(string.IsNullOrEmpty(EditConfigTemplateFilterModel.SearchText) || marketLookup.MarketTemplateName.Contains(EditConfigTemplateFilterModel.SearchText, StringComparison.OrdinalIgnoreCase)))
+                        //    continue;
+                        
+                        var isVisible = ((EditConfigTemplateFilterModel.SelectedMarkets.Any() && MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId == 1) || EditConfigTemplateFilterModel.SelectedMarkets.Contains(MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId.ToString()))
+                                                && (string.IsNullOrEmpty(EditConfigTemplateFilterModel.SearchText) || marketLookup.MarketTemplateName.Contains(EditConfigTemplateFilterModel.SearchText, StringComparison.OrdinalIgnoreCase))
+                                                && EditConfigTemplateFilterModel.SelectedConfigStatus.Contains(marketLookup.IsActive ? "1" : "2");
 
-                        var newMarketTemplate = marketTemplates.FirstOrDefault(m => m.MarketLookup.MarketTemplateId == marketLookup.MarketTemplateId);
+                        var newMarketTemplate = MarketLookupNavigation.FirstOrDefault(m => m.MarketLookup.MarketTemplateId == marketLookup.MarketTemplateId);
                         if (newMarketTemplate == null)
                         {
 
@@ -339,7 +350,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 {
                                     MarketTemplateId = marketLookup.MarketTemplateId,
                                     IsActive = false,
-                                    FixtureTypeId = EditConfigTemplateFilterModel.ScopeId,
+                                    FixtureStatusId = EditConfigTemplateFilterModel.ScopeId,
+                                    FixtureTypeId = (int)FixtureType.Match,
                                     SportId = EditConfigTemplateFilterModel.SportId
                                 };
                             }
@@ -348,15 +360,16 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 marketLookup.IsActive = configTemplateMargin.IsActive;
                             }
 
-                            if (!EditConfigTemplateFilterModel.SelectedConfigStatus.Contains(marketLookup.IsActive ? "1" : "2"))
-                                continue;
+                            //if (!EditConfigTemplateFilterModel.SelectedConfigStatus.Contains(marketLookup.IsActive ? "1" : "2"))
+                            //    continue;
 
                             var prematchSettings = GetPrematchSettingsTemplate(configTemplateMargin, marketLookup.MarketTemplateId, marketLookup.MarketTemplateName);
                             var liveSettings = GetLiveSettingsTemplate(configTemplateMargin, marketLookup.MarketTemplateId);
 
-
-                            marketTemplates.Add(new MarketLookupNavigationModel()
+                            
+                            MarketLookupNavigation.Add(new MarketLookupNavigationModel()
                             {
+                                IsVisible = isVisible,
                                 IsSelected = false,
                                 MarketTemplateGroupIds = new List<int>() { marketTemplateGroup.MarketTemplateGroupId },
                                 MarketLookup = marketLookup,
@@ -404,14 +417,15 @@ namespace Backoffice.Web.Pages.OddsEngine
                         }
                         else
                         {
+                            newMarketTemplate.IsVisible = isVisible;
+
                             if (!newMarketTemplate.MarketTemplateGroupIds.Contains(marketTemplateGroup.MarketTemplateGroupId))
                                 newMarketTemplate.MarketTemplateGroupIds.Add(marketTemplateGroup.MarketTemplateGroupId);
                         }
 
                     }
                 }
-            }
-            return marketTemplates;
+            };
         }
 
         private PrematchSettingsTemplateModel GetPrematchSettingsTemplate(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, string marketTemplateId, string marketTemplateName)
@@ -442,7 +456,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 foreach (var time in liveSettings.Time)
                 {
-                    keyTime.Add(new KeyTimeModel { Key = GetLiveKey(time.ToString(), configTemplateMargin), TimeDisplay = time.ToString(), Time = time });
+                    keyTime.Add(new KeyTimeModel { Key = GetLiveKey(time.ToString(), configTemplateMargin), TimeDisplay = time.ToString(), Time = (time*60) });
                 }
             }
             else

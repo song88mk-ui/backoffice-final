@@ -62,9 +62,9 @@
     }
     else
     {
-        if (MarketLookupNavigation != null && MarketLookupNavigation.Any())
+        if (MarketLookupNavigation != null && MarketLookupNavigation.Any(m => m.IsVisible))
         {
-            foreach (var market in MarketLookupNavigation)
+            foreach (var market in MarketLookupNavigation.Where(m => m.IsVisible))
             {
                 <AccordionTemplateConfiguration Market="market"
                     @key="@($"{EditConfigTemplateFilterModel.ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"

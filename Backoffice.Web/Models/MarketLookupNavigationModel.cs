@@ -5,6 +5,7 @@ namespace Backoffice.Web.Models
     public class MarketLookupNavigationModel
     {
         public bool IsSelected { get; set; }
+        public bool IsVisible { get; set; }
         public List<int> MarketTemplateGroupIds { get; set; }
         public MarketLookupModel MarketLookup { get; set; }
         public MarketLookupModel NewMarketLookup { get; set; }
