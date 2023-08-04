@@ -5,48 +5,29 @@
         <div class="d-flex justify-content-between  keys-container">
             @foreach (var setting in LiveSettings.Settings)
             {
-                if (LiveSettings.Settings.First() == setting)
-                {
-                    <div class="timeline-key">
-                        <div>
-                            <div class="line"></div>
-                            <span class="timeline-axis-label label-prematch">Live</span>
-                            <div title="Click to add key" class="key">
-                                <a id="timeline-@setting.Time" class="waves-effect waves-light timeline-axis-item-key-container"
-                                    @onclick="_ => OnAddKeyClickEvent(setting)"
-                                    @onclick:preventDefault @onclick:stopPropagation
-                                    @onmouseleave="CloseModal">
-                                    <span class="timeline-axis-item-key-big timeline-axis-item-key-init" title="Click to edit key">
-                                        @setting.Key
-                                        <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />
-                                    </span>
-                                </a>
-                            </div>
-                            <div class="label">0</div>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="timeline-key">
-                        <div>
-                            <div class="line"></div>
+                var settingClass = setting.Key != null && setting.Key > 0 ? "timeline-axis-item-key-big timeline-axis-item-key-init" : "timeline-axis-item-key";
 
-                            <div title="Click to add key" class="key">
-                                <a id="timeline-@setting.Time" class="waves-effect waves-light timeline-axis-item-key-container"
-                                    @onclick="_ => OnAddKeyClickEvent(setting)"
-                                    @onclick:preventDefault @onclick:stopPropagation
-                                    @onmouseleave="CloseModal">
-                                    <span class="timeline-axis-item-key-big timeline-axis-item-key-init" title="Click to edit key">
-                                        @setting.Key
-                                        <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />
-                                    </span>
-                                </a>
-                            </div>
-                            <div class="label">@setting.TimeDisplay</div>
+                <div class="timeline-key">
+                    <div>
+                        <div class="line"></div>
+                        @if (LiveSettings.Settings.First() == setting)
+                        {
+                            <span class="timeline-axis-label label-prematch">Live</span>
+                        }
+                        <div title="Click to add key" class="key">
+                            <a id="timeline-@setting.Time" class="waves-effect waves-light timeline-axis-item-key-container"
+                            @onclick="_ => OnAddKeyClickEvent(setting)"
+                            @onclick:preventDefault @onclick:stopPropagation
+                            @onmouseleave="CloseModal">
+                                <span class="@settingClass" title="Click to edit key">
+                                    @setting.Key
+                                    <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />
+                                </span>
+                            </a>
                         </div>
+                        <div class="label">@setting.TimeDisplay</div>
                     </div>
-                }
+                </div>
             }
         </div>
     </div>

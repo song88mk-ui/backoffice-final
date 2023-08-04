@@ -106,15 +106,6 @@
     width: 36px;
 }
 
-.timeline-axis:not(.disabled) .timeline-axis-item-key:hover,
-.timeline-axis:not(.disabled) .timeline-axis-item-key.timeline-axis-item-key-active {
-    background-color: #0ac282;
-    border-color: #0ac282;
-    color: #fff;
-    height: 36px;
-    width: 36px;
-}
-
 .timeline-axis:not(.disabled) .timeline-axis-item-key:hover:not(.timeline-axis-item-key-big):after,
 .timeline-axis:not(.disabled) .timeline-axis-item-key.timeline-axis-item-key-active:not(.timeline-axis-item-key-big):after {
     content: '+';

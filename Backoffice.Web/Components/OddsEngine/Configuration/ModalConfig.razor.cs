@@ -107,106 +107,28 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 return;
             }
 
-            Setting.Key = NewSetting.Key;
-            Setting.Time = NewSetting.Time;
+            Setting.Key = null;
             if (IsPrematch == true)
             {
+                var setting = SettingsPrematch.Settings.FirstOrDefault(s => s.Time == NewSetting.Time);
+                if (setting != null)
+                {
+                    setting.Key = NewSetting.Key;
+                }
                 SettingsPrematch.LastKey = GetLastKey(true);
             }
             else
             {
+                var setting = SettingsLive.Settings.FirstOrDefault(s => s.Time == NewSetting.Time);
+                if (setting != null)
+                {
+                    setting.Key = NewSetting.Key;
+                }
+
                 SettingsLive.LastKey = GetLastKey(false);
             }
-                //if (IsPrematch == true)
-                //{
-                //    //var currentSetting = SettingsPrematch.Settings.Where(s => s.Time == Setting.Time).FirstOrDefault();
-                //    //currentSetting.Key = Setting.Key;
-                //    SettingsPrematch.LastKey = GetLastKey(true);
-                //    //    ConfigSettingsModel data = new ConfigSettingsModel();
-                //    //    data.ClientId = new Guid(SettingsPrematch.ClientId);
-                //    //    data.SportId = SettingsPrematch.SportId;
-                //    //    data.SegmentId = SettingsPrematch.SegmentId;
-                //    //    data.LeagueId = SettingsPrematch.LeagueId;
-                //    //    data.MarketTemplateId = int.Parse(SettingsPrematch.MarketTemplateId);
-
-
-                //    //    //Check for existing keys
-                //    //    var existingKeys = SettingsPrematch.Settings.Where(a => a.Key != null).ToList();
-
-                //    //    if (existingKeys != null)
-                //    //    {
-                //    //        data.PrematchSettings.Settings = existingKeys.Select(a=> new KeyTimeClientConfigModel { Key= (int)a.Key, Time = a.Time, SortOrder = a.SortOrder }).ToList();
-                //    //        var dataExist = data.PrematchSettings.Settings.Where(a => a.Time == Setting.Time).FirstOrDefault();
-                //    //        if (dataExist == null)
-                //    //        {
-                //    //            data.PrematchSettings.Settings.Add(new KeyTimeClientConfigModel { Key = (int)Setting.Key, Time = Setting.Time , SortOrder = Setting.SortOrder});
-                //    //        }
-                //    //        else
-                //    //        {
-                //    //            foreach (var row in data.PrematchSettings.Settings)
-                //    //            {
-                //    //                if (row.Time == Setting.Time)
-                //    //                {
-                //    //                    row.Key = (int)Setting.Key;
-                //    //                    break;
-                //    //                }
-                //    //            }
-                //    //        }
-                //    //    }
-                //    //    else
-                //    //    {
-                //    //        data.PrematchSettings.Settings = new List<KeyTimeClientConfigModel>();
-                //    //    }
-
-                //    //await TradingService.AddOrUpdateConfig(data);
-                //    //if (IsConnected) await HubConnection.SendAsync("OnConfigChange", data);
-                //}
-                //else
-                //{
-                //    var currentSetting = SettingsLive.Settings.Where(s => s.Time == Setting.Time).FirstOrDefault();
-                //    currentSetting.Key = Setting.Key;
-                //    SettingsLive.LastKey = GetLastKey(false);
-                //    //    ConfigSettingsModel data = new ConfigSettingsModel();
-                //    //    data.ClientId = new Guid(SettingsLive.ClientId);
-                //    //    data.SportId = SettingsLive.SportId;
-                //    //    data.SegmentId = SettingsLive.SegmentId;
-                //    //    data.LeagueId = SettingsLive.LeagueId;
-                //    //    data.MarketTemplateId = int.Parse(SettingsLive.MarketTemplateId);
-
-
-                //    //    //Check for existing keys
-                //    //    var existingKeys = SettingsLive.Settings.Where(a => a.Key != null).ToList();
-
-                //    //    if (existingKeys != null)
-                //    //    {
-                //    //        data.LivematchSettings.Settings = existingKeys.Select(a => new KeyTimeClientConfigModel { Key = (int)a.Key, Time = a.Time, SortOrder = a.SortOrder }).ToList();
-
-                //    //        var dataExist = data.LivematchSettings.Settings.Where(a => a.Time == Setting.Time).FirstOrDefault();
-                //    //        if (dataExist == null)
-                //    //        {
-                //    //            data.LivematchSettings.Settings.Add(new KeyTimeClientConfigModel { Key = (int)Setting.Key, Time = Setting.Time, SortOrder=Setting.SortOrder });
-                //    //        }
-                //    //        else
-                //    //        {
-                //    //            foreach (var row in data.LivematchSettings.Settings)
-                //    //            {
-                //    //                if (row.Time == Setting.Time)
-                //    //                {
-                //    //                    row.Key = (int)Setting.Key;
-                //    //                    break;
-                //    //                }
-                //    //            }
-                //    //        }
-                //    //    }
-                //    //    else
-                //    //    {
-                //    //        data.LivematchSettings.Settings = new List<KeyTimeClientConfigModel>();
-                //    //    }
-
-                //    //    //await TradingService.AddOrUpdateConfig(data);
-                //    //    //if (IsConnected) await HubConnection.SendAsync("OnConfigChange", data);
-                //}
-                StateHasChanged();
+            
+            StateHasChanged();
 
             Modal.Close(ModalResult.Ok("Form Submitted"));
         }
@@ -215,55 +137,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             if (Setting.Key != null)
             {
-                //////ConfigSettingsModel data = new ConfigSettingsModel();
-                ////if (IsPrematch == true)
-                ////{
-                ////    //var setting = SettingsPrematch.Settings.Where(a => a.Time == Setting.Time && a.Key == Setting.Key && a.SortOrder == Setting.SortOrder).FirstOrDefault();
-                ////    //setting.Key = null;
-                ////    Setting.Key = null;
-                ////    ////Check for existing keys
-                ////    //var existingKeys = SettingsPrematch.Settings.Where(a => a.Time == Setting.Time).Select(a => new { Key = a.Key, Time = a.Time, SortOrder = a.SortOrder }).FirstOrDefault();
-                ////    //if (existingKeys != null)
-                ////    //{
-
-                ////    //    //data.ClientId = new Guid(SettingsPrematch.ClientId);
-                ////    //    //data.SportId = SettingsPrematch.SportId;
-                ////    //    //data.SegmentId = SettingsPrematch.SegmentId;
-                ////    //    //data.LeagueId = SettingsPrematch.LeagueId;
-                ////    //    //data.MarketTemplateId = int.Parse(SettingsPrematch.MarketTemplateId);
-                ////    //    //data.PrematchSettings.Settings = SettingsPrematch.Settings.Where(a => a.Key != null).Select(a => new KeyTimeClientConfigModel { Key = (int)a.Key, Time = a.Time, SortOrder = a.SortOrder }).ToList();
-
-                ////    //    ////Remove key
-                ////    //    //data.PrematchSettings.Settings.RemoveAll(a=>a.Time == existingKeys.Time && a.Key==existingKeys.Key && a.SortOrder == existingKeys.SortOrder);
-                ////    //    //await TradingService.AddOrUpdateConfig(data);
-                ////    //}
-                ////}
-                ////else
-                ////{
-                ////    //var setting = SettingsLive.Settings.Where(a => a.Time == Setting.Time && a.Key == Setting.Key && a.SortOrder == Setting.SortOrder).FirstOrDefault();
-                ////    //setting.Key = null;
-                ////    Setting.Key = null;
-
-                ////    ////Check for existing keys
-                ////    //var existingKeys = SettingsLive.Settings.Where(a => a.Key == Setting.Key && a.Time == Setting.Time).Select(a => new KeyTimeClientConfigModel { Key = (int)a.Key, Time = a.Time, SortOrder = a.SortOrder }).FirstOrDefault();
-                ////    //if (existingKeys != null)
-                ////    //{
-
-                ////    //    //data.ClientId = new Guid(SettingsLive.ClientId);
-                ////    //    //data.SportId = SettingsLive.SportId;
-                ////    //    //data.SegmentId = SettingsLive.SegmentId;
-                ////    //    //data.LeagueId = SettingsLive.LeagueId;
-                ////    //    //data.MarketTemplateId = int.Parse(SettingsLive.MarketTemplateId);
-                ////    //    //data.LivematchSettings.Settings = SettingsLive.Settings.Where(a => a.Key != null).Select(a => new KeyTimeClientConfigModel { Key = (int)a.Key, Time = a.Time, SortOrder = a.SortOrder }).ToList();
-
-                ////    //    ////Remove key
-                ////    //    //data.LivematchSettings.Settings.RemoveAll(a => a.Time == existingKeys.Time && a.Key == existingKeys.Key && a.SortOrder == existingKeys.SortOrder);
-                ////    //    Setting.Key = null;
-                ////    //    //await TradingService.AddOrUpdateConfig(data);
-                ////    //}
-                ////}
-                //if (IsConnected) await HubConnection.SendAsync("onconfigchange", data);
-
                 Setting.Key = null;
                 if (IsPrematch == true)
                 {
