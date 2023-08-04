@@ -1522,7 +1522,8 @@ namespace Backoffice.API.Repositories
                             case ConfigState.Assigned:
                                 foreach (var config in configs)
                                 {
-                                    if (!_backofficeContext.ConfigTemplateAssigned.Any(x => x.Id == config.Id && x.SportId == config.SportId && x.SegmentId == config.SegmentId && x.LeagueId == config.LeagueId))
+                                    var configTemplateAssigned = _backofficeContext.ConfigTemplateAssigned.FirstOrDefault(x => x.Id == config.Id && x.SportId == config.SportId && x.SegmentId == config.SegmentId && x.LeagueId == config.LeagueId);
+                                    if (configTemplateAssigned == null)
                                     {
                                         context.ConfigTemplateAssigned.Add(new ConfigTemplateAssigned()
                                         {
@@ -1541,7 +1542,8 @@ namespace Backoffice.API.Repositories
                                     }
                                     else
                                     {
-                                        context.ConfigTemplateAssigned.Update(config);
+                                        configTemplateAssigned.PrematchConfigTemplateId = config.PrematchConfigTemplateId;
+                                        configTemplateAssigned.LiveConfigTemplateId = config.LiveConfigTemplateId;
                                     }
                                     context.SaveChanges();
                                 }
