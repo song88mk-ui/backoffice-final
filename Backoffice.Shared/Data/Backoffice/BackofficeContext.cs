@@ -19,7 +19,7 @@ namespace Backoffice.Shared.Data.Backoffice
         public DbSet<ClientInformation> ClientInformation { get; set; }
 
         public DbSet<ClientBetSetting> ClientBetSetting { get; set; }
-        public DbSet<ConfigTemplate> ConfigTemplates { get; set; }
+        public DbSet<ConfigTemplate> ConfigTemplate { get; set; }
         public DbSet<ConfigTemplateMargin> ConfigTemplateMargin { get; set; }
         public DbSet<ConfigTemplateAssigned> ConfigTemplateAssigned { get; set; }
         public DbSet<ActivityLog> ActivityLog { get; set; }

@@ -1361,7 +1361,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var query = _backofficeContext.ConfigTemplates.OrderBy(x => x.Name).AsNoTracking();
+                var query = _backofficeContext.ConfigTemplate.OrderBy(x => x.Name).AsNoTracking();
 
                 if (sportIds != null && sportIds.Count() > 0)
                 {
@@ -1410,7 +1410,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var query = _backofficeContext.ConfigTemplates.AsNoTracking();
+                var query = _backofficeContext.ConfigTemplate.AsNoTracking();
 
                 var result = query.Where(e => e.Id == templateId).Select(x => new ConfigTemplateModel()
                 {
@@ -1443,20 +1443,20 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var config = _backofficeContext.ConfigTemplates.Where(x => x.Id == request.Id).AsNoTracking().FirstOrDefault();
+                var config = _backofficeContext.ConfigTemplate.Where(x => x.Id == request.Id).AsNoTracking().FirstOrDefault();
 
                 if (config != null)
                 {
                     if (config.Name != request.Name)
                     {
                         config.Name = request.Name;
-                        _backofficeContext.ConfigTemplates.Update(config);
+                        _backofficeContext.ConfigTemplate.Update(config);
                         await _backofficeContext.SaveChangesAsync();
                     }
                 }
                 else
                 {
-                    var isConfigExisting = _backofficeContext.ConfigTemplates.Any(e => e.Name == request.Name);
+                    var isConfigExisting = _backofficeContext.ConfigTemplate.Any(e => e.Name == request.Name);
 
                     if (isConfigExisting)
                     {
@@ -1467,7 +1467,7 @@ namespace Backoffice.API.Repositories
                         };
                     }
 
-                    _backofficeContext.ConfigTemplates.Add(new ConfigTemplate()
+                    _backofficeContext.ConfigTemplate.Add(new ConfigTemplate()
                     {
                         Name = request.Name,
                         SportId = request.SportId,
@@ -1568,11 +1568,11 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var config = _backofficeContext.ConfigTemplates.Where(x => x.Id.ToString() == id).AsNoTracking().FirstOrDefault();
+                var config = _backofficeContext.ConfigTemplate.Where(x => x.Id.ToString() == id).AsNoTracking().FirstOrDefault();
 
                 if (config != null)
                 {
-                    _backofficeContext.ConfigTemplates.Remove(config);
+                    _backofficeContext.ConfigTemplate.Remove(config);
                 }
 
                 await _backofficeContext.SaveChangesAsync();
