@@ -141,7 +141,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         {
                             MarketTemplateId = margin.MarketTemplateId,
                             Live = string.Empty,
-                            Prematch = margin.Config,
+                            Prematch = PrematchSelectedItem.Value > 0 ? margin.Config : string.Empty,
                             IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
                             FixtureTypeId = (int)FixtureType.Match
                         });
@@ -158,7 +158,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             marketConfig.Add(new MarketConfig()
                             {
                                 MarketTemplateId = margin.MarketTemplateId,
-                                Live = margin.Config,
+                                Live = LiveSelectedItem.Value > 0 ? margin.Config : string.Empty,
                                 Prematch = string.Empty,
                                 IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
                                 FixtureTypeId = (int)FixtureType.Match
@@ -166,7 +166,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         }
                         else
                         {
-                            mConfig.Live = margin.Config;
+                            mConfig.Live = LiveSelectedItem.Value > 0 ? margin.Config : string.Empty;
                             if (margin.IsActive)
                                 mConfig.IsActive = true;
 
@@ -310,10 +310,15 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     await Modal.OnSaveClickCallback.InvokeAsync(_alertModel);
                 }
 
+                IsPreLoader = true;
+                ModalService.Cancel();
+
+            }
+            else
+            {
+                IsPreLoader = false;
             }
 
-            IsPreLoader = true;
-            ModalService.Cancel();
         }
 
         public async Task OnShowAllClickedEvent()
