@@ -105,32 +105,17 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnAllMarketStatusClickEvent()
         {
-            //MarketLookupNavigationModelsTemp = new List<MarketLookupNavigationModel>();
-
-            //SelectedContents = await GetContents();
-            //SelectedContents.ForEach(market => GetNewSettings(market));
 
             if (AllMarketStatusName == "ACTIVATE ALL")
             {
-                //var allDisabled = MarketLookupNavigation.Where(market => market.MarketLookup.IsActive == false).ToList();
-
-                //MarketLookupNavigationModelsTemp.AddRange(allDisabled);
-
                 MarketLookupNavigation.Where(m => m.IsVisible).ToList().ForEach(market => market.NewMarketLookup.IsActive = true);
             }
             else
             {
-                //var allEnabled = MarketLookupNavigation.Where(market => market.MarketLookup.IsActive == true).ToList();
-
-                //MarketLookupNavigationModelsTemp.AddRange(allEnabled);
-
                 MarketLookupNavigation.Where(m => m.IsVisible).ToList().ForEach(market => market.NewMarketLookup.IsActive = false);
             }
 
-            //IsMarketEditing = true;
-
             AllMarketStatusName = AllMarketStatusName == "DEACTIVATE ALL" ? "ACTIVATE ALL" : "DEACTIVATE ALL";
-            //AllMarketStatus = AllMarketStatusName == "Deactivate All" ? 1 : 0;
 
             await OnTemplateMarginChange();
         }

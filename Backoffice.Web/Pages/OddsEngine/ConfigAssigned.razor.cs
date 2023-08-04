@@ -41,7 +41,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string _pageTitle;
         private ConfigState? _state;
         private List<SelectListItemModel<string>> _sports;
-        private List<SelectListItemModel<string>> _scopes;
         private ConfigStateFilterModel _filterModel;
         private List<SelectListItemWithCheckboxModel<string>> _clients;
         private SearchFormModel _searchForm;
@@ -58,7 +57,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsEdit = false;
             IconClass = "";
             _sports = new();
-            _scopes = new();
             _clients = new();
             _searchForm = new();
             _alertModel = new();
@@ -97,12 +95,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (_selectedClientCount == 1)
                     _selectedClientName = Clients?.FirstOrDefault(x => x.IsChecked && x.Value.ToUpper() != "ALL")?.Name ?? string.Empty;
             }
-            if (!Scopes.Equals(_scopes))
-            {
-                _scopes = Scopes;
-                _filterModel.ScopeId = int.Parse(_scopes.FirstOrDefault()?.Value ?? "-1");
-                _filterModel.ScopeName = _scopes.FirstOrDefault()?.Name ?? "-";
-            }
+            
             if (!Sports.Equals(_sports))
             {
                 _sports = Sports;
@@ -118,8 +111,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _filterModel = new()
                 {
                     ClientCodes = Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
-                    ScopeId = int.Parse(_scopes.FirstOrDefault()?.Value ?? "-1"),
-                    ScopeName = _scopes.FirstOrDefault()?.Name ?? "-",
                     SportId = int.Parse(_sports.FirstOrDefault()?.Value ?? "-1"),
                     SportName = _sports.FirstOrDefault()?.Name ?? "-",
                     SearchText = _searchForm.SearchText
@@ -164,15 +155,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             await LoadLeagues(_filterModel);
         }
-        public async Task OnScopeCheckboxClickEvent(ChangeEventArgs e)
-        {
-            if (e != null)
-            {
-                _filterModel.ScopeId = int.Parse((e == null ? _scopes.FirstOrDefault()?.Value : e.Value?.ToString()) ?? "-1");
-                _filterModel.ScopeName = (e == null ? _scopes.FirstOrDefault()?.Name : _scopes.FirstOrDefault(x => x.Value == e.Value.ToString())?.Name) ?? string.Empty;
-            }
-            await LoadLeagues(_filterModel);
-        }
+        
         public async Task OnModalSaveEvent(object e)
         {
             _alertModel = new();
@@ -207,8 +190,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             _filterModel = new ConfigStateFilterModel()
             {
                 ClientCodes = _clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
-                ScopeId = int.Parse(_scopes.FirstOrDefault().Value),
-                ScopeName = _scopes.FirstOrDefault().Name,
                 SportId = int.Parse(_sports.FirstOrDefault().Value),
                 SportName = _sports.FirstOrDefault().Name,
                 SearchText = _searchForm.SearchText
@@ -262,7 +243,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Leagues", leagues);
             parameters.Add("State", _state);
             parameters.Add("SportId", _filterModel.SportId);
-            parameters.Add("ScopeId", _filterModel.ScopeId);
             parameters.Add("Region", _region);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
@@ -301,7 +281,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 payload.ClientCodes = filter.ClientCodes ?? new List<string>();
                 payload.SportId = filter.SportId;
-                payload.ScopeId = filter.ScopeId;
                 payload.SearchText = filter.SearchText;
             }
             payload.MetaData = MetaData;

@@ -63,15 +63,6 @@
                 </select>
             }
 
-            @if (_scopes != null && _scopes.Any())
-            {
-                <select class="form-select" @onchange="OnScopeCheckboxClickEvent">
-                    @foreach (var item in _scopes)
-                    {
-                        <option value="@item.Value" selected="@(item.Value == _filterModel.SportId.ToString())">@item.Name</option>
-                    }
-                </select>
-            }
         </div>
 
         <div>
@@ -85,12 +76,7 @@
                     </div>
                 </EditForm>
             </div>
-            @*<div class="input-group">
-            <input type="text" id="search" placeholder="Search" class="form-control search-text valid border-end-0" />
-            <span class="input-group-text border-start-0">
-            <i class="fa fa-search"></i>
-            </span>
-            </div>*@
+
         </div>
     </div>
 </div>
@@ -109,7 +95,6 @@
                     <th class="index" scope="col">No.</th>
                     <th class="filter" scope="col">Client Name</th>
                     <th class="filter" scope="col">Sport</th>
-                    <th class="filter" scope="col">Scope</th>
                     <th class="template" scope="col">League Name</th>
                     <th class="template" scope="col">Template</th>
                 </tr>

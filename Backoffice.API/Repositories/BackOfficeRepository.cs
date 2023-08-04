@@ -1374,7 +1374,7 @@ namespace Backoffice.API.Repositories
 
                 var result = query.ToList().Select(x =>
                 {
-                    var leagues = _backofficeContext.ConfigTemplateAssigned.Where(p => p.ConfigTemplateId == x.Id).AsNoTracking().ToList();
+                    var leagues = _backofficeContext.ConfigTemplateAssigned.Where(p => p.PrematchConfigTemplateId == x.Id || p.LiveConfigTemplateId == x.Id).AsNoTracking().ToList();
                     return new ConfigTemplateModel()
                     {
                         Id = x.Id,
@@ -1494,7 +1494,8 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var templateId = request.TemplateId;
+                var prematchTemplateId = request.PrematchTemplateId;
+                var liveTemplateId = request.LiveTemplateId;
                 var leagueRequest = request.Leagues;
                 var configs = leagueRequest.Select(x => new ConfigTemplateAssigned()
                 {
@@ -1508,7 +1509,8 @@ namespace Backoffice.API.Repositories
                     SegmentName = x.SegmentName,
                     LeagueId = x.LeagueId,
                     LeagueName = x.LeagueName,
-                    ConfigTemplateId = templateId
+                    PrematchConfigTemplateId = prematchTemplateId,
+                    LiveConfigTemplateId = liveTemplateId
                 }).ToList();
 
                 using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
@@ -1533,7 +1535,8 @@ namespace Backoffice.API.Repositories
                                             SegmentName = config.SegmentName,
                                             LeagueId = config.LeagueId,
                                             LeagueName = config.LeagueName,
-                                            ConfigTemplateId = config.ConfigTemplateId
+                                            PrematchConfigTemplateId = config.PrematchConfigTemplateId,
+                                            LiveConfigTemplateId = config.LiveConfigTemplateId
                                         });
                                     }
                                     else
@@ -1599,7 +1602,7 @@ namespace Backoffice.API.Repositories
                 }
                 else
                 {
-                    var configTemplate = await GetConfigTemplates(sportIds: payload.SportId != -1 ? new List<int>() { payload.SportId } : null, scopeIds: payload.ScopeId != -1 ? new List<int>() { payload.ScopeId } : null);
+                    var configTemplate = await GetConfigTemplates(sportIds: payload.SportId != -1 ? new List<int>() { payload.SportId } : null);
                     templates = configTemplate.Result;
                 }
 
@@ -1614,7 +1617,7 @@ namespace Backoffice.API.Repositories
                     }
                 }
 
-                var query = _backofficeContext.ConfigTemplateAssigned.ToList().Where(x => templates.Any(template => template.Id == x.ConfigTemplateId));
+                var query = _backofficeContext.ConfigTemplateAssigned.ToList().Where(x => templates.Any(template => template.Id == x.PrematchConfigTemplateId || template.Id == x.LiveConfigTemplateId));
 
                 if(query.Any())
                 {
@@ -1649,14 +1652,14 @@ namespace Backoffice.API.Repositories
                             ClientName = x.ClientName,
                             SportId = x.SportId,
                             SportName = x.SportName,
-                            FixtureStatusId = templates.Where(cl => cl.Id == x.ConfigTemplateId).Select(x => x.FixtureStatusId).FirstOrDefault(),
-                            FixtureStatusName = ((FixtureStatus)templates.Where(cl => cl.Id == x.ConfigTemplateId).Select(x => x.FixtureStatusId).FirstOrDefault()).ToString(),
                             SegmentId = x.SegmentId,
                             SegmentName = x.SegmentName,
                             LeagueId = x.LeagueId,
                             LeagueName = x.LeagueName,
-                            TemplateId = x.ConfigTemplateId,
-                            TemplateName = templates.Where(cl => cl.Id == x.ConfigTemplateId).Select(x => x.Name).FirstOrDefault()
+                            PrematchTemplateId = x.PrematchConfigTemplateId,
+                            LiveTemplateId = x.LiveConfigTemplateId,
+                            PrematchTemplateName = templates.Where(cl => cl.Id == x.PrematchConfigTemplateId).Select(x => x.Name).FirstOrDefault(),
+                            LiveTemplateName = templates.Where(cl => cl.Id == x.LiveConfigTemplateId).Select(x => x.Name).FirstOrDefault()
                         }).ToList();
                         break;
                     case ConfigState.UnAssigned:
@@ -1675,13 +1678,8 @@ namespace Backoffice.API.Repositories
 
                                 foreach (var league in leagues)
                                 {
-                                    var fixtures = new List<int>() { payload.ScopeId };
-
-                                    if (payload.ScopeId == -1)
-                                    {
-                                        var template = templates.Where(x => query.Any(q => q.ConfigTemplateId == x.Id && q.LeagueId == league.LeagueId && q.ClientCode == clientCode)).ToList();
-                                        fixtures = fixtureStatusIds.Where(x => !template.Any(t => t.FixtureStatusId == x)).ToList();
-                                    }
+                                    var template = templates.Where(x => query.Any(q => (q.PrematchConfigTemplateId == x.Id || q.LiveConfigTemplateId == x.Id) && q.LeagueId == league.LeagueId && q.ClientCode == clientCode)).ToList();
+                                    var fixtures = fixtureStatusIds.Where(x => !template.Any(t => t.FixtureStatusId == x)).ToList();
 
                                     foreach (var item in fixtures)
                                     {
@@ -1696,8 +1694,6 @@ namespace Backoffice.API.Repositories
                                                 ClientName = client.ClientName,
                                                 SportId = league.SportId,
                                                 SportName = league.SportName,
-                                                FixtureStatusId = item,
-                                                FixtureStatusName = ((FixtureStatus)item).ToString(),
                                                 SegmentId = league.SegmentId,
                                                 SegmentName = league.SegmentName,
                                                 LeagueId = league.LeagueId,

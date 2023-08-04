@@ -101,14 +101,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     ClientName = x.ClientName,
                     SportId = x.SportId,
                     SportName = x.SportName,
-                    FixtureStatusId = x.FixtureStatusId,
-                    FixtureStatusName = x.FixtureStatusName,
                     SegmentId = x.SegmentId,
                     SegmentName = x.SegmentName,
                     LeagueId = x.LeagueId,
                     LeagueName = x.LeagueName,
-                    TemplateId = x.TemplateId,
-                    TemplateName = x.TemplateName
+                    PrematchTemplateId = x.PrematchTemplateId,
+                    PrematchTemplateName = x.PrematchTemplateName
                 }).ToList();
                 var state = ConfigState.UnAssigned;
 
@@ -119,19 +117,50 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                 var response = await BackOfficeService.SetLeagueState(state, new ConfigSetLeagueStateRequest()
                 {
-                    TemplateId = SelectedItem.Value,
+                    PrematchTemplateId = SelectedItem.Value,
+                    LiveTemplateId = SelectedItem.Value,
                     Leagues = leagueRequest
                 });
 
                 if (response.StatusCode == StatusCode.Success)
                 {
                     List<MarketConfig> marketConfig = new List<MarketConfig>();
-                    var marketTemplateId = SelectedItem.Value > 0 ? SelectedItem.Value : leagueRequest.FirstOrDefault().TemplateId;
-                    var configTemplateMargins = await GetConfigTemplateMargin(marketTemplateId);
+                    var prematchTemplateId = SelectedItem.Value > 0 ? SelectedItem.Value : leagueRequest.FirstOrDefault().PrematchTemplateId;
+                    var prematchConfigTemplateMargins = await GetConfigTemplateMargin(prematchTemplateId);
 
-                    foreach (var margin in configTemplateMargins.ConfigTemplateMargins)
+                    foreach (var margin in prematchConfigTemplateMargins.ConfigTemplateMargins)
                     {
                         if(margin.FixtureStatusId == (int)FixtureStatus.Prematch)
+                        {
+                            marketConfig.Add(new MarketConfig()
+                            {
+                                MarketTemplateId = margin.MarketTemplateId,
+                                Live = string.Empty,
+                                Prematch = margin.Config,
+                                IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
+                                FixtureTypeId = (int)FixtureType.Match
+                            });
+                        }
+                        else
+                        {
+                            marketConfig.Add(new MarketConfig()
+                            {
+                                MarketTemplateId = margin.MarketTemplateId,
+                                Live = margin.Config,
+                                Prematch = string.Empty,
+                                IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
+                                FixtureTypeId = (int)FixtureType.Match
+                            });
+                        }
+
+                    }
+
+                    var liveTemplateId = SelectedItem.Value > 0 ? SelectedItem.Value : leagueRequest.FirstOrDefault().LiveTemplateId;
+                    var liveConfigTemplateMargins = await GetConfigTemplateMargin(liveTemplateId);
+                    //TODO: Refactor this code
+                    foreach (var margin in liveConfigTemplateMargins.ConfigTemplateMargins)
+                    {
+                        if (margin.FixtureStatusId == (int)FixtureStatus.Prematch)
                         {
                             marketConfig.Add(new MarketConfig()
                             {
@@ -229,15 +258,15 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                     var distinctTemplates = Leagues.Select(x => new
                     {
-                        Id = x.TemplateId.ToString(),
-                        Name = x.TemplateName
+                        Id = x.PrematchTemplateId.ToString(),
+                        Name = x.PrematchTemplateName
                     }).Distinct().ToList();
 
                     var cancellationTokenSource = new CancellationTokenSource();
 
                     Parallel.ForEach(distinctTemplates, async (item) =>
                     {
-                        var leagues = Leagues.Where(x => x.TemplateId.ToString() == item.Id).ToList();
+                        var leagues = Leagues.Where(x => x.PrematchTemplateId.ToString() == item.Id).ToList();
 
                         var from = "";
                         var to = "";
