@@ -18,6 +18,7 @@ namespace Backoffice.Shared.Data.Backoffice.Entities
         public string SegmentName { get; set; }
         public int LeagueId { get; set; }
         public string LeagueName { get; set; }
-        public long ConfigTemplateId { get; set; }
+        public long PrematchConfigTemplateId { get; set; }
+        public long LiveConfigTemplateId { get; set; }
     }
 }

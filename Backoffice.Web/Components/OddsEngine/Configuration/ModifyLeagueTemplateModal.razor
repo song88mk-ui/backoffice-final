@@ -20,7 +20,7 @@
                         <div class="col-12 mb-2 p-0">
                             <div class="container border">
                                 <p class="fw-bold my-2">@item.LeagueName</p>
-                                <p class="mb-2">@($"{item.ClientName} | {item.SportName} | {item.FixtureStatusName}")</p>
+                                <p class="mb-2">@($"{item.ClientName} | {item.SportName}")</p>
                             </div>
                         </div>
                     }
@@ -28,29 +28,50 @@
             </div>
         </div>
         <div class="d-flex my-3 ms-2">
-            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">Template</label>
+            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">Prematch Template</label>
             <div class="col col-sm-10">
                 <div class="dropdown">
                     <button class="btn w-100 form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        @if (SelectedItem != null && !string.IsNullOrEmpty(SelectedItem.Name))
+                        @if (PrematchSelectedItem != null && !string.IsNullOrEmpty(PrematchSelectedItem.Name))
                         {
-                            <span class="@(SelectedItem.Value == -1 ? "text-danger":"")">@SelectedItem.Name</span>
+                            <span class="@(PrematchSelectedItem.Value == -1 ? "text-danger":"")">@PrematchSelectedItem.Name</span>
                         }
                         else
                         {
                             <span class="template-name-italic">Select Template</span>
                         }
                     </button>
-                    @if (Templates != null && Templates.Any())
+                    @if (PrematchTemplates != null && PrematchTemplates.Any())
                     {
-                        <SelectWithSearch State="State" Items="Templates" AriaLabel="scope-dropdown" OnSelectionCallback="OnTemplateSelectChanged" />
+                        <SelectWithSearch State="State" Items="PrematchTemplates" AriaLabel="scope-dropdown" OnSelectionCallback="OnPrematchTemplateSelectChanged" />
                     }
                 </div>
             </div>            
         </div>
+        <div class="d-flex my-3 ms-2">
+            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">Live Template</label>
+            <div class="col col-sm-10">
+                <div class="dropdown">
+                    <button class="btn w-100 form-select dropdown-toggle" type="button" id="live-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        @if (LiveSelectedItem != null && !string.IsNullOrEmpty(LiveSelectedItem.Name))
+                        {
+                            <span class="@(LiveSelectedItem.Value == -1 ? "text-danger":"")">@LiveSelectedItem.Name</span>
+                        }
+                        else
+                        {
+                            <span class="template-name-italic">Select Template</span>
+                        }
+                    </button>
+                    @if (LiveTemplates != null && LiveTemplates.Any())
+                    {
+                        <SelectWithSearch State="State" Items="LiveTemplates" AriaLabel="scope-dropdown" OnSelectionCallback="OnLiveTemplateSelectChanged" />
+                    }
+                </div>
+            </div>
+        </div>
 
         <div class="col-sm-12 ms-2">
-            @if (IsRemoveCurrentTemplate)
+            @if (IsRemoveCurrentPrematchTemplate || IsRemoveCurrentLiveTemplate)
             {
                 <div class="d-flex align-items-baseline flex-gap">
                     <i class="fa fa-info-circle" aria-hidden="true"></i><span class="fst-italic fw-bold">By removing the currently assigned template, the leagues you have selected will be moved to the Unassigned page.</span>

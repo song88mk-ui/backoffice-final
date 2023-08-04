@@ -144,7 +144,6 @@ namespace Backoffice.API.Controllers.Backoffice
             var userId = HttpContext.Items["UserId"]?.ToString();
             var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
 
-            var isAssigned = true;
             var result = new BaseResponse<ConfigTemplateLeagueResponse>()
             {
                 StatusCode = BoStatusCode.Error,

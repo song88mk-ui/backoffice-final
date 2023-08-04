@@ -12,13 +12,13 @@ namespace Backoffice.Shared.Models
         public string ClientName { get; set; }
         public int SportId { get; set; }
         public string SportName { get; set; }
-        public int FixtureStatusId { get; set; }
-        public string FixtureStatusName { get; set; }
         public int SegmentId { get; set; }
         public string SegmentName { get; set; }
         public int LeagueId { get; set; }
         public string LeagueName { get; set; }
-        public long TemplateId { get; set; } = -1;
-        public string TemplateName { get; set; } = "";
+        public long PrematchTemplateId { get; set; } = -1;
+        public long LiveTemplateId { get; set; } = -1;
+        public string PrematchTemplateName { get; set; } = "";
+        public string LiveTemplateName { get; set; } = "";
     }
 }

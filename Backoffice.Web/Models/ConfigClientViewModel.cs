@@ -11,14 +11,14 @@ namespace Backoffice.Web.Models
         public string ClientName { get; set; }
         public int SportId { get; set; }
         public string SportName { get; set; }
-        public int FixtureStatusId { get; set; }
-        public string FixtureStatusName { get; set; }
         public int SegmentId { get; set; }
         public string SegmentName { get; set; }
         public int LeagueId { get; set; }
         public string LeagueName { get; set; }
-        public long TemplateId { get; set; } = -1;
-        public string TemplateName { get; set; } = "";
+        public long PrematchTemplateId { get; set; } = -1;
+        public string PrematchTemplateName { get; set; } = "";
+        public long LiveTemplateId { get; set; } = -1;
+        public string LiveTemplateName { get; set; } = "";
 
         public static implicit operator ConfigClientViewModel(ConfigClientModel payload)
         {
@@ -30,14 +30,14 @@ namespace Backoffice.Web.Models
                 ClientName = payload.ClientName,
                 SportId = payload.SportId,
                 SportName = payload.SportName,
-                FixtureStatusId = payload.FixtureStatusId,
-                FixtureStatusName = payload.FixtureStatusName,
                 SegmentId = payload.SegmentId,
                 SegmentName = payload.SegmentName,
                 LeagueId = payload.LeagueId,
                 LeagueName = payload.LeagueName,
-                TemplateId = payload.TemplateId,
-                TemplateName = payload.TemplateName
+                PrematchTemplateId = payload.PrematchTemplateId,
+                PrematchTemplateName = payload.PrematchTemplateName,
+                LiveTemplateId = payload.LiveTemplateId,
+                LiveTemplateName = payload.LiveTemplateName
             };
         }
         public static List<ConfigClientViewModel> ConvertList(List<ConfigClientModel> payload)
@@ -50,14 +50,14 @@ namespace Backoffice.Web.Models
                 ClientName = x.ClientName,
                 SportId = x.SportId,
                 SportName = x.SportName,
-                FixtureStatusId = x.FixtureStatusId,
-                FixtureStatusName = x.FixtureStatusName,
                 SegmentId = x.SegmentId,
                 SegmentName = x.SegmentName,
                 LeagueId = x.LeagueId,
                 LeagueName = x.LeagueName,
-                TemplateId = x.TemplateId,
-                TemplateName = x.TemplateName
+                PrematchTemplateId = x.PrematchTemplateId,
+                PrematchTemplateName = x.PrematchTemplateName,
+                LiveTemplateId = x.LiveTemplateId,
+                LiveTemplateName = x.LiveTemplateName
             }).ToList();
         }
     }
