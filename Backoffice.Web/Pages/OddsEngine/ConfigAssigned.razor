@@ -89,14 +89,18 @@
 
                     <AuthorizeView Policy="sbc-config-canedit">
                         <Authorized Context="ActivateAll">
-                            <th class="index" scope="col"></th>
+                            <th class="index" scope="col" rowspan="2"></th>
                         </Authorized>
                     </AuthorizeView>
-                    <th class="index" scope="col">No.</th>
-                    <th class="filter" scope="col">Client Name</th>
-                    <th class="filter" scope="col">Sport</th>
-                    <th class="template" scope="col">League Name</th>
-                    <th class="template" scope="col">Template</th>
+                    <th class="index" scope="col" rowspan="2">No.</th>
+                    <th class="filter" scope="col" rowspan="2">Client Name</th>
+                    <th class="filter" scope="col" rowspan="2">Sport</th>
+                    <th class="template" scope="col" rowspan="2">League Name</th>
+                    <th class="template" scope="col" colspan="2">Template</th>
+                </tr>
+                <tr>
+                    <th class="template" scope="col">Prematch</th>
+                    <th class="template" scope="col">Live</th>
                 </tr>
             </thead>
 
