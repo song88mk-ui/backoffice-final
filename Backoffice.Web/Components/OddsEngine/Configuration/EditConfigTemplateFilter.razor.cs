@@ -92,7 +92,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                 EditConfigTemplateFilterModel.SportName = (await TradingService.GetSportLookup()).Result.SportLookup.FirstOrDefault(e => e.SportId == response.Result.SportId).SportName;
                 EditConfigTemplateFilterModel.SportId = response.Result.SportId;
-                EditConfigTemplateFilterModel.ScopeId = response.Result.FixtureTypeId;
+                EditConfigTemplateFilterModel.ScopeId = response.Result.FixtureStatusId;
             }
         }
 

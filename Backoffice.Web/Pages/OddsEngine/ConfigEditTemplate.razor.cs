@@ -235,10 +235,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                         ConfigTemplateId = ConfigTemplateId,
                         SportId = EditConfigTemplateFilterModel.SportId,
                         MarketTemplateId = market.MarketLookup.MarketTemplateId,
-                        FixtureTypeId = EditConfigTemplateFilterModel.ScopeId,
+                        FixtureTypeId = (int)FixtureType.Match,
+                        FixtureStatusId = EditConfigTemplateFilterModel.ScopeId,
                         IsActive = market.NewMarketLookup.IsActive,
-                        Prematch = JsonSerializer.Serialize(prematchSettings),
-                        Live = JsonSerializer.Serialize(livematchSettings)
+                        Config = EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Prematch ? JsonSerializer.Serialize(prematchSettings) : JsonSerializer.Serialize(livematchSettings)
                     });
                 }
 
@@ -419,8 +419,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             return new PrematchSettingsTemplateModel()
             {
                 SportId = EditConfigTemplateFilterModel.ConfigTemplate.SportId,
-                FirstKey = GetFirstKey(configTemplateMargin, true),
-                LastKey = GetLastKey(configTemplateMargin, true),
+                FirstKey = GetFirstKey(configTemplateMargin),
+                LastKey = GetLastKey(configTemplateMargin),
                 MarketTemplateId = marketTemplateId,
                 Settings = MockData.PrematchSettings.Select(s => new Backoffice.Shared.Models.KeyTimeModel()
                 {
@@ -453,8 +453,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             return new LiveSettingsTemplateModel()
             {
                 SportId = configTemplateMargin.SportId,
-                FirstKey = GetFirstKey(configTemplateMargin, false),
-                LastKey = GetLastKey(configTemplateMargin, false),
+                FirstKey = GetFirstKey(configTemplateMargin),
+                LastKey = GetLastKey(configTemplateMargin),
                 MarketTemplateId = configTemplateMargin.MarketTemplateId.ToString(),
                 Settings = keyTime,
                 OvertimeKey = liveSettings?.Overtime.ToString(),
@@ -462,15 +462,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
         }
 
-        private string GetFirstKey(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, bool isPrematch)
+        private string GetFirstKey(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin)
         {
 
-            if (configTemplateMargin == null || (string.IsNullOrEmpty(configTemplateMargin.Prematch) && string.IsNullOrEmpty(configTemplateMargin.Live))) return "101";
+            if (configTemplateMargin == null || string.IsNullOrEmpty(configTemplateMargin.Config)) return "101";
 
-            if ((isPrematch && configTemplateMargin.Prematch?.Length == 0)
-                || (!isPrematch && configTemplateMargin.Live?.Length == 0)) return "101";
+            if (configTemplateMargin.Config?.Length == 0) return "101";
 
-            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(isPrematch ? configTemplateMargin.Prematch : configTemplateMargin.Live);
+            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(configTemplateMargin.Config);
 
             if (keyTimes == null) return "";
 
@@ -478,14 +477,13 @@ namespace Backoffice.Web.Pages.OddsEngine
             return (firstKey ?? 101).ToString();
         }
 
-        private string GetLastKey(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, bool isPrematch)
+        private string GetLastKey(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin)
         {
-            if (configTemplateMargin == null || (string.IsNullOrEmpty(configTemplateMargin.Prematch) && string.IsNullOrEmpty(configTemplateMargin.Live))) return "101";
+            if (configTemplateMargin == null || string.IsNullOrEmpty(configTemplateMargin.Config)) return "101";
 
-            if ((isPrematch && configTemplateMargin.Prematch?.Length == 0)
-                || (!isPrematch && configTemplateMargin.Live?.Length == 0)) return "";
+            if (configTemplateMargin.Config?.Length == 0) return "";
 
-            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(isPrematch ? configTemplateMargin.Prematch : configTemplateMargin.Live);
+            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(configTemplateMargin.Config);
             if (keyTimes == null) return "";
 
             var lastKey = keyTimes.Where(s => s.M > 101).LastOrDefault()?.M;
@@ -503,7 +501,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     return null;
             }
 
-            if (string.IsNullOrEmpty(configTemplateMargin.Prematch))
+            if (string.IsNullOrEmpty(configTemplateMargin.Config))
             {
                 if (Time == "INST")
                     return 101;
@@ -512,7 +510,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
 
-            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(configTemplateMargin.Prematch);
+            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(configTemplateMargin.Config);
             if (keyTimes == null && Time == "INST")
                 return 101;
 
@@ -548,7 +546,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     return null;
             }
 
-            if (string.IsNullOrEmpty(configTemplateMargin.Live))
+            if (string.IsNullOrEmpty(configTemplateMargin.Config))
             {
                 if (Time == "0")
                     return 101;
@@ -556,7 +554,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     return null;
             }
 
-            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(configTemplateMargin.Live);
+            List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(configTemplateMargin.Config);
             if (keyTimes == null && Time == "0")
                 return 101;
 

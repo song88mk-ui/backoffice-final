@@ -18,8 +18,8 @@ namespace Backoffice.Shared.Models
         public int SportId { get; set; }
         public string MarketTemplateId { get; set; }
         public int FixtureTypeId { get; set; }
+        public int FixtureStatusId { get; set; }
         public bool IsActive { get; set; }
-        public string Prematch { get; set; }
-        public string Live { get; set; }
+        public string Config { get; set; }
     }
 }

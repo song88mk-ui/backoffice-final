@@ -1369,7 +1369,7 @@ namespace Backoffice.API.Repositories
                 }
                 if (scopeIds != null && scopeIds.Count() > 0)
                 {
-                    query = query.Where(x => scopeIds.Contains(x.FixtureTypeId));
+                    query = query.Where(x => scopeIds.Contains(x.FixtureStatusId));
                 }
 
                 var result = query.ToList().Select(x =>
@@ -1381,6 +1381,7 @@ namespace Backoffice.API.Repositories
                         Name = x.Name,
                         SportId = x.SportId,
                         FixtureTypeId = x.FixtureTypeId,
+                        FixtureStatusId = x.FixtureStatusId,
                         Timestamp = x.Timestamp,
                         ClientsCount = leagues.Select(x => x.ClientCode).Distinct().Count(),
                         LeaguesCount = leagues.Select(x => x.LeagueId).Distinct().Count(),
@@ -1417,6 +1418,7 @@ namespace Backoffice.API.Repositories
                     Name = x.Name,
                     SportId = x.SportId,
                     FixtureTypeId = x.FixtureTypeId,
+                    FixtureStatusId = x.FixtureStatusId,
                     Timestamp = x.Timestamp
                 }).FirstOrDefault();
 
@@ -1470,6 +1472,7 @@ namespace Backoffice.API.Repositories
                         Name = request.Name,
                         SportId = request.SportId,
                         FixtureTypeId = request.FixtureTypeId,
+                        FixtureStatusId = request.FixtureStatusId,
                         Timestamp = DateTime.UtcNow
                     });
                     await _backofficeContext.SaveChangesAsync();
@@ -1646,8 +1649,8 @@ namespace Backoffice.API.Repositories
                             ClientName = x.ClientName,
                             SportId = x.SportId,
                             SportName = x.SportName,
-                            FixtureStatusId = templates.Where(cl => cl.Id == x.ConfigTemplateId).Select(x => x.FixtureTypeId).FirstOrDefault(),
-                            FixtureStatusName = ((FixtureStatus)templates.Where(cl => cl.Id == x.ConfigTemplateId).Select(x => x.FixtureTypeId).FirstOrDefault()).ToString(),
+                            FixtureStatusId = templates.Where(cl => cl.Id == x.ConfigTemplateId).Select(x => x.FixtureStatusId).FirstOrDefault(),
+                            FixtureStatusName = ((FixtureStatus)templates.Where(cl => cl.Id == x.ConfigTemplateId).Select(x => x.FixtureStatusId).FirstOrDefault()).ToString(),
                             SegmentId = x.SegmentId,
                             SegmentName = x.SegmentName,
                             LeagueId = x.LeagueId,
@@ -1677,7 +1680,7 @@ namespace Backoffice.API.Repositories
                                     if (payload.ScopeId == -1)
                                     {
                                         var template = templates.Where(x => query.Any(q => q.ConfigTemplateId == x.Id && q.LeagueId == league.LeagueId && q.ClientCode == clientCode)).ToList();
-                                        fixtures = fixtureStatusIds.Where(x => !template.Any(t => t.FixtureTypeId == x)).ToList();
+                                        fixtures = fixtureStatusIds.Where(x => !template.Any(t => t.FixtureStatusId == x)).ToList();
                                     }
 
                                     foreach (var item in fixtures)
@@ -1801,9 +1804,9 @@ namespace Backoffice.API.Repositories
                     MarketTemplateId = x.MarketTemplateId,
                     SportId = x.SportId,
                     FixtureTypeId = x.FixtureTypeId,
+                    FixtureStatusId = x.FixtureStatusId,
                     IsActive = x.IsActive,
-                    Prematch = x.Prematch,
-                    Live = x.Live,
+                    Config = x.Config,
                 }).ToList();
 
                 return new BaseResponse<ConfigTemplateMarginModel>()
@@ -1844,10 +1847,10 @@ namespace Backoffice.API.Repositories
                     {
                         ConfigTemplateId = config.ConfigTemplateId,
                         FixtureTypeId = config.FixtureTypeId,
+                        FixtureStatusId = config.FixtureStatusId,
                         MarketTemplateId = config.MarketTemplateId,
                         SportId = config.SportId,
-                        Prematch = config.Prematch,
-                        Live = config.Live,
+                        Config = config.Config,
                         IsActive = config.IsActive
                     });
                 }

@@ -12,7 +12,7 @@ namespace Backoffice.Shared.Data.Backoffice
             modelBuilder.Entity<ClientBetSetting>().HasKey(k => new { k.ClientBetSettingId });
             modelBuilder.Entity<ActivityLog>().HasKey(k => new { k.Id });
             modelBuilder.Entity<ConfigTemplate>().HasKey(k => new { k.Id });
-            modelBuilder.Entity<ConfigTemplateMargin>().HasKey(k => new { k.ConfigTemplateId, k.SportId, k.FixtureTypeId, k.MarketTemplateId });
+            modelBuilder.Entity<ConfigTemplateMargin>().HasKey(k => new { k.ConfigTemplateId, k.SportId, k.FixtureTypeId, k.FixtureStatusId, k.MarketTemplateId });
             modelBuilder.Entity<ConfigTemplateAssigned>().HasKey(k => new { k.Id });
         }
 

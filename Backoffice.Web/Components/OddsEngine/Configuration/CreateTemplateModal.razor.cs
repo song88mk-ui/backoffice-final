@@ -75,7 +75,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var payload = new ConfigTemplateModel()
             {
                 SportId = SelectedSportId,
-                FixtureTypeId = SelectedScopeId,
+                FixtureTypeId = (int)FixtureType.Match,
+                FixtureStatusId = SelectedScopeId,
                 Name = TemplateName,
             };
 

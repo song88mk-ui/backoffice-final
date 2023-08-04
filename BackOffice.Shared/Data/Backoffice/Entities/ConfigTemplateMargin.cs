@@ -14,9 +14,10 @@ namespace Backoffice.Shared.Data.Backoffice.Entities
         [Key]
         public int FixtureTypeId { get; set; }
         [Key]
+        public int FixtureStatusId { get; set; }
+        [Key]
         public string MarketTemplateId { get; set; }
         public bool IsActive { get; set; }
-        public string Prematch { get; set; }
-        public string Live { get; set; }
+        public string Config { get; set; }
     }
 }

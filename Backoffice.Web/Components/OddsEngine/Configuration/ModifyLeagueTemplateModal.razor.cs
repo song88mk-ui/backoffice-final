@@ -131,14 +131,29 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                     foreach (var margin in configTemplateMargins.ConfigTemplateMargins)
                     {
-                        marketConfig.Add(new MarketConfig()
+                        if(margin.FixtureStatusId == (int)FixtureStatus.Prematch)
                         {
-                            MarketTemplateId = margin.MarketTemplateId,
-                            Live = margin.Live,
-                            Prematch = margin.Prematch,
-                            IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
-                            FixtureTypeId = margin.FixtureTypeId
-                        });
+                            marketConfig.Add(new MarketConfig()
+                            {
+                                MarketTemplateId = margin.MarketTemplateId,
+                                Live = string.Empty,
+                                Prematch = margin.Config,
+                                IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
+                                FixtureTypeId = (int)FixtureType.Match
+                            });
+                        }
+                        else
+                        {
+                            marketConfig.Add(new MarketConfig()
+                            {
+                                MarketTemplateId = margin.MarketTemplateId,
+                                Live = margin.Config,
+                                Prematch = string.Empty,
+                                IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
+                                FixtureTypeId = (int)FixtureType.Match
+                            });
+                        }
+
                     }
 
                     foreach (var league in leagueRequest)
@@ -155,8 +170,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         {
                             IsActive = s.IsActive,
                             MarketTemplateId = s.MarketTemplateId,
-                            PrematchSettings = JsonSerializer.Deserialize<List<MarketMargin>>(s.Prematch)?.ToList() ?? new List<MarketMargin>(),
-                            LivematchSettings = JsonSerializer.Deserialize<List<MarketMargin>>(s.Live)?.ToList() ?? new List<MarketMargin>(),
+                            PrematchSettings = string.IsNullOrEmpty(s.Prematch) ? new List<MarketMargin>() : JsonSerializer.Deserialize<List<MarketMargin>>(s.Prematch)?.ToList() ?? new List<MarketMargin>(),
+                            LivematchSettings = string.IsNullOrEmpty(s.Live) ? new List<MarketMargin>() : JsonSerializer.Deserialize<List<MarketMargin>>(s.Live)?.ToList() ?? new List<MarketMargin>(),
                         }).ToList();
 
                         data.LeagueConfig = new List<LeagueConfigModel>()

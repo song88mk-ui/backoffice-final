@@ -48,7 +48,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 await BackofficeService.AddActivityLog(new ActivityLogModel()
                 {
                     Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                    Payload = $"{ConfigTemplateModel.SportId}.{ConfigTemplateModel.FixtureTypeId}.{ConfigTemplateModel.Name}.T".Replace(" ", "_"),
+                    Payload = $"{ConfigTemplateModel.SportId}.{ConfigTemplateModel.FixtureStatusId}.{ConfigTemplateModel.Name}.T".Replace(" ", "_"),
                     From = JsonSerializer.Serialize(ConfigTemplateModel),
                     To = "-",
                     Activity = Activity.Delete.ToString(),
