@@ -1686,7 +1686,7 @@ namespace Backoffice.API.Repositories
                                     foreach (var item in fixtures)
                                     {
                                         var client = clientList.FirstOrDefault(x => x.ClientCode.ToUpper() == clientCode.ToUpper());
-                                        if (client != null)
+                                        if (client != null && !result.Any(r => r.ClientCode == client.ClientCode && r.SportId == league.SportId && r.SegmentId == league.SegmentId && r.LeagueId == league.LeagueId))
                                         {
                                             result.Add(new ConfigClientModel()
                                             {
