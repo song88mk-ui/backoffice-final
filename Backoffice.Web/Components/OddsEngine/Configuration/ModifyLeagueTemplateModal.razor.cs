@@ -140,7 +140,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         marketConfig.Add(new MarketConfig()
                         {
                             MarketTemplateId = margin.MarketTemplateId,
-                            Live = string.Empty,
+                            Live = LiveSelectedItem.Value > 0 ? margin.Config : string.Empty,
                             Prematch = PrematchSelectedItem.Value > 0 ? margin.Config : string.Empty,
                             IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
                             FixtureTypeId = (int)FixtureType.Match
@@ -255,20 +255,20 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                     Parallel.ForEach(distinctTemplates, async (item) =>
                     {
-                        var leagues = Leagues.Where(x => x.PrematchTemplateId.ToString() == item.Id).ToList();
+                        var premathcLeagues = Leagues.Where(x => x.PrematchTemplateId.ToString() == item.Id).ToList();
 
-                        var from = "";
-                        var to = "";
-                        from = JsonSerializer.Serialize(new ConfigTemplateLogModel()
+                        var preFrom = "";
+                        var preTo = "";
+                        preFrom = JsonSerializer.Serialize(new ConfigTemplateLogModel()
                         {
                             TemplateName = item.Id != "-1" ? item.Name : "Unassigned",
                             Payloads = new ConfigTemplateLogPayloadModel()
                             {
-                                Clients = leagues.Select(x => x.ClientName).Distinct().ToList(),
-                                Leagues = leagues.Select(x => x.LeagueName).Distinct().ToList()
+                                Clients = premathcLeagues.Select(x => x.ClientName).Distinct().ToList(),
+                                Leagues = premathcLeagues.Select(x => x.LeagueName).Distinct().ToList()
                             }
                         });
-                        to = JsonSerializer.Serialize(new ConfigTemplateLogModel()
+                        preTo = JsonSerializer.Serialize(new ConfigTemplateLogModel()
                         {
                             TemplateName = PrematchSelectedItem != null && PrematchSelectedItem.Value.ToString() != "-1" ? PrematchSelectedItem.Name : "Unassigned",
                             Payloads = new ConfigTemplateLogPayloadModel()
@@ -283,7 +283,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                             Payload = $"{ActivityLogPayload}.{PrematchSelectedItem?.Name ?? ""}.T".Replace(" ", "_"),
                             From = from,
-                            To = to,
+                            To = preTo,
                             Activity = Activity.Update.ToString(),
                             UserId = UserModel.Id,
                             UserName = UserModel.UserName,

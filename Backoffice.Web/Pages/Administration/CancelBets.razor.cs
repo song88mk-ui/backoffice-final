@@ -40,9 +40,11 @@ namespace Backoffice.Web.Pages.Administration
             };
 
             await AuthenticateAccess.InvokeAsync();
-
-            _pageHeaderModel.Title = "Cancel Bets";
-            _pageHeaderModel.IconClass = "ico ico-cancel-bets";
+            _pageHeaderModel = new()
+            {
+                Title = "Cancel Bets",
+                IconClass = "ico ico-cancel-bets"
+            };
         }
 
         private void OnAddBetReferenceIdCallbackEvent()

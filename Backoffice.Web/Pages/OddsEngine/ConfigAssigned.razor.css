@@ -31,7 +31,7 @@ div.league-state-edit.active {
     opacity: 1;
 }
 
-button.form-select {
+.form-select {
     background-color: #fff;
     text-align: left;
     border: 1px solid #ced4da;

@@ -12,6 +12,13 @@
     margin-right: 10px;
 }
 
+.form-select {
+    background-color: #fff;
+    text-align: left;
+    border: 1px solid #ced4da;
+    width: 200px;
+}
+
 .filter-div {
     gap: 2rem;
     flex-basis: 25%;
