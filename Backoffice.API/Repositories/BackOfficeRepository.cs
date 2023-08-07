@@ -1733,7 +1733,7 @@ namespace Backoffice.API.Repositories
         private async Task<int> GetUnAssignedCount(List<string> clientCodes)
         {
             var result = 0;
-            var assignedConfigTask = GetConfigState(clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.Assigned);
+            var assignedConfigTask = GetConfigState(clientCodes, null, ConfigState.Assigned);
             var leagueLookupResponseTask = _tradingRepository.GetAllLeagueLookup("");
 
             await Task.WhenAll(leagueLookupResponseTask, assignedConfigTask);
@@ -1746,7 +1746,7 @@ namespace Backoffice.API.Repositories
                 var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
                 var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
 
-                result = (leagueLookup.Count * GetTradingClientInformation().Count * 2) - assignedLeagues;
+                result = (leagueLookup.Count * GetTradingClientInformation().Count) - assignedLeagues;
             }
 
             return await Task.FromResult(result);

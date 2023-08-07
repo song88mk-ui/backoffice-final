@@ -18,6 +18,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string? QueryMessage { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter(Name = "UserClientCodes")] public List<string> UserClientCodes { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
         public List<SelectListItemModel<string>> Sports { get; set; }
         public List<SelectListItemModel<string>> Scopes { get; set; }
@@ -54,6 +55,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task Init()
         {
+            await AuthenticateAccess.InvokeAsync();
+
             Sports = new List<SelectListItemModel<string>>();
             Scopes = new List<SelectListItemModel<string>>();
 
