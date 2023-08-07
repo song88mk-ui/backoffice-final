@@ -6,7 +6,6 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,18 +26,18 @@ namespace Backoffice.API.Repositories
         private readonly BackofficeContext _backofficeContext;
         private readonly IPlatformRepository _platformRepository;
         private readonly ITradingRepository _tradingRepository;
-        private readonly IMemCache _memCache;
+        //private readonly IMemCache _memCache;
 
         #endregion
 
         #region Ctor
 
-        public BackofficeRepository(BackofficeContext backofficeContext, IPlatformRepository platformRepository, ITradingRepository tradingRepository, IMemCache memCache)
+        public BackofficeRepository(BackofficeContext backofficeContext, IPlatformRepository platformRepository, ITradingRepository tradingRepository)
         {
             _backofficeContext = backofficeContext;
             _platformRepository = platformRepository;
             _tradingRepository = tradingRepository;
-            _memCache = memCache;
+            //_memCache = memCache;
         }
 
         #endregion
@@ -1587,7 +1586,7 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<List<ConfigTemplateModel>>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
             }
         }
-        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1)
+        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodesv1, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1)
         {
             try
             {
@@ -1595,22 +1594,27 @@ namespace Backoffice.API.Repositories
                 var isCompleteClient = false;
 
                 var clientList = GetTradingClientInformation();
+                var allClientsCount = clientList.Count;
                 var metaData = payload.MetaData;
 
-                if (clientCodes.Count() == 1)
+                if (clientCodesv1.Count() == 1)
                 {
-                    if (clientCodes.FirstOrDefault().ToUpper() == "ALL")
+                    if (clientCodesv1.FirstOrDefault().ToUpper() != "ALL")
                     {
-                        clientCodes = clientList.Select(x => x.ClientCode).ToList();
+                        clientList = new List<ClientInformationModel>();
                     }
                 }
-
-                if (payload.ClientCodes.Any())
+                else
                 {
-                    clientCodes = clientCodes.Where(x => payload.ClientCodes.ToList().Contains(x)).Select(x => x.ToUpper()).ToList();
+                    clientList = clientList.Where(x => clientCodesv1.Contains(x.ClientCode)).ToList();
                 }
 
-                var query = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(x => clientCodes.Contains(x.ClientCode.ToUpper())); //.Where(x => templates.Any(template => template.Id == x.PrematchConfigTemplateId || template.Id == x.LiveConfigTemplateId));
+                if (payload != null)
+                {
+                    clientList = clientList.Where(x => payload.ClientCodes?.ToList()?.Contains(x.ClientCode) ?? false ).ToList();
+                }
+
+                var query = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(x => clientList.Select(cl => cl.ClientCode).Contains(x.ClientCode.ToUpper())); //.Where(x => templates.Any(template => template.Id == x.PrematchConfigTemplateId || template.Id == x.LiveConfigTemplateId));
 
                 if (payload.SportId != -1)
                 {
@@ -1624,14 +1628,12 @@ namespace Backoffice.API.Repositories
 
                 if (query.Any())
                 {
-                    isCompleteClient = !query.Select(x => x.ClientCode).Distinct().ToList().Any(x => !clientCodes.Contains(x));
+                    isCompleteClient = query.Count() == allClientsCount;
                 }
-
 
                 switch (configState)
                 {
                     case ConfigState.Assigned:
-
                         result = query.Select(x => new ConfigClientModel()
                         {
                             Id = x.Id,
@@ -1650,7 +1652,6 @@ namespace Backoffice.API.Repositories
                             LiveTemplateName = _backofficeContext.ConfigTemplate.Where(cl => cl.Id == x.LiveConfigTemplateId).Select(x => x.Name).FirstOrDefault()
                         }).ToList();
                         break;
-
                     case ConfigState.UnAssigned:
 
                         var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup(payload.SportId == -1 ? "" : string.Join(',', payload.SportId));
@@ -1658,32 +1659,28 @@ namespace Backoffice.API.Repositories
                         {
                             var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
 
-                            foreach (var clientCode in clientCodes)
+                            foreach (var client in clientList)
                             {
-                                var userLeagues = query.Where(x => x.ClientCode == clientCode).ToList();
+                                var userLeagues = query.Where(x => x.ClientCode == client.ClientCode).ToList();
                                 var leagues = leagueLookup.Where(x => !userLeagues.Any(u => u.SportId == x.SportId && u.SegmentId == x.SegmentId && u.LeagueId == x.LeagueId)).ToList();
 
-                                foreach (var league in leagues)
+                                Parallel.ForEach(leagues, league =>
                                 {
-                                    var client = clientList.FirstOrDefault(x => x.ClientCode.ToUpper() == clientCode.ToUpper());
-                                    if (client != null && !result.Any(r => r.ClientCode == client.ClientCode && r.SportId == league.SportId && r.SegmentId == league.SegmentId && r.LeagueId == league.LeagueId))
+                                    result.Add(new ConfigClientModel()
                                     {
-                                        result.Add(new ConfigClientModel()
-                                        {
-                                            Id = -1,
-                                            ClientId = client.ClientId.ToString(),
-                                            ClientCode = client.ClientCode.ToUpper(),
-                                            ClientName = client.ClientName,
-                                            SportId = league.SportId,
-                                            SportName = league.SportName,
-                                            SegmentId = league.SegmentId,
-                                            SegmentName = league.SegmentName,
-                                            LeagueId = league.LeagueId,
-                                            LeagueName = league.LeagueName
-                                        });
-                                    }
-                                }
-                            };
+                                        Id = -1,
+                                        ClientId = client.ClientId.ToString(),
+                                        ClientCode = client.ClientCode.ToUpper(),
+                                        ClientName = client.ClientName,
+                                        SportId = league.SportId,
+                                        SportName = league.SportName,
+                                        SegmentId = league.SegmentId,
+                                        SegmentName = league.SegmentName,
+                                        LeagueId = league.LeagueId,
+                                        LeagueName = league.LeagueName
+                                    });
+                                });
+                            }
                         }
 
                         if (!string.IsNullOrEmpty(payload.SearchText))
@@ -1694,11 +1691,14 @@ namespace Backoffice.API.Repositories
 
                 }
 
-                result = result
-                    .OrderBy(x => x.ClientCode)
-                    .ThenBy(x => x.SportName)
-                    .ThenBy(x => x.LeagueName)
-                    .ToList();
+                if (result != null)
+                {
+                    result = result
+                        .OrderBy(x => x.ClientCode)
+                        .ThenBy(x => x.SportName)
+                        .ThenBy(x => x.LeagueName)
+                        .ToList();
+                }
 
                 metaData.TotalCount = result.Count();
                 metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
@@ -1728,7 +1728,27 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<ConfigTemplateLeagueResponse>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
             }
         }
+        private async Task<int> GetUnAssignedCount(List<string> clientCodes)
+        {
+            var result = 0;
+            var assignedConfigTask = GetConfigState(clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.Assigned);
+            var leagueLookupResponseTask = _tradingRepository.GetAllLeagueLookup("");
 
+            await Task.WhenAll(leagueLookupResponseTask, assignedConfigTask);
+
+            var leagueLookupResponse = leagueLookupResponseTask.Result;
+            var assignedConfig = assignedConfigTask.Result;
+
+            if (leagueLookupResponse.StatusCode == StatusCode.Success)
+            {
+                var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
+                var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
+
+                result = (leagueLookup.Count * GetTradingClientInformation().Count * 2) - assignedLeagues;
+            }
+
+            return await Task.FromResult(result);
+        }
         public async Task<BaseResponse<int>> GetTemplateConfigCount(List<string> clientCodes, string state)
         {
             try
@@ -1741,8 +1761,8 @@ namespace Backoffice.API.Repositories
                 }
                 else if (state.ToUpper() == ConfigState.UnAssigned.ToString().ToUpper())
                 {
-                    var unassignedConfig = await GetConfigState(clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.UnAssigned);
-                    count = unassignedConfig.Result.ClientConfigs.Count();
+                    var unassignedConfig = await GetUnAssignedCount(clientCodes);
+                    count = unassignedConfig;
                 }
                 else
                 {
@@ -1964,17 +1984,19 @@ namespace Backoffice.API.Repositories
         }
         private List<ClientInformation> GetClientInformation()
         {
-            return _memCache.GetCache("boci", () => _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24) ?? new List<ClientInformation>();
+            //return _memCache.GetCache("boci", () => _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24) ?? new List<ClientInformation>();
+            return _backofficeContext.ClientInformation.AsNoTracking().ToList() ?? new List<ClientInformation>();
         }
         private List<ClientInformationModel> GetTradingClientInformation()
         {
-            return _memCache.GetCache("botci", () => _tradingRepository.GetClientList("").Result?.Result, 24) ?? new List<ClientInformationModel>();
+            //return _memCache.GetCache("botci", () => _tradingRepository.GetClientList("").Result?.Result, 24) ?? new List<ClientInformationModel>();
+            return _tradingRepository.GetClientList("").Result?.Result ?? new List<ClientInformationModel>();
         }
         private long InsertClientRecord(ClientInformation client)
         {
             _backofficeContext.ClientInformation.Add(client);
             _backofficeContext.SaveChanges();
-            _memCache.AddOrUpdateCache<List<ClientInformation>>("boci", _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24);
+            //_memCache.AddOrUpdateCache<List<ClientInformation>>("boci", _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24);
 
             return client.ClientId;
         }
@@ -1982,7 +2004,7 @@ namespace Backoffice.API.Repositories
         {
             var entity = _backofficeContext.ClientInformation.Update(client).Entity;
             _backofficeContext.SaveChanges();
-            _memCache.AddOrUpdateCache<List<ClientInformation>>("boci", _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24);
+            //_memCache.AddOrUpdateCache<List<ClientInformation>>("boci", _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24);
 
             return client.ClientId;
         }
