@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Net.Mail;
 using System.Text.Json;
@@ -25,8 +24,6 @@ namespace Backoffice.API.Repositories
     public class BackofficeRepository : IBackofficeRepository
     {
         #region Fields
-
-        private readonly IConfiguration _configuration;
         private readonly BackofficeContext _backofficeContext;
         private readonly IPlatformRepository _platformRepository;
         private readonly ITradingRepository _tradingRepository;
@@ -36,9 +33,8 @@ namespace Backoffice.API.Repositories
 
         #region Ctor
 
-        public BackofficeRepository(IConfiguration configuration, BackofficeContext backofficeContext, IPlatformRepository platformRepository, ITradingRepository tradingRepository, IMemCache memCache)
+        public BackofficeRepository(BackofficeContext backofficeContext, IPlatformRepository platformRepository, ITradingRepository tradingRepository, IMemCache memCache)
         {
-            _configuration = configuration;
             _backofficeContext = backofficeContext;
             _platformRepository = platformRepository;
             _tradingRepository = tradingRepository;
@@ -1662,7 +1658,7 @@ namespace Backoffice.API.Repositories
                         {
                             var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
 
-                            foreach(var clientCode in clientCodes)
+                            foreach (var clientCode in clientCodes)
                             {
                                 var userLeagues = query.Where(x => x.ClientCode == clientCode).ToList();
                                 var leagues = leagueLookup.Where(x => !userLeagues.Any(u => u.SportId == x.SportId && u.SegmentId == x.SegmentId && u.LeagueId == x.LeagueId)).ToList();

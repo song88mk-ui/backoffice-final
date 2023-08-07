@@ -497,7 +497,7 @@ namespace Backoffice.Utility.Repository
         {
             try
             {
-                var assignedLeagues = _backofficeContext.ConfigTemplateAssigned.Where(x => x.ConfigTemplateId.ToString() == request.ConfigTemplateId).ToList()
+                var assignedLeagues = _backofficeContext.ConfigTemplateAssigned.Where(x => x.PrematchConfigTemplateId.ToString() == request.ConfigTemplateId || x.LiveConfigTemplateId.ToString() == request.ConfigTemplateId).ToList()
                     .GroupBy(x => x.SportId).Select(x => new KeyValuePair<int, List<MyTemplateExportPayloadModel>>(x.Key, x.GroupBy(y => y.ClientCode).Select(y => new MyTemplateExportPayloadModel()
                     {
                         ClientCode = y.Key,

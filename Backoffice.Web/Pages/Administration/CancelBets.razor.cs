@@ -128,7 +128,6 @@ namespace Backoffice.Web.Pages.Administration
 
                 if (response.StatusCode == StatusCode.Success)
                 {
-
                     //activity log
                     OnActivityLogListMessage message = new();
                     foreach (var data in response.Result.Data)
