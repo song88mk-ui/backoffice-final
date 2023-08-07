@@ -71,7 +71,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             if (CurrentLiveId > 0)
             {
-                var liveSelectedName = LiveTemplates.FirstOrDefault(p => p.Value == CurrentPrematchId)?.Name ?? string.Empty;
+                var liveSelectedName = LiveTemplates.FirstOrDefault(p => p.Value == CurrentLiveId)?.Name ?? string.Empty;
                 _liveSelectedItem = new SelectListItemModel<long>() { Value = CurrentLiveId, Name = liveSelectedName };
             }
             
