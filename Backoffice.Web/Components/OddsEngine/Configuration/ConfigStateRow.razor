@@ -9,7 +9,7 @@
     <th class="text-center font-weight-normal">@Index</th>
     <td class="px-4">@Config.ClientName</td>
     <td class="px-4">@Config.SportName</td>
-    <td class="px-4">@Config.LeagueName</td>
+    <td class="px-4">@Config.SegmentName > @Config.LeagueName</td>
     <td class="@(State == ConfigState.UnAssigned ? "template-name-italic" : "") px-4">@(Config.PrematchTemplateId == -1 ? "No template assigned" : Config.PrematchTemplateName)</td>
     <td class="@(State == ConfigState.UnAssigned ? "template-name-italic" : "") px-4">@(Config.LiveTemplateId == -1 ? "No template assigned" : Config.LiveTemplateName)</td>
 </tr>

@@ -1598,18 +1598,6 @@ namespace Backoffice.API.Repositories
                 var result = new List<ConfigClientModel>();
                 var isCompleteClient = false;
 
-                //var templates = new List<ConfigTemplateModel>();
-                //if (templateId != -1)
-                //{
-                //    var configTemplate = await GetConfigTemplateById(templateId);
-                //    templates = new List<ConfigTemplateModel>() { configTemplate.Result };
-                //}
-                //else
-                //{
-                //    var configTemplate = await GetConfigTemplates(sportIds: payload.SportId != -1 ? new List<int>() { payload.SportId } : null);
-                //    templates = configTemplate.Result;
-                //}
-
                 var clientList = GetTradingClientInformation();
                 var metaData = payload.MetaData;
 

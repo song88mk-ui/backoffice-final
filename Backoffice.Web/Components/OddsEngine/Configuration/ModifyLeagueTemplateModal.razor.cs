@@ -96,7 +96,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             IsPreLoader = true;
             StateHasChanged();
 
-            if (PrematchSelectedItem != null && LiveSelectedItem != null)
+            if (PrematchSelectedItem != null || LiveSelectedItem != null)
             {
                 var leagueRequest = Leagues.Select(x => new ConfigClientModel()
                 {
@@ -117,22 +117,22 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 }).ToList();
 
                 var state = ConfigState.UnAssigned;
-                if (PrematchSelectedItem.Value > 0 || LiveSelectedItem.Value > 0)
+                if (PrematchSelectedItem?.Value > 0 || LiveSelectedItem?.Value > 0)
                 {
                     state = ConfigState.Assigned;
                 }
 
                 var response = await BackOfficeService.SetLeagueState(state, new ConfigSetLeagueStateRequest()
                 {
-                    PrematchTemplateId = PrematchSelectedItem.Value,
-                    LiveTemplateId = LiveSelectedItem.Value,
+                    PrematchTemplateId = PrematchSelectedItem?.Value ?? 0,
+                    LiveTemplateId = LiveSelectedItem?.Value ?? 0,
                     Leagues = leagueRequest
                 });
 
                 if (response.StatusCode == StatusCode.Success)
                 {
                     List<MarketConfig> marketConfig = new List<MarketConfig>();
-                    var prematchTemplateId = PrematchSelectedItem.Value > 0 ? PrematchSelectedItem.Value : leagueRequest.FirstOrDefault().PrematchTemplateId;
+                    var prematchTemplateId = PrematchSelectedItem?.Value > 0 ? PrematchSelectedItem.Value : leagueRequest.FirstOrDefault().PrematchTemplateId;
                     var prematchConfigTemplateMargins = await GetConfigTemplateMargin(prematchTemplateId);
 
                     foreach (var margin in prematchConfigTemplateMargins.ConfigTemplateMargins)
@@ -147,7 +147,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         });
                     }
 
-                    var liveTemplateId = LiveSelectedItem.Value > 0 ? LiveSelectedItem.Value : leagueRequest.FirstOrDefault().LiveTemplateId;
+                    var liveTemplateId = LiveSelectedItem?.Value > 0 ? LiveSelectedItem.Value : leagueRequest.FirstOrDefault().LiveTemplateId;
                     var liveConfigTemplateMargins = await GetConfigTemplateMargin(liveTemplateId);
 
                     foreach (var margin in liveConfigTemplateMargins.ConfigTemplateMargins)
@@ -270,7 +270,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         });
                         to = JsonSerializer.Serialize(new ConfigTemplateLogModel()
                         {
-                            TemplateName = PrematchSelectedItem.Value.ToString() != "-1" ? PrematchSelectedItem.Name : "Unassigned",
+                            TemplateName = PrematchSelectedItem != null && PrematchSelectedItem.Value.ToString() != "-1" ? PrematchSelectedItem.Name : "Unassigned",
                             Payloads = new ConfigTemplateLogPayloadModel()
                             {
                                 Clients = new List<string>(),
@@ -281,7 +281,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         var activityLog = new ActivityLogModel()
                         {
                             Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                            Payload = $"{ActivityLogPayload}.{PrematchSelectedItem.Name}.T".Replace(" ", "_"),
+                            Payload = $"{ActivityLogPayload}.{PrematchSelectedItem?.Name ?? ""}.T".Replace(" ", "_"),
                             From = from,
                             To = to,
                             Activity = Activity.Update.ToString(),
@@ -300,7 +300,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     }
                     else
                     {
-                        message = $"{PrematchSelectedItem.Name} template has successfully been assigned to selected leagues.";
+                        message = $"{PrematchSelectedItem?.Name ?? ""} template has successfully been assigned to selected leagues.";
                     }
                     _alertModel = new()
                     {
