@@ -50,22 +50,26 @@
                                     <tbody>
                                         @if (BetRefenceModel != null && BetRefenceModel.BetReferenceIds.Any())
                                         {
+                                            var count = -1;
                                             for (var i = 0; i < BetRefenceModel.BetReferenceIds.Count; i++)
                                             {
+                                                count = count + 1;
+
+                                                var betReference = BetRefenceModel.BetReferenceIds[i];
                                                 <tr>
                                                     <td class="text-center">@(i + 1)</td>
                                                     <td>
                                                         <div class="input-group @(!IsPreload && Alerts != null && Alerts.Any(a => a.Control == i.ToString()) ? "border-danger" : "") ">
-                                                            <input type="text" class="form-control" @bind-value="@BetRefenceModel.BetReferenceIds[i]" />
-                                                            @if (!IsPreload && !string.IsNullOrEmpty(BetRefenceModel.BetReferenceIds[i]))
+                                                            <input type="text" class="form-control" @oninput="(e) => OnInputBetId(e, count)" />
+                                                            @if (!IsPreload && !string.IsNullOrEmpty(betReference))
                                                             {
-                                                                <span class="input-group-text form-clear" @onclick="() => BetRefenceModel.BetReferenceIds[i] = string.Empty"><i class="fa fa-remove"></i></span>
+                                                                <span class="input-group-text form-clear" @onclick="() => OnClearInput(count)"><i class="fa fa-remove"></i></span>
                                                             }
                                                         </div>
                                                     </td>
                                                     <td>
                                                         <div class="d-flex justify-content-center">
-                                                            <a class="link-trash me-2" href="javascript:(0)" @onclick="() => BetRefenceModel.BetReferenceIds.RemoveAt(i)">
+                                                            <a class="link-trash me-2" href="javascript:(0)" @onclick="() => OnRemoveInput(count)">
                                                                 <i class="fa fa-trash"></i>
                                                             </a>
                                                         </div>

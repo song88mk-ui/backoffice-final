@@ -45,6 +45,22 @@ namespace Backoffice.Web.Pages.Administration
             };
         }
 
+        private async Task OnInputBetId(ChangeEventArgs e, int i)
+        {
+            
+                BetRefenceModel.BetReferenceIds[i] = e?.Value?.ToString();
+        }
+
+        private async Task OnClearInput(int i)
+        {
+            BetRefenceModel.BetReferenceIds[i] = string.Empty;
+        }
+
+        private async Task OnRemoveInput(int i)
+        {
+            BetRefenceModel.BetReferenceIds.RemoveAt(i);
+        }
+
         private void OnAddBetReferenceIdCallbackEvent()
         {
             if (BetRefenceModel.BetReferenceIds != null && BetRefenceModel.BetReferenceIds.Any() && BetRefenceModel.BetReferenceIds.Count() <= 9)
@@ -52,6 +68,7 @@ namespace Backoffice.Web.Pages.Administration
                 BetRefenceModel.BetReferenceIds.Add(string.Empty);
             }
         }
+
         private void OnCancelBetCallbackEvent()
         {
             IsPreload = true;
@@ -237,8 +254,8 @@ namespace Backoffice.Web.Pages.Administration
                         });
                     }
 
-                    var existingBet = BetRefenceModel.BetReferenceIds.FirstOrDefault(b => b.Trim() == bet.Trim());
-                    if (existingBet != null)
+                    var existingBet = BetRefenceModel.BetReferenceIds.Where(b => b.Trim() == bet.Trim()).ToList();
+                    if (existingBet != null && existingBet.Count > 1)
                     {
                         if (!Alerts.Any(a => a.Message.Contains($"Duplicate Bet Reference Id found. {bet.Trim()}")))
                             Alerts.Add(new()
