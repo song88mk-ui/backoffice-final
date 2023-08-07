@@ -29,8 +29,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public List<SelectListItemModel<long>> PrematchTemplates { get; set; }
         public List<SelectListItemModel<long>> LiveTemplates { get; set; }
 
-        public SelectListItemModel<long> PrematchSelectedItem { get; set; }
-        public SelectListItemModel<long> LiveSelectedItem { get; set; }
+        private SelectListItemModel<long> _prematchSelectedItem { get; set; }
+        private SelectListItemModel<long> _liveSelectedItem { get; set; }
 
         public bool IsRemoveCurrentPrematchTemplate { get; set; } = false;
         public bool IsRemoveCurrentLiveTemplate { get; set; } = false;
@@ -58,16 +58,29 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ActivityLogPayload = $"{SportId}";
             PrematchTemplates = await GetTemplates(SportId, (int)FixtureStatus.Prematch);
             LiveTemplates = await GetTemplates(SportId, (int)FixtureStatus.Live);
+
+            var initPrematchSelection = Leagues?.Select(x => new { x.PrematchTemplateId, x.PrematchTemplateName }).Distinct();
+            var initLivematchSelection = Leagues?.Select(x => new { x.LiveTemplateId, x.LiveTemplateName }).Distinct();
+            _prematchSelectedItem = initPrematchSelection != null && initPrematchSelection.Count() == 1 ? new SelectListItemModel<long>()
+            {
+                Value = initPrematchSelection?.FirstOrDefault()?.PrematchTemplateId ?? -1,
+                Name = initPrematchSelection?.FirstOrDefault()?.PrematchTemplateName ?? ""
+            } : new SelectListItemModel<long>();
+            _liveSelectedItem = initLivematchSelection != null && initLivematchSelection.Count() == 1 ? new SelectListItemModel<long>()
+            {
+                Value = initLivematchSelection?.FirstOrDefault()?.LiveTemplateId ?? -1,
+                Name = initLivematchSelection?.FirstOrDefault()?.LiveTemplateName ?? ""
+            } : new SelectListItemModel<long>();
         }
 
         public async Task OnPrematchTemplateSelectChanged(SelectListItemModel<long> e)
         {
-            PrematchSelectedItem = new SelectListItemModel<long>();
-            PrematchSelectedItem = e;
+            _prematchSelectedItem = new SelectListItemModel<long>();
+            _prematchSelectedItem = e;
 
             IsRemoveCurrentPrematchTemplate = false;
 
-            if (PrematchSelectedItem != null && PrematchSelectedItem.Value == -1)
+            if (_prematchSelectedItem != null && _prematchSelectedItem.Value == -1)
             {
                 IsRemoveCurrentPrematchTemplate = true;
             }
@@ -75,12 +88,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnLiveTemplateSelectChanged(SelectListItemModel<long> e)
         {
-            LiveSelectedItem = new SelectListItemModel<long>();
-            LiveSelectedItem = e;
+            _liveSelectedItem = new SelectListItemModel<long>();
+            _liveSelectedItem = e;
 
             IsRemoveCurrentLiveTemplate = false;
 
-            if (LiveSelectedItem != null && LiveSelectedItem.Value == -1)
+            if (_liveSelectedItem != null && _liveSelectedItem.Value == -1)
             {
                 IsRemoveCurrentLiveTemplate = true;
             }
@@ -96,7 +109,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             IsPreLoader = true;
             StateHasChanged();
 
-            if (PrematchSelectedItem != null || LiveSelectedItem != null)
+            if (_prematchSelectedItem != null || _liveSelectedItem != null)
             {
                 var leagueRequest = Leagues.Select(x => new ConfigClientModel()
                 {
@@ -117,22 +130,22 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 }).ToList();
 
                 var state = ConfigState.UnAssigned;
-                if (PrematchSelectedItem?.Value > 0 || LiveSelectedItem?.Value > 0)
+                if (_prematchSelectedItem?.Value > 0 || _liveSelectedItem?.Value > 0)
                 {
                     state = ConfigState.Assigned;
                 }
 
                 var response = await BackOfficeService.SetLeagueState(state, new ConfigSetLeagueStateRequest()
                 {
-                    PrematchTemplateId = PrematchSelectedItem?.Value ?? 0,
-                    LiveTemplateId = LiveSelectedItem?.Value ?? 0,
+                    PrematchTemplateId = _prematchSelectedItem?.Value ?? 0,
+                    LiveTemplateId = _liveSelectedItem?.Value ?? 0,
                     Leagues = leagueRequest
                 });
 
                 if (response.StatusCode == StatusCode.Success)
                 {
                     List<MarketConfig> marketConfig = new List<MarketConfig>();
-                    var prematchTemplateId = PrematchSelectedItem?.Value > 0 ? PrematchSelectedItem.Value : leagueRequest.FirstOrDefault().PrematchTemplateId;
+                    var prematchTemplateId = _prematchSelectedItem?.Value > 0 ? _prematchSelectedItem.Value : leagueRequest.FirstOrDefault().PrematchTemplateId;
                     var prematchConfigTemplateMargins = await GetConfigTemplateMargin(prematchTemplateId);
 
                     foreach (var margin in prematchConfigTemplateMargins.ConfigTemplateMargins)
@@ -140,14 +153,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         marketConfig.Add(new MarketConfig()
                         {
                             MarketTemplateId = margin.MarketTemplateId,
-                            Live = LiveSelectedItem.Value > 0 ? margin.Config : string.Empty,
-                            Prematch = PrematchSelectedItem.Value > 0 ? margin.Config : string.Empty,
+                            Live = _liveSelectedItem.Value > 0 ? margin.Config : string.Empty,
+                            Prematch = _prematchSelectedItem.Value > 0 ? margin.Config : string.Empty,
                             IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
                             FixtureTypeId = (int)FixtureType.Match
                         });
                     }
 
-                    var liveTemplateId = LiveSelectedItem?.Value > 0 ? LiveSelectedItem.Value : leagueRequest.FirstOrDefault().LiveTemplateId;
+                    var liveTemplateId = _liveSelectedItem?.Value > 0 ? _liveSelectedItem.Value : leagueRequest.FirstOrDefault().LiveTemplateId;
                     var liveConfigTemplateMargins = await GetConfigTemplateMargin(liveTemplateId);
 
                     foreach (var margin in liveConfigTemplateMargins.ConfigTemplateMargins)
@@ -158,7 +171,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             marketConfig.Add(new MarketConfig()
                             {
                                 MarketTemplateId = margin.MarketTemplateId,
-                                Live = LiveSelectedItem.Value > 0 ? margin.Config : string.Empty,
+                                Live = _liveSelectedItem.Value > 0 ? margin.Config : string.Empty,
                                 Prematch = string.Empty,
                                 IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
                                 FixtureTypeId = (int)FixtureType.Match
@@ -166,7 +179,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         }
                         else
                         {
-                            mConfig.Live = LiveSelectedItem.Value > 0 ? margin.Config : string.Empty;
+                            mConfig.Live = _liveSelectedItem.Value > 0 ? margin.Config : string.Empty;
                             if (margin.IsActive)
                                 mConfig.IsActive = true;
 
@@ -270,7 +283,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         });
                         preTo = JsonSerializer.Serialize(new ConfigTemplateLogModel()
                         {
-                            TemplateName = PrematchSelectedItem != null && PrematchSelectedItem.Value.ToString() != "-1" ? PrematchSelectedItem.Name : "Unassigned",
+                            TemplateName = _prematchSelectedItem != null && _prematchSelectedItem.Value.ToString() != "-1" ? _prematchSelectedItem.Name : "Unassigned",
                             Payloads = new ConfigTemplateLogPayloadModel()
                             {
                                 Clients = new List<string>(),
@@ -281,7 +294,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         var activityLog = new ActivityLogModel()
                         {
                             Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                            Payload = $"{ActivityLogPayload}.{PrematchSelectedItem?.Name ?? ""}.T".Replace(" ", "_"),
+                            Payload = $"{ActivityLogPayload}.{_prematchSelectedItem?.Name ?? ""}.T".Replace(" ", "_"),
                             From = preFrom,
                             To = preTo,
                             Activity = Activity.Update.ToString(),
@@ -300,7 +313,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     }
                     else
                     {
-                        message = $"{PrematchSelectedItem?.Name ?? ""} template has successfully been assigned to selected leagues.";
+                        message = $"{_prematchSelectedItem?.Name ?? ""} template has successfully been assigned to selected leagues.";
                     }
                     _alertModel = new()
                     {

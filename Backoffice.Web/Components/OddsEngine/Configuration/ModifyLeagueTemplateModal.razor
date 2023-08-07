@@ -32,9 +32,9 @@
             <div class="col col-sm-10">
                 <div class="dropdown">
                     <button class="btn w-100 form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        @if (PrematchSelectedItem != null && !string.IsNullOrEmpty(PrematchSelectedItem.Name))
+                        @if (_prematchSelectedItem != null && !string.IsNullOrEmpty(_prematchSelectedItem.Name))
                         {
-                            <span class="@(PrematchSelectedItem.Value == -1 ? "text-danger":"")">@PrematchSelectedItem.Name</span>
+                            <span class="@(_prematchSelectedItem.Value == -1 ? "text-danger":"")">@_prematchSelectedItem.Name</span>
                         }
                         else
                         {
@@ -53,9 +53,9 @@
             <div class="col col-sm-10">
                 <div class="dropdown">
                     <button class="btn w-100 form-select dropdown-toggle" type="button" id="live-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        @if (LiveSelectedItem != null && !string.IsNullOrEmpty(LiveSelectedItem.Name))
+                        @if (_liveSelectedItem != null && !string.IsNullOrEmpty(_liveSelectedItem.Name))
                         {
-                            <span class="@(LiveSelectedItem.Value == -1 ? "text-danger":"")">@LiveSelectedItem.Name</span>
+                            <span class="@(_liveSelectedItem.Value == -1 ? "text-danger":"")">@_liveSelectedItem.Name</span>
                         }
                         else
                         {
