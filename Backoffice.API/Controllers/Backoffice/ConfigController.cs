@@ -24,6 +24,7 @@ namespace Backoffice.API.Controllers.Backoffice
         private readonly IMaintenanceRepository _maintenanceRepository;
         public ConfigController(IBackofficeRepository backofficeRepository, IMaintenanceRepository maintenanceRepository)
         {
+            //
             _backofficeRepository = backofficeRepository;
             _maintenanceRepository = maintenanceRepository;
         }
