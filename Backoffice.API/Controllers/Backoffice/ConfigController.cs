@@ -153,7 +153,7 @@ namespace Backoffice.API.Controllers.Backoffice
 
             if (templateId != -1)
             {
-                result = await _backofficeRepository.GetConfigState(clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.Assigned, templateId);
+                result = await _backofficeRepository.GetConfigState(clientCodes, null, ConfigState.Assigned, templateId);
             }
             else
             {

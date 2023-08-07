@@ -1628,7 +1628,7 @@ namespace Backoffice.API.Repositories
 
                 if (query != null && query.Any())
                 {
-                    isCompleteClient = query.Count() == allClientsCount;
+                    isCompleteClient = clientList.Count() == allClientsCount;
                 }
 
                 switch (configState)
