@@ -282,7 +282,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         {
                             Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                             Payload = $"{ActivityLogPayload}.{PrematchSelectedItem?.Name ?? ""}.T".Replace(" ", "_"),
-                            From = from,
+                            From = preFrom,
                             To = preTo,
                             Activity = Activity.Update.ToString(),
                             UserId = UserModel.Id,

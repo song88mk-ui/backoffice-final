@@ -1,5 +1,4 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Components.Administration.CancelBets;
 using Backoffice.Web.Models;
@@ -7,7 +6,6 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Serilog;
 using System.Text.Json;
-using Serilog;
 
 namespace Backoffice.Web.Pages.Administration
 {
