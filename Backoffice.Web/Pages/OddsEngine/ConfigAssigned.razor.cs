@@ -179,6 +179,13 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task SelectedPage(int selectedPage)
         {
+            if(IsSelectedLeagueShowing)
+            {
+                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+            }
+
+            SelectedLeagueCount = 0;
+            IsSelectedLeagueShowing = false;
             MetaData.CurrentPage = selectedPage;
             await LoadLeagues(_filterModel);
         }
