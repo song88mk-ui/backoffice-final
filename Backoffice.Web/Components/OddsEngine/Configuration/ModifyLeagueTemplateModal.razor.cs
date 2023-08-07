@@ -40,6 +40,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private bool IsShowAll = false;
         private string ActivityLogPayload = "";
         private int SportId = 0;
+        private long CurrentPrematchId = 0;
+        private long CurrentLiveId = 0;
         private AlertModel _alertModel;
         #endregion
 
@@ -55,22 +57,24 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             Leagues = ModalParameters.TryGet<List<ConfigClientViewModel>>("Leagues");
             State = ModalParameters.TryGet<ConfigState>("State");
             SportId = ModalParameters.TryGet<int>("SportId");
+            CurrentPrematchId = ModalParameters.TryGet<long>("CurrentPrematchId");
+            CurrentLiveId = ModalParameters.TryGet<long>("CurrentLiveId");
             ActivityLogPayload = $"{SportId}";
             PrematchTemplates = await GetTemplates(SportId, (int)FixtureStatus.Prematch);
             LiveTemplates = await GetTemplates(SportId, (int)FixtureStatus.Live);
 
-            var initPrematchSelection = Leagues?.Select(x => new { x.PrematchTemplateId, x.PrematchTemplateName }).Distinct();
-            var initLivematchSelection = Leagues?.Select(x => new { x.LiveTemplateId, x.LiveTemplateName }).Distinct();
-            _prematchSelectedItem = initPrematchSelection != null && initPrematchSelection.Count() == 1 ? new SelectListItemModel<long>()
+            if(CurrentPrematchId > 0 )
             {
-                Value = initPrematchSelection?.FirstOrDefault()?.PrematchTemplateId ?? -1,
-                Name = initPrematchSelection?.FirstOrDefault()?.PrematchTemplateName ?? ""
-            } : new SelectListItemModel<long>();
-            _liveSelectedItem = initLivematchSelection != null && initLivematchSelection.Count() == 1 ? new SelectListItemModel<long>()
+                var prematchSelectedName = PrematchTemplates.FirstOrDefault(p => p.Value == CurrentPrematchId)?.Name ?? string.Empty;
+                _prematchSelectedItem = new SelectListItemModel<long>() { Value = CurrentPrematchId, Name = prematchSelectedName };
+            }
+
+            if (CurrentLiveId > 0)
             {
-                Value = initLivematchSelection?.FirstOrDefault()?.LiveTemplateId ?? -1,
-                Name = initLivematchSelection?.FirstOrDefault()?.LiveTemplateName ?? ""
-            } : new SelectListItemModel<long>();
+                var liveSelectedName = LiveTemplates.FirstOrDefault(p => p.Value == CurrentLiveId)?.Name ?? string.Empty;
+                _liveSelectedItem = new SelectListItemModel<long>() { Value = CurrentLiveId, Name = liveSelectedName };
+            }
+            
         }
 
         public async Task OnPrematchTemplateSelectChanged(SelectListItemModel<long> e)
@@ -137,55 +141,64 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                 var response = await BackOfficeService.SetLeagueState(state, new ConfigSetLeagueStateRequest()
                 {
-                    PrematchTemplateId = _prematchSelectedItem?.Value ?? 0,
-                    LiveTemplateId = _liveSelectedItem?.Value ?? 0,
+                    PrematchTemplateId = _prematchSelectedItem?.Value ?? -1,
+                    LiveTemplateId = _liveSelectedItem?.Value ?? -1,
                     Leagues = leagueRequest
                 });
 
                 if (response.StatusCode == StatusCode.Success)
                 {
                     List<MarketConfig> marketConfig = new List<MarketConfig>();
+
                     var prematchTemplateId = _prematchSelectedItem?.Value > 0 ? _prematchSelectedItem.Value : leagueRequest.FirstOrDefault().PrematchTemplateId;
-                    var prematchConfigTemplateMargins = await GetConfigTemplateMargin(prematchTemplateId);
 
-                    foreach (var margin in prematchConfigTemplateMargins.ConfigTemplateMargins)
+                    if(prematchTemplateId > 0)
                     {
-                        marketConfig.Add(new MarketConfig()
-                        {
-                            MarketTemplateId = margin.MarketTemplateId,
-                            Live = _liveSelectedItem.Value > 0 ? margin.Config : string.Empty,
-                            Prematch = _prematchSelectedItem.Value > 0 ? margin.Config : string.Empty,
-                            IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
-                            FixtureTypeId = (int)FixtureType.Match
-                        });
-                    }
-
-                    var liveTemplateId = _liveSelectedItem?.Value > 0 ? _liveSelectedItem.Value : leagueRequest.FirstOrDefault().LiveTemplateId;
-                    var liveConfigTemplateMargins = await GetConfigTemplateMargin(liveTemplateId);
-
-                    foreach (var margin in liveConfigTemplateMargins.ConfigTemplateMargins)
-                    {
-                        var mConfig = marketConfig.FirstOrDefault(m => m.MarketTemplateId == margin.MarketTemplateId);
-                        if (mConfig == null)
+                        var prematchConfigTemplateMargins = await GetConfigTemplateMargin(prematchTemplateId);
+                        foreach (var margin in prematchConfigTemplateMargins.ConfigTemplateMargins)
                         {
                             marketConfig.Add(new MarketConfig()
                             {
                                 MarketTemplateId = margin.MarketTemplateId,
-                                Live = _liveSelectedItem.Value > 0 ? margin.Config : string.Empty,
-                                Prematch = string.Empty,
+                                Live = _liveSelectedItem != null && _liveSelectedItem.Value > 0 ? margin.Config : string.Empty,
+                                Prematch = _prematchSelectedItem != null && _prematchSelectedItem.Value > 0 ? margin.Config : string.Empty,
                                 IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
                                 FixtureTypeId = (int)FixtureType.Match
                             });
                         }
-                        else
+                    }
+
+
+                    var liveTemplateId = _liveSelectedItem?.Value > 0 ? _liveSelectedItem.Value : leagueRequest.FirstOrDefault().LiveTemplateId;
+
+                    if(liveTemplateId > 0)
+                    {
+                        var liveConfigTemplateMargins = await GetConfigTemplateMargin(liveTemplateId);
+
+                        foreach (var margin in liveConfigTemplateMargins.ConfigTemplateMargins)
                         {
-                            mConfig.Live = _liveSelectedItem.Value > 0 ? margin.Config : string.Empty;
-                            if (margin.IsActive)
-                                mConfig.IsActive = true;
+                            var mConfig = marketConfig.FirstOrDefault(m => m.MarketTemplateId == margin.MarketTemplateId);
+                            if (mConfig == null)
+                            {
+                                marketConfig.Add(new MarketConfig()
+                                {
+                                    MarketTemplateId = margin.MarketTemplateId,
+                                    Live = _liveSelectedItem != null && _liveSelectedItem.Value > 0 ? margin.Config : string.Empty,
+                                    Prematch = string.Empty,
+                                    IsActive = state == ConfigState.Assigned ? margin.IsActive : false,
+                                    FixtureTypeId = (int)FixtureType.Match
+                                });
+                            }
+                            else
+                            {
+                                mConfig.Live = _liveSelectedItem != null && _liveSelectedItem.Value > 0 ? margin.Config : string.Empty;
+                                if (margin.IsActive)
+                                    mConfig.IsActive = true;
+                            }
 
                         }
-
                     }
+                    
 
                     foreach (var league in leagueRequest)
                     {

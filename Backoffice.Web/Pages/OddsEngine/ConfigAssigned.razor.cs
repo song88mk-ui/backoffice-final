@@ -250,6 +250,13 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Leagues", leagues);
             parameters.Add("State", _state);
             parameters.Add("SportId", _filterModel.SportId);
+
+            var selectedPrematch = ConfigClients.Where(x => x.IsChecked && x.PrematchTemplateId > 0).Select(s => s.PrematchTemplateId).Distinct().ToList();
+            var selectedLive = ConfigClients.Where(x => x.IsChecked && x.LiveTemplateId > 0).Select(s => s.LiveTemplateId).Distinct().ToList(); ;
+
+            parameters.Add("CurrentPrematchId", selectedPrematch.Count() == 1 ? selectedPrematch.FirstOrDefault() : 0);
+            parameters.Add("CurrentLiveId", selectedLive.Count() == 1 ? selectedLive.FirstOrDefault() : 0);
+
             parameters.Add("Region", _region);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
