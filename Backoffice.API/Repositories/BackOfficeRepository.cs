@@ -1616,6 +1616,9 @@ namespace Backoffice.API.Repositories
 
                 var query = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(x => clientList.Select(cl => cl.ClientCode).Contains(x.ClientCode.ToUpper())); //.Where(x => templates.Any(template => template.Id == x.PrematchConfigTemplateId || template.Id == x.LiveConfigTemplateId));
 
+                if (templateId != -1)
+                    query = query.Where(x => x.PrematchConfigTemplateId == templateId || x.LiveConfigTemplateId == templateId);
+
                 if (payload != null && payload.SportId != -1)
                 {
                     query = query.Where(x => x.SportId == payload.SportId);
