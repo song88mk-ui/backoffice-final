@@ -1595,7 +1595,7 @@ namespace Backoffice.API.Repositories
 
                 var clientList = GetTradingClientInformation();
                 var allClientsCount = clientList.Count;
-                var metaData = payload.MetaData;
+                var metaData = payload?.MetaData;
 
                 if (clientCodesv1.Count() == 1)
                 {
@@ -1616,17 +1616,17 @@ namespace Backoffice.API.Repositories
 
                 var query = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(x => clientList.Select(cl => cl.ClientCode).Contains(x.ClientCode.ToUpper())); //.Where(x => templates.Any(template => template.Id == x.PrematchConfigTemplateId || template.Id == x.LiveConfigTemplateId));
 
-                if (payload.SportId != -1)
+                if (payload != null && payload.SportId != -1)
                 {
                     query = query.Where(x => x.SportId == payload.SportId);
                 }
 
-                if (!string.IsNullOrEmpty(payload.SearchText))
+                if (payload != null && !string.IsNullOrEmpty(payload.SearchText))
                 {
                     query = query.Where(x => x.ClientName.ToLower().Contains(payload.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(payload.SearchText.ToLower()));
                 }
 
-                if (query.Any())
+                if (query != null && query.Any())
                 {
                     isCompleteClient = query.Count() == allClientsCount;
                 }
@@ -1700,16 +1700,18 @@ namespace Backoffice.API.Repositories
                         .ToList();
                 }
 
-                metaData.TotalCount = result.Count();
-                metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
+                if(metaData != null)
+                {
+                    metaData.TotalCount = result.Count();
+                    metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
 
-                var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
-                metaData.PageSize = metaData.PageSize == -1 ? metaData.TotalCount : metaData.PageSize;
-
-                if (metaData.CurrentPage > 0)
-                    result = result.Skip(skip).Take(metaData.PageSize).ToList();
-                else
-                    result = result.Skip(0).Take(metaData.PageSize).ToList();
+                    var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
+                    metaData.PageSize = metaData.PageSize == -1 ? metaData.TotalCount : metaData.PageSize;
+                    if (metaData.CurrentPage > 0)
+                        result = result.Skip(skip).Take(metaData.PageSize).ToList();
+                    else
+                        result = result.Skip(0).Take(metaData.PageSize).ToList();
+                }
 
                 return new BaseResponse<ConfigTemplateLeagueResponse>()
                 {
@@ -1756,7 +1758,7 @@ namespace Backoffice.API.Repositories
                 var count = 0;
                 if (state.ToUpper() == ConfigState.Assigned.ToString().ToUpper())
                 {
-                    var assignedConfig = await GetConfigState(clientCodes, new ConfigTemplateLeagueRequest(), ConfigState.Assigned);
+                    var assignedConfig = await GetConfigState(clientCodes, null, ConfigState.Assigned);
                     count = assignedConfig.Result.ClientConfigs.Count();
                 }
                 else if (state.ToUpper() == ConfigState.UnAssigned.ToString().ToUpper())
