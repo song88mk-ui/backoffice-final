@@ -90,7 +90,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _prematchSelectedItem = new SelectListItemModel<long>();
             _prematchSelectedItem = e;
 
-            _hasChanged = CurrentPrematchId != _prematchSelectedItem.Value && _liveSelectedItem != null;
+            _hasChanged = CurrentPrematchId != (_prematchSelectedItem?.Value ?? 0) || CurrentLiveId != (_liveSelectedItem?.Value ?? 0);
 
             IsRemoveCurrentPrematchTemplate = false;
 
@@ -105,7 +105,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _liveSelectedItem = new SelectListItemModel<long>();
             _liveSelectedItem = e;
 
-            _hasChanged = CurrentLiveId != _liveSelectedItem.Value && _prematchSelectedItem != null;
+            _hasChanged = CurrentPrematchId != (_prematchSelectedItem?.Value ?? 0) || CurrentLiveId != (_liveSelectedItem?.Value ?? 0);
 
             IsRemoveCurrentLiveTemplate = false;
 
@@ -139,10 +139,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     SegmentName = x.SegmentName,
                     LeagueId = x.LeagueId,
                     LeagueName = x.LeagueName,
-                    PrematchTemplateId = x.PrematchTemplateId,
-                    PrematchTemplateName = x.PrematchTemplateName,
-                    LiveTemplateId = x.LiveTemplateId,
-                    LiveTemplateName = x.LiveTemplateName
+                    PrematchTemplateId = _prematchSelectedItem?.Value ?? -1,
+                    PrematchTemplateName = _prematchSelectedItem?.Name ?? string.Empty,
+                    LiveTemplateId = _liveSelectedItem?.Value ?? -1,
+                    LiveTemplateName = _liveSelectedItem?.Name ?? string.Empty
                 }).ToList();
 
                 var state = ConfigState.UnAssigned;

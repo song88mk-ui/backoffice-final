@@ -43,7 +43,7 @@
                     </button>
                     @if (PrematchTemplates != null && PrematchTemplates.Any())
                     {
-                        <SelectWithSearch State="State" Items="PrematchTemplates" AriaLabel="scope-dropdown" OnSelectionCallback="OnPrematchTemplateSelectChanged" />
+                        <SelectWithSearch SelectedItem="_prematchSelectedItem" State="State" Items="PrematchTemplates" AriaLabel="scope-dropdown" OnSelectionCallback="OnPrematchTemplateSelectChanged" />
                     }
                 </div>
             </div>            
@@ -64,7 +64,7 @@
                     </button>
                     @if (LiveTemplates != null && LiveTemplates.Any())
                     {
-                        <SelectWithSearch State="State" Items="LiveTemplates" AriaLabel="scope-dropdown" OnSelectionCallback="OnLiveTemplateSelectChanged" />
+                        <SelectWithSearch SelectedItem="_liveSelectedItem" State="State" Items="LiveTemplates" AriaLabel="scope-dropdown" OnSelectionCallback="OnLiveTemplateSelectChanged" />
                     }
                 </div>
             </div>
