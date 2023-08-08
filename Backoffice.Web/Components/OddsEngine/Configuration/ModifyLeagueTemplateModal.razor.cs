@@ -69,11 +69,19 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 var prematchSelectedName = PrematchTemplates.FirstOrDefault(p => p.Value == CurrentPrematchId)?.Name ?? string.Empty;
                 _prematchSelectedItem = new SelectListItemModel<long>() { Value = CurrentPrematchId, Name = prematchSelectedName };
             }
+            else
+            {
+                CurrentPrematchId = -1;
+            }
 
             if (CurrentLiveId > 0 && Leagues.All(x => x.LiveTemplateId == CurrentLiveId))
             {
                 var liveSelectedName = LiveTemplates.FirstOrDefault(p => p.Value == CurrentLiveId)?.Name ?? string.Empty;
                 _liveSelectedItem = new SelectListItemModel<long>() { Value = CurrentLiveId, Name = liveSelectedName };
+            }
+            else
+            {
+                CurrentLiveId = -1;
             }
             
         }
@@ -83,7 +91,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _prematchSelectedItem = new SelectListItemModel<long>();
             _prematchSelectedItem = e;
 
-            _hasChanged = (PrematchTemplates.FirstOrDefault(p => p.Value == CurrentPrematchId)?.Value ?? -1) != _prematchSelectedItem.Value;
+            _hasChanged = CurrentPrematchId!= _prematchSelectedItem.Value;
 
             IsRemoveCurrentPrematchTemplate = false;
 
@@ -98,7 +106,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _liveSelectedItem = new SelectListItemModel<long>();
             _liveSelectedItem = e;
 
-            _hasChanged = (LiveTemplates.FirstOrDefault(p => p.Value == CurrentLiveId)?.Value ?? -1) != _liveSelectedItem.Value;
+            _hasChanged = CurrentLiveId != _liveSelectedItem.Value;
 
             IsRemoveCurrentLiveTemplate = false;
 
