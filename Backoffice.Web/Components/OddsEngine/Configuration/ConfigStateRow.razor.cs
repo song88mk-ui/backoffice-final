@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public ConfigState? State { get; set; }
         [Parameter] public int Index { get; set; }
         [Parameter] public ConfigClientViewModel Config { get; set; }
-        [Parameter] public EventCallback ItemSelectionChangedEvent { get; set; }
+        [Parameter] public EventCallback<ConfigClientViewModel> ItemSelectionChangedEvent { get; set; }
         private bool _IsEdit = false;
 
         private List<ConfigTemplateModel> _template;
@@ -56,7 +56,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public async Task OnCheckboxClicked(ChangeEventArgs e)
         {
             Config.IsChecked = (bool)e.Value;
-            await ItemSelectionChangedEvent.InvokeAsync();
+            await ItemSelectionChangedEvent.InvokeAsync(Config);
         }
 
         public async Task TestClickRow()

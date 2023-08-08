@@ -6,9 +6,6 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Drawing;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -30,11 +27,11 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<ConfigClientViewModel> ConfigClients { get; set; } = new List<ConfigClientViewModel>();
+        private List<ConfigClientViewModel>? _selectedConfigClients { get; set; }
         public MetaData MetaData { get; set; }
         public string IconClass { get; set; }
         public bool IsPreloader { get; set; } = true;
         public bool IsEdit { get; set; } = false;
-        public int SelectedLeagueCount { get; set; }
         public bool IsSelectedLeagueShowing { get; set; } = false;
 
         #endregion
@@ -65,6 +62,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             MetaData = new();
             _filterModel = new();
             _pageTitle = State == ConfigState.Assigned ? "Assigned Leagues" : "Unassigned Leagues";
+            _selectedConfigClients = new();
 
             Breadcrumbs = new List<BreadcrumbModel>()
             {
@@ -95,7 +93,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (_selectedClientCount == 1)
                     _selectedClientName = Clients?.FirstOrDefault(x => x.IsChecked && x.Value.ToUpper() != "ALL")?.Name ?? string.Empty;
             }
-            
+
             if (!Sports.Equals(_sports))
             {
                 _sports = Sports;
@@ -139,6 +137,14 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _filterModel.ClientCodes = items.Keys.Where(x => x.ToUpper() != "ALL").ToList();
             }
 
+            if (IsSelectedLeagueShowing)
+            {
+                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+                IsSelectedLeagueShowing = false;
+            }
+
+            _selectedConfigClients = new();
+
             await LoadLeagues(_filterModel);
             //var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
 
@@ -148,6 +154,14 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnSportCheckboxClickEvent(ChangeEventArgs e)
         {
+            if (IsSelectedLeagueShowing)
+            {
+                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+                IsSelectedLeagueShowing = false;
+            }
+
+            _selectedConfigClients = new();
+
             if (e != null)
             {
                 _filterModel.SportId = int.Parse((e == null ? _sports.FirstOrDefault()?.Value : e.Value?.ToString()) ?? "-1");
@@ -155,20 +169,25 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             await LoadLeagues(_filterModel);
         }
-        
+
         public async Task OnModalSaveEvent(object e)
         {
+            _selectedConfigClients = new();
             _alertModel = new();
             await OnStateHasChanged.InvokeAsync();
             await LoadLeagues(_filterModel);
 
-            if(e is AlertModel)
+            if (e is AlertModel)
             {
                 _alertModel = (AlertModel)e;
             }
 
-            IsSelectedLeagueShowing = false;
-            await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+            await SelectedPage(1);
+            if(IsSelectedLeagueShowing)
+            {
+                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+                IsSelectedLeagueShowing = false;
+            }
         }
 
         public async Task OnInputSearchEvent()
@@ -179,13 +198,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task SelectedPage(int selectedPage)
         {
-            if(IsSelectedLeagueShowing)
-            {
-                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
-            }
-
-            SelectedLeagueCount = 0;
-            IsSelectedLeagueShowing = false;
             MetaData.CurrentPage = selectedPage;
             await LoadLeagues(_filterModel);
         }
@@ -205,22 +217,28 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             await LoadLeagues(_filterModel);
         }
-        public async Task OnConfigSelectionChanged()
+        public async Task OnConfigSelectionChanged(ConfigClientViewModel config)
         {
             if (ConfigClients.Any(x => x.IsChecked))
                 IsEdit = true;
             else
                 IsEdit = false;
 
-            SelectedLeagueCount = ConfigClients.Where(x => x.IsChecked).Count();
+            if (_selectedConfigClients == null)
+                _selectedConfigClients = new();
 
-            if (SelectedLeagueCount > 0 && !IsSelectedLeagueShowing)
+            if (config.IsChecked)
+                _selectedConfigClients.Add(config);
+            else
+                _selectedConfigClients.Remove(config);
+
+            if (_selectedConfigClients.Count > 0 && !IsSelectedLeagueShowing)
             {
                 IsSelectedLeagueShowing = true;
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
             }
 
-            if (SelectedLeagueCount == 0)
+            if (_selectedConfigClients.Count == 0)
             {
                 IsSelectedLeagueShowing = false;
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
@@ -230,20 +248,34 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             ConfigClients.ForEach(x => x.IsChecked = false);
             IsEdit = false;
-            SelectedLeagueCount = 0;
-            IsSelectedLeagueShowing = false;
 
-            await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+            var configs = ConfigClients.Where(x => !x.IsChecked).ToList();
+
+            if (_selectedConfigClients == null)
+                _selectedConfigClients = new();
+
+            _selectedConfigClients.RemoveAll(x => configs.Any(cc => cc.ClientCode == x.ClientCode && cc.LeagueId == x.LeagueId && cc.SportId == x.SportId));
+
+            if (IsSelectedLeagueShowing && _selectedConfigClients.Count == 0)
+            {
+                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+                IsSelectedLeagueShowing = false;
+            }
         }
         public async Task OnSelectAllClickedEvent()
         {
             ConfigClients.ForEach(x => x.IsChecked = true);
+            var configs = ConfigClients.Where(x => x.IsChecked).ToList();
 
-            SelectedLeagueCount = ConfigClients.Where(x => x.IsChecked).Count();
+            if (_selectedConfigClients == null)
+                _selectedConfigClients = new();
+
+            _selectedConfigClients.RemoveAll(x => configs.Any(cc => cc.ClientCode == x.ClientCode && cc.LeagueId == x.LeagueId && cc.SportId == x.SportId));
+            _selectedConfigClients.AddRange(configs);
         }
         public async Task OnEditTemplateClickedEvent()
         {
-            var leagues = ConfigClients.Where(x => x.IsChecked).ToList();
+            var leagues = _selectedConfigClients.Where(x => x.IsChecked).ToList();
 
             var parameters = new ModalParameters();
 
@@ -275,6 +307,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
+            _selectedConfigClients = null;
             _state = null;
             GC.Collect();
         }
@@ -313,6 +346,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                     if (response.Result.MetaData != null)
                         MetaData = response.Result.MetaData;
                 }
+
+                ConfigClients.ForEach(config =>
+                {
+                    config.IsChecked = _selectedConfigClients?.FirstOrDefault(x => x.ClientCode == config.ClientCode && x.LeagueId == config.LeagueId && x.SportId == config.SportId)?.IsChecked ?? config.IsChecked;
+                });
             }
             IsPreloader = false;
         }
