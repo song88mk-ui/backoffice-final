@@ -242,7 +242,7 @@ namespace Backoffice.API.Repositories
                 }
 
                 var fromUTC = request.DateFrom.ToString("yyyy-MM-dd HH:mm:ss");
-                var toUTC = request.DateTo.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
+                var toUTC = request.DateTo.ToString("yyyy-MM-dd HH:mm:ss");
                 var activityLogs = (await _backofficeContext.ReadActivityLog
                         .FromSqlRaw($"GetActivityLogs '{request.Page}', '{request.Payload}', '{fromUTC}', '{toUTC}'")
                     .ToListAsync())

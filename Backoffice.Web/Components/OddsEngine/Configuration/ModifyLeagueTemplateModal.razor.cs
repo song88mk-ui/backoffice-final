@@ -63,7 +63,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             PrematchTemplates = await GetTemplates(SportId, (int)FixtureStatus.Prematch);
             LiveTemplates = await GetTemplates(SportId, (int)FixtureStatus.Live);
 
-            if(CurrentPrematchId > 0 && Leagues.All(x => x.PrematchTemplateId == CurrentPrematchId))
+            if (CurrentPrematchId > 0 && Leagues.All(x => x.PrematchTemplateId == CurrentPrematchId))
             {
                 var prematchSelectedName = PrematchTemplates.FirstOrDefault(p => p.Value == CurrentPrematchId)?.Name ?? string.Empty;
                 _prematchSelectedItem = new SelectListItemModel<long>() { Value = CurrentPrematchId, Name = prematchSelectedName };
@@ -82,7 +82,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             {
                 CurrentLiveId = 0;
             }
-            
+
         }
 
         public async Task OnPrematchTemplateSelectChanged(SelectListItemModel<long> e)
@@ -90,7 +90,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _prematchSelectedItem = new SelectListItemModel<long>();
             _prematchSelectedItem = e;
 
-            _hasChanged = CurrentPrematchId!= _prematchSelectedItem.Value;
+            _hasChanged = CurrentPrematchId != _prematchSelectedItem.Value && _liveSelectedItem != null;
 
             IsRemoveCurrentPrematchTemplate = false;
 
@@ -105,7 +105,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _liveSelectedItem = new SelectListItemModel<long>();
             _liveSelectedItem = e;
 
-            _hasChanged = CurrentLiveId != _liveSelectedItem.Value;
+            _hasChanged = CurrentLiveId != _liveSelectedItem.Value && _prematchSelectedItem != null;
 
             IsRemoveCurrentLiveTemplate = false;
 
@@ -164,7 +164,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                     var prematchTemplateId = _prematchSelectedItem?.Value > 0 ? _prematchSelectedItem.Value : leagueRequest.FirstOrDefault().PrematchTemplateId;
 
-                    if(prematchTemplateId > 0)
+                    if (prematchTemplateId > 0)
                     {
                         var prematchConfigTemplateMargins = await GetConfigTemplateMargin(prematchTemplateId);
                         foreach (var margin in prematchConfigTemplateMargins.ConfigTemplateMargins)
@@ -183,7 +183,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                     var liveTemplateId = _liveSelectedItem?.Value > 0 ? _liveSelectedItem.Value : leagueRequest.FirstOrDefault().LiveTemplateId;
 
-                    if(liveTemplateId > 0)
+                    if (liveTemplateId > 0)
                     {
                         var liveConfigTemplateMargins = await GetConfigTemplateMargin(liveTemplateId);
 
@@ -210,7 +210,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                         }
                     }
-                    
+
 
                     foreach (var league in leagueRequest)
                     {
@@ -284,52 +284,102 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         }
                     }
 
-                    var distinctTemplates = Leagues.Select(x => new
+                    var distinctPrematchTemplates = Leagues.Select(x => new
                     {
                         Id = x.PrematchTemplateId.ToString(),
                         Name = x.PrematchTemplateName
                     }).Distinct().ToList();
+                    var distinctLiveTemplates = Leagues.Select(x => new
+                    {
+                        Id = x.LiveTemplateId.ToString(),
+                        Name = x.LiveTemplateName
+                    }).Distinct().ToList();
 
                     var cancellationTokenSource = new CancellationTokenSource();
 
-                    Parallel.ForEach(distinctTemplates, async (item) =>
+                    Parallel.ForEach(distinctPrematchTemplates, async (item) =>
                     {
-                        var premathcLeagues = Leagues.Where(x => x.PrematchTemplateId.ToString() == item.Id).ToList();
-
-                        var preFrom = "";
-                        var preTo = "";
-                        preFrom = JsonSerializer.Serialize(new ConfigTemplateLogModel()
+                        if (_prematchSelectedItem != null && _prematchSelectedItem.Value.ToString() != item.Id)
                         {
-                            TemplateName = item.Id != "-1" ? item.Name : "Unassigned",
-                            Payloads = new ConfigTemplateLogPayloadModel()
+                            var leagues = Leagues.Where(x => x.PrematchTemplateId.ToString() == item.Id).ToList();
+
+                            var from = "";
+                            var to = "";
+                            from = JsonSerializer.Serialize(new ConfigTemplateLogModel()
                             {
-                                Clients = premathcLeagues.Select(x => x.ClientName).Distinct().ToList(),
-                                Leagues = premathcLeagues.Select(x => x.LeagueName).Distinct().ToList()
-                            }
-                        });
-                        preTo = JsonSerializer.Serialize(new ConfigTemplateLogModel()
-                        {
-                            TemplateName = _prematchSelectedItem != null && _prematchSelectedItem.Value.ToString() != "-1" ? _prematchSelectedItem.Name : "Unassigned",
-                            Payloads = new ConfigTemplateLogPayloadModel()
+                                TemplateName = item.Id != "-1" ? item.Name : "Unassigned",
+                                Payloads = new ConfigTemplateLogPayloadModel()
+                                {
+                                    Clients = leagues.Select(x => x.ClientName).Distinct().ToList(),
+                                    Leagues = leagues.Select(x => x.LeagueName).Distinct().ToList()
+                                }
+                            });
+                            to = JsonSerializer.Serialize(new ConfigTemplateLogModel()
                             {
-                                Clients = new List<string>(),
-                                Leagues = new List<string>()
-                            }
-                        });
+                                TemplateName = _prematchSelectedItem != null && _prematchSelectedItem.Value.ToString() != "-1" ? _prematchSelectedItem.Name : "Unassigned",
+                                Payloads = new ConfigTemplateLogPayloadModel()
+                                {
+                                    Clients = new List<string>(),
+                                    Leagues = new List<string>()
+                                }
+                            });
 
-                        var activityLog = new ActivityLogModel()
+                            var activityLog = new ActivityLogModel()
+                            {
+                                Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
+                                Payload = $"{ActivityLogPayload}.{(int)FixtureStatus.Prematch}.{(_prematchSelectedItem.Value.ToString() == "-1" ? "Removed Current Template" : _prematchSelectedItem?.Name ?? "")}.T".Replace(" ", "_"),
+                                From = from,
+                                To = to,
+                                Activity = Activity.Update.ToString(),
+                                UserId = UserModel.Id,
+                                UserName = UserModel.UserName,
+                                TimeStamp = DateTime.UtcNow
+                            };
+
+                            await BackOfficeService.AddActivityLog(activityLog);
+                        }
+                    });
+                    Parallel.ForEach(distinctLiveTemplates, async (item) =>
+                    {
+                        if (_liveSelectedItem != null && _liveSelectedItem.Value.ToString() != item.Id)
                         {
-                            Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                            Payload = $"{ActivityLogPayload}.{_prematchSelectedItem?.Name ?? ""}.T".Replace(" ", "_"),
-                            From = preFrom,
-                            To = preTo,
-                            Activity = Activity.Update.ToString(),
-                            UserId = UserModel.Id,
-                            UserName = UserModel.UserName,
-                            TimeStamp = DateTime.UtcNow
-                        };
+                            var leagues = Leagues.Where(x => x.LiveTemplateId.ToString() == item.Id).ToList();
 
-                        await BackOfficeService.AddActivityLog(activityLog);
+                            var from = "";
+                            var to = "";
+                            from = JsonSerializer.Serialize(new ConfigTemplateLogModel()
+                            {
+                                TemplateName = item.Id != "-1" ? item.Name : "Unassigned",
+                                Payloads = new ConfigTemplateLogPayloadModel()
+                                {
+                                    Clients = leagues.Select(x => x.ClientName).Distinct().ToList(),
+                                    Leagues = leagues.Select(x => x.LeagueName).Distinct().ToList()
+                                }
+                            });
+                            to = JsonSerializer.Serialize(new ConfigTemplateLogModel()
+                            {
+                                TemplateName = _liveSelectedItem != null && _liveSelectedItem.Value.ToString() != "-1" ? _liveSelectedItem.Name : "Unassigned",
+                                Payloads = new ConfigTemplateLogPayloadModel()
+                                {
+                                    Clients = new List<string>(),
+                                    Leagues = new List<string>()
+                                }
+                            });
+
+                            var activityLog = new ActivityLogModel()
+                            {
+                                Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
+                                Payload = $"{ActivityLogPayload}.{(int)FixtureStatus.Live}.{(_liveSelectedItem.Value.ToString() == "-1" ? "Removed Current Template" : _liveSelectedItem?.Name ?? "")}.T".Replace(" ", "_"),
+                                From = from,
+                                To = to,
+                                Activity = Activity.Update.ToString(),
+                                UserId = UserModel.Id,
+                                UserName = UserModel.UserName,
+                                TimeStamp = DateTime.UtcNow
+                            };
+
+                            await BackOfficeService.AddActivityLog(activityLog);
+                        }
                     });
 
                     var message = "";

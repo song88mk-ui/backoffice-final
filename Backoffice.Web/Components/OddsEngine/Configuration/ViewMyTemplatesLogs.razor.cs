@@ -86,7 +86,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var scopeName = payloads.Count() > 1 ? Scopes.FirstOrDefault(x => x.Value == payloads[1])?.Name : "";
             var template = payloads.Count() > 2 ? payloads[2] : "";
 
-            stringBuilder.Append($"<th class=\"px-4\" scope=\"row\">{activityLog.TimeStamp.ToLocalTime().ToString("dd/mm/yyyy HH:mm")}</th>");
+            stringBuilder.Append($"<th class=\"px-4\" scope=\"row\">{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm")}</th>");
             stringBuilder.Append($"<td class=\"px-4\">{sportName}</td>");
             stringBuilder.Append($"<td class=\"px-4\">{scopeName}</td>");
             stringBuilder.Append($"<td class=\"px-4\">{template}</td>");
@@ -227,8 +227,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                 Payload = BuildPayload(filterModel),
                 MetaData = MetaData,
-                DateFrom = filterModel.DateFrom.Date.Add(new TimeSpan(0, 0, 0)),
-                DateTo = filterModel.DateTo.Date.Add(new TimeSpan(23, 59, 59)),
+                DateFrom = filterModel.DateFrom.ToUniversalTime().Date.Add(new TimeSpan(0, 0, 0)),
+                DateTo = filterModel.DateTo.ToUniversalTime().Date.Add(new TimeSpan(23, 59, 59)),
                 SearchText = filterModel.SearchText
             });
 
