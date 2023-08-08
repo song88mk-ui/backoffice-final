@@ -71,7 +71,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             }
             else
             {
-                CurrentPrematchId = -1;
+                CurrentPrematchId = 0;
             }
 
             if (CurrentLiveId > 0 && Leagues.All(x => x.LiveTemplateId == CurrentLiveId))
@@ -81,7 +81,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             }
             else
             {
-                CurrentLiveId = -1;
+                CurrentLiveId = 0;
             }
             
         }
