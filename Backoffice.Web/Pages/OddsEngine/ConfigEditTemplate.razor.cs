@@ -42,6 +42,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string AllMarketStatusName { get; set; } = "ACTIVATE ALL";
         public bool IsPreloader { get; set; } = true;
         public bool HasChanges { get; set; } = false;
+        private AlertModel _alertModel { get; set; }
         #endregion
 
 
@@ -154,6 +155,36 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 foreach (var market in MarketLookupNavigation)
                 {
+                    //validate Odds
+                    if(market.NewMarketLookup.IsActive)
+                    {
+                        switch ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId)
+                        {
+                            case FixtureStatus.Prematch:
+                                if (market.NewPrematchSettings.Settings.Any(x => x.Key <= 101))
+                                {
+                                    _alertModel = new AlertModel();
+                                    _alertModel.Message = "Please update margin for Active markets. 101 by default is not allowed";
+                                    _alertModel.Status = AlertStatus.Error;
+                                    _alertModel.Opacity = 1.0m;
+
+                                    return;
+                                }
+                                break;
+                            case FixtureStatus.Live:
+                                if (market.NewLiveSettings.Settings.Any(x => x.Key <= 101))
+                                {
+                                    _alertModel = new AlertModel();
+                                    _alertModel.Message = "Please update margin for Active markets. 101 by default is not allowed";
+                                    _alertModel.Status = AlertStatus.Error;
+                                    _alertModel.Opacity = 1.0m;
+
+                                    return;
+                                }
+                                break;
+                        }
+                    }
+
                     var livematchSettings = new List<MarketMargin>();
                     var liveSettings = market.NewLiveSettings.Settings.Where(a => a.Key != null);
                     if (liveSettings != null)
