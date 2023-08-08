@@ -1667,7 +1667,7 @@ namespace Backoffice.API.Repositories
                                 var userLeagues = query.Where(x => x.ClientCode == client.ClientCode).ToList();
                                 var leagues = leagueLookup.Where(x => !userLeagues.Any(u => u.SportId == x.SportId && u.SegmentId == x.SegmentId && u.LeagueId == x.LeagueId)).ToList();
 
-                                Parallel.ForEach(leagues, league =>
+                                foreach (var league in leagues)
                                 {
                                     result.Add(new ConfigClientModel()
                                     {
@@ -1682,7 +1682,7 @@ namespace Backoffice.API.Repositories
                                         LeagueId = league.LeagueId,
                                         LeagueName = league.LeagueName
                                     });
-                                });
+                                }
                             }
                         }
 
