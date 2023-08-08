@@ -82,5 +82,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickedEvent" disabled="@IsPreLoader">Cancel</button>
-    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickedEvent" disabled="@IsPreLoader">Apply</button>
+    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickedEvent" disabled="@(IsPreLoader || !_hasChanged)">Apply</button>
 </div>
