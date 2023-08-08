@@ -252,7 +252,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 SportId = league.SportId,
                                 SegmentId = league.SegmentId,
                                 LeagueId = league.LeagueId,
-                                IsActive = state == ConfigState.Assigned
+                                IsActive = state == ConfigState.Assigned ? data.MarketConfig.Any(m => m.IsActive) : false
                             };
 
                             await TradingService.Publish(new MessageRequest()
