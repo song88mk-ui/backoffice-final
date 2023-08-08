@@ -4,7 +4,6 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,6 +16,7 @@ using System.Transactions;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
 using static Backoffice.Shared.Models.Requests.AddOrUpdateBetConfigRequest;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
+using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
 
 namespace Backoffice.API.Repositories
 {
@@ -1611,7 +1611,7 @@ namespace Backoffice.API.Repositories
 
                 if (payload != null)
                 {
-                    clientList = clientList.Where(x => payload.ClientCodes?.ToList()?.Contains(x.ClientCode) ?? false ).ToList();
+                    clientList = clientList.Where(x => payload.ClientCodes?.ToList()?.Contains(x.ClientCode) ?? false).ToList();
                 }
 
                 var query = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(x => clientList.Select(cl => cl.ClientCode).Contains(x.ClientCode.ToUpper())); //.Where(x => templates.Any(template => template.Id == x.PrematchConfigTemplateId || template.Id == x.LiveConfigTemplateId));
@@ -1656,7 +1656,6 @@ namespace Backoffice.API.Repositories
                         }).ToList();
                         break;
                     case ConfigState.UnAssigned:
-
                         var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup(payload.SportId == -1 ? "" : string.Join(',', payload.SportId));
                         if (leagueLookupResponse.Result != null)
                         {
@@ -1667,22 +1666,19 @@ namespace Backoffice.API.Repositories
                                 var userLeagues = query.Where(x => x.ClientCode == client.ClientCode).ToList();
                                 var leagues = leagueLookup.Where(x => !userLeagues.Any(u => u.SportId == x.SportId && u.SegmentId == x.SegmentId && u.LeagueId == x.LeagueId)).ToList();
 
-                                foreach (var league in leagues)
+                                result.AddRange(leagues.Select(x => new ConfigClientModel()
                                 {
-                                    result.Add(new ConfigClientModel()
-                                    {
-                                        Id = -1,
-                                        ClientId = client.ClientId.ToString(),
-                                        ClientCode = client.ClientCode.ToUpper(),
-                                        ClientName = client.ClientName,
-                                        SportId = league.SportId,
-                                        SportName = league.SportName,
-                                        SegmentId = league.SegmentId,
-                                        SegmentName = league.SegmentName,
-                                        LeagueId = league.LeagueId,
-                                        LeagueName = league.LeagueName
-                                    });
-                                }
+                                    Id = -1,
+                                    ClientId = client.ClientId.ToString(),
+                                    ClientCode = client.ClientCode.ToUpper(),
+                                    ClientName = client.ClientName,
+                                    SportId = x.SportId,
+                                    SportName = x.SportName,
+                                    SegmentId = x.SegmentId,
+                                    SegmentName = x.SegmentName,
+                                    LeagueId = x.LeagueId,
+                                    LeagueName = x.LeagueName
+                                }));
                             }
                         }
 
@@ -1703,7 +1699,7 @@ namespace Backoffice.API.Repositories
                         .ToList();
                 }
 
-                if(metaData != null)
+                if (metaData != null)
                 {
                     metaData.TotalCount = result.Count();
                     metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
