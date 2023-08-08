@@ -372,7 +372,7 @@ namespace Backoffice.API.Controllers.Trading
         }
         [HttpPost("client/config")]
         public async Task<IActionResult> AddOrUpdateConfig([FromBody] ConfigSettingsModel request)
-        {
+        {//
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
 
             var result = await _tradingRepository.AddOrUpdateConfig(request, region);

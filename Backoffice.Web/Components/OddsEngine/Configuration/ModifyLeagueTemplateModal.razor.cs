@@ -1,5 +1,4 @@
-﻿using Backoffice.Shared.Data.Backoffice.Entities;
-using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineMessages;
@@ -222,6 +221,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         data.LeagueId = league.LeagueId;
                         data.ClientId = Guid.Parse(league.ClientId);
                         data.UserId = UserModel.Id;
+                        data.UserName = UserModel.UserName;
 
                         data.MarketConfig = marketConfig.Select(s => new MarketConfigModel
                         {
