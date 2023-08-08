@@ -145,7 +145,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _selectedConfigClients = new();
 
-            await LoadLeagues(_filterModel);
+            await SelectedPage(1);
             //var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
 
             //SelectedClientCount = selectedClients.Count;
@@ -167,7 +167,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _filterModel.SportId = int.Parse((e == null ? _sports.FirstOrDefault()?.Value : e.Value?.ToString()) ?? "-1");
                 _filterModel.SportName = (e == null ? _sports.FirstOrDefault()?.Name : _sports.FirstOrDefault(x => x.Value == e.Value.ToString())?.Name) ?? string.Empty;
             }
-            await LoadLeagues(_filterModel);
+            await SelectedPage(1);
         }
 
         public async Task OnModalSaveEvent(object e)
