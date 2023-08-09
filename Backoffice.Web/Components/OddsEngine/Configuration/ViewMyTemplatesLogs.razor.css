@@ -4,7 +4,9 @@
     opacity: 1;
     color: white;
 }
-
+.table-logs thead tr > th.date {
+    min-width : 12rem !important;
+}
 .log-filter {
     gap: 1rem;
 }
