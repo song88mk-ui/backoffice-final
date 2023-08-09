@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using Serilog;
 using RabbitMQ.Client.Apigen.Attributes;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -116,7 +117,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var markets = Fixture.Markets.Where(c => c.MarketTemplateId == MarketTemplateId).ToList();
             FixtureMarkets = await PrepareFixtureMarkets(markets);
 
-            MarginMarket = markets.FirstOrDefault() ?? new();
+            MarginMarket = markets.FirstOrDefault(f => f.MarketStatusId == (int)MarketStatus.Active) ?? markets.FirstOrDefault() ?? new();
             _isPreLoader = false;
         }
 
@@ -328,7 +329,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             //    }).Where(c => c.Selections.Any());
             //}
 
-            MarginMarket = filteredMarkets.FirstOrDefault();
+            MarginMarket =   filteredMarkets.FirstOrDefault(f => f.MarketStatusId == (int)MarketStatus.Active) ?? filteredMarkets.FirstOrDefault() ?? new();
 
             return PrepareFixtureMarkets(filteredMarkets.ToList()).Result;
         }
