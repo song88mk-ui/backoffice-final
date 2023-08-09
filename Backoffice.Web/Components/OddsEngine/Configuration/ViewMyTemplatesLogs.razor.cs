@@ -75,7 +75,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 };
             }
 
-            await GetContent(FilterModel);
+            await SelectPage(1);
         }
         public string GetLogDetails(ActivityLogModel activityLog)
         {
@@ -180,7 +180,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             {
                 FilterModel.SelectedSportId = e == null ? Sports.FirstOrDefault().Value : e.Value.ToString();
             }
-            await GetContent(FilterModel);
+            await SelectPage(1);
         }
         public async Task OnScopeClickEvent(ChangeEventArgs e)
         {
@@ -188,14 +188,15 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             {
                 FilterModel.SelectedScopeId = e == null ? Scopes.FirstOrDefault().Value : e.Value.ToString();
             }
-            await GetContent(FilterModel);
+
+            await SelectPage(1);
         }
         public async Task OnDatePickerClickEvent(DateRange range)
         {
             FilterModel.DateFrom = Convert.ToDateTime(range.Start.ToString("yyyy-MM-dd 00:00:00"));
             FilterModel.DateTo = Convert.ToDateTime(range.End.ToString("yyyy-MM-dd 23:59:59"));
 
-            await GetContent(FilterModel);
+            await SelectPage(1);
         }
         public async Task OnInputSearchEvent()
         {
@@ -220,7 +221,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 IsPreLoader = true;
                 StateHasChanged();
             }
-            MetaData.CurrentPage = 1;
             ActivitLogs = new List<ActivityLogModel>();
             var response = await BackOfficeService.GetActivityLogs(new ActivityLogRequest
             {
