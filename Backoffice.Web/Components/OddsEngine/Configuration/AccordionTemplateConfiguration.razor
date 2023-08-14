@@ -13,7 +13,7 @@
                             <input class="form-check-input" type="checkbox"
                                    id="@($"Market-{Market.NewMarketLookup.MarketTemplateId}Toggle")" role="switch"
                                    aria-label="@($"{Market.NewMarketLookup.MarketTemplateName} Toggle Switch")"
-                            @bind="Market.NewMarketLookup.IsActive" @oninput="OnMarketActiveChangedEvent" />
+                            @bind="Market.NewMarketLookup.IsActive" @oninput="OnMarketActiveChangedEvent" disabled="@IsReadOnly" />
                         </div>
                     </Authorized>
                     <NotAuthorized Context="ActivateAll">
@@ -21,7 +21,7 @@
                             <input class="form-check-input" type="checkbox"
                                    id="@($"Market-{Market.MarketLookup.MarketTemplateId}Toggle")" role="switch"
                                    aria-label="@($"{Market.MarketLookup.MarketTemplateName} Toggle Switch")"
-                            @bind="Market.MarketLookup.IsActive" disabled />
+                                @bind="Market.MarketLookup.IsActive" disabled />
                         </div>
                     </NotAuthorized>
                 </AuthorizeView>
@@ -30,23 +30,23 @@
 
         <div id="@($"Market-{Market.MarketLookup.MarketTemplateId}")" class="accordion-collapse collapse show">
             <div class="accordion-body">
-                @{
-                    var configStatus = Market.MarketLookup.IsActive ? "1" : "2";
-                    if (FilterConfigStatus == null || !FilterConfigStatus.Any() || FilterConfigStatus.Contains(configStatus))
-                    {
-                        if ((Scope == 99 || Scope == 0))
-                        {
-                            //prematch
-                            <PreMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "prematch") PrematchSettings="@Market.NewPrematchSettings" OnMarginChangeCallback="OnTemplateMarginChangeCallback" />
-                        }
+                                @{
+                                    var configStatus = Market.MarketLookup.IsActive ? "1" : "2";
+                                    if (FilterConfigStatus == null || !FilterConfigStatus.Any() || FilterConfigStatus.Contains(configStatus))
+                                    {
+                                        if ((Scope == 99 || Scope == 0))
+                                        {
+                                            //prematch
+                            <PreMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "prematch") PrematchSettings="@Market.NewPrematchSettings" OnMarginChangeCallback="OnTemplateMarginChangeCallback" IsReadOnly="IsReadOnly" />
+                                        }
 
-                        if ((Scope == 99 || Scope == 1))
-                        {
-                            //live
-                            <LiveMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "live") LiveSettings="@Market.NewLiveSettings" OnMarginChangeCallback="OnMarginChangedEvent" />
-                        }
-                    }
-                }
+                                        if ((Scope == 99 || Scope == 1))
+                                        {
+                                            //live
+                            <LiveMatchConfig @key=@(Market.MarketLookup.MarketTemplateId + "live") LiveSettings="@Market.NewLiveSettings" OnMarginChangeCallback="OnMarginChangedEvent" IsReadOnly="IsReadOnly" />
+                                        }
+                                    }
+                                }
             </div>
         </div>
     </div>

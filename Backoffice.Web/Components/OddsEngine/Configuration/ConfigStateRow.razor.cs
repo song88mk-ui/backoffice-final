@@ -63,7 +63,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnEditTemplateClickEvent(long configTemplateId)
         {
-            NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{configTemplateId}");
+            NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{configTemplateId}/true");
         }
         #endregion
     }

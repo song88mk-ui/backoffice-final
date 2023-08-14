@@ -26,6 +26,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public long ConfigTemplateId { get; set; }
+        [Parameter] public bool View { get; set; }
 
         public List<BreadcrumbModel> Breadcrumbs { get; set; }
         public List<MarketLookupNavigationModel> MarketLookupNavigation { get; set; }

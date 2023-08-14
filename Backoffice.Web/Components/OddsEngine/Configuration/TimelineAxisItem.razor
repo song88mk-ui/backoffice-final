@@ -7,15 +7,28 @@
         var settingClass = setting.Key != null && setting.Key > 0 ? "timeline-axis-item-key-big" : "timeline-axis-item-key";
 
         <div class="timeline-axis-item my-3 first-axis">
-            <a id="timeline-@setting.TimeDisplay" class="waves-effect waves-light timeline-axis-item-key-container"
-            @onclick="_ => OnAddKeyClickEvent(setting)"
-            @onclick:preventDefault @onclick:stopPropagation
-            @onmouseleave="CloseModal">
-                <span class="@settingClass" title="Click to edit key">
-                    @setting.Key
-                    <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />
-                </span>
-            </a>
+            @if(IsReadOnly)
+            {
+                <a id="timeline-@setting.TimeDisplay" class="waves-effect waves-light timeline-axis-item-key-container">
+                    <span class="@settingClass" title="Click to edit key">
+                        @setting.Key
+                        <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />
+                    </span>
+                </a>
+            }
+            else
+            {
+                <a id="timeline-@setting.TimeDisplay" class="waves-effect waves-light timeline-axis-item-key-container"
+                @onclick="_ => OnAddKeyClickEvent(setting)"
+                @onclick:preventDefault @onclick:stopPropagation
+                @onmouseleave="CloseModal" disabled="@IsReadOnly">
+                    <span class="@settingClass" title="Click to edit key">
+                        @setting.Key
+                        <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />
+                    </span>
+                </a>
+            }
+
             <span class="timeline-axis-item-label">@setting.TimeDisplay</span>
         </div>
     }

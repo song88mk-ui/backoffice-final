@@ -12,6 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] public IModalService Modal { get; set; }
         [Parameter] public LiveSettingsTemplateModel LiveSettings { get; set; }
         [Parameter] public EventCallback OnMarginChangeCallback { get; set; }
+        [Parameter] public bool IsReadOnly { get; set; }
         public ModalParameters Parameters { get; set; }
         public Type ContentComponent { get; set; }
         #endregion

@@ -15,15 +15,28 @@
                             <span class="timeline-axis-label label-prematch">Live</span>
                         }
                         <div title="Click to add key" class="key">
-                            <a id="timeline-@setting.Time" class="waves-effect waves-light timeline-axis-item-key-container"
-                            @onclick="_ => OnAddKeyClickEvent(setting)"
-                            @onclick:preventDefault @onclick:stopPropagation
-                            @onmouseleave="CloseModal">
-                                <span class="@settingClass" title="Click to edit key">
-                                    @setting.Key
-                                    <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />
-                                </span>
-                            </a>
+                            @if(IsReadOnly)
+                            {
+                                <a id="timeline-@setting.Time" class="waves-effect waves-light timeline-axis-item-key-container">
+                                    <span class="@settingClass" title="Click to edit key">
+                                        @setting.Key
+                                        <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />
+                                    </span>
+                                </a>
+                            }
+                            else
+                            {
+                                <a id="timeline-@setting.Time" class="waves-effect waves-light timeline-axis-item-key-container"
+                                @onclick="_ => OnAddKeyClickEvent(setting)"
+                                @onclick:preventDefault @onclick:stopPropagation
+                                @onmouseleave="CloseModal" disabled="@IsReadOnly">
+                                    <span class="@settingClass" title="Click to edit key">
+                                        @setting.Key
+                                        <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />
+                                    </span>
+                                </a>
+                            }
+
                         </div>
                         <div class="label">@setting.TimeDisplay</div>
                     </div>

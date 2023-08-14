@@ -9,7 +9,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public EventCallback OnTemplateMarginChangeCallback { get; set; }
         [Parameter] public List<string> FilterConfigStatus { get; set; }
         [Parameter] public int Scope { get; set; }
-        
+        [Parameter] public bool IsReadOnly { get; set; }
+
 
         #region Methods                                        
 

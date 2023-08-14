@@ -3,6 +3,7 @@
 @layout OEMonitoringLayout
 
 @page "/hk/odds-engine/config-templates/edit/{configTemplateId:long}"
+@page "/hk/odds-engine/config-templates/edit/{configTemplateId:long}/{view:bool}"
 
 <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region" />
 
@@ -14,8 +15,11 @@
             </div>
 
             <div>
-                <button type="button" class="btn btn-cancel" @onclick="OnCancelMarginTemplate">Cancel</button>
-                <button type="button" class="btn btn-save" disabled="@(!HasChanges)" @onclick="OnSaveMarginTemplate">Save Changes</button>
+                @if(!View)
+                {
+                    <button type="button" class="btn btn-cancel" @onclick="OnCancelMarginTemplate">Cancel</button>
+                    <button type="button" class="btn btn-save" disabled="@(!HasChanges)" @onclick="OnSaveMarginTemplate">Save Changes</button>
+                }
             </div>
         </div>
     </div>
@@ -54,7 +58,7 @@
 <EditConfigTemplateFilter ConfigTemplateId="@ConfigTemplateId" EditConfigTemplateFilterCallback="InitConfigEditTemplate" />
 
 <div class="d-flex justify-content-end mb-4">
-    <button type="button" class="btn btn-activate-all fw-bold" @onclick="OnAllMarketStatusClickEvent">@AllMarketStatusName</button>
+    <button type="button" class="btn btn-activate-all fw-bold" @onclick="OnAllMarketStatusClickEvent" disabled="@View">@AllMarketStatusName</button>
 </div>
 
 <div class="col-md-12 mb-4">
@@ -68,7 +72,7 @@
         {
             foreach (var market in MarketLookupNavigation.Where(m => m.IsVisible))
             {
-                <AccordionTemplateConfiguration Market="market"
+                <AccordionTemplateConfiguration Market="market" IsReadOnly="View"
                     @key="@($"{EditConfigTemplateFilterModel.ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
                     FilterConfigStatus="@EditConfigTemplateFilterModel.SelectedConfigStatus"
                     Scope="@EditConfigTemplateFilterModel.ScopeId" 

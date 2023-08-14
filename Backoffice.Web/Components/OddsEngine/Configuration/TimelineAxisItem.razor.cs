@@ -12,6 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] public IModalService Modal { get; set; }
         [Parameter] public PrematchSettingsTemplateModel PrematchSettings { get; set; }
         [Parameter] public EventCallback OnMarginChangeCallback { get; set; }
+        [Parameter] public bool IsReadOnly { get; set; }
         public Type ContentComponent { get; set; }
         public ModalParameters Parameters { get; set; }
         //private Dictionary<string,ElementReference> ElementReferenceDict { get; set; }

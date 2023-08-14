@@ -17,7 +17,14 @@
         }
         else
         {
-            <a @onclick="_ => OnEditTemplateClickEvent(Config.PrematchTemplateId)">@Config.PrematchTemplateName</a>
+            if (State == ConfigState.UnAssigned)
+            {
+                <label>@Config.PrematchTemplateName</label>
+            }
+            else
+            {
+                <a @onclick="_ => OnEditTemplateClickEvent(Config.PrematchTemplateId)">@Config.PrematchTemplateName</a>
+            }
         }
 
     </td>
@@ -28,7 +35,14 @@
         }
         else
         {
-            <a @onclick="_ => OnEditTemplateClickEvent(Config.LiveTemplateId)">@Config.LiveTemplateName</a>
+            if (State == ConfigState.UnAssigned)
+            {
+                <label>@Config.LiveTemplateName</label>
+            }
+            else
+            {
+                <a @onclick="_ => OnEditTemplateClickEvent(Config.LiveTemplateId)">@Config.LiveTemplateName</a>                
+            }
         }
     </td>
 </tr>
