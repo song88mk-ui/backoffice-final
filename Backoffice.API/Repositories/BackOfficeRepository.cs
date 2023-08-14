@@ -1352,20 +1352,20 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Config
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(List<int> sportIds = null, List<int> scopeIds = null)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(string searchText, List<int> sportIds = null, List<int> scopeIds = null)
         {
             try
             {
                 var query = _backofficeContext.ConfigTemplate.AsNoTracking();
 
+                if (!string.IsNullOrEmpty(searchText))
+                    query = query.Where(x => x.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+
                 if (sportIds != null && sportIds.Count() > 0)
-                {
                     query = query.Where(x => sportIds.Contains(x.SportId));
-                }
+
                 if (scopeIds != null && scopeIds.Count() > 0)
-                {
                     query = query.Where(x => scopeIds.Contains(x.FixtureStatusId));
-                }
 
                 var configTemplates = await query.ToListAsync();
 
@@ -1579,7 +1579,7 @@ namespace Backoffice.API.Repositories
 
                 await _backofficeContext.SaveChangesAsync();
 
-                return await GetConfigTemplates();
+                return await GetConfigTemplates("");
             }
             catch (Exception ex)
             {
@@ -1767,7 +1767,7 @@ namespace Backoffice.API.Repositories
                 }
                 else
                 {
-                    var configTemplate = await GetConfigTemplates();
+                    var configTemplate = await GetConfigTemplates("");
                     var templates = configTemplate.Result;
                     count = templates.Count();
                 }
