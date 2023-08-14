@@ -4,6 +4,7 @@ using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -30,12 +31,14 @@ namespace Backoffice.Web.Pages.OddsEngine
         public string IconClass { get; set; }
         public int SelectedSportId { get; set; }
         public int SelectedScopeId { get; set; }
+        private SearchFormModel _searchForm;
         private AlertModel _alertModel { get; set; }
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            _searchForm = new();
             IsPreloader = true;
             PageTitle = "My Templates";
             IconClass = "";
@@ -179,6 +182,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             await LoadConfigTemplates();
         }
 
+
+        public async Task OnInputSearchEvent()
+        {
+            await LoadConfigTemplates();
+        }
+
         public void Dispose()
         {
 
@@ -193,7 +202,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsPreloader = true;
             StateHasChanged();
 
-            ConfigTemplates = (await BackOfficeService.GetConfigTemplate(SelectedSportId, SelectedScopeId)).Result;
+            ConfigTemplates = (await BackOfficeService.GetConfigTemplate(_searchForm.SearchText, SelectedSportId, SelectedScopeId)).Result;
 
             IsPreloader = false;
         }

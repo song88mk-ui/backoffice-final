@@ -1359,7 +1359,7 @@ namespace Backoffice.API.Repositories
                 var query = _backofficeContext.ConfigTemplate.AsNoTracking();
 
                 if (!string.IsNullOrEmpty(searchText))
-                    query = query.Where(x => x.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+                    query = query.Where(x => x.Name.ToLower().Contains(searchText.ToLower()));
 
                 if (sportIds != null && sportIds.Count() > 0)
                     query = query.Where(x => sportIds.Contains(x.SportId));

@@ -1320,21 +1320,26 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(int sportId = -1, int scopeId = -1)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1)
         {
             try
             {
                 var path = "api/config/templates";
 
                 var queries = new List<string>();
+                
+                if(!string.IsNullOrEmpty(searchText))
+                    queries.Add($"searchText={searchText}");
+                
                 if (sportId != -1)
                     queries.Add($"sportId={sportId}");
+                
                 if (scopeId != -1)
                     queries.Add($"scopeId={scopeId}");
+                
                 if (queries != null && queries.Any() && queries.Count > 0)
-                {
                     path += $"?{string.Join("&", queries)}";
-                }
+
                 var response = await _httpClient.GetAsync($"{path}");
 
                 if (response.IsSuccessStatusCode)

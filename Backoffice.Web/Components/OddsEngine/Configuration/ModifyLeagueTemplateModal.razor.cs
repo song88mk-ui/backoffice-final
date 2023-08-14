@@ -425,7 +425,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private async Task<List<SelectListItemModel<long>>> GetTemplates(int sportId, int scopeId)
         {
             IsPreLoader = true;
-            var response = await BackOfficeService.GetConfigTemplate(sportId, scopeId);
+            var response = await BackOfficeService.GetConfigTemplate(string.Empty, sportId, scopeId);
 
             IsPreLoader = false;
             if (response.StatusCode == StatusCode.Success && response.Result.Count > 0)
