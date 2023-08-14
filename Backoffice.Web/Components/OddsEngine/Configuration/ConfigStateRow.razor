@@ -10,6 +10,25 @@
     <td class="px-4">@Config.ClientName</td>
     <td class="px-4">@Config.SportName</td>
     <td class="px-4">@Config.SegmentName > @Config.LeagueName</td>
-    <td class="@(State == ConfigState.UnAssigned ? "template-name-italic" : "") px-4">@(Config.PrematchTemplateId == -1 ? "No template assigned" : Config.PrematchTemplateName)</td>
-    <td class="@(State == ConfigState.UnAssigned ? "template-name-italic" : "") px-4">@(Config.LiveTemplateId == -1 ? "No template assigned" : Config.LiveTemplateName)</td>
+    <td class="@(State == ConfigState.UnAssigned ? "template-name-italic" : "") px-4">
+        @if (Config.PrematchTemplateId == -1)
+        {
+            <label>No template assigned</label>
+        }
+        else
+        {
+            <a @onclick="_ => OnEditTemplateClickEvent(Config.PrematchTemplateId)">@Config.PrematchTemplateName</a>
+        }
+
+    </td>
+    <td class="@(State == ConfigState.UnAssigned ? "template-name-italic" : "") px-4">
+        @if (Config.LiveTemplateId == -1)
+        {
+            <label>No template assigned</label>
+        }
+        else
+        {
+            <a @onclick="_ => OnEditTemplateClickEvent(Config.LiveTemplateId)">@Config.LiveTemplateName</a>
+        }
+    </td>
 </tr>

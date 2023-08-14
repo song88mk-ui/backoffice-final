@@ -10,3 +10,9 @@
 .table-active {
     background-color: #EEF6FF;
 }
+
+a {
+    text-decoration: underline !important;
+    color: red !important;
+    cursor: pointer;
+}
