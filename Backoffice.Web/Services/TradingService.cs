@@ -2,16 +2,14 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Microsoft.AspNetCore.Http;
+using Serilog;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using Serilog;
 
 namespace Backoffice.Web.Services
 {
-    public class TradingService : ITradingService
+    public class TradingService : ITradingService, IDisposable
     {
         public string Region { get; set; }
         private HttpClient _client;
@@ -1425,6 +1423,8 @@ namespace Backoffice.Web.Services
         {
             _httpClient.Dispose();
             _authenticationService.Dispose();
+
+            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
         }
     }
 }

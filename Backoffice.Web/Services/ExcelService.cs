@@ -3,18 +3,16 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using ExcelDataReader;
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+using Serilog;
 using System.Data;
 using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Serilog;
 
 namespace Backoffice.Web.Services
 {
-    public class ExcelService : IExcelService
+    public class ExcelService : IExcelService, IDisposable
     {
         #region Properties
 
@@ -30,7 +28,9 @@ namespace Backoffice.Web.Services
             _configuration = configuration;
         }
         #endregion
+
         #region Methods
+        
         public async Task<BaseResponse<OnBulkUpdateConfigMessage>> ConvertExceltoBulkUpdateConfigMessage(MemoryStream stream, string fileName, string userId, string clientCodes, IMessageBroker messageBroker)
         {
             try
@@ -298,9 +298,16 @@ namespace Backoffice.Web.Services
                 };
             }
         }
+
+        public void Dispose()
+        {
+            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+        }
+
         #endregion
 
         #region Utilities
+
         private bool DataTableHasNull(DataTable table)
         {
             foreach (DataColumn column in table.Columns)

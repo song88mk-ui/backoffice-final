@@ -1,23 +1,11 @@
-﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
-using Backoffice.Shared.OutgoingEngineMessages;
-using Backoffice.Shared.Utilities;
-using Backoffice.Web.Telemetry;
-using ExcelDataReader;
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using System.Data;
+﻿using Backoffice.Web.Telemetry;
+using Serilog;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using Serilog;
 
 namespace Backoffice.Web.Services
 {
-    public class TableauService : ITableauService
+    public class TableauService : ITableauService, IDisposable
     {
         #region Fields
         private readonly HttpClient _httpClient;
@@ -87,6 +75,11 @@ namespace Backoffice.Web.Services
               activity?.Stop();
             }
         }
+        public void Dispose()
+        {
+            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+        }
+
         #endregion
 
     }

@@ -3,11 +3,7 @@ using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Hubs;
 using Microsoft.AspNetCore.SignalR;
-using RabbitMQ.Client.Events;
 using Serilog;
-using System.Drawing;
-using System.Net;
-using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
@@ -16,21 +12,18 @@ namespace Backoffice.Web.Middleware
     public class RabbitMQMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IMessageBroker _messageBrokerHk;
-        //private readonly IMessageBroker _messageBrokerSa;
+        private readonly IMessageBroker _messageBroker;
         private readonly IHubContext<BoHub> _boHub;
 
         public RabbitMQMiddleware(RequestDelegate next, IHubContext<BoHub> boHub, IMessageBroker messageBroker, IConfiguration config)
         {
             _next = next;
-            _messageBrokerHk = messageBroker;
-            //_messageBrokerSa = messageBroker;
+            _messageBroker = messageBroker;
             _boHub = boHub;
 
-            _messageBrokerHk.Connect(config.GetSection($"MessageBroker:HK").Get<MessageBrokerCredentialModel>());
-            //_messageBrokerSa.Connect(config.GetSection($"MessageBroker:SA").Get<MessageBrokerCredentialModel>());
+            _messageBroker.Connect(config.GetSection($"MessageBroker:HK").Get<MessageBrokerCredentialModel>());
 
-            _messageBrokerHk.MessageReceived += async (sender, e) =>
+            _messageBroker.MessageReceived += async (sender, e) =>
             {
                 var payload = Encoding.UTF8.GetString(e.Body);
                 var messageType = e.BasicProperties.Type;
@@ -40,16 +33,6 @@ namespace Backoffice.Web.Middleware
                     await SignalRSendMessage(messageType, payload, "HK");
                 }
             };
-            //_messageBrokerHk.MessageReceived += async (sender, e) =>
-            //{
-            //    var payload = Encoding.UTF8.GetString(e.Body);
-            //    var messageType = e.BasicProperties.Type;
-
-            //    if (e.RoutingKey.StartsWith("r.oe.bm.engine."))
-            //    {
-            //        await SignalRSendMessage(messageType, payload, "SA");
-            //    }
-            //};
         }
 
         public async Task Invoke(HttpContext httpContext)
@@ -104,6 +87,7 @@ namespace Backoffice.Web.Middleware
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
+
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
             }

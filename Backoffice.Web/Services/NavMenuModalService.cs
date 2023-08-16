@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Services
 {
-    public class NavMenuModalService : INavMenuModalService
+    public class NavMenuModalService : INavMenuModalService, IDisposable
     {
         public event Action<ModalResult> OnClose;
         internal event Action CloseModal;
@@ -44,6 +44,11 @@ namespace Backoffice.Web.Services
             modalResult.ModalType = _modalType;
             CloseModal?.Invoke();
             OnClose?.Invoke(modalResult);
+        }
+
+        public void Dispose()
+        {
+            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
         }
     }
 }

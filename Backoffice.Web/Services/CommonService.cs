@@ -12,7 +12,7 @@ using System.Text.Json;
 
 namespace Backoffice.Web.Services
 {
-    public class CommonService : ICommonService
+    public class CommonService : ICommonService, IDisposable
     {
         #region Fields
 
@@ -833,6 +833,12 @@ namespace Backoffice.Web.Services
             return result.TrimEnd('|').Replace("|", "<br>");
         }
 
+        public void Dispose()
+        {
+            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+        }
+
         #endregion
+
     }
 }

@@ -1604,6 +1604,8 @@ namespace Backoffice.Web.Services
         {
             //_httpClient.Dispose();
             //_authenticationService.Dispose();
+
+            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
         }
 
     }

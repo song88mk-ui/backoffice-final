@@ -19,7 +19,7 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Backoffice.Web.Services
 {
-    public class AuthenticationService : IAuthenticationService
+    public class AuthenticationService : IAuthenticationService, IDisposable
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
@@ -676,6 +676,8 @@ namespace Backoffice.Web.Services
         public void Dispose()
         {
             _httpClient.Dispose();
+
+            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
         }
     }
 }
