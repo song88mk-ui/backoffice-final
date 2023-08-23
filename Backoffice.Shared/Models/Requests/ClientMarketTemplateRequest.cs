@@ -12,6 +12,7 @@ namespace Backoffice.Shared.Models.Requests
         }
 
         public Guid ClientId { get; set; }
+        public string ClientCode { get; set; }
         public int SportId { get; set; }
         public int FixtureStatusId { get; set; }
         public List<ClientMarketTemplateModel> MarketTemplates { get; set; }

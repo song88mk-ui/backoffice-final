@@ -14,6 +14,5 @@ namespace Backoffice.Shared.Models.Requests
         public BetStatus NewStatus { get; set; }
         public string Reason { get; set; }
         public long? ModifiedByUserId { get; set; }
-
     }
 }

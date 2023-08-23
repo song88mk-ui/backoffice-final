@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -8,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -896,7 +894,22 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).PostAsync($"client/markettemplate", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
+                {
+                    await Publish(new MessageRequest
+                    {
+                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                        {
+                            ClientId = request.ClientId,
+                            ClientCode = request.ClientCode,
+                            CacheType = CacheType.MarketSortOrder
+                        }),
+                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                        MessageType = "OnMarketSortOrderChange",
+                        RoutingKey = $"r.oe.cachesync.onmarketsortorderchange"
+                    }, "HK");
+
                     return JsonSerializer.Deserialize<BaseResponse<ClientMarketTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)

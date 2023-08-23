@@ -163,6 +163,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var request = new ClientMarketTemplateRequest
             {
                 ClientId = new Guid(_filterModel.ClientId),
+                ClientCode = _filterModel.SelectedClientCode,
                 SportId = _filterModel.SelectedSportId,
                 FixtureStatusId = _filterModel.SelectedFixtureStatusId,
                 MarketTemplates = _marketTemplates.Select(s => new ClientMarketTemplateModel
