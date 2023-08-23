@@ -677,7 +677,21 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).PostAsync($"client/sportsettings", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
+                {
+                    await Publish(new MessageRequest
+                    {
+                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                        {
+                            ClientCode = request.ClientCode,
+                            CacheType = CacheType.SportSortOrder
+                        }),
+                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                        MessageType = "OnSportSortOrderChange",
+                        RoutingKey = $"r.oe.cachesync.onsportsortorderchange"
+                    }, "HK");
+
                     return JsonSerializer.Deserialize<BaseResponse<ClientSportSettingResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
