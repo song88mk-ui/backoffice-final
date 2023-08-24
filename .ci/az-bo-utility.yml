@@ -25,6 +25,7 @@ resources:
 extends:
   template: dotnetservice.yml@bt
   parameters:
+    authToFeeds: false
     runtime: win-x64
     projects:
       - Backoffice.Utility
