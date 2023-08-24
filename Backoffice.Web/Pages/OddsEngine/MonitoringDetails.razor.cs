@@ -12,6 +12,7 @@ using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using Serilog;
 using RabbitMQ.Client.Apigen.Attributes;
 using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
+using System.Drawing.Printing;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -622,7 +623,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                     activeSelections = selections.Where(c => c.IsActive == true && Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
                 }
 
-                var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(GetClientOdds(s, clientCode)))) - 100) / 100;
+				if (activeSelections.Count == 1)
+					activeSelections = selections.Where(c => Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
+
+				var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(GetClientOdds(s, clientCode)))) - 100) / 100;
 
                 return ((int)((margin * 100) + 100)).ToString();
             }
@@ -651,9 +655,13 @@ namespace Backoffice.Web.Pages.OddsEngine
             else
             {
                 newactiveSelections = selections.Where(c => c.IsActive == true).ToList();
-            }
 
-            var computedMargin = $"{(Math.Round(newactiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId).Odds)) - 100) + 100}";
+				if (newactiveSelections.Count == 1)
+					newactiveSelections = selections.Where(c => Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
+
+			}
+
+			var computedMargin = $"{(Math.Round(newactiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId).Odds)) - 100) + 100}";
 
             if (newMargin != computedMargin)
                 newMargin = $"{newMargin} ({computedMargin})";

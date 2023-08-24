@@ -4,6 +4,7 @@ using Backoffice.Web.Components.OddsEngine.Monitoring;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Drawing.Printing;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using static Backoffice.Web.Models.ClientModel;
 
@@ -126,7 +127,11 @@ namespace Backoffice.Web.Components.Common
             if (client == null)
             {
                 var activeSelections = selections.Where(c => c.IsActive == true && Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
-                var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(GetClientOdds(s, clientCode)))) - 100) / 100;
+
+				if (activeSelections.Count == 1)
+					activeSelections = selections.Where(c => Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
+
+				var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(GetClientOdds(s, clientCode)))) - 100) / 100;
 
                 return ((int)((margin * 100) + 100)).ToString();
             }
@@ -134,7 +139,11 @@ namespace Backoffice.Web.Components.Common
             var newMargin = ((int)((client.Item2 * 100) + 100)).ToString();
 
             var newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
-            var computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId)?.Odds ?? 1)) - 100) + 100}";
+
+			if (newActiveSelections.Count == 1)
+				newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
+
+			var computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId)?.Odds ?? 1)) - 100) + 100}";
 
             if (newMargin != computedMargin)
             {
