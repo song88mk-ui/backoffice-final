@@ -319,8 +319,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                         {
                             IsActive = s.IsActive,
                             MarketTemplateId = s.MarketTemplateId,
-                            PrematchSettings = string.IsNullOrEmpty(s.Prematch) ? new List<MarketMargin>() { new MarketMargin { T = -41472000, M = 0 } } : JsonSerializer.Deserialize<List<MarketMargin>>(s.Prematch)?.ToList() ?? new List<MarketMargin>(),
-                            LivematchSettings = string.IsNullOrEmpty(s.Live) ? new List<MarketMargin>() { new MarketMargin { T = 0, M = 0 } } : JsonSerializer.Deserialize<List<MarketMargin>>(s.Live)?.ToList() ?? new List<MarketMargin>(),
+                            PrematchSettings = string.IsNullOrEmpty(s.Prematch) ? new List<MarketMargin>() { new MarketMargin { T = -41472000, M = -1 } } : JsonSerializer.Deserialize<List<MarketMargin>>(s.Prematch)?.ToList() ?? new List<MarketMargin>(),
+                            LivematchSettings = string.IsNullOrEmpty(s.Live) ? new List<MarketMargin>() { new MarketMargin { T = 0, M = -1 } } : JsonSerializer.Deserialize<List<MarketMargin>>(s.Live)?.ToList() ?? new List<MarketMargin>(),
                         }).ToList();
 
                         data.LeagueConfig = new List<LeagueConfigModel>()
