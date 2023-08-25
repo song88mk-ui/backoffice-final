@@ -302,14 +302,14 @@ namespace Backoffice.Web.Pages.OddsEngine
                             {
                                 marketConfig.Prematch = margin.Config;
                                 marketConfig.Live = newConfigTemplateMargins.ConfigTemplateMargins.FirstOrDefault(f => f.MarketTemplateId == margin.MarketTemplateId)?.Config ?? string.Empty;
-                                marketConfig.IsActive = league.LiveTemplateId > 0 ? true : margin.IsActive;
+                                marketConfig.IsActive = !string.IsNullOrEmpty(marketConfig.Live) && league.LiveTemplateId > 0 ? true : margin.IsActive;
                             }
 
                             if (EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Live)
                             {
                                 marketConfig.Live = margin.Config;
                                 marketConfig.Prematch = newConfigTemplateMargins.ConfigTemplateMargins.FirstOrDefault(f => f.MarketTemplateId == margin.MarketTemplateId)?.Config ?? string.Empty;
-                                marketConfig.IsActive = league.PrematchTemplateId > 0 ? true : margin.IsActive;
+                                marketConfig.IsActive = !string.IsNullOrEmpty(marketConfig.Prematch) && league.PrematchTemplateId > 0 ? true : margin.IsActive;
                             }
 
                             marketConfigs.Add(marketConfig);
