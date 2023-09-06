@@ -52,9 +52,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _tableClass = "sport-setting-table";
 
-            _clientSportsSettingsModel = new();
-            _modifiedClientSportsSettingsModel = new();
-            _alertModel = new();
+            _clientSportsSettingsModel = new List<SportSettingSport>();
+            _modifiedClientSportsSettingsModel = new List<SportSettingSport>();
+            _alertModel = new AlertModel();
 
 
             OnSegmentActionAsync = OnSegmentClickEvent;
@@ -119,30 +119,31 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (response.StatusCode == StatusCode.Success)
             {
-                _clientSportsSettingsModel = new();
-                _clientSportsSettingsModel = _modifiedClientSportsSettingsModel
-                .Select((s, spIndex) => new SportSettingSport
-                {
-                    SportId = s.SportId,
-                    SportName = s.SportName,
-                    SortOrder = spIndex + 1,
-                    Segments = s.Segments.Select((se, seIndex) => new SportSettingSegment
-                    {
-                        SegmentName = se.SegmentName,
-                        Leagues = se.Leagues.Select((le, leIndex) => new SportSettingLeague
-                        {
-                            LeagueId = le.LeagueId,
-                            LeagueName = le.LeagueName,
-                            SortOrder = leIndex + 1,
-                            IsActive = le.IsActive
-                        }).ToList(),
-                        SortOrder = seIndex + 1,
-                        IsActive = se.IsActive,
-                        IsOpen = se.IsOpen
-                    }).ToList(),
-                    IsActive = s.IsActive,
-                    IsOpen = s.IsOpen
-                }).ToList();
+                //_clientSportsSettingsModel = _modifiedClientSportsSettingsModel
+                //.Select((s, spIndex) => new SportSettingSport
+                //{
+                //    SportId = s.SportId,
+                //    SportName = s.SportName,
+                //    SortOrder = spIndex + 1,
+                //    Segments = s.Segments.Select((se, seIndex) => new SportSettingSegment
+                //    {
+                //        SegmentName = se.SegmentName,
+                //        Leagues = se.Leagues.Select((le, leIndex) => new SportSettingLeague
+                //        {
+                //            LeagueId = le.LeagueId,
+                //            LeagueName = le.LeagueName,
+                //            SortOrder = leIndex + 1,
+                //            IsActive = le.IsActive
+                //        }).ToList(),
+                //        SortOrder = seIndex + 1,
+                //        IsActive = se.IsActive,
+                //        IsOpen = se.IsOpen
+                //    }).ToList(),
+                //    IsActive = s.IsActive,
+                //    IsOpen = s.IsOpen
+                //}).ToList();
+
+                //_modifiedClientSportsSettingsModel = _clientSportsSettingsModel; //re-bind
 
                 _alertModel = new()
                 {
