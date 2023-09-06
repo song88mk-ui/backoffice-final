@@ -143,7 +143,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                 //    IsOpen = s.IsOpen
                 //}).ToList();
 
-                //_modifiedClientSportsSettingsModel = _clientSportsSettingsModel; //re-bind
+                //_clientSportsSettingsModel = _modifiedClientSportsSettingsModel;
+
+                await GetSports();
 
                 _alertModel = new()
                 {
