@@ -459,7 +459,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                         //if (!(string.IsNullOrEmpty(EditConfigTemplateFilterModel.SearchText) || marketLookup.MarketTemplateName.Contains(EditConfigTemplateFilterModel.SearchText, StringComparison.OrdinalIgnoreCase)))
                         //    continue;
 
-                        var isVisible = ((EditConfigTemplateFilterModel.SelectedMarkets.Any() && MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId == 1) || EditConfigTemplateFilterModel.SelectedMarkets.Contains(MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId.ToString()))
+                        var isVisible = (((EditConfigTemplateFilterModel.SelectedMarkets.Any() || MarketTemplateGroups.Count == 1) && MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId == 1) 
+                                || EditConfigTemplateFilterModel.SelectedMarkets.Contains(MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId.ToString()))
                                                 && (string.IsNullOrEmpty(EditConfigTemplateFilterModel.SearchText) || marketLookup.MarketTemplateName.Contains(EditConfigTemplateFilterModel.SearchText, StringComparison.OrdinalIgnoreCase))
                                                 && EditConfigTemplateFilterModel.SelectedConfigStatus.Contains(marketLookup.IsActive ? "1" : "2");
 
