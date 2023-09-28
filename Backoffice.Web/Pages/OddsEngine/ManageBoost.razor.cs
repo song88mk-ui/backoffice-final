@@ -84,10 +84,54 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var parameters = new ModalParameters();
 
+            var boostedSelectionTranslations = new List<BoostedSelectionTranslation>();
+            foreach(var translation in priceboost.BoostedSelectionTranslations)
+            {
+                boostedSelectionTranslations.Add(translation);
+            }
+
+            var newPriceBoost = new PriceBoostConfigModel
+            {
+                BoostedOdds = priceboost.BoostedOdds,
+                BoostedOddsStr = priceboost.BoostedOddsStr,
+                BoostedSelectionName = priceboost.SelectionName,
+                BoostedSelectionTranslations = boostedSelectionTranslations,
+                BROdds = priceboost.BROdds,
+                ClientCode = priceboost.ClientCode,
+                ClientId = priceboost.ClientId,
+                ClientName = priceboost.ClientName,
+                ClientOdds = priceboost.ClientOdds,
+                CurrentMinute = priceboost.CurrentMinute,
+                CurrentPeriod = priceboost.CurrentPeriod,
+                FixtureName = priceboost.FixtureName,
+                FixtureStartDate = priceboost.FixtureStartDate,
+                FixtureStatusId = priceboost.FixtureStatusId,
+                FixtureTypeId = priceboost.FixtureTypeId,
+                IconFixtureClass = priceboost.IconFixtureClass,
+                LeagueId = priceboost.LeagueId,
+                LeagueName = priceboost.LeagueName,
+                MarketName = priceboost.MarketName,
+                MarketSpecifier = priceboost.MarketSpecifier,
+                MarketTemplateId = priceboost.MarketTemplateId,
+                ProviderFixtureId = priceboost.ProviderFixtureId,
+                Score = priceboost.Score,
+                SegmentId = priceboost.SegmentId,
+                SegmentName = priceboost.SegmentName,
+                SelectionName = priceboost.SelectionName,
+                SelectionSpecifier = priceboost.SelectionSpecifier,
+                SelectionTemplateId = priceboost.SelectionTemplateId,
+                SportId = priceboost.SportId,
+                SportName = priceboost.SportName,
+                TimeStamp = priceboost.TimeStamp,
+                UserId = priceboost.UserId,
+                UserName = priceboost.UserName,
+            };
+
+
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-lg");
             parameters.Add("DialogStyle", "max-width: 90rem;top:50%;transform:translateY(-50%)");
-            parameters.Add("PriceBoostConfigModel", priceboost);
+            parameters.Add("PriceBoostConfigModel", newPriceBoost);
             parameters.Add("PriceBoostConfigModelSerialized", JsonSerializer.Serialize(priceboost));
             parameters.Add("Languages", _languagesModel);
             parameters.Add("Region", _region);

@@ -37,7 +37,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             _isPreloader = true;
             _languages = ModalParameters.TryGet<LanguagesModel>("Languages");
+            
             _priceBoostConfigModel = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
+            
             TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             _isPreloader = false;
         }
@@ -65,18 +67,22 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public async Task OnAddSelection()
         {
-            _priceBoostConfigModel.BoostedSelectionTranslations.Add(new BoostedSelectionTranslation
+            if(_languages.Languages.Count() - _priceBoostConfigModel.BoostedSelectionTranslations.Where(c => c.Language.LanguageCode == string.Empty).Count() > 0)
             {
-                BoostedSelectionName = string.Empty,
-                ClientCode = _priceBoostConfigModel.ClientCode,
-                Language = new Language
+                _priceBoostConfigModel.BoostedSelectionTranslations.Add(new BoostedSelectionTranslation
                 {
-                    LanguageCode = string.Empty,
-                    LanguageName = string.Empty
-                }
-            });
+                    BoostedSelectionName = string.Empty,
+                    ClientCode = _priceBoostConfigModel.ClientCode,
+                    Language = new Language
+                    {
+                        LanguageCode = string.Empty,
+                        LanguageName = string.Empty
+                    }
+                });
 
-            await InvokeAsync(StateHasChanged);
+            }
+
+            //await InvokeAsync(StateHasChanged);
         }
 
         public async Task OnDeleteSelection(BoostedSelectionTranslation selection)
@@ -91,12 +97,13 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             _languages.Languages.Add(prevLanguage);
 
-            await InvokeAsync(StateHasChanged);
+           // await InvokeAsync(StateHasChanged);
         }
 
         public async Task OnCancelModalClick()
         {
             ModalService.Cancel();
+
         }
 
         public async Task OnSaveModalClick()
