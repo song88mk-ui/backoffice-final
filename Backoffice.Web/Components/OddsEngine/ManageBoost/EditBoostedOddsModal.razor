@@ -66,11 +66,14 @@ else
                                             <input type="text" class="form-control" @bind-value="_priceBoostConfigModel.BoostedSelectionName" />
                                         </div>
                                     </div>
-                                    <div class="col-1 p-0">
-                                        <button type="button" class="btn" @onclick="OnAddSelection">
-                                            <i class="fa fa-plus-circle"></i>
-                                        </button>
-                                    </div>
+                                    @if (_languages.Languages.Any())
+                                    {
+                                        <div class="col-1 p-0">
+                                            <button type="button" class="btn" @onclick="OnAddSelection">
+                                                <i class="fa fa-plus-circle"></i>
+                                            </button>
+                                        </div>
+                                    }
                                     <div class="col-1 p-0">
                                         <button type="button" class="btn" disabled>
                                             <i class="fa fa-trash"></i>

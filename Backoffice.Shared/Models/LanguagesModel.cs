@@ -17,16 +17,6 @@ namespace Backoffice.Shared.Models
                 },
                 new Language
                 {
-                    LanguageCode = "MS",
-                    LanguageName = "Malay"
-                },
-                new Language
-                {
-                    LanguageCode = "LO",
-                    LanguageName = "Lao"
-                },
-                new Language
-                {
                     LanguageCode = "KO",
                     LanguageName = "Korean"
                 },
@@ -37,23 +27,13 @@ namespace Backoffice.Shared.Models
                 },
                 new Language
                 {
-                    LanguageCode = "ZHT",
-                    LanguageName = "Traditional Chinese"
-                },
-                new Language
-                {
                     LanguageCode = "VI",
                     LanguageName = "Vietnamese"
                 },
                 new Language
                 {
                     LanguageCode = "ID",
-                    LanguageName = "Indonesian"
-                },
-                new Language
-                {
-                    LanguageCode = "KM",
-                    LanguageName = "Khmer"
+                    LanguageName = "Bahasa Indonesia"
                 },
                 new Language
                 {
@@ -62,8 +42,13 @@ namespace Backoffice.Shared.Models
                 },
                 new Language
                 {
-                    LanguageCode = "SW",
-                    LanguageName = "Swahili"
+                    LanguageCode = "PT",
+                    LanguageName = "Portuguese"
+                },
+                new Language
+                {
+                    LanguageCode = "ES",
+                    LanguageName = "Spanish"
                 }
             };
         }

@@ -83,6 +83,14 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             _priceBoostConfigModel.BoostedSelectionTranslations.Remove(selection);
 
+            var prevLanguage = new Language
+            {
+                LanguageCode = selection.Language.LanguageCode,
+                LanguageName = selection.Language.LanguageName
+            };
+
+            _languages.Languages.Add(prevLanguage);
+
             await InvokeAsync(StateHasChanged);
         }
 

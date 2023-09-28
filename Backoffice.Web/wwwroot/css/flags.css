@@ -573,6 +573,11 @@
     width: 32px;
 }
 
+.flag-ja {
+    content: url('../icons/svg/flags/ja.svg');
+    width: 32px;
+}
+
 .flag-je {
     content: url('../icons/svg/flags/je.svg');
     width: 32px;
@@ -628,8 +633,8 @@
     width: 32px;
 }
 
-.flag-kr {
-    content: url('../icons/svg/flags/kr.svg');
+.flag-ko {
+    content: url('../icons/svg/flags/ko.svg');
     width: 32px;
 }
 
@@ -1188,8 +1193,8 @@
     width: 32px;
 }
 
-.flag-us {
-    content: url('../icons/svg/flags/us.svg');
+.flag-en {
+    content: url('../icons/svg/flags/en.svg');
     width: 32px;
 }
 
@@ -1265,6 +1270,11 @@
 
 .flag-za {
     content: url('../icons/svg/flags/za.svg');
+    width: 32px;
+}
+
+.flag-zh {
+    content: url('../icons/svg/flags/zh.svg');
     width: 32px;
 }
 
