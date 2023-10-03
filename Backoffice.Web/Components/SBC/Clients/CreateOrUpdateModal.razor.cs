@@ -329,7 +329,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                 {
                     if (setting.BetSettingSoccer.MaxPerGame > 0 && setting.BetSettingSoccer.MaxPerGame < setting.BetSettingSoccer.MaxPerTicket)
                     {
-                        var message = $"MaxPerGame must be greater than or equal {setting.BetSettingSoccer.MaxPerTicket}";
+                        var message = $"MaxPerGame must be greater than or equal {setting.BetSettingSoccer.MaxPerTicket} - {setting.CurrencyCode}";
                         if (!Alerts.Any(a => a.Message == message))
                         {
                             Alerts.Add(new AlertModel
@@ -343,7 +343,7 @@ namespace Backoffice.Web.Components.SBC.Clients
 
                     if (setting.BetSettingAllSports.MaxPerGame > 0 && setting.BetSettingAllSports.MaxPerGame < setting.BetSettingAllSports.MaxPerTicket)
                     {
-                        var message = $"MaxPerGame must be greater than or equal {setting.BetSettingAllSports.MaxPerTicket}";
+                        var message = $"MaxPerGame must be greater than or equal {setting.BetSettingAllSports.MaxPerTicket} - {setting.CurrencyCode}";
                         if (!Alerts.Any(a => a.Message == message))
                         {
                             Alerts.Add(new AlertModel
@@ -357,7 +357,7 @@ namespace Backoffice.Web.Components.SBC.Clients
 
                     if (setting.BetSettingCricket.MaxPerGame > 0 && setting.BetSettingCricket.MaxPerGame < setting.BetSettingCricket.MaxPerTicket)
                     {
-                        var message = $"MaxPerGame must be greater than or equal {setting.BetSettingCricket.MaxPerTicket}";
+                        var message = $"MaxPerGame must be greater than or equal {setting.BetSettingCricket.MaxPerTicket} - {setting.CurrencyCode}";
                         if (!Alerts.Any(a => a.Message == message))
                         {
                             Alerts.Add(new AlertModel
