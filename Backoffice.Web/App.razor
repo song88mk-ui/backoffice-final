@@ -25,33 +25,33 @@
 
     private async Task OnNavigateAsync(NavigationContext args)
     {
-        var activity = System.Diagnostics.Activity.Current;
+        //var activity = System.Diagnostics.Activity.Current;
         try
         {
-            Log.Information($"Current page: {NavigationManager.Uri}");
-            if (!string.IsNullOrEmpty(args.Path))
-                Log.Information($"{args.Path}");
+            //Log.Information($"Current page: {NavigationManager.Uri}");
+            //if (!string.IsNullOrEmpty(args.Path))
+            //    Log.Information($"{args.Path}");
 
             var state = await ((AuthStateProvider)_authState).GetAuthenticationStateAsync();
 
-            if (state.User.Identity?.IsAuthenticated ?? false)
-                Log.Information($"[App.Razor] [Authorized] {NavigationManager.Uri}");
-            else
-                Log.Warning($"[App.Razor] [Unauthorized] {NavigationManager.Uri}");
+            //if (state.User.Identity?.IsAuthenticated ?? false)
+            //    Log.Information($"[App.Razor] [Authorized] {NavigationManager.Uri}");
+            //else
+            //    Log.Warning($"[App.Razor] [Unauthorized] {NavigationManager.Uri}");
 
-            if (activity != null && activity.IsAllDataRequested) {
-              activity.SetTag("navigation.context.uri", NavigationManager.Uri);
-              activity.SetTag("navigation.context.path", args.Path);
-              activity.SetTag("sate.user.identity.authenticated", state.User.Identity?.IsAuthenticated);
-              activity.SetStatus(ActivityStatusCode.Ok);
-            }
+            //if (activity != null && activity.IsAllDataRequested) {
+            //  activity.SetTag("navigation.context.uri", NavigationManager.Uri);
+            //  activity.SetTag("navigation.context.path", args.Path);
+            //  activity.SetTag("sate.user.identity.authenticated", state.User.Identity?.IsAuthenticated);
+            //  activity.SetStatus(ActivityStatusCode.Ok);
+            //}
         }
         catch (Exception ex)
         {
-            if (activity != null && activity.IsAllDataRequested)
-            {
-              activity.SetStatus(ActivityStatusCode.Error, ex.Message);
-            }
+            //if (activity != null && activity.IsAllDataRequested)
+            //{
+            //  activity.SetStatus(ActivityStatusCode.Error, ex.Message);
+            //}
             Log.Error(ex.Message);
             if (ex.StackTrace != null)
                 Log.Error(ex.StackTrace.ToString());

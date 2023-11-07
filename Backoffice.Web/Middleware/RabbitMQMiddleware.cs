@@ -50,19 +50,19 @@ namespace Backoffice.Web.Middleware
                 {
                     case "OnOddsChange":
                         var oddschange = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(payload);
-                        hubClients.SendAsync("onoddschange", oddschange).Wait();
+                        await hubClients.SendAsync("onoddschange", oddschange);
                         break;
                     case "OnBetStopFixture":
                         var betStopFixture = JsonSerializer.Deserialize<OnExternalBetStopFixtureMessage>(payload);
-                        hubClients.SendAsync("onbetstopfixture", betStopFixture).Wait();
+                        await hubClients.SendAsync("onbetstopfixture", betStopFixture);
                         break;
                     case "OnBetStopGlobal":
                         var betStopGlobal = JsonSerializer.Deserialize<OnExternalBetStopGlobalMessage>(payload);
-                        hubClients.SendAsync("onbetstopglobal", betStopGlobal).Wait();
+                        await hubClients.SendAsync("onbetstopglobal", betStopGlobal);
                         break;
                     case "OnSignIn":
                         var signin = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(payload);
-                        hubClients.SendAsync("onsignin", signin).Wait();
+                        await hubClients.SendAsync("onsignin", signin);
                         break;
                     case "OnNewNotification":
                         var notificationsModel = JsonSerializer.Deserialize<NotificationsDetailsModel>(payload);
@@ -80,7 +80,7 @@ namespace Backoffice.Web.Middleware
                             ClaimsType = notificationsModel.ClaimType,
                             ClientCode = notificationsModel.ClientCode,
                         };
-                        hubClients.SendAsync("Notification", notifPayload).Wait();
+                        await hubClients.SendAsync("Notification", notifPayload);
                         break;
                 }
             }
