@@ -20,6 +20,7 @@
                     const result = await Blazor.reconnect();
                     if (!result) {
                         // The server was reached, but the connection was rejected; reload the page.
+                        console.log('The server was reached, but the connection was rejected; reload the page.');
                         location.reload();
                         return;
                     }
