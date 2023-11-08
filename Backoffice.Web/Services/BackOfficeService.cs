@@ -291,7 +291,8 @@ namespace Backoffice.Web.Services
                         return new BaseResponse<ActivityLogResponse>
                         {
                             StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})",
+                            Result = new ActivityLogResponse{ActivityLogs = new List<ActivityLogModel>()}
                         };
                     }
                 }
