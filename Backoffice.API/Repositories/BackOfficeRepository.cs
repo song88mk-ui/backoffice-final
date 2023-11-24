@@ -342,31 +342,31 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var query = GetClientInformation().Where(x => (x.ApplicationId == (int)Application2.SBC || x.ApplicationId == (int)Application.Sportsbook));
+                var query = GetClientInformation().Where(c => (c.ApplicationId == (int)Application2.SBC || c.ApplicationId == (int)Application.Sportsbook));
 
                 if (brands != null)
                 {
-                    query = query.Where(x => brands.Contains(x.Brand));
+                    query = query.Where(c => brands.Contains(c.Brand));
                 }
                 if (!string.IsNullOrEmpty(request.Search))
-                    query = query.Where(c => c.Name.Contains(request.Search));
+                    query = query.Where(c => c.Name.Contains(request.Search, StringComparison.InvariantCultureIgnoreCase));
 
                 // sort order
                 if (request.SortBy == ClientSorting.SortByBusinessNameAsc)
                 {
-                    query = query.OrderBy(c => c.Name);
+                    query = query.OrderBy(o => o.Name);
                 }
                 else if (request.SortBy == ClientSorting.SortByBusinessNameDesc)
                 {
-                    query = query.OrderByDescending(c => c.Name);
+                    query = query.OrderByDescending(o => o.Name);
                 }
                 else if (request.SortBy == ClientSorting.SortByCreatedDateAsc)
                 {
-                    query = query.OrderBy(c => c.CreatedDate);
+                    query = query.OrderBy(o => o.CreatedDate);
                 }
                 else if (request.SortBy == ClientSorting.SortByCreatedDateDesc)
                 {
-                    query = query.OrderByDescending(c => c.CreatedDate);
+                    query = query.OrderByDescending(o => o.CreatedDate);
                 }
 
                 var totalClientCount = query.Count();
