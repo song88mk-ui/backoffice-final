@@ -51,19 +51,25 @@
     <ErrorContent Context="errorException">
         <div id="blazor-error-ui">
             <div class="blazor-error-body">
-                <script>
-                    console.log(@errorException)
-                </script>
+                @{
+                    LogError(errorException);
+                }
             </div>
         </div>
     </ErrorContent>
 </ErrorBoundary>
 
 @code {
+    [Inject] public IJSRuntime JsRuntime { get; set; }
     private ErrorBoundary? _errorBoundary;
 
     protected override void OnParametersSet()
     {
         _errorBoundary?.Recover();
+    }
+
+    private async void LogError(Exception ex)
+    {
+        await JsRuntime.InvokeAsync<string>("console.log", $"{ex.Message}\n{ex.StackTrace}");
     }
 }
