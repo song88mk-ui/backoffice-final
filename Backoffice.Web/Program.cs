@@ -194,7 +194,6 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("admin-maintenance", policy => policy.RequireClaim($"{AdminPermission.Admin_Maintenance.ToString().Replace('_', '.')}",
         $"{(int)Access.Edit}", $"{(int)Access.View}"));
     #endregion
-
 });
 
 builder.Services.AddBlazoredLocalStorage();

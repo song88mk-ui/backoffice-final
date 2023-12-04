@@ -21,14 +21,16 @@
                     if (!result) {
                         // The server was reached, but the connection was rejected; reload the page.
                         console.log('The server was reached, but the connection was rejected; reload the page.');
+                        console.log('Boot - Reconnecting ' + result)
                         location.reload();
                         return;
                     }
 
                     // Successfully reconnected to the server.
                     return;
-                } catch {
+                } catch (ex){
                     // Didn't reach the server; try again.
+                    console.log('Boot Error - ' + ex)
                 }
             }
 
@@ -47,8 +49,12 @@
 
     Blazor.start({
         reconnectionHandler: {
-            onConnectionDown: () => currentReconnectionProcess ??= startReconnectionProcess(),
+            onConnectionDown: () => {
+                console.log('Blazor is down');
+                currentReconnectionProcess ??= startReconnectionProcess();
+            },
             onConnectionUp: () => {
+                console.log('Blazor is up');
                 currentReconnectionProcess?.cancel();
                 currentReconnectionProcess = null;
             }

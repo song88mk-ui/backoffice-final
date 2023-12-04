@@ -35,7 +35,6 @@ namespace Backoffice.Web.Services
         {
             try
             {
-
                 // read excel file
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
