@@ -1,18 +1,12 @@
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
-using Backoffice.Web.Models;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
-using Newtonsoft.Json.Linq;
 using Serilog;
-using System.Security.Claims;
 using System.Text.Json;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
 namespace Backoffice.Web.Pages.Authentication
@@ -135,7 +129,6 @@ namespace Backoffice.Web.Pages.Authentication
                 TempData["HasError"] = true;
                 ModelState.AddModelError(string.Empty, ErrorMessage);
             }
-
             if (!string.IsNullOrEmpty(_httpContextAccessor.HttpContext.Session.GetString("ErrorMessage")))
             {
                 TempData["HasError"] = true;

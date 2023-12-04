@@ -257,13 +257,11 @@ namespace Backoffice.Web.Shared
                 }
             }
         }
-
         public void OnSportClickEvent(SportClickCallbackModel model)
         {
             SelectedSport = model;
             HeaderNavMenuReference.ActivateMenu("monitoring");
         }
-
         public async ValueTask DisposeAsync()
         {
             if (_hubConnection != null)
@@ -316,7 +314,6 @@ namespace Backoffice.Web.Shared
         #endregion
 
         #region Utilities
-
         private async Task Subscribe()
         {
             try
@@ -371,7 +368,6 @@ namespace Backoffice.Web.Shared
                         (message.Page, message.Details, true));
             }
         }
-
 
         private async Task<PermissionResponse> GetPermissionList()
         {

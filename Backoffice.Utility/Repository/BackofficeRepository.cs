@@ -1,32 +1,28 @@
 ﻿using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Data.Backoffice.Entities;
-using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Shared.Utilities;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Security.Claims;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Transactions;
-using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models.Response;
-using System.Linq;
-using OfficeOpenXml;
-using LicenseContext = OfficeOpenXml.LicenseContext;
-using OfficeOpenXml.Style;
-using System.Text.Json;
-using System.IO;
-using Microsoft.WindowsAzure.Storage;
-using Backoffice.Shared.Utilities;
-using System.Text;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore.Query;
-using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
+using LicenseContext = OfficeOpenXml.LicenseContext;
 
 namespace Backoffice.Utility.Repository
 {

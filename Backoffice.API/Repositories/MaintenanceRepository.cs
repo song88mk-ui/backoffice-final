@@ -8,7 +8,6 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using System;
