@@ -1,4 +1,5 @@
-﻿(() => {
+﻿function bootInit() {
+    console.log("Boot js start")
     const maximumRetryCount = 3;
     const retryIntervalMilliseconds = 5000;
 
@@ -60,4 +61,6 @@
             }
         }
     });
-})();
+};
+
+bootInit();
