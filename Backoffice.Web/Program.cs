@@ -222,7 +222,7 @@ builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>(client =>
     client.DefaultRequestHeaders.Add("x-region", configuration["API:Region"]);
 });
 builder.Services.AddScoped<ICommonService, CommonService>();
-builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+builder.Services.AddSingleton<AuthenticationStateProvider, AuthStateProvider>();
 builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
 builder.Services.AddScoped<ToastService>();
 
