@@ -253,7 +253,7 @@ namespace Backoffice.Web.Shared
                         Log.Error(ex.StackTrace.ToString());
 
                     toasterService.AddToast(Toast.NewToast
-                            ("Error", ex.Message));
+                            ("Rebder Error", ex.Message));
                 }
             }
         }
