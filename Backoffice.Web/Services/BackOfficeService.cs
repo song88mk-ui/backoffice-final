@@ -351,7 +351,6 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-
         public async Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request)
         {
             try

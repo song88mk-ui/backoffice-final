@@ -118,7 +118,7 @@
                                         <td class="px-4" @onclick="() => OnEditTemplateClickEvent(configTemplate)">@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()) != null ? $"{Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()).Name}" : "")</td>
                                         <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@($"{configTemplate.ClientsCount} Client{(configTemplate.ClientsCount > 1 ? "s" : "")}")</td>
                                         <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@($"{configTemplate.LeaguesCount} League{(configTemplate.LeaguesCount > 1 ? "s" : "")}")</td>
-                                        <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@(configTemplate.Timestamp.ToString("hh:mm dd/mm/yyyy"))</td>
+                                        <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@(configTemplate.Timestamp.ToString("HH:mm dd/MM/yyyy"))</td>
                                         <td>
                                             <div class="manage-cell">
                                                 <AuthorizeView Policy="sbc-config-canedit">
