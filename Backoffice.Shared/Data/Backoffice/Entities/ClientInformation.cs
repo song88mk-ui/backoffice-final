@@ -59,5 +59,6 @@ namespace Backoffice.Shared.Data.Backoffice.Entities
         public string Email { get; set; }
         public bool IsEmailNotification { get; set; }
         public int BetSlipMaxSelection { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
