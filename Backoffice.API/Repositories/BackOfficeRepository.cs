@@ -343,7 +343,8 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var query = GetClientInformation().Where(c => (c.ApplicationId == (int)Application2.SBC || c.ApplicationId == (int)Application.Sportsbook));
+                var inactiveClients = new List<string> { "10I", "GUR", "10C", "10B", "10D", "10E", "10G", "10K", "10M", "10N", "10T", "10Z", "MAF" };
+                var query = GetClientInformation().Where(c => (c.ApplicationId == (int)Application2.SBC || c.ApplicationId == (int)Application.Sportsbook) && !inactiveClients.Contains(c.Brand));
 
                 if (brands != null)
                 {
