@@ -1226,7 +1226,7 @@ namespace Backoffice.API.Repositories
                             int retry = 0;
                             while (retry < 3)
                             {
-                                var newPlatformBettingResponse = await _platformRepository.ProcessBackOfficeClientBetConfig(betConfigRequest, request.Region);
+                                var newPlatformBettingResponse = await _platformRepository.ProcessBackofficeClientBetConfig(betConfigRequest, request.Region);
                                 if (newPlatformBettingResponse.StatusCode == StatusCode.Success)
                                     break;
                                 retry += 1;

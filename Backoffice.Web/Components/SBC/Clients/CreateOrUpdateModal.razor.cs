@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.SBC.Clients
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
@@ -488,7 +488,7 @@ namespace Backoffice.Web.Components.SBC.Clients
 
                 }
 
-                var response = (await BackOfficeService.AddOrUpdateClient(clientRequest));
+                var response = (await BackofficeService.AddOrUpdateClient(clientRequest));
 
                 if (response.Result)
                 {

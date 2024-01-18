@@ -18,7 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         [Inject] ITradingService TradingService { get; set; }
         [Inject] IModalService ModalService { get; set; }
-        [Inject] IBackofficeService BackOfficeService { get; set; }
+        [Inject] IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] ModalParameters ModalParameters { get; set; }
@@ -243,7 +243,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     }
                 }                
 
-                var addLogResponse = await BackOfficeService.AddActivityLogList(activityLogList);
+                var addLogResponse = await BackofficeService.AddActivityLogList(activityLogList);
 
                 //await JsRuntime.InvokeVoidAsync("ShowNotication", SaveButton, "Priceboost has been updated");
 

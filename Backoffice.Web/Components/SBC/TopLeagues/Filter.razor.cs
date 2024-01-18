@@ -8,7 +8,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
     public partial class Filter : IDisposable
     {
         #region Properties
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnInitCallback { get; set; }
@@ -41,7 +41,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 IsReset = false
             };
 
-            var clients = (await BackOfficeService.GetClients()).Result;
+            var clients = (await BackofficeService.GetClients()).Result;
 
             if (clients != null && clients.Clients.Any())
             {
@@ -78,7 +78,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 TopLeaguesFilterModel.ClientIds = string.Join(",", selectedClients);
             }
 
-            var sports = (await BackOfficeService.GetSportsAsync()).Result;
+            var sports = (await BackofficeService.GetSportsAsync()).Result;
 
             if (sports != null && sports.SportLookup.Any())
             {

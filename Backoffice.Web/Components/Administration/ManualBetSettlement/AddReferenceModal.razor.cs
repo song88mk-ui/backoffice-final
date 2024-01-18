@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         //[Inject] private IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
@@ -90,7 +90,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
                 await InvokeAsync(StateHasChanged);
 
-                var response = (await BackOfficeService.GetManualBetDetails(new ManualBetDetailsRequest()
+                var response = (await BackofficeService.GetManualBetDetails(new ManualBetDetailsRequest()
                 {
                     BetIds = new List<string> { betIdString }
                 })).Result;

@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
 
@@ -473,7 +473,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                         });
                     }
 
-                    await BackOfficeService.AddActivityLogList(ActivityLogs);
+                    await BackofficeService.AddActivityLogList(ActivityLogs);
                 }
 
                 IsPreLoader = false;

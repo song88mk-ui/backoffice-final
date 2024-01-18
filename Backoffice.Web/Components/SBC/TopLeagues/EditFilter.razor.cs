@@ -8,7 +8,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [Parameter] public int ClientId { get; set; }
         [Parameter] public int SportId { get; set; }
@@ -30,7 +30,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             SelectedLeague = new LeagueModel();
             SportsTree = new SportsTreeModel();
 
-            SportsTree = (await BackOfficeService.GetSportstreeByClientId(ClientId)).Result;
+            SportsTree = (await BackofficeService.GetSportstreeByClientId(ClientId)).Result;
 
             if (SportsTree != null)
                 SelectedSport = SportsTree.Sports.FirstOrDefault(s => s.SportId == SportId);

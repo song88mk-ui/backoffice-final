@@ -11,7 +11,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }
@@ -60,7 +60,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 ClientIdSelectedModel = new List<ClientIdSelectedModel>()
             };
 
-            var clients = (await BackOfficeService.GetClients()).Result;
+            var clients = (await BackofficeService.GetClients()).Result;
 
             if (clients != null)
             {
@@ -149,7 +149,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                     TopLeagues = topSetUp
                 };
 
-                var result = await BackOfficeService.CopyTopLeaguesAsync(CopyTopLeaguesRequest);
+                var result = await BackofficeService.CopyTopLeaguesAsync(CopyTopLeaguesRequest);
 
                 if (result.Result)
                 {

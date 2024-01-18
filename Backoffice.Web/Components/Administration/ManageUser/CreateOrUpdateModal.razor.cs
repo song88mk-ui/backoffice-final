@@ -18,7 +18,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         #region Properties
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -55,7 +55,7 @@ namespace Backoffice.Web.Components.Administration.ManageUser
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
             UserRegister = ModalParameters.TryGet<UserRegisterModel>("UserModel");
 
-            var clients = (await BackOfficeService.GetClients()).Result;
+            var clients = (await BackofficeService.GetClients()).Result;
 
             if (clients != null && clients.Clients.Any())
             {

@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
@@ -210,7 +210,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
                     if (onActivityLogListMessage.OnActivityLogMessages.Any())
                     {
-                        var activityLogResponse = await BackOfficeService.AddActivityLogList(onActivityLogListMessage);
+                        var activityLogResponse = await BackofficeService.AddActivityLogList(onActivityLogListMessage);
                     }
 
 

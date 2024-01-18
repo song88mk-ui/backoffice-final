@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         [Inject] IModalService ModalService { get; set; }
         [Inject] ITradingService TradingService { get; set; }
-        [Inject] IBackofficeService BackOfficeService { get; set; }
+        [Inject] IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
@@ -100,7 +100,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     Translations = PriceBoost.BoostedSelectionTranslations
                 };
 
-                var deleteLogResponse = await BackOfficeService.AddActivityLog(new ActivityLogModel()
+                var deleteLogResponse = await BackofficeService.AddActivityLog(new ActivityLogModel()
                 {
                     Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace('_', '.'),
                     Payload = $"{PriceBoost.ClientCode}.{PriceBoost.SportId}.{PriceBoost.SegmentId}.{PriceBoost.LeagueId}",

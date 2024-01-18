@@ -9,7 +9,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
         [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }

@@ -9,7 +9,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [Parameter] public EventCallback<string> OnMarketChangedCallback { get; set; }
         [Parameter] public EventCallback OnCloseMarketCallback { get; set; }
@@ -26,7 +26,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         {
             MarketTemplates = new List<SelectListItemModel<string>>();
 
-            var mainMarketTemplateResponse = await BackOfficeService.GetTopMarkets(SportId);
+            var mainMarketTemplateResponse = await BackofficeService.GetTopMarkets(SportId);
 
             if (mainMarketTemplateResponse.StatusCode == StatusCode.Success)
             {

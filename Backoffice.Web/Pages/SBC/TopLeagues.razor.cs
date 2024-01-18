@@ -15,7 +15,7 @@ namespace Backoffice.Web.Pages.SBC
         #region Properties
 
         [Inject] public IModalService ModalService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
@@ -131,7 +131,7 @@ namespace Backoffice.Web.Pages.SBC
             TopLeaguesList = null;
             FilterModel = null;
 
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -156,7 +156,7 @@ namespace Backoffice.Web.Pages.SBC
                 LanguageCode = "en"
             };
 
-            var topLeaguesResponse = await BackOfficeService.GetTopLeaguesAsync(GetTopLeaguesRequest);
+            var topLeaguesResponse = await BackofficeService.GetTopLeaguesAsync(GetTopLeaguesRequest);
 
             if (topLeaguesResponse.StatusCode != Backoffice.Shared.Enums.StatusCode.Success)
             {

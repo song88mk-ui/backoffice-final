@@ -14,7 +14,7 @@ namespace Backoffice.Web.Pages.Administration
     {
         #region Properties
 
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
@@ -93,7 +93,7 @@ namespace Backoffice.Web.Pages.Administration
                     }
                     else
                     {
-                        var response = (await BackOfficeService.GetResendSettlementBetDetails(new ResendSettlementBetDetailRequest()
+                        var response = (await BackofficeService.GetResendSettlementBetDetails(new ResendSettlementBetDetailRequest()
                         {
                             BetId = betId.ToString()
                         })).Result;
@@ -222,7 +222,7 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }

@@ -14,7 +14,7 @@ namespace Backoffice.Web.Shared
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public INavMenuModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel? UserModel { get; set; }
@@ -236,7 +236,7 @@ namespace Backoffice.Web.Shared
 
         public void Dispose()
         {
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
         }
 
         #endregion
@@ -245,7 +245,7 @@ namespace Backoffice.Web.Shared
 
         private async Task<List<SportModel>> GetSportsTreeMenu()
         {
-            var response = await BackOfficeService.GetSportsTreeAsync((int)FixtureType.Match);
+            var response = await BackofficeService.GetSportsTreeAsync((int)FixtureType.Match);
             var result = new List<SportModel>();
 
             if (response.StatusCode == StatusCode.Success)

@@ -17,7 +17,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         #region Properties
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
@@ -72,7 +72,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         {
             IsPreLoader = true;
 
-            var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
+            var response = (await BackofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = AdminPermission.Admin_ManageUserGroups.ToString().Replace("_", "."),
                 Payload = $"{UserGroupId}",

@@ -63,7 +63,7 @@ namespace Backoffice.API.Repositories
 
         }
 
-        public async Task<BaseResponse<StatusCode>> ProcessBackOfficeClientBetConfig(AddOrUpdateBetConfigRequest request, string region)
+        public async Task<BaseResponse<StatusCode>> ProcessBackofficeClientBetConfig(AddOrUpdateBetConfigRequest request, string region)
         {
             try
             {

@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Properties
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -151,7 +151,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     state = ConfigState.Assigned;
                 }
 
-                var response = await BackOfficeService.SetLeagueState(state, new ConfigSetLeagueStateRequest()
+                var response = await BackofficeService.SetLeagueState(state, new ConfigSetLeagueStateRequest()
                 {
                     PrematchTemplateId = _prematchSelectedItem?.Value ?? -1,
                     LiveTemplateId = _liveSelectedItem?.Value ?? -1,
@@ -335,7 +335,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 TimeStamp = DateTime.UtcNow
                             };
 
-                            await BackOfficeService.AddActivityLog(activityLog);
+                            await BackofficeService.AddActivityLog(activityLog);
                         }
                     });
                     Parallel.ForEach(distinctLiveTemplates, async (item) =>
@@ -377,7 +377,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 TimeStamp = DateTime.UtcNow
                             };
 
-                            await BackOfficeService.AddActivityLog(activityLog);
+                            await BackofficeService.AddActivityLog(activityLog);
                         }
                     });
 
@@ -424,7 +424,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private async Task<List<SelectListItemModel<long>>> GetTemplates(int sportId, int scopeId)
         {
             IsPreLoader = true;
-            var response = await BackOfficeService.GetConfigTemplate(string.Empty, sportId, scopeId);
+            var response = await BackofficeService.GetConfigTemplate(string.Empty, sportId, scopeId);
 
             IsPreLoader = false;
             if (response.StatusCode == StatusCode.Success && response.Result.Count > 0)
@@ -449,7 +449,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private async Task<ConfigTemplateMarginModel> GetConfigTemplateMargin(long configTemplateId)
         {
-            var response = await BackOfficeService.GetConfigTemplateMargin(configTemplateId);
+            var response = await BackofficeService.GetConfigTemplateMargin(configTemplateId);
 
             if (response.StatusCode == StatusCode.Success)
                 return response.Result;

@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
@@ -85,7 +85,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             IsPreLoader = true;
 
             ActivityLogs = new List<ActivityLogModel>();
-            var response = await BackOfficeService.GetActivityLogs(new ActivityLogRequest
+            var response = await BackofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace("_", "."),
                 Payload = $"{ClientCode}",

@@ -13,7 +13,7 @@ namespace Backoffice.Web.Components.Administration.ResendSettlement
         #region Properties
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
@@ -39,7 +39,7 @@ namespace Backoffice.Web.Components.Administration.ResendSettlement
         {
             if (ResendSettlementModel.Any())
             {
-                var response = await BackOfficeService.ResendSettlement(new ResendSettlementRequest()
+                var response = await BackofficeService.ResendSettlement(new ResendSettlementRequest()
                 {
                     Bets = ResendSettlementModel.Select(s =>
                         new ResendSettlementRequest.ResendSettlementRequestData()

@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
@@ -178,7 +178,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                     SortOrder = s.SortOrder
                 }).ToList();
 
-            await BackOfficeService.PostClientTopFixtures(new PostClientTopFixtureRequest()
+            await BackofficeService.PostClientTopFixtures(new PostClientTopFixtureRequest()
             {
                 ClientId = TopFixture.ClientIdRef,
                 TopFixtures = topFixtures

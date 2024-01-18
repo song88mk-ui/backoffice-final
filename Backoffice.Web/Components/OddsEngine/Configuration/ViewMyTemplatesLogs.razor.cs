@@ -18,7 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Properties
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
@@ -222,7 +222,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 StateHasChanged();
             }
             ActivitLogs = new List<ActivityLogModel>();
-            var response = await BackOfficeService.GetActivityLogs(new ActivityLogRequest
+            var response = await BackofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                 Payload = BuildPayload(filterModel),

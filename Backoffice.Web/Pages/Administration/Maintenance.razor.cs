@@ -9,7 +9,7 @@ namespace Backoffice.Web.Pages.Administration
     public partial class Maintenance : IDisposable
     {
         #region Properties
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
@@ -74,7 +74,7 @@ namespace Backoffice.Web.Pages.Administration
         public void Dispose()
         {
             AlertModel = null;
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -89,7 +89,7 @@ namespace Backoffice.Web.Pages.Administration
                 IsPreLoader = true;
             }
 
-            var result = await BackOfficeService.GetMaintenance();
+            var result = await BackofficeService.GetMaintenance();
 
             if (result.StatusCode == Backoffice.Shared.Enums.StatusCode.Success)
             {

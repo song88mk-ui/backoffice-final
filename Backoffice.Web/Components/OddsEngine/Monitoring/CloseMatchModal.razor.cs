@@ -17,7 +17,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
@@ -49,7 +49,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                 Raw = string.Empty,
             };
 
-            var result = await BackOfficeService.DeactivateFixtureMarkets(request);
+            var result = await BackofficeService.DeactivateFixtureMarkets(request);
 
             await Modal.OnSaveClickCallback.InvokeAsync(new DeactivateFixtureCallbackModel
             {

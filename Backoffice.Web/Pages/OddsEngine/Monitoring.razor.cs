@@ -22,7 +22,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public ICommonService CommonService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
@@ -246,7 +246,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async Task<List<FixtureMarketModel>> GetFixtures(MarketFixtureRequest request)
         {
-            var response = await BackOfficeService.GetMarketFixtures(request);
+            var response = await BackofficeService.GetMarketFixtures(request);
             var marketFixtures = response.Result;
 
             if (marketFixtures.Fixtures.Count == 0)

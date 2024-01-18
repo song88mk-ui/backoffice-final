@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.Administration
     {
         #region Properties
 
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
@@ -134,7 +134,7 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -153,7 +153,7 @@ namespace Backoffice.Web.Pages.Administration
             IsPreloader = true;
             IsExportDisabled = true;
 
-            var response = await BackOfficeService.GetManualBetSettlementActivityLogs(new ManualBetSettlementActivityLogRequest()
+            var response = await BackofficeService.GetManualBetSettlementActivityLogs(new ManualBetSettlementActivityLogRequest()
             {
                 ManualBetSettlementCallbackModel = CallbackModel,
                 MetaData = MetaData

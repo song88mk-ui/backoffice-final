@@ -15,7 +15,7 @@ namespace Backoffice.Web.Pages.Administration
         #region Properties
 
         [Inject] public IMessageBroker MessageBroker { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -99,7 +99,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             CancelBets = null;
 
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -120,7 +120,7 @@ namespace Backoffice.Web.Pages.Administration
                 MetaData = MetaData
             };
 
-            var response = await BackOfficeService.GetActivityLogs(request);
+            var response = await BackofficeService.GetActivityLogs(request);
 
             if (response.StatusCode == StatusCode.Success)
             {

@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         #region Properties
 
         [Inject] public IModalService ModalService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
         public IJSStreamReference? DataReference { get; set; }
@@ -265,7 +265,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 }).ToList()
             };
 
-            var response = await BackOfficeService.PostTopLeaguesAsync(PostTopLeaguesRequest);
+            var response = await BackofficeService.PostTopLeaguesAsync(PostTopLeaguesRequest);
 
             if (response.StatusCode == StatusCode.Success)
             {

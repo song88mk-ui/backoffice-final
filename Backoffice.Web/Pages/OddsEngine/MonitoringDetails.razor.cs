@@ -23,7 +23,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public ICommonService CommonService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
@@ -199,7 +199,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public void Dispose()
         {
             TradingService.Dispose();
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
         }
 
         #endregion
@@ -211,7 +211,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (!_isPreLoader)
                 _isPreLoader = true;
 
-            var marketFixtureResponse = await BackOfficeService.GetMarketFixtureDetails(Id);
+            var marketFixtureResponse = await BackofficeService.GetMarketFixtureDetails(Id);
 
             if (marketFixtureResponse.StatusCode == StatusCode.Success)
             {

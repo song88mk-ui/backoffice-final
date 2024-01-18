@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
         #region Properties
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -74,7 +74,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
                 ActivityLogs.OnActivityLogMessages.Add(ActivityLog);
             }
 
-            var response = (await BackOfficeService.ManualSettlement(new ManualBetSettlementRequest()
+            var response = (await BackofficeService.ManualSettlement(new ManualBetSettlementRequest()
             {
                 BetData = ManualBetDetailsModel.Bets.Select(bet => new ManualBetRequest()
                 {

@@ -9,7 +9,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
 
@@ -36,7 +36,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 SearchText = string.Empty
             };
 
-            var clients = (await BackOfficeService.GetClients()).Result;
+            var clients = (await BackofficeService.GetClients()).Result;
 
             if (clients != null && clients.Clients.Any())
             {

@@ -13,7 +13,7 @@ namespace Backoffice.Web.Components.Administration.Maintenance
     public partial class ConfirmationModal
     {
         [Inject] IModalService ModalService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
@@ -47,7 +47,7 @@ namespace Backoffice.Web.Components.Administration.Maintenance
             var timer = new Stopwatch();
 
             timer.Start();
-            var result = await BackOfficeService.SetMaintenance(_isMaintenance);
+            var result = await BackofficeService.SetMaintenance(_isMaintenance);
 
             if (result.StatusCode == StatusCode.Success)
             {
@@ -64,7 +64,7 @@ namespace Backoffice.Web.Components.Administration.Maintenance
                     TimeStamp = DateTime.UtcNow
                 };
 
-                await BackOfficeService.AddActivityLog(activityLog);
+                await BackofficeService.AddActivityLog(activityLog);
 
                 timer.Stop();
                 AlertModel = new AlertModel()

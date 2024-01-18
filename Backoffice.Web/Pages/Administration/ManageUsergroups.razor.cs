@@ -14,7 +14,7 @@ namespace Backoffice.Web.Pages.Administration
         #region Properties
 
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
@@ -58,7 +58,7 @@ namespace Backoffice.Web.Pages.Administration
 
             await AuthenticateAccess.InvokeAsync();
 
-            var clients = (await BackOfficeService.GetClients()).Result;
+            var clients = (await BackofficeService.GetClients()).Result;
 
             if (clients != null && clients.Clients.Any())
             {
@@ -198,7 +198,7 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
             AuthenticationService.Dispose();
 
             GC.SuppressFinalize(this);

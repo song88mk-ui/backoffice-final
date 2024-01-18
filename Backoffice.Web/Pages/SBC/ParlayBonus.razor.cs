@@ -12,7 +12,7 @@ namespace Backoffice.Web.Pages.SBC
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
@@ -166,7 +166,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             IsPreloading = true;
 
-            var result = (await BackOfficeService.AddOrUpdateParlayBonus(new ParlayBonusRequest()
+            var result = (await BackofficeService.AddOrUpdateParlayBonus(new ParlayBonusRequest()
             {
                 ClientIdRef = ClientId,
                 ParlayBonusConfig = ClientParlayBonusModel.ParlayBonusConfig.Select(s => new ParlayBonusConfigRequest()
@@ -256,7 +256,7 @@ namespace Backoffice.Web.Pages.SBC
             TempConfig = null;
             Clients = null;
 
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -272,7 +272,7 @@ namespace Backoffice.Web.Pages.SBC
 
         private async Task LoadClients()
         {
-            var clients = (await BackOfficeService.GetClients()).Result;
+            var clients = (await BackofficeService.GetClients()).Result;
             if (clients != null)
             {
                 if (UserClientCodes != null && UserClientCodes.Any())
@@ -305,7 +305,7 @@ namespace Backoffice.Web.Pages.SBC
             IsPreloading = true;
             IsEmpty = true;
 
-            var result = (await BackOfficeService.GetClientParlayBonus(new GetParlayBonusRequest()
+            var result = (await BackofficeService.GetClientParlayBonus(new GetParlayBonusRequest()
             {
                 ClientIdRef = clientId,
                 Page = MetaData.CurrentPage,

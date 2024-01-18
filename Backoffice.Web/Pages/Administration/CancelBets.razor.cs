@@ -14,7 +14,7 @@ namespace Backoffice.Web.Pages.Administration
         #region Properties
 
         [Inject] public IModalService ModalService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
@@ -108,7 +108,7 @@ namespace Backoffice.Web.Pages.Administration
 
                 var betIds = BetRefenceModel.BetReferenceIds.Where(x => !string.IsNullOrEmpty(x)).Select(x => x).ToList();
 
-                var manualBetDetailsResponse = await BackOfficeService.GetManualBetDetails(new() { BetIds = betIds });
+                var manualBetDetailsResponse = await BackofficeService.GetManualBetDetails(new() { BetIds = betIds });
                 var betDetails = manualBetDetailsResponse.Result;
 
                 var notRunningBets = betDetails.Bets.Where(b => b.BetStatusId != (int)BetStatus.Running).ToList();
@@ -135,7 +135,7 @@ namespace Backoffice.Web.Pages.Administration
                     return;
 
                 var reason = BetRefenceModel.Reason;
-                var response = (await BackOfficeService.CancelBet(new()
+                var response = (await BackofficeService.CancelBet(new()
                 {
                     BetIds = betIds,
                     NewStatus = BetStatus.Cancelled,
@@ -175,7 +175,7 @@ namespace Backoffice.Web.Pages.Administration
                         }
                     }
 
-                    await BackOfficeService.AddActivityLogList(message);
+                    await BackofficeService.AddActivityLogList(message);
 
                     Alerts.Add(new()
                     {

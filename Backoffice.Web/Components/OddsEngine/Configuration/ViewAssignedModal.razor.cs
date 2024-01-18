@@ -11,7 +11,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
@@ -28,7 +28,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var configTemplateModel = ModalParameters.TryGet<ConfigTemplateModel>("ConfigTemplateModel");
             Leagues = new List<ConfigClientModel>();
 
-            var assignedLeagues = await BackOfficeService.GetConfigClient(ConfigState.Assigned, new ConfigTemplateLeagueRequest(), (int)configTemplateModel.Id);
+            var assignedLeagues = await BackofficeService.GetConfigClient(ConfigState.Assigned, new ConfigTemplateLeagueRequest(), (int)configTemplateModel.Id);
             if (assignedLeagues.StatusCode == StatusCode.Success)
             {
                 Leagues = assignedLeagues.Result?.ClientConfigs ?? new List<ConfigClientModel>();

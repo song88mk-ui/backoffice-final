@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
@@ -100,7 +100,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 }
 
                 //activity log
-                await BackOfficeService.AddActivityLog(new ActivityLogModel
+                await BackofficeService.AddActivityLog(new ActivityLogModel
                 {
                     Page = SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", "."),
                     Payload = $"{CopyToClientCode}.{CopyToSportId}.{CopyToFixtureStatusId}.0",

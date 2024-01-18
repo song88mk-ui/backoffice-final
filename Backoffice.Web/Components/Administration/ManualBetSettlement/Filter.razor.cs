@@ -13,7 +13,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
         #region Properties
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
 
         [Parameter] public EventCallback OnSearchButtonCallback { get; set; }
         [Parameter] public EventCallback<ManualBetSettlementCallbackModel> OnInitCallback { get; set; }
@@ -251,7 +251,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
         private async Task LoadClients()
         {
-            var clients = (await BackOfficeService.GetClients()).Result;
+            var clients = (await BackofficeService.GetClients()).Result;
 
             if (clients != null && clients.Clients.Any())
             {
@@ -286,7 +286,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
         private async Task LoadSports()
         {
-            var sports = (await BackOfficeService.GetSportsAsync()).Result;
+            var sports = (await BackofficeService.GetSportsAsync()).Result;
 
             Sports = sports.SportLookup.Select(s => new SelectListItemWithCheckboxModel<string>
             {

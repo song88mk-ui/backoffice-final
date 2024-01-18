@@ -12,7 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class EditConfigTemplateFilter : IDisposable
     {
         #region Properties
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -84,7 +84,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Utilities
         private async Task LoadConfigTemplateById()
         {
-            var response = await BackOfficeService.GetConfigTemplateById(ConfigTemplateId);
+            var response = await BackofficeService.GetConfigTemplateById(ConfigTemplateId);
 
             if (response.StatusCode == StatusCode.Success && response.Result != null)
             {

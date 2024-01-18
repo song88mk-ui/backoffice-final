@@ -13,7 +13,7 @@ namespace Backoffice.Web.Pages.SBC
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
@@ -69,7 +69,7 @@ namespace Backoffice.Web.Pages.SBC
         public async Task OnCreateClientClickEvent()
         {
             Alerts.Clear();
-            var sports = (await BackOfficeService.GetSportsAsync()).Result;
+            var sports = (await BackofficeService.GetSportsAsync()).Result;
             var realSports = new SportsLookupModel();
             var virtualSports = new SportsLookupModel();
 
@@ -114,7 +114,7 @@ namespace Backoffice.Web.Pages.SBC
         public async Task OnEditClientClickEvent(ClientListResponse.Client client)
         {
             Alerts.Clear();
-            var sports = (await BackOfficeService.GetSportsAsync()).Result;
+            var sports = (await BackofficeService.GetSportsAsync()).Result;
             var realSports = new SportsLookupModel();
             var virtualSports = new SportsLookupModel();
 
@@ -143,7 +143,7 @@ namespace Backoffice.Web.Pages.SBC
                 });
             }
 
-            client.BetSettings = (await BackOfficeService.GetBetSetting(new BetSettingRequest
+            client.BetSettings = (await BackofficeService.GetBetSetting(new BetSettingRequest
             {
                 ClientId = client.ClientId
             })).Result.BetSettings ?? new List<ClientListResponse.BetSetting>();
@@ -202,7 +202,7 @@ namespace Backoffice.Web.Pages.SBC
         public async Task OnViewBetSettingClickEvent(ClientListResponse.Client client)
         {
 
-            client.BetSettings = (await BackOfficeService.GetBetSetting(new BetSettingRequest
+            client.BetSettings = (await BackofficeService.GetBetSetting(new BetSettingRequest
             {
                 ClientId = client.ClientId
             })).Result.BetSettings ?? new List<ClientListResponse.BetSetting>();
@@ -238,7 +238,7 @@ namespace Backoffice.Web.Pages.SBC
             ClientListModel = null;
             Alerts = null;
 
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -257,7 +257,7 @@ namespace Backoffice.Web.Pages.SBC
                 SortBy = (ClientSorting)sortBy
             };
 
-            var response = await BackOfficeService.GetClientList(request);
+            var response = await BackofficeService.GetClientList(request);
 
             if (response.StatusCode == StatusCode.Success)
             {

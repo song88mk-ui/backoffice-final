@@ -10,7 +10,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [Parameter] public EventCallback<string> OnInputSearchCallback { get; set; }
         [Parameter] public EventCallback<MarketGroupNavigationModel> OnMarketTemplateGroupCallback { get; set; }
@@ -30,7 +30,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             MarketTemplateGroups = new List<MarketGroupNavigationModel>();
 
             // 99 = all fixture types
-            var marketTemplateGroupResponse = (await BackOfficeService.GetMarketTemplateGroups(99));
+            var marketTemplateGroupResponse = (await BackofficeService.GetMarketTemplateGroups(99));
 
             if (marketTemplateGroupResponse.StatusCode == StatusCode.Success)
             {

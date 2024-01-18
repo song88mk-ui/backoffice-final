@@ -24,7 +24,7 @@ namespace Backoffice.Web.Shared
         [Inject] private IHttpContextAccessor _httpContextAccessor { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
@@ -84,7 +84,7 @@ namespace Backoffice.Web.Shared
 
                 OnFilterClientActionAsync = OnFilterClientEvent;
 
-                var clientResult = await BackOfficeService.GetClients();
+                var clientResult = await BackofficeService.GetClients();
 
                 if (clientResult.StatusCode != StatusCode.Success)
                 {
@@ -307,7 +307,7 @@ namespace Backoffice.Web.Shared
 
         public void Dispose()
         {
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
 
             toasterService.Dispose();
             _toasterService.Dispose();

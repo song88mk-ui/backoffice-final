@@ -17,7 +17,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
@@ -170,7 +170,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
                     var userGroupId = !IsEdit ? response.Result.UserGroupId : request.UserGroupId;
 
-                    await BackOfficeService.AddActivityLog(new ActivityLogModel
+                    await BackofficeService.AddActivityLog(new ActivityLogModel
                     {
                         Page = AdminPermission.Admin_ManageUserGroups.ToString().Replace("_", "."),
                         Payload = $"{userGroupId}",

@@ -13,7 +13,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
     {
         #region Properties   
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
@@ -34,7 +34,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
             {
                 TopFixture = ModalParameters.TryGet<ClientTopFixtureModel.OrderedClientTopFixture>("TopFixture") ?? new ClientTopFixtureModel.OrderedClientTopFixture();
 
-                var clients = (await BackOfficeService.GetClients()).Result;
+                var clients = (await BackofficeService.GetClients()).Result;
                 if (clients != null)
                 {
                     clients.Clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != TopFixture.ClientIdRef).ToList() : new List<Client>();
@@ -85,7 +85,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 }).ToList()
             };
 
-            await BackOfficeService.CopyClientTopFixtures(request);
+            await BackofficeService.CopyClientTopFixtures(request);
             ModalService.Cancel();
 
             await Modal.OnSaveClickCallback.InvokeAsync(string.Join(",", clientids));

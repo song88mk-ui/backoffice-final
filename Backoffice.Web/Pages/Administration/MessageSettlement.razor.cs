@@ -18,7 +18,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public IModalService ModalService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
@@ -93,7 +93,7 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -115,7 +115,7 @@ namespace Backoffice.Web.Pages.Administration
                 DateTo = FilterModel.ToDate.Date.Add(new TimeSpan(23, 59, 59))
             };
 
-            var logs = await BackOfficeService.GetActivityLogs(request);
+            var logs = await BackofficeService.GetActivityLogs(request);
 
             var result = new List<MessageSettlementModel>();
 

@@ -21,7 +21,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public int? AssignedLeaguesCount { get; set; }
         [Parameter] public int? UnAssignedLeaguesCount { get; set; }
 
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
 
         public TemplateConfigCount TemplateConfigCount { get; set; }
 

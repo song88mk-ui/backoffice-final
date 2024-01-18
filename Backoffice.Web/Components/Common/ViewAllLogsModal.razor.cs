@@ -19,7 +19,7 @@ namespace Backoffice.Web.Components.Common
         #region Properties
         [Inject] IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
@@ -83,7 +83,7 @@ namespace Backoffice.Web.Components.Common
                 _metaData.PageSize = int.MaxValue;
             }
 
-            var response = await BackOfficeService.GetPriceboostActivityLogs(new PriceboostActivityLogRequest
+            var response = await BackofficeService.GetPriceboostActivityLogs(new PriceboostActivityLogRequest
             {
                 Page = CurrentPage.ToString().Replace("_", "."),
                 Payload = payload,

@@ -16,7 +16,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
 
         [Parameter] public EventCallback OnStateHasChanged { get; set; }
@@ -206,7 +206,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsPreloader = true;
             StateHasChanged();
 
-            ConfigTemplates = (await BackOfficeService.GetConfigTemplate(_searchForm.SearchText, SelectedSportId, SelectedScopeId)).Result;
+            ConfigTemplates = (await BackofficeService.GetConfigTemplate(_searchForm.SearchText, SelectedSportId, SelectedScopeId)).Result;
 
             IsPreloader = false;
         }

@@ -13,7 +13,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
         [Parameter] public EventCallback OnStateHasChanged { get; set; }
@@ -331,7 +331,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 payload.SearchText = filter.SearchText;
             }
             payload.MetaData = MetaData;
-            var response = await BackOfficeService.GetConfigClient(_state ?? ConfigState.Assigned, payload);
+            var response = await BackofficeService.GetConfigClient(_state ?? ConfigState.Assigned, payload);
 
             if (response.StatusCode == StatusCode.Success)
             {

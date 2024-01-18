@@ -13,7 +13,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
     public partial class CloseMarketsModal : IDisposable
     {
         #region Properties
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
@@ -57,7 +57,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             }
 
             // 99 = all fixture types
-            var marketTemplateGroupResponse = (await BackOfficeService.GetMarketTemplateGroups(99));
+            var marketTemplateGroupResponse = (await BackofficeService.GetMarketTemplateGroups(99));
 
             if (marketTemplateGroupResponse.StatusCode == StatusCode.Success)
             {

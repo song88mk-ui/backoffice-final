@@ -18,7 +18,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Inject] IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
@@ -288,7 +288,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (response.StatusCode == StatusCode.Success)
                 {
                     //activity log
-                    await BackOfficeService.AddActivityLog(new ActivityLogModel
+                    await BackofficeService.AddActivityLog(new ActivityLogModel
                     {
                         Page = SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", "."),
                         Payload = $"{MarketGroupModel.ClientCode}.{MarketGroupModel.SportId}.{MarketGroupModel.FixtureStatusId}.0",
@@ -322,7 +322,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public void Dispose()
         {
             TradingService.Dispose();
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
         }
 
         #endregion

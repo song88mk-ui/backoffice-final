@@ -11,7 +11,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [Parameter] public int ClientId { get; set; }
         [Parameter] public EventCallback<EditTopFixturesModel> OnInitCallback { get; set; }
@@ -39,7 +39,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 SportsTree = new SportsTreeModel();
                 SortFilter = "1";
 
-                SportsTree = (await BackOfficeService.GetSportstreeByClientId(ClientId)).Result;
+                SportsTree = (await BackofficeService.GetSportstreeByClientId(ClientId)).Result;
 
                 var model = new EditTopFixturesModel
                 {

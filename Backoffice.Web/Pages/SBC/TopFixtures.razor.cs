@@ -14,7 +14,7 @@ namespace Backoffice.Web.Pages.SBC
         #region Properties
 
         [Inject] public IModalService ModalService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
@@ -109,7 +109,7 @@ namespace Backoffice.Web.Pages.SBC
                 var clientTopFixture = TopFixturesModel.TopFixtures.FirstOrDefault(t => t.ClientIdRef == Convert.ToInt32(clientIdRef));
                 if (clientTopFixture != null)
                 {
-                    var result = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = item.ToString() })).Result;
+                    var result = (await BackofficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = item.ToString() })).Result;
 
                     clientTopFixture.TopFixtures = result.TopFixtures.FirstOrDefault()?.TopFixtures ?? new List<ClientTopFixtureModel.TopFixture>();
                 }
@@ -127,7 +127,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             TopFixturesModel = null;
 
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -144,7 +144,7 @@ namespace Backoffice.Web.Pages.SBC
 
             FilterModel = filterModel;
             var clientIds = string.Join(",", filterModel.Clients.Select(s => s.ClientId).ToList());
-            var topFixtureResponse = (await BackOfficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = clientIds }));
+            var topFixtureResponse = (await BackofficeService.GetClientTopFixtures(new GetClientTopFixtureRequest { ClientIds = clientIds }));
 
             if (topFixtureResponse.StatusCode != Backoffice.Shared.Enums.StatusCode.Success)
             {

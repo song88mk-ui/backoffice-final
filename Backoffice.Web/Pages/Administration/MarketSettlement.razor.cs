@@ -14,7 +14,7 @@ namespace Backoffice.Web.Pages.Administration
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
@@ -71,7 +71,7 @@ namespace Backoffice.Web.Pages.Administration
             var filterLeagueId = ModalFilter.LeagueId == 0 ? "%%" : ModalFilter.LeagueId.ToString();
             var filterFixtureId = string.IsNullOrEmpty(ModalFilter.FixtureId) ? "%" : ModalFilter.FixtureId;
 
-            var response = (await BackOfficeService.GetActivityLogs(new ActivityLogRequest
+            var response = (await BackofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
                 Payload = $"{filterSportsId}.{filterSegmentId}.{filterLeagueId}.{filterFixtureId}",
@@ -124,7 +124,7 @@ namespace Backoffice.Web.Pages.Administration
             MetaData = null;
 
             TradingService.Dispose();
-            BackOfficeService.Dispose();
+            BackofficeService.Dispose();
             ToasterService.Dispose();
             _toasterService.Dispose();
 
