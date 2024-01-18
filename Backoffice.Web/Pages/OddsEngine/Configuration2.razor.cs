@@ -81,9 +81,24 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-md");
             parameters.Add("Region", Region);
+            parameters.Add("OnCopyClientSettingsCallback", EventCallback.Factory.Create(this, OnCopyClientSettingsAlert));
 
             var options = new ModalOptions();
             ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
+        }
+
+        public async Task OnCopyClientSettingsAlert()
+        {
+            //Alerts.Clear();
+
+            //Alerts.Add(new AlertModel()
+            //{
+            //    Status = AlertStatus.Success.ToString(),
+            //    Message = "Success! Copy Client Settings is being generated. System will notify once done.",
+            //    Opacity = 1.0m
+            //});
+
+            //Guid = Guid.NewGuid();
         }
 
         public async Task OnNavMenuCallback()
