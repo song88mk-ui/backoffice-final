@@ -499,13 +499,13 @@ namespace Backoffice.API.Repositories
                     var clients = clientIdRefs.Split(',').ToList().ConvertAll(int.Parse);
                     var clientInformation = GetClientInformation();
 
-                    var hkResult = clientInformation.Where(s => clients.Contains(s.ClientId) && s.Region == "HK").Select(s => s.ClientId).ToList();
+                    var hkResult = clientInformation.Where(s => s.IsDeleted == false && clients.Contains(s.ClientId) && s.Region == "HK").Select(s => s.ClientId).ToList();
                     if (hkResult.Any())
                         result.Add("HK", string.Join(",", hkResult));
 
-                    var saResult = clientInformation.Where(s => clients.Contains(s.ClientId) && s.Region == "SA").Select(s => s.ClientId).ToList();
-                    if (saResult.Any())
-                        result.Add("SA", string.Join(",", saResult));
+                    //var saResult = clientInformation.Where(s => s.IsDeleted == false && clients.Contains(s.ClientId) && s.Region == "SA").Select(s => s.ClientId).ToList();
+                    //if (saResult.Any())
+                    //    result.Add("SA", string.Join(",", saResult));
                 }
 
                 return new BaseResponse<Dictionary<string, string>>
