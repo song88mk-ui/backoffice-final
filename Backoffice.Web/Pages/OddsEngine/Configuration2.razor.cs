@@ -1,4 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -11,6 +13,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Properties
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IModalService ModalService { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
 
         [Parameter]
@@ -70,6 +73,32 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnConfigNavMenuSelected(ConfigTemplateNavMenu configNavMenu)
         {
             SelectedConfigNavMenu = configNavMenu;
+        }
+
+        public async Task OnCopyClientSettings()
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("ModalClass", "modal-center");
+            parameters.Add("ModalDialogClass", "modal-md");
+            parameters.Add("Region", Region);
+            parameters.Add("OnCopyClientSettingsCallback", EventCallback.Factory.Create(this, OnCopyClientSettingsAlert));
+
+            var options = new ModalOptions();
+            ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
+        }
+
+        public async Task OnCopyClientSettingsAlert()
+        {
+            //Alerts.Clear();
+
+            //Alerts.Add(new AlertModel()
+            //{
+            //    Status = AlertStatus.Success.ToString(),
+            //    Message = "Success! Copy Client Settings is being generated. System will notify once done.",
+            //    Opacity = 1.0m
+            //});
+
+            //Guid = Guid.NewGuid();
         }
 
         public async Task OnNavMenuCallback()

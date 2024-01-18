@@ -16,6 +16,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         [Parameter] public EventCallback<ConfigTemplateNavMenu> SelectConfigNavMenuCallback { get; set; }
+        [Parameter] public EventCallback SelectCopyClientCallback { get; set; }
         [Parameter] public int? MyTemplatesCount { get; set; }
         [Parameter] public int? AssignedLeaguesCount { get; set; }
         [Parameter] public int? UnAssignedLeaguesCount { get; set; }
@@ -63,6 +64,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             CurrentMenu = configNavMenu;
             await SelectConfigNavMenuCallback.InvokeAsync(configNavMenu);
+        }
+
+        public async Task SelectCopyClientSettings()
+        {
+            await SelectCopyClientCallback.InvokeAsync();
         }
 
         public void Dispose()

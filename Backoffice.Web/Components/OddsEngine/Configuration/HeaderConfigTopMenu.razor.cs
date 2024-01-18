@@ -47,19 +47,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ModalService.Open<ViewLogs>($"View Logs", parameters, options);
         }
 
-        public async Task OnCopyClientSettingsClickEvent()
-        {
-
-            var parameters = new ModalParameters();
-            parameters.Add("ModalClass", "modal-center");
-            parameters.Add("ModalDialogClass", "modal-md");
-            parameters.Add("Region", Region);
-            //parameters.Add("OnCopyClientSettingsCallback", EventCallback.Factory.Create(this, ConfigurationRef.OnCopyClientSettingsAlert));
-
-            var options = new ModalOptions();
-            ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
-        }        
-
         public void Dispose()
         {
             GC.SuppressFinalize(this);
