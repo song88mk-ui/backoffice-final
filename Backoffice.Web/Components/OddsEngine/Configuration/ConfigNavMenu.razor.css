@@ -13,7 +13,12 @@
     font-family: 'Segoe UI';
 }
 
-    .config-nav.active {
-        border-bottom: solid 3px #F08154;
-        color: black;
-    }
+.config-nav.active {
+    border-bottom: solid 3px #F08154;
+    color: black;
+}
+
+.btn-copy-client {
+    background-color: #1F1F1F;
+    color: #FFFFFF;
+}
