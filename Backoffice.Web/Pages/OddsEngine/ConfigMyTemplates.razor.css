@@ -8,6 +8,10 @@
     font-size: 14px;
 }
 
+.fa {
+    color: #404E67;
+}
+
 .fa-list:before {
     margin-right: 10px;
 }

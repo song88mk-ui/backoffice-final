@@ -16,7 +16,7 @@ using Serilog;
 
 namespace Backoffice.Web.Services
 {
-    public class BackOfficeService : IBackOfficeService
+    public class BackofficeService : IBackofficeService
     {
         #region Fields
         private HttpClient _client;
@@ -41,7 +41,7 @@ namespace Backoffice.Web.Services
 
         #region Ctor
 
-        public BackOfficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IMessageBroker messageBroker, IHttpContextAccessor httpContextAccessor)
+        public BackofficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IMessageBroker messageBroker, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
             _authenticationService = authenticationService;
@@ -1368,21 +1368,21 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(ConfigTemplateModel request)
+        public async Task<BaseResponse<long>> AddOrUpdateConfigTemplate(ConfigTemplateModel request)
         {
             try
             {
                 var Model = await _httpClient.PostAsync($"api/config/template", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (Model.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<bool>();
+                    return JsonSerializer.Deserialize<BaseResponse<long>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<long>();
                 else
                 {
                     if (Model.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<bool>();
+                        return JsonSerializer.Deserialize<BaseResponse<long>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<long>();
                     else
                     {
-                        return new BaseResponse<bool>
+                        return new BaseResponse<long>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
@@ -1392,7 +1392,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                return new BaseResponse<bool>
+                return new BaseResponse<long>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

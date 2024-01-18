@@ -218,7 +218,7 @@ builder.Services.AddHttpClient<ITradingService, TradingService>(client =>
     client.DefaultRequestHeaders.Add("x-api-key", configuration["API:Backoffice:Security:APIKey"]);
     client.DefaultRequestHeaders.Add("x-region", configuration["API:Region"]);
 });
-builder.Services.AddHttpClient<IBackOfficeService, BackOfficeService>(client =>
+builder.Services.AddHttpClient<IBackofficeService, BackofficeService>(client =>
 {
     client.BaseAddress = new Uri(configuration["API:Backoffice:Uri"]);
     client.DefaultRequestHeaders.Add("x-api-key", configuration["API:Backoffice:Security:APIKey"]);

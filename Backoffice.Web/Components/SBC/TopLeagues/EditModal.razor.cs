@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         #region Properties
 
         [Inject] public IModalService ModalService { get; set; }
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
         public IJSStreamReference? DataReference { get; set; }

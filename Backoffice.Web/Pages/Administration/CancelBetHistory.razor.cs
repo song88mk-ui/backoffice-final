@@ -15,7 +15,7 @@ namespace Backoffice.Web.Pages.Administration
         #region Properties
 
         [Inject] public IMessageBroker MessageBroker { get; set; }
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }

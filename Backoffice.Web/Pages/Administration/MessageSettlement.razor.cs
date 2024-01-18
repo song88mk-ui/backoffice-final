@@ -18,7 +18,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public IModalService ModalService { get; set; }
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }

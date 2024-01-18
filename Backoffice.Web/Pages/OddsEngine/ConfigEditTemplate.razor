@@ -2,8 +2,8 @@
 
 @layout OEMonitoringLayout
 
-@page "/hk/odds-engine/config-templates/edit/{configTemplateId:long}"
-@page "/hk/odds-engine/config-templates/edit/{configTemplateId:long}/{view:bool}"
+@page "/hk/odds-engine/config-templates/{Action}/{configTemplateId:long}"
+@page "/hk/odds-engine/config-templates/{Action}/{configTemplateId:long}/{view:bool}"
 
 <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region" />
 
@@ -12,6 +12,10 @@
         <div class="d-flex justify-content-between mx-4">
             <div>
                 <h4 class="page-title fw-bold">@ConfigTemplateName</h4>
+                @if (_isExisitngName)
+                {
+                    <span class="fst-italic text-danger">Sorry, that name already exists!</span>
+                }
             </div>
 
             <div>

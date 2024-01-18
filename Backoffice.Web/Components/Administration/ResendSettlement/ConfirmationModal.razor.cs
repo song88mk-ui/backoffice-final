@@ -13,7 +13,7 @@ namespace Backoffice.Web.Components.Administration.ResendSettlement
         #region Properties
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackOfficeService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 

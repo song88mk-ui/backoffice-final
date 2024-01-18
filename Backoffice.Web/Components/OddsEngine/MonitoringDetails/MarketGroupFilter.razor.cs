@@ -10,7 +10,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
     {
         #region Properties
 
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
 
         [Parameter] public EventCallback<string> OnInputSearchCallback { get; set; }
         [Parameter] public EventCallback<MarketGroupNavigationModel> OnMarketTemplateGroupCallback { get; set; }

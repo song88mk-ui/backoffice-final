@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Properties
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackOfficeService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -210,7 +210,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                         }
                     }
-
 
                     foreach (var league in leagueRequest)
                     {

@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackOfficeService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }

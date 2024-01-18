@@ -11,7 +11,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
     {
         #region Properties
 
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter] public CustomModal Modal { get; set; }

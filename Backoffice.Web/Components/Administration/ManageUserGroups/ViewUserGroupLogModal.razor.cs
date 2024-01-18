@@ -17,7 +17,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         #region Properties
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 

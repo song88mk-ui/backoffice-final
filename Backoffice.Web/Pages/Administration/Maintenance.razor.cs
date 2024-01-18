@@ -9,7 +9,7 @@ namespace Backoffice.Web.Pages.Administration
     public partial class Maintenance : IDisposable
     {
         #region Properties
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }

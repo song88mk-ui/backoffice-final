@@ -12,7 +12,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
         [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
 
@@ -123,7 +123,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             await InvokeAsync(async () =>
             {
-                var response = await BackOfficeService.GetTemplateConfigCount();
+                var response = await BackofficeService.GetTemplateConfigCount();
                 _myTemplatesCount = response.Result;
                 if (response.StatusCode == StatusCode.Success)
                     _myTemplatesCount = response.Result;
@@ -133,7 +133,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             });
             await InvokeAsync(async () =>
             {
-                var response = await BackOfficeService.GetTemplateConfigCount(ConfigState.Assigned.ToString());
+                var response = await BackofficeService.GetTemplateConfigCount(ConfigState.Assigned.ToString());
                 _assignedLeaguesCount = response.Result;
                 if (response.StatusCode == StatusCode.Success)
                     _assignedLeaguesCount = response.Result;
@@ -143,7 +143,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             });
             await InvokeAsync(async () =>
             {
-                var response = await BackOfficeService.GetTemplateConfigCount(ConfigState.UnAssigned.ToString());
+                var response = await BackofficeService.GetTemplateConfigCount(ConfigState.UnAssigned.ToString());
                 if (response.StatusCode == StatusCode.Success)
                     _unAssignedLeaguesCount = response.Result;
                 else

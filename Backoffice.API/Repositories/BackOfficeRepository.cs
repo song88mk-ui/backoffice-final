@@ -1438,7 +1438,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(ConfigTemplateModel request)
+        public async Task<BaseResponse<long>> AddOrUpdateConfigTemplate(ConfigTemplateModel request)
         {
             try
             {
@@ -1459,34 +1459,35 @@ namespace Backoffice.API.Repositories
 
                     if (isConfigExisting)
                     {
-                        return new BaseResponse<bool>()
+                        return new BaseResponse<long>()
                         {
                             StatusCode = StatusCode.Error,
                             Message = "Sorry, that name already exists!"
                         };
                     }
-
-                    _backofficeContext.ConfigTemplate.Add(new ConfigTemplate()
+                    config = new ConfigTemplate()
                     {
                         Name = request.Name,
                         SportId = request.SportId,
                         FixtureTypeId = request.FixtureTypeId,
                         FixtureStatusId = request.FixtureStatusId,
                         Timestamp = DateTime.UtcNow
-                    });
+                    };
+
+                    _backofficeContext.ConfigTemplate.Add(config);
                     await _backofficeContext.SaveChangesAsync();
                 }
 
-                return new BaseResponse<bool>()
+                return new BaseResponse<long>()
                 {
                     StatusCode = StatusCode.Success,
                     Message = StatusCode.Success.ToString(),
-                    Result = true
+                    Result = config.Id
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<bool>() { StatusCode = StatusCode.Error, Message = ex.Message };
+                return new BaseResponse<long>() { StatusCode = StatusCode.Error, Message = ex.Message };
             }
         }
         public async Task<BaseResponse<bool>> SetConfigState(ConfigState configState, ConfigSetLeagueStateRequest request)

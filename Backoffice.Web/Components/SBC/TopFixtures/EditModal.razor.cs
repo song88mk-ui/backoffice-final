@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
     {
         #region Properties
 
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 

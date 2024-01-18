@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.Administration
     {
         #region Properties
 
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackOfficeService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 

@@ -7,7 +7,7 @@ using Backoffice.Web.Models;
 
 namespace Backoffice.Web.Services
 {
-    public interface IBackOfficeService
+    public interface IBackofficeService
     {
         Task<BaseResponse<bool>> GetMaintenance();
         Task<BaseResponse<bool>> SetMaintenance(bool request);
@@ -47,7 +47,7 @@ namespace Backoffice.Web.Services
         #region ConfigTemplate
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId);
         Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1);
-        Task<BaseResponse<bool>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
+        Task<BaseResponse<long>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
         Task<BaseResponse<bool>> SetLeagueState(ConfigState state, ConfigSetLeagueStateRequest payload);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(long id);
         Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload, int templateId= -1);

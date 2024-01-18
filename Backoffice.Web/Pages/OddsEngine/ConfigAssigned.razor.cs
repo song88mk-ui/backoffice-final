@@ -13,7 +13,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackOfficeService { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
         [Parameter] public EventCallback OnStateHasChanged { get; set; }

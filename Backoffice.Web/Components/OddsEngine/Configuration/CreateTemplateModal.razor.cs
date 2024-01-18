@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IBackOfficeService BackofficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
 
         [Parameter] public EventCallback<bool> CreateTemplateCallback { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
@@ -102,7 +102,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             else
             {
                 IsConfigNameExisting = true;
-            }            
+            }
         }
 
         public void Dispose()

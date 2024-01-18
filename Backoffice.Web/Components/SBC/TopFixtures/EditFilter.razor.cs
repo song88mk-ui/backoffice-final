@@ -11,7 +11,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
     {
         #region Properties
 
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
 
         [Parameter] public int ClientId { get; set; }
         [Parameter] public EventCallback<EditTopFixturesModel> OnInitCallback { get; set; }

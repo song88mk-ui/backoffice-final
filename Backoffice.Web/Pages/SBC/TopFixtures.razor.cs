@@ -14,7 +14,7 @@ namespace Backoffice.Web.Pages.SBC
         #region Properties
 
         [Inject] public IModalService ModalService { get; set; }
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 

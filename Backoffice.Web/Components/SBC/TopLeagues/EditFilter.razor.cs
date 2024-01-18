@@ -8,7 +8,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
     {
         #region Properties
 
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
 
         [Parameter] public int ClientId { get; set; }
         [Parameter] public int SportId { get; set; }

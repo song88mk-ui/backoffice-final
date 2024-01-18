@@ -13,7 +13,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
         #region Properties
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackOfficeService { get; set; }
 
         [Parameter] public EventCallback OnSearchButtonCallback { get; set; }
         [Parameter] public EventCallback<ManualBetSettlementCallbackModel> OnInitCallback { get; set; }

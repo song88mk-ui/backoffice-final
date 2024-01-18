@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackOfficeService { get; set; }
         //[Inject] private IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }

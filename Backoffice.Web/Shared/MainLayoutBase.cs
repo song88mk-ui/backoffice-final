@@ -24,7 +24,7 @@ namespace Backoffice.Web.Shared
         [Inject] private IHttpContextAccessor _httpContextAccessor { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }

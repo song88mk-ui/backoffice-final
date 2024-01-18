@@ -10,7 +10,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
     {
         #region Properties
 
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [Parameter] public EventCallback<MonitoringCallbackModel> OnInitCallback { get; set; }
         [Parameter] public int SportId { get; set; }
         #endregion

@@ -16,7 +16,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackOfficeService BackOfficeService { get; set; }
+        [Inject] private IBackofficeService BackOfficeService { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
 
         [Parameter] public EventCallback OnStateHasChanged { get; set; }
@@ -108,7 +108,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public async Task OnCopyTemplateClickEvent(ConfigTemplateModel configTemplateModel)
         {
-            await Task.CompletedTask;
+            NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/copy/{configTemplateModel.Id}");
         }
 
         public async Task OnDeleteTemplateClickEvent(ConfigTemplateModel configTemplateModel)

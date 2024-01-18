@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         public List<PriceBoostActivityLog> ActivityLogs { get; set; }
         public PriceBoostConfigModel PriceBoost { get; set; } 

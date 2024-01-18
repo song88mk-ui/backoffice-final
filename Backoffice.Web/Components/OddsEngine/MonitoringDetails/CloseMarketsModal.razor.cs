@@ -13,7 +13,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
     public partial class CloseMarketsModal : IDisposable
     {
         #region Properties
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 

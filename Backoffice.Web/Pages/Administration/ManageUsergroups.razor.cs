@@ -14,7 +14,7 @@ namespace Backoffice.Web.Pages.Administration
         #region Properties
 
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
-        [Inject] public IBackOfficeService BackOfficeService { get; set; }
+        [Inject] public IBackofficeService BackOfficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }

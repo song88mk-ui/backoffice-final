@@ -12,7 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackOfficeService BackofficeService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
