@@ -106,6 +106,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{configTemplateModel.Id}");
         }
+        public async Task OnCopyTemplateClickEvent(ConfigTemplateModel configTemplateModel)
+        {
+            await Task.CompletedTask;
+        }
 
         public async Task OnDeleteTemplateClickEvent(ConfigTemplateModel configTemplateModel)
         {

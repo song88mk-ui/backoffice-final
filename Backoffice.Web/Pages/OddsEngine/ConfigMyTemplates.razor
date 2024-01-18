@@ -126,14 +126,21 @@
                                                         <a class= href="javascript:void(0)" @onclick="() => OnEditTemplateClickEvent(configTemplate)" title="Edit Template">
                                                             <i class="fa fa-edit"></i>
                                                         </a>
-                                                        <a href="javascript:void(0)" @onclick="() => OnDeleteTemplateClickEvent(configTemplate)" title="Delete Template">
-                                                            <i class="fa fa-trash"></i>
+                                                        <a href="javascript:void(0)" @onclick="() => OnCopyTemplateClickEvent(configTemplate)" title="Copy Template">
+                                                            <i class="fa fa-copy"></i>
                                                         </a>
                                                     </Authorized>
                                                 </AuthorizeView>
                                                 <a href="javascript:void(0)" @onclick="() => OnExportTemplateClickEvent(configTemplate)" title="Export Template">
                                                     <i class="fa fa-file-archive-o"></i>
                                                 </a>
+                                                <AuthorizeView Policy="sbc-config-canedit">
+                                                    <Authorized Context="ActivateAll">
+                                                        <a href="javascript:void(0)" @onclick="() => OnDeleteTemplateClickEvent(configTemplate)" title="Delete Template">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </Authorized>
+                                                </AuthorizeView>
                                                 <a href="javascript:void(0)" @onclick="() => OnViewAssignedClickEvent(configTemplate)" title="View Assigned" class="@(isReadOnly ? "disabled" : "")">
                                                     <i class="fa fa-list"></i>
                                                 </a>
