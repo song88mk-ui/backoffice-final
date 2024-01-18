@@ -310,7 +310,7 @@ namespace Backoffice.API.Repositories
             try
             {
                 var clients = GetClientInformation()
-                    .Where(c => c.StatusId == (int)ClientStatus.Normal)
+                    .Where(c => c.IsDeleted == false && c.StatusId == (int)ClientStatus.Normal)
                     .Select(client => new ClientResponse.Client
                     {
                         ClientId = client.ClientId,
