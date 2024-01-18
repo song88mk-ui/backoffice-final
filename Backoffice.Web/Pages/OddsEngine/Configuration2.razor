@@ -16,6 +16,8 @@ else
         <ConfigNavMenu Region="@Region" MyTemplatesCount="@_myTemplatesCount" AssignedLeaguesCount="@_assignedLeaguesCount" UnAssignedLeaguesCount="@_unAssignedLeaguesCount" SelectConfigNavMenuCallback="OnConfigNavMenuSelected" SelectCopyClientCallback="OnCopyClientSettings" />
     </div>
 
+    <AlertMessage AlertClass="mx-3" AlertModel="@_alertModel"></AlertMessage>
+
     @if (SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
     {
         <ConfigMyTemplates Sports="@Sports" Scopes="@Scopes" QueryMessage="@QueryMessage" OnStateHasChanged="@OnNavMenuCallback" />

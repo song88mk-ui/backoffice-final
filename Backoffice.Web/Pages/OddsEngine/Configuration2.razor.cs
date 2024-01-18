@@ -34,6 +34,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private int? _myTemplatesCount;
         private int? _assignedLeaguesCount;
         private int? _unAssignedLeaguesCount;
+        private AlertModel _alertModel { get; set; }
 
 
         #region Methods
@@ -89,15 +90,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnCopyClientSettingsAlert()
         {
-            //Alerts.Clear();
-
-            //Alerts.Add(new AlertModel()
-            //{
-            //    Status = AlertStatus.Success.ToString(),
-            //    Message = "Success! Copy Client Settings is being generated. System will notify once done.",
-            //    Opacity = 1.0m
-            //});
-
+            _alertModel = new AlertModel()
+            {
+                Status = AlertStatus.Success,
+                Message = "Copy Client Settings Successfully.",
+                Opacity = 1.0m
+            };
             //Guid = Guid.NewGuid();
         }
 
