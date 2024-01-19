@@ -1,10 +1,12 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -70,7 +72,23 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 //    TimeStamp = DateTime.UtcNow
                 //});
 
-                //MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnCopyClientSettings", "r.oe.web.config.oncopyclientsettings", Guid.NewGuid().ToString());
+                var message = new OnCopyClientSettingsMessage
+                {
+                    UserId = UserModel.Id,
+                    FromClientCode = SelectedFromClient.Key,
+                    ToClientCode = SelectedToClient.Key,
+                    ToRemoveConfig = response.Result.ToBeRemoved.Select(s => new ClientLeagueConfig 
+                        { 
+                            ClientCode = s.ClientCode, 
+                            ClientId = s.ClientId,
+                            SportId = s.SportId,
+                            SegmentId = s.SegmentId,
+                            LeagueId = s.LeagueId,
+                        }
+                    ).ToList()
+                };
+
+                MessageBroker.Publish(JsonSerializer.Serialize(message), "OnCopyClientSettings2", "r.oe.web.config.oncopyclientsettings2", Guid.NewGuid().ToString());
 
                 ModalService.Cancel();
 
