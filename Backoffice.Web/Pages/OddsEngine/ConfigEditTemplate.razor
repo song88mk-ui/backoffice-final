@@ -22,7 +22,7 @@
                 @if(!View)
                 {
                     <button type="button" class="btn btn-cancel" @onclick="OnCancelMarginTemplate">Cancel</button>
-                    <button type="button" class="btn btn-save" disabled="@(!HasChanges)" @onclick="OnSaveMarginTemplate">Save Changes</button>
+                    <button type="button" class="btn btn-save" disabled="@(!HasChanges || IsPreloader || _isProcessing)" @onclick="OnSaveMarginTemplate">Save Changes</button>
                 }
             </div>
         </div>
