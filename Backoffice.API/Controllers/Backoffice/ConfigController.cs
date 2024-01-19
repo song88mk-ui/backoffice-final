@@ -99,6 +99,7 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
+
         [HttpPost("template/set/{state}")]
         [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> ConfigTemplateSetState([FromBody] ConfigSetLeagueStateRequest request, [FromRoute] string state)
@@ -207,6 +208,23 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> AddOrUpdateConfigTemplateMargin([FromBody] ConfigTemplateMarginModel request)
         {
             var result = await _backofficeRepository.AddOrUpdateConfigTemplateMargin(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpPost("template/copy/client")]
+        [Authorize("SBC.OE.Config", ((int)Access.View))]
+        public async Task<IActionResult> CopyClientConfig([FromBody] CopyClientConfigRequest request)
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+
+            var result = await _backofficeRepository.CopyClientConfig(request);
 
             switch (result.StatusCode)
             {

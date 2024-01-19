@@ -28,6 +28,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1);
         Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMarginById(long templateId);
         Task<BaseResponse<bool>> AddOrUpdateConfigTemplateMargin(ConfigTemplateMarginModel request);
+        Task<BaseResponse<CopyClientConfigResponse>> CopyClientConfig(CopyClientConfigRequest request);
         #endregion
 
         #region TOP FIXTURES

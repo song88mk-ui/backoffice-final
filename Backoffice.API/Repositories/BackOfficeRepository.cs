@@ -1870,6 +1870,86 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<bool>() { StatusCode = StatusCode.Error, Message = ex.Message };
             }
         }
+
+        public async Task<BaseResponse<CopyClientConfigResponse>> CopyClientConfig(CopyClientConfigRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.FromClientCode) || string.IsNullOrEmpty(request.ToClientCode))
+                    return new BaseResponse<CopyClientConfigResponse>()
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = StatusCode.Error.ToString(),
+                        Result = new CopyClientConfigResponse
+                        {
+                            Result = false,
+                        }
+                    };
+
+                var toBeRemovedConfigTemplate = new List<ConfigTemplateAssigned>();
+
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    using (var context = _backofficeContext)
+                    {
+                        //check if there are existing config template assigned to ToClientCode that needs to be removed in OE.Adapter cache
+                        var fromClientConfigTemplateAssigned = context.ConfigTemplateAssigned.Where(c => c.ClientCode == request.FromClientCode).ToList();
+                        var toClientConfigTemplateAssigned = context.ConfigTemplateAssigned.Where(c => c.ClientCode == request.ToClientCode).ToList();
+
+                        if(toClientConfigTemplateAssigned.Any())
+                        {
+                            foreach (var config in toClientConfigTemplateAssigned)
+                            {
+                                var fromConfig = fromClientConfigTemplateAssigned.FirstOrDefault(c => c.SportId == config.SportId && c.SegmentId == config.SegmentId && c.LeagueId == config.LeagueId);
+                                if (fromConfig == null)
+                                    toBeRemovedConfigTemplate.Add(config);
+                            }
+
+                            context.ConfigTemplateAssigned.RemoveRange(toClientConfigTemplateAssigned);
+                            context.SaveChanges();
+                        }
+
+                        //assign all config templates assigned from FromClientCode into ToClientCode
+                        foreach (var config in fromClientConfigTemplateAssigned)
+                        {
+                            context.ConfigTemplateAssigned.Add(new ConfigTemplateAssigned()
+                            {
+                                ClientId = request.ToClientId,
+                                ClientCode = request.ToClientCode,
+                                ClientName = request.ToClientName,
+                                SportId = config.SportId,
+                                SportName = config.SportName,
+                                SegmentId = config.SegmentId,
+                                SegmentName = config.SegmentName,
+                                LeagueId = config.LeagueId,
+                                LeagueName = config.LeagueName,
+                                PrematchConfigTemplateId = config.PrematchConfigTemplateId,
+                                LiveConfigTemplateId = config.LiveConfigTemplateId
+                            });
+                        }
+                        context.SaveChanges();
+
+                        scope.Complete();
+                    }
+                }
+
+                return new BaseResponse<CopyClientConfigResponse>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = new CopyClientConfigResponse
+                    {
+                        Result = true,
+                        ToBeRemoved = toBeRemovedConfigTemplate
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<CopyClientConfigResponse>() { StatusCode = StatusCode.Error, Message = ex.Message };
+            }
+        }
+
         #endregion
 
         #region Methods - Top Fixtures
