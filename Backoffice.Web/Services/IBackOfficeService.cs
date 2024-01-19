@@ -54,7 +54,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<int>> GetTemplateConfigCount(string state = "", CancellationToken token = default);
         Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(long configTemplateId);
         Task<BaseResponse<bool>> AddOrUpdateConfigTemplateMargin(ConfigTemplateMarginModel request);
-
+        Task<BaseResponse<CopyClientConfigResponse>> CopyClientConfig(CopyClientConfigRequest request);
         #endregion
 
         void Dispose();

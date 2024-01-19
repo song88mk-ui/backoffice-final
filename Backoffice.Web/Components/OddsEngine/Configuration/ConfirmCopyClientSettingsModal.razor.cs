@@ -1,11 +1,10 @@
-﻿using Backoffice.Shared.OutgoingEngineMessages;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using System.Drawing;
-using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -14,12 +13,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
-        
+        [Inject] private IBackofficeService BackofficeService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }        
 
         private EventCallback OnCopyClientSettingsCallback { get; set; }
         private string Region { get; set; }
+        private ClientInformationModel ToClient { get; set; }
         private KeyValuePair<string, string> SelectedFromClient { get; set; }
         private KeyValuePair<string, string> SelectedToClient { get; set; }        
         #endregion
@@ -29,6 +30,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             SelectedFromClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedFromClient");
             SelectedToClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedToClient");
             Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            ToClient = ModalParameters.TryGet<ClientInformationModel>("ToClient");
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback>("OnCopyClientSettingsCallback");
         }
         public async Task OnCancelModalClickEvent()
@@ -44,18 +46,36 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnApplyModalClickEvent()
         {
-            var payload = new OnCopyClientSettingsMessage
+            var payload = new CopyClientConfigRequest
             {
-                UserId = UserModel.Id,
                 FromClientCode = SelectedFromClient.Key,
-                ToClientCode = SelectedToClient.Key
+                ToClientCode = ToClient.ClientCode,
+                ToClientId = ToClient.ClientId,
+                ToClientName = ToClient.ClientName
             };
 
-            //MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnCopyClientSettings", "r.oe.web.config.oncopyclientsettings", Guid.NewGuid().ToString());
+            var response = await BackofficeService.CopyClientConfig(payload);
 
-            ModalService.Cancel();
+            if (response.StatusCode == StatusCode.Success)
+            {
+                //await BackofficeService.AddActivityLog(new ActivityLogModel()
+                //{
+                //    Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
+                //    Payload = $"{SelectedSportId}.{SelectedScopeId}.{payload.Name}.T".Replace(" ", "_"),
+                //    From = "-",
+                //    To = JsonSerializer.Serialize(payload),
+                //    Activity = Activity.Copy.ToString(),
+                //    UserId = UserModel.Id,
+                //    UserName = UserModel.UserName,
+                //    TimeStamp = DateTime.UtcNow
+                //});
 
-            await OnCopyClientSettingsCallback.InvokeAsync();
+                //MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnCopyClientSettings", "r.oe.web.config.oncopyclientsettings", Guid.NewGuid().ToString());
+
+                ModalService.Cancel();
+
+                await OnCopyClientSettingsCallback.InvokeAsync();
+            }
         }
         public void Dispose()
         {

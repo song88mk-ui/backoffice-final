@@ -9,7 +9,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
         [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
@@ -17,7 +16,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private EventCallback OnCopyClientSettingsCallback { get; set; }
 
-        private List<SelectListItemModel<string>> Clients { get; set; }
+        private List<ClientInformationModel> Clients { get; set; }
         private List<SelectListItemModel<string>> FromClients { get; set; }
         private List<SelectListItemModel<string>> ToClients { get; set; }
         private string Region { get; set; }
@@ -28,7 +27,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            Clients = new List<SelectListItemModel<string>>();
+            Clients = new List<ClientInformationModel>();
             FromClients = new List<SelectListItemModel<string>>();
             ToClients = new List<SelectListItemModel<string>>();
 
@@ -42,27 +41,27 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public async Task Initialize()
         {
             Clients = await LoadClients();
-            SelectedFromClient = new KeyValuePair<string, string>(Clients[0].Value, Clients[0].Name);
-            SelectedToClient = new KeyValuePair<string, string>(Clients[1].Value, Clients[1].Name);
+            SelectedFromClient = new KeyValuePair<string, string>(Clients[0].ClientCode, Clients[0].ClientName);
+            SelectedToClient = new KeyValuePair<string, string>(Clients[1].ClientCode, Clients[1].ClientName);
 
-            FromClients = Clients.Where(x => x.Value != SelectedToClient.Key).ToList();
-            ToClients = Clients.Where(x => x.Value != SelectedFromClient.Key).ToList();
+            FromClients = Clients.Where(x => x.ClientCode != SelectedToClient.Key).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
+            ToClients = Clients.Where(x => x.ClientCode != SelectedFromClient.Key).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
         }
 
         public async Task OnFromClientChangedEvent(ChangeEventArgs e)
         {
             string ClientId = e.Value.ToString();
 
-            SelectedFromClient = new KeyValuePair<string, string>(e.Value.ToString(), Clients.FirstOrDefault(x => x.Value == ClientId).Name);
-            ToClients = Clients.Where(x => x.Value != SelectedFromClient.Key).ToList();
+            SelectedFromClient = new KeyValuePair<string, string>(e.Value.ToString(), Clients.FirstOrDefault(x => x.ClientCode == ClientId).ClientName);
+            ToClients = Clients.Where(x => x.ClientCode != SelectedFromClient.Key).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
         }
 
         public async Task OnToClientChangedEvent(ChangeEventArgs e)
         {
             string ClientId = e.Value.ToString();
 
-            SelectedToClient = new KeyValuePair<string, string>(e.Value.ToString(), Clients.FirstOrDefault(x => x.Value == ClientId).Name);
-            FromClients = Clients.Where(x => x.Value != SelectedToClient.Key).ToList();
+            SelectedToClient = new KeyValuePair<string, string>(e.Value.ToString(), Clients.FirstOrDefault(x => x.ClientCode == ClientId).ClientName);
+            FromClients = Clients.Where(x => x.ClientCode != SelectedToClient.Key).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
         }
 
         public async Task OnCancelModalClickEvent()
@@ -75,6 +74,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-md");
+            parameters.Add("ToClient", Clients.FirstOrDefault(c => c.ClientCode == SelectedToClient.Key));
             parameters.Add("SelectedFromClient", SelectedFromClient);
             parameters.Add("SelectedToClient", SelectedToClient);
             parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);
@@ -90,7 +90,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #endregion
 
         #region Utilities
-        private async Task<List<SelectListItemModel<string>>> LoadClients()
+        private async Task<List<ClientInformationModel>> LoadClients()
         {
             var clients = new List<ClientInformationModel>();
             clients = (await TradingService.GetClientList()).Result;
@@ -99,11 +99,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
             }
 
-            return clients?.Select(x => new SelectListItemModel<string>()
-            {
-                Name = x.ClientName,
-                Value = x.ClientCode
-            }).ToList() ?? new List<SelectListItemModel<string>>();
+            return clients?.ToList() ?? new List<ClientInformationModel>();
         }
         #endregion
     }
