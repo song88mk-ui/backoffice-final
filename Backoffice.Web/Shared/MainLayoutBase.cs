@@ -364,10 +364,14 @@ namespace Backoffice.Web.Shared
                         ("Error Connecting to hub", ex.Message));
             }
         }
+
         private async Task ProcessNotification(NotificationsModel message)
         {
             if (message != null)
             {
+                if (!string.IsNullOrEmpty(message.UserId) && message.UserId != UserModel.Id)
+                    return;
+
                 toasterService.AddToast(Toast.NewToast
                         (message.Page, message.Details, true));
             }
