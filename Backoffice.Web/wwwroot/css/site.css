@@ -255,6 +255,10 @@ a, .btn-link {
     content: "\1129";
 }
 
+.ico-pen:before {
+    content: "\112C";
+}
+
 iframe {
     width: 100% !important;
 }

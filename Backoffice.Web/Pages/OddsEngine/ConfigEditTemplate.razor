@@ -8,21 +8,37 @@
 <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region" />
 
 <div class="col-md-12 mb-4">
-    <div class="col-md-12 mb-4">
-        <div class="d-flex justify-content-between mx-4">
-            <div>
-                <h4 class="page-title fw-bold">@ConfigTemplateName</h4>
-                @if (_isExisitngName)
-                {
-                    <span class="fst-italic text-danger">Sorry, that name already exists!</span>
-                }
-            </div>
+    <div class="col-md-12 my-4">
+        <div class="d-flex justify-content-between">
 
-            <div>
-                @if(!View)
+            @if (!_isEdttingName)
+            {
+                <div class="d-flex align-items-center">
+                    <h4 class="page-title fw-bold m-0">@ConfigTemplateName</h4>
+                    <icon class="btn border-0 ico ico-pen mx-2" @onclick="OnTemplateNameClicked"></icon>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex border col-8">
+                    <input class="template-name edit border-0 form-control w-100 shadow-none" @bind-value="_temporaryName" />
+                    <button class="btn border-0 fa fa-close" @onclick="OnCancelTemplateNameClicked"></button>
+                    <button class="btn border-0 fa fa-check" @onclick="OnSaveTemplateNameClicked"></button>
+                </div>
+            }
+
+            @if (_isExisitngName)
+            {
+                <div>
+                    <span class="fst-italic text-danger">Sorry, that name already exists!</span>
+                </div>
+            }
+
+            <div class="d-flex align-items-center">
+                @if (!View)
                 {
-                    <button type="button" class="btn btn-cancel" @onclick="OnCancelMarginTemplate">Cancel</button>
-                    <button type="button" class="btn btn-save" disabled="@(!HasChanges || IsPreloader || _isProcessing)" @onclick="OnSaveMarginTemplate">Save Changes</button>
+                    <button type="button" class="btn btn-cancel mx-1" @onclick="OnCancelMarginTemplate">Cancel</button>
+                    <button type="button" class="btn btn-save mx-1" disabled="@(!(HasChanges || IsNameChanges) || IsPreloader || _isProcessing)" @onclick="OnSaveMarginTemplate">Save Changes</button>
                 }
             </div>
         </div>
@@ -77,10 +93,10 @@
             foreach (var market in MarketLookupNavigation.Where(m => m.IsVisible))
             {
                 <AccordionTemplateConfiguration Market="market" IsReadOnly="View"
-                    @key="@($"{EditConfigTemplateFilterModel.ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
-                    FilterConfigStatus="@EditConfigTemplateFilterModel.SelectedConfigStatus"
-                    Scope="@EditConfigTemplateFilterModel.ScopeId" 
-                    OnTemplateMarginChangeCallback="OnTemplateMarginChange"/>
+                                                @key="@($"{EditConfigTemplateFilterModel.ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
+                                                FilterConfigStatus="@EditConfigTemplateFilterModel.SelectedConfigStatus"
+                                                Scope="@EditConfigTemplateFilterModel.ScopeId"
+                                                OnTemplateMarginChangeCallback="OnTemplateMarginChange" />
             }
         }
         else

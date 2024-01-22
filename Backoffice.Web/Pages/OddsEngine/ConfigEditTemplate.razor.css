@@ -38,10 +38,11 @@
 }
 
 .btn:disabled {
-    background: #9AA0AB;
+   opacity: 60%;
+   border: none;
 }
 
-.card-flex,.select-div,.filter-div  {
+.card-flex, .select-div, .filter-div {
     gap: 2rem;
 }
 
@@ -54,7 +55,7 @@
 }
 
 .btn-activate-all {
-    color: black;    
+    color: black;
 }
 
 button.form-select {
@@ -66,4 +67,23 @@ button.form-select {
 
 .dropdown-toggle::after {
     content: unset;
+}
+
+.template-name.edit{
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+}
+
+.ico-pen {
+    font-size: 1rem;
+    color: #404E67;
+}
+
+.fa-check {
+    color: #E5442F;
+    font-size: 1.5rem;
+}
+.fa-close {
+    color: #505050;
+    font-size: 1.5rem;
 }

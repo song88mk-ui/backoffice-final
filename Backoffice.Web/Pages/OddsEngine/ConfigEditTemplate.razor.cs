@@ -43,10 +43,13 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string AllMarketStatusName { get; set; } = "ACTIVATE ALL";
         public bool IsPreloader { get; set; } = true;
         public bool HasChanges { get; set; } = false;
+        public bool IsNameChanges { get; set; } = false;
         private AlertModel _alertModel { get; set; }
         private Activity? _activity;
         private bool _isExisitngName;
         private bool _isProcessing;
+        private bool _isEdttingName;
+        private string _temporaryName;
         #endregion
 
 
@@ -80,7 +83,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             await LoadConfigTemplateMargin();
         }
-
+        protected override Task OnParametersSetAsync()
+        {
+            return base.OnParametersSetAsync();
+        }
         public async Task InitConfigEditTemplate(EditConfigTemplateFilterModel model)
         {
             IsPreloader = true;
@@ -105,7 +111,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             SportIcon = EditConfigTemplateFilterModel.SportName.Contains(" ") ? EditConfigTemplateFilterModel.SportName.Replace(" ", "-").ToLower() : EditConfigTemplateFilterModel.SportName.ToLower();
             SportName = EditConfigTemplateFilterModel.SportName;
-            ConfigTemplateName = $"{(_activity == Activity.Copy ? "Copy of " : "")} {EditConfigTemplateFilterModel.ConfigTemplate.Name}";
+            ConfigTemplateName = $"{(_activity == Activity.Copy ? "Copy of " : "")}{EditConfigTemplateFilterModel.ConfigTemplate.Name}";
             Scope = ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId).ToString();
 
             await LoadMarkets();
@@ -472,6 +478,22 @@ namespace Backoffice.Web.Pages.OddsEngine
                         NavigationManager.NavigateTo($"hk/odds-engine/config-templates?message=Successfully updated");
                     }
                 }
+
+
+                if (IsNameChanges && _activity != Activity.Copy)
+                {
+                    var payload = new ConfigTemplateModel()
+                    {
+                        Id = ConfigTemplateId,
+                        SportId = EditConfigTemplateFilterModel.SportId,
+                        FixtureTypeId = (int)FixtureType.Match,
+                        FixtureStatusId = EditConfigTemplateFilterModel.ScopeId,
+                        Name = ConfigTemplateName,
+                    };
+
+                    var response = await BackofficeService.AddOrUpdateConfigTemplate(payload);
+                    IsNameChanges = false;
+                }
             }
             catch (Exception ex)
             {
@@ -486,6 +508,22 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnCancelMarginTemplate()
         {
             NavigationManager.NavigateTo($"hk/odds-engine/config-templates");
+        }
+        public async Task OnTemplateNameClicked()
+        {
+            _isEdttingName = true;
+            _temporaryName = ConfigTemplateName;
+        }
+        public async Task OnSaveTemplateNameClicked()
+        {
+            _isEdttingName = false;
+            ConfigTemplateName = _temporaryName;
+            if (ConfigTemplateName != EditConfigTemplateFilterModel.ConfigTemplate.Name)
+                IsNameChanges = true;
+        }
+        public async Task OnCancelTemplateNameClicked()
+        {
+            _isEdttingName = false;
         }
 
         public void Dispose()
