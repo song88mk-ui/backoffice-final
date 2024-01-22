@@ -14,7 +14,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
-        private EventCallback OnCopyClientSettingsCallback { get; set; }
+        private EventCallback<AlertModel> OnCopyClientSettingsCallback { get; set; }
 
         private List<ClientInformationModel> Clients { get; set; }
         private List<SelectListItemModel<string>> FromClients { get; set; }
@@ -31,7 +31,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             FromClients = new List<SelectListItemModel<string>>();
             ToClients = new List<SelectListItemModel<string>>();
 
-            OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback>("OnCopyClientSettingsCallback");
+            OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback<AlertModel>>("OnCopyClientSettingsCallback");
             Region = ModalParameters.TryGet<string>("Region").ToUpper();
             TradingService.Region = Region.ToUpper();
 

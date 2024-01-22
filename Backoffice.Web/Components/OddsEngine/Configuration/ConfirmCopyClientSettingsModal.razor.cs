@@ -20,11 +20,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }        
 
-        private EventCallback OnCopyClientSettingsCallback { get; set; }
+        private EventCallback<AlertModel> OnCopyClientSettingsCallback { get; set; }
         private string Region { get; set; }
         private ClientInformationModel ToClient { get; set; }
         private KeyValuePair<string, string> SelectedFromClient { get; set; }
-        private KeyValuePair<string, string> SelectedToClient { get; set; }        
+        private KeyValuePair<string, string> SelectedToClient { get; set; }
+        private bool _isProcessing;
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
@@ -33,7 +34,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             SelectedToClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedToClient");
             Region = ModalParameters.TryGet<string>("Region").ToUpper();
             ToClient = ModalParameters.TryGet<ClientInformationModel>("ToClient");
-            OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback>("OnCopyClientSettingsCallback");
+            OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback<AlertModel>>("OnCopyClientSettingsCallback");
         }
         public async Task OnCancelModalClickEvent()
         {
@@ -48,6 +49,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnApplyModalClickEvent()
         {
+            _isProcessing = true;
+
+            var alert = new AlertModel();
             var payload = new CopyClientConfigRequest
             {
                 FromClientCode = SelectedFromClient.Key,
@@ -60,17 +64,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             if (response.StatusCode == StatusCode.Success)
             {
-                //await BackofficeService.AddActivityLog(new ActivityLogModel()
-                //{
-                //    Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                //    Payload = $"{SelectedSportId}.{SelectedScopeId}.{payload.Name}.T".Replace(" ", "_"),
-                //    From = "-",
-                //    To = JsonSerializer.Serialize(payload),
-                //    Activity = Activity.Copy.ToString(),
-                //    UserId = UserModel.Id,
-                //    UserName = UserModel.UserName,
-                //    TimeStamp = DateTime.UtcNow
-                //});
 
                 var message = new OnCopyClientSettingsMessage
                 {
@@ -90,10 +83,25 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                 MessageBroker.Publish(JsonSerializer.Serialize(message), "OnCopyClientSettings2", "r.oe.web.config.oncopyclientsettings2", Guid.NewGuid().ToString());
 
-                ModalService.Cancel();
-
-                await OnCopyClientSettingsCallback.InvokeAsync();
+                alert = new AlertModel()
+                {
+                    Status = AlertStatus.Success,
+                    Message = "Copy Client Settings Successfully.",
+                    Opacity = 1.0m
+                };
             }
+            else
+                alert = new AlertModel()
+                {
+                    Status = AlertStatus.Error,
+                    Message = "Copy Client Settings Failed.",
+                    Opacity = 1.0m
+                };
+            
+            _isProcessing = false;
+
+            ModalService.Cancel();
+            await OnCopyClientSettingsCallback.InvokeAsync(alert);
         }
         public void Dispose()
         {

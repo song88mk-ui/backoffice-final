@@ -8,9 +8,16 @@
             <br />
             You can't undo this action.
         </div>
+        @if(_isProcessing)
+        {
+            <div class="text-center">
+                <Preloader />
+            </div>
+        }
+
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" data-bs-dismiss="modal" @onclick="OnCancelModalClickEvent">Cancel</button>
-    <button type="button" class="btn modal-btn btn-apply" @onclick="OnApplyModalClickEvent">Apply</button>
+    <button type="button" class="btn modal-btn btn-cancel" disabled="@_isProcessing" data-bs-dismiss="modal" @onclick="OnCancelModalClickEvent">Cancel</button>
+    <button type="button" class="btn modal-btn btn-apply" disabled="@_isProcessing" @onclick="OnApplyModalClickEvent">Apply</button>
 </div>
