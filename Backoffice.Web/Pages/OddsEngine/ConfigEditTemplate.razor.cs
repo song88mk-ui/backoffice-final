@@ -79,6 +79,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _ => null
             };
 
+            if (_activity == null)
+            {
+                NavigationManager.NavigateTo("/notfound");
+                return;
+            }
+
             HasChanges = _activity == Activity.Copy;
 
             await LoadConfigTemplateMargin();
@@ -452,7 +458,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             {
                                 Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                                 Payload = $"{EditConfigTemplateFilterModel.SportId}.{EditConfigTemplateFilterModel.ScopeId}.{EditConfigTemplateFilterModel.ConfigTemplate.Name}.Modified_Margins.M".Replace(" ", "_"),
-                                From = JsonSerializer.Serialize(oldConfigMarginsLogs),
+                                From = _activity == Activity.Copy ?  "-" : JsonSerializer.Serialize(oldConfigMarginsLogs),
                                 To = JsonSerializer.Serialize(newConfigMarginsLogs),
                                 Activity = Activity.Update.ToString(),
                                 UserId = UserModel.Id,
@@ -466,7 +472,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             {
                                 Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                                 Payload = $"{EditConfigTemplateFilterModel.SportId}.{EditConfigTemplateFilterModel.ScopeId}.{EditConfigTemplateFilterModel.ConfigTemplate.Name}.Changed_Market_State.M".Replace(" ", "_"),
-                                From = JsonSerializer.Serialize(oldMarketState),
+                                From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldMarketState),
                                 To = JsonSerializer.Serialize(newMarketState),
                                 Activity = Activity.Update.ToString(),
                                 UserId = UserModel.Id,
