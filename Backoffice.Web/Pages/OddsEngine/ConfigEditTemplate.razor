@@ -10,7 +10,6 @@
 <div class="col-md-12 mb-4">
     <div class="col-md-12 my-4">
         <div class="d-flex justify-content-between">
-
             @if (!_isEdttingName)
             {
                 <div class="d-flex align-items-center">
@@ -26,14 +25,6 @@
                     <button class="btn border-0 fa fa-check" @onclick="OnSaveTemplateNameClicked"></button>
                 </div>
             }
-
-            @if (_isExisitngName)
-            {
-                <div>
-                    <span class="fst-italic text-danger">Sorry, that name already exists!</span>
-                </div>
-            }
-
             <div class="d-flex align-items-center">
                 @if (!View)
                 {
@@ -42,6 +33,12 @@
                 }
             </div>
         </div>
+        @if (_isExisitngName)
+        {
+            <div class="col">
+                <span class="fst-italic text-danger">Sorry, that name already exists!</span>
+            </div>
+        }
     </div>
 
     <div class="col-md-12 mb-4">

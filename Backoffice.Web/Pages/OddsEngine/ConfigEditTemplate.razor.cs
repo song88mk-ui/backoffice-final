@@ -524,6 +524,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             _isEdttingName = false;
             ConfigTemplateName = _temporaryName;
+            _isExisitngName = false;
+
             if (ConfigTemplateName != EditConfigTemplateFilterModel.ConfigTemplate.Name)
                 IsNameChanges = true;
         }
