@@ -458,7 +458,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             {
                                 Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                                 Payload = $"{EditConfigTemplateFilterModel.SportId}.{EditConfigTemplateFilterModel.ScopeId}.{EditConfigTemplateFilterModel.ConfigTemplate.Name}.Modified_Margins.M".Replace(" ", "_"),
-                                From = _activity == Activity.Copy ?  "-" : JsonSerializer.Serialize(oldConfigMarginsLogs),
+                                From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldConfigMarginsLogs),
                                 To = JsonSerializer.Serialize(newConfigMarginsLogs),
                                 Activity = Activity.Update.ToString(),
                                 UserId = UserModel.Id,

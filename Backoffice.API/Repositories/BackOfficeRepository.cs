@@ -1446,16 +1446,16 @@ namespace Backoffice.API.Repositories
 
                 if (config != null)
                 {
-                    if (config.Name != request.Name)
+                    if (config.Name.Trim().ToLower() != request.Name.Trim().ToLower())
                     {
-                        config.Name = request.Name;
+                        config.Name = request.Name.Trim();
                         _backofficeContext.ConfigTemplate.Update(config);
                         await _backofficeContext.SaveChangesAsync();
                     }
                 }
                 else
                 {
-                    var isConfigExisting = _backofficeContext.ConfigTemplate.Any(e => e.Name == request.Name);
+                    var isConfigExisting = _backofficeContext.ConfigTemplate.Any(e => e.Name.Trim().ToLower() == request.Name.Trim().ToLower());
 
                     if (isConfigExisting)
                     {
@@ -1467,7 +1467,7 @@ namespace Backoffice.API.Repositories
                     }
                     config = new ConfigTemplate()
                     {
-                        Name = request.Name,
+                        Name = request.Name.Trim(),
                         SportId = request.SportId,
                         FixtureTypeId = request.FixtureTypeId,
                         FixtureStatusId = request.FixtureStatusId,
