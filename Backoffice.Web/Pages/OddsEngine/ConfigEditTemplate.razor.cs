@@ -556,7 +556,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (ConfigTemplateName != EditConfigTemplateFilterModel.ConfigTemplate.Name)
             {
                 IsNameChanges = true;
-                //Breadcrumbs.Last().Name = ConfigTemplateName;
+                Breadcrumbs.Last().Name = ConfigTemplateName;
             }
         }
         public async Task OnCancelTemplateNameClicked()
