@@ -1446,7 +1446,17 @@ namespace Backoffice.API.Repositories
 
                 if (config != null)
                 {
-                    if (config.Name.Trim().ToLower() != request.Name.Trim().ToLower())
+                    var isExistingName = _backofficeContext.ConfigTemplate.Any(e => e.Name.Trim().ToLower() == request.Name.Trim().ToLower() && e.Id != config.Id);
+
+                    if (isExistingName)
+                    {
+                        return new BaseResponse<long>()
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Sorry, that name already exists!"
+                        };
+                    }
+                    else if (config.Name.Trim().ToLower() != request.Name.Trim().ToLower())
                     {
                         config.Name = request.Name.Trim();
                         _backofficeContext.ConfigTemplate.Update(config);
@@ -1455,9 +1465,9 @@ namespace Backoffice.API.Repositories
                 }
                 else
                 {
-                    var isConfigExisting = _backofficeContext.ConfigTemplate.Any(e => e.Name.Trim().ToLower() == request.Name.Trim().ToLower());
+                    var isExistingName = _backofficeContext.ConfigTemplate.Any(e => e.Name.Trim().ToLower() == request.Name.Trim().ToLower());
 
-                    if (isConfigExisting)
+                    if (isExistingName)
                     {
                         return new BaseResponse<long>()
                         {
@@ -1465,6 +1475,7 @@ namespace Backoffice.API.Repositories
                             Message = "Sorry, that name already exists!"
                         };
                     }
+
                     config = new ConfigTemplate()
                     {
                         Name = request.Name.Trim(),
@@ -1896,7 +1907,7 @@ namespace Backoffice.API.Repositories
                         var fromClientConfigTemplateAssigned = context.ConfigTemplateAssigned.Where(c => c.ClientCode == request.FromClientCode).ToList();
                         var toClientConfigTemplateAssigned = context.ConfigTemplateAssigned.Where(c => c.ClientCode == request.ToClientCode).ToList();
 
-                        if(toClientConfigTemplateAssigned.Any())
+                        if (toClientConfigTemplateAssigned.Any())
                         {
                             foreach (var config in toClientConfigTemplateAssigned)
                             {

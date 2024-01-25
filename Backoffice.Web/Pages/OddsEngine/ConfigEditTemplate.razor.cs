@@ -99,6 +99,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             EditConfigTemplateFilterModel = model;
 
+
+            SportIcon = EditConfigTemplateFilterModel.SportName.Contains(" ") ? EditConfigTemplateFilterModel.SportName.Replace(" ", "-").ToLower() : EditConfigTemplateFilterModel.SportName.ToLower();
+            SportName = EditConfigTemplateFilterModel.SportName;
+            ConfigTemplateName = $"{(_activity == Activity.Copy ? "Copy of " : "")}{EditConfigTemplateFilterModel.ConfigTemplate.Name}";
+            Scope = ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId).ToString();
+
             Breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
@@ -109,16 +115,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                 },
                 new BreadcrumbModel
                 {
-                    Name = $"{EditConfigTemplateFilterModel.ConfigTemplate.Name}",
+                    Name = $"{ConfigTemplateName}",
                     Url = $"hk/odds-engine/config-templates/edit/{ConfigTemplateId}",
                     IsCurrentPage = true
                 }
             };
-
-            SportIcon = EditConfigTemplateFilterModel.SportName.Contains(" ") ? EditConfigTemplateFilterModel.SportName.Replace(" ", "-").ToLower() : EditConfigTemplateFilterModel.SportName.ToLower();
-            SportName = EditConfigTemplateFilterModel.SportName;
-            ConfigTemplateName = $"{(_activity == Activity.Copy ? "Copy of " : "")}{EditConfigTemplateFilterModel.ConfigTemplate.Name}";
-            Scope = ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId).ToString();
 
             await LoadMarkets();
 
@@ -176,6 +177,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 return;
 
             _isProcessing = true;
+            var isNavigate = false;
 
             try
             {
@@ -481,12 +483,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                             });
                         }
 
-                        NavigationManager.NavigateTo($"hk/odds-engine/config-templates?message=Successfully updated");
+                        isNavigate = true;
                     }
                 }
 
 
-                if (IsNameChanges && _activity != Activity.Copy)
+                if (IsNameChanges && _activity == Activity.Update)
                 {
                     var payload = new ConfigTemplateModel()
                     {
@@ -499,7 +501,32 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     var response = await BackofficeService.AddOrUpdateConfigTemplate(payload);
                     IsNameChanges = false;
+
+                    if (response.StatusCode == StatusCode.Success)
+                    {
+                        await BackofficeService.AddActivityLog(new ActivityLogModel()
+                        {
+                            Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
+                            Payload = $"{EditConfigTemplateFilterModel.SportId}.{EditConfigTemplateFilterModel.ScopeId}.{payload.Name}.T".Replace(" ", "_"),
+                            From = "-",
+                            To = JsonSerializer.Serialize(payload),
+                            Activity = Activity.Create.ToString(),
+                            UserId = UserModel.Id,
+                            UserName = UserModel.UserName,
+                            TimeStamp = DateTime.UtcNow
+                        });
+
+                        isNavigate = true;
+                    }
+                    else
+                    {
+                        _isExisitngName = true;
+                        return;
+                    }
                 }
+
+                if(isNavigate)
+                    NavigationManager.NavigateTo($"hk/odds-engine/config-templates?message=Successfully updated");
             }
             catch (Exception ex)
             {
@@ -518,16 +545,19 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnTemplateNameClicked()
         {
             _isEdttingName = true;
-            _temporaryName = ConfigTemplateName;
+            _temporaryName = ConfigTemplateName.Trim();
         }
         public async Task OnSaveTemplateNameClicked()
         {
             _isEdttingName = false;
-            ConfigTemplateName = _temporaryName;
+            ConfigTemplateName = _temporaryName.Trim();
             _isExisitngName = false;
 
             if (ConfigTemplateName != EditConfigTemplateFilterModel.ConfigTemplate.Name)
+            {
                 IsNameChanges = true;
+                Breadcrumbs.Last().Name = ConfigTemplateName;
+            }
         }
         public async Task OnCancelTemplateNameClicked()
         {

@@ -14,7 +14,11 @@
             {
                 <div class="d-flex align-items-center">
                     <h4 class="page-title fw-bold m-0">@ConfigTemplateName</h4>
-                    <icon class="btn border-0 ico ico-pen mx-2" @onclick="OnTemplateNameClicked"></icon>
+
+                    @if (!string.IsNullOrEmpty(ConfigTemplateName))
+                    {
+                        <icon class="btn border-0 ico ico-pen mx-2" @onclick="OnTemplateNameClicked"></icon>
+                    }
                 </div>
             }
             else

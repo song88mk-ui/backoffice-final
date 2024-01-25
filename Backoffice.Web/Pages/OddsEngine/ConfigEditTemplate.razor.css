@@ -37,11 +37,6 @@
     background: transparent linear-gradient(269deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
 
-.btn:disabled {
-   opacity: 60%;
-   border: none;
-}
-
 .card-flex, .select-div, .filter-div {
     gap: 2rem;
 }
