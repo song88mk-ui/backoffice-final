@@ -125,7 +125,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
             if (_selectedClientCount == 1)
                 _selectedClientName = items.FirstOrDefault().Value;
 
-            await OnFilterClientCallback.InvokeAsync();
+            await OnFilterClientCallback.InvokeAsync(_clientFilter);
         }
 
         public void Dispose()

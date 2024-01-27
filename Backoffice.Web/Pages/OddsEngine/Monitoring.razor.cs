@@ -69,7 +69,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnParametersSetAsync()
         {
-            if (SelectedSport != null && _slugs != null && _slugs.Count >= 2)
+            if (SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2)
             {
                 var isSportChanged = _sportId != SelectedSport.SportId || _leagueId != SelectedSport.LeagueId;
                 _sportId = SelectedSport.SportId;
@@ -134,10 +134,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
         {
-            //DO NOTHING , check if clientfilter is updating, otherwise pass it as param here;
             if (clients != null)
             {
-                _clients = clients.Select(s => new Client
+                _clients = clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => new Client
                             {
                                 ClientCode = s.Value,
                                 ClientName = s.Name,
