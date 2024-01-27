@@ -1,15 +1,42 @@
 ﻿<div class="content-filter mx-3">
     <div class="w-100 d-flex justify-content-between">
         <div class="select-container">
-            @if (_topMarketTemplates != null && _topMarketTemplates.Any())
-            {
-                <select class="form-select d-block" @onchange="OnMarketChangedEvent">
-                    @foreach (var item in _topMarketTemplates)
+            <div class="me-4 w-50">
+                <div class="dropdown">
+                    <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        @if (_clientFilter.Any())
+                        {
+                            if (_clientFilter.Count - 1 == _selectedClientCount)
+                            {
+                                <span>All Clients (@_selectedClientCount)</span>
+                            }
+                            else
+                            {
+                                <span>@(_selectedClientCount == 1 ? _selectedClientName : $"Clients ({_selectedClientCount})")</span>
+                            }
+                        }
+                        else
+                        {
+                            <span>No Clients Available</span>
+                        }
+                    </button>
+                    @if (_clientFilter.Any())
                     {
-                        <option value="@item.MainMarketTemplateId" selected="@(item.MainMarketTemplateId.ToString() == _marketTemplateId)">@item.Name</option>
+                        <SelectWithCheckbox Items="_clientFilter" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="client-dropdown" />
                     }
-                </select>
-            }
+                </div>
+            </div>
+            <div class="me-4 w-50">
+                @if (_topMarketTemplates != null && _topMarketTemplates.Any())
+                {
+                    <select class="form-select d-block" @onchange="OnMarketChangedEvent">
+                        @foreach (var item in _topMarketTemplates)
+                        {
+                            <option value="@item.MainMarketTemplateId" selected="@(item.MainMarketTemplateId.ToString() == _marketTemplateId)">@item.Name</option>
+                        }
+                    </select>
+                }
+            </div>
         </div>
         <div>
             @if (_topMarketTemplates != null)
