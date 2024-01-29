@@ -1,12 +1,12 @@
 ﻿<div class="content-filter mx-3">
     <div class="d-flex justify-content-between">
         <div class="select-container d-flex">
-            <div class="me-4 w-50">
+            <div class="me-2">
                 <div class="dropdown">
                     <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         @if (_clientFilter.Any())
                         {
-                            if (_clientFilter.Count - 1 == _selectedClientCount)
+                            if (_clientFilter.Count == _selectedClientCount)
                             {
                                 <span>All Clients (@_selectedClientCount)</span>
                             }
@@ -26,7 +26,7 @@
                     }
                 </div>
             </div>
-            <div class="me-4 w-50">
+            <div class="me-2">
                 @if (_topMarketTemplates != null && _topMarketTemplates.Any())
                 {
                     <select class="form-select d-block" @onchange="OnMarketChangedEvent">
