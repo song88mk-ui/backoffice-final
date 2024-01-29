@@ -1,5 +1,5 @@
-﻿<tr>
-    <td>
+﻿<tr class="d-flex">
+    <td class="td-start-date">
         @if (_fixtureStatusId == 1)
         {
             <span class="m-1">@_currentPeriod</span>
@@ -18,7 +18,7 @@
         }
 
     </td>
-    <td>
+    <td class="td-fixture-name">
         <div class="d-flex justify-content-between px-2">
             <a href="@($"hk/odds-engine/monitoring-details/{_providerFixtureId}")" class="fixture-details text-decoration-none">
                 <span class="fw-bold">@_homeName?.ToUpper()</span>
@@ -36,7 +36,7 @@
     {
         <AuthorizeView Policy="sbc-monitoring-match-canedit">
             <Authorized Context="ActivateAll">
-                <td>
+                <td class="td-close-match">
                     <button type="button" class="btn btn-dark close-match-btn mx-4" @onclick="OnCloseMatchClickEvent">Close Match</button>
                 </td>
             </Authorized>
@@ -44,8 +44,8 @@
     }
 
     <!-- BR CTRL -->
-    <td>
-        <div class="d-flex justify-content-left">
+    <td class="td-master">
+        <div class="d-flex justify-content-center">
             @if (Market != null && _selections.Any())
             {
                 foreach (var selection in _selections)
@@ -92,8 +92,8 @@
     {
         foreach (var client in Clients)
         {
-            <td>
-                <div class="d-flex justify-content-left">
+            <td class="td-master">
+                <div class="d-flex justify-content-center">
                     @if (Market != null && _selections.Any())
                     {
                         foreach (var selection in _selections)
