@@ -38,3 +38,11 @@
 .selection-name-container {
     white-space: nowrap;
 }
+
+.td-selection{
+    width: 300px;
+}
+
+.td-master, .td-client {
+    flex: 1
+}

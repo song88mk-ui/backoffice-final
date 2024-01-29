@@ -51,3 +51,28 @@ table thead th:last-child {
 .market-template-fixture-container {
     width: 85%;
 }
+
+.th-start-date {
+    width: 100px;
+}
+
+.th-fixture-name {
+    width: 400px;
+}
+
+.th-close-match {
+    width: 150px;
+}
+
+.th-master, .th-client {
+    flex: 1
+}
+
+
+.td-master, .td-client {
+    flex: 1
+}
+
+.td-selection {
+    width: 300px;
+}
