@@ -1,8 +1,8 @@
-﻿<tr>
-    <td>
+﻿<tr class="d-flex">
+    <td class="td-selection">
         <span class="selection-name-container fw-bold">@Selection.SelectionName</span>
     </td>
-    <td>
+    <td class="td-master">
         <div class="d-flex justify-content-center">
             <div class="odds-container @GetClientColor() py-1">
                 <span class="d-block text-center">@GetClientOdds(null)</span>
@@ -13,7 +13,7 @@
     {
         foreach (var client in _clients)
         {
-            <td>
+            <td class="td-client">
                 <div class="d-flex justify-content-center">
                     <div class="odds-container @GetClientColor(client.ClientCode) py-1">
                         @if (HasClientConfig(client.ClientCode, _clientCode, _clientCodeMargin))

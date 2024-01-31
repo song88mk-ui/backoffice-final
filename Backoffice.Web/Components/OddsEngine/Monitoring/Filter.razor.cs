@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
+using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -11,15 +12,23 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         #region Properties
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
+        [Inject] public ITradingService TradingService { get; set; }
+
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [Parameter] public EventCallback<MonitoringCallbackModel> OnInitCallback { get; set; }
+        [Parameter] public EventCallback<List<SelectListItemWithCheckboxModel<string>>> OnFilterClientCallback { get; set; }
         [Parameter] public int SportId { get; set; }
         #endregion
 
         #region Fields
+        private string _region = "hk";
         private int _sportId;
         private SearchFormModel _searchForm;
         private List<MainMarketTemplateResponse> _topMarketTemplates;
+        private List<SelectListItemWithCheckboxModel<string>> _clientFilter;
         private string _marketTemplateId = string.Empty;
+        private int _selectedClientCount;
+        private string _selectedClientName;
         #endregion
 
         #region Methods
@@ -28,6 +37,40 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         {
             _topMarketTemplates = new List<MainMarketTemplateResponse>();
             _searchForm = new SearchFormModel();
+            _clientFilter = new List<SelectListItemWithCheckboxModel<string>>();
+
+            TradingService.Region = _region.ToUpper();
+
+            var clientsResponse = await TradingService.GetClientList();
+            var clients = clientsResponse.Result;
+
+            if (clients != null)
+            {
+                _clientFilter = UserClientCodes != null && UserClientCodes.Any() ?
+                    clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()))
+                        .Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList() : new();
+
+                _clientFilter.Insert(0, new SelectListItemWithCheckboxModel<string>
+                {
+                    Value = "all",
+                    Name = "All Clients",
+                    IsChecked = true
+                });
+            }
+            else
+            {
+                _clientFilter.Add(new SelectListItemWithCheckboxModel<string>
+                {
+                    Value = "all",
+                    Name = "All Clients",
+                    IsChecked = true
+                });
+            }
+
+            _selectedClientCount = _clientFilter.Count;
+            _selectedClientName = _selectedClientCount > 0 ? string.Empty : _clientFilter.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+
+            await OnFilterClientCallback.InvokeAsync(_clientFilter);
         }
 
         protected override async Task OnParametersSetAsync()
@@ -72,6 +115,17 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                 SearchText = _searchForm.SearchText,
                 SelectedMarketTemplateId = _marketTemplateId
             });
+        }
+
+        public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
+        {
+            _selectedClientName = string.Empty;
+            _selectedClientCount = items.Count;
+            
+            if (_selectedClientCount == 1)
+                _selectedClientName = items.FirstOrDefault().Value;
+
+            await OnFilterClientCallback.InvokeAsync(_clientFilter);
         }
 
         public void Dispose()

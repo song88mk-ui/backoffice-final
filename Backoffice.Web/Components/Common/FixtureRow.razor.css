@@ -15,3 +15,20 @@
 .close-match-btn{
     white-space: nowrap;
 }
+
+
+.td-start-date {
+    width: 100px;
+}
+
+.td-fixture-name {
+    width: 400px;
+}
+
+.td-close-match {
+    width: 150px;
+}
+
+.td-master {
+    flex: 1
+}

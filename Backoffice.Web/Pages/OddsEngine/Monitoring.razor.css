@@ -33,9 +33,17 @@ table thead th:last-child {
 }
 
 .th-start-date {
-    width: 15%;
+    width: 100px;
 }
 
 .th-fixture-name {
-    width: 25%;
+    width: 400px;
+}
+
+.th-close-match {
+    width: 150px;
+}
+
+.th-master, .th-client {
+    flex: 1
 }

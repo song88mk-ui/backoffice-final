@@ -4,15 +4,10 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
-using Backoffice.Web.Shared;
-using Backoffice.Web.Shared.OddsEngine;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR.Client;
-using System;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using Serilog;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -23,10 +18,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public ICommonService CommonService { get; set; }
         [Inject] public IBackofficeService BackofficeService { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
@@ -69,31 +62,14 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
-            TradingService.Region = _region.ToUpper();
             _slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
 
             await AuthenticateAccess.InvokeAsync();
-
-            var clientsResponse = await TradingService.GetClientList();
-            var clients = clientsResponse.Result;
-
-            if (clients != null)
-            {
-                _clients = UserClientCodes != null && UserClientCodes.Any() ?
-                    clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()))
-                    .Select(s => new Client
-                    {
-                        ClientCode = s.ClientCode,
-                        ClientName = s.ClientName,
-                        Region = Configuration?["Region"] ?? "HK"
-                    })
-                    .ToList() : new();
-            }
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            if (SelectedSport != null && _slugs != null && _slugs.Count >= 2)
+            if (SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2)
             {
                 var isSportChanged = _sportId != SelectedSport.SportId || _leagueId != SelectedSport.LeagueId;
                 _sportId = SelectedSport.SportId;
@@ -154,6 +130,19 @@ namespace Backoffice.Web.Pages.OddsEngine
         private async Task MonitoringCallback(MonitoringCallbackModel model)
         {
             await OnInitializeEvent(_monitoringCallbackModel = model);
+        }
+
+        private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
+        {
+            if (clients != null)
+            {
+                _clients = clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => new Client
+                            {
+                                ClientCode = s.Value,
+                                ClientName = s.Name,
+                                Region = _region
+                            }).ToList();
+            }
         }
 
         private async Task OnSaveClickedEvent(object param)

@@ -13,6 +13,7 @@ using Serilog;
 using RabbitMQ.Client.Apigen.Attributes;
 using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 using System.Drawing.Printing;
+using System.Drawing;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -27,12 +28,12 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public string Id { get; set; }
 
+        private string _region = "hk";
         private HubConnection _hubConnection { get; set; }
 
         private List<BreadcrumbModel> Breadcrumbs { get; set; }
@@ -61,6 +62,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         protected override async Task OnInitializedAsync()
         {
             _isPreLoader = true;
+            _clients = new();
             _pageHeaderModel = new();
             TradingService.Region = Region.ToUpper();
             Breadcrumbs = new List<BreadcrumbModel>();
@@ -71,21 +73,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarginMarket = new MarketModel();
 
             await AuthenticateAccess.InvokeAsync();
-
-            var clients = (await TradingService.GetClientList()).Result;
-
-            if (clients != null)
-            {
-                _clients = UserClientCodes != null && UserClientCodes.Any() ?
-                        clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()))
-                        .Select(s => new Client
-                        {
-                            ClientCode = s.ClientCode,
-                            ClientName = s.ClientName,
-                            Region = Configuration["Region"] ?? string.Empty
-                        })
-                        .ToList() : new List<Client>();
-            }
 
             await PrepareMonitoringDetails();
         }
@@ -134,6 +121,19 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
             ModalService.Open<CloseMarketsModal>("Close Markets", parameters, options);
+        }
+
+        private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
+        {
+            if (clients != null)
+            {
+                _clients = clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => new Client
+                {
+                    ClientCode = s.Value,
+                    ClientName = s.Name,
+                    Region = _region
+                }).ToList();
+            }
         }
 
         public async Task OnInputSearchEvent(string search)

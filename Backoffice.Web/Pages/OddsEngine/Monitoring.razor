@@ -17,8 +17,7 @@
             <PageHeader PageHeaderModel="@_pageHeaderModel" />
         </div>
         <div class="col-md-12">
-            <Filter SportId="_sportId"
-                    OnInitCallback="MonitoringCallback" />
+            <Filter SportId="_sportId" OnInitCallback="MonitoringCallback" OnFilterClientCallback="FilterClientCallback" />
         </div>
 
         @if (!string.IsNullOrEmpty(_alertModel.Message))
@@ -39,7 +38,7 @@
                 {
                     <table class="table table-hover table-bordered mb-0">
                         <thead class="table-head">
-                            <tr>
+                            <tr class="d-flex">
                                 <th class="th-start-date py-3"></th>
                                 <th class="th-fixture-name py-3"></th>
                                 <AuthorizeView Policy="sbc-monitoring-match-canedit">
