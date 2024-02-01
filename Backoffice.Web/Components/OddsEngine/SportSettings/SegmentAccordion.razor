@@ -1,0 +1,30 @@
+﻿<div class="segment-container @(_showLeagues ? "active" : "") border rounded shadow-sm mb-2" data-id="@_segment.SegmentId">
+    <div class="segment-main @(_page == EditSportSettingsPage.SegmentAndLeagues ? "pe-3" : "px-3")">
+        <div class="d-flex justify-content-between">
+            <div class="d-flex">
+                @if (_page == EditSportSettingsPage.SegmentAndLeagues)
+                {
+                    <div class="drag-container d-flex justify-content-center align-items-center me-2">
+                        <i class="fa fa-ellipsis-v me-1 drag-item" />
+                        <i class="fa fa-ellipsis-v drag-item" />
+                    </div>
+                }
+                <span class="segment-name fw-bold py-2">
+                    @_segment.SegmentName
+                </span>
+            </div>
+            <span class="segment-toggle border rounded my-2" @onclick="OnToggleClick">
+                <i class="fa @(_showLeagues ? "fa-angle-up" : "fa-angle-down") mx-2 my-1" />
+            </span>
+        </div>
+    </div>
+    @if (_showLeagues)
+    {
+        <div id="@($"leagueEditable-{_segment.SportId}-{_segment.SegmentId}")" class="d-flex flex-column mx-3 my-2">
+            @foreach (var league in _segment.Leagues)
+            {
+                <LeagueAccordion @key="league" League="league" Page="_page" />
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,13 @@
+﻿.league-container {
+    background-color: #fff;
+}
+
+.drag-container {
+    background-color: #E8F5FF;
+    padding-right: 0.3rem;
+    padding-left: 0.3rem;
+}
+
+.drag-item {
+    color: #BDDEF8;
+}
