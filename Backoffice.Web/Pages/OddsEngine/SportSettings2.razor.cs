@@ -12,6 +12,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IPreRenderService PreRenderService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
@@ -60,6 +61,14 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnUpdateClickEvent(Tuple<bool, EditSportSettingsPage> data)
         {
+            //var parameters = new ModalParameters();
+            //parameters.Add("UserAction", "LEAVING");
+            //parameters.Add("DialogStyle", "max-width: 600px;");
+
+            //var options = new ModalOptions();
+            //ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
+
+            //return;
             _isUpdate = data.Item1;
 
             if (!_sportLookupSettings.Any())
@@ -145,7 +154,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     setting => setting.SportId,
                     sort => int.Parse(sort.RowId),
                     (setting, sort) => new SportSettingSport
-                    { 
+                    {
                         SportId = setting.SportId,
                         SportName = setting.SportName,
                         Segments = setting.Segments,
