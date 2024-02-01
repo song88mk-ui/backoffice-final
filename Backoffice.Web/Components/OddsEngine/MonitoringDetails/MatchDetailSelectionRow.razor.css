@@ -41,6 +41,7 @@
 
 .td-selection{
     width: 300px;
+    min-width: 200px;
 }
 
 .td-master, .td-client {

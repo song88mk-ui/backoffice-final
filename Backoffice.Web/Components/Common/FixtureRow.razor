@@ -1,4 +1,4 @@
-﻿<tr class="d-flex">
+﻿<tr>
     <td class="td-start-date">
         @if (_fixtureStatusId == 1)
         {
@@ -45,7 +45,7 @@
 
     <!-- BR CTRL -->
     <td class="td-master">
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-left">
             @if (Market != null && _selections.Any())
             {
                 foreach (var selection in _selections)
@@ -93,7 +93,7 @@
         foreach (var client in Clients)
         {
             <td class="td-master">
-                <div class="d-flex justify-content-center">
+                <div class="d-flex justify-content-left">
                     @if (Market != null && _selections.Any())
                     {
                         foreach (var selection in _selections)

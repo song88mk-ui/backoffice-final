@@ -22,7 +22,8 @@
 }
 
 .td-fixture-name {
-    width: 400px;
+    width: 320px;
+    min-width: 250px;
 }
 
 .td-close-match {
