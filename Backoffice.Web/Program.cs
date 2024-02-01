@@ -231,6 +231,7 @@ builder.Services.AddScoped<ToastService>();
 
 builder.Services.AddScoped<IExcelService, ExcelService>();
 builder.Services.AddScoped<ITableauService, TableauService>();
+builder.Services.AddScoped<IPreRenderService, PreRenderService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSignalR();

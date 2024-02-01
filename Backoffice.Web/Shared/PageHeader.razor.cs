@@ -1,5 +1,6 @@
 ﻿using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics;
 
 namespace Backoffice.Web.Shared
 {
@@ -9,6 +10,9 @@ namespace Backoffice.Web.Shared
 
         private string _title = "";
         private string _iconClass = "";
+
+        //private int counter;
+
         protected override void OnParametersSet()
         {
             if (PageHeaderModel != null)
@@ -18,7 +22,10 @@ namespace Backoffice.Web.Shared
                 if (PageHeaderModel.IconClass != _iconClass)
                     _iconClass = PageHeaderModel.IconClass;
             }
+
+            //Debug.WriteLine(counter++);
         }
+
         public void Dispose()
         {
             PageHeaderModel = null;

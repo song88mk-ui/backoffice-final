@@ -6,7 +6,7 @@
         <CascadingValue Value="AuthenticateAccessEvent" Name="AuthenticateAccessEvent">
             <CascadingValue Value="UserModel" Name="UserModel">
                 <CascadingValue Value="UserClaims" Name="UserClaims">
-                    <CascadingValue Value="UserClientCodes" Name="UserClientCodes">
+                    <CascadingValue Value="UserClientCodes" Name="UserClientCodes" IsFixed>
                         @if (NavigationManager.Uri.Contains("/admin"))
                         {
                             <PageTitle>Backoffice - Administration</PageTitle>

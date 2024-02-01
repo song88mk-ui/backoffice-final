@@ -1,0 +1,16 @@
+﻿<div class="league-container border rounded shadow-sm mb-2" data-id="@League.LeagueId">
+    <div class="league-main  @(_page == EditSportSettingsPage.SegmentAndLeagues ? "pe-3" : "px-3")">
+        <div class="d-flex">
+            @if (_page == EditSportSettingsPage.SegmentAndLeagues)
+            {
+                <div class="drag-container d-flex justify-content-center align-items-center me-2">
+                    <i class="fa fa-ellipsis-v me-1 drag-item" />
+                    <i class="fa fa-ellipsis-v drag-item" />
+                </div>
+            }
+            <span class="league-name fw-bold py-2">
+                @League.LeagueName
+            </span>
+        </div>
+    </div>
+</div>

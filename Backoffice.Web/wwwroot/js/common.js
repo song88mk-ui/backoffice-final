@@ -1,4 +1,7 @@
-﻿// initialize table sorting
+﻿//const Sortable = require("./sortablejs/modular/sortable.core.esm.js");
+
+
+// initialize table sorting
 window.initSort = (className, handler) => {
     var tableClass = className + ' > tbody';
 
@@ -108,7 +111,6 @@ window.getSortOrder = (className) => {
     var concat = data.join("\r\n");
     return new Blob([concat], { type: "application/txt" });
 }
-
 
 window.showToast = (className) => {
     $('.' + className).toast({
@@ -457,4 +459,108 @@ window.scrollIntoElement = (elementId) => {
 
 window.showSelectedLeagueCount = () => {
     $('#selectedLeagueWrapper').slideToggle("fast");
+}
+
+var netReference = null;
+
+window.loadEventListener = (reference) => {
+    netReference = reference;
+}
+window.enableSportSortOrder = () => {
+    $('.connect-list').multisortable({
+        stop: function (event, ui) {
+            var data = [];
+            var index = 1;
+
+            $('#sportstreeEditable .sport-container').each(function () {
+                data.push({
+                    rowId: $(this).attr('data-id'),
+                    sortOrder: index
+                });
+
+                index++;
+            });
+
+            var allData = [];
+            index = 1;
+
+            $('#allSportsEditable .sport-container').each(function () {
+                allData.push({
+                    rowId: $(this).attr('data-id'),
+                    sortOrder: index
+                });
+
+                index++;
+            });
+
+            //console.log(data);
+
+            // call C# method here
+            netReference.invokeMethodAsync('UpdateSportSetting', data, allData)
+        },
+    });
+
+    $('#sportstreeEditable, #allSportsEditable').sortable({
+        handle: '.drag-container',
+        connectWith: '.connect-list',
+        placeholder: 'py-3 mb-2 border border-2 border-info rounded',
+        scroll: true,
+        tolerance: 'pointer'
+    })
+}
+
+window.enableSortOrder2 = (id, childId, sportId, segmentId) => {
+    $(id).sortable({
+        handle: '.drag-container',
+        placeholder: 'py-3 mb-2 border border-2 border-info rounded',
+        scroll: true,
+        tolerance: 'pointer',
+
+        stop: function (event, ui) {
+            var data = [];
+            var index = 1;
+
+            $(childId).each(function () {
+                data.push({
+                    rowId: $(this).attr('data-id'),
+                    sortOrder: index
+                });
+
+                index++;
+            });
+
+            netReference.invokeMethodAsync('UpdateSportSetting', sportId, segmentId, data);
+        },
+    });
+};
+
+window.disableSortOrder2 = (id) => {
+    $(id).sortable('disable');
+}
+
+window.getSelectedSports = () => {
+    var data = [];
+
+    $('#allSportsEditable .sport-container.selected').each(function () {
+        data.push($(this).attr('data-id'));
+    });
+
+    return data;
+}
+
+window.getCurrentSortOrder = (id) => {
+    var data = [];
+    var index = 1;
+
+    $(id).each(function () {
+
+        data.push({
+            rowId: $(this).attr('data-id'),
+            sortOrder: index
+        });
+
+        index++;
+    });
+
+    return data;
 }
