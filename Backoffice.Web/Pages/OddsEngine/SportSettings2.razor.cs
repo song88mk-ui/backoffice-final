@@ -61,14 +61,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnUpdateClickEvent(Tuple<bool, EditSportSettingsPage> data)
         {
-            //var parameters = new ModalParameters();
-            //parameters.Add("UserAction", "LEAVING");
-            //parameters.Add("DialogStyle", "max-width: 600px;");
-
-            //var options = new ModalOptions();
-            //ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
-
-            //return;
             _isUpdate = data.Item1;
 
             if (!_sportLookupSettings.Any())
@@ -196,7 +188,18 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _currentEditPage = data.Item2;
         }
-
+        public void OnConfirmationModalSaveClicked(object userAction)
+        {
+            switch ((int)userAction)
+            {
+                case 0:
+                    break;
+                case 1:
+                    break;
+                default:
+                    break;
+            }
+        }
         private async Task GetSports()
         {
             _sportSettings = new List<SportSettingSport>();
@@ -235,7 +238,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         SortOrder = segment.SortOrder,
                         IsActive = true,
                         Leagues = league.Select(s => new SportSettingLeague
-                        { 
+                        {
                             SportId = s.SportId,
                             SegmentId = s.SegmentId,
                             LeagueId = s.LeagueId,

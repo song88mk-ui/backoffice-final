@@ -11,6 +11,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
     {
         [Inject] public IPreRenderService PreRenderService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
 
@@ -99,12 +100,31 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         public async Task OnCancelClick()
         {
-            _isUpdate = _editSportSettingsPage == EditSportSettingsPage.SegmentAndLeagues ? true : false;
-            _editSportSettingsPage = EditSportSettingsPage.Sport;
+            var parameters = new ModalParameters();
+            parameters.Add("UserAction", "Cancelling");
+            parameters.Add("DialogStyle", "max-width: 600px;");
 
-            await OnUpdateClickCallback.InvokeAsync(new Tuple<bool, EditSportSettingsPage>(_isUpdate, _editSportSettingsPage));
+            var options = new ModalOptions();
+            ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
+        }
+        public async Task OnConfirmationModalSaveClicked(object userAction)
+        {
+            if (userAction == null)
+                return;
 
-            _shouldRender = true;
+            switch ((int)userAction)
+            {
+                case 0:
+                    _isUpdate = _editSportSettingsPage == EditSportSettingsPage.SegmentAndLeagues ? true : false;
+                    _editSportSettingsPage = EditSportSettingsPage.Sport;
+
+                    await OnUpdateClickCallback.InvokeAsync(new Tuple<bool, EditSportSettingsPage>(_isUpdate, _editSportSettingsPage));
+
+                    _shouldRender = true;
+                    break;
+                default:
+                    break;
+            }
         }
 
         public async Task OnSaveChangesClick()

@@ -9,7 +9,7 @@ else
             <div class="text-center">
                 <img src="icons/svg/warning-icon.svg" />
             </div>
-            @if(_userAction == 0)
+            @if (_userAction == 0)
             {
                 <div class="text-center mt-4">
                     Are you sure you want to cancel?
@@ -17,7 +17,7 @@ else
                     All your progress won’t be saved.
                 </div>
             }
-            else if(_userAction == 1)
+            else if (_userAction == 1)
             {
                 <div class="text-center mt-4">
                     Do you want to save your changes before navigating
@@ -29,15 +29,7 @@ else
         @* <AlertMessage AlertModel="@AlertModel" /> *@
     </div>
     <div class="modal-footer mx-4">
-        <button type="button" class="btn modal-btn btn-cancel">No</button>
-
-        @if (_userAction == 0)
-        {
-            <button type="button" class="btn modal-btn btn-continue" disabled="@IsUpdating">Yes, Cancel</button>
-        }
-        else if (_userAction == 1)
-        {
-            <button type="button" class="btn modal-btn btn-continue" disabled="@IsUpdating">Save Changes</button>
-        }
+        <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCacnelClicked">No</button>
+        <button type="button" class="btn modal-btn btn-apply" @onclick="OnYesBtnClicked" disabled="@IsUpdating">@_buttonYesDisplay</button>
     </div>
 }
