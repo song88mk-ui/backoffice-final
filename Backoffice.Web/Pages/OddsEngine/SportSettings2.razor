@@ -25,7 +25,6 @@
             <div class="d-flex @(_isPreload || !_isUpdate || (_isUpdate && _currentEditPage == EditSportSettingsPage.SegmentAndLeagues) ? "flex-column" : "") mx-3 mt-4">
                 @if (!_isPreload)
                 {
-
                     if (_sportSettings.Any())
                     {
                         if (!_isUpdate)
@@ -55,6 +54,17 @@
                     else
                     {
                         // no record found
+                        <div class="d-flex border">
+                            <div class="mx-4 my-3">
+                                <img class="no-record-found" src="icons/svg/no-record-found.svg" />
+                            </div>
+                            <div class="my-3 d-flex flex-column justify-content-center">
+                                <h5 class="mb-2">
+                                    <strong>There are no sports to display</strong>
+                                </h5>
+                                <p class="mb-0">To select sports for this client, click the Update button.</p>
+                            </div>
+                        </div>
                     }
                 }
                 else
