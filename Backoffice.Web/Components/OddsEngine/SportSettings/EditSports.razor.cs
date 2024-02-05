@@ -149,7 +149,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             }
             else
             {
-                _sportLookupSettings = SportLookupSettings.Where(c => c.SportName.Contains(_searchForm.SearchText))
+                _sportLookupSettings = SportLookupSettings.Where(c => c.SportName.Contains(_searchForm.SearchText, StringComparison.CurrentCultureIgnoreCase))
                     .OrderBy(o => o.SportName)
                     .ToList();
             }
