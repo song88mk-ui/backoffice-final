@@ -16,11 +16,12 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         [Parameter] public List<SportSettingSport> SportSettings { get; set; }
         [Parameter] public List<SportSettingSport> SportLookupSettings { get; set; }
+        [Parameter] public EventCallback<bool> OnValueHadChanged { get; set; }
 
         private List<SportSettingSport> _sportSettings = new List<SportSettingSport>();
         private List<SportSettingSport> _sportLookupSettings = new List<SportSettingSport>();
-        List<SportSettingSport> _sportSettingsCache = new List<SportSettingSport>();
-        List<SportSettingSport> _sportLookupSettingsCache = new List<SportSettingSport>();
+        private List<string> _sportSettingsCache = new List<string>();
+        private List<string> _sportLookupSettingsCache = new List<string>();
 
         private List<int> selectedSportIds = new List<int>();
 
@@ -39,8 +40,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             _sportSettings = SportSettings;
             _sportLookupSettings = SportLookupSettings.Where(c => !activeSportIds.Contains(c.SportId)).ToList();
 
-            _sportSettingsCache = _sportSettings.GetRange(0, SportSettings.Count());
-            _sportLookupSettingsCache = _sportLookupSettings.GetRange(0, _sportLookupSettings.Count());
+            _sportSettingsCache = _sportSettings.Select(x => $"{x.SportId}.{x.SortOrder}").ToList();
+            _sportLookupSettingsCache = _sportLookupSettings.Select(x => $"{x.SportId}").ToList();
 
             _shouldRender = true;
 
@@ -186,7 +187,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             // sports = _sports settings
 
-            var test1 = _sportSettingsCache.All(x => sports.Any(t => t.RowId.Equals(x.SportId) && t.SortOrder.Equals(x.SortOrder)));
+            var hasChanges = !(_sportSettingsCache.All(x => sports.Any(t => $"{t.RowId}.{t.SortOrder}".ToLower() == x.ToLower())) && _sportLookupSettingsCache.All(x => allSports.Any(t => $"{t.RowId}".ToLower() == x.ToLower())));
 
             _sportSettings = SportLookupSettings.Where(c => sportIds.Contains(c.SportId))
                 .Join(sports,
@@ -222,6 +223,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             _selectAll = false;
             _shouldRender = true;
 
+            await OnValueHadChanged.InvokeAsync(hasChanges);
             await InvokeAsync(StateHasChanged);
         }
     }
