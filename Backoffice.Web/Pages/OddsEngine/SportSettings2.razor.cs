@@ -20,25 +20,26 @@ namespace Backoffice.Web.Pages.OddsEngine
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         private List<BreadcrumbModel> _breadcrumbs = new List<BreadcrumbModel>();
-        private PageHeaderModel _pageHeaderModel = new PageHeaderModel();
         private List<SportSettingSport> _sportSettings = new List<SportSettingSport>();
         private List<SportSettingSport> _sportLookupSettings = new List<SportSettingSport>();
         private List<SportSettingSport> _editedSportSettings = new List<SportSettingSport>();
+
+        private PageHeaderModel _pageHeaderModel = new PageHeaderModel();
         private AlertModel _alertModel;
+        private Filter2 FilterReference;
 
         private string _clientCode;
+        private string _targetLocation;
+        private string _pageUrl = "/hk/odds-engine/sport-settings";
 
-        private Filter2 FilterReference;
         private bool _renderFilter = true;
         private bool _isPreload;
         private bool _isUpdate;
         private bool _hasChanges;
-        private string _targetLocation;
         private bool _allowedLeave;
 
         private EditSportSettingsPage _currentEditPage;
         private IDisposable registration;
-        private string _pageUrl = "/hk/odds-engine/sport-settings";
 
         protected override async Task OnInitializedAsync()
         {
@@ -138,14 +139,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                     }).ToList();
 
                     _sportLookupSettings = sportLookupResponse.Result.SportLookup
-                        .Select(s => new SportSettingSport
-                        {
-                            SportId = s.SportId,
-                            SportName = s.SportName,
-                            SortOrder = s.SportId
-                        }).ToList();
-
-                    _sportLookupSettings = sportLookupResponse.Result.SportLookup
                         .GroupJoin(segmentSettings,
                         sport => sport.SportId,
                         segment => segment.SportId,
@@ -161,6 +154,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                         })
                         .OrderBy(o => o.SortOrder)
                         .ToList();
+
+                    // add virtual sports
+                    _sportLookupSettings.AddRange(GetVirtualSports());
                 }
             }
 
@@ -232,6 +228,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _currentEditPage = data.Item2;
         }
+
         public async void OnConfirmationModalSaveClicked(object userAction)
         {
             if (userAction == null)
@@ -254,6 +251,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     break;
             }
         }
+
         public async void OnModalCancelClicked(object userAction)
         {
             if (userAction == null)
@@ -268,6 +266,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             }
         }
+
         private async Task GetSports()
         {
             _sportSettings = new List<SportSettingSport>();
@@ -372,6 +371,64 @@ namespace Backoffice.Web.Pages.OddsEngine
             }).ToList();
 
             return result;
+        }
+
+        private List<SportSettingSport> GetVirtualSports()
+        {
+            // 1001,1002,1003,1005,1021,1055,1058
+            var sports = new List<SportSettingSport>
+            {
+                new SportSettingSport
+                {
+                    SportId = 1001,
+                    SportName = "Virtual Soccer",
+                    SortOrder = 1001
+                },
+
+                new SportSettingSport
+                {
+                    SportId = 1002,
+                    SportName = "Virtual Basketball",
+                    SortOrder = 1002
+                },
+
+                new SportSettingSport
+                {
+                    SportId = 1003,
+                    SportName = "Virtual Baseball",
+                    SortOrder = 1003
+                },
+
+                new SportSettingSport
+                {
+                    SportId = 1005,
+                    SportName = "Virtual Tennis",
+                    SortOrder = 1005
+                },
+
+                new SportSettingSport
+                {
+                    SportId = 1021,
+                    SportName = "Virtual Cricket",
+                    SortOrder = 1021
+                },
+
+                new SportSettingSport
+                {
+                    SportId = 1055,
+                    SportName = "Virtual Horse Classics",
+                    SortOrder = 1055
+                },
+
+                new SportSettingSport
+                {
+                    SportId = 1058,
+                    SportName = "Virtual Dog Racing",
+                    SortOrder = 1058
+                }
+            };
+
+            return sports;
         }
 
         public void Dispose() => registration?.Dispose();
