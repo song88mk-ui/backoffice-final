@@ -20,7 +20,7 @@ namespace Backoffice.Web.Services
             Open(typeof(T), title, parameters, options);
         }
 
-        public void Open(Type contentComponent, string title, ModalParameters parameters, ModalOptions options)
+        public async void Open(Type contentComponent, string title, ModalParameters parameters, ModalOptions options)
         {
             if (!typeof(ComponentBase).IsAssignableFrom(contentComponent))
             {
@@ -30,7 +30,7 @@ namespace Backoffice.Web.Services
             var content = new RenderFragment(s => { s.OpenComponent(1, contentComponent); s.CloseComponent(); });
             _modalType = contentComponent;
 
-            OnOpen?.Invoke(title, content, parameters, options);
+             OnOpen?.Invoke(title, content, parameters, options);
         }
 
         public void Cancel()

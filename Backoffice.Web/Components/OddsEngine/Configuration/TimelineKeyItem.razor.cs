@@ -3,6 +3,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -34,11 +35,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             }
             else
             {
-                CloseModal();
+                Modal.Cancel();
             }
         }
 
-        public void CloseModal()
+        public void CloseModal(MouseEventArgs args)
         {
             Modal.Cancel();
         }

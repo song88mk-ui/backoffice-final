@@ -1,6 +1,9 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Shared.OddsEngine
@@ -29,12 +32,16 @@ namespace Backoffice.Web.Shared.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            var page = NavigationManager?.Uri.Replace(NavigationManager.BaseUri, "");
-            ActivateMenu(page);
+            NavigationManager.LocationChanged += HandleLocationChanged;
         }
         protected override async Task OnParametersSetAsync()
         {
             _address = $"{Region.ToLower()}/odds-engine";
+        }
+        private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+        {
+            var page = NavigationManager?.Uri.Replace(NavigationManager.BaseUri, "");
+            ActivateMenu(page);
         }
         public void ActivateMenu(string? menu = null)
         {
@@ -71,6 +78,7 @@ namespace Backoffice.Web.Shared.OddsEngine
                         _menu = OeNavMenu.MarketSettings;
                         break;
                 }
+                StateHasChanged();
             }
         }
         private async Task OnPriceBoostClickEvent()
@@ -96,6 +104,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         }
         public void Dispose()
         {
+            NavigationManager.LocationChanged -= HandleLocationChanged;
         }
 
         #endregion

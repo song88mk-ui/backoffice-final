@@ -36,12 +36,12 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         private async void OnYesBtnClicked()
         {
-            await Modal.OnSaveClickCallback.InvokeAsync();
+            await Modal.OnSaveClickCallback.InvokeAsync(_userAction);
             ModalService.Cancel();
         }
         private async void OnCacnelClicked()
         {
-            await Modal.OnCancelClickCallback.InvokeAsync();
+            await Modal.OnCancelClickCallback.InvokeAsync(_userAction);
             ModalService.Cancel();
         }
         public void Dispose()

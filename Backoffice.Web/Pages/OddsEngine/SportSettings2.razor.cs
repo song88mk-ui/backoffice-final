@@ -1,18 +1,21 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Components.OddsEngine.SportSettings;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class SportSettings2
+    public partial class SportSettings2 : IDisposable
     {
         [Inject] public IPreRenderService PreRenderService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
@@ -25,11 +28,17 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private string _clientCode;
 
+        private Filter2 FilterReference;
         private bool _renderFilter = true;
         private bool _isPreload;
         private bool _isUpdate;
+        private bool _hasChanges;
+        private string _targetLocation;
+        private bool _allowedLeave;
 
         private EditSportSettingsPage _currentEditPage;
+        private IDisposable registration;
+        private string _pageUrl = "/hk/odds-engine/sport-settings";
 
         protected override async Task OnInitializedAsync()
         {
@@ -39,7 +48,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _breadcrumbs.Add(new BreadcrumbModel
             {
                 Name = "Sport Settings",
-                Url = $"hk/odds-engine/sport-settings",
+                Url = _pageUrl,
                 IsCurrentPage = true
             });
 
@@ -47,8 +56,43 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 Title = "Sport Settings"
             };
+            await Task.CompletedTask;
         }
+        protected override void OnAfterRender(bool firstRender)
+        {
+            if (firstRender)
+            {
+                registration = NavigationManager.RegisterLocationChangingHandler(OnLocationChanging);
+            }
+        }
+        private async ValueTask OnLocationChanging(LocationChangingContext context)
+        {
+            if (_isUpdate)
+            {
+                var parameters = new ModalParameters();
+                parameters.Add("UserAction", "LEAVING");
+                parameters.Add("DialogStyle", "max-width: 600px;");
 
+                var options = new ModalOptions();
+                ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
+
+                context.PreventNavigation();
+            }
+
+            if (_allowedLeave)
+            {
+                _targetLocation = context.TargetLocation.Replace(NavigationManager.BaseUri, "");
+            }
+        }
+        private async Task OnCancleClickedEvent()
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("UserAction", "CANCELLING");
+            parameters.Add("DialogStyle", "max-width: 600px;");
+
+            var options = new ModalOptions();
+            ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
+        }
         public async Task OnClientChangedEvent(string clientCode)
         {
             _clientCode = clientCode;
@@ -188,16 +232,40 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _currentEditPage = data.Item2;
         }
-        public void OnConfirmationModalSaveClicked(object userAction)
+        public async void OnConfirmationModalSaveClicked(object userAction)
         {
+            if (userAction == null)
+                return;
+
             switch ((int)userAction)
             {
                 case 0:
+                    await FilterReference.OnConfirmationModalSaveClicked();
                     break;
                 case 1:
+                    await FilterReference.OnSaveChangesClick();
+                    if (!string.IsNullOrEmpty(_targetLocation))
+                    {
+                        _allowedLeave = true;
+                        NavigationManager.NavigateTo(_targetLocation);
+                    }
                     break;
                 default:
                     break;
+            }
+        }
+        public async void OnModalCancelClicked(object userAction)
+        {
+            if (userAction == null)
+                return;
+
+            if ((int)userAction == 1)
+            {
+                if (!string.IsNullOrEmpty(_targetLocation))
+                {
+                    _allowedLeave = true;
+                    NavigationManager.NavigateTo(_targetLocation);
+                }
             }
         }
         private async Task GetSports()
@@ -305,5 +373,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             return result;
         }
+
+        public void Dispose() => registration?.Dispose();
     }
 }

@@ -15,17 +15,8 @@ namespace Backoffice.Web.Components.Common
 
         #endregion
 
-        #region Methods
-
-        public async Task OnOEBreadcrumbClickEvent()
-        {
-            HeaderNavMenuReference.ActivateMenu("MONITORING");
-        }
-
         public void Dispose()
         {
         }
-
-        #endregion
     }
 }

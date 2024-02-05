@@ -2,7 +2,11 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Pages.SBC;
 using Microsoft.AspNetCore.Components;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.JSInterop;
+using RabbitMQ.Util;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Backoffice.Web.Components.OddsEngine.SportSettings
 {
@@ -15,6 +19,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         private List<SportSettingSport> _sportSettings = new List<SportSettingSport>();
         private List<SportSettingSport> _sportLookupSettings = new List<SportSettingSport>();
+        List<SportSettingSport> _sportSettingsCache = new List<SportSettingSport>();
+        List<SportSettingSport> _sportLookupSettingsCache = new List<SportSettingSport>();
 
         private List<int> selectedSportIds = new List<int>();
 
@@ -30,23 +36,11 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         {
             var activeSportIds = SportSettings.Where(c => c.IsActive).Select(s => s.SportId).ToList();
 
-            //_sportSettings = SportLookupSettings.Where(c => activeSportIds.Contains(c.SportId))
-            //    .Join(SportSettings,
-            //    lookup => lookup.SportId,
-            //    sport => sport.SportId,
-            //    (lookup, sport) => new SportSettingSport
-            //    {
-            //        SportId = sport.SportId,
-            //        s
-            //        SortOrder = sport.SortOrder,
-            //        IsActive = true,
-            //    })
-            //    .OrderBy(o => o.SortOrder)
-            //    .ToList();
-
             _sportSettings = SportSettings;
-
             _sportLookupSettings = SportLookupSettings.Where(c => !activeSportIds.Contains(c.SportId)).ToList();
+
+            _sportSettingsCache = _sportSettings.GetRange(0, SportSettings.Count());
+            _sportLookupSettingsCache = _sportLookupSettings.GetRange(0, _sportLookupSettings.Count());
 
             _shouldRender = true;
 
@@ -119,7 +113,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             if (!selectedSportIds.Any())
                 return;
 
-            _removeAll = false; 
+            _removeAll = false;
 
             _shouldRender = true;
         }
@@ -189,6 +183,10 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         {
             // need to remove check as well
             var sportIds = sports.Select(s => int.Parse(s.RowId)).ToList();
+
+            // sports = _sports settings
+
+            var test1 = _sportSettingsCache.All(x => sports.Any(t => t.RowId.Equals(x.SportId) && t.SortOrder.Equals(x.SortOrder)));
 
             _sportSettings = SportLookupSettings.Where(c => sportIds.Contains(c.SportId))
                 .Join(sports,

@@ -21,7 +21,7 @@
                 <a id="timeline-@setting.TimeDisplay" class="waves-effect waves-light timeline-axis-item-key-container"
                 @onclick="_ => OnAddKeyClickEvent(setting)"
                 @onclick:preventDefault @onclick:stopPropagation
-                @onmouseleave="CloseModal" disabled="@IsReadOnly">
+                @onpointerleave="CloseModal" disabled="@IsReadOnly">
                     <span class="@settingClass" title="Click to edit key">
                         @setting.Key
                         <BlazoredToolTip @bind-IsVisible="setting.IsTooltipVisible" contentComponent="ContentComponent" Parameters="Parameters" />

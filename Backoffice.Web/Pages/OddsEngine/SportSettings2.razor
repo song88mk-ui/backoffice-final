@@ -20,7 +20,7 @@
                 </div>
             }
             <div>
-                <Filter2 Render="_renderFilter" OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" />
+                <Filter2 @ref="FilterReference" Render="_renderFilter" OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickEvent="OnCancleClickedEvent" />
             </div>
             <div class="d-flex @(_isPreload || !_isUpdate || (_isUpdate && _currentEditPage == EditSportSettingsPage.SegmentAndLeagues) ? "flex-column" : "") mx-3 mt-4">
                 @if (!_isPreload)
@@ -47,7 +47,7 @@
                                     <h6 class="fw-bold">Sports Tree</h6>
                                 </div>
 
-                                <EditSegmentLeagues @bind-SportSettings="_editedSportSettings" />
+                                <EditSegmentLeagues @bind-SportSettings="_editedSportSettings"/>
                             }
                         }
                     }
@@ -75,6 +75,7 @@
                 }
             </div>
         </div>
+        <CustomModal OnSaveClickCallback="OnConfirmationModalSaveClicked" OnCancelClickCallback="OnModalCancelClicked"/>
     </Authorized>
     <NotAuthorized>
         <RedirectToPage FromPage="@SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace('_', '.')" />
