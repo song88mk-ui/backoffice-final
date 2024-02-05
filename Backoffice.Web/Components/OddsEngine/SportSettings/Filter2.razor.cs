@@ -26,7 +26,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         private int _counter;
 
-        public bool _isUpdate;
+        private bool _isUpdate;
         private bool _init;
         private bool _shouldRender;
 
