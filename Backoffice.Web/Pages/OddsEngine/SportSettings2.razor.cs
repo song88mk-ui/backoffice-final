@@ -68,7 +68,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async ValueTask OnLocationChanging(LocationChangingContext context)
         {
-            if (_isUpdate)
+            if (_isUpdate && _hasChanges)
             {
                 var parameters = new ModalParameters();
                 parameters.Add("UserAction", "LEAVING");
@@ -77,12 +77,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var options = new ModalOptions();
                 ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
 
-                context.PreventNavigation();
-            }
-
-            if (_allowedLeave)
-            {
                 _targetLocation = context.TargetLocation.Replace(NavigationManager.BaseUri, "");
+                context.PreventNavigation();
             }
         }
         private async Task OnCancleClickedEvent()
@@ -162,6 +158,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (data.Item2 == EditSportSettingsPage.SegmentAndLeagues)
             {
+                _hasChanges = false;
                 var sportsOrder = await JSRuntime.InvokeAsync<List<SortOrderModel>>("getCurrentSortOrder", "#sportstreeEditable .sport-container");
 
                 _editedSportSettings = _sportSettings
@@ -240,6 +237,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     await FilterReference.OnConfirmationModalSaveClicked();
                     break;
                 case 1:
+                    await FilterReference.OnSaveChangesClick();
                     await FilterReference.OnSaveChangesClick();
                     if (!string.IsNullOrEmpty(_targetLocation))
                     {
