@@ -3,7 +3,6 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace Backoffice.Web.Components.OddsEngine.SportSettings
 {
@@ -11,12 +10,12 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
     {
         [Inject] public IPreRenderService PreRenderService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
 
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback<Tuple<bool, EditSportSettingsPage>> OnUpdateClickCallback { get; set; }
+        [Parameter] public EventCallback<Tuple<bool, EditSportSettingsPage>> OnCancelClickEvent { get; set; }
         [Parameter] public bool Render { get; set; }
 
         private List<SelectListItemModel<string>> _clients = new List<SelectListItemModel<string>>();
@@ -100,31 +99,17 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         public async Task OnCancelClick()
         {
-            var parameters = new ModalParameters();
-            parameters.Add("UserAction", "Cancelling");
-            parameters.Add("DialogStyle", "max-width: 600px;");
-
-            var options = new ModalOptions();
-            ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
+            await OnCancelClickEvent.InvokeAsync();
         }
-        public async Task OnConfirmationModalSaveClicked(object userAction)
+        public async Task OnConfirmationModalSaveClicked()
         {
-            if (userAction == null)
-                return;
+            _isUpdate = _editSportSettingsPage == EditSportSettingsPage.SegmentAndLeagues ? true : false;
+            _editSportSettingsPage = EditSportSettingsPage.Sport;
 
-            switch ((int)userAction)
-            {
-                case 0:
-                    _isUpdate = _editSportSettingsPage == EditSportSettingsPage.SegmentAndLeagues ? true : false;
-                    _editSportSettingsPage = EditSportSettingsPage.Sport;
+            await OnUpdateClickCallback.InvokeAsync(new Tuple<bool, EditSportSettingsPage>(_isUpdate, _editSportSettingsPage));
 
-                    await OnUpdateClickCallback.InvokeAsync(new Tuple<bool, EditSportSettingsPage>(_isUpdate, _editSportSettingsPage));
-
-                    _shouldRender = true;
-                    break;
-                default:
-                    break;
-            }
+            _shouldRender = true;
+            await InvokeAsync(StateHasChanged);
         }
 
         public async Task OnSaveChangesClick()

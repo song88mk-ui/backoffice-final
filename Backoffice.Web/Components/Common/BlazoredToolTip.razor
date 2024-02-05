@@ -2,7 +2,7 @@
 {
 <div @ref="TooltipReference" class="tooltipcontent @(!IsVisible ? "hide" : "show") @ComponentPosition @ComponentClass" 
       @onclick:preventDefault="true" @onclick:stopPropagation="true"
-      @onmouseleave:preventDefault="true" @onmouseleave:stopPropagation="true">
+      @onpointerleave:preventDefault="true" @onpointerleave:stopPropagation="true">
     @if (Content != null)
     {
         <h3 class="popover-header">@Title</h3>
