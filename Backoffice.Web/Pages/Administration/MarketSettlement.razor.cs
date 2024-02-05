@@ -76,8 +76,8 @@ namespace Backoffice.Web.Pages.Administration
                 Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
                 Payload = $"{filterSportsId}.{filterSegmentId}.{filterLeagueId}.{filterFixtureId}",
                 MetaData = MetaData,
-                DateFrom = Convert.ToDateTime(fromDate).Date,
-                DateTo = Convert.ToDateTime(toDate).Date
+                DateFrom = Convert.ToDateTime(fromDate),
+                DateTo = Convert.ToDateTime(toDate)
             })).Result;
 
             List<ManualMarketSettlementAuditModel> result = new List<ManualMarketSettlementAuditModel>();
