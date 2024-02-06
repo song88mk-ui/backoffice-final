@@ -16,6 +16,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
+        [Parameter] public string Region { get; set; } = "hk";
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
@@ -213,6 +214,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 });
 
                 _isPreload = false;
+                _renderFilter = true;
 
                 if (response.StatusCode == StatusCode.Success)
                 {
@@ -227,6 +229,51 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             _currentEditPage = data.Item2;
+        }
+        public async Task OnCopyClickEvent()
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("FromClientCode", _clientCode);
+
+            var sports = _sportSettings
+                .Select(s => new SportsSortOrder
+                {
+                    SportId = s.SportId,
+                    SportName = s.SportName,
+                    SortOrder = s.SortOrder,
+                    SegmentsSortOrder = s.Segments.Select(se => new SportsSegmentSortOrder
+                    {
+                        SportId = s.SportId,
+                        SportName = s.SportName,
+                        SegmentId = se.SegmentId,
+                        SegmentName = se.SegmentName,
+                        LeagueSortOrder = se.Leagues.Select(le => new SportSegmentLeagueSortOrder
+                        {
+                            SportId = s.SportId,
+                            SportName = s.SportName,
+                            SegmentId = se.SegmentId,
+                            SegmentName = se.SegmentName,
+                            LeagueId = le.LeagueId,
+                            LeagueName = le.LeagueName,
+                            SortOrder = le.SortOrder,
+                            IsActive = le.IsActive
+                        }).ToList(),
+                        SortOrder = se.SortOrder,
+                        IsActive = se.IsActive,
+                        IsOpen = se.IsOpen
+                    }).ToList(),
+                    IsActive = s.IsActive,
+                    IsOpen = s.IsOpen
+                }).ToList();
+
+            parameters.Add("Sports", sports);
+            parameters.Add("DialogStyle", "max-width: 600px;");
+            parameters.Add("Region", Region);
+
+            var options = new ModalOptions();
+
+            ModalService.Open<CopyModal>($"Copy Sports Settings", parameters, options);
         }
 
         public async void OnConfirmationModalSaveClicked(object userAction)
@@ -402,6 +449,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             _isPreload = false;
+            _renderFilter = true;
         }
 
         private List<SportsSortOrder> GetSportSortOrder(List<SportSettingSport> sportSettings)

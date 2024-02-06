@@ -20,7 +20,7 @@
                 </div>
             }
             <div>
-                <Filter2 @ref="FilterReference" Render="_renderFilter" OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickEvent="OnCancleClickedEvent" />
+                <Filter2 @ref="FilterReference" Render="_renderFilter" OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCopyClickCallback="OnCopyClickEvent" OnCancelClickEvent="OnCancleClickedEvent" IsPreload="_isPreload" />
             </div>
             <div class="d-flex @(_isPreload || !_isUpdate || (_isUpdate && _currentEditPage == EditSportSettingsPage.SegmentAndLeagues) ? "flex-column" : "") mx-3 mt-4">
                 @if (!_isPreload)

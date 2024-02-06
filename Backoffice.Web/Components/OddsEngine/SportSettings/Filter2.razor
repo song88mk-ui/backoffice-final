@@ -20,13 +20,13 @@
                 @if (!_isUpdate)
                 {
                     <div class="me-2">
-                        <a href="javascript:void(0)" class="btn btn-update px-3 rounded" @onclick="OnUpdateClick">
+                        <a href="javascript:void(0)" class="btn btn-update px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnUpdateClick">
                             <i class="fa fa-edit"></i>
                             Update
                         </a>
                     </div>
                     <div class="me-2">
-                        <a href="javascript:void(0)" class="btn btn-copy px-3 rounded">
+                        <a href="javascript:void(0)" class="btn btn-copy px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnCopyClickEvent">
                             <i class="fa fa-copy"></i>
                             Copy
                         </a>
@@ -35,12 +35,12 @@
                 else
                 {
                     <div class="me-2">
-                        <a href="javascript:void(0)" class="btn btn-cancel px-3 rounded" @onclick="OnCancelClick">
+                        <a href="javascript:void(0)" class="btn btn-cancel px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnCancelClick">
                             Cancel
                         </a>
                     </div>
                     <div>
-                        <a href="javascript:void(0)" class="btn btn-edit px-3 rounded" @onclick="OnSaveChangesClick">
+                        <a href="javascript:void(0)" class="btn btn-edit px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnSaveChangesClick">
                             Save Changes
                         </a>
                     </div>
@@ -50,7 +50,7 @@
         @if (!_isUpdate)
         {
             <div>
-                <a href="javascript:void(0)" class="btn btn-logs px-3 rounded border">
+                <a href="javascript:void(0)" class="btn btn-logs px-3 rounded border @(IsPreload ? "disabled" : "")">
                     <i class="fa fa-table"></i>
                     Logs
                 </a>
