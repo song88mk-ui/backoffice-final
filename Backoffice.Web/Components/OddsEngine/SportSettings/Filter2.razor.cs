@@ -14,9 +14,11 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
 
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
+        [Parameter] public EventCallback OnCopyClickCallback { get; set; }
         [Parameter] public EventCallback<Tuple<bool, EditSportSettingsPage>> OnUpdateClickCallback { get; set; }
         [Parameter] public EventCallback<Tuple<bool, EditSportSettingsPage>> OnCancelClickEvent { get; set; }
         [Parameter] public bool Render { get; set; }
+        [Parameter] public bool IsPreload { get; set; }
 
         private List<SelectListItemModel<string>> _clients = new List<SelectListItemModel<string>>();
 
@@ -96,7 +98,16 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             _shouldRender = true;
         }
+        public async Task OnCopyClickEvent()
+        {
+            if (IsPreload)
+                return;
 
+            if (string.IsNullOrEmpty(_selectedClientCode))
+                return;
+
+            await OnCopyClickCallback.InvokeAsync();
+        }
         public async Task OnCancelClick()
         {
             await OnCancelClickEvent.InvokeAsync();
