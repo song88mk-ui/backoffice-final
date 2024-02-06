@@ -237,8 +237,69 @@ namespace Backoffice.Web.Pages.OddsEngine
                     await FilterReference.OnConfirmationModalSaveClicked();
                     break;
                 case 1:
-                    await FilterReference.OnSaveChangesClick();
-                    await FilterReference.OnSaveChangesClick();
+                    List<SportSettingSport>? editedSportSettings = null;
+                    if (_currentEditPage != EditSportSettingsPage.Main)
+                    {
+                        if (_currentEditPage == EditSportSettingsPage.Sport)
+                        {
+                            var sportsOrder = await JSRuntime.InvokeAsync<List<SortOrderModel>>("getCurrentSortOrder", "#sportstreeEditable .sport-container");
+                            editedSportSettings = _sportSettings
+                                .Join(sportsOrder,
+                                setting => setting.SportId,
+                                sort => int.Parse(sort.RowId),
+                                (setting, sort) => new SportSettingSport
+                                {
+                                    SportId = setting.SportId,
+                                    SportName = setting.SportName,
+                                    Segments = setting.Segments,
+                                    SortOrder = sort.SortOrder,
+                                    IsActive = true
+                                })
+                                .ToList();
+
+                            var currentSportIds = editedSportSettings.Select(s => s.SportId).ToList();
+                            var filteredSportsOrder = sportsOrder.Where(c => !currentSportIds.Contains(int.Parse(c.RowId))).ToList();
+
+                            var newSportSettings = _sportLookupSettings
+                                .Join(filteredSportsOrder,
+                                setting => setting.SportId,
+                                sort => int.Parse(sort.RowId),
+                                (setting, sort) => new SportSettingSport
+                                {
+                                    SportId = setting.SportId,
+                                    SportName = setting.SportName,
+                                    Segments = setting.Segments,
+                                    SortOrder = sort.SortOrder,
+                                    IsActive = true
+                                })
+                                .ToList();
+
+                            editedSportSettings.AddRange(newSportSettings);
+                            editedSportSettings = editedSportSettings.OrderBy(o => o.SortOrder).ToList();
+                        }
+
+                        if (editedSportSettings == null)
+                            editedSportSettings = _editedSportSettings;
+
+                        var response = await TradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
+                        {
+                            ClientCode = _clientCode,
+                            UserId = UserModel.Id,
+                            UserName = UserModel.UserName,
+                            TimeStamp = DateTime.UtcNow,
+                            SportsSortOrder = GetSportSortOrder(),
+                        });
+
+                        if (response.StatusCode == StatusCode.Success)
+                        {
+                            _alertModel = new AlertModel()
+                            {
+                                Status = AlertStatus.Success,
+                                Message = "Successfully saved Sport - Segment - League ordering.",
+                            };
+                        }
+                    }
+
                     if (!string.IsNullOrEmpty(_targetLocation))
                     {
                         _allowedLeave = true;
