@@ -68,17 +68,20 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async ValueTask OnLocationChanging(LocationChangingContext context)
         {
-            if (_isUpdate && _hasChanges)
+            if (!_allowedLeave)
             {
-                var parameters = new ModalParameters();
-                parameters.Add("UserAction", "LEAVING");
-                parameters.Add("DialogStyle", "max-width: 600px;");
+                if (_isUpdate && _hasChanges)
+                {
+                    var parameters = new ModalParameters();
+                    parameters.Add("UserAction", "LEAVING");
+                    parameters.Add("DialogStyle", "max-width: 600px;");
 
-                var options = new ModalOptions();
-                ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
+                    var options = new ModalOptions();
+                    ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
 
-                _targetLocation = context.TargetLocation.Replace(NavigationManager.BaseUri, "");
-                context.PreventNavigation();
+                    _targetLocation = context.TargetLocation.Replace(NavigationManager.BaseUri, "");
+                    context.PreventNavigation();
+                }
             }
         }
         private async Task OnCancleClickedEvent()
@@ -206,7 +209,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     UserId = UserModel.Id,
                     UserName = UserModel.UserName,
                     TimeStamp = DateTime.UtcNow,
-                    SportsSortOrder = GetSportSortOrder(),
+                    SportsSortOrder = GetSportSortOrder(_editedSportSettings),
                 });
 
                 _isPreload = false;
@@ -237,8 +240,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                     await FilterReference.OnConfirmationModalSaveClicked();
                     break;
                 case 1:
+                    _isPreload = true;
                     List<SportSettingSport>? editedSportSettings = null;
-                    if (_currentEditPage != EditSportSettingsPage.Main)
+                    var editablePages = new[] { EditSportSettingsPage.Sport, EditSportSettingsPage.SegmentAndLeagues };
+                    if (editablePages.Contains(_currentEditPage))
                     {
                         if (_currentEditPage == EditSportSettingsPage.Sport)
                         {
@@ -287,9 +292,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                             UserId = UserModel.Id,
                             UserName = UserModel.UserName,
                             TimeStamp = DateTime.UtcNow,
-                            SportsSortOrder = GetSportSortOrder(),
+                            SportsSortOrder = GetSportSortOrder(editedSportSettings),
                         });
 
+                        _isPreload = false;
                         if (response.StatusCode == StatusCode.Success)
                         {
                             _alertModel = new AlertModel()
@@ -313,6 +319,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async void OnModalCancelClicked(object userAction)
         {
+            _allowedLeave = false;
             if (userAction == null)
                 return;
 
@@ -397,9 +404,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isPreload = false;
         }
 
-        private List<SportsSortOrder> GetSportSortOrder()
+        private List<SportsSortOrder> GetSportSortOrder(List<SportSettingSport> sportSettings)
         {
-            var result = _editedSportSettings.Select((s, sIndex) => new SportsSortOrder
+            var result = sportSettings.Select((s, sIndex) => new SportsSortOrder
             {
                 SportId = s.SportId,
                 SportName = s.SportName,
