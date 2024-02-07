@@ -5,7 +5,6 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Diagnostics;
-using System.Drawing;
 using Activity = Backoffice.Shared.Enums.Activity;
 
 namespace Backoffice.Web.Components.Administration.Maintenance
@@ -26,7 +25,7 @@ namespace Backoffice.Web.Components.Administration.Maintenance
         private bool _oldMaintenanceValue { get; set; }
 
         protected override async Task OnInitializedAsync()
-        {
+        { 
             IsUpdating = false;
             AlertModel = new AlertModel();
             _isMaintenance = ModalParameters.TryGet<bool>("IsMaintenance");

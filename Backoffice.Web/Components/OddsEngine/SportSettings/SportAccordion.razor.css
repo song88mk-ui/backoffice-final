@@ -1,0 +1,29 @@
+﻿.sport-container {
+    background-color: #FFFFFF;
+}
+
+.sport-container.active .sport-main {
+    background-color: #354156;
+}
+
+.sport-container.active {
+    border-color: #354156 !important;
+}
+
+.sport-container.active .sport-name, .sport-container.active .sport-toggle {
+    color: #fff;
+}
+
+.drag-container {
+    background-color: #E8F5FF;
+    padding-right: 0.3rem;
+    padding-left: 0.3rem;
+}
+
+.drag-item {
+    color: #BDDEF8;
+}
+
+.checkbox-item {
+    background-color: #C5C5C5;
+}

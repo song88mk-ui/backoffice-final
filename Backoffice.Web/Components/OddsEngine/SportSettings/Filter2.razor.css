@@ -1,0 +1,24 @@
+﻿.btn-update, .btn-copy, .btn-cancel, .btn-edit {
+    color: #FFF;
+}
+
+.btn-update {
+    background-color: #E43F2C;
+}
+
+.btn-logs {
+    color: #414141;
+    border-color: #414141 !important;
+}
+
+.btn-copy {
+    background-color: #1F1F1F;
+}
+
+.btn-cancel {
+    background-color: #9AA0AB;
+}
+
+.btn-edit {
+    background-color: #E43F2C;
+}

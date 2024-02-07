@@ -1,0 +1,49 @@
+﻿<div class="sport-container @(_showSegments ? "active" : "") @(_page != EditSportSettingsPage.Sport ? "" : "is-edit") @(_isSelected ? "selected" : "") border rounded shadow-sm mb-2 user-select-none" data-id="@_sport.SportId">
+    <div class="sport-main @(_page != EditSportSettingsPage.Sport ? "px-3" : "") ">
+        <div class="d-flex @(_page != EditSportSettingsPage.Sport ? "justify-content-between" : "justify-content-start")">
+            @if (_page == EditSportSettingsPage.Sport)
+            {
+                <div class="drag-container d-flex justify-content-center align-items-center me-2">
+                    <i class="fa fa-ellipsis-v me-1 drag-item" />
+                    <i class="fa fa-ellipsis-v drag-item" />
+                </div>
+                <div class="checkbox-container me-2 d-flex align-items-center">
+                    <input type="checkbox" class="form-check-input mt-0" autocomplete="off" checked="@_isSelected" @onchange="OnCheckboxChanged">
+                </div>
+            }
+            <span class="sport-name @(_page == EditSportSettingsPage.Sport || _showSegments ? "" : "fw-bold") py-2">
+                @_sport.SportName
+            </span>
+            @if (_page != EditSportSettingsPage.Sport)
+            {
+                <span class="sport-toggle border rounded my-2" @onclick="OnToggleClick">
+                    <i class="fa @(_showSegments ? "fa-angle-up" : "fa-angle-down") mx-2 my-1" />
+                </span>
+            }
+        </div>
+    </div>
+    @if (_showSegments)
+    {
+        <div id="@($"segmentEditable-{_sport.SportId}")" class="d-flex flex-column mx-3 my-2">
+            @*@if (_page == EditSportSettingsPage.SegmentAndLeagues)
+            {
+                foreach (var segment in _sport.Segments)
+                {
+                    <SegmentAccordion @key="segment" Segment="segment" Page="_page" />
+                }
+            }
+            else
+            {
+                foreach (var segment in _sport.Segments)
+                {
+                    <SegmentAccordion @key="segment" Segment="segment" Page="_page" />
+                }
+            }*@
+
+            @foreach (var segment in _sport.Segments)
+            {
+                <SegmentAccordion @key="segment" Segment="segment" Page="_page" />
+            }
+        </div>
+    }
+</div>

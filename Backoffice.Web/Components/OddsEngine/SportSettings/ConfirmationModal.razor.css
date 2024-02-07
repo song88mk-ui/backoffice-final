@@ -1,0 +1,8 @@
+﻿.modal-btn {
+    color: white;
+    border-radius: 2px;
+}
+
+.btn-apply {
+    background: transparent linear-gradient(180deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+}

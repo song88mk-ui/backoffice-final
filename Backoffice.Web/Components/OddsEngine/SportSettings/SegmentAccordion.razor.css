@@ -1,0 +1,21 @@
+﻿.segment-container {
+    background-color: #FFFFFF;
+}
+
+.segment-container.active .segment-main {
+    background-color: #E3F3FF;
+}
+
+.segment-container.active {
+    background-color: #F2FAFF;
+}
+
+.drag-container {
+    background-color: #E8F5FF;
+    padding-right: 0.3rem;
+    padding-left: 0.3rem;
+}
+
+.drag-item {
+    color: #BDDEF8;
+}
