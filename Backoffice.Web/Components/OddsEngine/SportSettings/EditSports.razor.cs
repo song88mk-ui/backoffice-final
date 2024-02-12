@@ -108,7 +108,16 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             _shouldRender = true;
         }
-
+        private void OnSportAccordionSelectedEvent(int sportId)
+        {
+            _sportSettings.ForEach(x =>
+            {
+                if (sportId == x.SportId)
+                    x.IsOpen = true;
+                else
+                    x.IsOpen = false;
+            });
+        }
         public async Task OnClearSportsSelectionClick()
         {
             if (!selectedSportIds.Any())

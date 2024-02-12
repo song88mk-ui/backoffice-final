@@ -11,7 +11,8 @@
     <div id="sportstreeEditable" class="d-flex flex-column mx-3 connect-list">
         @foreach (var sport in _sportSettings)
         {
-            <SportAccordion @key="sport" Sport="sport" Page="EditSportSettingsPage.Sport" IsSelected="_removeAll" OnCheckboxChangedCallback="OnCheckboxChanged" />
+            <SportAccordion @key="sport" Sport="sport" Page="EditSportSettingsPage.Sport"
+                            OnSportToggleCallback="OnSportAccordionSelectedEvent" IsSelected="_removeAll" OnCheckboxChangedCallback="OnCheckboxChanged" />
         }
     </div>
 </div>

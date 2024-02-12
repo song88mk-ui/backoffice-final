@@ -35,6 +35,16 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 await JSRuntime.InvokeVoidAsync("loadEventListener", DotNetObjectReference.Create(this));
             }
         }
+        private void OnSportAccordionSelectedEvent(int sportId)
+        {
+            _sportSettings.ForEach(x =>
+            {
+                if (sportId == x.SportId)
+                    x.IsOpen = true;
+                else 
+                    x.IsOpen = false;
+            });
+        }
 
         [JSInvokable]
         public async Task UpdateSportSetting(int sportId, int segmentId, List<SortOrderModel> items)

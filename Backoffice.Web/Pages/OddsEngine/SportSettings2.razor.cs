@@ -285,13 +285,14 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             switch ((int)userAction)
             {
-                case 0:
+                case (int)EditSportSettingsPage.Main:
                     //_renderFilter = false;
                     _isUpdate = false;
 
                     await GetSports();
                     break;
-                case 1:
+                case (int)EditSportSettingsPage.Sport:
+                case (int)EditSportSettingsPage.SegmentAndLeagues:
                     var editablePages = new[] { EditSportSettingsPage.Sport, EditSportSettingsPage.SegmentAndLeagues };
                     if (editablePages.Contains(_currentEditPage))
                     {

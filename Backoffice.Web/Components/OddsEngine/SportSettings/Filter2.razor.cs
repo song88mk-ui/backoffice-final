@@ -111,7 +111,15 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         }
         public async Task OnCancelClick()
         {
-            await OnCancelClickCallback.InvokeAsync();
+            if (_editSportSettingsPage == EditSportSettingsPage.SegmentAndLeagues)
+            {
+                _editSportSettingsPage = EditSportSettingsPage.Sport;
+                await OnUpdateClickCallback.InvokeAsync(_editSportSettingsPage);
+            }
+            else
+            {
+                await OnCancelClickCallback.InvokeAsync();
+            }
         }
 
         public async Task OnSaveChangesClick()

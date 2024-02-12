@@ -1,4 +1,4 @@
 ﻿@foreach (var sport in SportSettings)
 {
-    <SportAccordion Sport="sport" Page="EditSportSettingsPage.Main" />
+    <SportAccordion Sport="sport" Page="EditSportSettingsPage.Main" OnSportToggleCallback="OnSportAccordionSelectedEvent" />
 }
