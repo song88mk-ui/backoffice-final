@@ -202,30 +202,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             else if (data.Item2 == EditSportSettingsPage.Main)
             {
-                _isPreload = true;
+                await SaveSportsSetting();
 
-                var response = await TradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
-                {
-                    ClientCode = _clientCode,
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName,
-                    TimeStamp = DateTime.UtcNow,
-                    SportsSortOrder = GetSportSortOrder(_editedSportSettings),
-                });
-
-                _isPreload = false;
                 _renderFilter = true;
-
-                if (response.StatusCode == StatusCode.Success)
-                {
-                    _sportSettings = _editedSportSettings;
-
-                    _alertModel = new AlertModel()
-                    {
-                        Status = AlertStatus.Success,
-                        Message = "Successfully saved Sport - Segment - League ordering.",
-                    };
-                }
             }
 
             _currentEditPage = data.Item2;
@@ -287,28 +266,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                     await FilterReference.OnConfirmationModalSaveClicked();
                     break;
                 case 1:
-                    _isPreload = true;
                     var editablePages = new[] { EditSportSettingsPage.Sport, EditSportSettingsPage.SegmentAndLeagues };
                     if (editablePages.Contains(_currentEditPage))
                     {
-                        var response = await TradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
-                        {
-                            ClientCode = _clientCode,
-                            UserId = UserModel.Id,
-                            UserName = UserModel.UserName,
-                            TimeStamp = DateTime.UtcNow,
-                            SportsSortOrder = GetSportSortOrder(_editedSportSettings),
-                        });
-                        if (response.StatusCode == StatusCode.Success)
-                        {
-                            _alertModel = new AlertModel()
-                            {
-                                Status = AlertStatus.Success,
-                                Message = "Successfully saved Sport - Segment - League ordering.",
-                            };
-                        }
+                        await SaveSportsSetting();
                     }
-                    _isPreload = false;
 
                     if (!string.IsNullOrEmpty(_targetLocation))
                     {
@@ -500,6 +462,27 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
 
             return sports;
+        }
+        private async Task SaveSportsSetting()
+        {
+            _isPreload = true;
+            var response = await TradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
+            {
+                ClientCode = _clientCode,
+                UserId = UserModel.Id,
+                UserName = UserModel.UserName,
+                TimeStamp = DateTime.UtcNow,
+                SportsSortOrder = GetSportSortOrder(_editedSportSettings),
+            });
+            if (response.StatusCode == StatusCode.Success)
+            {
+                _alertModel = new AlertModel()
+                {
+                    Status = AlertStatus.Success,
+                    Message = "Success! Your changes have been saved.",
+                };
+            }
+            _isPreload = false;
         }
 
         public void Dispose() => registration?.Dispose();
