@@ -1,6 +1,6 @@
 ﻿<div class="d-flex mx-3 justify-content-between">
     <div>
-        <select class="form-select" @onchange="OnClientChangedEvent">
+        <select class="form-select" @onchange="OnClientChangedEvent" disabled="@_isUpdate">
             @foreach (var item in _clients)
             {
                 if (_selectedClientCode == item.Value)
