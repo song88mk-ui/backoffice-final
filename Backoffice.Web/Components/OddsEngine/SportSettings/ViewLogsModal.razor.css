@@ -14,7 +14,7 @@ tbody tr td:nth-child(2n+1) {
 .table thead th, .table tbody td, ::deep .table tfoot td {
     font-size: 0.9rem;
     font-weight: inherit;
-    vertical-align: middle;
+    /*vertical-align: middle;*/
 }
 
 table thead th {

@@ -13,12 +13,14 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
 
+        //[Parameter] public bool Render { get; set; }
+        [Parameter] public bool IsUpdate { get; set; }
+        [Parameter] public bool IsPreload { get; set; }
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback OnCopyClickCallback { get; set; }
-        [Parameter] public EventCallback<Tuple<bool, EditSportSettingsPage>> OnUpdateClickCallback { get; set; }
-        [Parameter] public EventCallback<Tuple<bool, EditSportSettingsPage>> OnCancelClickEvent { get; set; }
-        [Parameter] public bool Render { get; set; }
-        [Parameter] public bool IsPreload { get; set; }
+        [Parameter] public EventCallback<EditSportSettingsPage> OnUpdateClickCallback { get; set; }
+        [Parameter] public EventCallback OnCancelClickCallback { get; set; }
+        [Parameter] public EventCallback OnViewLogsCallback { get; set; }
 
         private List<SelectListItemModel<string>> _clients = new List<SelectListItemModel<string>>();
 
@@ -28,16 +30,15 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         private int _counter;
 
-        private bool _isUpdate;
-        private bool _init;
-        private bool _shouldRender;
+        //private bool _init;
+        //private bool _shouldRender;
 
         protected override async Task OnInitializedAsync()
         {
             if (PreRenderService.IsPreRendering)
                 return;
 
-            _init = true;
+            //_init = true;
 
             TradingService.Region = "HK";
 
@@ -63,40 +64,40 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         protected override async Task OnParametersSetAsync()
         {
-            _shouldRender = _init ? _init : Render;
+            //_shouldRender = _init ? _init : Render;
 
-            if (!_shouldRender)
-                return;
+            //if (!_shouldRender)
+            //    return;
 
-            Debug.WriteLine($"Filter2: {_counter++}");
+            //Debug.WriteLine($"Filter2: {_counter++}");
 
-            _init = false;
+            //_init = false;
         }
 
-        protected override bool ShouldRender() => _shouldRender;
+        //protected override bool ShouldRender() => _shouldRender;
 
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
             _selectedClientCode = e.Value.ToString();
+            _editSportSettingsPage = EditSportSettingsPage.Main;
             await OnClientChangedCallback.InvokeAsync(_selectedClientCode);
 
-            if (_isUpdate)
-            {
-                _isUpdate = false;
-                _editSportSettingsPage = EditSportSettingsPage.Main;
+            //if (IsUpdate)
+            //{
+            //    IsUpdate = false;
+            //    _editSportSettingsPage = EditSportSettingsPage.Main;
 
-                await OnUpdateClickCallback.InvokeAsync(new Tuple<bool, EditSportSettingsPage>(_isUpdate, _editSportSettingsPage));
-            }
+            //    await OnUpdateClickCallback.InvokeAsync(_editSportSettingsPage);
+            //}
         }
 
         public async Task OnUpdateClick()
         {
-            _isUpdate = true;
             _editSportSettingsPage = EditSportSettingsPage.Sport;
 
-            await OnUpdateClickCallback.InvokeAsync(new Tuple<bool, EditSportSettingsPage>(_isUpdate, _editSportSettingsPage));
+            await OnUpdateClickCallback.InvokeAsync(_editSportSettingsPage);
 
-            _shouldRender = true;
+            //_shouldRender = true;
         }
         public async Task OnCopyClickEvent()
         {
@@ -110,38 +111,21 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         }
         public async Task OnCancelClick()
         {
-            await OnCancelClickEvent.InvokeAsync();
-        }
-        public async Task OnConfirmationModalSaveClicked()
-        {
-            _isUpdate = _editSportSettingsPage == EditSportSettingsPage.SegmentAndLeagues ? true : false;
-            _editSportSettingsPage = EditSportSettingsPage.Sport;
-
-            await OnUpdateClickCallback.InvokeAsync(new Tuple<bool, EditSportSettingsPage>(_isUpdate, _editSportSettingsPage));
-
-            _shouldRender = true;
-            await InvokeAsync(StateHasChanged);
+            await OnCancelClickCallback.InvokeAsync();
         }
 
         public async Task OnSaveChangesClick()
         {
             if (_editSportSettingsPage == EditSportSettingsPage.Sport)
             {
-                _isUpdate = true;
                 _editSportSettingsPage = EditSportSettingsPage.SegmentAndLeagues;
 
-                await OnUpdateClickCallback.InvokeAsync(new Tuple<bool, EditSportSettingsPage>(_isUpdate, _editSportSettingsPage));
-
-                _shouldRender = false;
+                await OnUpdateClickCallback.InvokeAsync(_editSportSettingsPage);
             }
             else if (_editSportSettingsPage == EditSportSettingsPage.SegmentAndLeagues)
             {
-                _isUpdate = false;
                 _editSportSettingsPage = EditSportSettingsPage.Main;
-
-                _shouldRender = true;
-
-                await OnUpdateClickCallback.InvokeAsync(new Tuple<bool, EditSportSettingsPage>(_isUpdate, _editSportSettingsPage));
+                await OnUpdateClickCallback.InvokeAsync(_editSportSettingsPage);
 
             }
         }

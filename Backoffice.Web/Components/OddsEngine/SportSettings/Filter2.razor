@@ -1,6 +1,6 @@
 ﻿<div class="d-flex mx-3 justify-content-between">
     <div>
-        <select class="form-select" @onchange="OnClientChangedEvent" disabled="@_isUpdate">
+        <select class="form-select" @onchange="OnClientChangedEvent" disabled="@IsUpdate">
             @foreach (var item in _clients)
             {
                 if (_selectedClientCode == item.Value)
@@ -17,7 +17,7 @@
     <div class="d-flex justify-content-end">
         <AuthorizeView Policy="sbc-sports-setting-canedit">
             <Authorized Context="ActivateAll">
-                @if (!_isUpdate)
+                @if (!IsUpdate)
                 {
                     <div class="me-2">
                         <a href="javascript:void(0)" class="btn btn-update px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnUpdateClick">
@@ -65,10 +65,10 @@
                 }
             </Authorized>
         </AuthorizeView>
-        @if (!_isUpdate)
+        @if (!IsUpdate)
         {
             <div>
-                <a href="javascript:void(0)" class="btn btn-logs px-3 rounded border @(IsPreload ? "disabled" : "")">
+                <a href="javascript:void(0)" class="btn btn-logs px-3 rounded border @(IsPreload ? "disabled" : "")" @onclick="() => OnViewLogsCallback.InvokeAsync()">
                     <i class="fa fa-table"></i>
                     Logs
                 </a>

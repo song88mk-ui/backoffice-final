@@ -27,13 +27,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private PageHeaderModel _pageHeaderModel = new PageHeaderModel();
         private AlertModel _alertModel;
-        private Filter2 FilterReference;
 
         private string _clientCode;
         private string _targetLocation;
         private string _pageUrl = "/hk/odds-engine/sport-settings";
 
-        private bool _renderFilter = true;
+        //private bool _renderFilter = true;
         private bool _isPreload;
         private bool _isUpdate;
         private bool _hasChanges;
@@ -59,6 +58,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Title = "Sport Settings"
             };
             await Task.CompletedTask;
+            _isUpdate = false;
         }
         protected override void OnAfterRender(bool firstRender)
         {
@@ -85,29 +85,31 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             }
         }
-        private async Task OnCancleClickedEvent()
+        private async Task OnCancelClickedEvent()
         {
-            var parameters = new ModalParameters();
-            parameters.Add("UserAction", "CANCELLING");
-            parameters.Add("DialogStyle", "max-width: 600px;");
+            if (_currentEditPage != EditSportSettingsPage.SegmentAndLeagues)
+            {
+                var parameters = new ModalParameters();
+                parameters.Add("UserAction", "CANCELLING");
+                parameters.Add("DialogStyle", "max-width: 600px;");
 
-            var options = new ModalOptions();
-            ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
+                var options = new ModalOptions();
+                ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
+            }
         }
         public async Task OnClientChangedEvent(string clientCode)
         {
             _clientCode = clientCode;
-
-            _renderFilter = false;
+            _currentEditPage = EditSportSettingsPage.Main;
+            //_renderFilter = false;
             _isUpdate = false;
 
             await GetSports();
         }
 
-        public async Task OnUpdateClickEvent(Tuple<bool, EditSportSettingsPage> data)
+        public async Task OnUpdateClickEvent(EditSportSettingsPage editSportSettingsPage)
         {
-            _isUpdate = data.Item1;
-
+            _isPreload = true;
             if (!_sportLookupSettings.Any())
             {
                 var sportLookupResponse = await TradingService.GetSportLookup();
@@ -160,54 +162,62 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             }
 
-            if (data.Item2 == EditSportSettingsPage.SegmentAndLeagues)
+            switch (editSportSettingsPage)
             {
-                _hasChanges = false;
-                var sportsOrder = await JSRuntime.InvokeAsync<List<SortOrderModel>>("getCurrentSortOrder", "#sportstreeEditable .sport-container");
+                case EditSportSettingsPage.Sport:
+                    _isUpdate = true;
+                    break;
+                case EditSportSettingsPage.SegmentAndLeagues:
+                    _isUpdate = true;
+                    _hasChanges = false;
+                    var sportsOrder = await JSRuntime.InvokeAsync<List<SortOrderModel>>("getCurrentSortOrder", "#sportstreeEditable .sport-container");
 
-                _editedSportSettings = _sportSettings
-                    .Join(sportsOrder,
-                    setting => setting.SportId,
-                    sort => int.Parse(sort.RowId),
-                    (setting, sort) => new SportSettingSport
-                    {
-                        SportId = setting.SportId,
-                        SportName = setting.SportName,
-                        Segments = setting.Segments,
-                        SortOrder = sort.SortOrder,
-                        IsActive = true
-                    })
-                    .ToList();
+                    _editedSportSettings = _sportSettings
+                        .Join(sportsOrder,
+                        setting => setting.SportId,
+                        sort => int.Parse(sort.RowId),
+                        (setting, sort) => new SportSettingSport
+                        {
+                            SportId = setting.SportId,
+                            SportName = setting.SportName,
+                            Segments = setting.Segments,
+                            SortOrder = sort.SortOrder,
+                            IsActive = true
+                        })
+                        .ToList();
 
-                var currentSportIds = _editedSportSettings.Select(s => s.SportId).ToList();
-                var filteredSportsOrder = sportsOrder.Where(c => !currentSportIds.Contains(int.Parse(c.RowId))).ToList();
+                    var currentSportIds = _editedSportSettings.Select(s => s.SportId).ToList();
+                    var filteredSportsOrder = sportsOrder.Where(c => !currentSportIds.Contains(int.Parse(c.RowId))).ToList();
 
-                var newSportSettings = _sportLookupSettings
-                    .Join(filteredSportsOrder,
-                    setting => setting.SportId,
-                    sort => int.Parse(sort.RowId),
-                    (setting, sort) => new SportSettingSport
-                    {
-                        SportId = setting.SportId,
-                        SportName = setting.SportName,
-                        Segments = setting.Segments,
-                        SortOrder = sort.SortOrder,
-                        IsActive = true
-                    })
-                    .ToList();
+                    var newSportSettings = _sportLookupSettings
+                        .Join(filteredSportsOrder,
+                        setting => setting.SportId,
+                        sort => int.Parse(sort.RowId),
+                        (setting, sort) => new SportSettingSport
+                        {
+                            SportId = setting.SportId,
+                            SportName = setting.SportName,
+                            Segments = setting.Segments,
+                            SortOrder = sort.SortOrder,
+                            IsActive = true
+                        })
+                        .ToList();
 
-                _editedSportSettings.AddRange(newSportSettings);
+                    _editedSportSettings.AddRange(newSportSettings);
 
-                _editedSportSettings = _editedSportSettings.OrderBy(o => o.SortOrder).ToList();
+                    _editedSportSettings = _editedSportSettings.OrderBy(o => o.SortOrder).ToList();
+                    break;
+                case EditSportSettingsPage.Main:
+                    await SaveSportsSetting();
+
+                    _isUpdate = false;
+                    //_renderFilter = true;
+                    break;
             }
-            else if (data.Item2 == EditSportSettingsPage.Main)
-            {
-                await SaveSportsSetting();
 
-                _renderFilter = true;
-            }
-
-            _currentEditPage = data.Item2;
+            if (_isPreload)
+                _isPreload = false;
+            _currentEditPage = editSportSettingsPage;
         }
         public async Task OnCopyClickEvent()
         {
@@ -254,7 +264,20 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             ModalService.Open<CopyModal>($"Copy Sports Settings", parameters, options);
         }
+        public async Task OnViewLogsClickEvent()
+        {
+            var parameters = new ModalParameters();
 
+            parameters.Add("ClientCode", _clientCode);
+
+            parameters.Add("DialogStyle", "max-width: 1300px !important;");
+            parameters.Add("ModalClass", "show logs-modal");
+            parameters.Add("Region", Region);
+
+            var options = new ModalOptions();
+
+            ModalService.Open<ViewLogsModal>("View Logs", parameters, options);
+        }
         public async void OnConfirmationModalSaveClicked(object userAction)
         {
             if (userAction == null)
@@ -263,7 +286,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             switch ((int)userAction)
             {
                 case 0:
-                    await FilterReference.OnConfirmationModalSaveClicked();
+                    //_renderFilter = false;
+                    _isUpdate = false;
+
+                    await GetSports();
                     break;
                 case 1:
                     var editablePages = new[] { EditSportSettingsPage.Sport, EditSportSettingsPage.SegmentAndLeagues };
@@ -289,7 +315,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (userAction == null)
                 return;
 
-            if ((int)userAction == 1)
+            if ((int)userAction == (int)EditSportSettingsPage.Sport)
             {
                 if (!string.IsNullOrEmpty(_targetLocation))
                 {
@@ -306,7 +332,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (string.IsNullOrEmpty(_clientCode))
                 return;
 
-            _isPreload = true;
+            if (!_isPreload)
+                _isPreload = true;
 
             var sportsOrderResponse = await TradingService.GetClientSportOrderList(new ClientSportOrderListRequest
             {
@@ -368,7 +395,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             _isPreload = false;
-            _renderFilter = true;
+            await InvokeAsync(StateHasChanged);
+            //_renderFilter = true;
         }
 
         private List<SportsSortOrder> GetSportSortOrder(List<SportSettingSport> sportSettings)
@@ -474,6 +502,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 TimeStamp = DateTime.UtcNow,
                 SportsSortOrder = GetSportSortOrder(_editedSportSettings),
             });
+
             if (response.StatusCode == StatusCode.Success)
             {
                 _alertModel = new AlertModel()
@@ -482,7 +511,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                     Message = "Success! Your changes have been saved.",
                 };
             }
-            _isPreload = false;
+
+            //_renderFilter = false;
+            _isUpdate = false;
+
+            await GetSports();
         }
 
         public void Dispose() => registration?.Dispose();
