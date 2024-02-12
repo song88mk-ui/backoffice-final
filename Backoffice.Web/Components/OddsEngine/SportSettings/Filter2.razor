@@ -35,9 +35,18 @@
                 else
                 {
                     <div class="me-2">
+                        @if (_editSportSettingsPage == EditSportSettingsPage.Sport)
+                        {
                         <a href="javascript:void(0)" class="btn btn-cancel px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnCancelClick">
                             Cancel
                         </a>
+                        }
+                        else
+                        {
+                            <a href="javascript:void(0)" class="btn btn-cancel px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnCancelClick">
+                                Back
+                            </a>
+                        }
                     </div>
                     <div>
                         <a href="javascript:void(0)" class="btn btn-edit px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnSaveChangesClick">
