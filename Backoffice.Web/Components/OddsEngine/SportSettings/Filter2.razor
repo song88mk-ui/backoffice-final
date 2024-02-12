@@ -37,9 +37,9 @@
                     <div class="me-2">
                         @if (_editSportSettingsPage == EditSportSettingsPage.Sport)
                         {
-                        <a href="javascript:void(0)" class="btn btn-cancel px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnCancelClick">
-                            Cancel
-                        </a>
+                            <a href="javascript:void(0)" class="btn btn-cancel px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnCancelClick">
+                                Cancel
+                            </a>
                         }
                         else
                         {
@@ -49,9 +49,18 @@
                         }
                     </div>
                     <div>
-                        <a href="javascript:void(0)" class="btn btn-edit px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnSaveChangesClick">
-                            Save Changes
-                        </a>
+                        @if (_editSportSettingsPage == EditSportSettingsPage.Sport)
+                        {
+                            <a href="javascript:void(0)" class="btn btn-edit px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnSaveChangesClick">
+                                Next
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="javascript:void(0)" class="btn btn-edit px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnSaveChangesClick">
+                                Save Changes
+                            </a>
+                        }
                     </div>
                 }
             </Authorized>

@@ -288,61 +288,17 @@ namespace Backoffice.Web.Pages.OddsEngine
                     break;
                 case 1:
                     _isPreload = true;
-                    List<SportSettingSport>? editedSportSettings = null;
                     var editablePages = new[] { EditSportSettingsPage.Sport, EditSportSettingsPage.SegmentAndLeagues };
                     if (editablePages.Contains(_currentEditPage))
                     {
-                        if (_currentEditPage == EditSportSettingsPage.Sport)
-                        {
-                            var sportsOrder = await JSRuntime.InvokeAsync<List<SortOrderModel>>("getCurrentSortOrder", "#sportstreeEditable .sport-container");
-                            editedSportSettings = _sportSettings
-                                .Join(sportsOrder,
-                                setting => setting.SportId,
-                                sort => int.Parse(sort.RowId),
-                                (setting, sort) => new SportSettingSport
-                                {
-                                    SportId = setting.SportId,
-                                    SportName = setting.SportName,
-                                    Segments = setting.Segments,
-                                    SortOrder = sort.SortOrder,
-                                    IsActive = true
-                                })
-                                .ToList();
-
-                            var currentSportIds = editedSportSettings.Select(s => s.SportId).ToList();
-                            var filteredSportsOrder = sportsOrder.Where(c => !currentSportIds.Contains(int.Parse(c.RowId))).ToList();
-
-                            var newSportSettings = _sportLookupSettings
-                                .Join(filteredSportsOrder,
-                                setting => setting.SportId,
-                                sort => int.Parse(sort.RowId),
-                                (setting, sort) => new SportSettingSport
-                                {
-                                    SportId = setting.SportId,
-                                    SportName = setting.SportName,
-                                    Segments = setting.Segments,
-                                    SortOrder = sort.SortOrder,
-                                    IsActive = true
-                                })
-                                .ToList();
-
-                            editedSportSettings.AddRange(newSportSettings);
-                            editedSportSettings = editedSportSettings.OrderBy(o => o.SortOrder).ToList();
-                        }
-
-                        if (editedSportSettings == null)
-                            editedSportSettings = _editedSportSettings;
-
                         var response = await TradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
                         {
                             ClientCode = _clientCode,
                             UserId = UserModel.Id,
                             UserName = UserModel.UserName,
                             TimeStamp = DateTime.UtcNow,
-                            SportsSortOrder = GetSportSortOrder(editedSportSettings),
+                            SportsSortOrder = GetSportSortOrder(_editedSportSettings),
                         });
-
-                        _isPreload = false;
                         if (response.StatusCode == StatusCode.Success)
                         {
                             _alertModel = new AlertModel()
@@ -352,6 +308,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             };
                         }
                     }
+                    _isPreload = false;
 
                     if (!string.IsNullOrEmpty(_targetLocation))
                     {
