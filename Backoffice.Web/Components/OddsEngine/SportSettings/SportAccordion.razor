@@ -14,7 +14,7 @@
             <span class="sport-name @(_page == EditSportSettingsPage.Sport || _showSegments ? "" : "fw-bold") py-2">
                 @_sport.SportName
             </span>
-            @if (_page != EditSportSettingsPage.Sport)
+            @if (_page != EditSportSettingsPage.Sport && _sport.SportId < 1000)
             {
                 <span class="sport-toggle border rounded my-2" @onclick="OnToggleClick">
                     <i class="fa @(_showSegments ? "fa-angle-up" : "fa-angle-down") mx-2 my-1" />
