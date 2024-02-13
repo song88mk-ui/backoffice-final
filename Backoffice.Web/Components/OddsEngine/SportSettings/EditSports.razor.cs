@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Pages.SBC;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.JSInterop;
 using RabbitMQ.Util;
@@ -24,32 +25,30 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         private List<string> _sportLookupSettingsCache = new List<string>();
 
         private List<int> selectedSportIds = new List<int>();
+        private List<int> selectedAllSportIds = new List<int>();
 
         private SearchFormModel _searchForm = new SearchFormModel();
 
         private bool _hasChanges;
         private bool _isSortable;
-        private bool _selectAll;
-        private bool _removeAll;
 
-        private bool _shouldRender = true;
-
-        protected override Task OnParametersSetAsync()
+        //private bool _shouldRender = true;
+        protected override async Task OnInitializedAsync()
         {
             var activeSportIds = SportSettings.Where(c => c.IsActive).Select(s => s.SportId).ToList();
+            _sportSettings = SportSettings;
+            _sportLookupSettings = SportLookupSettings.Where(c => !activeSportIds.Contains(c.SportId)).ToList();
 
-            SportSettings.ForEach(s =>
+            _sportSettings.ForEach(s =>
             {
                 s.IsOpen = false;
                 s.Segments.ForEach(seg => seg.IsOpen = false);
             });
-            _sportSettings = SportSettings;
-            _sportLookupSettings = SportLookupSettings.Where(c => !activeSportIds.Contains(c.SportId)).ToList();
-
+        }
+        protected override Task OnParametersSetAsync()
+        {
             _sportSettingsCache = _sportSettings.Select(x => $"{x.SportId}.{x.SortOrder}").ToList();
             _sportLookupSettingsCache = _sportLookupSettings.Select(x => $"{x.SportId}").ToList();
-
-            _shouldRender = true;
 
             return base.OnParametersSetAsync();
         }
@@ -68,20 +67,20 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             }
         }
 
-        protected override bool ShouldRender() => _shouldRender;
+        //protected override bool ShouldRender() => _shouldRender;
 
         public async Task OnSelectAllClick()
         {
-            _selectAll = true;
-
-            _shouldRender = true;
+            _hasChanges = true;
+            //_selectAll = true;
+            selectedAllSportIds.AddRange(_sportLookupSettings.Select(x => x.SportId));
+            //_shouldRender = true;
         }
 
         public async Task OnClearSelectionClick()
         {
-            _selectAll = false;
-
-            _shouldRender = true;
+            _hasChanges = false;
+            selectedAllSportIds.Clear();
         }
 
         public async Task OnRemoveClick()
@@ -110,40 +109,33 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 sortOrder++;
             }
 
-            selectedSportIds = new List<int>();
+            selectedSportIds.Clear();
 
-            _shouldRender = true;
-        }
-        private void OnSportAccordionSelectedEvent(int sportId)
-        {
-            _sportSettings.ForEach(x =>
-            {
-                if (sportId == x.SportId)
-                    x.IsOpen = true;
-                else
-                    x.IsOpen = false;
-            });
+            //_shouldRender = true;
         }
         public async Task OnClearSportsSelectionClick()
         {
-            if (!selectedSportIds.Any())
-                return;
-
-            _removeAll = false;
-
-            _shouldRender = true;
+            selectedSportIds.Clear();
         }
 
         public async Task OnCheckboxChanged(Tuple<int, bool> data)
         {
-            _hasChanges = true;
-
             if (data.Item2)
                 selectedSportIds.Add(data.Item1);
             else
                 selectedSportIds.Remove(data.Item1);
+        }
+        public async Task OnAllSportsCheckboxChanged(Tuple<int, bool> data)
+        {
+            _hasChanges = true;
 
-            _shouldRender = false;
+            if (data.Item2)
+                selectedAllSportIds.Add(data.Item1);
+            else
+                selectedAllSportIds.Remove(data.Item1);
+
+            if (!selectedAllSportIds.Any())
+                _hasChanges = false;
         }
 
         private async Task OnInputSearchEvent()
@@ -166,7 +158,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                     .ToList();
             }
 
-            _shouldRender = true;
+            //_shouldRender = true;
         }
 
         private async Task OnAddToSportstreeClick()
@@ -178,7 +170,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             if (!sportIds.Any())
                 return;
 
-            var selectedSports = _sportLookupSettings.Where(c => sportIds.Contains(c.SportId)).ToList();
+            var selectedSports = _sportLookupSettings.Where(c => sportIds.Contains(c.SportId) && !_sportSettings.Any(x => x.SportId == c.SportId)).ToList();
 
             var sortOrder = _sportSettings.Max(c => c.SortOrder) + 1;
 
@@ -193,7 +185,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             _sportLookupSettings = _sportLookupSettings.Where(c => !sportIds.Contains(c.SportId)).ToList();
 
-            _shouldRender = true;
+            //_shouldRender = true;
         }
 
         [JSInvokable]
@@ -236,9 +228,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 })
                 .OrderBy(o => o.SortOrder)
                 .ToList();
-
-            _selectAll = false;
-            _shouldRender = true;
 
             await OnValueHadChanged.InvokeAsync(hasChanges);
             await InvokeAsync(StateHasChanged);

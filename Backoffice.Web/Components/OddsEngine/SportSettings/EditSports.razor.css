@@ -41,3 +41,7 @@
 #sportstreeEditable {
     min-height: 42vh;
 }
+
+.clear-selection-btn:disabled, .remove-btn:disabled {
+    opacity: 50%;
+}

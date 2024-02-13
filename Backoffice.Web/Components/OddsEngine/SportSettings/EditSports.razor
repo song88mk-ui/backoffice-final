@@ -4,14 +4,14 @@
             <span class="fw-bold sports-tree-title">Sports Tree</span>
         </div>
         <div class="d-flex justify-content-end">
-            <button class="bg-transparent px-2 border-0 clear-selection-btn" disabled="@_hasChanges" @onclick="OnClearSportsSelectionClick">Clear Selection</button>
-            <button class="bg-transparent px-2 border-0 remove-btn" disabled="@_hasChanges" @onclick="OnRemoveClick">Remove</button>
+            <button class="bg-transparent px-2 border-0 clear-selection-btn" disabled="@(!selectedSportIds.Any())" @onclick="OnClearSportsSelectionClick">Clear Selection</button>
+            <button class="bg-transparent px-2 border-0 remove-btn" disabled="@(!selectedSportIds.Any())" @onclick="OnRemoveClick">Remove</button>
         </div>
     </div>
     <div id="sportstreeEditable" class="d-flex flex-column mx-3 connect-list">
         @foreach (var sport in _sportSettings)
         {
-            <SportAccordion @key="sport" Sport="sport" Page="EditSportSettingsPage.Sport" IsSelected="_removeAll" OnCheckboxChangedCallback="OnCheckboxChanged" />
+            <SportAccordion @key="sport" Sport="sport" Page="EditSportSettingsPage.Sport" IsSelected="selectedSportIds.Any(x => x == sport.SportId)" OnCheckboxChangedCallback="OnCheckboxChanged" />
         }
     </div>
 </div>
@@ -30,9 +30,9 @@
                 <span class="fw-bold sports-tree-title">All Sports</span>
             </div>
             <div class="d-flex justify-content-end">
-                <button class="bg-transparent px-2 border-0 clear-selection-btn" disabled="@_hasChanges" @onclick="OnClearSelectionClick">Clear Selection</button>
+                <button class="bg-transparent px-2 border-0 clear-selection-btn" disabled="@(!_hasChanges)" @onclick="OnClearSelectionClick">Clear Selection</button>
                 <button class="bg-transparent px-2 border-0 select-all-btn me-2" @onclick="OnSelectAllClick">Select All</button>
-                <button class="btn bg-white add-to-btn border rounded" disabled="@_hasChanges" @onclick="OnAddToSportstreeClick">
+                <button class="btn bg-white add-to-btn border rounded" disabled="@(!_hasChanges)" @onclick="OnAddToSportstreeClick">
                     <i class="fa fa-plus me-2" />
                     Add To Sports Tree
                 </button>
@@ -41,7 +41,7 @@
         <div id="allSportsEditable" class="d-flex flex-column mx-3 connect-list">
             @foreach (var sport in _sportLookupSettings)
             {
-                <SportAccordion @key="sport" Sport="sport" Page="EditSportSettingsPage.Sport" IsSelected="_selectAll" />
+                <SportAccordion @key="sport" Sport="sport" Page="EditSportSettingsPage.Sport" IsSelected="selectedAllSportIds.Any(x => x == sport.SportId)" OnCheckboxChangedCallback="OnAllSportsCheckboxChanged" />
             }
         </div>
     </div>

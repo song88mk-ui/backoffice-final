@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -25,20 +26,18 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         private bool _isSelected;
         private bool _initSegmentSortable;
 
-        private bool _shouldRender = true;
+        //private bool _shouldRender = true;
         private int _sportId;
         private string _sportName;
         private List<SportSettingSegment> _segments = null;
 
-        protected override Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
         {
             //_sport = Sport;
             _page = Page;
             _isSelected = IsSelected;
 
             _sportName = Sport.SportName;
-
-            return base.OnInitializedAsync();
         }
 
         protected override void OnParametersSet()
@@ -62,8 +61,9 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             //if (!_shouldRender)
             //    return;
 
-            _page = Page;
             _isSelected = IsSelected;
+            _page = Page;
+
             _isOpen = Sport.IsOpen;
 
             //base.OnParametersSet();
@@ -83,7 +83,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             }
         }
 
-        //protected override bool ShouldRender() => _shouldRender;
+        protected override bool ShouldRender() => true;
 
         public async Task OnToggleClick()
         {
@@ -98,7 +98,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             await OnSportToggleCallback.InvokeAsync(_isOpen ? -1 : _sportId);
             //_shouldRender = true;
         }
-        private void OnSportAccordionSelectedEvent(int segmentId)
+        private async Task OnSportAccordionSelectedEvent(int segmentId)
         {
             _segments.ForEach(x =>
             {
@@ -111,11 +111,14 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         public async Task OnCheckboxChanged(ChangeEventArgs e)
         {
-            _isSelected = bool.Parse(e.Value.ToString());
 
-            await OnCheckboxChangedCallback.InvokeAsync(new Tuple<int, bool>(Sport.SportId, _isSelected));
+            var isSelected = bool.Parse(e?.Value?.ToString() ?? "false");
 
-            _shouldRender = true;
+            _isSelected = isSelected;
+
+            await OnCheckboxChangedCallback.InvokeAsync(new Tuple<int, bool>(_sportId, _isSelected));
+
+            //_shouldRender = true;
         }
     }
 }
