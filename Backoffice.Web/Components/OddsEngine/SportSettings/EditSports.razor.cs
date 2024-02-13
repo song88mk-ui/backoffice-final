@@ -177,7 +177,11 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             var selectedSports = _sportLookupSettings.Where(c => sportIds.Contains(c.SportId) && !_sportSettings.Any(x => x.SportId == c.SportId)).ToList();
 
-            var sortOrder = _sportSettings.Max(c => c.SortOrder) + 1;
+            var sortOrder = 1;
+            if(_sportSettings.Any() && _sportSettings.Count() > 0)
+            {
+                sortOrder = _sportSettings.Max(c => c.SortOrder) + 1;
+            }
 
             foreach (var sport in selectedSports)
             {
