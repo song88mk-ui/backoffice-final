@@ -27,6 +27,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         private SearchFormModel _searchForm = new SearchFormModel();
 
+        private bool _hasChanges;
         private bool _isSortable;
         private bool _selectAll;
         private bool _removeAll;
@@ -37,6 +38,11 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         {
             var activeSportIds = SportSettings.Where(c => c.IsActive).Select(s => s.SportId).ToList();
 
+            SportSettings.ForEach(s =>
+            {
+                s.IsOpen = false;
+                s.Segments.ForEach(seg => seg.IsOpen = false);
+            });
             _sportSettings = SportSettings;
             _sportLookupSettings = SportLookupSettings.Where(c => !activeSportIds.Contains(c.SportId)).ToList();
 
@@ -130,6 +136,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         public async Task OnCheckboxChanged(Tuple<int, bool> data)
         {
+            _hasChanges = true;
+
             if (data.Item2)
                 selectedSportIds.Add(data.Item1);
             else
