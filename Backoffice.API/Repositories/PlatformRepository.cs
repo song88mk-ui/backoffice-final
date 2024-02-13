@@ -3,6 +3,7 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Shared.OutgoingEngineMessages;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using static Backoffice.Shared.Models.Requests.GetTopLeaguesRequest;
 using static Backoffice.Shared.Models.Response.ClientTopFixtureResponse;
@@ -23,10 +25,12 @@ namespace Backoffice.API.Repositories
     {
         private readonly IConfiguration _configuration;
         private readonly IBackofficeActivityLogRepository _activityLogRepository;
-        public PlatformRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository)
+        private readonly IRabbitMqRepository _rabbitMqRepository;
+        public PlatformRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IRabbitMqRepository rabbitMqRepository)
         {
             _configuration = configuration;
             _activityLogRepository = activityLogRepository;
+            _rabbitMqRepository = rabbitMqRepository; 
         }
 
         #region Client
@@ -534,7 +538,20 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).PostAsync($"v1/client/parlaybonus", new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
+                {
+                    await _rabbitMqRepository.Publish(new MessageRequest
+                    {
+                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                        {
+                            CacheType = CacheType.ParlayBonus
+                        }),
+                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                        MessageType = "OnParlayBonusChange",
+                        RoutingKey = $"r.oe.cachesync.onparlaybonuschange"
+                    }, region);
+
                     return JsonConvert.DeserializeObject<BaseResponse<StatusCode>>(await response.Content.ReadAsStringAsync());
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
@@ -757,6 +774,7 @@ namespace Backoffice.API.Repositories
         }
         #endregion
 
+        
         #region Utilities
 
         private HttpClient GetHttpClient(string region)
