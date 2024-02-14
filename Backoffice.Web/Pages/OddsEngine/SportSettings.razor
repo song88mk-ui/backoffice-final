@@ -2,84 +2,81 @@
 
 @layout OEMonitoringLayout
 
-@*@page "/hk/odds-engine/sport-settings"*@
+@page "/hk/odds-engine/sport-settings"
 
 <AuthorizeView Policy="sbc-sports-setting">
     <Authorized>
-        <div class="col-md-12">
-            <Breadcrumb Breadcrumbs="_breadcrumbs" Region="@Region" />
-        </div>
-        <div class="col-md-12">
-            <PageHeader PageHeaderModel="_pageHeaderModel" />
-        </div>
-
-        @if (_alertModel != null && !string.IsNullOrEmpty(_alertModel.Message))
-        {
-            <div class="col-md-12">
-                <div class="mt-4 mx-3">
-                    <AlertMessage AlertModel="@_alertModel" />
-                </div>
+        <div class="d-flex flex-column">
+            <div>
+                <Breadcrumb Breadcrumbs="_breadcrumbs" Region="hk" />
             </div>
-        }
-
-        <div class="col-md-12">
-            <Filter OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCancelClickCallback="OnCancelClickEvent" OnSaveClickCallback="OnSaveClickEvent" OnCopyClickCallback="OnCopyClickEvent" OnViewLogsCallback="OnViewLogsClickEvent" IsPreload="_isPreload" Region="Region" />
-        </div>
-        <div class="col-md-12">
-            <div class="mx-3 mt-4">
-                @if (_isPreload)
+            <div>
+                <PageHeader PageHeaderModel="_pageHeaderModel" />
+            </div>
+            @if (_alertModel != null)
+            {
+                <div class="mx-3 mb-3">
+                    <AlertMessage AlertModel="_alertModel" />
+                </div>
+            }
+            <div>
+                <Filter2 IsUpdate="_isUpdate" OnClientChangedCallback="OnClientChangedEvent" OnUpdateClickCallback="OnUpdateClickEvent" OnCopyClickCallback="OnCopyClickEvent" OnCancelClickCallback="OnCancelClickedEvent" OnViewLogsCallback="OnViewLogsClickEvent"
+                         IsPreload="_isPreload" />
+            </div>
+            <div class="d-flex @(_isPreload || !_isUpdate || (_isUpdate && _currentEditPage == EditSportSettingsPage.SegmentAndLeagues) ? "flex-column" : "") mx-3 mt-4">
+                @if (!_isPreload)
                 {
-                    <Preloader />
+                    if (_sportSettings.Any())
+                    {
+                        if (!_isUpdate)
+                        {
+                            <div class="mb-2">
+                                <h6 class="fw-bold">Sports</h6>
+                            </div>
+
+                            <Main SportSettings="_sportSettings" />
+                        }
+                        else if (_sportLookupSettings.Any())
+                        {
+                            if (_currentEditPage == EditSportSettingsPage.Sport)
+                            {
+                                <EditSports SportSettings="_sportSettings" SportLookupSettings="_sportLookupSettings" OnValueHadChanged="e => _hasChanges = e" />
+                            }
+                            else if (_currentEditPage == EditSportSettingsPage.SegmentAndLeagues)
+                            {
+                                <div class="mb-2">
+                                    <h6 class="fw-bold">Sports Tree</h6>
+                                </div>
+
+                                <EditSegmentLeagues @bind-SportSettings="_editedSportSettings" OnValueHadChanged="e => _hasChanges = e" />
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // no record found
+                        <div class="d-flex border">
+                            <div class="mx-4 my-3">
+                                <img class="no-record-found" src="icons/svg/no-record-found.svg" />
+                            </div>
+                            <div class="my-3 d-flex flex-column justify-content-center">
+                                <h5 class="mb-2">
+                                    <strong>There are no sports to display</strong>
+                                </h5>
+                                <p class="mb-0">To select sports for this client, click the Update button.</p>
+                            </div>
+                        </div>
+                    }
                 }
                 else
                 {
-                    <table class="table table-hover table-bordered @_tableClass">
-                        <thead class="table-head">
-                            <tr>
-                                <th class="th-no py-3">#</th>
-                                <th class="th-checkbox py-3">
-                                    <div class="form-check d-flex justify-content-center">
-                                        <input class="form-check-input" type="checkbox" @onchange="e => OnActiveHeaderChangedEvent(e)" disabled="@(!_isUpdate)">
-                                    </div>
-                                </th>
-                                <th class="th-sports py-3">Sports</th>
-                                <th class="th-action py-3"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (_clientSportsSettingsModel.Any())
-                            {
-                                foreach (var sport in _clientSportsSettingsModel)
-                                {
-                                    <tr @key="@($"sport-{sport.SportId}")" id="sport-@sport.SportId" class="sport-row">
-                                        <td class="text-center fw-bold">@sport.SortOrder</td>
-                                        <td>
-                                            <div class="form-check d-flex justify-content-center">
-                                                <input class="form-check-input" type="checkbox" @bind="sport.IsActive" disabled="@(!_isUpdate)">
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex justify-content-between">
-                                                <span>@sport.SportName</span>
-                                                <span class="dropdown-cat dropdown-segment @(_isUpdate ? "" : "disabled")">
-                                                    <i class="fa fa-chevron-down" @onclick="() => OnSportClickEvent(sport)"></i>
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="link-bars me-2 drag-handle" href="javascript:(0)">
-                                                <i class="fa fa-bars"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
+                    <div class="my-2">
+                        <Preloader />
+                    </div>
                 }
             </div>
         </div>
-        <CustomModal OnSaveClickCallback="OnSaveCopyClickEvent" />
+        <CustomModal OnSaveClickCallback="OnConfirmationModalSaveClicked" OnCancelClickCallback="OnModalCancelClicked" />
     </Authorized>
     <NotAuthorized>
         <RedirectToPage FromPage="@SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace('_', '.')" />
