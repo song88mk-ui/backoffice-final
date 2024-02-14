@@ -41,7 +41,23 @@ namespace Backoffice.API.Repositories
                 var response = await GetHttpClient(region).PostAsync($"v1/client", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonConvert.DeserializeObject<BaseResponse<PlatformClientResponse>>(await response.Content.ReadAsStringAsync());
+                {
+                    var result = JsonConvert.DeserializeObject<BaseResponse<PlatformClientResponse>>(await response.Content.ReadAsStringAsync());
+                    await _rabbitMqRepository.Publish(new MessageRequest
+                    {
+                        Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
+                        {
+                            CacheType = CacheType.Client,
+                            ClientId = result.Result.ClientId,
+                            ClientCode = request.ClientCode,
+                            CacheKey = $"cc:{result.Result.ClientId.ToString().ToUpper()}"
+                        }),
+                        CorrelationId = Guid.NewGuid().ToString().ToUpper(),
+                        MessageType = "OnClientChange",
+                        RoutingKey = $"r.oe.cachesync.onclientchange"
+                    }, region);
+                    return result;
+                }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)

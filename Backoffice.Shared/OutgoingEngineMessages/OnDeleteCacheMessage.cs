@@ -8,5 +8,6 @@ namespace Backoffice.Shared.OutgoingEngineMessages
         public Guid ClientId { get; set; }
         public string ClientCode { get; set; }
         public CacheType CacheType { get; set; }
+        public string CacheKey { get; set; }
     }
 }
