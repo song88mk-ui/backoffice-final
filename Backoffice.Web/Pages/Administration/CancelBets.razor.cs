@@ -47,8 +47,7 @@ namespace Backoffice.Web.Pages.Administration
 
         private async Task OnInputBetId(ChangeEventArgs e, int i)
         {
-            
-                BetRefenceModel.BetReferenceIds[i] = e?.Value?.ToString();
+            BetRefenceModel.BetReferenceIds[i] = e?.Value?.ToString();
         }
 
         private async Task OnClearInput(int i)
@@ -299,6 +298,17 @@ namespace Backoffice.Web.Pages.Administration
 
             return true;
 
+        }
+
+        private async Task AlertDisposal(decimal opacity, CancelBetAlertModel alert)
+        {
+            if (opacity > 0)
+                return;
+
+            if(Alerts != null && Alerts.Any() && Alerts.Contains(alert))
+            {
+                Alerts.Remove(alert);
+            }
         }
         #endregion
     }

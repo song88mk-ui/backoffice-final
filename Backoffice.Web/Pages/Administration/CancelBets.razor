@@ -14,9 +14,9 @@
                     {
                         foreach (var alert in Alerts)
                         {
-                            <div class="col-md-12 mt-4 ">
+                            <div class="col-md-12">
                                 <div class="mx-3">
-                                    <AlertMessage AlertModel="@alert" />
+                                    <AlertMessage AlertModel="@alert" OpacityChanged="e => AlertDisposal(e, alert)" />
                                 </div>
                             </div>
                         }
@@ -50,26 +50,25 @@
                                     <tbody>
                                         @if (BetRefenceModel != null && BetRefenceModel.BetReferenceIds.Any())
                                         {
-                                            var count = -1;
-                                            for (var i = 0; i < BetRefenceModel.BetReferenceIds.Count; i++)
+                                            var counter = 1;
+                                            for (var i = 0; i < BetRefenceModel.BetReferenceIds.Count; i++, counter++)
                                             {
-                                                count = count + 1;
-
+                                                var index = i;
                                                 var betReference = BetRefenceModel.BetReferenceIds[i];
                                                 <tr>
-                                                    <td class="text-center">@(i + 1)</td>
+                                                    <td class="text-center">@counter</td>
                                                     <td>
-                                                        <div class="input-group @(!IsPreload && Alerts != null && Alerts.Any(a => a.Control == i.ToString()) ? "border-danger" : "") ">
-                                                            <input type="text" class="form-control" @oninput="(e) => OnInputBetId(e, count)" />
+                                                        <div class="input-group @(!IsPreload && Alerts != null && Alerts.Any(a => a.Control == index.ToString()) ? "border-danger" : "") ">
+                                                            <input type="text" class="form-control" @oninput="(e) => OnInputBetId(e, index)" />
                                                             @if (!IsPreload && !string.IsNullOrEmpty(betReference))
                                                             {
-                                                                <span class="input-group-text form-clear" @onclick="() => OnClearInput(count)"><i class="fa fa-remove"></i></span>
+                                                                <span class="input-group-text form-clear" @onclick="() => OnClearInput(index)"><i class="fa fa-remove"></i></span>
                                                             }
                                                         </div>
                                                     </td>
                                                     <td>
                                                         <div class="d-flex justify-content-center">
-                                                            <a class="link-trash me-2" href="javascript:(0)" @onclick="() => OnRemoveInput(count)">
+                                                            <a class="link-trash me-2" href="javascript:(0)" @onclick="() => OnRemoveInput(index)">
                                                                 <i class="fa fa-trash"></i>
                                                             </a>
                                                         </div>

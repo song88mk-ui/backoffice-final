@@ -22,6 +22,7 @@
     [Parameter] public Guid Guid { get; set; }
     [Parameter] public bool IsHtmlMessage { get; set; } = false;
     [Parameter] public string AlertClass { get; set; } = "";
+
     private string _alertClass = "";
 
     #region Methods
@@ -80,9 +81,8 @@
         }
     }
 
-    public void Dispose()
+    public async void Dispose()
     {
-
     }
     #endregion
 }
