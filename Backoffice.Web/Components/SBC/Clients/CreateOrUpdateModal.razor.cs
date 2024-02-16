@@ -116,13 +116,17 @@ namespace Backoffice.Web.Components.SBC.Clients
                 }
             }
 
-            Currencies = new List<string>()
-            {
-                "USD", "EUR", "GBP", "KRW", "VND", "THB", "CNY", "MYR", "KHR", "IDR", "INR", "JPY",
-                "MMK", "HKD", "AED", "TRY", "TWD", "NZD", "ZAR", "KES", "TZS", "GHS", "ZMW", "MZN",
-                "CDF", "ETB", "MWK", "XAF", "NGN", "BTC", "ETH", "PKR", "BRL", "CLP", "PEN", "MXN",
-                "BDT"
-            };
+            var concealedCurrency = new[] { Currency.ALL, Currency.PHP };
+
+            Currencies = Enum.GetValues<Currency>().Except(concealedCurrency).Select(x => x.ToString()).ToList();
+
+            //Currencies = new List<string>()
+            //{
+            //    "USD", "EUR", "GBP", "KRW", "VND", "THB", "CNY", "MYR", "KHR", "IDR", "INR", "JPY",
+            //    "MMK", "HKD", "AED", "TRY", "TWD", "NZD", "ZAR", "KES", "TZS", "GHS", "ZMW", "MZN",
+            //    "CDF", "ETB", "MWK", "XAF", "NGN", "BTC", "ETH", "PKR", "BRL", "CLP", "PEN", "MXN",
+            //    "BDT"
+            //};
 
             if (!IsEdit)
             {
