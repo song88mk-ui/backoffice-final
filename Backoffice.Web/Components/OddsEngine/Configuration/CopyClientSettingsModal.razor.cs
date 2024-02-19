@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -50,18 +51,32 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnFromClientChangedEvent(ChangeEventArgs e)
         {
-            string ClientId = e.Value.ToString();
+            var clientCode = e.Value?.ToString()?.ToUpper() ?? string.Empty;
+            var client = Clients.FirstOrDefault(c => c.ClientCode == clientCode);
 
-            SelectedFromClient = new KeyValuePair<string, string>(e.Value.ToString(), Clients.FirstOrDefault(x => x.ClientCode == ClientId).ClientName);
-            ToClients = Clients.Where(x => x.ClientCode != SelectedFromClient.Key).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
+            SelectedFromClient = new KeyValuePair<string, string>(clientCode, client?.ClientName ?? string.Empty);
+
+            ToClients = Clients.Where(x => x.ClientCode != clientCode).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
+
+            if (!ToClients.Any(x => x.Value == SelectedToClient.Value))
+            {
+                SelectedToClient = new KeyValuePair<string, string>(FromClients.FirstOrDefault()?.Value ?? string.Empty, FromClients.FirstOrDefault()?.Name ?? string.Empty);
+            }
         }
 
         public async Task OnToClientChangedEvent(ChangeEventArgs e)
         {
-            string ClientId = e.Value.ToString();
+            var clientCode = e.Value?.ToString()?.ToUpper() ?? string.Empty;
+            var client = Clients.FirstOrDefault(c => c.ClientCode == clientCode);
 
-            SelectedToClient = new KeyValuePair<string, string>(e.Value.ToString(), Clients.FirstOrDefault(x => x.ClientCode == ClientId).ClientName);
-            FromClients = Clients.Where(x => x.ClientCode != SelectedToClient.Key).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
+            SelectedToClient = new KeyValuePair<string, string>(clientCode, client?.ClientName ?? string.Empty);
+
+            FromClients = Clients.Where(x => x.ClientCode != clientCode).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
+
+            if (!FromClients.Any(x => x.Value == SelectedFromClient.Value))
+            {
+                SelectedFromClient = new KeyValuePair<string, string>(FromClients.FirstOrDefault()?.Value ?? string.Empty, FromClients.FirstOrDefault()?.Name ?? string.Empty);
+            }
         }
 
         public async Task OnCancelModalClickEvent()
@@ -74,7 +89,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-md");
-            parameters.Add("ToClient", Clients.FirstOrDefault(c => c.ClientCode == SelectedToClient.Key));
+            parameters.Add("ToClient", Clients.FirstOrDefault(c => c.ClientCode == SelectedFromClient.Value));
             parameters.Add("SelectedFromClient", SelectedFromClient);
             parameters.Add("SelectedToClient", SelectedToClient);
             parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);
