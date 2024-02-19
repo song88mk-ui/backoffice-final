@@ -58,7 +58,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             ToClients = Clients.Where(x => x.ClientCode != clientCode).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
 
-            if (!ToClients.Any(x => x.Value == SelectedToClient.Value))
+            if (!ToClients.Any(x => x.Value == SelectedToClient.Key))
             {
                 SelectedToClient = new KeyValuePair<string, string>(FromClients.FirstOrDefault()?.Value ?? string.Empty, FromClients.FirstOrDefault()?.Name ?? string.Empty);
             }
@@ -73,7 +73,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             FromClients = Clients.Where(x => x.ClientCode != clientCode).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
 
-            if (!FromClients.Any(x => x.Value == SelectedFromClient.Value))
+            if (!FromClients.Any(x => x.Value == SelectedFromClient.Key))
             {
                 SelectedFromClient = new KeyValuePair<string, string>(FromClients.FirstOrDefault()?.Value ?? string.Empty, FromClients.FirstOrDefault()?.Name ?? string.Empty);
             }
@@ -89,7 +89,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-md");
-            parameters.Add("ToClient", Clients.FirstOrDefault(c => c.ClientCode == SelectedFromClient.Value));
+            parameters.Add("ToClient", Clients.FirstOrDefault(c => c.ClientCode == SelectedFromClient.Key));
             parameters.Add("SelectedFromClient", SelectedFromClient);
             parameters.Add("SelectedToClient", SelectedToClient);
             parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);

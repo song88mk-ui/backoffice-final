@@ -90,6 +90,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnCopyClientSettingsAlert(AlertModel alert)
         {
+            IsPreleader = true;
+            CalculateConfigCounts();
+            await Init();
+
             _alertModel = alert;
         }
 
