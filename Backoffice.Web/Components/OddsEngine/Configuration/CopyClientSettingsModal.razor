@@ -5,7 +5,7 @@
             <select class="form-select" id="fromClient" @onchange="OnFromClientChangedEvent">
                 @foreach (var item in FromClients)
                 {
-                    <option value="@item.Value" selected="@(item.Value == SelectedToClient.Key)">@item.Name</option>
+                    <option value="@item.Value" selected="@(item.Value == SelectedFromClient.Key)">@item.Name</option>
                 }
             </select>
         </div>
