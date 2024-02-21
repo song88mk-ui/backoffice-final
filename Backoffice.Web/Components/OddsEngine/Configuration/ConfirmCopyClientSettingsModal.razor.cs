@@ -39,6 +39,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-md");
+            parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);
             parameters.Add("FromClientCode", SelectedFromClient.Key);
             parameters.Add("ToClientCode", ToClient.ClientCode);
             parameters.Add("Region", Region);
