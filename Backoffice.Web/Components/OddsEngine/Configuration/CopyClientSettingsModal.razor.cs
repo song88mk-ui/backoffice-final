@@ -2,7 +2,6 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -18,8 +17,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private EventCallback<AlertModel> OnCopyClientSettingsCallback { get; set; }
 
         private List<ClientInformationModel> Clients { get; set; }
-        private List<SelectListItemModel<string>> FromClients { get; set; }
-        private List<SelectListItemModel<string>> ToClients { get; set; }
         private string Region { get; set; }
 
         private KeyValuePair<string, string> SelectedFromClient { get; set; }
@@ -29,9 +26,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         protected override async Task OnInitializedAsync()
         {
             Clients = new List<ClientInformationModel>();
-            FromClients = new List<SelectListItemModel<string>>();
-            ToClients = new List<SelectListItemModel<string>>();
-
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback<AlertModel>>("OnCopyClientSettingsCallback");
             Region = ModalParameters.TryGet<string>("Region").ToUpper();
             TradingService.Region = Region.ToUpper();
@@ -42,11 +36,23 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         public async Task Initialize()
         {
             Clients = await LoadClients();
-            SelectedFromClient = new KeyValuePair<string, string>(Clients[0].ClientCode, Clients[0].ClientName);
-            SelectedToClient = new KeyValuePair<string, string>(Clients[1].ClientCode, Clients[1].ClientName);
 
-            FromClients = Clients.Where(x => x.ClientCode != SelectedToClient.Key).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
-            ToClients = Clients.Where(x => x.ClientCode != SelectedFromClient.Key).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
+            var selectedFrom = ModalParameters.TryGet<string>("FromClientCode");
+            var selectedTo = ModalParameters.TryGet<string>("ToClientCode");
+
+            if(!string.IsNullOrEmpty(selectedFrom) && !string.IsNullOrEmpty(selectedTo))
+            {
+                var clientFrom = Clients.FirstOrDefault(c => c.ClientCode.ToUpper() == selectedFrom.ToUpper());
+                var clientTo = Clients.FirstOrDefault(c => c.ClientCode.ToUpper() == selectedTo.ToUpper());
+
+                SelectedFromClient = new KeyValuePair<string, string>(clientFrom?.ClientCode ?? string.Empty, clientFrom?.ClientName ?? string.Empty);
+                SelectedToClient = new KeyValuePair<string, string>(clientTo?.ClientCode ?? string.Empty, clientTo?.ClientName ?? string.Empty);
+            }
+            else
+            {
+                SelectedFromClient = new KeyValuePair<string, string>(Clients[0].ClientCode, Clients[0].ClientName);
+                SelectedToClient = new KeyValuePair<string, string>(Clients[1].ClientCode, Clients[1].ClientName);
+            }
         }
 
         public async Task OnFromClientChangedEvent(ChangeEventArgs e)
@@ -55,13 +61,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var client = Clients.FirstOrDefault(c => c.ClientCode == clientCode);
 
             SelectedFromClient = new KeyValuePair<string, string>(clientCode, client?.ClientName ?? string.Empty);
-
-            ToClients = Clients.Where(x => x.ClientCode != clientCode).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
-
-            if (!ToClients.Any(x => x.Value == SelectedToClient.Key))
-            {
-                SelectedToClient = new KeyValuePair<string, string>(FromClients.FirstOrDefault()?.Value ?? string.Empty, FromClients.FirstOrDefault()?.Name ?? string.Empty);
-            }
         }
 
         public async Task OnToClientChangedEvent(ChangeEventArgs e)
@@ -70,13 +69,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var client = Clients.FirstOrDefault(c => c.ClientCode == clientCode);
 
             SelectedToClient = new KeyValuePair<string, string>(clientCode, client?.ClientName ?? string.Empty);
-
-            FromClients = Clients.Where(x => x.ClientCode != clientCode).Select(x => new SelectListItemModel<string> { Value = x.ClientCode, Name = x.ClientName }).ToList();
-
-            if (!FromClients.Any(x => x.Value == SelectedFromClient.Key))
-            {
-                SelectedFromClient = new KeyValuePair<string, string>(FromClients.FirstOrDefault()?.Value ?? string.Empty, FromClients.FirstOrDefault()?.Name ?? string.Empty);
-            }
         }
 
         public async Task OnCancelModalClickEvent()
@@ -89,9 +81,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-md");
-            parameters.Add("ToClient", Clients.FirstOrDefault(c => c.ClientCode == SelectedFromClient.Key));
+            parameters.Add("ToClient", Clients.FirstOrDefault(c => c.ClientCode == SelectedToClient.Key));
             parameters.Add("SelectedFromClient", SelectedFromClient);
-            parameters.Add("SelectedToClient", SelectedToClient);
             parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);
             parameters.Add("Region", Region);
 

@@ -2,10 +2,13 @@
     <div class="row mb-3">
         <div class="col">
             <label for="fromClient" class="form-label">From</label>
-            <select class="form-select" id="fromClient" @onchange="OnFromClientChangedEvent">
-                @foreach (var item in FromClients)
+            <select class="form-select" id="fromClient" @onchange="@(e => OnFromClientChangedEvent(e))">
+                @foreach (var item in Clients)
                 {
-                    <option value="@item.Value" selected="@(item.Value == SelectedFromClient.Key)">@item.Name</option>
+                    if (SelectedToClient.Key != item.ClientCode)
+                    {
+                        <option @key="item" value="@item.ClientCode" selected="@(item.ClientCode == SelectedFromClient.Key)">@item.ClientName</option>
+                    }
                 }
             </select>
         </div>
@@ -14,9 +17,12 @@
         <div class="col">
             <label for="toClient" class="form-label">To</label>
             <select class="form-select" id="toClient" @onchange="OnToClientChangedEvent">
-                @foreach (var item in ToClients)
+                @foreach (var item in Clients)
                 {
-                    <option value="@item.Value" selected="@(item.Value == SelectedToClient.Key)">@item.Name</option>
+                    if (SelectedFromClient.Key != item.ClientCode)
+                    {
+                        <option @key="item" value="@item.ClientCode" selected="@(item.ClientCode == SelectedToClient.Key)">@item.ClientName</option>
+                    }
                 }
             </select>
         </div>

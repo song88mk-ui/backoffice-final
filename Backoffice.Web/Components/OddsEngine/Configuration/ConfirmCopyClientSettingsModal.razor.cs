@@ -24,14 +24,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private string Region { get; set; }
         private ClientInformationModel ToClient { get; set; }
         private KeyValuePair<string, string> SelectedFromClient { get; set; }
-        private KeyValuePair<string, string> SelectedToClient { get; set; }
         private bool _isProcessing;
         #endregion
         #region Methods
         protected override async Task OnInitializedAsync()
         {
             SelectedFromClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedFromClient");
-            SelectedToClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedToClient");
             Region = ModalParameters.TryGet<string>("Region").ToUpper();
             ToClient = ModalParameters.TryGet<ClientInformationModel>("ToClient");
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback<AlertModel>>("OnCopyClientSettingsCallback");
@@ -41,6 +39,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-md");
+            parameters.Add("FromClientCode", SelectedFromClient.Key);
+            parameters.Add("ToClientCode", ToClient.ClientCode);
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
@@ -69,7 +69,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 {
                     UserId = UserModel.Id,
                     FromClientCode = SelectedFromClient.Key,
-                    ToClientCode = SelectedToClient.Key,
+                    ToClientCode = ToClient.ClientCode,
                     ToRemoveConfig = response.Result.ToBeRemoved.Select(s => new ClientLeagueConfig 
                         { 
                             ClientCode = s.ClientCode, 
