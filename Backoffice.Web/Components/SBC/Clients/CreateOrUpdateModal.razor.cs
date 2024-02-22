@@ -874,34 +874,31 @@ namespace Backoffice.Web.Components.SBC.Clients
 
         private async Task<decimal> GetSuggestedMinimumBet(string currencyCode)
         {
-            var currency = (Currency)Enum.Parse(typeof(Currency), currencyCode.ToUpper());
+            var suggestedMinimumBet = 0.02m;
 
-            var suggestedMinimumBet = 1m;
+            if (Enum.TryParse<Currency>(currencyCode.ToUpper(), out var currency))
+            {
+                var highValueArr = new Currency[] { Currency.KRW, Currency.VND, Currency.KHR, Currency.IDR, Currency.MMK };
+                var minValue100Arr = new Currency[] { Currency.CDF, Currency.TZS };
+                var minValue1Arr = new Currency[] { Currency.PKR };
 
-            var highValueArr = new Currency[] { Currency.KRW, Currency.VND, Currency.KHR, Currency.IDR, Currency.MMK };
-            var minValue100Arr = new Currency[] { Currency.CDF, Currency.TZS };
-            var minValue1Arr = new Currency[] { Currency.PKR };
-
-            if (highValueArr.Contains(currency))
-            {
-                suggestedMinimumBet = 1000m;
-            }
-            else if (minValue100Arr.Contains(currency))
-            {
-                suggestedMinimumBet = 100m;
-            }
-            else if (currency == Currency.BTC || currency == Currency.ETH)
-            {
-                //suggestedMinimumBet = 0.000000010000m;
-                suggestedMinimumBet = 0.00010000m; // FCI-6803
-            }
-            else if (minValue1Arr.Contains(currency))
-            {
-                suggestedMinimumBet = 1m;
-            }
-            else
-            {
-                suggestedMinimumBet = 0.02m;
+                if (highValueArr.Contains(currency))
+                {
+                    suggestedMinimumBet = 1000m;
+                }
+                else if (minValue100Arr.Contains(currency))
+                {
+                    suggestedMinimumBet = 100m;
+                }
+                else if (currency == Currency.BTC || currency == Currency.ETH)
+                {
+                    //suggestedMinimumBet = 0.000000010000m;
+                    suggestedMinimumBet = 0.00010000m; // FCI-6803
+                }
+                else if (minValue1Arr.Contains(currency))
+                {
+                    suggestedMinimumBet = 1m;
+                }
             }
 
             return suggestedMinimumBet;
