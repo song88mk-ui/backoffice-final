@@ -112,8 +112,16 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     switch (payloads.LastOrDefault()?.ToUpper())
                     {
                         case "T":
-                            var tFromPayload = JsonSerializer.Deserialize<ConfigTemplateLogModel>(activityLog.From);
-                            var tToPayload = JsonSerializer.Deserialize<ConfigTemplateLogModel>(activityLog.To);
+                            var tFromPayload = new ConfigTemplateLogModel();
+                            if (activityLog.From != "-")
+                            {
+                                tFromPayload = JsonSerializer.Deserialize<ConfigTemplateLogModel>(activityLog.From);
+                            }
+                            var tToPayload = new ConfigTemplateLogModel();
+                            if (activityLog.To != "-")
+                            {
+                                tToPayload = JsonSerializer.Deserialize<ConfigTemplateLogModel>(activityLog.To);
+                            }
 
                             stringBuilder.Append($"<td class=\"px-4\">");
                             stringBuilder.Append($"<strong>Clients</strong>");
@@ -135,28 +143,42 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             stringBuilder.Append($"<td class=\"px-4\">{tToPayload.TemplateName}</td>");
                             break;
                         case "M":
-                            var mFromPayload = JsonSerializer.Deserialize<List<ConfigMarginActivityLogModel>>(activityLog.From) ?? new List<ConfigMarginActivityLogModel>();
-                            var mToPayload = JsonSerializer.Deserialize<List<ConfigMarginActivityLogModel>>(activityLog.To) ?? new List<ConfigMarginActivityLogModel>(); ;
-
                             stringBuilder.Append($"<td class=\"px-4\">{payloads[3]}</td>");
-                            stringBuilder.Append($"<td class=\"px-4\">");
-                            foreach (var item in mFromPayload)
+                            if (activityLog.From == "-")
                             {
-                                stringBuilder.Append($"<strong>{item.MarketTemplateName}</strong>");
-                                stringBuilder.Append($"<br>");
-                                stringBuilder.Append(string.Join("", item.Payload.Select(x => $"<span>{x}</span><br>").ToList()));
-                                stringBuilder.Append($"<br>");
+                                stringBuilder.Append($"<td class=\"px-4\">-</td>");
                             }
-                            stringBuilder.Append($"</td>");
-                            stringBuilder.Append($"<td class=\"px-4\">");
-                            foreach (var item in mToPayload)
+                            else
                             {
-                                stringBuilder.Append($"<strong>{item.MarketTemplateName}</strong>");
-                                stringBuilder.Append($"<br>");
-                                stringBuilder.Append(string.Join("", item.Payload.Select(x => $"<span>{x}</span><br>").ToList()));
-                                stringBuilder.Append($"<br>");
+                                stringBuilder.Append($"<td class=\"px-4\">");
+                                var payload = JsonSerializer.Deserialize<List<ConfigMarginActivityLogModel>>(activityLog.From) ?? new List<ConfigMarginActivityLogModel>();
+                                foreach (var item in payload)
+                                {
+                                    stringBuilder.Append($"<strong>{item.MarketTemplateName}</strong>");
+                                    stringBuilder.Append($"<br>");
+                                    stringBuilder.Append(string.Join("", item.Payload.Select(x => $"<span>{x}</span><br>").ToList()));
+                                    stringBuilder.Append($"<br>");
+                                }
+                                stringBuilder.Append($"</td>");
                             }
-                            stringBuilder.Append($"</td>");
+                            if (activityLog.To != "-")
+                            {
+                                stringBuilder.Append($"<td class=\"px-4\">-</td>");
+                            }
+                            else
+                            {
+                                stringBuilder.Append($"<td class=\"px-4\">");
+                                var payload = JsonSerializer.Deserialize<List<ConfigMarginActivityLogModel>>(activityLog.To) ?? new List<ConfigMarginActivityLogModel>();
+                                foreach (var item in payload)
+                                {
+                                    stringBuilder.Append($"<strong>{item.MarketTemplateName}</strong>");
+                                    stringBuilder.Append($"<br>");
+                                    stringBuilder.Append(string.Join("", item.Payload.Select(x => $"<span>{x}</span><br>").ToList()));
+                                    stringBuilder.Append($"<br>");
+                                }
+                                stringBuilder.Append($"</td>");
+                            }
+
                             break;
                         default:
                             stringBuilder.Append($"<td class=\"px-4\">-</td>");
