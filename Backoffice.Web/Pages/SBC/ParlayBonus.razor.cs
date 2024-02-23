@@ -25,7 +25,7 @@ namespace Backoffice.Web.Pages.SBC
         public List<SelectListItemModel<Client>> Clients { get; set; }
 
         public long ClientId { get; set; }
-        public bool IsUpdating { get; set; }
+        public bool IsEdit { get; set; }
         public bool IsPreloading { get; set; }
         public bool IsEmpty { get; set; }
         public string ToastMessage { get; set; }
@@ -39,7 +39,7 @@ namespace Backoffice.Web.Pages.SBC
         private PageHeaderModel _pageHeaderModel;
         public const string ToastTitle = "Parlay Bonus";
         public static Func<decimal, string, Task> OnDisableSaveActionAsync;
-
+        private bool _isSaving;
         #endregion
 
         #region Methods     
@@ -123,15 +123,16 @@ namespace Backoffice.Web.Pages.SBC
 
         public async Task OnUpdateClickEvent()
         {
-            IsUpdating = !IsUpdating;
+            IsEdit = !IsEdit;
         }
 
         public async Task OnAddClickEvent()
         {
+            _isSaving = true;
             IsAdding = true;
             Models.ParlayBonusConfig newConfig = null;
 
-            IsUpdating = true;
+            IsEdit = true;
 
             if (ClientParlayBonusModel.ParlayBonusConfig.Count == 0)
             {
@@ -160,10 +161,12 @@ namespace Backoffice.Web.Pages.SBC
 
             await SelectPage(MetaData.TotalPages);
             await InvokeAsync(StateHasChanged);
+            _isSaving = false;
         }
 
         public async Task OnSaveClickEvent()
         {
+            _isSaving = true;
             IsPreloading = true;
 
             var result = (await BackofficeService.AddOrUpdateParlayBonus(new ParlayBonusRequest()
@@ -186,7 +189,7 @@ namespace Backoffice.Web.Pages.SBC
                 ToastMessage = result.Message;
             }
 
-            IsUpdating = false;
+            IsEdit = false;
 
             IsAdding = false;
 
@@ -200,6 +203,8 @@ namespace Backoffice.Web.Pages.SBC
 
             await LoadClientParlayBonus(ClientId);
             await ShowToast();
+
+            _isSaving = false;
         }
 
         public async Task OnCancelClickEvent()
@@ -208,7 +213,7 @@ namespace Backoffice.Web.Pages.SBC
 
             TempConfig = new List<Models.ParlayBonusConfig>();
 
-            IsUpdating = false;
+            IsEdit = false;
 
             IsAdding = false;
 
@@ -333,7 +338,7 @@ namespace Backoffice.Web.Pages.SBC
 
                 if (!IsAdding)
                 {
-                    IsUpdating = false;
+                    IsEdit = false;
                 }
 
                 ClientParlayBonusModel = result;
@@ -347,7 +352,7 @@ namespace Backoffice.Web.Pages.SBC
                 {
                     ClientParlayBonusModel.ParlayBonusMinOdds = 1.20m;
                 }
-            }
+            } 
         }
 
         private async Task DisableSaveButton(decimal inputValue, string id)

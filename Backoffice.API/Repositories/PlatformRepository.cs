@@ -1,5 +1,4 @@
-﻿using Azure;
-using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -12,7 +11,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using static Backoffice.Shared.Models.Requests.GetTopLeaguesRequest;
 using static Backoffice.Shared.Models.Response.ClientTopFixtureResponse;
@@ -534,7 +532,7 @@ namespace Backoffice.API.Repositories
                         Page = request.Page,
                         PageSize = request.PageSize,
                         Total = bonus.Count,
-                        TotalPage = ((bonus.Count - 1) / request.PageSize) + 1
+                        TotalPage = request.PageSize != 0 ? ((bonus.Count - 1) / request.PageSize) + 1 : bonus.Count
                     }
                 };
             }

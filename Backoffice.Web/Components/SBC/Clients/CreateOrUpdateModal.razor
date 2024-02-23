@@ -1,780 +1,783 @@
 ﻿<div class="modal-body">
-    <EditForm EditContext="EditContext">
-        <div class="business-container">
-            <div class="row">
-                @if (IsPreload)
-                {
+    @if (IsPreload)
+    {
+        <div class="col-md-12">
+            <div class="mt-4 mx-3">
+                <Preloader />
+            </div>
+        </div>
+    }
+    else
+    {
+        <EditForm EditContext="EditContext">
+            <div class="business-container">
+                <div class="row">
                     <div class="col-md-12">
-                        <div class="mt-4 mx-3">
-                            <Preloader />
-                        </div>
+                        <!-- title here -->
+                        <h6 class="title fw-bold ps-2 py-1">Business Information</h6>
                     </div>
-                }
-                <div class="col-md-12">
-                    <!-- title here -->
-                    <h6 class="title fw-bold ps-2 py-1">Business Information</h6>
-                </div>
-                <div class="col-md-12">
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label for="businessNameField" class="form-label">Business Name</label>
-                            <input type="text" class="form-control" id="businessNameField" placeholder="Enter Business Name" @bind-value="Client.Name" />
-                        </div>
-                        <div class="col-md-4">
-                            <label for="websiteField" class="form-label">Website</label>
-                            <input type="text" class="form-control" id="websiteField" placeholder="https://www.song88.com" @bind-value="Client.Website" />
-                        </div>
-                        <div class="col-md-4">
-                            <label for="emailField" class="form-label">Email Address</label>
-                            <div class="input-group">
-                                <input type="email" class="form-control" id="emailField" placeholder="Enter Email Address" aria-label="Email" @bind-value="Client.Email" />
-                                <div class="input-group-text">
-                                    <div class="form-check form-switch">
-                                        @if (Client.IsEmailNotification)
-                                        {
-                                            <input class="form-check-input" type="checkbox" role="switch" id="emailNotifSwitch" aria-label="Notify email switch" @onchange="(e) => OnEmailNotifClicked(e)" checked />
-                                        }
-                                        else
-                                        {
-                                            <input class="form-check-input" type="checkbox" role="switch" id="emailNotifSwitch" aria-label="Notify email switch" @onchange="(e) => OnEmailNotifClicked(e)" />
-                                        }
-                                    </div>
-                                </div>
+                    <div class="col-md-12">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="businessNameField" class="form-label">Business Name</label>
+                                <input type="text" class="form-control" id="businessNameField" placeholder="Enter Business Name" @bind-value="Client.Name" />
                             </div>
-                            <p class="fst-italic p-desc">Add Email Address and enable toggle to be notified via email.</p>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="monthlyFeeInputGroup" class="form-label">Monthly Fee</label>
-                            <div class="input-group" id="monthlyFeeInputGroup">
-                                <div class="input-group-text">
-                                    <div class="form-check form-switch">
-                                        @if (monthlyFeeToggle)
-                                        {
-                                            <input id="monthlyFeeSwitch" class="form-check-input" role="switch" type="checkbox" aria-label="Checkbox for Monthly Fee" @onchange="(e) => OnMonthlyFeeClicked(e)" checked />
-                                        }
-                                        else
-                                        {
-                                            <input id="monthlyFeeSwitch" class="form-check-input" role="switch" type="checkbox" aria-label="Checkbox for Monthly Fee" @onchange="(e) => OnMonthlyFeeClicked(e)" />
-                                        }
-                                        <label class="form-check-label monthly-fee-lbl" for="monthlyFeeSwitch">Monthly Fee</label>
-                                    </div>
-                                </div>
-                                @if (monthlyFeeToggle)
-                                {
-                                    <input type="text" class="form-control" placeholder="Enter Monthly Fee" id="monthlyFeeField" @bind-value="Client.MonthlyFee" />
-                                }
-                                else
-                                {
-                                    <input type="text" class="form-control" placeholder="Enter Monthly Fee" id="monthlyFeeField" @bind-value="Client.MonthlyFee" disabled />
-                                }
+                            <div class="col-md-4">
+                                <label for="websiteField" class="form-label">Website</label>
+                                <input type="text" class="form-control" id="websiteField" placeholder="https://www.song88.com" @bind-value="Client.Website" />
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="telephoneField" class="form-label">Telephone</label>
-                            <input type="text" class="form-control" id="telephoneField" placeholder="Enter Telephone Number" @bind-value="Client.TelephoneNumber" />
-                        </div>
-                        <div class="col-md-3">
-                            <label for="brandField" class="form-label">Brand</label>
-                            <input type="text" class="form-control" id="brandField" placeholder="Enter Brand" @bind-value="Client.ClientCode" disabled="@IsEdit" />
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="d-flex flex-column tax-settings mb-3">
-                                <div class="p-2 mb-2 tax-settings-head">
-                                    Tax Settings
-                                </div>
-                                <div class="ps-2 pb-3 border-bottom">
-                                    <label for="stakeField" class="form-label stake-lbl">Stake</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">%</span>
-                                        <InputDecimal id="stakeField" Min=0 Max=100 @bind-Value="Client.TaxConfig.StakeTax" class="form-control rounded border-start-0" />
-                                        <div class="dropdown mx-2">
-                                            <button class="btn tax-settings-btn dropdown-toggle ps-4" type="button" id="sportTypesDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                                Exclude Sport Types
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sportTypesDropdown">
-                                                <li>
-                                                    @if (RealSports != null && SelectedRealSports.Count == RealSports.SportLookup.Count && SelectedRealSports.Count > 0)
-                                                    {
-                                                        <input class="form-check-input" type="checkbox" id="allSports" aria-label="..." @onchange="(e) => OnRealSportsClicked(e, 0)" checked />
-                                                    }
-                                                    else
-                                                    {
-                                                        <input class="form-check-input" type="checkbox" id="allSports" aria-label="..." @onchange="(e) => OnRealSportsClicked(e, 0)" />
-                                                    }
-                                                    <button class="dropdown-item dropdown-toggle ps-4" id="sportsItemDropdown" data-bs-target="#sportCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sportCollapse">
-                                                        Sports
-                                                    </button>
-
-                                                    <div class="collapse" id="sportCollapse">
-                                                        <ul class="list-group">
-                                                            @if (RealSports != null && RealSports.SportLookup.Any())
-                                                            {
-                                                                foreach (var sport in RealSports.SportLookup)
-                                                                {
-                                                                    <li class="list-group-item">
-                                                                        @if (SelectedRealSports.Contains(sport.SportId))
-                                                                        {
-                                                                            <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnRealSportsClicked(e, sport.SportId)" checked />
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnRealSportsClicked(e, sport.SportId)" />
-                                                                        }
-                                                                        <label class="form-check-label" for="@sport.SportId" @onclick="() => OnRealSportsClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
-                                                                    </li>
-                                                                }
-                                                            }
-                                                        </ul>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    @if (VirtualSports != null && SelectedVirtualSports.Count == VirtualSports.SportLookup.Count && SelectedVirtualSports.Count > 0)
-                                                    {
-                                                        <input class="form-check-input" type="checkbox" id="allVirtualSports" aria-label="..." @onchange="(e) => OnVirtualSportsClicked(e, 0)" checked />
-                                                    }
-                                                    else
-                                                    {
-                                                        <input class="form-check-input" type="checkbox" id="allVirtualSports" aria-label="..." @onchange="(e) => OnVirtualSportsClicked(e, 0)" />
-                                                    }
-                                                    <button class="dropdown-item dropdown-toggle ps-4" id="virtualSportsItemDropdown" data-bs-target="#virtualSportCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="virtualSportCollapse">
-                                                        Virtual Sports
-                                                    </button>
-
-                                                    <div class="collapse" id="virtualSportCollapse">
-                                                        <ul class="list-group">
-                                                            @if (VirtualSports != null && VirtualSports.SportLookup.Any())
-                                                            {
-                                                                foreach (var sport in VirtualSports.SportLookup)
-                                                                {
-                                                                    <li class="list-group-item">
-                                                                        @if (SelectedVirtualSports.Contains(sport.SportId))
-                                                                        {
-                                                                            <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnVirtualSportsClicked(e, sport.SportId)" checked />
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnVirtualSportsClicked(e, sport.SportId)" />
-                                                                        }
-                                                                        <label class="form-check-label" for="@sport.SportId" @onclick="() => OnVirtualSportsClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
-                                                                    </li>
-                                                                }
-                                                            }
-                                                        </ul>
-                                                    </div>
-                                                </li>
-
-                                            </ul>
+                            <div class="col-md-4">
+                                <label for="emailField" class="form-label">Email Address</label>
+                                <div class="input-group">
+                                    <input type="email" class="form-control" id="emailField" placeholder="Enter Email Address" aria-label="Email" @bind-value="Client.Email" />
+                                    <div class="input-group-text">
+                                        <div class="form-check form-switch">
+                                            @if (Client.IsEmailNotification)
+                                            {
+                                                <input class="form-check-input" type="checkbox" role="switch" id="emailNotifSwitch" aria-label="Notify email switch" @onchange="(e) => OnEmailNotifClicked(e)" checked />
+                                            }
+                                            else
+                                            {
+                                                <input class="form-check-input" type="checkbox" role="switch" id="emailNotifSwitch" aria-label="Notify email switch" @onchange="(e) => OnEmailNotifClicked(e)" />
+                                            }
                                         </div>
                                     </div>
                                 </div>
-                                <div class="ps-2 pb-3 pt-2">
-                                    <label for="winningsField" class="form-label stake-lbl">Winnings</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">%</span>
-                                        <InputDecimal id="winningsField" Min=0 Max=100 @bind-Value="Client.TaxConfig.WinningsTax" class="form-control rounded border-start-0" />
-                                        <div class="dropdown mx-2">
-                                            <button class="btn tax-settings-btn dropdown-toggle ps-4" type="button" id="sportTypesWinningsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                                Exclude Sport Types
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sportTypesWinningsDropdown">
-                                                <li>
-                                                    @if (RealSports != null && SelectedRealSportsWin.Count == RealSports.SportLookup.Count && SelectedRealSportsWin.Count > 0)
-                                                    {
-                                                        <input class="form-check-input" type="checkbox" id="allSportsWinnings" aria-label="..." @onchange="(e) => OnRealSportsWinClicked(e, 0)" checked />
-                                                    }
-                                                    else
-                                                    {
-                                                        <input class="form-check-input" type="checkbox" id="allSportsWinnings" aria-label="..." @onchange="(e) => OnRealSportsWinClicked(e, 0)" />
-                                                    }
-                                                    <button class="dropdown-item dropdown-toggle ps-4" id="sportsItemWinningsDropdown" data-bs-target="#sportWinningsCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sportWinningsCollapse">
-                                                        Sports
-                                                    </button>
+                                <p class="fst-italic p-desc">Add Email Address and enable toggle to be notified via email.</p>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="monthlyFeeInputGroup" class="form-label">Monthly Fee</label>
+                                <div class="input-group" id="monthlyFeeInputGroup">
+                                    <div class="input-group-text">
+                                        <div class="form-check form-switch">
+                                            @if (monthlyFeeToggle)
+                                            {
+                                                <input id="monthlyFeeSwitch" class="form-check-input" role="switch" type="checkbox" aria-label="Checkbox for Monthly Fee" @onchange="(e) => OnMonthlyFeeClicked(e)" checked />
+                                            }
+                                            else
+                                            {
+                                                <input id="monthlyFeeSwitch" class="form-check-input" role="switch" type="checkbox" aria-label="Checkbox for Monthly Fee" @onchange="(e) => OnMonthlyFeeClicked(e)" />
+                                            }
+                                            <label class="form-check-label monthly-fee-lbl" for="monthlyFeeSwitch">Monthly Fee</label>
+                                        </div>
+                                    </div>
+                                    @if (monthlyFeeToggle)
+                                    {
+                                        <input type="text" class="form-control" placeholder="Enter Monthly Fee" id="monthlyFeeField" @bind-value="Client.MonthlyFee" />
+                                    }
+                                    else
+                                    {
+                                        <input type="text" class="form-control" placeholder="Enter Monthly Fee" id="monthlyFeeField" @bind-value="Client.MonthlyFee" disabled />
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="telephoneField" class="form-label">Telephone</label>
+                                <input type="text" class="form-control" id="telephoneField" placeholder="Enter Telephone Number" @bind-value="Client.TelephoneNumber" />
+                            </div>
+                            <div class="col-md-3">
+                                <label for="brandField" class="form-label">Brand</label>
+                                <input type="text" class="form-control" id="brandField" placeholder="Enter Brand" @bind-value="Client.ClientCode" disabled="@IsEdit" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column tax-settings mb-3">
+                                    <div class="p-2 mb-2 tax-settings-head">
+                                        Tax Settings
+                                    </div>
+                                    <div class="ps-2 pb-3 border-bottom">
+                                        <label for="stakeField" class="form-label stake-lbl">Stake</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">%</span>
+                                            <InputDecimal id="stakeField" Min=0 Max=100 @bind-Value="Client.TaxConfig.StakeTax" class="form-control rounded border-start-0" />
+                                            <div class="dropdown mx-2">
+                                                <button class="btn tax-settings-btn dropdown-toggle ps-4" type="button" id="sportTypesDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                                    Exclude Sport Types
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sportTypesDropdown">
+                                                    <li>
+                                                        @if (RealSports != null && SelectedRealSports.Count == RealSports.SportLookup.Count && SelectedRealSports.Count > 0)
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" id="allSports" aria-label="..." @onchange="(e) => OnRealSportsClicked(e, 0)" checked />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" id="allSports" aria-label="..." @onchange="(e) => OnRealSportsClicked(e, 0)" />
+                                                        }
+                                                        <button class="dropdown-item dropdown-toggle ps-4" id="sportsItemDropdown" data-bs-target="#sportCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sportCollapse">
+                                                            Sports
+                                                        </button>
 
-                                                    <div class="collapse" id="sportWinningsCollapse">
-                                                        <ul class="list-group">
-                                                            @if (RealSports != null && RealSports.SportLookup.Any())
-                                                            {
-                                                                foreach (var sport in RealSports.SportLookup)
+                                                        <div class="collapse" id="sportCollapse">
+                                                            <ul class="list-group">
+                                                                @if (RealSports != null && RealSports.SportLookup.Any())
                                                                 {
-                                                                    var refId = $"win{sport.SportId}";
-                                                                    <li class="list-group-item">
-                                                                        @if (SelectedRealSportsWin.Contains(sport.SportId))
-                                                                        {
-                                                                            <input class="form-check-input" type="checkbox" id="@refId" @onchange="(e) => OnRealSportsWinClicked(e, sport.SportId)" checked />
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <input class="form-check-input" type="checkbox" id="@refId" @onchange="(e) => OnRealSportsWinClicked(e, sport.SportId)" />
-                                                                        }
-                                                                        <label class="form-check-label" for="@refId" @onclick="() => OnRealSportsWinClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
-                                                                    </li>
+                                                                    foreach (var sport in RealSports.SportLookup)
+                                                                    {
+                                                                        <li class="list-group-item">
+                                                                            @if (SelectedRealSports.Contains(sport.SportId))
+                                                                            {
+                                                                                <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnRealSportsClicked(e, sport.SportId)" checked />
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnRealSportsClicked(e, sport.SportId)" />
+                                                                            }
+                                                                            <label class="form-check-label" for="@sport.SportId" @onclick="() => OnRealSportsClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
+                                                                        </li>
+                                                                    }
                                                                 }
-                                                            }
-                                                        </ul>
-                                                    </div>
-                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </li>
 
-                                                <li>
-                                                    @if (VirtualSports != null && SelectedVirtualSportsWin.Count == VirtualSports.SportLookup.Count && SelectedVirtualSportsWin.Count > 0)
-                                                    {
-                                                        <input class="form-check-input" type="checkbox" id="allVirtualSports" aria-label="..." @onchange="(e) => OnVirtualSportsWinClicked(e, 0)" checked />
-                                                    }
-                                                    else
-                                                    {
-                                                        <input class="form-check-input" type="checkbox" id="allVirtualSports" aria-label="..." @onchange="(e) => OnVirtualSportsWinClicked(e, 0)" />
-                                                    }
-                                                    <button class="dropdown-item dropdown-toggle ps-4" id="virtualSportsItemWinningsDropdown" data-bs-target="#virtualSportWinningsCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="virtualSportWinningsCollapse">
-                                                        Virtual Sports
-                                                    </button>
+                                                    <li>
+                                                        @if (VirtualSports != null && SelectedVirtualSports.Count == VirtualSports.SportLookup.Count && SelectedVirtualSports.Count > 0)
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" id="allVirtualSports" aria-label="..." @onchange="(e) => OnVirtualSportsClicked(e, 0)" checked />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" id="allVirtualSports" aria-label="..." @onchange="(e) => OnVirtualSportsClicked(e, 0)" />
+                                                        }
+                                                        <button class="dropdown-item dropdown-toggle ps-4" id="virtualSportsItemDropdown" data-bs-target="#virtualSportCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="virtualSportCollapse">
+                                                            Virtual Sports
+                                                        </button>
 
-                                                    <div class="collapse" id="virtualSportWinningsCollapse">
-                                                        <ul class="list-group">
-                                                            @if (VirtualSports != null && VirtualSports.SportLookup.Any())
-                                                            {
-                                                                foreach (var sport in VirtualSports.SportLookup)
+                                                        <div class="collapse" id="virtualSportCollapse">
+                                                            <ul class="list-group">
+                                                                @if (VirtualSports != null && VirtualSports.SportLookup.Any())
                                                                 {
-                                                                    var refIdVirtual = $"winvirtual{sport.SportId}";
-                                                                    <li class="list-group-item">
-                                                                        @if (SelectedVirtualSportsWin.Contains(sport.SportId))
-                                                                        {
-                                                                            <input class="form-check-input" type="checkbox" id="@refIdVirtual" @onchange="(e) => OnVirtualSportsWinClicked(e, sport.SportId)" checked />
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <input class="form-check-input" type="checkbox" id="@refIdVirtual" @onchange="(e) => OnVirtualSportsWinClicked(e, sport.SportId)" />
-                                                                        }
-                                                                        <label class="form-check-label" for="@refIdVirtual" @onclick="() => OnVirtualSportsWinClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
-                                                                    </li>
+                                                                    foreach (var sport in VirtualSports.SportLookup)
+                                                                    {
+                                                                        <li class="list-group-item">
+                                                                            @if (SelectedVirtualSports.Contains(sport.SportId))
+                                                                            {
+                                                                                <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnVirtualSportsClicked(e, sport.SportId)" checked />
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnVirtualSportsClicked(e, sport.SportId)" />
+                                                                            }
+                                                                            <label class="form-check-label" for="@sport.SportId" @onclick="() => OnVirtualSportsClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
+                                                                        </li>
+                                                                    }
                                                                 }
-                                                            }
-                                                        </ul>
-                                                    </div>
-                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </li>
 
-                                            </ul>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="ps-2 pb-3 pt-2">
+                                        <label for="winningsField" class="form-label stake-lbl">Winnings</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">%</span>
+                                            <InputDecimal id="winningsField" Min=0 Max=100 @bind-Value="Client.TaxConfig.WinningsTax" class="form-control rounded border-start-0" />
+                                            <div class="dropdown mx-2">
+                                                <button class="btn tax-settings-btn dropdown-toggle ps-4" type="button" id="sportTypesWinningsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                                    Exclude Sport Types
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sportTypesWinningsDropdown">
+                                                    <li>
+                                                        @if (RealSports != null && SelectedRealSportsWin.Count == RealSports.SportLookup.Count && SelectedRealSportsWin.Count > 0)
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" id="allSportsWinnings" aria-label="..." @onchange="(e) => OnRealSportsWinClicked(e, 0)" checked />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" id="allSportsWinnings" aria-label="..." @onchange="(e) => OnRealSportsWinClicked(e, 0)" />
+                                                        }
+                                                        <button class="dropdown-item dropdown-toggle ps-4" id="sportsItemWinningsDropdown" data-bs-target="#sportWinningsCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sportWinningsCollapse">
+                                                            Sports
+                                                        </button>
+
+                                                        <div class="collapse" id="sportWinningsCollapse">
+                                                            <ul class="list-group">
+                                                                @if (RealSports != null && RealSports.SportLookup.Any())
+                                                                {
+                                                                    foreach (var sport in RealSports.SportLookup)
+                                                                    {
+                                                                        var refId = $"win{sport.SportId}";
+                                                                        <li class="list-group-item">
+                                                                            @if (SelectedRealSportsWin.Contains(sport.SportId))
+                                                                            {
+                                                                                <input class="form-check-input" type="checkbox" id="@refId" @onchange="(e) => OnRealSportsWinClicked(e, sport.SportId)" checked />
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" type="checkbox" id="@refId" @onchange="(e) => OnRealSportsWinClicked(e, sport.SportId)" />
+                                                                            }
+                                                                            <label class="form-check-label" for="@refId" @onclick="() => OnRealSportsWinClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
+                                                                        </li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        @if (VirtualSports != null && SelectedVirtualSportsWin.Count == VirtualSports.SportLookup.Count && SelectedVirtualSportsWin.Count > 0)
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" id="allVirtualSports" aria-label="..." @onchange="(e) => OnVirtualSportsWinClicked(e, 0)" checked />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-check-input" type="checkbox" id="allVirtualSports" aria-label="..." @onchange="(e) => OnVirtualSportsWinClicked(e, 0)" />
+                                                        }
+                                                        <button class="dropdown-item dropdown-toggle ps-4" id="virtualSportsItemWinningsDropdown" data-bs-target="#virtualSportWinningsCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="virtualSportWinningsCollapse">
+                                                            Virtual Sports
+                                                        </button>
+
+                                                        <div class="collapse" id="virtualSportWinningsCollapse">
+                                                            <ul class="list-group">
+                                                                @if (VirtualSports != null && VirtualSports.SportLookup.Any())
+                                                                {
+                                                                    foreach (var sport in VirtualSports.SportLookup)
+                                                                    {
+                                                                        var refIdVirtual = $"winvirtual{sport.SportId}";
+                                                                        <li class="list-group-item">
+                                                                            @if (SelectedVirtualSportsWin.Contains(sport.SportId))
+                                                                            {
+                                                                                <input class="form-check-input" type="checkbox" id="@refIdVirtual" @onchange="(e) => OnVirtualSportsWinClicked(e, sport.SportId)" checked />
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="form-check-input" type="checkbox" id="@refIdVirtual" @onchange="(e) => OnVirtualSportsWinClicked(e, sport.SportId)" />
+                                                                            }
+                                                                            <label class="form-check-label" for="@refIdVirtual" @onclick="() => OnVirtualSportsWinClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
+                                                                        </li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="d-flex flex-column tax-settings">
-                                <div class="p-2 mb-2 tax-settings-head">
-                                    Bet Slip Settings
-                                </div>
-                                <div class="p-2">
-                                    <label class="form-label" for="betSlipSettingsField">
-                                        Maximum No. of Selections
-                                    </label>
-                                    <input type="text" id="betSlipSettingsField" placeholder="20" @bind-value="Client.BetSlipMaxSelection" />
-                                    <p class="fst-italic p-desc">This will limit the number of bets a user can place in the bet slip.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="d-flex flex-column">
-                                @if (IsEdit)
-                                {
+                                <div class="d-flex flex-column tax-settings">
+                                    <div class="p-2 mb-2 tax-settings-head">
+                                        Bet Slip Settings
+                                    </div>
                                     <div class="p-2">
-                                        Status
-                                    </div>
-                                    <div class="btn-group border rounded p-2" role="group" aria-label="Status Toggle Button Group">
-
-                                        @if (Client.StatusId == (int)ClientStatus.Normal)
-                                        {
-                                            <input type="radio" class="btn-check" name="statusRadio" id="normalRadio" autocomplete="off" checked @onchange="(e) => OnStatusNormalClicked(e)" />
-                                        }
-                                        else
-                                        {
-                                            <input type="radio" class="btn-check" name="statusRadio" id="normalRadio" autocomplete="off" @onchange="(e) => OnStatusNormalClicked(e)" />
-                                        }
-                                        <label class="btn btn-radio" for="normalRadio">Normal</label>
-
-                                        @if (Client.StatusId != (int)ClientStatus.Normal)
-                                        {
-                                            <input type="radio" class="btn-check" name="statusRadio" id="lockedRadio" autocomplete="off" checked @onchange="(e) => OnStatusLockedClicked(e)" />
-                                        }
-                                        else
-                                        {
-                                            <input type="radio" class="btn-check" name="statusRadio" id="lockedRadio" autocomplete="off" @onchange="(e) => OnStatusLockedClicked(e)" />
-                                        }
-                                        <label class="btn btn-radio" for="lockedRadio">Locked</label>
-
-                                    </div>
-                                }
-                                <div class="p-2">
-                                    Region
-                                </div>
-                                <div class="btn-group border rounded p-2" role="group" aria-label="Region Toggle Button Group">
-                                    @if (!IsEdit)
-                                    {
-                                        if (Client.Region == "HK")
-                                        {
-                                            <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" @onchange="(e) => OnRegionHKClicked(e)" checked />
-                                        }
-                                        else
-                                        {
-                                            <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" @onchange="(e) => OnRegionHKClicked(e)" />
-                                        }
-                                        <label class="btn btn-radio" for="hongkongRadio">Hongkong</label>
-
-                                        @if (Client.Region == "SA")
-                                        {
-                                            <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" @onchange="(e) => OnRegionAFClicked(e)" checked />
-                                        }
-                                        else
-                                        {
-                                            <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" @onchange="(e) => OnRegionAFClicked(e)" />
-                                        }
-                                        <label class="btn btn-radio" for="africaRadio">Africa</label>
-                                    }
-                                    else
-                                    {
-                                        if (Client.Region == "HK")
-                                        {
-                                            <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" checked disabled />
-                                        }
-                                        else
-                                        {
-                                            <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" disabled />
-                                        }
-                                        <label class="btn btn-radio" for="hongkongRadio">Hongkong</label>
-
-                                        @if (Client.Region == "SA")
-                                        {
-                                            <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" disabled checked />
-                                        }
-                                        else
-                                        {
-                                            <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" disabled />
-                                        }
-                                        <label class="btn btn-radio" for="africaRadio">Africa</label>
-                                    }
-
-                                </div>
-
-                                <div class="d-flex flex-column mt-3 tax-settings">
-                                    <div class="d-flex justify-content-between tax-settings-head">
-                                        <div class="p-2">
-                                            Company Revenue Share
-                                        </div>
-
-                                        <label class="switchCompany m-2">
-                                            <input type="checkbox" id="companyRevenueShareSwitch" @onclick="ToggleCompanyRevenueSwitch" />
-                                            <div class="sliderCompany round"></div>
+                                        <label class="form-label" for="betSlipSettingsField">
+                                            Maximum No. of Selections
                                         </label>
+                                        <input type="text" id="betSlipSettingsField" placeholder="20" @bind-value="Client.BetSlipMaxSelection" />
+                                        <p class="fst-italic p-desc">This will limit the number of bets a user can place in the bet slip.</p>
                                     </div>
-
-                                    @if (!Client.IsTierRevenue)
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column">
+                                    @if (IsEdit)
                                     {
-                                    //fixed
-                                        <div class="d-flex justify-content-around">
-                                            <div class="p-2">
-                                                <label class="form-label" for="sportsBookDropdown">Sportsbook</label>
-                                                <select class="form-control form-select" aria-label="Sportsbook Dropdown" id="sportsBookDropdown" @onchange="OnRevenueSportsbookClicked">
-                                                    @for (int i = 0; i <= 100; i++)
-                                                    {
-                                                        if (Convert.ToDecimal(i) == Client.RevenueShare.SportsbookShare)
-                                                        {
-                                                            <option value="@i" selected>@(i)%</option>
-                                                        }
-                                                        else
-                                                        {
-                                                            <option value="@i">@(i)%</option>
-                                                        }
-                                                    }
-                                                </select>
-                                            </div>
+                                        <div class="p-2">
+                                            Status
+                                        </div>
+                                        <div class="btn-group border rounded p-2" role="group" aria-label="Status Toggle Button Group">
 
-                                            <div class="p-2">
-                                                <label class="form-label" for="jackpotDropdown">Jackpot</label>
-                                                <select class="form-control form-select" aria-label="Jackpot Dropdown" id="jackpotDropdown" @onchange="OnRevenueJackpotClicked">
-                                                    @for (int i = 0; i <= 100; i++)
-                                                    {
-                                                        if (Convert.ToDecimal(i) == Client.RevenueShare.JackpotShare)
-                                                        {
-                                                            <option value="@i" selected>@(i)%</option>
-                                                        }
-                                                        else
-                                                        {
-                                                            <option value="@i">@(i)%</option>
-                                                        }
-                                                    }
-                                                </select>
-                                            </div>
+                                            @if (Client.StatusId == (int)ClientStatus.Normal)
+                                            {
+                                                <input type="radio" class="btn-check" name="statusRadio" id="normalRadio" autocomplete="off" checked @onchange="(e) => OnStatusNormalClicked(e)" />
+                                            }
+                                            else
+                                            {
+                                                <input type="radio" class="btn-check" name="statusRadio" id="normalRadio" autocomplete="off" @onchange="(e) => OnStatusNormalClicked(e)" />
+                                            }
+                                            <label class="btn btn-radio" for="normalRadio">Normal</label>
+
+                                            @if (Client.StatusId != (int)ClientStatus.Normal)
+                                            {
+                                                <input type="radio" class="btn-check" name="statusRadio" id="lockedRadio" autocomplete="off" checked @onchange="(e) => OnStatusLockedClicked(e)" />
+                                            }
+                                            else
+                                            {
+                                                <input type="radio" class="btn-check" name="statusRadio" id="lockedRadio" autocomplete="off" @onchange="(e) => OnStatusLockedClicked(e)" />
+                                            }
+                                            <label class="btn btn-radio" for="lockedRadio">Locked</label>
+
                                         </div>
                                     }
-                                    else
-                                    {
-                                    //tier
-                                        <div class="d-flex flex-column p-3">
-                                            <div class="d-flex justify-content-evenly">
-                                                <div>
-                                                    @if (SportsbookTierOption)
-                                                    {
-                                                        <input type="radio" class="btn-check" name="tierOptions" id="sportsBookOption" @onchange="(e) => OnSportsbookTierOptionClicked(e)" checked />
-                                                    }
-                                                    else
-                                                    {
-                                                        <input type="radio" class="btn-check" name="tierOptions" id="sportsBookOption" @onchange="(e) => OnSportsbookTierOptionClicked(e)" />
-                                                    }
-                                                    <label class="btn modalTab" for="sportsBookOption">Sportsbook</label>
-                                                </div>
-                                                <div>
-                                                    @if (SportsbookTierOption)
-                                                    {
-                                                        <input type="radio" class="btn-check" name="tierOptions" id="jackpotOption" @onchange="(e) => OnJackpotTierOptionClicked(e)" />
-                                                    }
-                                                    else
-                                                    {
-                                                        <input type="radio" class="btn-check" name="tierOptions" id="jackpotOption" @onchange="(e) => OnJackpotTierOptionClicked(e)" checked />
-                                                    }
-                                                    <label class="btn modalTab" for="jackpotOption">Jackpot</label>
-                                                </div>
+                                    <div class="p-2">
+                                        Region
+                                    </div>
+                                    <div class="btn-group border rounded p-2" role="group" aria-label="Region Toggle Button Group">
+                                        @if (!IsEdit)
+                                        {
+                                            if (Client.Region == "HK")
+                                            {
+                                                <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" @onchange="(e) => OnRegionHKClicked(e)" checked />
+                                            }
+                                            else
+                                            {
+                                                <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" @onchange="(e) => OnRegionHKClicked(e)" />
+                                            }
+                                            <label class="btn btn-radio" for="hongkongRadio">Hongkong</label>
+
+                                            @if (Client.Region == "SA")
+                                            {
+                                                <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" @onchange="(e) => OnRegionAFClicked(e)" checked />
+                                            }
+                                            else
+                                            {
+                                                <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" @onchange="(e) => OnRegionAFClicked(e)" />
+                                            }
+                                            <label class="btn btn-radio" for="africaRadio">Africa</label>
+                                        }
+                                        else
+                                        {
+                                            if (Client.Region == "HK")
+                                            {
+                                                <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" checked disabled />
+                                            }
+                                            else
+                                            {
+                                                <input type="radio" class="btn-check" name="regionRadio" id="hongkongRadio" autocomplete="off" disabled />
+                                            }
+                                            <label class="btn btn-radio" for="hongkongRadio">Hongkong</label>
+
+                                            @if (Client.Region == "SA")
+                                            {
+                                                <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" disabled checked />
+                                            }
+                                            else
+                                            {
+                                                <input type="radio" class="btn-check" name="regionRadio" id="africaRadio" autocomplete="off" disabled />
+                                            }
+                                            <label class="btn btn-radio" for="africaRadio">Africa</label>
+                                        }
+
+                                    </div>
+
+                                    <div class="d-flex flex-column mt-3 tax-settings">
+                                        <div class="d-flex justify-content-between tax-settings-head">
+                                            <div class="p-2">
+                                                Company Revenue Share
                                             </div>
 
-                                            <div class="p-2 border rounded">
-                                                <table class="table">
-                                                    <thead>
-                                                        <tr class="border rounded">
-                                                            <th scope="col">No.</th>
-                                                            <th scope="col">From</th>
-                                                            <th scope="col">To</th>
-                                                            <th scope="col">%GGR</th>
-                                                            <th scope="col" class="noPadding"><button class="btn addBtn" type="button" @onclick="OnAddTierClicked">Add</button></th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
+                                            <label class="switchCompany m-2">
+                                                <input type="checkbox" id="companyRevenueShareSwitch" @onclick="ToggleCompanyRevenueSwitch" />
+                                                <div class="sliderCompany round"></div>
+                                            </label>
+                                        </div>
+
+                                        @if (!Client.IsTierRevenue)
+                                        {
+                                            //fixed
+                                            <div class="d-flex justify-content-around">
+                                                <div class="p-2">
+                                                    <label class="form-label" for="sportsBookDropdown">Sportsbook</label>
+                                                    <select class="form-control form-select" aria-label="Sportsbook Dropdown" id="sportsBookDropdown" @onchange="OnRevenueSportsbookClicked">
+                                                        @for (int i = 0; i <= 100; i++)
+                                                        {
+                                                            if (Convert.ToDecimal(i) == Client.RevenueShare.SportsbookShare)
+                                                            {
+                                                                <option value="@i" selected>@(i)%</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@i">@(i)%</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+
+                                                <div class="p-2">
+                                                    <label class="form-label" for="jackpotDropdown">Jackpot</label>
+                                                    <select class="form-control form-select" aria-label="Jackpot Dropdown" id="jackpotDropdown" @onchange="OnRevenueJackpotClicked">
+                                                        @for (int i = 0; i <= 100; i++)
+                                                        {
+                                                            if (Convert.ToDecimal(i) == Client.RevenueShare.JackpotShare)
+                                                            {
+                                                                <option value="@i" selected>@(i)%</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@i">@(i)%</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            //tier
+                                            <div class="d-flex flex-column p-3">
+                                                <div class="d-flex justify-content-evenly">
+                                                    <div>
                                                         @if (SportsbookTierOption)
                                                         {
-                                                            if (SportsbookTier.Tiers != null && SportsbookTier.Tiers.Any())
-                                                            {
-                                                                foreach (var tier in SportsbookTier.Tiers)
-                                                                {
-                                                                    var tierRef = $"s{tier.Tier}";
-                                                                    <tr>
-                                                                        <td scope="row" class="text-center">@tier.Tier</td>
-                                                                        <td scope="row" class="text-center">
-                                                                            @if (tier.Tier == 1)
-                                                                            {
-                                                                                <input type="text" class="form-control" id="from@(tierRef)" placeholder="0.01" @bind-value="tier.From" disabled />
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                <input type="text" class="form-control" id="from@(tierRef)" placeholder="0.01" @bind-value="tier.From" />
-                                                                            }
-                                                                        </td>
-                                                                        <td scope="row" class="text-center">
-                                                                            <input type="text" class="form-control" id="to@(tierRef)" placeholder="0.01" @bind-value="tier.To" />
-                                                                        </td>
-                                                                        <td scope="row" class="text-center">
-                                                                            <select class="form-select" aria-label="Tier Select" id="@tierRef" @onchange="(e) => OnTierSelect(e, tier)">
-                                                                                @for (int i = 0; i <= 100; i++)
-                                                                                {
-                                                                                    if (Convert.ToDecimal(i) == tier.Percentage)
-                                                                                    {
-                                                                                        <option value="@i" selected>@(i)%</option>
-                                                                                    }
-                                                                                    else
-                                                                                    {
-                                                                                        <option value="@i">@(i)%</option>
-                                                                                    }
-                                                                                }
-                                                                            </select>
-                                                                        </td>
-                                                                        <td scope="row" class="text-center"><button class="btn clientBtn" type="button" @onclick="() => OnRemoveTierClicked(tier)">Remove</button></td>
-                                                                    </tr>
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                <tr>
-                                                                    <td scope="row" colspan="5" class="text-center">No Tiers Yet</td>
-                                                                </tr>
-                                                            }
-
+                                                            <input type="radio" class="btn-check" name="tierOptions" id="sportsBookOption" @onchange="(e) => OnSportsbookTierOptionClicked(e)" checked />
                                                         }
                                                         else
                                                         {
-                                                            if (JackpotTier.Tiers != null && JackpotTier.Tiers.Any())
+                                                            <input type="radio" class="btn-check" name="tierOptions" id="sportsBookOption" @onchange="(e) => OnSportsbookTierOptionClicked(e)" />
+                                                        }
+                                                        <label class="btn modalTab" for="sportsBookOption">Sportsbook</label>
+                                                    </div>
+                                                    <div>
+                                                        @if (SportsbookTierOption)
+                                                        {
+                                                            <input type="radio" class="btn-check" name="tierOptions" id="jackpotOption" @onchange="(e) => OnJackpotTierOptionClicked(e)" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="radio" class="btn-check" name="tierOptions" id="jackpotOption" @onchange="(e) => OnJackpotTierOptionClicked(e)" checked />
+                                                        }
+                                                        <label class="btn modalTab" for="jackpotOption">Jackpot</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="p-2 border rounded">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr class="border rounded">
+                                                                <th scope="col">No.</th>
+                                                                <th scope="col">From</th>
+                                                                <th scope="col">To</th>
+                                                                <th scope="col">%GGR</th>
+                                                                <th scope="col" class="noPadding"><button class="btn addBtn" type="button" @onclick="OnAddTierClicked">Add</button></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @if (SportsbookTierOption)
                                                             {
-                                                                foreach (var tier in JackpotTier.Tiers)
+                                                                if (SportsbookTier.Tiers != null && SportsbookTier.Tiers.Any())
                                                                 {
-                                                                    var tierRef = $"j{tier.Tier}";
-                                                                    <tr>
-                                                                        <td scope="row" class="text-center">@tier.Tier</td>
-                                                                        <td scope="row" class="text-center">
-                                                                            @if (tier.Tier == 1)
-                                                                            {
-                                                                                <input type="text" class="form-control" id="from@(tierRef)" placeholder="0.01" @bind-value="tier.From" disabled />
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                <input type="text" class="form-control" id="from@(tierRef)" placeholder="0.01" @bind-value="tier.From" />
-                                                                            }
-                                                                        </td>
-                                                                        <td scope="row" class="text-center">
-                                                                            <input type="text" class="form-control" id="to@(tierRef)" placeholder="0.01" @bind-value="tier.To" />
-                                                                        </td>
-                                                                        <td scope="row" class="text-center">
-                                                                            <select class="form-select" aria-label="Tier Select" id="@tierRef" @onchange="(e) => OnTierSelect(e, tier)">
-                                                                                @for (int i = 0; i <= 100; i++)
+                                                                    foreach (var tier in SportsbookTier.Tiers)
+                                                                    {
+                                                                        var tierRef = $"s{tier.Tier}";
+                                                                        <tr>
+                                                                            <td scope="row" class="text-center">@tier.Tier</td>
+                                                                            <td scope="row" class="text-center">
+                                                                                @if (tier.Tier == 1)
                                                                                 {
-                                                                                    if (Convert.ToDecimal(i) == tier.Percentage)
-                                                                                    {
-                                                                                        <option value="@i" selected>@(i)%</option>
-                                                                                    }
-                                                                                    else
-                                                                                    {
-                                                                                        <option value="@i">@(i)%</option>
-                                                                                    }
+                                                                                    <input type="text" class="form-control" id="from@(tierRef)" placeholder="0.01" @bind-value="tier.From" disabled />
                                                                                 }
-                                                                            </select>
-                                                                        </td>
-                                                                        <td scope="row" class="text-center"><button class="btn clientBtn" type="button" @onclick="() => OnRemoveTierClicked(tier)">Remove</button></td>
+                                                                                else
+                                                                                {
+                                                                                    <input type="text" class="form-control" id="from@(tierRef)" placeholder="0.01" @bind-value="tier.From" />
+                                                                                }
+                                                                            </td>
+                                                                            <td scope="row" class="text-center">
+                                                                                <input type="text" class="form-control" id="to@(tierRef)" placeholder="0.01" @bind-value="tier.To" />
+                                                                            </td>
+                                                                            <td scope="row" class="text-center">
+                                                                                <select class="form-select" aria-label="Tier Select" id="@tierRef" @onchange="(e) => OnTierSelect(e, tier)">
+                                                                                    @for (int i = 0; i <= 100; i++)
+                                                                                    {
+                                                                                        if (Convert.ToDecimal(i) == tier.Percentage)
+                                                                                        {
+                                                                                            <option value="@i" selected>@(i)%</option>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <option value="@i">@(i)%</option>
+                                                                                        }
+                                                                                    }
+                                                                                </select>
+                                                                            </td>
+                                                                            <td scope="row" class="text-center"><button class="btn clientBtn" type="button" @onclick="() => OnRemoveTierClicked(tier)">Remove</button></td>
+                                                                        </tr>
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <tr>
+                                                                        <td scope="row" colspan="5" class="text-center">No Tiers Yet</td>
                                                                     </tr>
                                                                 }
+
                                                             }
                                                             else
                                                             {
-                                                                <tr>
-                                                                    <td scope="row" colspan="5" class="text-center">No Tiers Yet</td>
-                                                                </tr>
+                                                                if (JackpotTier.Tiers != null && JackpotTier.Tiers.Any())
+                                                                {
+                                                                    foreach (var tier in JackpotTier.Tiers)
+                                                                    {
+                                                                        var tierRef = $"j{tier.Tier}";
+                                                                        <tr>
+                                                                            <td scope="row" class="text-center">@tier.Tier</td>
+                                                                            <td scope="row" class="text-center">
+                                                                                @if (tier.Tier == 1)
+                                                                                {
+                                                                                    <input type="text" class="form-control" id="from@(tierRef)" placeholder="0.01" @bind-value="tier.From" disabled />
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <input type="text" class="form-control" id="from@(tierRef)" placeholder="0.01" @bind-value="tier.From" />
+                                                                                }
+                                                                            </td>
+                                                                            <td scope="row" class="text-center">
+                                                                                <input type="text" class="form-control" id="to@(tierRef)" placeholder="0.01" @bind-value="tier.To" />
+                                                                            </td>
+                                                                            <td scope="row" class="text-center">
+                                                                                <select class="form-select" aria-label="Tier Select" id="@tierRef" @onchange="(e) => OnTierSelect(e, tier)">
+                                                                                    @for (int i = 0; i <= 100; i++)
+                                                                                    {
+                                                                                        if (Convert.ToDecimal(i) == tier.Percentage)
+                                                                                        {
+                                                                                            <option value="@i" selected>@(i)%</option>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <option value="@i">@(i)%</option>
+                                                                                        }
+                                                                                    }
+                                                                                </select>
+                                                                            </td>
+                                                                            <td scope="row" class="text-center"><button class="btn clientBtn" type="button" @onclick="() => OnRemoveTierClicked(tier)">Remove</button></td>
+                                                                        </tr>
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <tr>
+                                                                        <td scope="row" colspan="5" class="text-center">No Tiers Yet</td>
+                                                                    </tr>
+                                                                }
                                                             }
+
+                                                        </tbody>
+                                                    </table>
+                                                    <div class="d-flex align-items-center">
+                                                        <label class="tier-lbl" colspan="3">Above Tier Settings</label>
+                                                        @if (SportsbookTierOption)
+                                                        {
+                                                            <select class="form-select" aria-label="Above Tier Select" id="aboveTierSelect" @onchange="(e) => OnAboveTierSelect(e)">
+                                                                @for (int i = 0; i <= 100; i++)
+                                                                {
+                                                                    if (Convert.ToDecimal(i) == SportsbookTier.AboveTierPercentage)
+                                                                    {
+                                                                        <option value="@i" selected>@(i)%</option>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="@i">@(i)%</option>
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        }
+                                                        else
+                                                        {
+                                                            <select class="form-select" aria-label="Above Tier Select" id="aboveTierSelect" @onchange="(e) => OnAboveTierSelect(e)">
+                                                                @for (int i = 0; i <= 100; i++)
+                                                                {
+                                                                    if (Convert.ToDecimal(i) == JackpotTier.AboveTierPercentage)
+                                                                    {
+                                                                        <option value="@i" selected>@(i)%</option>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="@i">@(i)%</option>
+                                                                    }
+                                                                }
+                                                            </select>
                                                         }
 
-                                                    </tbody>
-                                                </table>
-                                                <div class="d-flex align-items-center">
-                                                    <label class="tier-lbl" colspan="3">Above Tier Settings</label>
-                                                    @if (SportsbookTierOption)
-                                                    {
-                                                        <select class="form-select" aria-label="Above Tier Select" id="aboveTierSelect" @onchange="(e) => OnAboveTierSelect(e)">
-                                                            @for (int i = 0; i <= 100; i++)
-                                                            {
-                                                                if (Convert.ToDecimal(i) == SportsbookTier.AboveTierPercentage)
-                                                                {
-                                                                    <option value="@i" selected>@(i)%</option>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <option value="@i">@(i)%</option>
-                                                                }
-                                                            }
-                                                        </select>
-                                                    }
-                                                    else
-                                                    {
-                                                        <select class="form-select" aria-label="Above Tier Select" id="aboveTierSelect" @onchange="(e) => OnAboveTierSelect(e)">
-                                                            @for (int i = 0; i <= 100; i++)
-                                                            {
-                                                                if (Convert.ToDecimal(i) == JackpotTier.AboveTierPercentage)
-                                                                {
-                                                                    <option value="@i" selected>@(i)%</option>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <option value="@i">@(i)%</option>
-                                                                }
-                                                            }
-                                                        </select>
-                                                    }
-
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    }
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="bet-container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h6 class="title fw-bold ps-2 py-1">Bet Setting</h6>
-                </div>
-                <div class="col-md-12">
-                    <div class="row">
-                        @foreach (var currency in Currencies)
-                        {
-                            <div class="col">
-                                @if (SelectedCurrency == currency)
-                                {
-                                    <input type="radio" class="btn-check" name="currencyOptions" id="@currency" @onchange="() => OnCurrencyClicked(currency)" checked />
-                                }
-                                else
-                                {
-                                    <input type="radio" class="btn-check" name="currencyOptions" id="@currency" @onchange="() => OnCurrencyClicked(currency)" />
-                                }
-                                <label class="btn modalTab" for="@currency">@currency</label>
-                            </div>
-                        }
+            <div class="bet-container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="title fw-bold ps-2 py-1">Bet Setting</h6>
                     </div>
-
-                    <div class="row mt-4">
-                        <div class="col-md-6">
-                            <div class="d-flex flex-column tax-settings">
-                                <div class="p-2 mb-2 tax-settings-head">
-                                    Soccer
+                    <div class="col-md-12">
+                        <div class="row">
+                            @foreach (var currency in Currencies)
+                            {
+                                <div class="col">
+                                    @if (SelectedCurrency == currency)
+                                    {
+                                        <input type="radio" class="btn-check" name="currencyOptions" id="@currency" @onchange="() => OnCurrencyClicked(currency)" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="radio" class="btn-check" name="currencyOptions" id="@currency" @onchange="() => OnCurrencyClicked(currency)" />
+                                    }
+                                    <label class="btn modalTab" for="@currency">@currency</label>
                                 </div>
-                                <div class="p-2 d-flex">
-                                    <div class="d-flex flex-column me-4">
-                                        <label class="form-label" for="@($"{SelectedCurrency}.soccerMinTicketField")">
-                                            Min Per Ticket
-                                        </label>
-                                        <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.soccerMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MinPerTicket" />
-                                        <p class="fst-italic p-desc">Minimum is 0.02</p>
-                                    </div>
-
-                                    <div class="d-flex flex-column">
-                                        <label class="form-label" for="@($"{SelectedCurrency}.soccerMaxTicketField")">
-                                            Max Per Ticket
-                                        </label>
-                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.soccerMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerTicket" />
-
-                                    </div>
-                                </div>
-                                <div class="ps-2 pb-2 padRight">
-                                    <label class="form-label" for="@($"{SelectedCurrency}.soccerMaxGameField")">Max Per Game</label>
-                                    <InputDecimal class="form-control rounded" Min=0 Max=100 id="@($"{SelectedCurrency}.soccerMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerGame" />
-                                </div>
-                            </div>
+                            }
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="d-flex flex-column tax-settings">
-                                <div class="p-2 mb-2 tax-settings-head">
-                                    Cricket
-                                </div>
-                                <div class="p-2 d-flex">
-                                    <div class="d-flex flex-column me-4">
-                                        <label class="form-label" for="@($"{SelectedCurrency}.cricketMinTicketField")">
-                                            Min Per Ticket
-                                        </label>
-                                        <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.cricketMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MinPerTicket" />
-                                        <p class="fst-italic p-desc">Minimum is 0.02</p>
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column tax-settings">
+                                    <div class="p-2 mb-2 tax-settings-head">
+                                        Soccer
                                     </div>
-
-                                    <div class="d-flex flex-column">
-                                        <label class="form-label" for="@($"{SelectedCurrency}.cricketMaxTicketField")">
-                                            Max Per Ticket
-                                        </label>
-                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.cricketMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MaxPerTicket" />
-                                    </div>
-                                </div>
-                                <div class="ps-2 pb-2 padRight">
-                                    <label class="form-label" for="@($"{SelectedCurrency}.cricketMaxGameField")">Max Per Game</label>
-                                    <InputDecimal class="form-control" id="@($"{SelectedCurrency}.cricketMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MaxPerGame" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-4">
-                        <div class="col-md-6">
-                            <div class="d-flex flex-column tax-settings">
-                                <div class="p-2 mb-2 tax-settings-head">
-                                    Other Sports
-                                </div>
-                                <div class="p-2 d-flex">
-                                    <div class="d-flex flex-column me-4">
-                                        <label class="form-label" for="@($"{SelectedCurrency}.othersMinTicketField")">
-                                            Min Per Ticket
-                                        </label>
-                                        <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.othersMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MinPerTicket" />
-                                        <p class="fst-italic p-desc">Minimum is 0.02</p>
-                                    </div>
-
-                                    <div class="d-flex flex-column">
-                                        <label class="form-label" for="@($"{SelectedCurrency}.othersMaxTicketField")">
-                                            Max Per Ticket
-                                        </label>
-                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.othersMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MaxPerTicket" />
-                                    </div>
-                                </div>
-                                <div class="ps-2 pb-2 padRight">
-                                    <label class="form-label" for="@($"{SelectedCurrency}.othersMaxGameField")">Max Per Game</label>
-                                    <InputDecimal class="form-control" id="@($"{SelectedCurrency}.othersMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MaxPerGame" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="d-flex flex-column tax-settings">
-                                <div class="p-2 mb-2 tax-settings-head">
-                                    Parlay
-                                </div>
-                                <div class="p-2 d-flex">
-                                    <div class="d-flex flex-column me-4">
-                                        <label class="form-label" for="@($"{SelectedCurrency}.parlayMinTicketField")">
-                                            Min Per Ticket
-                                        </label>
-                                        <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.parlayMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MinPerTicket" />
-                                        <p class="fst-italic p-desc">Minimum is 0.02</p>
-                                    </div>
-
-                                    <div class="d-flex flex-column">
-                                        <label class="form-label" for="@($"{SelectedCurrency}.parlayMaxTicketField")">
-                                            Max Per Ticket
-                                        </label>
-                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxPerTicket" />
-                                    </div>
-                                </div>
-                                <div class="ps-2 pb-2">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label class="form-label" for="@($"{SelectedCurrency}.parlayMaxPayoutField")">Max Payout Per Ticket</label>
-                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxPayoutField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxPayoutPerTicket" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label" for="@($"{SelectedCurrency}.parlayMaxBonusWinnings")">Max Bonus Winnings</label>
-                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxBonusWinnings")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxWinningsBonus" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="row mt-4">
-                        <div class="col-md-6">
-                            <div class="d-flex flex-column tax-settings">
-                                <div class="p-2 mb-2 tax-settings-head">
-                                    Price Boost
-                                </div>
-
-                                <div class="p-2">
-                                    <label class="form-label" for="@($"{SelectedCurrency}.priceboostMaxStake")">Max Stake</label>
-                                    <InputDecimal class="form-control" id="@($"{SelectedCurrency}.priceboostMaxStake")" @bind-Value="SelectedBetSetting.BetSettingPriceboost.MaxStake" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="d-flex flex-column tax-settings">
-                                <div class="p-2 mb-2 tax-settings-head">
-                                    Bet Builder
-                                </div>
-
-                                <div class="p-2">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label class="form-label" for="@($"{SelectedCurrency}.betBuilderMinTicket")">Min Per Ticket</label>
-                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.betBuilderMinTicket")" @bind-Value="SelectedBetSetting.BetSettingBetBuilder.MinStake" />
+                                    <div class="p-2 d-flex">
+                                        <div class="d-flex flex-column me-4">
+                                            <label class="form-label" for="@($"{SelectedCurrency}.soccerMinTicketField")">
+                                                Min Per Ticket
+                                            </label>
+                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.soccerMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MinPerTicket" />
                                             <p class="fst-italic p-desc">Minimum is 0.02</p>
                                         </div>
 
-                                        <div class="col-md-6">
-                                            <label class="form-label" for="@($"{SelectedCurrency}.betBuilderMaxTicket")">Max Per Ticket</label>
-                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.betBuilderMaxTicket")" @bind-Value="SelectedBetSetting.BetSettingBetBuilder.MaxStake" />
+                                        <div class="d-flex flex-column">
+                                            <label class="form-label" for="@($"{SelectedCurrency}.soccerMaxTicketField")">
+                                                Max Per Ticket
+                                            </label>
+                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.soccerMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerTicket" />
+
+                                        </div>
+                                    </div>
+                                    <div class="ps-2 pb-2 padRight">
+                                        <label class="form-label" for="@($"{SelectedCurrency}.soccerMaxGameField")">Max Per Game</label>
+                                        <InputDecimal class="form-control rounded" Min=0 Max=100 id="@($"{SelectedCurrency}.soccerMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerGame" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column tax-settings">
+                                    <div class="p-2 mb-2 tax-settings-head">
+                                        Cricket
+                                    </div>
+                                    <div class="p-2 d-flex">
+                                        <div class="d-flex flex-column me-4">
+                                            <label class="form-label" for="@($"{SelectedCurrency}.cricketMinTicketField")">
+                                                Min Per Ticket
+                                            </label>
+                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.cricketMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MinPerTicket" />
+                                            <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                        </div>
+
+                                        <div class="d-flex flex-column">
+                                            <label class="form-label" for="@($"{SelectedCurrency}.cricketMaxTicketField")">
+                                                Max Per Ticket
+                                            </label>
+                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.cricketMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MaxPerTicket" />
+                                        </div>
+                                    </div>
+                                    <div class="ps-2 pb-2 padRight">
+                                        <label class="form-label" for="@($"{SelectedCurrency}.cricketMaxGameField")">Max Per Game</label>
+                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.cricketMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MaxPerGame" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column tax-settings">
+                                    <div class="p-2 mb-2 tax-settings-head">
+                                        Other Sports
+                                    </div>
+                                    <div class="p-2 d-flex">
+                                        <div class="d-flex flex-column me-4">
+                                            <label class="form-label" for="@($"{SelectedCurrency}.othersMinTicketField")">
+                                                Min Per Ticket
+                                            </label>
+                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.othersMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MinPerTicket" />
+                                            <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                        </div>
+
+                                        <div class="d-flex flex-column">
+                                            <label class="form-label" for="@($"{SelectedCurrency}.othersMaxTicketField")">
+                                                Max Per Ticket
+                                            </label>
+                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.othersMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MaxPerTicket" />
+                                        </div>
+                                    </div>
+                                    <div class="ps-2 pb-2 padRight">
+                                        <label class="form-label" for="@($"{SelectedCurrency}.othersMaxGameField")">Max Per Game</label>
+                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.othersMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MaxPerGame" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column tax-settings">
+                                    <div class="p-2 mb-2 tax-settings-head">
+                                        Parlay
+                                    </div>
+                                    <div class="p-2 d-flex">
+                                        <div class="d-flex flex-column me-4">
+                                            <label class="form-label" for="@($"{SelectedCurrency}.parlayMinTicketField")">
+                                                Min Per Ticket
+                                            </label>
+                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.parlayMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MinPerTicket" />
+                                            <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                        </div>
+
+                                        <div class="d-flex flex-column">
+                                            <label class="form-label" for="@($"{SelectedCurrency}.parlayMaxTicketField")">
+                                                Max Per Ticket
+                                            </label>
+                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxPerTicket" />
+                                        </div>
+                                    </div>
+                                    <div class="ps-2 pb-2">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="@($"{SelectedCurrency}.parlayMaxPayoutField")">Max Payout Per Ticket</label>
+                                                <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxPayoutField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxPayoutPerTicket" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="@($"{SelectedCurrency}.parlayMaxBonusWinnings")">Max Bonus Winnings</label>
+                                                <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxBonusWinnings")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxWinningsBonus" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column tax-settings">
+                                    <div class="p-2 mb-2 tax-settings-head">
+                                        Price Boost
+                                    </div>
+
+                                    <div class="p-2">
+                                        <label class="form-label" for="@($"{SelectedCurrency}.priceboostMaxStake")">Max Stake</label>
+                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.priceboostMaxStake")" @bind-Value="SelectedBetSetting.BetSettingPriceboost.MaxStake" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column tax-settings">
+                                    <div class="p-2 mb-2 tax-settings-head">
+                                        Bet Builder
+                                    </div>
+
+                                    <div class="p-2">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="@($"{SelectedCurrency}.betBuilderMinTicket")">Min Per Ticket</label>
+                                                <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.betBuilderMinTicket")" @bind-Value="SelectedBetSetting.BetSettingBetBuilder.MinStake" />
+                                                <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="@($"{SelectedCurrency}.betBuilderMaxTicket")">Max Per Ticket</label>
+                                                <InputDecimal class="form-control" id="@($"{SelectedCurrency}.betBuilderMaxTicket")" @bind-Value="SelectedBetSetting.BetSettingBetBuilder.MaxStake" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -783,8 +786,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </EditForm>
+        </EditForm>
+    }
 </div>
 <div class="modal-footer">
     @if (Alerts != null && Alerts.Any())

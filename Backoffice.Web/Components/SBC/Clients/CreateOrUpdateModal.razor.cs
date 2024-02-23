@@ -364,7 +364,6 @@ namespace Backoffice.Web.Components.SBC.Clients
                             });
                         }
                     }
-
                 }
 
                 if (Alerts.Any())

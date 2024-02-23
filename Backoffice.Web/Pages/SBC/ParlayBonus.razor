@@ -12,7 +12,7 @@
                     </div>
                     <div class="col-md-12">
                         <Filter Clients="@Clients" ClientParlayBonusResponse="ClientParlayBonusModel"
-                                @bind-IsUpdating="IsUpdating"
+                                @bind-IsEdit="IsEdit" IsDisableAction="@_isSaving"
                                 OnUpdateClickCallback="OnUpdateClickEvent" OnAddClickCallback="OnAddClickEvent"
                                 OnSaveClickCallback="OnSaveClickEvent" OnCancelClickCallback="OnCancelClickEvent"
                                 OnClientChangedCallback="OnClientChangedEvent" />
@@ -53,7 +53,7 @@
                                             <tr>
                                                 <td>@item.SelectionCount</td>
                                                 <td class="td-parlay-bonus">
-                                                    @if (IsUpdating)
+                                                    @if (IsEdit)
                                                     {
                                                         <input id="@($"parlay-bonus-input-{item.SelectionCount}")" class="form-control parlay-bonus-input @(item.ParlayBonus < 0 || item.ParlayBonus > 5000 || item.ParlayBonus == 0 ? "border border-danger": "")" placeholder="Min. Value 0.01" type="number" @bind="@item.ParlayBonus" data-decimal=2 oninput="enforceNumberValidation(this, 5000)" />
                                                         <span>%</span>
@@ -65,7 +65,7 @@
                                                     }
                                                 </td>
                                                 <td>
-                                                    @if (IsUpdating)
+                                                    @if (IsEdit)
                                                     {
                                                         <button type="button" class="btn tl-link-add me-2" title="Delete" @onclick="_ => OnDeleteConfig(item)">
                                                             <i class="fa fa-trash"></i>

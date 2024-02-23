@@ -20,9 +20,10 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
         [Parameter] public EventCallback<long> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
-        [Parameter] public EventCallback<bool> IsUpdatingChanged { get; set; }
+        [Parameter] public EventCallback<bool> IsEditChanged { get; set; }
         [Parameter] public List<SelectListItemModel<Client>> Clients { get; set; }
-        [Parameter] public bool IsUpdating { get; set; }
+        [Parameter] public bool IsEdit { get; set; }
+        [Parameter] public bool IsDisableAction { get; set; }
 
         public ElementReference ParlayBonusMinOddsElementReference { get; set; }
         public ElementReference FilterAddButtonElementReference { get; set; }
@@ -44,7 +45,7 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
         {
-            IsUpdating = false;
+            IsEdit = false;
             ClientId = e.Value.ToString();
             await OnClientChangedCallback.InvokeAsync(long.Parse(e.Value.ToString()));
         }
@@ -52,23 +53,23 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
         public async Task OnUpdateClickEvent()
         {
             OriginalMinOdds = ClientParlayBonusResponse.ParlayBonusMinOdds;
-            IsUpdating = !IsUpdating;
+            IsEdit = !IsEdit;
 
             IsFormValid = ClientParlayBonusResponse.ParlayBonusMinOdds < 1.20m ? true : false;
 
-            await OnUpdateClickCallback.InvokeAsync(IsUpdating);
+            await OnUpdateClickCallback.InvokeAsync(IsEdit);
         }
 
         public async Task OnSaveClickEvent()
         {
-            IsUpdating = false;
+            IsEdit = false;
             await OnSaveClickCallback.InvokeAsync();
         }
 
         public async Task OnCancelClickEvent()
         {
             ClientParlayBonusResponse.ParlayBonusMinOdds = OriginalMinOdds;
-            IsUpdating = !IsUpdating;
+            IsEdit = !IsEdit;
 
             await OnCancelClickCallback.InvokeAsync();            
         }

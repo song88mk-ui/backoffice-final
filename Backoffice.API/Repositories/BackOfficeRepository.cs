@@ -378,7 +378,6 @@ namespace Backoffice.API.Repositories
                 var clients = query.Skip(skip).Take(request.PageSize).ToList();
 
                 var clientList = new List<ClientListResponse.Client>();
-
                 foreach (var client in clients)
                 {
                     var clientResponse = new ClientListResponse.Client
