@@ -28,7 +28,7 @@ namespace Backoffice.API.Repositories
         {
             _configuration = configuration;
             _activityLogRepository = activityLogRepository;
-            _rabbitMqRepository = rabbitMqRepository; 
+            _rabbitMqRepository = rabbitMqRepository;
         }
 
         #region Client
@@ -532,7 +532,7 @@ namespace Backoffice.API.Repositories
                         Page = request.Page,
                         PageSize = request.PageSize,
                         Total = bonus.Count,
-                        TotalPage = request.PageSize != 0 ? ((bonus.Count - 1) / request.PageSize) + 1 : bonus.Count
+                        TotalPage = (request.PageSize > 0 ? (bonus.Count - 1) / request.PageSize : 0) + 1
                     }
                 };
             }
@@ -788,7 +788,7 @@ namespace Backoffice.API.Repositories
         }
         #endregion
 
-        
+
         #region Utilities
 
         private HttpClient GetHttpClient(string region)
