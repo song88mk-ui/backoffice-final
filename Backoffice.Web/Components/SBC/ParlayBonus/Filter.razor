@@ -26,7 +26,7 @@
                 @*     @if (IsEdit)
                     { *@
                         <input type="number" @ref="ParlayBonusMinOddsElementReference" @bind="ClientParlayBonusResponse.ParlayBonusMinOdds"
-                               class="form-control pe-5 min-odds-input text-center @(IsFormValid ? "border-danger":"")" @oninput="ValidateParlayBonusMinOdds" disabled="@(IsEdit ||IsDisableAction)" />
+                               class="form-control pe-5 min-odds-input text-center @(IsFormValid ? "border-danger":"")" @oninput="ValidateParlayBonusMinOdds" disabled="@(!IsEdit ||IsDisableAction)" />
                   @*   }
                     else
                     {
