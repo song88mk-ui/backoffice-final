@@ -1,5 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.OddsEngine.SportSettings;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -41,6 +43,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         private EditSportSettingsPage _currentEditPage;
         private IDisposable registration;
 
+        private Task<BaseResponse<SegmentLookupResponse>> _segmentLookupTask;
+        private Task<BaseResponse<LeagueLookupResponse>> _leagueLookupTask;
         protected override async Task OnInitializedAsync()
         {
             if (PreRenderService.IsPreRendering)
@@ -52,6 +56,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Url = _pageUrl,
                 IsCurrentPage = true
             });
+
+            _segmentLookupTask = Task.Run(() => TradingService.GetSegmentLookup(0));
+            _leagueLookupTask = Task.Run(() => TradingService.GetLeagueLookup(0, 0));
 
             _pageHeaderModel = new PageHeaderModel
             {
@@ -351,34 +358,74 @@ namespace Backoffice.Web.Pages.OddsEngine
                 ClientCode = _clientCode
             });
 
+            var leagueLookupResponse = _leagueLookupTask.Result.Result;
+            var segmentLookupResponse = _segmentLookupTask.Result.Result;
+
             if (sportsOrderResponse.StatusCode == StatusCode.Success && segmentOrderResponse.StatusCode == StatusCode.Success && leagueOrderResponse.StatusCode == StatusCode.Success)
             {
-                var segmentSettings = segmentOrderResponse.Result
-                    .GroupJoin(leagueOrderResponse.Result,
-                    segment => new { SpId = segment.SportId, SegId = segment.SegmentId },
-                    league => new { SpId = league.SportId, SegId = league.SegmentId },
-                    (segment, league) => new SportSettingSegment
-                    {
-                        SportId = segment.SportId,
-                        SegmentId = segment.SegmentId,
-                        SegmentName = segment.SegmentName,
-                        SortOrder = segment.SortOrder,
-                        IsActive = true,
-                        Leagues = league.Select(s => new SportSettingLeague
+                var leagues = leagueLookupResponse.LeagueLookup.GroupJoin(leagueOrderResponse.Result,
+                        le => new { le.SportId, le.SegmentId, le.LeagueId },
+                        so => new { so.SportId, so.SegmentId, so.LeagueId },
+                        (le, so) => new { Lookup = le, LookupOrder = so })
+                        .SelectMany(
+                        temp => temp.LookupOrder.DefaultIfEmpty(),
+                        (temp, s) => new SportSettingLeague
                         {
-                            SportId = s.SportId,
-                            SegmentId = s.SegmentId,
-                            LeagueId = s.LeagueId,
-                            LeagueName = s.LeagueName,
-                            SortOrder = s.SortOrder,
-                            IsActive = true
-                        }).ToList()
-                    }).ToList();
+                            SportId = temp.Lookup.SportId,
+                            SegmentId = temp.Lookup.SegmentId,
+                            LeagueId = temp.Lookup.LeagueId,
+                            LeagueName = temp.Lookup.LeagueName.TrimEnd(),
+                            IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
+                            SortOrder = temp.LookupOrder.FirstOrDefault() != null ? temp.LookupOrder.FirstOrDefault().SortOrder : 1000
+                        })
+                        .OrderBy(o => o.SortOrder)
+                        .ToList();
+
+                var segments = segmentLookupResponse.SegmentLookup.GroupJoin(segmentOrderResponse.Result,
+                    seg => new { seg.SportId, seg.SegmentId },
+                    lp => new { lp.SportId, lp.SegmentId },
+                    (seg, lp) => new { Lookup = seg, LookupOrder = lp })
+                    .SelectMany(
+                    temp => temp.LookupOrder.DefaultIfEmpty(),
+                    (temp, s) => new SportSettingSegment
+                    {
+                        SportId = temp.Lookup.SportId,
+                        SegmentId = temp.Lookup.SegmentId,
+                        SegmentName = temp.Lookup.SegmentName.TrimEnd(),
+                        IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
+                        SortOrder = temp.LookupOrder.FirstOrDefault() != null ? temp.LookupOrder.FirstOrDefault().SortOrder : 1000,
+                        IsOpen = false,
+                        Leagues = leagues.Where(c => c.SportId == temp.Lookup.SportId && c.SegmentId == temp.Lookup.SegmentId).ToList()
+                    })
+                    .OrderBy(o => o.SortOrder)
+                    .ToList();
+
+                //var segmentSettings = segmentOrderResponse.Result
+                //    .GroupJoin(leagueOrderResponse.Result,
+                //    segment => new { SpId = segment.SportId, SegId = segment.SegmentId },
+                //    league => new { SpId = league.SportId, SegId = league.SegmentId },
+                //    (segment, league) => new SportSettingSegment
+                //    {
+                //        SportId = segment.SportId,
+                //        SegmentId = segment.SegmentId,
+                //        SegmentName = segment.SegmentName,
+                //        SortOrder = segment.SortOrder,
+                //        IsActive = true,
+                //        Leagues = league.Select(s => new SportSettingLeague
+                //        {
+                //            SportId = s.SportId,
+                //            SegmentId = s.SegmentId,
+                //            LeagueId = s.LeagueId,
+                //            LeagueName = s.LeagueName,
+                //            SortOrder = s.SortOrder,
+                //            IsActive = true
+                //        }).ToList()
+                //    }).ToList();
 
 
                 _sportSettings = sportsOrderResponse.Result
                     .Where(s => s.IsActive)
-                    .GroupJoin(segmentSettings,
+                    .GroupJoin(segments,
                     sport => sport.SportId,
                     segment => segment.SportId,
                     (sport, segment) => new { sport, segment })
