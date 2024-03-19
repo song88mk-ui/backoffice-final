@@ -358,6 +358,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 ClientCode = _clientCode
             });
 
+            await Task.WhenAll(_leagueLookupTask, _segmentLookupTask);
             var leagueLookupResponse = _leagueLookupTask.Result.Result;
             var segmentLookupResponse = _segmentLookupTask.Result.Result;
 
