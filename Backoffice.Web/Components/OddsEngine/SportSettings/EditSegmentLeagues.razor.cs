@@ -62,7 +62,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                     sort => int.Parse(sort.RowId),
                     (league, sort) => new SportSettingLeague
                     {
-                        SportId = league.SegmentId,
+                        SportId = league.SportId,
                         SegmentId = league.SegmentId,
                         LeagueId = league.LeagueId,
                         LeagueName = league.LeagueName,
@@ -79,7 +79,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                     sort => int.Parse(sort.RowId),
                     (segment, sort) => new SportSettingSegment
                     {
-                        SportId = segment.SegmentId,
+                        SportId = segment.SportId,
                         SegmentId = segment.SegmentId,
                         SegmentName = segment.SegmentName,
                         SortOrder = sort.SortOrder,
