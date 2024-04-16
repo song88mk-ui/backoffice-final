@@ -92,7 +92,7 @@
                                         <label for="stakeField" class="form-label stake-lbl">Stake</label>
                                         <div class="input-group">
                                             <span class="input-group-text">%</span>
-                                            <InputDecimal id="stakeField" Min=0 Max=100 @bind-Value="Client.TaxConfig.StakeTax" class="form-control rounded border-start-0" />
+                                                <InputDecimal id="stakeField" Min=0 Max=100 @bind-Value="Client.TaxConfig.StakeTax" class="form-control rounded border-start-0" IsNullable=false/>
                                             <div class="dropdown mx-2">
                                                 <button class="btn tax-settings-btn dropdown-toggle ps-4" type="button" id="sportTypesDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                                     Exclude Sport Types
@@ -178,7 +178,7 @@
                                         <label for="winningsField" class="form-label stake-lbl">Winnings</label>
                                         <div class="input-group">
                                             <span class="input-group-text">%</span>
-                                            <InputDecimal id="winningsField" Min=0 Max=100 @bind-Value="Client.TaxConfig.WinningsTax" class="form-control rounded border-start-0" />
+                                            <InputDecimal id="winningsField" Min=0 Max=100 @bind-Value="Client.TaxConfig.WinningsTax" class="form-control rounded border-start-0" IsNullable=false/>
                                             <div class="dropdown mx-2">
                                                 <button class="btn tax-settings-btn dropdown-toggle ps-4" type="button" id="sportTypesWinningsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                                     Exclude Sport Types
@@ -631,7 +631,7 @@
                                             <label class="form-label" for="@($"{SelectedCurrency}.soccerMinTicketField")">
                                                 Min Per Ticket
                                             </label>
-                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.soccerMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MinPerTicket" />
+                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.soccerMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MinPerTicket" IsNullable=false/>
                                             <p class="fst-italic p-desc">Minimum is 0.02</p>
                                         </div>
 
@@ -639,13 +639,13 @@
                                             <label class="form-label" for="@($"{SelectedCurrency}.soccerMaxTicketField")">
                                                 Max Per Ticket
                                             </label>
-                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.soccerMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerTicket" />
+                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.soccerMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerTicket" IsNullable=false/>
 
                                         </div>
                                     </div>
                                     <div class="ps-2 pb-2 padRight">
                                         <label class="form-label" for="@($"{SelectedCurrency}.soccerMaxGameField")">Max Per Game</label>
-                                        <InputDecimal class="form-control rounded" Min=0 Max=100 id="@($"{SelectedCurrency}.soccerMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerGame" />
+                                        <InputDecimal class="form-control rounded" Min=0 Max=100 id="@($"{SelectedCurrency}.soccerMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MaxPerGame" IsNullable=false />
                                     </div>
                                 </div>
                             </div>
@@ -660,7 +660,7 @@
                                             <label class="form-label" for="@($"{SelectedCurrency}.cricketMinTicketField")">
                                                 Min Per Ticket
                                             </label>
-                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.cricketMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MinPerTicket" />
+                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.cricketMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MinPerTicket" IsNullable=false />
                                             <p class="fst-italic p-desc">Minimum is 0.02</p>
                                         </div>
 
@@ -668,12 +668,12 @@
                                             <label class="form-label" for="@($"{SelectedCurrency}.cricketMaxTicketField")">
                                                 Max Per Ticket
                                             </label>
-                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.cricketMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MaxPerTicket" />
+                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.cricketMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MaxPerTicket" IsNullable=false/>
                                         </div>
                                     </div>
                                     <div class="ps-2 pb-2 padRight">
                                         <label class="form-label" for="@($"{SelectedCurrency}.cricketMaxGameField")">Max Per Game</label>
-                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.cricketMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MaxPerGame" />
+                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.cricketMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MaxPerGame" IsNullable=false />
                                     </div>
                                 </div>
                             </div>
@@ -690,7 +690,7 @@
                                             <label class="form-label" for="@($"{SelectedCurrency}.othersMinTicketField")">
                                                 Min Per Ticket
                                             </label>
-                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.othersMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MinPerTicket" />
+                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.othersMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MinPerTicket" IsNullable=false/>
                                             <p class="fst-italic p-desc">Minimum is 0.02</p>
                                         </div>
 
@@ -698,12 +698,12 @@
                                             <label class="form-label" for="@($"{SelectedCurrency}.othersMaxTicketField")">
                                                 Max Per Ticket
                                             </label>
-                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.othersMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MaxPerTicket" />
+                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.othersMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MaxPerTicket" IsNullable=false />
                                         </div>
                                     </div>
                                     <div class="ps-2 pb-2 padRight">
                                         <label class="form-label" for="@($"{SelectedCurrency}.othersMaxGameField")">Max Per Game</label>
-                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.othersMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MaxPerGame" />
+                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.othersMaxGameField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MaxPerGame" IsNullable=false />
                                     </div>
                                 </div>
                             </div>
@@ -718,7 +718,7 @@
                                             <label class="form-label" for="@($"{SelectedCurrency}.parlayMinTicketField")">
                                                 Min Per Ticket
                                             </label>
-                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.parlayMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MinPerTicket" />
+                                            <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.parlayMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MinPerTicket" IsNullable=false />
                                             <p class="fst-italic p-desc">Minimum is 0.02</p>
                                         </div>
 
@@ -726,18 +726,18 @@
                                             <label class="form-label" for="@($"{SelectedCurrency}.parlayMaxTicketField")">
                                                 Max Per Ticket
                                             </label>
-                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxPerTicket" />
+                                            <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxTicketField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxPerTicket" IsNullable=false/>
                                         </div>
                                     </div>
                                     <div class="ps-2 pb-2">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <label class="form-label" for="@($"{SelectedCurrency}.parlayMaxPayoutField")">Max Payout Per Ticket</label>
-                                                <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxPayoutField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxPayoutPerTicket" />
+                                                <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxPayoutField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxPayoutPerTicket" IsNullable=false/>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label" for="@($"{SelectedCurrency}.parlayMaxBonusWinnings")">Max Bonus Winnings</label>
-                                                <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxBonusWinnings")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxWinningsBonus" />
+                                                <InputDecimal class="form-control" id="@($"{SelectedCurrency}.parlayMaxBonusWinnings")" @bind-Value="SelectedBetSetting.BetSettingParlay.MaxWinningsBonus" IsNullable=false />
                                             </div>
                                         </div>
                                     </div>
@@ -755,7 +755,7 @@
 
                                     <div class="p-2">
                                         <label class="form-label" for="@($"{SelectedCurrency}.priceboostMaxStake")">Max Stake</label>
-                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.priceboostMaxStake")" @bind-Value="SelectedBetSetting.BetSettingPriceboost.MaxStake" />
+                                        <InputDecimal class="form-control" id="@($"{SelectedCurrency}.priceboostMaxStake")" @bind-Value="SelectedBetSetting.BetSettingPriceboost.MaxStake" IsNullable=false />
                                     </div>
                                 </div>
                             </div>
@@ -770,13 +770,13 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <label class="form-label" for="@($"{SelectedCurrency}.betBuilderMinTicket")">Min Per Ticket</label>
-                                                <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.betBuilderMinTicket")" @bind-Value="SelectedBetSetting.BetSettingBetBuilder.MinStake" />
+                                                <InputDecimal Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.betBuilderMinTicket")" @bind-Value="SelectedBetSetting.BetSettingBetBuilder.MinStake" IsNullable=false />
                                                 <p class="fst-italic p-desc">Minimum is 0.02</p>
                                             </div>
 
                                             <div class="col-md-6">
                                                 <label class="form-label" for="@($"{SelectedCurrency}.betBuilderMaxTicket")">Max Per Ticket</label>
-                                                <InputDecimal class="form-control" id="@($"{SelectedCurrency}.betBuilderMaxTicket")" @bind-Value="SelectedBetSetting.BetSettingBetBuilder.MaxStake" />
+                                                <InputDecimal class="form-control" id="@($"{SelectedCurrency}.betBuilderMaxTicket")" @bind-Value="SelectedBetSetting.BetSettingBetBuilder.MaxStake" IsNullable=false />
                                             </div>
                                         </div>
                                     </div>

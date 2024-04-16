@@ -2,11 +2,12 @@
 @using System.Globalization
 @inherits InputNumber<decimal?>
 
-<input type="number" class="@this.CssClass" @attributes=this.AdditionalAttributes @bind-value="this.CurrentValue" placeholder='0.00' data-decimal="2" oninput="enforceNumberValidation(this)"/>
+<input type="number" class="@this.CssClass" @attributes=this.AdditionalAttributes @bind-value="this.CurrentValue" placeholder='0.00' data-decimal="2" oninput="enforceNumberValidation(this)" onfocusout="@OnFocusOut" />
 
 @code {
     [Parameter] public decimal? Min { get; set; } = decimal.MinValue;
     [Parameter] public decimal? Max { get; set; } = decimal.MaxValue;
+    [Parameter] public bool IsNullable { get; set; } = true;
 
     private async Task OnValueChanged(ChangeEventArgs e)
     {
@@ -54,5 +55,10 @@
             result = CurrentValue;
 
         return validationErrorMessage is null;
+    }
+    protected void OnFocusOut()
+    {
+        if (!IsNullable && this.CurrentValue == null)
+            this.CurrentValue = 0.00m;
     }
 }
