@@ -31,7 +31,7 @@ namespace Backoffice.Web.Shared
                 if (claim != null)
                 {
                     if (FromPage != null && FromPage == SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.'))
-                        await JSRuntime.InvokeVoidAsync("console.log", $"Redirection claim {JsonSerializer.Serialize(claim)}");
+                        await JSRuntime.InvokeVoidAsync("console.log", $"Redirection claim {JsonSerializer.Serialize(claim.Value)}");
 
                     var menu = await MenuHelper.GetMenu(claim, FromPage ?? string.Empty);
 
