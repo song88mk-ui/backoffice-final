@@ -1,9 +1,12 @@
-﻿using Backoffice.Web.Helpers;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.JSInterop;
+using Newtonsoft.Json.Schema;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace Backoffice.Web.Shared
 {
@@ -16,25 +19,25 @@ namespace Backoffice.Web.Shared
 
         protected override async Task OnInitializedAsync()
         {
-            await JSRuntime.InvokeAsync<string>("console.log", "Redirection Triggered");
-
             if (UserClaims != null && UserClaims.Any())
             {
                 var prefix = FromPage?.Split('.').FirstOrDefault();
 
-
-                await JSRuntime.InvokeAsync<string>("console.log", $"Redirection prefix {prefix}");
                 if (prefix == null)
                     return;
 
                 var claim = UserClaims.FirstOrDefault(c => c.Type.Contains($"{prefix}."));
+
                 if (claim != null)
                 {
-                    await JSRuntime.InvokeAsync<string>("console.log", $"Redirection prefix {prefix}");
+                    if (FromPage != null && FromPage == SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.'))
+                        await JSRuntime.InvokeAsync<string>("console.log", $"Redirection claim {JsonSerializer.Serialize(claim)}");
+
                     var menu = await MenuHelper.GetMenu(claim, FromPage ?? string.Empty);
 
+                    if (FromPage != null && FromPage == SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.'))
+                        await JSRuntime.InvokeAsync<string>("console.log", $"Redirection url {menu.Url}");
 
-                    await JSRuntime.InvokeAsync<string>("console.log", $"Redirection url {menu.Url}");
                     NavigationManager.NavigateTo(menu.Url, true);
                 }
             }
