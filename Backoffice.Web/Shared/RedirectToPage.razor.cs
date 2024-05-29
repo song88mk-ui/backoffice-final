@@ -31,12 +31,12 @@ namespace Backoffice.Web.Shared
                 if (claim != null)
                 {
                     if (FromPage != null && FromPage == SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.'))
-                        await JSRuntime.InvokeAsync<string>("console.log", $"Redirection claim {JsonSerializer.Serialize(claim)}");
+                        await JSRuntime.InvokeVoidAsync("console.log", $"Redirection claim {JsonSerializer.Serialize(claim)}");
 
                     var menu = await MenuHelper.GetMenu(claim, FromPage ?? string.Empty);
 
                     if (FromPage != null && FromPage == SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.'))
-                        await JSRuntime.InvokeAsync<string>("console.log", $"Redirection url {menu.Url}");
+                        await JSRuntime.InvokeVoidAsync("console.log", $"Redirection url {menu.Url}");
 
                     NavigationManager.NavigateTo(menu.Url, true);
                 }
