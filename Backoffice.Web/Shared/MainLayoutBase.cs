@@ -295,13 +295,13 @@ namespace Backoffice.Web.Shared
 
             if (authResponse.StatusCode != StatusCode.Success)
             {
-                Log.Warning($"[MainLayourBase] [Unauthorized] {NavigationManager.Uri}");
+                Log.Warning($"[MainLayoutBase] [Unauthorized] {NavigationManager.Uri}");
                 Log.Warning($"{authResponse.StatusCode} - {authResponse.Message}");
                 NavigationManager.NavigateTo("login", true);
             }
             else
             {
-                Log.Information($"[MainLayourBase] [Authorized] {NavigationManager.Uri}");
+                Log.Information($"[MainLayoutBase] [Authorized] {NavigationManager.Uri}");
             }
         }
 
