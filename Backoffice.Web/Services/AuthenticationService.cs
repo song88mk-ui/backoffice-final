@@ -6,6 +6,7 @@ using Backoffice.Shared.Utilities;
 using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Telemetry;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Serilog;
 using System.Diagnostics;
@@ -21,6 +22,7 @@ namespace Backoffice.Web.Services
 {
     public class AuthenticationService : IAuthenticationService, IDisposable
     {
+        private IMemCache _memCache;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
         private readonly AuthenticationStateProvider _authStateProvider;
@@ -28,11 +30,12 @@ namespace Backoffice.Web.Services
         private readonly Histogram<double> _authLoginCallDurationHistogram;
 
         public AuthenticationService(HttpClient httpClient, AuthenticationStateProvider authStateProvider,
-            ILocalStorageService localStorage, IHttpContextAccessor httpContextAccessor, Instrumentation instrumentation)
+            ILocalStorageService localStorage, IHttpContextAccessor httpContextAccessor, Instrumentation instrumentation, IMemCache memCache)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClient;
             _authStateProvider = authStateProvider;
+            _memCache = memCache;
 
             this._authLoginCallDurationHistogram = instrumentation.AuthLoginCallDurationHistogram;
         }
@@ -115,6 +118,12 @@ namespace Backoffice.Web.Services
                 userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
             }
 
+            var key = $"as:t:{userToken}";
+            var cache = _memCache.GetCache<BaseResponse<TokenModel>>(key);
+
+            if (cache != null)
+                return cache;
+
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
             var response = await _httpClient.GetAsync("api/authentication/authenticate");
 
@@ -134,6 +143,8 @@ namespace Backoffice.Web.Services
 
                 ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(userName);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+                _memCache.AddOrUpdateCache(key, result, DateTimeOffset.UtcNow.AddMinutes(1));
 
                 return result;
             }

@@ -90,6 +90,7 @@ builder.Services.AddServerSideBlazor().AddCircuitOptions(o =>
     o.DetailedErrors = true;
 });
 
+builder.Services.AddSingleton<IMemCache, MemCache>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorizationCore();
 
