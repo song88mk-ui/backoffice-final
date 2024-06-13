@@ -2,11 +2,11 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.SBC.SubUser;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Pages.SBC
@@ -17,6 +17,7 @@ namespace Backoffice.Web.Pages.SBC
 
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel? UserModel { get; set; }
@@ -38,6 +39,8 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnInitializedAsync()
         {
+            JSRuntime.InvokeVoidAsync("console.log", "SubUser - OnInitializedAsync");
+
             _pageHeaderModel = new()
             {
                 Title = "Sub Users",
@@ -58,11 +61,12 @@ namespace Backoffice.Web.Pages.SBC
             };
 
             await AuthenticateAccess.InvokeAsync();
-
         }
 
         public async Task OnInitEvent(SubUserCallbackModel model)
         {
+            JSRuntime.InvokeVoidAsync("console.log", "SubUser - OnInitEvent");
+
             CallbackModel = model;
             SubUsers = await GetSubUsers(1, model.SearchText);
 
@@ -139,14 +143,16 @@ namespace Backoffice.Web.Pages.SBC
 
         public void Dispose()
         {
-            PermissionResponse = null;
-            SubUserClaims = null;
-            SubUsers = null;
-            Alerts = null;
+            JSRuntime.InvokeVoidAsync("console.log", "SubUser - Dispose");
 
-            AuthenticationService.Dispose();
+            //PermissionResponse = null;
+            //SubUserClaims = null;
+            //SubUsers = null;
+            //Alerts = null;
 
-            GC.SuppressFinalize(this);
+            //AuthenticationService.Dispose();
+
+            //GC.SuppressFinalize(this);
         }
 
         #endregion

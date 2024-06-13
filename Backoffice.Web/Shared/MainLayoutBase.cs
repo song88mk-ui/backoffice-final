@@ -28,6 +28,7 @@ namespace Backoffice.Web.Shared
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+        [Inject] public IPreRenderService PreRenderService { get; set; }
 
         public SportClickCallbackModel SelectedSport { get; set; }
 
@@ -59,6 +60,9 @@ namespace Backoffice.Web.Shared
 
         protected override async Task OnInitializedAsync()
         {
+            if (PreRenderService.IsPreRendering)
+                return;
+
             try
             {
                 IsPreLoader = true;

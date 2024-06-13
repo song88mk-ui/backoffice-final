@@ -33,7 +33,7 @@ namespace Backoffice.Web.Shared
                     if (FromPage != null && FromPage == SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.'))
                     {
                         var subUserClaim = UserClaims.FirstOrDefault(c => c.Type == FromPage);
-                        await JSRuntime.InvokeVoidAsync("console.log", $"Redirection claim {subUserClaim.Type} - {subUserClaim.Value}");
+                        JSRuntime.InvokeVoidAsync("console.log", $"Redirection claim {subUserClaim.Type} - {subUserClaim.Value}");
                     }
 
                     var menu = await MenuHelper.GetMenu(claim, FromPage ?? string.Empty);

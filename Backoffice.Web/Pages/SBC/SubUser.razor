@@ -3,8 +3,6 @@
 
 @page "/sub-user"
 
-@inject IJSRuntime JsRuntime;
-
 <AuthorizeView Policy="sbc-subusers">
     <Authorized>
         <div class="row">
@@ -96,7 +94,7 @@
     </Authorized>
     <NotAuthorized>
         @{
-            JsRuntime.InvokeVoidAsync("console.log", "Sub-User = Unauthorized");
+            JSRuntime.InvokeVoidAsync("console.log", "Sub-User = Unauthorized");
         }
         <RedirectToPage FromPage="@SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.')" />
     </NotAuthorized>

@@ -3,50 +3,53 @@
 
 <ErrorBoundary @ref="_errorBoundary">
     <ChildContent>
-        <CascadingValue Value="AuthenticateAccessEvent" Name="AuthenticateAccessEvent">
-            <CascadingValue Value="UserModel" Name="UserModel">
-                <CascadingValue Value="UserClaims" Name="UserClaims">
-                    <CascadingValue Value="UserClientCodes" Name="UserClientCodes" IsFixed>
-                        @if (NavigationManager.Uri.Contains("/admin"))
-                        {
-                            <PageTitle>Backoffice - Administration</PageTitle>
-                        }
-                        else
-                        {
-                            <PageTitle>Backoffice - SBC</PageTitle>
-                        }
+        @if (!PreRenderService.IsPreRendering)
+        {
+            <CascadingValue Value="AuthenticateAccessEvent" Name="AuthenticateAccessEvent">
+                <CascadingValue Value="UserModel" Name="UserModel">
+                    <CascadingValue Value="UserClaims" Name="UserClaims">
+                        <CascadingValue Value="UserClientCodes" Name="UserClientCodes" IsFixed>
+                            @if (NavigationManager.Uri.Contains("/admin"))
+                            {
+                                <PageTitle>Backoffice - Administration</PageTitle>
+                            }
+                            else
+                            {
+                                <PageTitle>Backoffice - SBC</PageTitle>
+                            }
 
-                        @if (IsPreLoader)
-                        {
-                            <div class="preload-container d-flex justify-content-center align-items-center">
-                                <Preloader InlineSpinnerCss="@InlineSpinnerCss" />
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="page">
-                                <div class="sidebar">
-                                    @if (NavigationManager.Uri.Contains("/admin"))
-                                    {
-                                        <NavMenu NavMenuAccess="PermissionCategory.Admin" NavMenus="NavMenus" />
-                                    }
-                                    else
-                                    {
-                                        <NavMenu NavMenuAccess="PermissionCategory.SBC" NavMenus="NavMenus" />
-                                    }
+                            @if (IsPreLoader)
+                            {
+                                <div class="preload-container d-flex justify-content-center align-items-center">
+                                    <Preloader InlineSpinnerCss="@InlineSpinnerCss" />
                                 </div>
-                                <main>
-                                    <article class="content px-4">
-                                        @Body
-                                    </article>
-                                </main>
-                            </div>
-                        }
+                            }
+                            else
+                            {
+                                <div class="page">
+                                    <div class="sidebar">
+                                        @if (NavigationManager.Uri.Contains("/admin"))
+                                        {
+                                            <NavMenu NavMenuAccess="PermissionCategory.Admin" NavMenus="NavMenus" />
+                                        }
+                                        else
+                                        {
+                                            <NavMenu NavMenuAccess="PermissionCategory.SBC" NavMenus="NavMenus" />
+                                        }
+                                    </div>
+                                    <main>
+                                        <article class="content px-4">
+                                            @Body
+                                        </article>
+                                    </main>
+                                </div>
+                            }
+                        </CascadingValue>
                     </CascadingValue>
                 </CascadingValue>
             </CascadingValue>
-        </CascadingValue>
-        <ToastComponent />
+            <ToastComponent />
+        }
     </ChildContent>
     <ErrorContent Context="errorException">
         <div id="blazor-error-ui">
