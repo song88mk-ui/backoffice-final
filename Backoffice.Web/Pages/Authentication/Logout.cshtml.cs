@@ -28,7 +28,7 @@ namespace Backoffice.Web.Pages.Authentication
                 Response.Cookies.Delete("RememberMePreference");
             }
 
-            return LocalRedirect("~/login");
+            return LocalRedirect("/login");
         }
     }
 }
