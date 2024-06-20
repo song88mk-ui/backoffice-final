@@ -78,9 +78,6 @@ namespace Backoffice.Web.Shared
                 
                 var authState = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
 
-                await JSRuntime.InvokeVoidAsync("console.log", authState == null ? "authState is null" : "authState is not null");
-
-                //var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 var userClaims = authState.User.Claims.ToList();
                 var roleId = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLEID")?.Value ?? string.Empty;
                 var role = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLENAME")?.Value ?? string.Empty;

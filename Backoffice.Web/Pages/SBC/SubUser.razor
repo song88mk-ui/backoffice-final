@@ -93,9 +93,6 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        @{
-            JSRuntime.InvokeVoidAsync("console.log", "Sub-User = Unauthorized");
-        }
         <RedirectToPage FromPage="@SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.')" />
     </NotAuthorized>
 </AuthorizeView>
