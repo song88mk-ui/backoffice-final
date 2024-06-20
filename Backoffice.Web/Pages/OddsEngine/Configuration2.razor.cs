@@ -139,11 +139,21 @@ namespace Backoffice.Web.Pages.OddsEngine
             });
             await InvokeAsync(async () =>
             {
-                var response = await BackofficeService.GetTemplateConfigCount(ConfigState.UnAssigned.ToString());
-                if (response.StatusCode == StatusCode.Success)
-                    _unAssignedLeaguesCount = response.Result;
-                else
-                    _unAssignedLeaguesCount = -1;
+                var attempt = 0;
+
+                while(attempt < 3)
+                {
+                    var response = await BackofficeService.GetTemplateConfigCount(ConfigState.UnAssigned.ToString());
+                    if (response.StatusCode == StatusCode.Success)
+                    {
+                        _unAssignedLeaguesCount = response.Result;
+                        break;
+                    }
+                    else
+                        _unAssignedLeaguesCount = -1;
+
+                    attempt++;
+                }
 
                 StateHasChanged();
             });

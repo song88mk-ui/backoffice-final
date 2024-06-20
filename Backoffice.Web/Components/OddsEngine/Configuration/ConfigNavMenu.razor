@@ -1,8 +1,8 @@
 ﻿<div class="d-flex justify-content-between col mx-4 config-nav-container">
     <div>
-        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.MyTemplates)">My Templates (@String.Format("{0:N0}", MyTemplatesCount))</a>
-        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.Assigned)">Assigned (@(AssignedLeaguesCount is null ? "Calculating..." : (AssignedLeaguesCount < 0 ? "Error..." : String.Format("{0:N0}", AssignedLeaguesCount))))</a>
-        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.UnAssigned)">Unassigned (@(UnAssignedLeaguesCount is null ? "Calculating..." : (UnAssignedLeaguesCount < 0 ? "Error..." : String.Format("{0:N0}", UnAssignedLeaguesCount))))</a>
+        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.MyTemplates)">My Templates (@(MyTemplatesCount is null ? "Calculating..." : (MyTemplatesCount < 0 ? "Calculating.." : String.Format("{0:N0}", MyTemplatesCount))))</a>
+        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.Assigned)">Assigned (@(AssignedLeaguesCount is null ? "Calculating..." : (AssignedLeaguesCount < 0 ? "Calculating.." : String.Format("{0:N0}", AssignedLeaguesCount))))</a>
+        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.UnAssigned)">Unassigned (@(UnAssignedLeaguesCount is null ? "Calculating..." : (UnAssignedLeaguesCount < 0 ? "Calculating.." : String.Format("{0:N0}", UnAssignedLeaguesCount))))</a>
     </div>
     <div>
         <a class="btn btn-copy-client" href="javascript:(0)" @onclick="SelectCopyClientSettings">Copy Client Settings</a>
