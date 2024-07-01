@@ -4,6 +4,7 @@ using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AuthorizeAttribute = Backoffice.API.ActionFilter.AuthorizeAttribute;
 using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.Backoffice
@@ -293,6 +295,7 @@ namespace Backoffice.API.Controllers.Backoffice
 
         #region Translation
 
+        [AllowAnonymous]
         [HttpGet("translations")]
         public async Task<IActionResult> GetTranslations()
         {
@@ -301,7 +304,7 @@ namespace Backoffice.API.Controllers.Backoffice
             var langCode = LanguageCode.EN;
             Enum.TryParse(HttpContext.Items["x-language-code"]?.ToString(), out langCode);
 
-            var result = await _backofficeRepository.GetTranslations(langCode);
+            var result = await _backofficeRepository.GetTranslationsByLanguageCode(langCode);
 
             switch (result.StatusCode)
             {

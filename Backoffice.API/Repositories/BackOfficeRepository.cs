@@ -1965,12 +1965,12 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<CopyClientConfigResponse>() { StatusCode = StatusCode.Error, Message = ex.Message };
             }
         }
-        public async Task<BaseResponse<Dictionary<string, string>>> GetTranslations(LanguageCode langCode)
+        public async Task<BaseResponse<TranslationResponse>> GetTranslationsByLanguageCode(LanguageCode langCode)
         {
             var languageCode = langCode.ToString().ToUpper();
             var key = $"tr-{languageCode}";
 
-            var cache = _memCache.GetCache<BaseResponse<Dictionary<string, string>>>(key);
+            var cache = _memCache.GetCache<BaseResponse<TranslationResponse>>(key);
 
             if (cache != null)
                 return cache;
@@ -1992,11 +1992,15 @@ namespace Backoffice.API.Repositories
                     Value = right != null ? right.Value : left.english.Value
                 }).ToDictionary(s => s.Name, s => s.Value);
 
-            return new BaseResponse<Dictionary<string, string>>()
+            return new BaseResponse<TranslationResponse>()
             {
                 StatusCode = StatusCode.Success,
                 Message = StatusCode.Success.ToString(),
-                Result = result
+                Result = new TranslationResponse()
+                {
+                    LanguageCode = languageCode,
+                    Translations = result
+                }
             };
         }
         #endregion

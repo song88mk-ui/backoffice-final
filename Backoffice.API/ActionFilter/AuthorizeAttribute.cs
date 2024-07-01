@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -20,7 +21,7 @@ using System.Threading.Tasks;
 namespace Backoffice.API.ActionFilter
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class AuthorizeAttribute : Attribute, IAuthorizationFilter
+    public class AuthorizeAttribute : AllowAnonymousAttribute, IAuthorizationFilter
     {
         private IConfiguration _configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -46,6 +47,9 @@ namespace Backoffice.API.ActionFilter
                 var region = string.Empty;
                 if (context.HttpContext.Request.Headers.ContainsKey("x-region"))
                     region = context.HttpContext.Request.Headers["x-region"];
+
+
+                if (context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any()) return;
 
                 if (!context.HttpContext.Request.Headers.ContainsKey("Authorization"))
                 {
@@ -126,7 +130,6 @@ namespace Backoffice.API.ActionFilter
                 return;
             }
         }
-
         #region Utilities
 
         public async Task<BaseResponse<TokenModel>> Authenticate(string token)
