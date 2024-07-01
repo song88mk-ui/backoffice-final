@@ -302,7 +302,7 @@ namespace Backoffice.API.Controllers.Backoffice
             var userId = HttpContext.Items["UserId"]?.ToString();
 
             var langCode = LanguageCode.EN;
-            Enum.TryParse(HttpContext.Items["x-language-code"]?.ToString(), out langCode);
+            Enum.TryParse(HttpContext.Items["LanguageCode"]?.ToString(), out langCode);
 
             var result = await _backofficeRepository.GetTranslationsByLanguageCode(langCode);
 
