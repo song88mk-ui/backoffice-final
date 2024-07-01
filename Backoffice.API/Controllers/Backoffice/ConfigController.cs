@@ -293,7 +293,7 @@ namespace Backoffice.API.Controllers.Backoffice
 
         #region Translation
 
-        [HttpPost("translations")]
+        [HttpGet("translations")]
         public async Task<IActionResult> GetTranslations()
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
