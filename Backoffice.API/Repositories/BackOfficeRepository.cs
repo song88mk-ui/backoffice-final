@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Data.Backoffice;
+﻿using Azure.Core;
+using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
@@ -6,6 +7,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +19,7 @@ using System.Transactions;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
 using static Backoffice.Shared.Models.Requests.AddOrUpdateBetConfigRequest;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Backoffice.API.Repositories
 {
@@ -1962,7 +1965,40 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<CopyClientConfigResponse>() { StatusCode = StatusCode.Error, Message = ex.Message };
             }
         }
+        public async Task<BaseResponse<Dictionary<string, string>>> GetTranslations(LanguageCode langCode)
+        {
+            var languageCode = langCode.ToString().ToUpper();
+            var key = $"tr-{languageCode}";
 
+            var cache = _memCache.GetCache<BaseResponse<Dictionary<string, string>>>(key);
+
+            if (cache != null)
+                return cache;
+
+            var result = new Dictionary<string, string>();
+
+            var translations = GetTranslations();
+            var englishTranslations = translations.Where(c => c.LanguageCode == "EN").ToList();
+            var refTranslations = translations.Where(c => c.LanguageCode == languageCode).ToList();
+
+            result = englishTranslations.GroupJoin(refTranslations,
+                en => en.Name,
+                la => la.Name,
+                (english, language) => new { english, language })
+                .SelectMany(s => s.language.DefaultIfEmpty(),
+                (left, right) => new
+                {
+                    Name = left.english.Name,
+                    Value = right != null ? right.Value : left.english.Value
+                }).ToDictionary(s => s.Name, s => s.Value);
+
+            return new BaseResponse<Dictionary<string, string>>()
+            {
+                StatusCode = StatusCode.Success,
+                Message = StatusCode.Success.ToString(),
+                Result = result
+            };
+        }
         #endregion
 
         #region Methods - Top Fixtures
@@ -2205,6 +2241,10 @@ namespace Backoffice.API.Repositories
             }
 
             return activityLogs;
+        }
+        private List<Translation> GetTranslations()
+        {
+            return _memCache.GetCache("tr", () => _backofficeContext.Translation.AsNoTracking().ToList(), 24);
         }
         #endregion
     }

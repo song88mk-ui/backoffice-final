@@ -37,5 +37,7 @@ namespace Backoffice.API.Repositories
 
         Task<BaseResponse<List<CurrenciesResponse>>> GetCurrencies();
         Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request, List<string> brands = null);
+
+        Task<BaseResponse<Dictionary<string, string>>> GetTranslations(LanguageCode langCode);
     }
 }

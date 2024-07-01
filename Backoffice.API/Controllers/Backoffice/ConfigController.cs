@@ -290,5 +290,28 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         #endregion
+
+        #region Translation
+
+        [HttpPost("translations")]
+        public async Task<IActionResult> GetTranslations()
+        {
+            var userId = HttpContext.Items["UserId"]?.ToString();
+
+            var langCode = LanguageCode.EN;
+            Enum.TryParse(HttpContext.Items["x-language-code"]?.ToString(), out langCode);
+
+            var result = await _backofficeRepository.GetTranslations(langCode);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        #endregion
     }
 }
