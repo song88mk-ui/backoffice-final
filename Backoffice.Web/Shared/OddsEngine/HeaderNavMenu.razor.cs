@@ -65,7 +65,7 @@ namespace Backoffice.Web.Shared.OddsEngine
                         _menu = OeNavMenu.Config;
                         break;
                     case "PRICEBOOST":
-                    case "MAMAGE-BOOST":
+                    case "MANAGE-BOOST":
                     case "BOOSTED-SETTINGS":
                         _menu = OeNavMenu.PriceBoost;
                         break;
