@@ -1,1 +1,12 @@
-﻿
+﻿.dropdown-menu {
+    min-width: 0rem;
+}
+
+.dropdown .btn {
+    background: transparent;
+    color: #212529;
+}
+
+.ico-flag {
+    max-width: 32px;
+}
