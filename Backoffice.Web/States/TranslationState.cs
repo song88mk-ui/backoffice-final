@@ -40,9 +40,9 @@ namespace Backoffice.Web.States
             var index = -1;
             var i = 0;
 
-            while ((index = result.IndexOf("#")) != -1 && i < values.Length)
+            while ((index = result.IndexOf(placeholder)) != -1 && i < values.Length)
             {
-                result = result.Substring(0, index) + values[i] + result.Substring(index + 1);
+                result = result.Substring(0, index) + values[i] + result.Substring(index + placeholder.Length);
                 i++;
             }
 

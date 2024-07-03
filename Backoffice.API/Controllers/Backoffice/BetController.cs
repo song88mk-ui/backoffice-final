@@ -17,7 +17,6 @@ namespace Backoffice.API.Controllers.Backoffice
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class BetController : ControllerBase
     {
-        //
         private readonly IPlatformRepository _platformRepository;        
         private readonly bool _isStaging;
 
