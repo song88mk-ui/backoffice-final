@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AllowAnonymousAttribute = Backoffice.API.ActionFilter.AllowAnonymousAttribute;
 using AuthorizeAttribute = Backoffice.API.ActionFilter.AuthorizeAttribute;
 using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 

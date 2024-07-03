@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 namespace Backoffice.API.ActionFilter
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class AuthorizeAttribute : AllowAnonymousAttribute, IAuthorizationFilter
+    public class AuthorizeAttribute : Attribute, IAuthorizationFilter
     {
         private IConfiguration _configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -51,7 +51,7 @@ namespace Backoffice.API.ActionFilter
                 if (context.HttpContext.Request.Headers.ContainsKey("x-language-code"))
                     context.HttpContext.Items["LanguageCode"] = context.HttpContext.Request.Headers["x-language-code"];
 
-                //if (context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any()) return;
+                if (context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any()) return;
 
                 if (!context.HttpContext.Request.Headers.ContainsKey("Authorization"))
                 {
@@ -170,4 +170,8 @@ namespace Backoffice.API.ActionFilter
         }
         #endregion
     }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class AllowAnonymousAttribute : Attribute
+    { }
 }
