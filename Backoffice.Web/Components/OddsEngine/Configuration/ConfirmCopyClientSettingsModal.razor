@@ -18,6 +18,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" disabled="@_isProcessing" data-bs-dismiss="modal" @onclick="OnCancelModalClickEvent">Cancel</button>
-    <button type="button" class="btn modal-btn btn-apply" disabled="@_isProcessing" @onclick="OnApplyModalClickEvent">Apply</button>
+    <button type="button" class="btn modal-btn btn-cancel" disabled="@_isProcessing" data-bs-dismiss="modal" @onclick="OnCancelModalClickEvent">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn btn-apply" disabled="@_isProcessing" @onclick="OnApplyModalClickEvent">@TranslationState.GetValue("Apply")</button>
 </div>

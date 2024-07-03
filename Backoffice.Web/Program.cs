@@ -4,6 +4,7 @@ using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Hubs;
 using Backoffice.Web.Middleware;
 using Backoffice.Web.Services;
+using Backoffice.Web.States;
 using Backoffice.Web.Telemetry;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -184,14 +185,17 @@ builder.Services.AddHttpClient<IBackofficeService, BackofficeService>(client =>
     client.DefaultRequestHeaders.Add("x-api-key", configuration["API:Backoffice:Security:APIKey"]);
     client.DefaultRequestHeaders.Add("x-region", configuration["API:Region"]);
 });
+builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<ICommonService, CommonService>();
-builder.Services.AddSingleton<AuthenticationStateProvider, AuthStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
 builder.Services.AddScoped<ToastService>();
 
 builder.Services.AddScoped<IExcelService, ExcelService>();
 builder.Services.AddScoped<ITableauService, TableauService>();
 builder.Services.AddScoped<IPreRenderService, PreRenderService>();
+
+builder.Services.AddScoped<TranslationState>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSignalR();

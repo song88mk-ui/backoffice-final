@@ -443,11 +443,11 @@
                                                     <table class="table">
                                                         <thead>
                                                             <tr class="border rounded">
-                                                                <th scope="col">No.</th>
+                                                                <th scope="col">@TranslationState.GetValue("No.")</th>
                                                                 <th scope="col">From</th>
                                                                 <th scope="col">To</th>
                                                                 <th scope="col">%GGR</th>
-                                                                <th scope="col" class="noPadding"><button class="btn addBtn" type="button" @onclick="OnAddTierClicked">Add</button></th>
+                                                                <th scope="col" class="noPadding"><button class="btn addBtn" type="button" @onclick="OnAddTierClicked">@TranslationState.GetValue("Add")</button></th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -799,6 +799,6 @@
             }
         </div>
     }
-    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
-    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Save</button>
+    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Save")</button>
 </div>

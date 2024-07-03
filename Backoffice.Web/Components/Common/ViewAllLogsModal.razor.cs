@@ -388,7 +388,7 @@ namespace Backoffice.Web.Components.Common
                 {
                     var viewData = JsonConvert.DeserializeObject<BoostedSettingsModel>(changeData);
 
-                    return $"<b><strong>% Cap of Current Odds from Boosted Odds</strong></b><br><p>{viewData.Cap.ToString("P2", CultureInfo.InvariantCulture)}</p>";
+                    return $"<b><strong>% {TranslationState.GetValue("Cap of Current Odds from Boosted Odds")}</strong></b><br><p>{viewData.Cap.ToString("P2", CultureInfo.InvariantCulture)}</p>";
                 }
             }
             return "-";

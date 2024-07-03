@@ -24,7 +24,7 @@
             <div class="col-md-12">
                 <form class="row g-3">
                     <div class="col-md-6">
-                        <label for="inputUserName" class="form-label">Username</label>
+                        <label for="inputUserName" class="form-label">@TranslationState.GetValue("Username")</label>
                         <div class="input-group">
                             <span class="input-group-text" id="inputGroupPrepend3">@SubUserClaims.MainUserName</span>
                             @if (IsEdit)
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label for="inputName" class="form-label">Nickname</label>
+                        <label for="inputName" class="form-label">@TranslationState.GetValue("Nickname")</label>
                         <input type="text" class="form-control" id="inputName" placeholder="Enter Nickname" @bind-value="SubUser.NickName">
                     </div>
 
@@ -64,7 +64,7 @@
                         <div class="col-md-6">
                             <div class="d-flex flex-column">
                                 <div>
-                                    <label for="selectStatus" class="form-label">Status</label>
+                                    <label for="selectStatus" class="form-label">@TranslationState.GetValue("Status")</label>
                                 </div>
 
                                 <div class="btn-group border rounded" role="group" aria-label="Status Toggle Button Group">
@@ -120,8 +120,8 @@
                             </div>
                         }
 
-                        <button type="button" class="btn modal-btn cancel-btn waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">Cancel</button>
-                        <button type="button" class="btn modal-btn save-btn waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">Save</button>
+                        <button type="button" class="btn modal-btn cancel-btn waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Cancel")</button>
+                        <button type="button" class="btn modal-btn save-btn waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Save")</button>
                     </div>
                 </form>
             </div>

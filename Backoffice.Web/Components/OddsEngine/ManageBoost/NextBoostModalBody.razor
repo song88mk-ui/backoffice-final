@@ -7,8 +7,8 @@
         <thead>
             <tr>
                 <th scope="col">Details</th>
-                <th scope="col">Sports</th>
-                <th scope="col">Client Name</th>
+                <th scope="col">@TranslationState.GetValue("Sports")</th>
+                <th scope="col">@TranslationState.GetValue("Client name")</th>
                 <th scope="col">BR CTRL</th>
                 <th scope="col">Current Odds</th>
                 <th scope="col">Boosted Odds</th>
@@ -55,6 +55,6 @@
     </table>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">Cancel</button>
-    <button type="button" class="btn modal-btn modal-save" @onclick="OnSaveModalClick" disabled="@IsSaveDisabled">Save</button>
+    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn modal-save" @onclick="OnSaveModalClick" disabled="@IsSaveDisabled">@TranslationState.GetValue("Save")</button>
 </div>

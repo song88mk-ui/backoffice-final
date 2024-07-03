@@ -1,0 +1,18 @@
+﻿<div class="d-flex align-items-end">
+    <div class="dropdown">
+        <button class="btn btn-secondary @(TranslationState.LanguageCodes.Any() ? "dropdown-toggle" : "")" type="button" id="dropdownLanguage" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="@($"flag-{TranslationState.ActiveLanguageCode.ToString().ToLower()}")" aria-hidden="true"></i><span>@TranslationState.ActiveLanguageCode.ToString()</span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownLanguage">
+            @foreach (var langCode in TranslationState.LanguageCodes.Select(s => s.ToString()))
+            {
+                <button class="dropdown-item position-relative" @onclick="e => OnLanguageCodeChanged(langCode)">
+                    <span class="lang-menu">
+                        <i class="@($"ico-flag flag-{langCode.ToLower()}")" aria-hidden="true">
+                        </i>@langCode
+                    </span>
+                </button>
+            }
+        </ul>
+    </div>
+</div>

@@ -18,6 +18,6 @@
     }
 </div>
 <div class="modal-footer notifications">
-    <button type="button" @onclick="OnCancelClickEvent" class="btn btn-default" disabled="@IsPreLoader">Cancel</button>
-    <button type="button" @onclick="OnCopyMarketGroup" data-type="inverse" data-from="top" data-align="right" class="btn btn-success" disabled="@IsPreLoader">Copy</button>
+    <button type="button" @onclick="OnCancelClickEvent" class="btn btn-default" disabled="@IsPreLoader">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" @onclick="OnCopyMarketGroup" data-type="inverse" data-from="top" data-align="right" class="btn btn-success" disabled="@IsPreLoader">@TranslationState.GetValue("Copy")</button>
 </div>

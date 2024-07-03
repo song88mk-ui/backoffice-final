@@ -79,13 +79,13 @@
     }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnModalCancelEvent">Cancel</button>
+    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnModalCancelEvent">@TranslationState.GetValue("Cancel")</button>
     @if (string.IsNullOrEmpty(SelectedClientCode) || SelectedSportId <= 0 || SelectedFixtureStatusId <= -1)
     {
-        <button type="button" class="btn modal-btn modal-save" disabled>Copy</button>
+        <button type="button" class="btn modal-btn modal-save" disabled>@TranslationState.GetValue("Copy")</button>
     }
     else
     {
-        <button type="button" class="btn modal-btn modal-save" @onclick="OnModalCopyEvent" disabled="@IsPreLoader">Copy</button>
+        <button type="button" class="btn modal-btn modal-save" @onclick="OnModalCopyEvent" disabled="@IsPreLoader">@TranslationState.GetValue("Copy")</button>
     }
 </div>

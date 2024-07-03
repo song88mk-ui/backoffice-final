@@ -8,14 +8,14 @@
 
             <a href="javascript:void(0)" class="p-2" @onclick="OnLogsClickEvent">
                 <i class="fa fa-list-alt"></i>
-                Logs
+                @TranslationState.GetValue("Logs")
             </a>
 
         </Authorized>
         <NotAuthorized Context="ActivateAll">            
             <a href="javascript:void(0)" class="p-2" @onclick="OnLogsClickEvent">
                 <i class="fa fa-list-alt"></i>
-                Logs
+                @TranslationState.GetValue("Logs")
             </a>            
         </NotAuthorized>
     </AuthorizeView>

@@ -3,6 +3,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.SBC.ParlayBonus;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
+using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -37,7 +38,7 @@ namespace Backoffice.Web.Pages.SBC
 
         #region Fields
         private PageHeaderModel _pageHeaderModel;
-        public const string ToastTitle = "Parlay Bonus";
+        //public const string ToastTitle = "Parlay Bonus";
         public static Func<decimal, string, Task> OnDisableSaveActionAsync;
         private bool _isSaving;
         #endregion
@@ -97,7 +98,7 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("ClientName", ClientName);
 
             var options = new ModalOptions();
-            ModalService.Open<DeleteModal>($"Delete Parlay Bonus", parameters, options);
+            ModalService.Open<DeleteModal>("Delete Parlay Bonus", parameters, options);
         }
 
         public async Task OnViewConfigLog(Models.ParlayBonusConfig parlayBonusConfig)
@@ -110,7 +111,7 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("ModalIcon", "<i class=\"fa fa-list-alt m-2\"></i>");
 
             var options = new ModalOptions();
-            ModalService.Open<ViewLogModal>($"Logs", parameters, options);
+            ModalService.Open<ViewLogModal>("Logs", parameters, options);
         }
 
         public async Task SelectPage(int page)
@@ -182,7 +183,7 @@ namespace Backoffice.Web.Pages.SBC
 
             if (result.StatusCode == Backoffice.Shared.Enums.StatusCode.Success)
             {
-                ToastMessage = "Parlay bonus updated!";
+                ToastMessage = TranslationState.GetValue("Parlay bonus updated!");
             }
             else
             {

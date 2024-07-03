@@ -28,9 +28,9 @@
     }
 </div>
 <div class="modal-footer">
-    <button class="btn modal-btn modal-@(!_isEmptyLeagues ? "apply" : "cancel" )" @onclick="OnCancelClickEvent" disabled="@_isPreloader">Cancel</button>
+    <button class="btn modal-btn modal-@(!_isEmptyLeagues ? "apply" : "cancel" )" @onclick="OnCancelClickEvent" disabled="@_isPreloader">@TranslationState.GetValue("Cancel")</button>
     @if (_isEmptyLeagues)
     {
-        <button class="btn modal-btn modal-apply" @onclick="OnApplyClickEvent" disabled="@_isPreloader">Apply</button>
+        <button class="btn modal-btn modal-apply" @onclick="OnApplyClickEvent" disabled="@_isPreloader">@TranslationState.GetValue("Apply")</button>
     }
 </div>

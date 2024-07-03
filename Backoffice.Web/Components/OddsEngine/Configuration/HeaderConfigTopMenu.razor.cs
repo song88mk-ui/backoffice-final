@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Data.Backoffice.Entities;
+using Backoffice.Shared.Enums;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -44,7 +45,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-            ModalService.Open<ViewLogs>($"View Logs", parameters, options);
+            ModalService.Open<ViewLogs>("View Logs", parameters, options);
         }
 
         public void Dispose()

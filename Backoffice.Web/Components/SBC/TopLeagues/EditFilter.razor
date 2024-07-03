@@ -2,7 +2,7 @@
 {
     <div class="row">
         <div class="col-2">
-            <label class="my-1 mr-2">Segment</label>
+            <label class="my-1 mr-2">@TranslationState.GetValue("Segment")</label>
 
             <select class="form-control form-select my-1 mr-sm-2" @onchange="OnSegmentChangedEvent">
                 <option value="0" selected>ALL</option>
@@ -23,7 +23,7 @@
             </select>
         </div>
         <div class="col-2">
-            <label class="my-1 mr-2">League</label>
+            <label class="my-1 mr-2">@TranslationState.GetValue("League")</label>
 
             <select class="form-control form-select my-1 mr-sm-2" @onchange="OnLeagueChangedEvent">
                 <option value="0" selected>ALL</option>

@@ -11,7 +11,7 @@
                 <div>
                     <a class="btn btn-logs" href="javascript:void(0)" @onclick="OnLogsClickEvent">
                         <i class="fa fa-list"></i>
-                        <span>Logs</span>
+                        <span>@TranslationState.GetValue("Logs")</span>
                     </a>
                 </div>
             </div>
@@ -75,7 +75,7 @@
                     <AuthorizeView Policy="sbc-config-canedit">
                         <Authorized Context="ActivateAll">
                             <button class="btn btn-create" @onclick="OnCreateNewTemplateClickEvent">
-                                Create New
+                                @TranslationState.GetValue("Create New")
                             </button>
                         </Authorized>
                     </AuthorizeView>
@@ -89,11 +89,11 @@
                     <thead>
                         <tr>
                             <th class="px-4" scope="col">Template Name</th>
-                            <th class="px-4" scope="col">Sports</th>
+                            <th class="px-4" scope="col">@TranslationState.GetValue("Sports")</th>
                             <th class="text-center" scope="col">Client Assigned</th>
                             <th class="text-center" scope="col">League Assigned</th>
-                            <th class="text-center" scope="col">Date Created</th>
-                            <th class="text-center" scope="col">Manage</th>
+                            <th class="text-center" scope="col">@TranslationState.GetValue("Date Created")</th>
+                            <th class="text-center" scope="col">@TranslationState.GetValue("Manage")</th>
                         </tr>
                     </thead>
 

@@ -6,11 +6,11 @@
         <div class="text-center">
             You are about to delete "<span class="fw-bold">Parlay Bonus for @ClientName > @((ParlayBonusConfig.ParlayBonus).ToString("#.00"))%</span>".
             <br />
-            Please be certain as this cannot be undone
+            @TranslationState.GetValue("Please be certain as this cannot be undone")
         </div>
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn cancel-btn" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
-    <button type="button" class="btn modal-btn apply-btn" data-bs-dismiss="modal" @onclick="OnApplyClickEvent">Apply</button>
+    <button type="button" class="btn modal-btn cancel-btn" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn apply-btn" data-bs-dismiss="modal" @onclick="OnApplyClickEvent">@TranslationState.GetValue("Apply")</button>
 </div>

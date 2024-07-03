@@ -13,6 +13,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Serilog;
+using System.Runtime.CompilerServices;
+using Google.Protobuf.WellKnownTypes;
+using System.Linq;
 
 namespace Backoffice.Web.Services
 {
@@ -37,6 +40,7 @@ namespace Backoffice.Web.Services
         private readonly IAuthenticationService _authenticationService;
         private readonly IMessageBroker _messageBroker;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private LanguageCode _languageCode;
         #endregion
 
         #region Ctor
@@ -52,6 +56,17 @@ namespace Backoffice.Web.Services
         }
 
         #endregion
+
+        private void AddOrUpdateRequestHeader(Dictionary<string, string> content)
+        {
+            foreach (var item in content)
+            {
+                if (_client.DefaultRequestHeaders.Contains(item.Key))
+                    _client.DefaultRequestHeaders.Remove(item.Key);
+
+                _client.DefaultRequestHeaders.Add(item.Key, item.Value);
+            }
+        }
 
         #region Method - Maintenance
 
@@ -292,7 +307,7 @@ namespace Backoffice.Web.Services
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})",
-                            Result = new ActivityLogResponse{ActivityLogs = new List<ActivityLogModel>()}
+                            Result = new ActivityLogResponse { ActivityLogs = new List<ActivityLogModel>() }
                         };
                     }
                 }
@@ -1291,6 +1306,38 @@ namespace Backoffice.Web.Services
 
         #region Config
 
+        public async Task<BaseResponse<TranslationResponse>> GetTranslation(LanguageCode langCode)
+        {
+            try
+            {
+                AddOrUpdateRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } });
+                var response = await _httpClient.GetAsync($"api/config/translations");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<TranslationResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<TranslationResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
+                    {
+                        return new BaseResponse<TranslationResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<TranslationResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
         public async Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId)
         {
             try
@@ -1327,16 +1374,16 @@ namespace Backoffice.Web.Services
                 var path = "api/config/templates";
 
                 var queries = new List<string>();
-                
-                if(!string.IsNullOrEmpty(searchText))
+
+                if (!string.IsNullOrEmpty(searchText))
                     queries.Add($"searchText={searchText}");
-                
+
                 if (sportId != -1)
                     queries.Add($"sportId={sportId}");
-                
+
                 if (scopeId != -1)
                     queries.Add($"scopeId={scopeId}");
-                
+
                 if (queries != null && queries.Any() && queries.Count > 0)
                     path += $"?{string.Join("&", queries)}";
 

@@ -124,7 +124,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             }
 
                             stringBuilder.Append($"<td class=\"px-4\">");
-                            stringBuilder.Append($"<strong>Clients</strong>");
+                            stringBuilder.Append($"<strong>{TranslationState.GetValue("Clients")}</strong>");
                             stringBuilder.Append($"<br>");
                             foreach (var client in tFromPayload.Payloads.Clients)
                             {
@@ -132,7 +132,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 stringBuilder.Append($"<br>");
                             }
                             stringBuilder.Append($"<br>");
-                            stringBuilder.Append($"<strong>Leagues</strong>");
+                            stringBuilder.Append($"<strong>{TranslationState.GetValue("Leagues")}</strong>");
                             foreach (var league in tFromPayload.Payloads.Leagues)
                             {
                                 stringBuilder.Append($"<br>");

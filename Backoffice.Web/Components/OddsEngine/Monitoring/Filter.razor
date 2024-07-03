@@ -43,7 +43,7 @@
             {
                 <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                     <div class="input-group">
-                        <InputText id="search" placeholder="Search" class="form-control search-text valid border-end-0" @bind-Value="_searchForm.SearchText" />
+                        <InputText id="search" placeholder=@TranslationState.GetValue("Search") class="form-control search-text valid border-end-0" @bind-Value="_searchForm.SearchText" />
                         <span class="input-group-text border-start-0">
                             <i class="fa fa-search"></i>
                         </span>

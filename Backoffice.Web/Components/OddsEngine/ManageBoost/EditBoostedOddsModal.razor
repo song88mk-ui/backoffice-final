@@ -10,8 +10,8 @@ else
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th scope="col">Client Name</th>
-                    <th scope="col">Sports</th>
+                    <th scope="col">@TranslationState.GetValue("Client name")</th>
+                    <th scope="col">@TranslationState.GetValue("Sports")</th>
                     <th scope="col">Details</th>
                     <th scope="col">BR Ctrl</th>
                     <th scope="col">Current Odds</th>
@@ -99,6 +99,6 @@ else
     </div>
 }
 <div class="modal-footer mx-4 pe-0">
-    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick" disabled="@_isPreloader">Cancel</button>
-    <button type="button" class="btn modal-btn modal-save" @onclick="OnSaveModalClick" disabled="@_isPreloader">Save</button>
+    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick" disabled="@_isPreloader">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn modal-save" @onclick="OnSaveModalClick" disabled="@_isPreloader">@TranslationState.GetValue("Save")</button>
 </div>

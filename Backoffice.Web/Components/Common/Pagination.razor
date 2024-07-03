@@ -2,6 +2,7 @@
     <tr>
         <td class="py-2" colspan="@RowInfColSpan">
             <span>Showing @FromRow to @ToRow of @MetaData.TotalCount entries</span>
+            <span>@TranslationState.GetValue("Showing (#) to (#) of (#) entries", placeholder: "(#)", FromRow, ToRow, MetaData.TotalCount)</span>
         </td>
         <td class="py-2 text-end" colspan="@PaginationColspan">
             <div class="tbl-pagination noselect">

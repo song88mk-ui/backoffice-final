@@ -4,7 +4,7 @@
             <div class="me-4">
                 <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                     <label class="form-label d-block">User Group Name</label>
-                    <InputText id="search" placeholder="Search" class="form-control search-text valid" @bind-Value="SearchForm.SearchText" />
+                    <InputText id="search" placeholder=@TranslationState.GetValue("Search") class="form-control search-text valid" @bind-Value="SearchForm.SearchText" />
                 </EditForm>
             </div>
             <div class="me-4">

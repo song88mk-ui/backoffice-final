@@ -54,25 +54,25 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnParametersSetAsync()
         {
-            if(_region != Region.ToUpper())
+            if (_region != Region.ToUpper())
             {
                 _region = Region.ToUpper();
                 TradingService.Region = _region;
                 _breadcrumbs = new()
-            {
-                new()
                 {
-                    Name = "Price Boost",
-                    Url = string.Empty,
-                    IsCurrentPage = false
-                },
-                new()
-                {
-                    Name = "Manage Boost",
-                    Url = $"{_region}/odds-engine/manage-boost",
-                    IsCurrentPage = true
-                }
-            };
+                    new()
+                    {
+                        Name = "Price Boost",
+                        Url = string.Empty,
+                        IsCurrentPage = false
+                    },
+                    new()
+                    {
+                        Name = "Manage Boost",
+                        Url = $"{_region}/odds-engine/manage-boost",
+                        IsCurrentPage = true
+                    }
+                };
             }
         }
         public void OnEditClickEvent(PriceBoostConfigModel priceboost)
@@ -85,7 +85,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var parameters = new ModalParameters();
 
             var boostedSelectionTranslations = new List<BoostedSelectionTranslation>();
-            foreach(var translation in priceboost.BoostedSelectionTranslations)
+            foreach (var translation in priceboost.BoostedSelectionTranslations)
             {
                 boostedSelectionTranslations.Add(translation);
             }

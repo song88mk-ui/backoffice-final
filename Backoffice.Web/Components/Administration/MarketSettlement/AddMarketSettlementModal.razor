@@ -21,7 +21,7 @@
                         }
                         <th scope="col">Event Details</th>
                         <th scope="col">Selection</th>
-                        <th scope="col">Status</th>
+                        <th scope="col">@TranslationState.GetValue("Status")</th>
                         <th scope="col">Reason</th>
                     </tr>
                 </thead>
@@ -112,6 +112,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelModal" disabled="@IsPreLoader">Cancel</button>
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelModal" disabled="@IsPreLoader">@TranslationState.GetValue("Cancel")</button>
     <button type="button" class="btn modal-btn btn-settle" @onclick="OnMarketSettlement" disabled="@IsPreLoader">Settle Market</button>
 </div>

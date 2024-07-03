@@ -33,7 +33,7 @@
                 @if (!View)
                 {
                     <button type="button" class="btn btn-cancel mx-1" @onclick="OnCancelMarginTemplate">Cancel</button>
-                    <button type="button" class="btn btn-save mx-1" disabled="@(!(HasChanges || IsNameChanges) || IsPreloader || _isProcessing || _isEdttingName)" @onclick="OnSaveMarginTemplate">Save Changes</button>
+                    <button type="button" class="btn btn-save mx-1" disabled="@(!(HasChanges || IsNameChanges) || IsPreloader || _isProcessing || _isEdttingName)" @onclick="OnSaveMarginTemplate">@TranslationState.GetValue("Save Changes")</button>
                 }
             </div>
         </div>

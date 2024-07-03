@@ -6,7 +6,7 @@
     <div class="d-flex flex-row">
         <div>
             <input type="radio" class="btn-check" name="matchTabOptions" id="matchType" checked @onclick="@(e => OnMatchTypeChanged(FixtureType.Match))" />
-            <label class="btn match-tab-lbl" for="matchType">Match Type</label>
+            <label class="btn match-tab-lbl" for="matchType">@TranslationState.GetValue("Match Type")</label>
         </div>
 
         <div>
@@ -17,7 +17,7 @@
 
     <div class="row mb-3">
         <div class="col-6">
-            <label for="sportSelect" class="form-label">Sports</label>
+            <label for="sportSelect" class="form-label">@TranslationState.GetValue("Sports")</label>
             <select class="form-select" id="sportSelect" @onchange="OnSportSelectChanged">
                 <option value="0">Select Sport</option>
                 @foreach (var item in Model.Sports)
@@ -34,7 +34,7 @@
             </select>
         </div>
         <div class="col-6">
-            <label for="segmentSelect" class="form-label">Segment</label>
+            <label for="segmentSelect" class="form-label">@TranslationState.GetValue("Segment")</label>
             <select class="form-select" id="segmentSelect" @onchange="OnSegmentSelectChanged">
                 <option value="0">Select Segment</option>
                 @foreach (var item in Model.Segments)
@@ -54,7 +54,7 @@
 
     <div class="row mb-3">
         <div class="col-6">
-            <label for="leagueSelect" class="form-label">League</label>
+            <label for="leagueSelect" class="form-label">@TranslationState.GetValue("League")</label>
             <select class="form-select" id="LeagueSelect" @onchange="OnLeagueSelectChanged">
                 <option value="0">Select League</option>
                 @foreach (var item in Model.Leagues)
@@ -127,6 +127,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">Cancel</button>
+    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">@TranslationState.GetValue("Cancel")</button>
     <button type="button" class="btn modal-btn modal-save" @onclick="OnNextModalClick">Next</button>
 </div>

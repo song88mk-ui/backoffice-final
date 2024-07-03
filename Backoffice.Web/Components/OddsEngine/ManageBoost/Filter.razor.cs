@@ -5,6 +5,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Backoffice.Web.Components.Common;
 using System.Drawing;
+using Backoffice.Web.States;
 
 namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 {
@@ -94,7 +95,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             parameters.Add("Region", _region);
 
             var options = new ModalOptions();
-            ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);
+            ModalService.Open<ViewAllLogsModal>("View Logs", parameters, options);
         }
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)

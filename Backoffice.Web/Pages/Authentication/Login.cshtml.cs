@@ -1,12 +1,15 @@
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
+using Backoffice.Web.States;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.JSInterop;
 using Serilog;
+using System.ComponentModel;
 using System.Text.Json;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
 namespace Backoffice.Web.Pages.Authentication
@@ -32,26 +35,41 @@ namespace Backoffice.Web.Pages.Authentication
 
         private readonly IAuthenticationService _authenticationService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        public readonly TranslationState _translationState;
 
         #endregion
 
         #region Ctor
 
-
-        public LoginModel(IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor)
+        public LoginModel(IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor, TranslationState translationState)
         {
             _authenticationService = authenticationService;
             _httpContextAccessor = httpContextAccessor;
             _access = new List<string>() { PermissionCategory.SBC.ToString().ToUpper(), PermissionCategory.Admin.ToString().ToUpper() };
+            _translationState = translationState;
+
+            //_translationState.PropertyChanged += TranslationStatePropertyChanged;
         }
 
         #endregion
 
         #region Methods
-
         public async Task<IActionResult> OnGet(string? returnUrl = null)
         {
-            //IsSaveCookie = await GetRememberMePreference();
+            _translationState.ActiveLanguageCode = LanguageCode.EN;
+
+            ViewData["welcome_to"] = _translationState.GetValue("Welcome to");
+            ViewData["back_office"] = _translationState.GetValue("Back Office");
+            ViewData["login"] = _translationState.GetValue("Login");
+
+
+            ViewData["username"] = _translationState.GetValue("Username");
+            ViewData["enter_your_username"] = _translationState.GetValue("Enter your username");
+            ViewData["password"] = _translationState.GetValue("Password");
+            ViewData["enter_your_password"] = _translationState.GetValue("Enter your password");
+            ViewData["remember_information"] = _translationState.GetValue("Remember Information");
+
+
             IsSaveCookie = false;
             if (Request.Cookies.ContainsKey("RememberMePreference"))
             {
@@ -201,6 +219,21 @@ namespace Backoffice.Web.Pages.Authentication
                 }
             }
             return Page();
+        }
+        private void TranslationStatePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            ViewData["welcome_to"] = _translationState.GetValue("Welcome to");
+            ViewData["back_office"] = _translationState.GetValue("Back Office");
+            ViewData["login"] = _translationState.GetValue("Login");
+
+
+            ViewData["username"] = _translationState.GetValue("Username");
+            ViewData["enter_your_username"] = _translationState.GetValue("Enter your username");
+            ViewData["password"] = _translationState.GetValue("Password");
+            ViewData["enter_your_password"] = _translationState.GetValue("Enter your password");
+            ViewData["remember_information"] = _translationState.GetValue("Remember Information");
+
+            NavigationManager.NavigateTo("");
         }
 
         #endregion

@@ -6,13 +6,13 @@
     <table class="table table-hover table-borderless mt-4 @TableClass">
         <thead class="table-head">
             <tr>
-                <th class="th-no">No</th>
+                <th class="th-no">@TranslationState.GetValue("No.")</th>
                 <th class="th-sport">Sport</th>
-                <th class="th-segment">Segment</th>
-                <th class="th-league">League</th>
+                <th class="th-segment">@TranslationState.GetValue("Segment")</th>
+                <th class="th-league">@TranslationState.GetValue("League")</th>
                 <th class="th-game">Game</th>
-                <th class="th-start-date">Kick Off Date & Time</th>
-                <th class="th-fixture-status">Fixture Status</th>
+                <th class="th-start-date">@TranslationState.GetValue("Kick Off Date & Time")</th>
+                <th class="th-fixture-status">@TranslationState.GetValue("Fixture Status")</th>
                 <th class="th-action">Action</th>
             </tr>
         </thead>
@@ -94,7 +94,7 @@
                                     <div class="dropdown">
                                         <button class="btn dropdown-toggle d-block w-100" data-bs-auto-close="outside" type="button" id="row-@model.SortOrder"
                                             data-bs-toggle="dropdown" aria-expanded="false" @onclick="() => OnDropdownSelect(model.SortOrder)">
-                                            No Game
+                                            @TranslationState.GetValue("No Game")
                                         </button>
                                         <ul class="dropdown-menu w-100" aria-labelledby="row-@model.SortOrder" id="select-@model.SortOrder">
                                             @if (model.SortOrder == SelectedRow)
@@ -135,6 +135,6 @@
     </table>
 </div>
 <div class="modal-footer mx-4 p-0 py-3 border-0">
-    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
-    <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">Save</button>
+    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">@TranslationState.GetValue("Save")</button>
 </div>

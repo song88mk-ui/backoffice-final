@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Data.Backoffice.Entities;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
@@ -84,7 +85,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
 
-            ModalService.Open<ViewMyTemplatesLogs>($"View Logs", parameters, options);
+            ModalService.Open<ViewMyTemplatesLogs>("View Logs", parameters, options);
         }
 
         public async Task OnCreateNewTemplateClickEvent()

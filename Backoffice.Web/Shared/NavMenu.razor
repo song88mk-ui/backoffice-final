@@ -36,7 +36,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
                             <div class="nav-item px-3">
                                 <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="@menu.Url" role="button" aria-expanded="false" aria-controls="@menu.Id">
                                     <span class="ico ico-@(menu.IconName)" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">@menu.Name</span>
+                                    <span class="nav-menu-text">@TranslationState.GetValue(menu.Name)</span>
                                     <span class="fa fa-chevron-right"></span>
                                 </NavLink>
                                 <div class="sub-menu collapse" id="@menu.Id">
@@ -46,7 +46,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
                                         <div class="nav-item">
                                             <NavLink class="nav-link" href="@submenu.Url">
                                                 <span class="ico ico-@(submenu.IconName)" aria-hidden="true"></span>
-                                                <span class="nav-menu-text">@submenu.Name</span>
+                                                <span class="nav-menu-text">@TranslationState.GetValue(submenu.Name)</span>
                                             </NavLink>
                                         </div>
                                     }
@@ -59,7 +59,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
                             <div class="nav-item px-3">
                                 <NavLink class="nav-link" href="@menu.Url">
                                     <span class="ico ico-@(menu.IconName)" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">@menu.Name</span>
+                                    <span class="nav-menu-text">@TranslationState.GetValue(menu.Name)</span>
                                 </NavLink>
                             </div>
                         }

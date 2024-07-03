@@ -11,7 +11,7 @@
     </div>
 
     <div class="row mb-3">
-        <label for="sportsSelect" class="col-sm-2 col-form-label">Sports:</label>
+        <label for="sportsSelect" class="col-sm-2 col-form-label">@TranslationState.GetValue("Sports"):</label>
         <div class="col-sm-10">
             <select class="form-select" @onchange="OnSportSelectChanged">
                 @if (Sports.Any())
@@ -63,6 +63,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickEvent">Cancel</button>
-    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickEvent">Save</button>
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickEvent">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickEvent">@TranslationState.GetValue("Save")</button>
 </div>

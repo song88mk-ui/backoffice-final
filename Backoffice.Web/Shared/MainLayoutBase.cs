@@ -6,13 +6,13 @@ using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Backoffice.Web.Shared.OddsEngine;
+using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Serilog;
 using System.Security.Claims;
-using System.Text.Json;
 
 namespace Backoffice.Web.Shared
 {
@@ -29,6 +29,7 @@ namespace Backoffice.Web.Shared
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] public IPreRenderService PreRenderService { get; set; }
+        [Inject] public TranslationState TranslationState { get; set; }
 
         public SportClickCallbackModel SelectedSport { get; set; }
 
@@ -63,6 +64,8 @@ namespace Backoffice.Web.Shared
             if (PreRenderService.IsPreRendering)
                 return;
 
+            TranslationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
+
             try
             {
                 IsPreLoader = true;
@@ -75,7 +78,7 @@ namespace Backoffice.Web.Shared
                     IsPreLoader = false;
                     return;
                 }
-                
+
                 var authState = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
 
                 var userClaims = authState.User.Claims.ToList();

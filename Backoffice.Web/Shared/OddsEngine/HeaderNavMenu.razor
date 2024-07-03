@@ -3,7 +3,7 @@
     {
         <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.Monitoring ? "active" : "")">
             <a class="header-link text-decoration-none" href="@_address/monitoring">
-                Monitoring
+                @TranslationState.GetValue("Monitoring")
             </a>
         </div>
     }
@@ -20,7 +20,7 @@
     {
         <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.PriceBoost ? "active" : "")">
             <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="OnPriceBoostClickEvent">
-                <span class="me-3">Price Boost</span>
+                <span class="me-3">@TranslationState.GetValue("Price Boost")</span>
                 @if (_showPriceBoostMenu)
                 {
                     <i class="fa fa-chevron-up"></i>
@@ -37,7 +37,7 @@
                     {
                         <li class="py-2">
                             <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/manage-boost">
-                                Manage Boost
+                                @TranslationState.GetValue("Manage Boost")
                             </a>
                         </li>
                     }
@@ -45,7 +45,7 @@
                     {
                         <li class="py-2">
                             <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/boosted-settings">
-                                Boosted Settings
+                                @TranslationState.GetValue("Boosted Settings")
                             </a>
                         </li>
                     }
@@ -57,7 +57,7 @@
     {
         <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.SportSettings ? "active" : "")">
             <a class="header-link text-decoration-none" href="@_address/sport-settings">
-                Sport Settings
+                @TranslationState.GetValue("Sport Settings")
             </a>
         </div>
     }
@@ -66,7 +66,7 @@
     {
         <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.MarketSettings ? "active" : "")">
             <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="OnMarketSettingsClickEvent">
-                <span class="me-3">Market Settings</span>
+                <span class="me-3">@TranslationState.GetValue("Market Settings")</span>
                 @if (_showMarketSettingsMenu)
                 {
                     <i class="fa fa-chevron-up"></i>

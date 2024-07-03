@@ -30,7 +30,7 @@
                             <tr>
                                 <th valign="middle" align="left"><strong>#</strong></th>
                                 <th valign="middle" align="left"><strong>Date</strong></th>
-                                <th valign="middle" align="left"><strong>Client Name</strong></th>
+                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("Client name")</strong></th>
                                 <th valign="middle" align="left"><strong>Activity</strong></th>
                                 <th valign="middle" align="left"><strong>Changed From</strong></th>
                                 <th valign="middle" align="left"><strong>Changed To</strong></th>
@@ -70,5 +70,5 @@
     </div>
 </div>
 <div class="modal-footer notifications">
-    <button type="button" @onclick="OnCancelClickEvent" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+    <button type="button" @onclick="OnCancelClickEvent" class="btn btn-danger waves-effect" data-dismiss="modal">@TranslationState.GetValue("Cancel")</button>
 </div>

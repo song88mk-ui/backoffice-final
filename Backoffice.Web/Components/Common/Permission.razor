@@ -85,7 +85,7 @@
                                             </div>
                                         }
                                         <div class="col text-center">
-                                            <button type="button" class="btn btn-enable-all" @onclick="() => OnEnableClickEvent(category)" disabled=@(!category.IsEnabled)>Enable All</button>
+                                            <button type="button" class="btn btn-enable-all" @onclick="() => OnEnableClickEvent(category)" disabled=@(!category.IsEnabled)>@TranslationState.GetValue("Enable All")</button>
                                         </div>
                                     </div>
                                 </div>

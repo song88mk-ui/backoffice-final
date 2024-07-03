@@ -22,13 +22,13 @@
                     <div class="me-2">
                         <a href="javascript:void(0)" class="btn btn-update px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnUpdateClick">
                             <i class="fa fa-edit"></i>
-                            Update
+                            @TranslationState.GetValue("Update")
                         </a>
                     </div>
                     <div class="me-2">
                         <a href="javascript:void(0)" class="btn btn-copy px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnCopyClickEvent">
                             <i class="fa fa-copy"></i>
-                            Copy
+                            @TranslationState.GetValue("Copy")
                         </a>
                     </div>
                 }
@@ -38,7 +38,7 @@
                         @if (_editSportSettingsPage == EditSportSettingsPage.Sport)
                         {
                             <a href="javascript:void(0)" class="btn btn-cancel px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnCancelClick">
-                                Cancel
+                                @TranslationState.GetValue("Cancel")
                             </a>
                         }
                         else
@@ -58,7 +58,7 @@
                         else
                         {
                             <a href="javascript:void(0)" class="btn btn-edit px-3 rounded @(IsPreload ? "disabled" : "")" @onclick="OnSaveChangesClick">
-                                Save Changes
+                                @TranslationState.GetValue("Save Changes")
                             </a>
                         }
                     </div>
@@ -70,7 +70,7 @@
             <div>
                 <a href="javascript:void(0)" class="btn btn-logs px-3 rounded border @(IsPreload ? "disabled" : "")" @onclick="() => OnViewLogsCallback.InvokeAsync()">
                     <i class="fa fa-table"></i>
-                    Logs
+                    @TranslationState.GetValue("Logs")
                 </a>
             </div>
         }

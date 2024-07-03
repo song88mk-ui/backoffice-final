@@ -22,13 +22,13 @@
                 <div class="me-2">
                     <a href="javascript:void(0)" class="btn btn-logs px-3 @(IsPreload ? "disabled" : "")" @onclick="OnViewLogsClickEvent">
                         <i class="fa fa-list"></i>
-                        Logs
+                        @TranslationState.GetValue("Logs")
                     </a>
                 </div>
                 <div class="me-2">
                     <a href="javascript:void(0)" class="btn btn-copy px-3 @(IsPreload ? "disabled" : "")" @onclick="OnCopyClickEvent">
                         <i class="fa fa-copy"></i>
-                        Copy
+                        @TranslationState.GetValue("Copy")
                     </a>
                 </div>
                 @if (!IsUpdate)
@@ -36,7 +36,7 @@
                     <div class="me-2">
                         <a href="javascript:void(0)" class="btn btn-edit px-3 @(IsPreload ? "disabled" : "")" @onclick="OnUpdateClickEvent">
                             <i class="fa fa-edit"></i>
-                            Update
+                            @TranslationState.GetValue("Update")
                         </a>
                     </div>
                 }
@@ -45,12 +45,12 @@
                     <div class="me-2">
                         <a href="javascript:void(0)" class="btn btn-save px-3 @(IsPreload ? "disabled" : "")" @onclick="OnSaveClickEvent">
                             <i class="fa fa-check"></i>
-                            Save
+                            @TranslationState.GetValue("Save")
                         </a>
                     </div>
                     <div class="me-2">
                         <a href="javascript:void(0)" class="btn btn-cancel px-3 @(IsPreload ? "disabled" : "")"  @onclick="OnCancelClickEvent">
-                            Cancel
+                            @TranslationState.GetValue("Cancel")
                         </a>
                     </div>
                 }
@@ -59,7 +59,7 @@
                 <div class="me-2">
                     <a href="javascript:void(0)" class="btn btn-logs px-3 @(IsPreload ? "disabled" : "")" @onclick="OnViewLogsClickEvent">
                         <i class="fa fa-list"></i>
-                        Logs
+                        @TranslationState.GetValue("Logs")
                     </a>
                 </div>
             </NotAuthorized>

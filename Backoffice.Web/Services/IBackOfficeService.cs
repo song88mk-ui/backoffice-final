@@ -45,6 +45,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<bool>> DeactivateFixtureMarkets(DeactivateFixtureMarketRequest request);
 
         #region ConfigTemplate
+        Task<BaseResponse<TranslationResponse>> GetTranslation(LanguageCode langCode);
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId);
         Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1);
         Task<BaseResponse<long>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);

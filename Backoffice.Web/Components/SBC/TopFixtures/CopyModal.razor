@@ -2,9 +2,9 @@
     <div class="modal-body">
         <div class="row">
             <div class="col-2">
-                <label class="my-1 mr-2">Clients</label>
+                <label class="my-1 mr-2">@TranslationState.GetValue("Clients")</label>
                 <div class="dropdown">
-                    <button class="btn clientBtn dropdown-toggle" type="button" id="clientDropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">Clients (@ClientIdSelectedModel?.Where(x => x.IsSelected).Count())</button>
+                    <button class="btn clientBtn dropdown-toggle" type="button" id="clientDropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">@TranslationState.GetValue("Clients") (@ClientIdSelectedModel?.Where(x => x.IsSelected).Count())</button>
 
                     <ul class="dropdown-menu" aria-labelledby="clientDropdown">
                         <li class="dropdown-item">
@@ -50,7 +50,7 @@
 
         <div class="row">
             <div class="col-12">
-                <label class="my-1 mr-2">Top Fixtures</label>
+                <label class="my-1 mr-2">@TranslationState.GetValue("Top Fixtures")</label>
                 <div class="d-flex flex-wrap p-3 leagueContainer">
                     @if(TopFixture != null)
                     {
@@ -66,7 +66,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn copyModalBtn copyModalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
-        <button type="button" class="btn copyModalBtn copyModalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">Save</button>
+        <button type="button" class="btn copyModalBtn copyModalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@TranslationState.GetValue("Cancel")</button>
+        <button type="button" class="btn copyModalBtn copyModalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">@TranslationState.GetValue("Save")</button>
     </div>
 </EditForm>

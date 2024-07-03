@@ -38,15 +38,15 @@
                         <table class="table table-hover table-bordered">
                             <thead class="table-head">
                                 <tr>
-                                    <th class="th-client-name py-3">Client Name</th>
-                                    <th class="th-sports py-3">Sports</th>
+                                    <th class="th-client-name py-3">@TranslationState.GetValue("Client name")</th>
+                                    <th class="th-sports py-3">@TranslationState.GetValue("Sports")</th>
                                     <th class="th-details py-3">Details</th>
                                     <th class="th-br-ctrl py-3">BR Ctrl</th>
                                     <th class="th-current-odds py-3">Current Odds</th>
                                     <th class="th-boosted-odds py-3">Boosted Odds</th>
                                     <AuthorizeView Policy="sbc-priceboost-manage-canedit">
                                         <Authorized Context="ActivateAll">
-                                            <th class="th-manage py-3">Manage</th>
+                                            <th class="th-manage py-3">@TranslationState.GetValue("Manage")</th>
                                         </Authorized>
                                     </AuthorizeView>
                                 </tr>

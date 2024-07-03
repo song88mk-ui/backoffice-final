@@ -54,7 +54,7 @@
                         <div class="me-2">
                             <a href="javascript:void(0)" class="btn btn-copy px-3 @(IsPreLoader ? "disabled" : "")" @onclick="OnCopyClickEvent">
                                 <i class="fa fa-copy"></i>
-                                Copy
+                                @TranslationState.GetValue("Copy")
                             </a>
                         </div>
                         @if (!IsUpdate)
@@ -62,7 +62,7 @@
                             <div class="me-2">
                                 <a href="javascript:void(0)" class="btn btn-edit px-3 @(IsPreLoader ? "disabled" : "")" @onclick="OnUpdateClickEvent">
                                     <i class="fa fa-edit"></i>
-                                    Update
+                                    @TranslationState.GetValue("Update")
                                 </a>
                             </div>
                         }
@@ -71,12 +71,12 @@
                             <div class="me-2">
                                 <a href="javascript:void(0)" class="btn btn-save px-3" @onclick="OnSaveClickEvent">
                                     <i class="fa fa-check"></i>
-                                    Save
+                                    @TranslationState.GetValue("Save")
                                 </a>
                             </div>
                             <div class="me-2">
                                 <a href="javascript:void(0)" class="btn btn-cancel px-3" @onclick="OnCancelClickEvent">
-                                    Cancel
+                                    @TranslationState.GetValue("Cancel")
                                 </a>
                             </div>
                         }
@@ -85,13 +85,13 @@
                         <div class="me-2">
                             <a href="javascript:void(0)" class="btn btn-copy px-3" disabled>
                                 <i class="fa fa-copy"></i>
-                                Copy
+                                @TranslationState.GetValue("Copy")
                             </a>
                         </div>
                         <div class="me-2">
                             <a href="javascript:void(0)" class="btn btn-edit px-3" disabled>
                                 <i class="fa fa-edit"></i>
-                                Update
+                                @TranslationState.GetValue("Update")
                             </a>
                         </div>
                     </NotAuthorized>

@@ -7,7 +7,7 @@
                 <div class="d-flex justify-content-between">
                     <div class="select-container">
                         <div class="me-4">
-                            <label class="form-label my-1 mr-2">Clients</label>
+                            <label class="form-label my-1 mr-2">@TranslationState.GetValue("Clients")</label>
                             <div class="dropdown">
                                 <button class="btn btn-client dropdown-toggle" type="button" id="client-dropdown" data-bs-auto-close="outside" data- data-bs-toggle="dropdown" aria-expanded="false">
                                     @if (Clients.Any())
@@ -75,7 +75,7 @@
         }
         <div class="row">
             <div class="col-md-12">
-                <label class="form-label my-1 mr-2">Leagues</label>
+                <label class="form-label my-1 mr-2">@TranslationState.GetValue("Leagues")</label>
                 <div class="d-flex flex-wrap p-3 league-container">
                     @foreach (var item in CopyTopLeaguesModel.CopyFromClientTopLeagues)
                     {
@@ -96,7 +96,7 @@
         }
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">Cancel</button>
-        <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">Save</button>
+        <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@TranslationState.GetValue("Cancel")</button>
+        <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">@TranslationState.GetValue("Save")</button>
     </div>
 </EditForm>
