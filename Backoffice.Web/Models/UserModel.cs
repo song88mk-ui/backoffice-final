@@ -7,8 +7,8 @@ namespace Backoffice.Web.Models
     {
         public UserModel()
         {
-            //ClientCodes = new List<string>();
-            //Claims = new List<Claim>();
+            ClientCodes = new List<string>();
+            Claims = new List<Claim>();
         }
 
         public string ConnectionId { get; set; }
@@ -17,7 +17,7 @@ namespace Backoffice.Web.Models
         public string RoleName { get; set; }
         public string RoleId { get; set; }
         public string MainUserId { get; set; }
-        //public List<string> ClientCodes { get; set; }
-        //public List<Claim> Claims { get; set; }
+        public List<string> ClientCodes { get; set; }
+        public List<Claim> Claims { get; set; }
     }
 }

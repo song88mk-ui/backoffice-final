@@ -220,7 +220,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _pageHeaderModel = new()
                 {
                     Title = $"{Fixture.SportName} - {Fixture.SegmentName} - {Fixture.LeagueName}",
-                    IconClass = $"iconfont iconfont-{Fixture.SportName.ToLower().Replace(" ", "-")}"
+                    IconClass = $"iconfont iconfont-{Fixture.SportName.ToLower().Replace(" ", "-")}",
+                    ShowLanguageDropDown = false
                 };
 
                 Breadcrumbs = new()

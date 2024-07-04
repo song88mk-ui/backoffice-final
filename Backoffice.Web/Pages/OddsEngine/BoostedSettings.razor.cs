@@ -40,7 +40,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             _pageHeaderModel = new()
             {
                 Title = "Boosted Settings",
-                IconClass = string.Empty
+                IconClass = string.Empty,
+                ShowLanguageDropDown = false
             };
 
             TradingService.Region = Region.ToUpper();

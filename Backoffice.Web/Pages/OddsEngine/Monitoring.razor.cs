@@ -79,7 +79,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _pageHeaderModel = new PageHeaderModel()
                 {
                     Title = $"{SelectedSport.SportName} - {SelectedSport.SegmentName} - {SelectedSport.LeagueName}",
-                    IconClass = $"iconfont iconfont-{SelectedSport.SportName.ToLower().Replace(" ", "-")}"
+                    IconClass = $"iconfont iconfont-{SelectedSport.SportName.ToLower().Replace(" ", "-")}",
+                    ShowLanguageDropDown = false
                 };
 
                 if (isSportChanged && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))

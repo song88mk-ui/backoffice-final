@@ -11,6 +11,8 @@ namespace Backoffice.Web.Shared.OddsEngine
         #region Methods
         protected override void OnInitialized()
         {
+            TranslationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
+
             var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
             var splitVal = page.Split("/").FirstOrDefault();
 

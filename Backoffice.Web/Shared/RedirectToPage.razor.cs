@@ -26,6 +26,8 @@ namespace Backoffice.Web.Shared
                 if (prefix == null)
                     return;
 
+                JSRuntime.InvokeVoidAsync("console.log", $"Redirection from {FromPage}");
+
                 var claim = userClaims.FirstOrDefault(c => c.Type.Contains($"{prefix}."));
 
                 if (claim != null)

@@ -17,7 +17,7 @@
             <div class="col-md-2">
                 @if (!IsEdit)
                 {
-                    <button type="button" class="btn btn-dark pull-right" @onclick="OnResetClickEvent" disabled="@IsPreload">Reset</button>
+                    <button type="button" class="btn btn-dark pull-right" @onclick="OnResetClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Reset")</button>
                 }
             </div>
 

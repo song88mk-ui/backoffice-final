@@ -46,7 +46,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             _alertModel = new();
             _pageHeaderModel = new()
             {
-                Title = "Manage Boost"
+                Title = "Manage Boost",
+                ShowLanguageDropDown = false
             };
             _breadcrumbs = new();
             await AuthenticateAccess.InvokeAsync();

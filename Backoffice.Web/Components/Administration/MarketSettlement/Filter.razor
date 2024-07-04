@@ -62,7 +62,7 @@
                 </div>
                 <div class="me-4 select-container">
                     <select class="form-select d-block" @onchange="OnLeagueChangedEvent">
-                        <option value="0">All Leagues</option>
+                        <option value="0">@TranslationState.GetValue("All Leagues")</option>
                         @foreach (var item in Leagues)
                         {
                             if (item.Value == FilterModel.LeagueId)

@@ -51,7 +51,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             TradingService.Region = Region.ToUpper();
             _pageHeaderModel = new()
             {
-                Title = "Market Groups"
+                Title = "Market Groups",
+                ShowLanguageDropDown = false
             };
             TableClass = "table-edit-market-group";
             IsPreLoader = true;

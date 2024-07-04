@@ -1,6 +1,6 @@
-﻿<div class="d-flex align-items-end">
+﻿<div class="d-flex align-items-center">
     <div class="dropdown">
-        <button class="btn btn-secondary @(TranslationState.LanguageCodes.Any() ? "dropdown-toggle" : "") d-flex align-items-center" type="button" id="dropdownLanguage" data-bs-toggle="dropdown" aria-expanded="false">
+        <button class="btn btn-secondary @(TranslationState.LanguageCodes.Any() ? "dropdown-toggle" : "") d-flex align-items-center @(DropDownButtonClassName)" type="button" id="dropdownLanguage" data-bs-toggle="dropdown" aria-expanded="false">
             <span class="d-flex">
                 <i class="@($"ico-flag flag-{TranslationState.ActiveLanguageCode.ToString().ToLower()}") me-2" aria-hidden="true"></i>
                 <span>@TranslationState.ActiveLanguageCode.ToString()</span>

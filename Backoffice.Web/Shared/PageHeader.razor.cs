@@ -11,6 +11,7 @@ namespace Backoffice.Web.Shared
 
         private string _title = "";
         private string _iconClass = "";
+        private bool _showLanguageDropdown;
 
         //private int counter;
 
@@ -22,6 +23,8 @@ namespace Backoffice.Web.Shared
                     _title = PageHeaderModel.Title;
                 if (PageHeaderModel.IconClass != _iconClass)
                     _iconClass = PageHeaderModel.IconClass;
+                if (PageHeaderModel.ShowLanguageDropDown != _showLanguageDropdown)
+                    _showLanguageDropdown = PageHeaderModel.ShowLanguageDropDown;
             }
 
             //Debug.WriteLine(counter++);

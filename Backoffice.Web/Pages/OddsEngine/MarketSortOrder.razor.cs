@@ -49,7 +49,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             _pageHeaderModel = new()
             {
-                Title = "Market Sort Order"
+                Title = "Market Sort Order",
+                ShowLanguageDropDown = false
             };
             TradingService.Region = Region.ToUpper();
 

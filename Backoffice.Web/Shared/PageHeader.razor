@@ -6,7 +6,10 @@
                 @TranslationState.GetValue(_title)
             </h4>
         </div>
-        <LanguageDropDown />
+        @if (_showLanguageDropdown)
+        {
+            <LanguageDropDown />
+        }
     </div>
     <hr size="1" />
 </div>

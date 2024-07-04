@@ -63,7 +63,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _pageHeaderModel = new PageHeaderModel
             {
-                Title = "Sport Settings"
+                Title = "Sport Settings",
+                ShowLanguageDropDown = false
             };
             await Task.CompletedTask;
             _isUpdate = false;

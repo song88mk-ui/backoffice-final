@@ -20,6 +20,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent" disabled="@IsPreload">Close</button>
+    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Close")</button>
     <button type="button" class="btn modal-btn modal-apply" @onclick="OnDeleteClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Apply")</button>
 </div>

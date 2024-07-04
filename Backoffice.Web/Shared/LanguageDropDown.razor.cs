@@ -7,6 +7,7 @@ namespace Backoffice.Web.Shared
     public partial class LanguageDropDown
     {
         [Parameter] public EventCallback OnLanguageCodeChangedCallback { get; set; }
+        [Parameter] public string DropDownButtonClassName { get; set; }
 
         private async void OnLanguageCodeChanged(string value)
         {
