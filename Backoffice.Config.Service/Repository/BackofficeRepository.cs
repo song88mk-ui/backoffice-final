@@ -60,7 +60,7 @@ namespace Backoffice.Utility.Repository
                 var configs = _backofficeContext.ConfigTemplateMargin.AsNoTracking().Where(c => configTemplateIds.Contains(c.ConfigTemplateId)).ToList();
 
                 //Parallel.ForEach(clients.GroupBy(s => s.ClientCode), client =>
-                foreach(var client in clients.GroupBy(s => s.ClientCode))
+                foreach (var client in clients.GroupBy(s => s.ClientCode))
                 {
                     var payload = new OutgoingUpdateClientMarketConfigMessage();
                     foreach (var leagues in client)
@@ -114,7 +114,7 @@ namespace Backoffice.Utility.Repository
                         //    }
 
                     }
-                });
+                }
             }
             catch (Exception ex)
             {
