@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Backoffice.Shared.OutgoingEngineMessages
 {
-    public class OutgoingUpdateClientMarketConfigMessage
+    public class OnUpdateClientLeagueConfigMessage
     {
-        public List<ConfigSettingsModel2> ConfigSettings { get; set; } = new List<ConfigSettingsModel2>();
+        public List<ClientLeagueConfigModel2> ConfigSettings { get; set; } = new List<ClientLeagueConfigModel2>();
     }
 }

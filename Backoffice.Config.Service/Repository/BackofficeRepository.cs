@@ -58,11 +58,11 @@ namespace Backoffice.Utility.Repository
                 }
 
                 var configs = _backofficeContext.ConfigTemplateMargin.AsNoTracking().Where(c => configTemplateIds.Contains(c.ConfigTemplateId)).ToList();
+                var allLeagues = new List<ClientMarketConfigModel2>();
 
-                //Parallel.ForEach(clients.GroupBy(s => s.ClientCode), client =>
                 foreach (var client in clients.GroupBy(s => s.ClientCode))
                 {
-                    var payload = new OutgoingUpdateClientMarketConfigMessage();
+                    var payload = new OnUpdateClientMarketConfigMessage();
                     foreach (var leagues in client)
                     {
                         var clientConfig = configs.Where(c => c.SportId == leagues.SportId && (c.ConfigTemplateId == leagues.PrematchConfigTemplateId || c.ConfigTemplateId == leagues.LiveConfigTemplateId))
@@ -78,7 +78,7 @@ namespace Backoffice.Utility.Repository
                             var prematch = config.FirstOrDefault(c => c.FixtureStatusId == (int)Scope.Prematch);
                             var live = config.FirstOrDefault(c => c.FixtureStatusId == (int)Scope.Live);
 
-                            payload.ConfigSettings.Add(new ConfigSettingsModel2
+                            payload.ConfigSettings.Add(new ClientMarketConfigModel2
                             {
                                 ClientId = leagues.ClientId,
                                 ClientCode = leagues.ClientCode,
@@ -100,20 +100,33 @@ namespace Backoffice.Utility.Repository
 
                         messageBroker.Publish(JsonSerializer.Serialize(payload), "OnUpdateClientMarketConfig", "r.oe.web.config.OnUpdateClientMarketConfig", ConvertToUnixTimestamp(DateTime.UtcNow).ToString());
 
-
-                        //if (league.Select(s => s).Any(c => c.IsActive))
-                        //    // Task League update
-                        //    var leagues = new ClientLeagueConfig()
-                        //    {
-                        //        ClientCode = leagueGroup.Key.ClientCode,
-                        //        SportId = leagueGroup.Key.SportId,
-                        //        SegmentId = leagueGroup.Key.SegmentId,
-                        //        LeagueId = leagueGroup.Key.LeagueId,
-                        //        ClientId = leagueGroup.Key.ClientId,
-                        //        IsActive = leagueGroup.Key.IsActive
-                        //    }
-
+                        allLeagues.AddRange(payload.ConfigSettings);
                     }
+                }
+
+                if(allLeagues.Any())
+                {
+                    var leagues = allLeagues.GroupBy(s => new
+                    {
+                        s.ClientId,
+                        s.ClientCode,
+                        s.SportId,
+                        s.SegmentId,
+                        s.LeagueId
+                    }).ToList();
+
+                    var payload = leagues.Select(s => new
+                    {
+                        s.Key.ClientId,
+                        s.Key.ClientCode,
+                        s.Key.SportId,
+                        s.Key.SegmentId,
+                        s.Key.LeagueId,
+                        IsActive = s.Any(c => c.IsActive)
+                    });
+                    int payloadByteSize = System.Text.ASCIIEncoding.Unicode.GetByteCount(JsonSerializer.Serialize(allLeagues));
+
+                    messageBroker.Publish(JsonSerializer.Serialize(allLeagues), "OnUpdateClientLeagueConfig", "r.oe.web.config.OnUpdateClientLeagueConfig", ConvertToUnixTimestamp(DateTime.UtcNow).ToString());
                 }
             }
             catch (Exception ex)
