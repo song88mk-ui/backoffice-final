@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>dotnet-Backoffice.Config.Service-674ca7ef-1c24-445a-8ca8-104a47bc30fe</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.32" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.32" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Backoffice.Shared\Backoffice.Shared.csproj" />
+  </ItemGroup>
+</Project>

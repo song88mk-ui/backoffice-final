@@ -402,14 +402,14 @@ namespace Backoffice.Web.Pages.OddsEngine
                             }).ToList();
 
                             data.LeagueConfig = new List<LeagueConfigModel>()
-                        {
-                            new LeagueConfigModel
                             {
-                                IsActive = data.MarketConfig.Any(m => m.IsActive),
-                                LeagueId = league.LeagueId,
-                                SegmentId = league.SegmentId
-                            }
-                        };
+                                new LeagueConfigModel
+                                {
+                                    IsActive = data.MarketConfig.Any(m => m.IsActive),
+                                    LeagueId = league.LeagueId,
+                                    SegmentId = league.SegmentId
+                                }
+                            };
 
                             var tresult = await TradingService.AddOrUpdateConfig(data);
                             if (tresult.StatusCode == StatusCode.Success)
@@ -525,7 +525,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     }
                 }
 
-                if(isNavigate)
+                if (isNavigate)
                     NavigationManager.NavigateTo($"hk/odds-engine/config-templates?message=Successfully updated");
             }
             catch (Exception ex)
