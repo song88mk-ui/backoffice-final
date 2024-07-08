@@ -1559,6 +1559,8 @@ namespace Backoffice.API.Repositories
                                     {
                                         configTemplateAssigned.PrematchConfigTemplateId = config.PrematchConfigTemplateId;
                                         configTemplateAssigned.LiveConfigTemplateId = config.LiveConfigTemplateId;
+
+                                        context.ConfigTemplateAssigned.Update(configTemplateAssigned);
                                     }
                                     context.SaveChanges();
                                 }
