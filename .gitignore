@@ -17,3 +17,5 @@ Backoffice.Utility/bin
 Backoffice.Hub/obj
 Backoffice.Hub/bin
 /Backoffice.Web/logs
+Backoffice.Config.Service/bin
+Backoffice.Config.Service/obj
