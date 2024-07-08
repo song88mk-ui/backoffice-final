@@ -11,10 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.WebSockets;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
 
 namespace Backoffice.Utility.Repository
 {
@@ -97,7 +96,7 @@ namespace Backoffice.Utility.Repository
 
                     if (payload.ConfigSettings.Any())
                     {
-                        int payloadByteSize = System.Text.ASCIIEncoding.Unicode.GetByteCount(JsonSerializer.Serialize(payload));
+                        int payloadByteSize = ASCIIEncoding.Unicode.GetByteCount(JsonSerializer.Serialize(payload));
 
                         messageBroker.Publish(JsonSerializer.Serialize(payload), "OnUpdateClientMarketConfig", "r.oe.web.config.OnUpdateClientMarketConfig", ConvertToUnixTimestamp(DateTime.UtcNow).ToString());
 

@@ -1856,26 +1856,21 @@ namespace Backoffice.API.Repositories
                 if (existingConfig != null)
                 {
                     _backofficeContext.ConfigTemplateMargin.RemoveRange(existingConfig);
-                    //await _backofficeContext.SaveChangesAsync();
                 }
 
-                foreach (var config in request.ConfigTemplateMargins)
+                _backofficeContext.ConfigTemplateMargin.AddRange(request.ConfigTemplateMargins.Select(config => new Shared.Data.Backoffice.Entities.ConfigTemplateMargin()
                 {
-                    _backofficeContext.ConfigTemplateMargin.Add(new Shared.Data.Backoffice.Entities.ConfigTemplateMargin()
-                    {
-                        ConfigTemplateId = config.ConfigTemplateId,
-                        FixtureTypeId = config.FixtureTypeId,
-                        FixtureStatusId = config.FixtureStatusId,
-                        MarketTemplateId = config.MarketTemplateId,
-                        SportId = config.SportId,
-                        Config = config.Config,
-                        IsActive = config.IsActive
-                    });
-                }
+                    ConfigTemplateId = config.ConfigTemplateId,
+                    FixtureTypeId = config.FixtureTypeId,
+                    FixtureStatusId = config.FixtureStatusId,
+                    MarketTemplateId = config.MarketTemplateId,
+                    SportId = config.SportId,
+                    Config = config.Config,
+                    IsActive = config.IsActive
+                }).ToArray());
 
                 await _backofficeContext.SaveChangesAsync();
 
-                // Rabbit MQ
                 var configTemplateIds = request.ConfigTemplateMargins.Select(s => s.ConfigTemplateId).Distinct();
 
                 foreach(var configTemplateId in configTemplateIds)
