@@ -56,6 +56,10 @@
             "Microsoft.Extensions.Hosting": {
               "target": "Package",
               "version": "[3.1.32, )"
+            },
+            "Microsoft.Extensions.Hosting.WindowsServices": {
+              "target": "Package",
+              "version": "[3.1.32, )"
             }
           },
           "imports": [

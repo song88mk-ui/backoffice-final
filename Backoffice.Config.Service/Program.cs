@@ -24,6 +24,6 @@ namespace Backoffice.Config.Service
                     services.AddSingleton<IMessageBroker, MessageBroker>();
                     services.AddSingleton<IBackofficeRepository, BackofficeRepository>();
                     services.AddHostedService<Worker>();
-                });
+                }).UseWindowsService();
     }
 }

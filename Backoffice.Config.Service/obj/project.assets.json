@@ -436,6 +436,24 @@
           }
         }
       },
+      "Microsoft.Extensions.Hosting.WindowsServices/3.1.32": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Hosting": "3.1.32",
+          "Microsoft.Extensions.Logging.EventLog": "3.1.32",
+          "System.ServiceProcess.ServiceController": "4.7.0"
+        },
+        "compile": {
+          "lib/netstandard2.1/Microsoft.Extensions.Hosting.WindowsServices.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/Microsoft.Extensions.Hosting.WindowsServices.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.Extensions.Logging/3.1.32": {
         "type": "package",
         "dependencies": {
@@ -1722,6 +1740,28 @@
           }
         }
       },
+      "System.ServiceProcess.ServiceController/4.7.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Diagnostics.EventLog": "4.7.0"
+        },
+        "compile": {
+          "ref/netstandard2.0/System.ServiceProcess.ServiceController.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/System.ServiceProcess.ServiceController.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/netstandard2.0/System.ServiceProcess.ServiceController.dll": {
+            "assetType": "runtime",
+            "rid": "win"
+          }
+        }
+      },
       "System.Text.Encoding/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -2469,6 +2509,22 @@
         "lib/netstandard2.0/Microsoft.Extensions.Hosting.Abstractions.xml",
         "microsoft.extensions.hosting.abstractions.3.1.32.nupkg.sha512",
         "microsoft.extensions.hosting.abstractions.nuspec"
+      ]
+    },
+    "Microsoft.Extensions.Hosting.WindowsServices/3.1.32": {
+      "sha512": "J8qk9eIqDVsqbmw7puJ9GawRISpQJRTe4/GNhT4ohBKI2wjfku45+y0kyUsM6e/bznhvKEjRtebEG1XPWJQ43g==",
+      "type": "package",
+      "path": "microsoft.extensions.hosting.windowsservices/3.1.32",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "lib/netstandard2.0/Microsoft.Extensions.Hosting.WindowsServices.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.Hosting.WindowsServices.xml",
+        "lib/netstandard2.1/Microsoft.Extensions.Hosting.WindowsServices.dll",
+        "lib/netstandard2.1/Microsoft.Extensions.Hosting.WindowsServices.xml",
+        "microsoft.extensions.hosting.windowsservices.3.1.32.nupkg.sha512",
+        "microsoft.extensions.hosting.windowsservices.nuspec"
       ]
     },
     "Microsoft.Extensions.Logging/3.1.32": {
@@ -5530,6 +5586,48 @@
         "system.security.securestring.nuspec"
       ]
     },
+    "System.ServiceProcess.ServiceController/4.7.0": {
+      "sha512": "FuYfwENKZqWxGtYU5Vay2ai2dPWLKzRgI+WZkjceN3jaTK9ZVYnV1GRMTtN3Qodm9RT0gOiN8WoHGNXzTaZ+fw==",
+      "type": "package",
+      "path": "system.serviceprocess.servicecontroller/4.7.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/System.ServiceProcess.ServiceController.dll",
+        "lib/net461/System.ServiceProcess.ServiceController.xml",
+        "lib/netstandard1.4/System.ServiceProcess.ServiceController.dll",
+        "lib/netstandard2.0/System.ServiceProcess.ServiceController.dll",
+        "lib/netstandard2.0/System.ServiceProcess.ServiceController.xml",
+        "ref/net461/System.ServiceProcess.ServiceController.dll",
+        "ref/net461/System.ServiceProcess.ServiceController.xml",
+        "ref/net472/System.ServiceProcess.ServiceController.dll",
+        "ref/net472/System.ServiceProcess.ServiceController.xml",
+        "ref/netstandard1.4/System.ServiceProcess.ServiceController.dll",
+        "ref/netstandard1.4/System.ServiceProcess.ServiceController.xml",
+        "ref/netstandard1.4/de/System.ServiceProcess.ServiceController.xml",
+        "ref/netstandard1.4/es/System.ServiceProcess.ServiceController.xml",
+        "ref/netstandard1.4/fr/System.ServiceProcess.ServiceController.xml",
+        "ref/netstandard1.4/it/System.ServiceProcess.ServiceController.xml",
+        "ref/netstandard1.4/ja/System.ServiceProcess.ServiceController.xml",
+        "ref/netstandard1.4/ko/System.ServiceProcess.ServiceController.xml",
+        "ref/netstandard1.4/ru/System.ServiceProcess.ServiceController.xml",
+        "ref/netstandard1.4/zh-hans/System.ServiceProcess.ServiceController.xml",
+        "ref/netstandard1.4/zh-hant/System.ServiceProcess.ServiceController.xml",
+        "ref/netstandard2.0/System.ServiceProcess.ServiceController.dll",
+        "ref/netstandard2.0/System.ServiceProcess.ServiceController.xml",
+        "runtimes/win/lib/net461/System.ServiceProcess.ServiceController.dll",
+        "runtimes/win/lib/net461/System.ServiceProcess.ServiceController.xml",
+        "runtimes/win/lib/netstandard1.5/System.ServiceProcess.ServiceController.dll",
+        "runtimes/win/lib/netstandard2.0/System.ServiceProcess.ServiceController.dll",
+        "runtimes/win/lib/netstandard2.0/System.ServiceProcess.ServiceController.xml",
+        "system.serviceprocess.servicecontroller.4.7.0.nupkg.sha512",
+        "system.serviceprocess.servicecontroller.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
     "System.Text.Encoding/4.3.0": {
       "sha512": "BiIg+KWaSDOITze6jGQynxg64naAPtqGHBwDrLaCtixsa5bKiR8dpPOHA7ge3C0JJQizJE+sfkz1wV+BAKAYZw==",
       "type": "package",
@@ -6216,7 +6314,8 @@
     ".NETCoreApp,Version=v3.1": [
       "Backoffice.Shared >= 1.0.0",
       "Microsoft.EntityFrameworkCore.SqlServer >= 3.1.32",
-      "Microsoft.Extensions.Hosting >= 3.1.32"
+      "Microsoft.Extensions.Hosting >= 3.1.32",
+      "Microsoft.Extensions.Hosting.WindowsServices >= 3.1.32"
     ]
   },
   "packageFolders": {
@@ -6272,6 +6371,10 @@
             "version": "[3.1.32, )"
           },
           "Microsoft.Extensions.Hosting": {
+            "target": "Package",
+            "version": "[3.1.32, )"
+          },
+          "Microsoft.Extensions.Hosting.WindowsServices": {
             "target": "Package",
             "version": "[3.1.32, )"
           }
