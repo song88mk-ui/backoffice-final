@@ -81,3 +81,6 @@ E:\projects\ASP Net\repos\backoffice-final\Backoffice.Config.Service\obj\Debug\n
 E:\projects\ASP Net\repos\backoffice-final\Backoffice.Config.Service\obj\Debug\netcoreapp3.1\Backoffice.Config.Service.dll
 E:\projects\ASP Net\repos\backoffice-final\Backoffice.Config.Service\obj\Debug\netcoreapp3.1\Backoffice.Config.Service.pdb
 E:\projects\ASP Net\repos\backoffice-final\Backoffice.Config.Service\obj\Debug\netcoreapp3.1\Backoffice.Config.Service.genruntimeconfig.cache
+E:\projects\ASP Net\repos\backoffice-final\Backoffice.Config.Service\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Hosting.WindowsServices.dll
+E:\projects\ASP Net\repos\backoffice-final\Backoffice.Config.Service\bin\Debug\netcoreapp3.1\System.ServiceProcess.ServiceController.dll
+E:\projects\ASP Net\repos\backoffice-final\Backoffice.Config.Service\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.ServiceProcess.ServiceController.dll
