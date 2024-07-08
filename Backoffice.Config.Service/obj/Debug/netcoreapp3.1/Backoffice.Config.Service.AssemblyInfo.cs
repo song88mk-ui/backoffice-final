@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Backoffice.Config.Service")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+98bbcb87f5de6c29d9ee6f18ad1b635aaf3e8c1f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7226c9dc9e9f474ba012db8740807e454eb3dfaa")]
 [assembly: System.Reflection.AssemblyProductAttribute("Backoffice.Config.Service")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Backoffice.Config.Service")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

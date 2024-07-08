@@ -40,7 +40,6 @@ namespace Backoffice.Config.Service
         }
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _backofficeRepository.UpdateClientMargin(10099, _messageBroker);
             _messageBroker.Connect();
             _messageBroker.MessageReceived += MessageReceivedEvent;
 

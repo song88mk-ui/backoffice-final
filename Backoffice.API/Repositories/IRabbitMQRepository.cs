@@ -8,6 +8,6 @@ namespace Backoffice.API.Repositories
 {
     public interface IRabbitMqRepository
     {
-        Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region);
+        Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region = "hk");
     }
 }

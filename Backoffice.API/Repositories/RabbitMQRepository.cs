@@ -28,7 +28,7 @@ namespace Backoffice.API.Repositories
             this._publishedMessagesCounter = instrumentation.PublishedMessagesCounter;
         }
 
-        public async Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region)
+        public async Task<BaseResponse<MessageResponse>> Publish(MessageRequest request, string region = "hk") 
         {
             using var activity = this._activitySource.StartActivity("broker-publish");
             try

@@ -29,18 +29,20 @@ namespace Backoffice.API.Repositories
         private readonly BackofficeContext _backofficeContext;
         private readonly IPlatformRepository _platformRepository;
         private readonly ITradingRepository _tradingRepository;
+        private readonly IRabbitMqRepository _rabbitMqRepository;
         private readonly IMemCache _memCache;
 
         #endregion
 
         #region Ctor
 
-        public BackofficeRepository(BackofficeContext backofficeContext, IPlatformRepository platformRepository, ITradingRepository tradingRepository, IMemCache memCache)
+        public BackofficeRepository(BackofficeContext backofficeContext, IPlatformRepository platformRepository, ITradingRepository tradingRepository, IMemCache memCache, IRabbitMqRepository rabbitMqRepository)
         {
             _backofficeContext = backofficeContext;
             _platformRepository = platformRepository;
             _tradingRepository = tradingRepository;
             _memCache = memCache;
+            _rabbitMqRepository = rabbitMqRepository;
         }
 
         #endregion
@@ -1872,6 +1874,21 @@ namespace Backoffice.API.Repositories
                 }
 
                 await _backofficeContext.SaveChangesAsync();
+
+                // Rabbit MQ
+                var configTemplateIds = request.ConfigTemplateMargins.Select(s => s.ConfigTemplateId).Distinct();
+
+                foreach(var configTemplateId in configTemplateIds)
+                {
+                    await _rabbitMqRepository.Publish(new MessageRequest()
+                    {
+                        CorrelationId = Guid.NewGuid().ToString(),
+                        MessageType = "UpdateClientMargin",
+                        RoutingKey = $"r.bo.config.updateclientmargin",
+                        Payload = JsonSerializer.Serialize(configTemplateId)
+                    });
+                }
+
 
                 return new BaseResponse<bool>()
                 {

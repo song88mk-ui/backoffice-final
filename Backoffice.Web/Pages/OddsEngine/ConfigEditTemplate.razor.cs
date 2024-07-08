@@ -350,109 +350,109 @@ namespace Backoffice.Web.Pages.OddsEngine
                     var result = await BackofficeService.AddOrUpdateConfigTemplateMargin(request);
                     if (result.StatusCode == StatusCode.Success)
                     {
-                        var configTemplateMargins = await GetConfigTemplateMargin(referenceConfigTemplateId);
+                        //var configTemplateMargins = await GetConfigTemplateMargin(referenceConfigTemplateId);
 
-                        var assignedLeagues = await LoadLeagues((int)referenceConfigTemplateId);
-                        foreach (var league in assignedLeagues)
-                        {
-                            ConfigSettingsModel data = new ConfigSettingsModel();
-                            data.ClientCode = league.ClientCode;
-                            data.SportId = league.SportId;
-                            data.SegmentId = league.SegmentId;
-                            data.LeagueId = league.LeagueId;
-                            data.ClientId = Guid.Parse(league.ClientId);
-                            data.UserId = UserModel.Id;
-                            data.UserName = UserModel.UserName;
+                        //var assignedLeagues = await LoadLeagues((int)referenceConfigTemplateId);
+                        //foreach (var league in assignedLeagues)
+                        //{
+                        //    ConfigSettingsModel data = new ConfigSettingsModel();
+                        //    data.ClientCode = league.ClientCode;
+                        //    data.SportId = league.SportId;
+                        //    data.SegmentId = league.SegmentId;
+                        //    data.LeagueId = league.LeagueId;
+                        //    data.ClientId = Guid.Parse(league.ClientId);
+                        //    data.UserId = UserModel.Id;
+                        //    data.UserName = UserModel.UserName;
 
 
-                            var marketConfigs = new List<MarketConfig>();
-                            var newConfigTemplateMargins = EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Prematch ? await GetConfigTemplateMargin(league.LiveTemplateId) : await GetConfigTemplateMargin(league.PrematchTemplateId);
+                        //    var marketConfigs = new List<MarketConfig>();
+                        //    var newConfigTemplateMargins = EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Prematch ? await GetConfigTemplateMargin(league.LiveTemplateId) : await GetConfigTemplateMargin(league.PrematchTemplateId);
 
-                            foreach (var margin in configTemplateMargins.ConfigTemplateMargins)
-                            {
-                                var marketConfig = new MarketConfig()
-                                {
-                                    MarketTemplateId = margin.MarketTemplateId,
-                                    FixtureTypeId = (int)FixtureType.Match
-                                };
+                        //    foreach (var margin in configTemplateMargins.ConfigTemplateMargins)
+                        //    {
+                        //        var marketConfig = new MarketConfig()
+                        //        {
+                        //            MarketTemplateId = margin.MarketTemplateId,
+                        //            FixtureTypeId = (int)FixtureType.Match
+                        //        };
 
-                                if (EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Prematch)
-                                {
-                                    marketConfig.Prematch = margin.Config;
-                                    marketConfig.Live = newConfigTemplateMargins.ConfigTemplateMargins.FirstOrDefault(f => f.MarketTemplateId == margin.MarketTemplateId)?.Config ?? string.Empty;
-                                    marketConfig.IsActive = !string.IsNullOrEmpty(marketConfig.Live) && league.LiveTemplateId > 0 ? true : margin.IsActive;
-                                }
+                        //        if (EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Prematch)
+                        //        {
+                        //            marketConfig.Prematch = margin.Config;
+                        //            marketConfig.Live = newConfigTemplateMargins.ConfigTemplateMargins.FirstOrDefault(f => f.MarketTemplateId == margin.MarketTemplateId)?.Config ?? string.Empty;
+                        //            marketConfig.IsActive = !string.IsNullOrEmpty(marketConfig.Live) && league.LiveTemplateId > 0 ? true : margin.IsActive;
+                        //        }
 
-                                if (EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Live)
-                                {
-                                    marketConfig.Live = margin.Config;
-                                    marketConfig.Prematch = newConfigTemplateMargins.ConfigTemplateMargins.FirstOrDefault(f => f.MarketTemplateId == margin.MarketTemplateId)?.Config ?? string.Empty;
-                                    marketConfig.IsActive = !string.IsNullOrEmpty(marketConfig.Prematch) && league.PrematchTemplateId > 0 ? true : margin.IsActive;
-                                }
+                        //        if (EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Live)
+                        //        {
+                        //            marketConfig.Live = margin.Config;
+                        //            marketConfig.Prematch = newConfigTemplateMargins.ConfigTemplateMargins.FirstOrDefault(f => f.MarketTemplateId == margin.MarketTemplateId)?.Config ?? string.Empty;
+                        //            marketConfig.IsActive = !string.IsNullOrEmpty(marketConfig.Prematch) && league.PrematchTemplateId > 0 ? true : margin.IsActive;
+                        //        }
 
-                                marketConfigs.Add(marketConfig);
-                            }
+                        //        marketConfigs.Add(marketConfig);
+                        //    }
 
-                            data.MarketConfig = marketConfigs.Select(s => new MarketConfigModel
-                            {
-                                IsActive = s.IsActive,
-                                MarketTemplateId = s.MarketTemplateId,
-                                PrematchSettings = string.IsNullOrEmpty(s.Prematch) ? new List<MarketMargin>() { new MarketMargin { T = -41472000, M = -1 } } : JsonSerializer.Deserialize<List<MarketMargin>>(s.Prematch)?.ToList() ?? new List<MarketMargin>(),
-                                LivematchSettings = string.IsNullOrEmpty(s.Live) ? new List<MarketMargin>() { new MarketMargin { T = 0, M = -1 } } : JsonSerializer.Deserialize<List<MarketMargin>>(s.Live)?.ToList() ?? new List<MarketMargin>(),
-                            }).ToList();
+                        //    data.MarketConfig = marketConfigs.Select(s => new MarketConfigModel
+                        //    {
+                        //        IsActive = s.IsActive,
+                        //        MarketTemplateId = s.MarketTemplateId,
+                        //        PrematchSettings = string.IsNullOrEmpty(s.Prematch) ? new List<MarketMargin>() { new MarketMargin { T = -41472000, M = -1 } } : JsonSerializer.Deserialize<List<MarketMargin>>(s.Prematch)?.ToList() ?? new List<MarketMargin>(),
+                        //        LivematchSettings = string.IsNullOrEmpty(s.Live) ? new List<MarketMargin>() { new MarketMargin { T = 0, M = -1 } } : JsonSerializer.Deserialize<List<MarketMargin>>(s.Live)?.ToList() ?? new List<MarketMargin>(),
+                        //    }).ToList();
 
-                            data.LeagueConfig = new List<LeagueConfigModel>()
-                            {
-                                new LeagueConfigModel
-                                {
-                                    IsActive = data.MarketConfig.Any(m => m.IsActive),
-                                    LeagueId = league.LeagueId,
-                                    SegmentId = league.SegmentId
-                                }
-                            };
+                        //    data.LeagueConfig = new List<LeagueConfigModel>()
+                        //    {
+                        //        new LeagueConfigModel
+                        //        {
+                        //            IsActive = data.MarketConfig.Any(m => m.IsActive),
+                        //            LeagueId = league.LeagueId,
+                        //            SegmentId = league.SegmentId
+                        //        }
+                        //    };
 
-                            var tresult = await TradingService.AddOrUpdateConfig(data);
-                            if (tresult.StatusCode == StatusCode.Success)
-                            {
+                        //    var tresult = await TradingService.AddOrUpdateConfig(data);
+                        //    if (tresult.StatusCode == StatusCode.Success)
+                        //    {
 
-                                var messageLeague = new OnLeagueConfigMessage
-                                {
-                                    ClientCode = league.ClientCode,
-                                    ClientId = Guid.Parse(league.ClientId),
-                                    SportId = league.SportId,
-                                    SegmentId = league.SegmentId,
-                                    LeagueId = league.LeagueId,
-                                    IsActive = data.MarketConfig.Any(m => m.IsActive)
-                                };
+                        //        var messageLeague = new OnLeagueConfigMessage
+                        //        {
+                        //            ClientCode = league.ClientCode,
+                        //            ClientId = Guid.Parse(league.ClientId),
+                        //            SportId = league.SportId,
+                        //            SegmentId = league.SegmentId,
+                        //            LeagueId = league.LeagueId,
+                        //            IsActive = data.MarketConfig.Any(m => m.IsActive)
+                        //        };
 
-                                await TradingService.Publish(new MessageRequest()
-                                {
-                                    CorrelationId = Guid.NewGuid().ToString(),
-                                    MessageType = "OnLeagueConfig",
-                                    RoutingKey = $"r.uof.onleagueconfig",
-                                    Payload = JsonSerializer.Serialize(messageLeague)
-                                });
+                        //        await TradingService.Publish(new MessageRequest()
+                        //        {
+                        //            CorrelationId = Guid.NewGuid().ToString(),
+                        //            MessageType = "OnLeagueConfig",
+                        //            RoutingKey = $"r.uof.onleagueconfig",
+                        //            Payload = JsonSerializer.Serialize(messageLeague)
+                        //        });
 
-                                var messageMarket = new OnMarketConfigMessage
-                                {
-                                    ClientCode = league.ClientCode,
-                                    ClientId = Guid.Parse(league.ClientId),
-                                    SportId = league.SportId,
-                                    SegmentId = league.SegmentId,
-                                    LeagueId = league.LeagueId,
-                                    Markets = marketConfigs
-                                };
+                        //        var messageMarket = new OnMarketConfigMessage
+                        //        {
+                        //            ClientCode = league.ClientCode,
+                        //            ClientId = Guid.Parse(league.ClientId),
+                        //            SportId = league.SportId,
+                        //            SegmentId = league.SegmentId,
+                        //            LeagueId = league.LeagueId,
+                        //            Markets = marketConfigs
+                        //        };
 
-                                await TradingService.Publish(new MessageRequest()
-                                {
-                                    CorrelationId = Guid.NewGuid().ToString(),
-                                    MessageType = "OnMarketConfig",
-                                    RoutingKey = $"r.uof.onmarketconfig",
-                                    Payload = JsonSerializer.Serialize(messageMarket)
-                                });
+                        //        await TradingService.Publish(new MessageRequest()
+                        //        {
+                        //            CorrelationId = Guid.NewGuid().ToString(),
+                        //            MessageType = "OnMarketConfig",
+                        //            RoutingKey = $"r.uof.onmarketconfig",
+                        //            Payload = JsonSerializer.Serialize(messageMarket)
+                        //        });
 
-                            }
-                        }
+                        //    }
+                        //}
 
                         if (new[] { oldConfigMarginsLogs, newConfigMarginsLogs }.All(x => x != null && x.Any()) && !oldConfigMarginsLogs.Equals(newConfigMarginsLogs))
                         {

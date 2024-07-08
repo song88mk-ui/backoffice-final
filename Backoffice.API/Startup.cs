@@ -12,16 +12,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using System.Diagnostics;
-using System.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Backoffice.API
 {
