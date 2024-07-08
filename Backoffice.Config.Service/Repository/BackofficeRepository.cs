@@ -115,18 +115,21 @@ namespace Backoffice.Utility.Repository
                         s.LeagueId
                     }).ToList();
 
-                    var payload = leagues.Select(s => new
+                    var payload = new OnUpdateClientLeagueConfigMessage
                     {
-                        s.Key.ClientId,
-                        s.Key.ClientCode,
-                        s.Key.SportId,
-                        s.Key.SegmentId,
-                        s.Key.LeagueId,
-                        IsActive = s.Any(c => c.IsActive)
-                    });
-                    int payloadByteSize = System.Text.ASCIIEncoding.Unicode.GetByteCount(JsonSerializer.Serialize(allLeagues));
+                        ConfigSettings = leagues.Select(s => new ClientLeagueConfigModel2
+                        {
+                            ClientId = s.Key.ClientId,
+                            ClientCode = s.Key.ClientCode,
+                            SportId = s.Key.SportId,
+                            SegmentId = s.Key.SegmentId,
+                            LeagueId = s.Key.LeagueId,
+                            IsActive = s.Any(c => c.IsActive)
+                        }).ToList()
+                    };
+                    int payloadByteSize = System.Text.ASCIIEncoding.Unicode.GetByteCount(JsonSerializer.Serialize(payload));
 
-                    messageBroker.Publish(JsonSerializer.Serialize(allLeagues), "OnUpdateClientLeagueConfig", "r.oe.web.config.OnUpdateClientLeagueConfig", ConvertToUnixTimestamp(DateTime.UtcNow).ToString());
+                    messageBroker.Publish(JsonSerializer.Serialize(payload), "OnUpdateClientLeagueConfig", "r.oe.web.config.OnUpdateClientLeagueConfig", ConvertToUnixTimestamp(DateTime.UtcNow).ToString());
                 }
             }
             catch (Exception ex)

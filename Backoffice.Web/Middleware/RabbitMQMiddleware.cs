@@ -75,7 +75,7 @@ namespace Backoffice.Web.Middleware
                             Details = notificationsModel.Details,
                             PageRedirect = notificationsModel.PageRedirect,
                             IsRead = false,
-                            UserId = notificationsModel.UserId.ToString(),
+                            UserId = notificationsModel.UserId?.ToString(),
                             DateText = date,
                             ClaimsType = notificationsModel.ClaimType,
                             ClientCode = notificationsModel.ClientCode,
