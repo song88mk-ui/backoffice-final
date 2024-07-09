@@ -5,6 +5,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -59,8 +60,9 @@ namespace Backoffice.Utility.Repository
 
                 var configs = _backofficeContext.ConfigTemplateMargin.AsNoTracking().Where(c => configTemplateIds.Contains(c.ConfigTemplateId)).ToList();
                 var allLeagues = new List<ClientMarketConfigModel2>();
+                var clientList = clients.GroupBy(s => s.ClientCode).ToList();
 
-                foreach (var client in clients.GroupBy(s => s.ClientCode))
+                foreach (var client in clientList)
                 {
                     var payload = new OnUpdateClientMarketConfigMessage();
                     foreach (var leagues in client)
@@ -73,25 +75,39 @@ namespace Backoffice.Utility.Repository
                                 FixtureTypeId = g.FixtureTypeId
                             });
 
-                        foreach (var config in clientConfig)
+                        payload.ConfigSettings.AddRange(clientConfig.Select(config => new ClientMarketConfigModel2
                         {
-                            var prematch = config.FirstOrDefault(c => c.FixtureStatusId == (int)Scope.Prematch);
-                            var live = config.FirstOrDefault(c => c.FixtureStatusId == (int)Scope.Live);
+                            ClientId = leagues.ClientId,
+                            ClientCode = leagues.ClientCode,
+                            SportId = leagues.SportId,
+                            SegmentId = leagues.SegmentId,
+                            LeagueId = leagues.LeagueId,
+                            MarketTemplateId = config.Key.MarketTemplateId,
+                            FixtureTypeId = config.Key.FixtureTypeId,
+                            IsActive = (config.FirstOrDefault(c => c.FixtureStatusId == (int)Scope.Prematch)?.IsActive ?? false) || (config.FirstOrDefault(c => c.FixtureStatusId == (int)Scope.Live)?.IsActive ?? false),
+                            Prematch = config.FirstOrDefault(c => c.FixtureStatusId == (int)Scope.Prematch)?.Config ?? _prematchDefaultMargin,
+                            Live = config.FirstOrDefault(c => c.FixtureStatusId == (int)Scope.Live)?.Config ?? _liveDefaultMargin
+                        }));
 
-                            payload.ConfigSettings.Add(new ClientMarketConfigModel2
-                            {
-                                ClientId = leagues.ClientId,
-                                ClientCode = leagues.ClientCode,
-                                SportId = leagues.SportId,
-                                SegmentId = leagues.SegmentId,
-                                LeagueId = leagues.LeagueId,
-                                MarketTemplateId = config.Key.MarketTemplateId,
-                                FixtureTypeId = config.Key.FixtureTypeId,
-                                IsActive = (prematch?.IsActive ?? false) || (live?.IsActive ?? false),
-                                Prematch = prematch?.Config ?? _prematchDefaultMargin,
-                                Live = live?.Config ?? _liveDefaultMargin
-                            });
-                        }
+                        //foreach (var config in clientConfig)
+                        //{
+                        //    var prematch = config.FirstOrDefault(c => c.FixtureStatusId == (int)Scope.Prematch);
+                        //    var live = config.FirstOrDefault(c => c.FixtureStatusId == (int)Scope.Live);
+
+                        //    payload.ConfigSettings.Add(new ClientMarketConfigModel2
+                        //    {
+                        //        ClientId = leagues.ClientId,
+                        //        ClientCode = leagues.ClientCode,
+                        //        SportId = leagues.SportId,
+                        //        SegmentId = leagues.SegmentId,
+                        //        LeagueId = leagues.LeagueId,
+                        //        MarketTemplateId = config.Key.MarketTemplateId,
+                        //        FixtureTypeId = config.Key.FixtureTypeId,
+                        //        IsActive = (prematch?.IsActive ?? false) || (live?.IsActive ?? false),
+                        //        Prematch = prematch?.Config ?? _prematchDefaultMargin,
+                        //        Live = live?.Config ?? _liveDefaultMargin
+                        //    });
+                        //}
                     }
 
                     if (payload.ConfigSettings.Any())
@@ -101,6 +117,8 @@ namespace Backoffice.Utility.Repository
                         messageBroker.Publish(JsonSerializer.Serialize(payload), "OnUpdateClientMarketConfig", "r.oe.web.config.OnUpdateClientMarketConfig", ConvertToUnixTimestamp(DateTime.UtcNow).ToString());
 
                         allLeagues.AddRange(payload.ConfigSettings);
+
+                        _logger.LogInformation($"{clientList.IndexOf(client) + 1}/{clientList.Count()} {client.Key} is done! {client.ToList().Count()} {payloadByteSize} bytes");
                     }
                 }
 
@@ -139,6 +157,8 @@ namespace Backoffice.Utility.Repository
             finally
             {
                 _logger.LogInformation("Finished Client Margin");
+
+                await Task.CompletedTask;
             }
         }
 
