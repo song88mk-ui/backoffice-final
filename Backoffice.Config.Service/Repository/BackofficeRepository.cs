@@ -22,11 +22,11 @@ namespace Backoffice.Utility.Repository
     {
         private readonly IConfiguration _configuration;
         private readonly BackofficeContext _backofficeContext;
-        private readonly ILogger<Worker> _logger;
+        private readonly ILogger<BackofficeRepository> _logger;
 
         private readonly string _prematchDefaultMargin;
         private readonly string _liveDefaultMargin;
-        public BackofficeRepository(IConfiguration configuration, ILogger<Worker> logger)
+        public BackofficeRepository(IConfiguration configuration, ILogger<BackofficeRepository> logger)
         {
             _configuration = configuration;
             _logger = logger;
@@ -38,9 +38,9 @@ namespace Backoffice.Utility.Repository
             _liveDefaultMargin = JsonSerializer.Serialize(new { T = 0, M = 101 });
         }
 
-        public async Task UpdateClientMargin(long configTemplateId, IMessageBroker messageBroker)
+        public void UpdateClientMargin(long configTemplateId, IMessageBroker messageBroker)
         {
-            _logger.LogInformation("Processing Client Margin...");
+            _logger.LogInformation($"{configTemplateId} Processing...");
             var timer = new Stopwatch();
             timer.Start();
             try
@@ -118,7 +118,7 @@ namespace Backoffice.Utility.Repository
 
                         allLeagues.AddRange(payload.ConfigSettings);
 
-                        _logger.LogInformation($"{clientList.IndexOf(client) + 1}/{clientList.Count()} {client.Key} is done! {client.ToList().Count()} {payloadByteSize} bytes");
+                        _logger.LogInformation($"{clientList.IndexOf(client) + 1}/{clientList.Count()} {client.Key} is done! {client.ToList().Count()} items with {payloadByteSize / (float)1048576} mb");
                     }
                 }
 
@@ -156,9 +156,7 @@ namespace Backoffice.Utility.Repository
             }
             finally
             {
-                _logger.LogInformation("Finished Client Margin");
-
-                await Task.CompletedTask;
+                _logger.LogInformation($"{configTemplateId} Finished!");
             }
         }
 

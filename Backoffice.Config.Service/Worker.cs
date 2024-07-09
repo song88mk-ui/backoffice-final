@@ -64,7 +64,6 @@ namespace Backoffice.Config.Service
             catch (Exception ex)
             {
                 _logger.LogError($"Error: {ex.Message}");
-
             }
         }
     }

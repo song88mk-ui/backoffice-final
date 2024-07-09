@@ -6,6 +6,6 @@ namespace Backoffice.Utility.Repository
 {
     public interface IBackofficeRepository
     {
-        Task UpdateClientMargin(long configTemplateId, IMessageBroker messageBroker);
+        void UpdateClientMargin(long configTemplateId, IMessageBroker messageBroker);
     }
 }

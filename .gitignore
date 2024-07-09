@@ -19,3 +19,15 @@ Backoffice.Hub/bin
 /Backoffice.Web/logs
 Backoffice.Config.Service/bin
 Backoffice.Config.Service/obj
+/Backoffice.Config.Service/bin/Debug/netcoreapp3.1/Backoffice.Config.Service.dll
+/Backoffice.Config.Service/bin/Debug/netcoreapp3.1/Backoffice.Config.Service.exe
+/Backoffice.Config.Service/bin/Debug/netcoreapp3.1/Backoffice.Config.Service.pdb
+/Backoffice.Config.Service/bin/Debug/netcoreapp3.1/Backoffice.Shared.dll
+/Backoffice.Config.Service/bin/Debug/netcoreapp3.1/Backoffice.Shared.pdb
+/Backoffice.Config.Service/obj/Debug/netcoreapp3.1/Backoffice.Config.Service.AssemblyInfo.cs
+/Backoffice.Config.Service/obj/Debug/netcoreapp3.1/apphost.exe
+/Backoffice.Config.Service/obj/Debug/netcoreapp3.1/Backoffice.Config.Service.csproj.AssemblyReference.cache
+/Backoffice.Config.Service/obj/Debug/netcoreapp3.1/Backoffice.Config.Service.AssemblyInfoInputs.cache
+/Backoffice.Config.Service/obj/Debug/netcoreapp3.1/Backoffice.Config.Service.dll
+/Backoffice.Config.Service/obj/Debug/netcoreapp3.1/Backoffice.Config.Service.pdb
+/Backoffice.Config.Service/obj/Debug/netcoreapp3.1/Backoffice.Config.Service.sourcelink.json
