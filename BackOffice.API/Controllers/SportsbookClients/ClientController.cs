@@ -89,5 +89,18 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
 
+        [HttpGet("exchange/rates")]
+        public async Task<IActionResult> GetExchangeRates()
+        {
+            var result = await _backofficeRepository.GetExchangeRates();
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
     }
 }

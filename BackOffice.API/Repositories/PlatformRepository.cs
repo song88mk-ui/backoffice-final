@@ -114,6 +114,38 @@ namespace Backoffice.API.Repositories
 
         }
 
+        public async Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates(string region)
+        {
+            try
+            {
+                var response = await GetHttpClient(region).GetAsync($"v1/client/exchangerates");
+
+                if (response.IsSuccessStatusCode)
+                    return JsonConvert.DeserializeObject<BaseResponse<ExchangeRatesResponse>>(await response.Content.ReadAsStringAsync());
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonConvert.DeserializeObject<BaseResponse<ExchangeRatesResponse>>(await response.Content.ReadAsStringAsync());
+                    else
+                    {
+                        return new BaseResponse<ExchangeRatesResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ExchangeRatesResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+
+        }
         #endregion
 
         #region TOP LEAGUES

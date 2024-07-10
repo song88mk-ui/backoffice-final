@@ -12,6 +12,7 @@ namespace Backoffice.API.Repositories
         #region Client
         Task<BaseResponse<PlatformClientResponse>> AddOrUpdateClient(ClientRequest request, string region);
         Task<BaseResponse<StatusCode>> ProcessBackofficeClientBetConfig(AddOrUpdateBetConfigRequest request, string region);
+        Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates(string region);
         #endregion
 
         #region Top Fixture

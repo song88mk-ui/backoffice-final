@@ -18,6 +18,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<Dictionary<string, string>>> GetClientsByRegion(string clientIdRefs);
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
+        Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates();
         #region Config
         Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(string searchText, List<int> sportIds = null, List<int> scopeIds = null);
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long templateId);

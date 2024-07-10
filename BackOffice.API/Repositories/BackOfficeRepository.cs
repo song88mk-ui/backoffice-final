@@ -1355,6 +1355,23 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+
+        public async Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates()
+        {
+            try
+            {
+                return await _platformRepository.GetExchangeRates("HK");
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ExchangeRatesResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = null
+                };
+            }
+        }
         #endregion
 
         #region Config
