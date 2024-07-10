@@ -525,24 +525,36 @@ namespace Backoffice.Web.Components.SBC.Clients
                 var suggestedMinBet = GetExchangeRate(betSetting.CurrencyCode);
 
                 betSetting.BetSettingAllSports.MinPerTicket = suggestedMinBet;
-                //if (betSetting.BetSettingAllSports.MinPerTicket > betSetting.BetSettingAllSports.MaxPerTicket)
-                //    betSetting.BetSettingAllSports.MaxPerTicket = suggestedMinBet * 10;
+                if (betSetting.BetSettingAllSports.MinPerTicket > betSetting.BetSettingAllSports.MaxPerTicket)
+                {
+                    betSetting.BetSettingAllSports.MaxPerTicket = suggestedMinBet * 1000;
+                    betSetting.BetSettingAllSports.MaxPerGame = suggestedMinBet * 1000;
+                }
 
                 betSetting.BetSettingBetBuilder.MinStake = suggestedMinBet;
-                //if (betSetting.BetSettingBetBuilder.MinStake > betSetting.BetSettingBetBuilder.MaxStake)
-                //    betSetting.BetSettingBetBuilder.MaxStake = suggestedMinBet * 10;
+                if (betSetting.BetSettingBetBuilder.MinStake > betSetting.BetSettingBetBuilder.MaxStake)
+                    betSetting.BetSettingBetBuilder.MaxStake = suggestedMinBet * 1000;
 
                 betSetting.BetSettingCricket.MinPerTicket = suggestedMinBet;
-                //if(betSetting.BetSettingCricket.MinPerTicket > betSetting.BetSettingCricket.MaxPerTicket)
-                //    betSetting.BetSettingCricket.MaxPerTicket = suggestedMinBet * 10;
+                if (betSetting.BetSettingCricket.MinPerTicket > betSetting.BetSettingCricket.MaxPerTicket)
+                {
+                    betSetting.BetSettingCricket.MaxPerTicket = suggestedMinBet * 1000;
+                    betSetting.BetSettingCricket.MaxPerGame = suggestedMinBet * 1000;
+                }
 
                 betSetting.BetSettingSoccer.MinPerTicket = suggestedMinBet;
-                //if (betSetting.BetSettingSoccer.MinPerTicket > betSetting.BetSettingSoccer.MaxPerTicket)
-                //    betSetting.BetSettingSoccer.MaxPerTicket = suggestedMinBet * 10;
+                if (betSetting.BetSettingSoccer.MinPerTicket > betSetting.BetSettingSoccer.MaxPerTicket)
+                {
+                    betSetting.BetSettingSoccer.MaxPerTicket = suggestedMinBet * 1000;
+                    betSetting.BetSettingSoccer.MaxPerGame = suggestedMinBet * 1000;
+                }
 
                 betSetting.BetSettingParlay.MinPerTicket = suggestedMinBet;
-                //if (betSetting.BetSettingParlay.MinPerTicket > betSetting.BetSettingParlay.MaxPerTicket)
-                //    betSetting.BetSettingParlay.MaxPerTicket = suggestedMinBet * 10;
+                if (betSetting.BetSettingParlay.MinPerTicket > betSetting.BetSettingParlay.MaxPerTicket)
+                {
+                    betSetting.BetSettingParlay.MaxPerTicket = suggestedMinBet * 1000;
+                    betSetting.BetSettingParlay.MaxPayoutPerTicket = suggestedMinBet * 1000;
+                }
             }
 
         }
