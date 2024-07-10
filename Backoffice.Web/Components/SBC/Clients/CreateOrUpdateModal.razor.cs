@@ -24,6 +24,7 @@ namespace Backoffice.Web.Components.SBC.Clients
         public ClientListResponse.Client Client { get; set; }
         public SportsLookupModel RealSports { get; set; }
         public SportsLookupModel VirtualSports { get; set; }
+        public ExchangeRatesResponse ExchangeRates { get; set; }
 
         public bool monthlyFeeToggle { get; set; }
         public List<string> Currencies { get; set; }
@@ -74,7 +75,9 @@ namespace Backoffice.Web.Components.SBC.Clients
             Client = ModalParameters.TryGet<ClientListResponse.Client>("Client");
             RealSports = ModalParameters.TryGet<SportsLookupModel>("RealSports");
             VirtualSports = ModalParameters.TryGet<SportsLookupModel>("VirtualSports");
+            ExchangeRates = ModalParameters.TryGet<ExchangeRatesResponse>("ExchangeRates");
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
+
             Client.StatusId = IsEdit ? Client.StatusId : (int)ClientStatus.Normal;
             Client.StatusName = IsEdit ? Client.StatusName : ClientStatus.Normal.ToString();
             Client.Region = IsEdit ? Client.Region : "HK";
@@ -512,6 +515,38 @@ namespace Backoffice.Web.Components.SBC.Clients
 
         }
 
+        public async Task OnUpdateMinBetClickEvent()
+        {
+            if (IsPreload)
+                return;
+
+            foreach(var betSetting in Client.BetSettings)
+            {
+                var suggestedMinBet = GetExchangeRate(betSetting.CurrencyCode);
+
+                betSetting.BetSettingAllSports.MinPerTicket = suggestedMinBet;
+                //if (betSetting.BetSettingAllSports.MinPerTicket > betSetting.BetSettingAllSports.MaxPerTicket)
+                //    betSetting.BetSettingAllSports.MaxPerTicket = suggestedMinBet * 10;
+
+                betSetting.BetSettingBetBuilder.MinStake = suggestedMinBet;
+                //if (betSetting.BetSettingBetBuilder.MinStake > betSetting.BetSettingBetBuilder.MaxStake)
+                //    betSetting.BetSettingBetBuilder.MaxStake = suggestedMinBet * 10;
+
+                betSetting.BetSettingCricket.MinPerTicket = suggestedMinBet;
+                //if(betSetting.BetSettingCricket.MinPerTicket > betSetting.BetSettingCricket.MaxPerTicket)
+                //    betSetting.BetSettingCricket.MaxPerTicket = suggestedMinBet * 10;
+
+                betSetting.BetSettingSoccer.MinPerTicket = suggestedMinBet;
+                //if (betSetting.BetSettingSoccer.MinPerTicket > betSetting.BetSettingSoccer.MaxPerTicket)
+                //    betSetting.BetSettingSoccer.MaxPerTicket = suggestedMinBet * 10;
+
+                betSetting.BetSettingParlay.MinPerTicket = suggestedMinBet;
+                //if (betSetting.BetSettingParlay.MinPerTicket > betSetting.BetSettingParlay.MaxPerTicket)
+                //    betSetting.BetSettingParlay.MaxPerTicket = suggestedMinBet * 10;
+            }
+
+        }
+
         public async Task OnEmailNotifClicked(ChangeEventArgs e)
         {
             if (IsPreload)
@@ -869,32 +904,16 @@ namespace Backoffice.Web.Components.SBC.Clients
 
             if (Enum.TryParse<Currency>(currencyCode.ToUpper(), out var currency))
             {
-                var highValueArr = new Currency[] { Currency.KRW, Currency.VND, Currency.KHR, Currency.IDR, Currency.MMK };
-                var minValue100Arr = new Currency[] { Currency.CDF, Currency.TZS };
-                var minValue1Arr = new Currency[] { Currency.PKR };
-
-                if (highValueArr.Contains(currency))
-                {
-                    suggestedMinimumBet = 1000m;
-                }
-                else if (minValue100Arr.Contains(currency))
-                {
-                    suggestedMinimumBet = 100m;
-                }
-                else if (currency == Currency.BTC || currency == Currency.ETH)
-                {
-                    //suggestedMinimumBet = 0.000000010000m;
-                    suggestedMinimumBet = 0.00010000m; // FCI-6803
-                }
-                else if (minValue1Arr.Contains(currency))
-                {
-                    suggestedMinimumBet = 1m;
-                }
+                suggestedMinimumBet = GetExchangeRate(currencyCode);
             }
 
             return suggestedMinimumBet;
         }
 
+        private decimal GetExchangeRate(string currencyCode)
+        {
+            return ExchangeRates?.ExchangeRates?.FirstOrDefault(e => e.CurrencyCode == currencyCode)?.ExchangeRate ?? 0;
+        }
         #endregion
     }
 }

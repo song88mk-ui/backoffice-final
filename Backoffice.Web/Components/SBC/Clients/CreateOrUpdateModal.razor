@@ -599,8 +599,11 @@
             </div>
             <div class="bet-container">
                 <div class="row">
-                    <div class="col-md-12">
-                        <h6 class="title fw-bold ps-2 py-1">Bet Setting</h6>
+                    <div class="col-md-10">
+                            <h6 class="title fw-bold ps-2 py-1">Bet Setting</h6>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnUpdateMinBetClickEvent" disabled="@IsPreload">Update Min Bet</button>
                     </div>
                     <div class="col-md-12">
                         <div class="row">
