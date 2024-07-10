@@ -2179,33 +2179,7 @@ namespace Backoffice.API.Repositories
         {
             var currency = (Currency)Enum.Parse(typeof(Currency), currencyCode);
 
-            var suggestedMinimumBet = 1m;
-
-            var highValueArr = new Currency[] { Currency.KRW, Currency.VND, Currency.KHR, Currency.IDR, Currency.MMK };
-            var minValue100Arr = new Currency[] { Currency.CDF, Currency.TZS };
-            var minValue1Arr = new Currency[] { Currency.PKR };
-
-            if (highValueArr.Contains(currency))
-            {
-                suggestedMinimumBet = 1000m;
-            }
-            else if (minValue100Arr.Contains(currency))
-            {
-                suggestedMinimumBet = 100m;
-            }
-            else if (currency == Currency.BTC || currency == Currency.ETH)
-            {
-                //suggestedMinimumBet = 0.000000010000m;
-                suggestedMinimumBet = 0.00010000m; // FCI-6803
-            }
-            else if (minValue1Arr.Contains(currency))
-            {
-                suggestedMinimumBet = 1m;
-            }
-            else
-            {
-                suggestedMinimumBet = 0.02m;
-            }
+            var suggestedMinimumBet = await GetExchangeRate(currencyCode);
 
             return suggestedMinimumBet;
         }
@@ -2280,6 +2254,12 @@ namespace Backoffice.API.Repositories
         private List<Translation> GetTranslations()
         {
             return _memCache.GetCache("tr", () => _backofficeContext.Translation.AsNoTracking().ToList(), 24);
+        }
+
+        private async Task<decimal> GetExchangeRate(string currencyCode)
+        {
+            var exchangeRates = (await GetExchangeRates()).Result.ExchangeRates;
+            return exchangeRates?.FirstOrDefault(e => e.CurrencyCode == currencyCode)?.ExchangeRate ?? 0;
         }
         #endregion
     }
