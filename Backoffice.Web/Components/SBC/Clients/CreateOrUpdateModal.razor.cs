@@ -7,6 +7,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Serilog;
+using System.Globalization;
 using System.Text.Json;
 
 namespace Backoffice.Web.Components.SBC.Clients
@@ -50,6 +51,8 @@ namespace Backoffice.Web.Components.SBC.Clients
 
         const decimal maxInputVal = 100;
         private decimal inputWinnings;
+
+        private string[] cryptoCurrencies = new string[] { Currency.BTC.ToString(), Currency.ETH.ToString() };
 
         #endregion
 
@@ -524,40 +527,27 @@ namespace Backoffice.Web.Components.SBC.Clients
             {
                 var suggestedMinBet = GetExchangeRate(betSetting.CurrencyCode);
 
-                betSetting.BetSettingAllSports.MinPerTicket = suggestedMinBet;
-                if (betSetting.BetSettingAllSports.MinPerTicket > betSetting.BetSettingAllSports.MaxPerTicket)
-                {
-                    betSetting.BetSettingAllSports.MaxPerTicket = suggestedMinBet * 1000;
-                    betSetting.BetSettingAllSports.MaxPerGame = suggestedMinBet * 1000;
-                }
+                betSetting.BetSettingAllSports.MinPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet);
+                betSetting.BetSettingAllSports.MaxPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+                betSetting.BetSettingAllSports.MaxPerGame = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
 
-                betSetting.BetSettingBetBuilder.MinStake = suggestedMinBet;
-                if (betSetting.BetSettingBetBuilder.MinStake > betSetting.BetSettingBetBuilder.MaxStake)
-                    betSetting.BetSettingBetBuilder.MaxStake = suggestedMinBet * 1000;
+                betSetting.BetSettingBetBuilder.MinStake = Truncate(betSetting.CurrencyCode, suggestedMinBet);
+                betSetting.BetSettingBetBuilder.MaxStake = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
 
-                betSetting.BetSettingCricket.MinPerTicket = suggestedMinBet;
-                if (betSetting.BetSettingCricket.MinPerTicket > betSetting.BetSettingCricket.MaxPerTicket)
-                {
-                    betSetting.BetSettingCricket.MaxPerTicket = suggestedMinBet * 1000;
-                    betSetting.BetSettingCricket.MaxPerGame = suggestedMinBet * 1000;
-                }
+                betSetting.BetSettingCricket.MinPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet);
+                betSetting.BetSettingCricket.MaxPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+                betSetting.BetSettingCricket.MaxPerGame = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
 
-                betSetting.BetSettingSoccer.MinPerTicket = suggestedMinBet;
-                if (betSetting.BetSettingSoccer.MinPerTicket > betSetting.BetSettingSoccer.MaxPerTicket)
-                {
-                    betSetting.BetSettingSoccer.MaxPerTicket = suggestedMinBet * 1000;
-                    betSetting.BetSettingSoccer.MaxPerGame = suggestedMinBet * 1000;
-                }
+                betSetting.BetSettingSoccer.MinPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet);
+                betSetting.BetSettingSoccer.MaxPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+                betSetting.BetSettingSoccer.MaxPerGame = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
 
-                betSetting.BetSettingParlay.MinPerTicket = suggestedMinBet;
-                if (betSetting.BetSettingParlay.MinPerTicket > betSetting.BetSettingParlay.MaxPerTicket)
-                {
-                    betSetting.BetSettingParlay.MaxPerTicket = suggestedMinBet * 1000;
-                    betSetting.BetSettingParlay.MaxPayoutPerTicket = suggestedMinBet * 1000;
-                }
+                betSetting.BetSettingParlay.MinPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet);
+                betSetting.BetSettingParlay.MaxPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+                betSetting.BetSettingParlay.MaxPayoutPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
             }
-
         }
+
 
         public async Task OnEmailNotifClicked(ChangeEventArgs e)
         {
@@ -920,6 +910,37 @@ namespace Backoffice.Web.Components.SBC.Clients
             }
 
             return suggestedMinimumBet;
+        }
+
+
+        private decimal Truncate(string currencyCode, decimal value)
+        {
+
+            int places = 2;
+            var formatter = "N2";
+
+            if (cryptoCurrencies.Contains(currencyCode))
+            {
+                places = 12;
+                formatter = "N12";
+
+                var result = Truncate(value, places, formatter).TrimEnd('0').TrimEnd('.');
+                return Convert.ToDecimal(result.Split(".").LastOrDefault()?.Length <= 1 ? Truncate(value, 2, "N2") : result);
+            }
+
+            return Convert.ToDecimal(Truncate(value, places, formatter));
+        }
+
+        private string Truncate(decimal value, int places = 2, string formatter = "")
+        {
+            try
+            {
+                return (Math.Truncate(value * (decimal)Math.Pow(10, places)) / (decimal)Math.Pow(10, places)).ToString(formatter, CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return "0";
+            }
         }
 
         private decimal GetExchangeRate(string currencyCode)
