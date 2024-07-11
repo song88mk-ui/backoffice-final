@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
 using System.Text.Json;
@@ -31,6 +32,7 @@ namespace Backoffice.API.Repositories
         private readonly ITradingRepository _tradingRepository;
         private readonly IRabbitMqRepository _rabbitMqRepository;
         private readonly IMemCache _memCache;
+        private string[] cryptoCurrencies = new string[] { Currency.BTC.ToString(), Currency.ETH.ToString() };
 
         #endregion
 
@@ -2181,8 +2183,40 @@ namespace Backoffice.API.Repositories
 
             var suggestedMinimumBet = await GetExchangeRate(currencyCode);
 
-            return suggestedMinimumBet;
+            return Truncate(currencyCode, suggestedMinimumBet);
         }
+
+        private decimal Truncate(string currencyCode, decimal value)
+        {
+
+            int places = 2;
+            var formatter = "N2";
+
+            if (cryptoCurrencies.Contains(currencyCode))
+            {
+                places = 12;
+                formatter = "N12";
+
+                var result = Truncate(value, places, formatter).TrimEnd('0').TrimEnd('.');
+                return Convert.ToDecimal(result.Split(".").LastOrDefault()?.Length <= 1 ? Truncate(value, 2, "N2") : result);
+            }
+
+            return Convert.ToDecimal(Truncate(value, places, formatter));
+        }
+
+        private string Truncate(decimal value, int places = 2, string formatter = "")
+        {
+            try
+            {
+                return (Math.Truncate(value * (decimal)Math.Pow(10, places)) / (decimal)Math.Pow(10, places)).ToString(formatter, CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return "0";
+            }
+        }
+
+
         private List<ActivityLogModel> FilterManualSettlementLogs(List<ActivityLogModel> activityLogs, ManualBetSettlementCallbackModel callbackModel)
         {
             string[] clientIds = null;
