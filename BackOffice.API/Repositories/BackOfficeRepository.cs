@@ -1892,7 +1892,7 @@ namespace Backoffice.API.Repositories
 
                 await _backofficeContext.SaveChangesAsync();
 
-                var configTemplateIds = request.ConfigTemplateMargins.Select(s => s.ConfigTemplateId).Distinct();
+                var configTemplateIds = request.ConfigTemplateMargins.Select(s => s.ConfigTemplateId).Distinct().ToList();
 
                 foreach(var configTemplateId in configTemplateIds)
                 {
@@ -1904,7 +1904,6 @@ namespace Backoffice.API.Repositories
                         Payload = JsonSerializer.Serialize(configTemplateId)
                     });
                 }
-
 
                 return new BaseResponse<bool>()
                 {
