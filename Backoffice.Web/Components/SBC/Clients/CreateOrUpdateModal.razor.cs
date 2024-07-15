@@ -545,6 +545,8 @@ namespace Backoffice.Web.Components.SBC.Clients
                 betSetting.BetSettingParlay.MinPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet);
                 betSetting.BetSettingParlay.MaxPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
                 betSetting.BetSettingParlay.MaxPayoutPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+
+                betSetting.BetSettingPriceboost.MaxStake = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
             }
         }
 
