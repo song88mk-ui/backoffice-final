@@ -5,11 +5,11 @@
         <div class="alert @_alertClass text-left" role="alert" style="@(AlertModel.Opacity == 0 ? $"display: none;" : $"display: block;") opacity: {AlertModel.Opacity}">
             @if (IsHtmlMessage)
             {
-                @((MarkupString)AlertModel.Message)
+                @((MarkupString)(TranslationState.GetValue(AlertModel.Message)))
             }
             else
             {
-                @AlertModel.Message
+                @TranslationState.GetValue(AlertModel.Message)
             }
         </div>
     </div>

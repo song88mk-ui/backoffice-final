@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Services;
 using Microsoft.EntityFrameworkCore.Internal;
+using System.Text.RegularExpressions;
 
 namespace Backoffice.Web.States
 {
@@ -34,24 +35,49 @@ namespace Backoffice.Web.States
                 ReloadModel();
         }
 
-        public string GetValue(string word, string placeholder = "#", params int[] values)
+        public string GetValue(string word)
         {
-            var result = GetValue(word);
-            var index = -1;
-            var i = 0;
+            var key = word.Replace(" ", "_").ToLower();
+            var placeHolders = ExtractPlaceholders(ref key);
+            var translated = Model.TryGetValue(key, out string? value) ? value : word;
 
-            while ((index = result.IndexOf(placeholder)) != -1 && i < values.Length)
-            {
-                result = result.Substring(0, index) + values[i] + result.Substring(index + placeholder.Length);
-                i++;
-            }
+            if (placeHolders.Any() && translated.Contains("{&}"))
+                return TransformPlaceHolder(word, "{&}", placeHolders.ToArray());
 
-            return result;
+            return translated.Replace("{", "").Replace("}", "");
         }
-        public string GetValue(string word) => Model.TryGetValue(word.Replace(" ", "_").ToLower(), out string? value) ? value : word;
+
         private async void ReloadModel()
         {
             Model = await _translationService.GetTranslations(_activeLangCode);
+        }
+        private string TransformPlaceHolder(string word, string placeholder, params object[] values)
+        {
+            var index = -1;
+            var i = 0;
+
+            while ((index = word.IndexOf(placeholder)) != -1 && i < values.Length)
+            {
+                word = word.Substring(0, index) + values[i] + word.Substring(index + placeholder.Length);
+                i++;
+            }
+
+            return word;
+        }
+        public List<string> ExtractPlaceholders(ref string input)
+        {
+            List<string> result = new List<string>();
+            Regex regex = new Regex(@"\{(.*?)\}");
+
+            MatchCollection matches = regex.Matches(input);
+            foreach (Match match in matches)
+            {
+                var matchVal = $"{{{match.Groups[1].Value}}}";
+                input = input.Replace(matchVal, "{&}");
+                result.Add(matchVal);
+            }
+
+            return result;
         }
     }
 }

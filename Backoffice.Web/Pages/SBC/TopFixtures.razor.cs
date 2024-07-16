@@ -82,7 +82,7 @@ namespace Backoffice.Web.Pages.SBC
 
             var options = new ModalOptions();
 
-            ModalService.Open<EditModal>($"Set Top Fixtures of {topFixture.ClientName}", parameters, options);
+            ModalService.Open<EditModal>($"Set Top Fixtures of {{{topFixture.ClientName}}}", parameters, options);
         }
 
         public async Task OnCopyClickEvent(ClientTopFixtureModel.OrderedClientTopFixture topFixture)
@@ -95,7 +95,7 @@ namespace Backoffice.Web.Pages.SBC
 
             var options = new ModalOptions();
 
-            ModalService.Open<CopyModal>($"Copy {topFixture.ClientName} Top Fixtures Settings To", parameters, options);
+            ModalService.Open<CopyModal>($"Copy {{{topFixture.ClientName}}} Top Fixtures Settings To", parameters, options);
         }
 
         public async Task OnSaveClickEvent(object item)

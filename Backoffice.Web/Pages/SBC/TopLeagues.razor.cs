@@ -87,7 +87,7 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("SportName", FilterModel.SportName);
 
             var options = new ModalOptions();
-            ModalService.Open<EditModal>($"Set the Top Leagues of {model.ClientName} ({FilterModel.SportName})", parameters, options);
+            ModalService.Open<EditModal>($"Set the Top Leagues of {{{model.ClientName}}} ({{{FilterModel.SportName}}}})", parameters, options);
         }
 
         public async Task OnCopyClickEvent(ClientTopLeague model)
