@@ -47,10 +47,12 @@
             <div class="row h-100">
                 <div class="col-6 first-banner d-flex flex-column justify-content-center align-items-center">
                     <div class="first-header-text">
-                        @Model.ViewData["welcome_to"]
+                        @* @Model.ViewData["welcome_to"] *@
+                        Welcome To
                     </div>
                     <div class="second-header-text mb-3">
-                        @Model.ViewData["back_office"]
+                        @* @Model.ViewData["back_office"] *@
+                        Back Office
                     </div>
                     <div class="banner-icons">
                         <img src="icons/svg/login-banner-icons.svg" alt="login banner icons" />
@@ -67,7 +69,8 @@
                             </div>
                             <div class="row d-flex flex-column">
                                 <div class="title text-center mt-4 mb-0">
-                                    @ViewData["login"]
+                                    @* @ViewData["login"] *@
+                                    Login
                                 </div>
                                 <hr class="col-lg-5 col-md-7 col-sm-10 align-self-center title-break" />
                             </div>
@@ -76,17 +79,19 @@
                             <div class="login-body mb-3">
                                 <div class="mb-4">
                                     <label class="form-label">
-                                        @ViewData["username"]
+                                        @* @ViewData["username"] *@
+                                        Username
                                     </label>
-                                    @Html.TextBoxFor(m => m.UserModel.Username, new { @class = "form-control p-3", @placeholder = ViewData["enter_your_username"], @id = "username", @autocomplete = "off", @onchange = "" })
+                                    @Html.TextBoxFor(m => m.UserModel.Username, new { @class = "form-control p-3", @placeholder = "Enter your username", @id = "username", @autocomplete = "off", @onchange = "" })
                                     @Html.ValidationMessageFor(m => m.UserModel.Username)
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label">
-                                        @ViewData["login"]
+                                        @* @ViewData["login"] *@
+                                        Login
                                     </label>
                                     <div class="input-group">
-                                        @Html.TextBoxFor(m => m.UserModel.Password, new { @type = "password", @class = "form-control p-3 pe-5", @placeholder = ViewData["enter_your_password"], id = "password", autocomplete = "off" })
+                                        @Html.TextBoxFor(m => m.UserModel.Password, new { @type = "password", @class = "form-control p-3 pe-5", @placeholder = "Enter your username", id = "password", autocomplete = "off" })
                                         <button type="button" class="d-flex align-items-center position-absolute end-0 h-100 bg-transparent border-0 password-eye" onclick="password_show_hide();">
                                             <i class="fa fa-eye-slash text-center eye-icon" id="show_eye"></i>
                                             <i class="fa fa-eye d-none text-center eye-icon" id="hide_eye"></i>
@@ -105,14 +110,16 @@
                                     <div class="col-md-6">
                                         @Html.CheckBoxFor(m => m.IsSaveCookie, new {@class = "form-check-input m8e-1", @id="rememberMe" })
                                         <label class="form-check-label">
-                                            @ViewData["remember_information"]
+                                            @* @ViewData["remember_information"] *@
+                                            Remember Information
                                         </label>
                                     </div>
                                 </div>
                             </div>
                             <div class="login-footer">
                                 <button type="submit" class="d-block rounded-2 text-decoration-none text-center col-12 border-0">
-                                    @ViewData["login"]
+                                    @* @ViewData["login"] *@
+                                    Login
                                 </button>
                             </div>
                         </form>
