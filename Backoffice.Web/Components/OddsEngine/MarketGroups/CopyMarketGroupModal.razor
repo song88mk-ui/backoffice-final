@@ -33,10 +33,10 @@
         <div class="row mb-2">
             <div class="col-2"></div>
             <div class="col-10">
-                <select class="form-select" placeholder="Select Sport" @onchange="OnSportChangedEvent">
+                <select class="form-select" placeholder="@TranslationState.GetValue("Select Sport")" @onchange="OnSportChangedEvent">
                     @if (Sports != null)
                     {
-                        <option value="0" selected>Select Sport</option>
+                        <option value="0" selected>@TranslationState.GetValue("Select Sport")</option>
 
                         foreach (var sport in Sports)
                         {

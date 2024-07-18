@@ -39,8 +39,8 @@
                                     <th scope="col" class="th-checkbox">
                                         <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxSelectAllClickedEvent" />
                                     </th>
-                                    <th scope="col" class="text-start">Market Group Name</th>
-                                    <th scope="col">Markets</th>
+                                    <th scope="col" class="text-start">@TranslationState.GetValue("Market Group Name")</th>
+                                    <th scope="col">@TranslationState.GetValue("Markets")</th>
                                     <th scope="col">@TranslationState.GetValue("Manage")</th>
                                     <th scope="col"></th>
                                 </tr>

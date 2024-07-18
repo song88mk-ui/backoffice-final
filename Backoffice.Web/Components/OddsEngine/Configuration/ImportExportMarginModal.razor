@@ -50,7 +50,7 @@
         </div>
         <div class="d-block">
             <select class="form-select export-select" multiple="multiple">
-                <option value="0" selected>All Sports</option>
+                <option value="0" selected>@TranslationState.GetValue("All Sports")</option>
                 @foreach(var sport in Sports)
                 {
                     <option value="@sport.Value">@sport.Name</option>

@@ -2,7 +2,7 @@
     @if (Items != null && Items.Any())
     {
         <li>
-            <input class="w-100 border p-2 px-3 search-text" placeholder="Select Template" @onchange="OnSearchTextChanged" />
+            <input class="w-100 border p-2 px-3 search-text" placeholder="@TranslationState.GetValue("Select Template")" @onchange="OnSearchTextChanged" />
         </li>
         foreach (var item in Items.Where(x => x.Name.ToUpper().Contains(SearchText.ToUpper())))
         {

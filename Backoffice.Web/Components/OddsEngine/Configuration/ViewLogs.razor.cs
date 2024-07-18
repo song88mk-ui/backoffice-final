@@ -134,10 +134,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 if (status == "oldValue")
                 {
                     if (configLogs.OldPrematchSettings != configLogs.NewPrematchSettings)
-                        value.Append($"<b>Prematch</b><br/>{Format(configLogs.OldPrematchSettings)}</br>");
+                        value.Append($"<b>{@TranslationState.GetValue("Prematch")}</b><br/>{Format(configLogs.OldPrematchSettings)}</br>");
 
                     if (configLogs.OldLiveSettings != configLogs.NewLiveSettings)
-                        value.Append($"<b>Live</b></br>{Format(configLogs.OldLiveSettings)}</br>");
+                        value.Append($"<b>{@TranslationState.GetValue("Live")}}</b></br>{Format(configLogs.OldLiveSettings)}</br>");
 
                     if (configLogs.OldStatus != configLogs.NewStatus)
                         value.Append($"<b>Market Status</b></br>{(configLogs.OldStatus == true ? "Active" : "Inactive")}");
@@ -145,10 +145,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 else
                 {
                     if (configLogs.OldPrematchSettings != configLogs.NewPrematchSettings)
-                        value.Append($"<b>Prematch</b></br>{Format(configLogs.NewPrematchSettings)}</br>");
+                        value.Append($"<b>{@TranslationState.GetValue("Prematch")}</b></br>{Format(configLogs.NewPrematchSettings)}</br>");
 
                     if (configLogs.OldLiveSettings != configLogs.NewLiveSettings)
-                        value.Append($"<b>Live</b></br>{Format(configLogs.NewLiveSettings)}</br>");
+                        value.Append($"<b>{@TranslationState.GetValue("Live")}}</b></br>{Format(configLogs.NewLiveSettings)}</br>");
 
                     if (configLogs.OldStatus != configLogs.NewStatus)
                         value.Append($"<b>Market Status</b></br>{(configLogs.NewStatus == true ? "Active" : "Inactive")}");

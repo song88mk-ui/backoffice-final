@@ -376,7 +376,7 @@
                                             //fixed
                                             <div class="d-flex justify-content-around">
                                                 <div class="p-2">
-                                                    <label class="form-label" for="sportsBookDropdown">Sportsbook</label>
+                                                    <label class="form-label" for="sportsBookDropdown">@TranslationState.GetValue("Sportsbook")</label>
                                                     <select class="form-control form-select" aria-label="Sportsbook Dropdown" id="sportsBookDropdown" @onchange="OnRevenueSportsbookClicked">
                                                         @for (int i = 0; i <= 100; i++)
                                                         {
@@ -424,7 +424,7 @@
                                                         {
                                                             <input type="radio" class="btn-check" name="tierOptions" id="sportsBookOption" @onchange="(e) => OnSportsbookTierOptionClicked(e)" />
                                                         }
-                                                        <label class="btn modalTab" for="sportsBookOption">Sportsbook</label>
+                                                        <label class="btn modalTab" for="sportsBookOption">@TranslationState.GetValue("Sportsbook")</label>
                                                     </div>
                                                     <div>
                                                         @if (SportsbookTierOption)

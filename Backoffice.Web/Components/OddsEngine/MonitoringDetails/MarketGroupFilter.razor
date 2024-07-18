@@ -12,7 +12,7 @@
     <div class="input-container d-flex flex-row-reverse align-items-end">
         <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
             <div class="input-group">
-                <InputText id="search" placeholder="Find" class="form-control search-text valid border-end-0" @bind-Value="SearchForm.SearchText" />
+                <InputText id="search" placeholder="@TranslationState.GetValue("Find")" class="form-control search-text valid border-end-0" @bind-Value="SearchForm.SearchText" />
                 <span class="input-group-text border-start-0">
                     <i class="fa fa-search"></i>
                 </span>

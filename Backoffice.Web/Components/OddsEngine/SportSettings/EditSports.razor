@@ -2,7 +2,7 @@
     <div class="d-flex flex-column sportstree-container py-3 me-2">
         <div class="d-flex justify-content-between mx-3 mb-3">
             <div>
-                <span class="fw-bold sports-tree-title">Sports Tree</span>
+                <span class="fw-bold sports-tree-title">@TranslationState.GetValue("Sports Tree")</span>
             </div>
             <div class="d-flex justify-content-end">
                 <button class="bg-transparent px-2 border-0 clear-selection-btn" disabled="@(!selectedSportIds.Any())" @onclick="OnClearSportsSelectionClick">Clear Selection</button>
@@ -35,7 +35,7 @@
 <div class="col main-container d-flex flex-column">
     <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
         <div class="input-group mb-3">
-            <InputText id="search" placeholder="Find Sports" class="form-control border-end-0" @bind-Value="_searchForm.SearchText" />
+            <InputText id="search" placeholder="@TranslationState.GetValue("Find Sports")" class="form-control border-end-0" @bind-Value="_searchForm.SearchText" />
             <span class="input-group-text border-start-0">
                 <i class="fa fa-search" />
             </span>
@@ -44,7 +44,7 @@
     <div class="all-sports-container flex-column d-flex rounded justify-content-between py-3">
         <div class="d-flex justify-content-between mx-3 mb-3">
             <div class="d-flex flex-column justify-content-center">
-                <span class="fw-bold sports-tree-title">All Sports</span>
+                <span class="fw-bold sports-tree-title">@TranslationState.GetValue("All Sports")</span>
             </div>
             <div class="d-flex justify-content-end">
                 <button class="bg-transparent px-2 border-0 clear-selection-btn" disabled="@(!_hasChanges)" @onclick="OnClearSelectionClick">Clear Selection</button>

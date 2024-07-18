@@ -5,7 +5,7 @@
             <div class="d-flex justify-content-between m-4">
 
                 <div>
-                    <h4 class="page-title">@PageTitle</h4>
+                    <h4 class="page-title">@TranslationState.GetValue(PageTitle)</h4>
                 </div>
 
                 <div>
@@ -23,7 +23,7 @@
                     <div class="input-container d-flex">
                         <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                             <div class="input-group">
-                                <InputText id="search" placeholder="Find" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
+                                <InputText id="search" placeholder="@TranslationState.GetValue("Find")" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
                                 <button class="input-group-text border-start-0">
                                     <i class="fa fa-search"></i>
                                 </button>
@@ -32,7 +32,7 @@
                     </div>
 
                     <select class="form-select" @onchange="OnSportChangedEvent">
-                        <option value="-1" selected="@SelectedSportId == -1">All Sports</option>
+                        <option value="-1" selected="@SelectedSportId == -1">@TranslationState.GetValue("All Sports")</option>
                         @if (Sports.Any())
                         {
                             @foreach (var item in Sports)
@@ -88,10 +88,10 @@
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th class="px-4" scope="col">Template Name</th>
+                            <th class="px-4" scope="col">@TranslationState.GetValue("Template Name")</th>
                             <th class="px-4" scope="col">@TranslationState.GetValue("Sports")</th>
-                            <th class="text-center" scope="col">Client Assigned</th>
-                            <th class="text-center" scope="col">League Assigned</th>
+                            <th class="text-center" scope="col">@TranslationState.GetValue("Client Assigned")</th>
+                            <th class="text-center" scope="col">@TranslationState.GetValue("League Assigned")</th>
                             <th class="text-center" scope="col">@TranslationState.GetValue("Date Created")</th>
                             <th class="text-center" scope="col">@TranslationState.GetValue("Manage")</th>
                         </tr>

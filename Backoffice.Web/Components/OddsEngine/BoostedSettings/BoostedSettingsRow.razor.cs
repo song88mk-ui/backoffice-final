@@ -52,7 +52,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                 parameters.Add("DialogStyle", "max-width: 80%; overflow-y: initial !important");
 
                 var options = new ModalOptions();
-                ModalService.Open<ViewLogsBoostedSettingModalBody>($"View Logs for {client.ClientName}", parameters, options);
+                ModalService.Open<ViewLogsBoostedSettingModalBody>($"View Logs for {{{client.ClientName}}}", parameters, options);
             }
             catch (Exception ex)
             {

@@ -16,5 +16,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn modal-btn cancel-btn" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@_isPreload">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn confirm-btn" data-bs-dismiss="modal" @onclick="OnConfirmClickEvent" disabled="@_isPreload">Confirm</button>
+    <button type="button" class="btn modal-btn confirm-btn" data-bs-dismiss="modal" @onclick="OnConfirmClickEvent" disabled="@_isPreload">@TranslationState.GetValue("Confirm")</button>
 </div>

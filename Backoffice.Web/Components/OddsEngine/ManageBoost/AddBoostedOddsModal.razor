@@ -19,7 +19,7 @@
         <div class="col-6">
             <label for="sportSelect" class="form-label">@TranslationState.GetValue("Sports")</label>
             <select class="form-select" id="sportSelect" @onchange="OnSportSelectChanged">
-                <option value="0">Select Sport</option>
+                <option value="0">@TranslationState.GetValue("Select Sport")</option>
                 @foreach (var item in Model.Sports)
                 {
                     if (Model.SportId == item.Value)
@@ -91,7 +91,7 @@
 
     <div class="row mb-3">
         <div class="col-6">
-            <label for="marketSelect" class="form-label">Market</label>
+            <label for="marketSelect" class="form-label">@TranslationState.GetValue("Market")</label>
             <select class="form-select" id="marketSelect" @onchange="OnMarketSelectChanged">                
                 <option value="">Select Market</option>
                 @foreach (var item in Model.Markets)

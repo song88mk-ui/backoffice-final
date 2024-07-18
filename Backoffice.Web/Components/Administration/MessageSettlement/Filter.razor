@@ -31,7 +31,7 @@
                 <div class="col-2 me-2">
                     <select class="form-select d-block" @onchange="OnSportChangedEvent">
                         <optgroup label="Sport">
-                            <option value="0" selected>All Sports</option>
+                            <option value="0" selected>@TranslationState.GetValue("All Sports")</option>
                         </optgroup>
                         @if (Sports != null && Sports.Any())
                         {

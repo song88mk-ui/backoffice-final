@@ -22,6 +22,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button class="btn modal-btn modal-cancel" type="button" @onclick="OnModalCancel" disabled="@IsPreload">Cancel</button>
-    <button class="btn modal-btn modal-confirm" type="button" @onclick="OnModalConfirm" disabled="@IsPreload">Confirm</button>
+    <button class="btn modal-btn modal-cancel" type="button" @onclick="OnModalCancel" disabled="@IsPreload">@TranslationState.GetValue("Cancel")</button>
+    <button class="btn modal-btn modal-confirm" type="button" @onclick="OnModalConfirm" disabled="@IsPreload">@TranslationState.GetValue("Confirm")</button>
 </div>

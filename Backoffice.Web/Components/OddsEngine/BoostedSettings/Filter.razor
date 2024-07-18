@@ -2,7 +2,7 @@
     <div class="input-container d-flex">
         <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
             <div class="input-group">
-                <InputText id="search" placeholder="Find Client" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText"/>
+                <InputText id="search" placeholder="@TranslationState.GetValue("Find Client")" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
                 <button class="input-group-text border-start-0">
                     <i class="fa fa-search"></i>
                 </button>

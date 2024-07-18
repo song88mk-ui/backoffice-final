@@ -45,7 +45,7 @@
                             else if (_currentEditPage == EditSportSettingsPage.SegmentAndLeagues)
                             {
                                 <div class="mb-2">
-                                    <h6 class="fw-bold">Sports Tree</h6>
+                                    <h6 class="fw-bold">@TranslationState.GetValue("Sports Tree")</h6>
                                 </div>
 
                                 <EditSegmentLeagues @bind-SportSettings="_editedSportSettings" OnValueHadChanged="e => _hasChanges = e" />

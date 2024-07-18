@@ -1,6 +1,6 @@
 ﻿<div class="d-flex py-2 pe-2 mx-3 mt-2 align-items-center timeline-axis">
     <div class="timeline-axis-line"></div>
-    <span class="timeline-axis-label label-prematch">Prematch</span>    
+    <span class="timeline-axis-label label-prematch">@TranslationState.GetValue("Prematch")</span>
 
     @foreach(var setting in PrematchSettings.Settings)
     {
@@ -34,5 +34,5 @@
     }
 
     
-    <span class="timeline-axis-label label-kickoff">Kick Off</span>
+    <span class="timeline-axis-label label-kickoff">@TranslationState.GetValue("Kick Off")</span>
 </div>

@@ -7,7 +7,7 @@
         <AlertMessage AlertClass="mx-3" AlertModel="@_alertModel"></AlertMessage>
         <div class="d-flex justify-content-between m-4">
             <div>
-                <h4 class="page-title">@_pageTitle</h4>
+                <h4 class="page-title">@TranslationState.GetValue(_pageTitle)</h4>
             </div>
         </div>
         <div id="selectedLeagueWrapper" style="display: none">
@@ -69,7 +69,7 @@
             <div class="input-container d-flex">
                 <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                     <div class="input-group">
-                        <InputText id="search" placeholder="Find Client" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
+                        <InputText id="search" placeholder="@TranslationState.GetValue("Find Client")" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
                         <button class="input-group-text border-start-0">
                             <i class="fa fa-search"></i>
                         </button>
@@ -94,13 +94,13 @@
                     </AuthorizeView>
                     <th class="index" scope="col" rowspan="2">@TranslationState.GetValue("No.")</th>
                     <th class="filter" scope="col" rowspan="2">@TranslationState.GetValue("Client name")</th>
-                    <th class="filter" scope="col" rowspan="2">Sport</th>
-                    <th class="template" scope="col" rowspan="2">League Name</th>
-                    <th class="template" scope="col" colspan="2">Template</th>
+                    <th class="filter" scope="col" rowspan="2">@TranslationState.GetValue("Sport")</th>
+                    <th class="template" scope="col" rowspan="2">@TranslationState.GetValue("League Name")</th>
+                    <th class="template" scope="col" colspan="2">@TranslationState.GetValue("Template")</th>
                 </tr>
                 <tr>
-                    <th class="template" scope="col">Prematch</th>
-                    <th class="template" scope="col">Live</th>
+                    <th class="template" scope="col">@TranslationState.GetValue("Prematch")</th>
+                    <th class="template" scope="col">@TranslationState.GetValue("Live")</th>
                 </tr>
             </thead>
 

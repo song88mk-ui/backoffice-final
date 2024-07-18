@@ -11,7 +11,7 @@
     <div class="col-4 position-relative">
         @*<EditForm class="f-right" Model="FilterModel" OnValidSubmit="OnSubmitClickEvent">
         <div class="right-icon-control">
-        <InputText id="search" class="form-control search-text" placeholder="Search Here..." @bind-Value="FilterModel.SearchText" />
+        <InputText id="search" class="form-control search-text" placeholder="@TranslationState.GetValue("Search Here")..." @bind-Value="FilterModel.SearchText" />
         <div class="form-icon"> <i class="feather icon-search"></i> </div>
         </div>
         </EditForm>*@

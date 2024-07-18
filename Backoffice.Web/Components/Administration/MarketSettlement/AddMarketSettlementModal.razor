@@ -85,7 +85,7 @@
                                 </td>
                                 <td valign="middle" align="left">
                                     <select class="form-select input-sm" name="Status" @onchange="(e) => OnAddStatusChange(e, marketSelection.RowCount)">
-                                        <option value="0">Select Status</option>
+                                        <option value="0">@TranslationState.GetValue("Select Status")</option>
                                         @foreach (var item in marketSelection.Statuses)
                                         {
                                             if (item.Value == marketSelection.ToStatus)

@@ -9,7 +9,7 @@
     <div class="col-4 position-relative">
         <EditForm class="f-right" Model="ConfigLogsFilterModel" OnValidSubmit="OnSubmitClickEvent">
             <div class="right-icon-control">
-                <InputText id="search" class="form-control search-text" placeholder="Search Here..." @bind-Value="ConfigLogsFilterModel.Filter" />
+                <InputText id="search" class="form-control search-text" placeholder="@TranslationState.GetValue("Search Here")..." @bind-Value="ConfigLogsFilterModel.Filter" />
                 <div class="form-icon"> <i class="feather icon-search"></i> </div>
             </div>
         </EditForm>

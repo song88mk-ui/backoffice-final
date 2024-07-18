@@ -11,7 +11,7 @@
             <div class="form-group">
                 <EditForm class="f-right form-group" Model="SearchForm" OnValidSubmit="OnSubmitClickEvent" Context="FormContext">
                     <div class="right-icon-control">
-                        <InputText id="search" class="form-control search-text" placeholder="Search Here..." @bind-Value="SearchForm.SearchText" />
+                        <InputText id="search" class="form-control search-text" placeholder="@TranslationState.GetValue("Search Here")..." @bind-Value="SearchForm.SearchText" />
                         <div class="form-icon"> <i class="feather icon-search"></i> </div>
                     </div>
                 </EditForm>

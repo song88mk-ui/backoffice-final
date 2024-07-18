@@ -7,7 +7,7 @@
     {
         <div class="container px-3 pb-4 border-bottom">
             <div class="mb-2 d-flex justify-content-between">
-                <label class="text-secondary fw-bold">Leagues Selected</label>
+                <label class="text-secondary fw-bold">@TranslationState.GetValue("Leagues selected")</label>
 
                 <a href="javascript:void(0)" @onclick="OnShowAllClickedEvent">@(!IsShowAll ? "Show All" : "Show Less")</a>
             </div>
@@ -28,7 +28,7 @@
             </div>
         </div>
         <div class="d-flex my-3 ms-2">
-            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">Prematch</label>
+            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">@TranslationState.GetValue("Prematch")</label>
             <div class="col col-sm-10">
                 <div class="dropdown">
                     <button class="btn w-100 form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -38,7 +38,7 @@
                         }
                         else
                         {
-                            <span class="template-name-italic">Select Template</span>
+                            <span class="template-name-italic">@TranslationState.GetValue("Select Template")</span>
                         }
                     </button>
                     @if (PrematchTemplates != null && PrematchTemplates.Any())
@@ -49,7 +49,7 @@
             </div>            
         </div>
         <div class="d-flex my-3 ms-2">
-            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">Live</label>
+            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">@TranslationState.GetValue("Live")</label>
             <div class="col col-sm-10">
                 <div class="dropdown">
                     <button class="btn w-100 form-select dropdown-toggle" type="button" id="live-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -59,7 +59,7 @@
                         }
                         else
                         {
-                            <span class="template-name-italic">Select Template</span>
+                            <span class="template-name-italic">@TranslationState.GetValue("Select Template")</span>
                         }
                     </button>
                     @if (LiveTemplates != null && LiveTemplates.Any())
