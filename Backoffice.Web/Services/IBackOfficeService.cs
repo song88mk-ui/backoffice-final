@@ -20,6 +20,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);
+        Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates();
         Task<BaseResponse<ClientTopFixtureModel>> GetClientTopFixtures(GetClientTopFixtureRequest request);
         Task<BaseResponse<PlatformMessageModel>> PostClientTopFixtures(PostClientTopFixtureRequest request);
         Task<BaseResponse<bool>> CopyClientTopFixtures(CopyClientTopFixtureRequest request);

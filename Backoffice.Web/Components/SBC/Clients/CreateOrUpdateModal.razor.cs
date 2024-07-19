@@ -7,6 +7,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Serilog;
+using System.Globalization;
 using System.Text.Json;
 
 namespace Backoffice.Web.Components.SBC.Clients
@@ -24,6 +25,7 @@ namespace Backoffice.Web.Components.SBC.Clients
         public ClientListResponse.Client Client { get; set; }
         public SportsLookupModel RealSports { get; set; }
         public SportsLookupModel VirtualSports { get; set; }
+        public ExchangeRatesResponse ExchangeRates { get; set; }
 
         public bool monthlyFeeToggle { get; set; }
         public List<string> Currencies { get; set; }
@@ -50,6 +52,8 @@ namespace Backoffice.Web.Components.SBC.Clients
         const decimal maxInputVal = 100;
         private decimal inputWinnings;
 
+        private string[] cryptoCurrencies = new string[] { Currency.BTC.ToString(), Currency.ETH.ToString() };
+
         #endregion
 
         #region Methods
@@ -74,7 +78,9 @@ namespace Backoffice.Web.Components.SBC.Clients
             Client = ModalParameters.TryGet<ClientListResponse.Client>("Client");
             RealSports = ModalParameters.TryGet<SportsLookupModel>("RealSports");
             VirtualSports = ModalParameters.TryGet<SportsLookupModel>("VirtualSports");
+            ExchangeRates = ModalParameters.TryGet<ExchangeRatesResponse>("ExchangeRates");
             IsEdit = ModalParameters.TryGet<bool>("IsEdit");
+
             Client.StatusId = IsEdit ? Client.StatusId : (int)ClientStatus.Normal;
             Client.StatusName = IsEdit ? Client.StatusName : ClientStatus.Normal.ToString();
             Client.Region = IsEdit ? Client.Region : "HK";
@@ -512,6 +518,39 @@ namespace Backoffice.Web.Components.SBC.Clients
 
         }
 
+        public async Task OnApplyBaseSettingsClickEvent()
+        {
+            if (IsPreload)
+                return;
+
+            foreach(var betSetting in Client.BetSettings)
+            {
+                var suggestedMinBet = GetExchangeRate(betSetting.CurrencyCode);
+
+                betSetting.BetSettingAllSports.MinPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet);
+                betSetting.BetSettingAllSports.MaxPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+                betSetting.BetSettingAllSports.MaxPerGame = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+
+                betSetting.BetSettingBetBuilder.MinStake = Truncate(betSetting.CurrencyCode, suggestedMinBet);
+                betSetting.BetSettingBetBuilder.MaxStake = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+
+                betSetting.BetSettingCricket.MinPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet);
+                betSetting.BetSettingCricket.MaxPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+                betSetting.BetSettingCricket.MaxPerGame = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+
+                betSetting.BetSettingSoccer.MinPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet);
+                betSetting.BetSettingSoccer.MaxPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+                betSetting.BetSettingSoccer.MaxPerGame = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+
+                betSetting.BetSettingParlay.MinPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet);
+                betSetting.BetSettingParlay.MaxPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+                betSetting.BetSettingParlay.MaxPayoutPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+
+                betSetting.BetSettingPriceboost.MaxStake = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
+            }
+        }
+
+
         public async Task OnEmailNotifClicked(ChangeEventArgs e)
         {
             if (IsPreload)
@@ -869,32 +908,47 @@ namespace Backoffice.Web.Components.SBC.Clients
 
             if (Enum.TryParse<Currency>(currencyCode.ToUpper(), out var currency))
             {
-                var highValueArr = new Currency[] { Currency.KRW, Currency.VND, Currency.KHR, Currency.IDR, Currency.MMK };
-                var minValue100Arr = new Currency[] { Currency.CDF, Currency.TZS };
-                var minValue1Arr = new Currency[] { Currency.PKR };
-
-                if (highValueArr.Contains(currency))
-                {
-                    suggestedMinimumBet = 1000m;
-                }
-                else if (minValue100Arr.Contains(currency))
-                {
-                    suggestedMinimumBet = 100m;
-                }
-                else if (currency == Currency.BTC || currency == Currency.ETH)
-                {
-                    //suggestedMinimumBet = 0.000000010000m;
-                    suggestedMinimumBet = 0.00010000m; // FCI-6803
-                }
-                else if (minValue1Arr.Contains(currency))
-                {
-                    suggestedMinimumBet = 1m;
-                }
+                suggestedMinimumBet = GetExchangeRate(currencyCode);
             }
 
             return suggestedMinimumBet;
         }
 
+
+        private decimal Truncate(string currencyCode, decimal value)
+        {
+
+            int places = 2;
+            var formatter = "N2";
+
+            if (cryptoCurrencies.Contains(currencyCode))
+            {
+                places = 12;
+                formatter = "N12";
+
+                var result = Truncate(value, places, formatter).TrimEnd('0').TrimEnd('.');
+                return Convert.ToDecimal(result.Split(".").LastOrDefault()?.Length <= 1 ? Truncate(value, 2, "N2") : result);
+            }
+
+            return Convert.ToDecimal(Truncate(value, places, formatter));
+        }
+
+        private string Truncate(decimal value, int places = 2, string formatter = "")
+        {
+            try
+            {
+                return (Math.Truncate(value * (decimal)Math.Pow(10, places)) / (decimal)Math.Pow(10, places)).ToString(formatter, CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return "0";
+            }
+        }
+
+        private decimal GetExchangeRate(string currencyCode)
+        {
+            return ExchangeRates?.ExchangeRates?.FirstOrDefault(e => e.CurrencyCode == currencyCode)?.ExchangeRate ?? 0;
+        }
         #endregion
     }
 }
