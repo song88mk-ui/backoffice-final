@@ -518,7 +518,7 @@ namespace Backoffice.Web.Components.SBC.Clients
 
         }
 
-        public async Task OnUpdateMinBetClickEvent()
+        public async Task OnApplyBaseSettingsClickEvent()
         {
             if (IsPreload)
                 return;
