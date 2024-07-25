@@ -164,6 +164,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
                 if (selections.Any())
                 {
+                    AddMarketSettlement.AddMarketSettlementSelections.Clear();
+
                     foreach (var selection in selections)
                     {
                         AddMarketSettlement.AddMarketSettlementSelections.Add(new AddMarketSettlementSelectionModel()
@@ -327,7 +329,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 if (!fixtureList.Any(f => f.Item1 == row.FixtureId))
                     fixtureList.Add(new Tuple<string, int, string, string, List<SelectionSettlementMessage>>(row.FixtureId, row.SportId, row.ProviderFixtureId, row.FixtureSpecifier, new List<SelectionSettlementMessage>()));
 
-                var marketSpecifier = string.Empty;
+                var marketSpecifier = row.MarketSpecifier;
                 if (string.IsNullOrEmpty(row.MarketSpecifier) && row.SelectionSpecifier.Contains("?"))
                     marketSpecifier = row.SelectionSpecifier.Split("?").LastOrDefault();
 
