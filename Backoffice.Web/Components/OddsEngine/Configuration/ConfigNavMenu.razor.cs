@@ -30,9 +30,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #endregion
 
         private CancellationTokenSource _cancellationTokenSource;
-        private string _myTemplatesCount;
-        private string _assignedLeaguesCount;
-        public string _unAssignedLeaguesCount;
 
         #region Methods                                          
         protected override async Task OnInitializedAsync()
@@ -46,18 +43,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             AssignedLeaguesCount = -1;
             UnAssignedLeaguesCount = -1;
             await SelectConfigNavMenuCallback.InvokeAsync(CurrentMenu);
-        }
-
-        protected override async Task OnParametersSetAsync()
-        {
-            if (MyTemplatesCount.ToString() != _myTemplatesCount)
-                _myTemplatesCount = (MyTemplatesCount is null ? "Calculating..." : (MyTemplatesCount < 0 ? "Error..." : MyTemplatesCount.ToString()));
-            if (AssignedLeaguesCount.ToString() != _assignedLeaguesCount)
-                _assignedLeaguesCount = (AssignedLeaguesCount is null ? "Calculating..." : (AssignedLeaguesCount < 0 ? "Error..." : AssignedLeaguesCount.ToString()));
-            if (UnAssignedLeaguesCount.ToString() != _unAssignedLeaguesCount)
-                _unAssignedLeaguesCount = (UnAssignedLeaguesCount is null ? "Calculating..." : (UnAssignedLeaguesCount < 0 ? "Error..." : UnAssignedLeaguesCount.ToString()));
-
-            await Task.CompletedTask;
         }
 
         public async Task OnSelectConfigNavMenu(ConfigTemplateNavMenu configNavMenu)

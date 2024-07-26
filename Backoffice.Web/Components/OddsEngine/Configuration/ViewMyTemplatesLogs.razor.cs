@@ -93,14 +93,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             if (activityLog.Activity == Activity.Create.ToString())
             {
-                stringBuilder.Append($"<td class=\"px-4\">Added New Template</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{TranslationState.GetValue("Added New Template")}</td>");
                 stringBuilder.Append($"<td class=\"px-4\">{activityLog.From}</td>");
                 var toPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.To);
                 stringBuilder.Append($"<td class=\"px-4\">{toPaylaod?.Name ?? "-"}</td>");
             }
             else if (activityLog.Activity == Activity.Delete.ToString())
             {
-                stringBuilder.Append($"<td class=\"px-4\">Deleted Template</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{TranslationState.GetValue("Deleted Template")}</td>");
                 var fromPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.From);
                 stringBuilder.Append($"<td class=\"px-4\">{fromPaylaod?.Name ?? "-"}</td>");
                 stringBuilder.Append($"<td class=\"px-4\">{activityLog.To}</td>");

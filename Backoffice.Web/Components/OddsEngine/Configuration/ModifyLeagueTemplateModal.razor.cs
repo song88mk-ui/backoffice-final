@@ -384,13 +384,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     var message = "";
                     if (state == ConfigState.UnAssigned)
                     {
-                        message = "Template successfully removed. Selected leagues have been moved to the 'Unassigned' page.";
-                        // message = $"success_remove_template_message
+                        //message = "Template successfully removed. Selected leagues have been moved to the 'Unassigned' page.";
+                        message = $"success_remove_template_message";
                     }
                     else
                     {
-                        message = $"{_prematchSelectedItem?.Name ?? ""} template has successfully been assigned to selected leagues.";
-                        // message = $"success_save_template_message";
+                        //message = $"{_prematchSelectedItem?.Name ?? ""} template has successfully been assigned to selected leagues.";
+                        message = $"success_save_template_message";
                     }
                     _alertModel = new()
                     {

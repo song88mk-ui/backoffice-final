@@ -275,7 +275,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 _alert = new()
                 {
                     Status = AlertStatus.Success,
-                    Message = $"{TranslationState.GetValue("Top League Saved")}!"
+                    Message = "Top League Saved!"
                 };
 
                 await InvokeAsync(StateHasChanged);

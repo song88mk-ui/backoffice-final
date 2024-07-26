@@ -52,7 +52,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                     {
                         IsSelected = false,
                         ClientId = string.Empty,
-                        ClientName = "No Clients Available"
+                        ClientName = TranslationState.GetValue("No Clients Available")
                     });
             }
             catch (Exception ex)

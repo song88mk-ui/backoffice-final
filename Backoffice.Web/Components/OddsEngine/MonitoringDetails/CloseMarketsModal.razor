@@ -57,7 +57,7 @@
                                 var isAllChecked = Markets.Any(m => m.MarketStatusId != 1) ? false : true;
                             }
                             <th class="th-width px-4 py-3"><input type="checkbox" checked="@isAllChecked" /></th>
-                            <th class="align-middle">Market Name</th>
+                            <th class="align-middle">@TranslationState.GetValue("Market Name")</th>
                         </tr>
                     </thead>
                     <tbody>

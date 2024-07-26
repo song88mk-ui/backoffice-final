@@ -298,7 +298,7 @@ namespace Backoffice.Web.Pages.SBC
                 Clients.Add(new SelectListItemModel<Client>
                 {
                     Value = new Client(),
-                    Name = "No Clients Available"
+                    Name = TranslationState.GetValue("No Clients Available")
                 });
             else
                 Clients.Insert(0, new SelectListItemModel<Client> { Value = new Client(), Name = "Choose client..." });

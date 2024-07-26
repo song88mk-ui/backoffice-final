@@ -58,7 +58,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 Clients.Add(new SelectListItemModel<string>
                 {
                     Value = "",
-                    Name = "No Clients Available"
+                    Name = TranslationState.GetValue("No Clients Available")
                 });
             }
         }

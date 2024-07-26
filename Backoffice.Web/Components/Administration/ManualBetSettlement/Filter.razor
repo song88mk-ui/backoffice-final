@@ -15,7 +15,7 @@
                 </button>
                 <button type="button" class="btn btn-filter px-4 py-2 me-3" @onclick="OnFilterClickEvent">
                     <i class="fa fa-filter me-3"></i>
-                    Filters
+                    @TranslationState.GetValue("Filters")
                 </button>
             </div>
         </div>
@@ -41,7 +41,7 @@
                     }
                     else
                     {
-                        <span>No Clients Available</span>
+                        <span>@TranslationState.GetValue("No Clients Available")</span>
                     }
                 </button>
                 @if (Clients.Any())

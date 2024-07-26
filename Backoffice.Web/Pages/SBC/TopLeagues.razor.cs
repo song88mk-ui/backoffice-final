@@ -102,7 +102,7 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("SportName", FilterModel.SportName);
 
             var options = new ModalOptions();
-            ModalService.Open<CopyModal>($"Copy {model.ClientName} Top League Settings ({FilterModel.SportName}) To", parameters, options);
+            ModalService.Open<CopyModal>($"Copy {{{model.ClientName}}} Top League Settings ({{{FilterModel.SportName}}}) To", parameters, options);
         }
 
         protected async Task SelectPage(int page)
