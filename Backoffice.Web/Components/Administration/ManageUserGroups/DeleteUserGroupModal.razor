@@ -13,7 +13,8 @@
             <icon class="ico ico-warning"></icon>
         </div>
         <div class="text-center">
-            You are about to delete "<span class="fw-bold">@UserGroup.UserGroupName</span>".
+            @* You are about to delete "<span class="fw-bold">@UserGroup.UserGroupName</span>". *@
+            @((MarkupString)TranslationState.GetValue(GetMarkupMessage()))
             <br />
             @TranslationState.GetValue("Please be certain as this cannot be undone")
         </div>

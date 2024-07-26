@@ -117,5 +117,7 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
         }
 
         #endregion
+
+        private string GetMarkupMessage() => $"You are about to delete {{{$"\"<span class=\"fw - bold\">{UserGroup.UserGroupName}</span>\""}}}.";
     }
 }

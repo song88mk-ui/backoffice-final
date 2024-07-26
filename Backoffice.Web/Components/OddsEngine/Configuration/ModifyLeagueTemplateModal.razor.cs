@@ -390,7 +390,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     else
                     {
                         //message = $"{_prematchSelectedItem?.Name ?? ""} template has successfully been assigned to selected leagues.";
-                        message = $"success_save_template_message";
+                        message = $"success_save_template_message_{{{_prematchSelectedItem?.Name ?? ""}}}";
                     }
                     _alertModel = new()
                     {
