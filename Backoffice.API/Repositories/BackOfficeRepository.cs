@@ -2024,7 +2024,8 @@ namespace Backoffice.API.Repositories
                     Value = right != null ? right.Value : left.english.Value
                 }).ToDictionary(s => s.Name, s => s.Value);
 
-            return new BaseResponse<TranslationResponse>()
+
+            var response = new BaseResponse<TranslationResponse>()
             {
                 StatusCode = StatusCode.Success,
                 Message = StatusCode.Success.ToString(),
@@ -2034,6 +2035,10 @@ namespace Backoffice.API.Repositories
                     Translations = result
                 }
             };
+
+            _memCache.AddOrUpdateCache(key, response, DateTimeOffset.UtcNow.AddHours(24));
+
+            return response;
         }
         #endregion
 
