@@ -6,6 +6,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
+using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
 using System;
@@ -1894,7 +1895,7 @@ namespace Backoffice.API.Repositories
 
                 var configTemplateIds = request.ConfigTemplateMargins.Select(s => s.ConfigTemplateId).Distinct().ToList();
 
-                foreach(var configTemplateId in configTemplateIds)
+                foreach (var configTemplateId in configTemplateIds)
                 {
                     await _rabbitMqRepository.Publish(new MessageRequest()
                     {
@@ -2002,43 +2003,54 @@ namespace Backoffice.API.Repositories
             var languageCode = langCode.ToString().ToUpper();
             var key = $"tr-{languageCode}";
 
-            var cache = _memCache.GetCache<BaseResponse<TranslationResponse>>(key);
+            var cache = _memCache.GetCache<TranslationResponse>(key);
 
             if (cache != null)
-                return cache;
-
-            var result = new Dictionary<string, string>();
+                return new BaseResponse<TranslationResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = cache
+                };
 
             var translations = GetTranslations();
             var englishTranslations = translations.Where(c => c.LanguageCode == "EN").ToList();
-            var refTranslations = translations.Where(c => c.LanguageCode == languageCode).ToList();
+            var reqTranslations = translations.Where(c => c.LanguageCode == languageCode).ToList();
 
-            result = englishTranslations.GroupJoin(refTranslations,
-                en => en.Name,
-                la => la.Name,
-                (english, language) => new { english, language })
-                .SelectMany(s => s.language.DefaultIfEmpty(),
-                (left, right) => new
+            //result = englishTranslations.GroupJoin(refTranslations,
+            //    en => en.Name,
+            //    la => la.Name,
+            //    (english, language) => new { english, language })
+            //    .SelectMany(s => s.language.DefaultIfEmpty(),
+            //    (left, right) => new
+            //    {
+            //        Name = left.english.Name,
+            //        Value = right != null ? right.Value : left.english.Value
+            //    }).ToDictionary(s => s.Name, s => s.Value);
+
+            var combinedResult = englishTranslations.Concat(reqTranslations)
+                .GroupBy(g => g.Name)
+                .Select(s => new
                 {
-                    Name = left.english.Name,
-                    Value = right != null ? right.Value : left.english.Value
-                }).ToDictionary(s => s.Name, s => s.Value);
+                    Name = s.Key,
+                    Value = s.OrderByDescending(x => reqTranslations.Contains(x)).First().Value
+                })
+                .ToDictionary(s => s.Name, x => x.Value);
 
+            var result = new TranslationResponse()
+            {
+                LanguageCode = languageCode,
+                Translations = combinedResult
+            };
 
-            var response = new BaseResponse<TranslationResponse>()
+            _memCache.AddOrUpdateCache(key, result, 24);
+
+            return new BaseResponse<TranslationResponse>()
             {
                 StatusCode = StatusCode.Success,
                 Message = StatusCode.Success.ToString(),
-                Result = new TranslationResponse()
-                {
-                    LanguageCode = languageCode,
-                    Translations = result
-                }
-            };
-
-            _memCache.AddOrUpdateCache(key, response, DateTimeOffset.UtcNow.AddHours(24));
-
-            return response;
+                Result = result
+            }; ;
         }
         #endregion
 
@@ -2186,14 +2198,14 @@ namespace Backoffice.API.Repositories
             var currency = (Currency)Enum.Parse(typeof(Currency), currencyCode);
 
             var suggestedMinimumBet = await GetExchangeRate(currencyCode);
-;
+            ;
             var highValueArr = new Currency[] { Currency.KRW, Currency.VND, Currency.KHR, Currency.IDR, Currency.MMK };
             var minValue100Arr = new Currency[] { Currency.CDF, Currency.TZS };
             var minValue1Arr = new Currency[] { Currency.PKR };
 
             if (highValueArr.Contains(currency))
             {
-                if(suggestedMinimumBet > 1000m)
+                if (suggestedMinimumBet > 1000m)
                     suggestedMinimumBet = 1000m;
             }
             else if (minValue100Arr.Contains(currency))
