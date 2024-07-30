@@ -24,7 +24,7 @@ namespace Backoffice.Shared.Models
             {
                 Selections = new List<BetSelectionDetails>();
             }
-            public Guid? BetId { get; set; }
+            public string? BetId { get; set; }
             public string UserId { get; set; }
             public decimal Stake { get; set; }
             public decimal TrueStake { get; set; }

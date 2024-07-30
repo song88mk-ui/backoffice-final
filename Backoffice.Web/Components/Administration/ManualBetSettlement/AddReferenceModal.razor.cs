@@ -26,10 +26,10 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
         private ManualBetDetailsModel ManualBetDetailsModel { get; set; }
 
         public bool IsAddDisabled { get; set; }
-        public bool IsActionDisabled { get; set; }       
+        public bool IsActionDisabled { get; set; }
         public bool IsBetSelectDisabled { get; set; }
         public bool IsReasonDisabled { get; set; }
-        public bool IsSettleDisabled { get; set; }        
+        public bool IsSettleDisabled { get; set; }
         public Guid Guid { get; set; }
         #endregion
 
@@ -39,7 +39,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
             ManualBetSettlementModel = new ManualBetSettlementModel();
             Alerts = new List<AlertModel>();
             IsAddDisabled = true;
-            IsActionDisabled = false;                        
+            IsActionDisabled = false;
             IsSettleDisabled = true;
             Guid = new Guid();
 
@@ -49,7 +49,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
             {
                 ManualBetDetailsModel = new ManualBetDetailsModel();
                 ManualBetDetailsModel.Bets.Add(new ManualBetDetails());
-            }            
+            }
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -69,7 +69,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
         public async Task OnAddReferenceIdClickedEvent()
         {
             ManualBetDetailsModel.Bets.Add(new ManualBetDetails());
-            IsAddDisabled = true;            
+            IsAddDisabled = true;
             IsSettleDisabled = true;
         }
 
@@ -104,17 +104,27 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
                     IsAddDisabled = false;
                     IsActionDisabled = false;
                     IsBetSelectDisabled = false;
-                    IsReasonDisabled = false;                    
+                    IsReasonDisabled = false;
+
+                    await InvokeAsync(StateHasChanged);
                 }
             }
             else
             {
-                ManualBetDetailsModel.Bets[index] = new ManualBetDetails();
+                if (bet.Selections.Any())
+                {
+                    ManualBetDetailsModel.Bets[index] = new ManualBetDetails()
+                    {
+                        BetId = bet.BetId
+                    };
+
+                    await InvokeAsync(StateHasChanged);
+                }
                 //IsSettleDisabled = true;
                 //await JSRuntime.InvokeVoidAsync("resetManualBetSettlementInputs", index);
             }
 
-            IsReasonDisabled = false;            
+            IsReasonDisabled = false;
         }
 
         public async Task OnBetStatusChangedEvent(ChangeEventArgs e, ManualBetDetails bet)
@@ -125,27 +135,27 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
             {
                 case BetStatus.Won:
                     {
-                        bet.NewBetStatusName = BetStatus.Won.ToString();                        
+                        bet.NewBetStatusName = BetStatus.Won.ToString();
                         break;
                     }
                 case BetStatus.Lost:
                     {
-                        bet.NewBetStatusName = BetStatus.Lost.ToString();                        
+                        bet.NewBetStatusName = BetStatus.Lost.ToString();
                         break;
                     }
                 case BetStatus.HalfWon:
                     {
-                        bet.NewBetStatusName = BetStatus.HalfWon.ToString();                        
+                        bet.NewBetStatusName = BetStatus.HalfWon.ToString();
                         break;
                     }
                 case BetStatus.HalfLost:
                     {
-                        bet.NewBetStatusName = BetStatus.HalfLost.ToString();                        
+                        bet.NewBetStatusName = BetStatus.HalfLost.ToString();
                         break;
                     }
                 case BetStatus.Void:
                     {
-                        bet.NewBetStatusName = BetStatus.Void.ToString();                        
+                        bet.NewBetStatusName = BetStatus.Void.ToString();
                         break;
                     }
                 default:
@@ -164,8 +174,8 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
         }
 
         public async Task OnDeleteClickEvent(ManualBetDetails bet)
-        {                        
-            ManualBetDetailsModel.Bets.Remove(bet);            
+        {
+            ManualBetDetailsModel.Bets.Remove(bet);
         }
 
         public async Task OnModalResetClickEvent()
@@ -184,7 +194,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
             if (ManualBetDetailsModel != null && ManualBetDetailsModel.Bets.Any())
             {
                 //8000 is cashedout
-                List<int> invalidStatusList = new List<int>() { (int)BetStatus.Rejected, (int)BetStatus.Cancelled, 8000};
+                List<int> invalidStatusList = new List<int>() { (int)BetStatus.Rejected, (int)BetStatus.Cancelled, 8000 };
 
                 if (ManualBetDetailsModel.Bets.Any(betDetails => invalidStatusList.Contains(betDetails.BetStatusId)))
                 {

@@ -67,56 +67,6 @@
                     </td>
                 </tr>
             }
-
-            @{
-                #region old code
-                //for (int count = 0; count < ManualBetDetailsModel.Bets.Count; count++)
-                //{/
-                //    var bet = ManualBetDetailsModel.Bets[count];
-            
-                //    <tr>
-                //        <th scope="row">
-                //            <span>@(count + 1)</span>
-                //        </th>
-
-                //        <td>
-                //            <textarea class="ref-id form-control" @bind="bet.BetId" placeholder="Reference ID" @oninput="(args) => OnReferenceIdOnChangeEvent(args, bet, ManualBetDetailsModel.Bets.IndexOf(bet))" disabled="@IsActionDisabled"></textarea>
-                //        </td>
-
-                //        <td class="fw-bold">
-                //            <div class="d-flex flex-column text-start">
-                //                @((MarkupString)BuildEventDetails(bet.Selections.FirstOrDefault(), bet.OddsTypeName))
-                //            </div>
-                //        </td>
-
-                //        <td class="fw-bold">
-                //            <div class="d-flex flex-column text-start">
-                //                @((MarkupString)BuildBetDate(bet))
-                //            </div>
-                //        </td>
-
-                //        <td>
-                //            <select class="form-select" @bind="bet.NewBetStatusId" @bind:event="onchange" disabled="@IsBetSelectDisabled">
-                //                <option value="0" selected>None</option>
-                //                <option value="@((int)BetStatus.Won)">Won</option>
-                //                <option value="@((int)BetStatus.Lost)">Lost</option>
-                //                <option value="@((int)BetStatus.HalfWon)">Half Won</option>
-                //                <option value="@((int)BetStatus.HalfLost)">Half Lost</option>
-                //                <option value="@((int)BetStatus.Void)">Void</option>
-                //            </select>
-                //        </td>
-                //        <td>
-                //            <textarea class="reason form-control" placeholder="Reason" @bind="bet.NewReason" @bind:event="oninput" disabled="@IsReasonDisabled"></textarea>
-                //        </td>
-                //        <td>
-                //            <button type="button" class="btn" @onclick="() => OnDeleteClickEvent(bet)" disabled="@((ManualBetDetailsModel.Bets.Count == 1 ? true: false) || @IsActionDisabled)">
-                //                <i class="fa fa-trash" />
-                //            </button>
-                //        </td>
-                //    </tr>
-                //}   
-            #endregion
-            }
         </tbody>
     </table>
 </div>
