@@ -1,14 +1,11 @@
-﻿using Azure.Core;
-using Backoffice.Shared.Data.Backoffice;
+﻿using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
-using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -21,7 +18,6 @@ using System.Transactions;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
 using static Backoffice.Shared.Models.Requests.AddOrUpdateBetConfigRequest;
 using static Backoffice.Shared.Models.Response.ClientListResponse;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Backoffice.API.Repositories
 {

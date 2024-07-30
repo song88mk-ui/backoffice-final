@@ -54,7 +54,7 @@
 
                 <div class="card-desc">
                     <label class="fw-bold">@TranslationState.GetValue("Sport")</label>
-                    <label>@SportName</label>
+                    <label>@TranslationState.GetValue(SportName)</label>
                 </div>
             </div>
 
@@ -64,8 +64,8 @@
                 </div>
 
                 <div class="card-desc">
-                    <label class="fw-bold">Scope</label>
-                    <label>@($"{Scope}")</label>
+                    <label class="fw-bold">@TranslationState.GetValue("Scope")</label>
+                    <label>@TranslationState.GetValue(Scope)</label>
                 </div>
             </div>
         </div>

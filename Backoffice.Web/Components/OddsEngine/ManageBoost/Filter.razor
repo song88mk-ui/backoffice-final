@@ -32,14 +32,7 @@
                         {
                             @foreach (var item in _sports)
                             {
-                                if (item.Value == SelectedSportId)
-                                {
-                                    <option value="@item.Value" selected>@item.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@item.Value">@item.Name</option>
-                                }
+                                <option value="@item.Value" selected="@(item.Value == SelectedSportId)">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                         else

@@ -21,14 +21,7 @@
                     <select class="form-select d-block" @onchange="OnSportChangedEvent">
                         @foreach (var sport in Sports)
                         {
-                            @if (SelectedSportId == sport.Value)
-                            {
-                                <option value="@sport.Value" selected>@sport.Name</option>
-                            }
-                            else
-                            {
-                                <option value="@sport.Value">@sport.Name</option>
-                            }
+                            <option value="@sport.Value" selected="@(sport.Value == SelectedSportId)">@TranslationState.GetValue(sport.Name)</option>
                         }
                     </select>
                 </div>

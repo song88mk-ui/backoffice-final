@@ -69,7 +69,7 @@
                                                         @betDetails.BetId
                                                     </td>
                                                     <td>
-                                                        @(betDetails.Selections.FirstOrDefault().SportName)
+                                                        @(TranslationState.GetValue(betDetails?.Selections?.FirstOrDefault()?.SportName ?? ""))
                                                     </td>
                                                     <td>
                                                         <span class="bet-date d-block">@(betDetails.BetDate.ToString("MM/dd/yyyy"))</span>

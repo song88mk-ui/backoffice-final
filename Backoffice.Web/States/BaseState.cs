@@ -12,7 +12,7 @@ namespace Backoffice.Web.States
         protected T Model
         {
             get { return _model; }
-            set
+            set 
             {
                 _model = value;
                 OnPropertyChanged();

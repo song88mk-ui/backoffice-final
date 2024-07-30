@@ -18,14 +18,7 @@
                 {
                     @foreach (var item in Sports)
                     {
-                        if (item.Value == SelectedSportId)
-                        {
-                            <option value="@item.Value" selected>@item.Name</option>
-                        }
-                        else
-                        {
-                            <option value="@item.Value">@item.Name</option>
-                        }
+                        <option value="@item.Value" selected="@(item.Value == SelectedSportId)">@TranslationState.GetValue(item.Name)</option>
                     }
                 }
                 else
@@ -37,21 +30,15 @@
     </div>
 
     <div class="row mb-3">
-        <label for="scopeSelect" class="col-sm-2 col-form-label">Scope:</label>
+        <label for="scopeSelect" class="col-sm-2 col-form-label">
+            @($"{TranslationState.GetValue("Scope")}:")</label>
         <div class="col-sm-10">
             <select class="form-select" @onchange="OnScopeSelectChanged">
                 @if (Sports.Any())
                 {
                     @foreach (var item in Scopes)
                     {
-                        if (item.Value == SelectedScopeId)
-                        {
-                            <option value="@item.Value" selected>@item.Name</option>
-                        }
-                        else
-                        {
-                            <option value="@item.Value">@item.Name</option>
-                        }
+                        <option value="@item.Value" selected="@(item.Value == SelectedScopeId)">@TranslationState.GetValue(item.Name)</option>
                     }
                 }
                 else

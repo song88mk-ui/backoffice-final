@@ -108,7 +108,7 @@
                                                             <input class="form-check-input" type="checkbox" id="allSports" aria-label="..." @onchange="(e) => OnRealSportsClicked(e, 0)" />
                                                         }
                                                         <button class="dropdown-item dropdown-toggle ps-4" id="sportsItemDropdown" data-bs-target="#sportCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sportCollapse">
-                                                            Sports
+                                                            @TranslationState.GetValue("Sports")
                                                         </button>
 
                                                         <div class="collapse" id="sportCollapse">
@@ -126,7 +126,7 @@
                                                                             {
                                                                                 <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnRealSportsClicked(e, sport.SportId)" />
                                                                             }
-                                                                            <label class="form-check-label" for="@sport.SportId" @onclick="() => OnRealSportsClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
+                                                                            <label class="form-check-label" for="@sport.SportId" @onclick="() => OnRealSportsClicked(null, sport.SportId, true)">&nbsp; @TranslationState.GetValue(sport.SportName)</label>
                                                                         </li>
                                                                     }
                                                                 }
@@ -144,7 +144,7 @@
                                                             <input class="form-check-input" type="checkbox" id="allVirtualSports" aria-label="..." @onchange="(e) => OnVirtualSportsClicked(e, 0)" />
                                                         }
                                                         <button class="dropdown-item dropdown-toggle ps-4" id="virtualSportsItemDropdown" data-bs-target="#virtualSportCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="virtualSportCollapse">
-                                                            Virtual Sports
+                                                            @TranslationState.GetValue("Virtual Sports")
                                                         </button>
 
                                                         <div class="collapse" id="virtualSportCollapse">
@@ -162,7 +162,7 @@
                                                                             {
                                                                                 <input class="form-check-input" type="checkbox" id="@sport.SportId" @onchange="(e) => OnVirtualSportsClicked(e, sport.SportId)" />
                                                                             }
-                                                                            <label class="form-check-label" for="@sport.SportId" @onclick="() => OnVirtualSportsClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
+                                                                            <label class="form-check-label" for="@sport.SportId" @onclick="() => OnVirtualSportsClicked(null, sport.SportId, true)">&nbsp; @TranslationState.GetValue(sport.SportName)</label>
                                                                         </li>
                                                                     }
                                                                 }
@@ -194,7 +194,7 @@
                                                             <input class="form-check-input" type="checkbox" id="allSportsWinnings" aria-label="..." @onchange="(e) => OnRealSportsWinClicked(e, 0)" />
                                                         }
                                                         <button class="dropdown-item dropdown-toggle ps-4" id="sportsItemWinningsDropdown" data-bs-target="#sportWinningsCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sportWinningsCollapse">
-                                                            Sports
+                                                            @TranslationState.GetValue("Sports")
                                                         </button>
 
                                                         <div class="collapse" id="sportWinningsCollapse">
@@ -213,7 +213,7 @@
                                                                             {
                                                                                 <input class="form-check-input" type="checkbox" id="@refId" @onchange="(e) => OnRealSportsWinClicked(e, sport.SportId)" />
                                                                             }
-                                                                            <label class="form-check-label" for="@refId" @onclick="() => OnRealSportsWinClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
+                                                                            <label class="form-check-label" for="@refId" @onclick="() => OnRealSportsWinClicked(null, sport.SportId, true)">&nbsp; @TranslationState.GetValue(sport.SportName)</label>
                                                                         </li>
                                                                     }
                                                                 }
@@ -231,7 +231,7 @@
                                                             <input class="form-check-input" type="checkbox" id="allVirtualSports" aria-label="..." @onchange="(e) => OnVirtualSportsWinClicked(e, 0)" />
                                                         }
                                                         <button class="dropdown-item dropdown-toggle ps-4" id="virtualSportsItemWinningsDropdown" data-bs-target="#virtualSportWinningsCollapse" data-bs-toggle="collapse" aria-expanded="false" aria-controls="virtualSportWinningsCollapse">
-                                                            Virtual Sports
+                                                            @TranslationState.GetValue("Virtual Sports")
                                                         </button>
 
                                                         <div class="collapse" id="virtualSportWinningsCollapse">
@@ -250,7 +250,7 @@
                                                                             {
                                                                                 <input class="form-check-input" type="checkbox" id="@refIdVirtual" @onchange="(e) => OnVirtualSportsWinClicked(e, sport.SportId)" />
                                                                             }
-                                                                            <label class="form-check-label" for="@refIdVirtual" @onclick="() => OnVirtualSportsWinClicked(null, sport.SportId, true)">&nbsp; @sport.SportName</label>
+                                                                            <label class="form-check-label" for="@refIdVirtual" @onclick="() => OnVirtualSportsWinClicked(null, sport.SportId, true)">&nbsp; @TranslationState.GetValue(sport.SportName)</label>
                                                                         </li>
                                                                     }
                                                                 }
@@ -444,8 +444,8 @@
                                                         <thead>
                                                             <tr class="border rounded">
                                                                 <th scope="col">@TranslationState.GetValue("No.")</th>
-                                                                <th scope="col">From</th>
-                                                                <th scope="col">To</th>
+                                                                <th scope="col">@TranslationState.GetValue("From")</th>
+                                                                <th scope="col">@TranslationState.GetValue("To")</th>
                                                                 <th scope="col">%GGR</th>
                                                                 <th scope="col" class="noPadding"><button class="btn addBtn" type="button" @onclick="OnAddTierClicked">@TranslationState.GetValue("Add")</button></th>
                                                             </tr>

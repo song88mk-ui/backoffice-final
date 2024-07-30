@@ -58,7 +58,7 @@
                 <select class="form-select" @onchange="OnSportCheckboxClickEvent">
                     @foreach (var item in _sports)
                     {
-                        <option value="@item.Value" selected="@(item.Value == _filterModel.SportId.ToString())">@item.Name</option>
+                        <option value="@item.Value" selected="@(item.Value == _filterModel.SportId.ToString())">@TranslationState.GetValue(item.Name)</option>
                     }
                 </select>
             }

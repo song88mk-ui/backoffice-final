@@ -22,14 +22,7 @@
                 <option value="0">@TranslationState.GetValue("Select Sport")</option>
                 @foreach (var item in Model.Sports)
                 {
-                    if (Model.SportId == item.Value)
-                    {
-                        <option value="@item.Value" selected>@item.Name</option>
-                    }
-                    else
-                    {
-                        <option value="@item.Value">@item.Name</option>
-                    }
+                    <option value="@item.Value" selected="@(item.Value == Model.SportId)">@TranslationState.GetValue(item.Name)</option>
                 }
             </select>
         </div>
@@ -39,14 +32,7 @@
                 <option value="0">Select Segment</option>
                 @foreach (var item in Model.Segments)
                 {
-                    if (Model.SegmentId == item.Value)
-                    {
-                        <option value="@item.Value" selected>@item.Name</option>
-                    }
-                    else
-                    {
-                        <option value="@item.Value">@item.Name</option>
-                    }
+                    <option value="@item.Value" selected="@(item.Value == Model.SegmentId)">@TranslationState.GetValue(item.Name)</option>
                 }
             </select>
         </div>
@@ -59,14 +45,7 @@
                 <option value="0">Select League</option>
                 @foreach (var item in Model.Leagues)
                 {
-                    if (Model.LeagueId == item.Value)
-                    {
-                        <option value="@item.Value" selected>@item.Name</option>
-                    }
-                    else
-                    {
-                        <option value="@item.Value">@item.Name</option>
-                    }
+                    <option value="@item.Value" selected="@(item.Value == Model.LeagueId)">@TranslationState.GetValue(item.Name)</option>
                 }
             </select>
         </div>
@@ -74,16 +53,9 @@
             <label for="fixtureSelect" class="form-label">Fixture</label>
             <select class="form-select" id="fixtureSelect" @onchange="OnFixtureSelectChanged">
                 <option value="">Select Fixture</option>
-                @foreach(var item in Model.Fixtures)
+                @foreach (var item in Model.Fixtures)
                 {
-                    if (Model.ProviderFixtureId == item.Value)
-                    {
-                        <option value="@item.Value" selected>@item.Name</option>
-                    }
-                    else
-                    {
-                        <option value="@item.Value">@item.Name</option>
-                    }
+                    <option value="@item.Value" selected="@(item.Value == Model.ProviderFixtureId)">@TranslationState.GetValue(item.Name)</option>
                 }
             </select>
         </div>
@@ -92,18 +64,11 @@
     <div class="row mb-3">
         <div class="col-6">
             <label for="marketSelect" class="form-label">@TranslationState.GetValue("Market")</label>
-            <select class="form-select" id="marketSelect" @onchange="OnMarketSelectChanged">                
+            <select class="form-select" id="marketSelect" @onchange="OnMarketSelectChanged">
                 <option value="">Select Market</option>
                 @foreach (var item in Model.Markets)
                 {
-                    if (Model.MarketName == item.Name)
-                    {
-                                <option value="@item.Value" selected>@item.Name</option>
-                    }
-                    else
-                    {
-                                <option value="@item.Value">@item.Name</option>
-                    }
+                    <option value="@item.Value" selected="@(item.Value == Model.MarketName)">@TranslationState.GetValue(item.Name)</option>
                 }
             </select>
         </div>
@@ -113,14 +78,7 @@
                 <option value="">Select Selection</option>
                 @foreach (var item in Model.Selections)
                 {
-                    if (Model.SelectionName == item.Name)
-                    {
-                        <option value="@item.Value" selected>@item.Name</option>
-                    }
-                    else
-                    {
-                        <option value="@item.Value">@item.Name</option>
-                    }
+                    <option value="@item.Value" selected="@(item.Value == Model.SelectionName)">@TranslationState.GetValue(item.Name)</option>
                 }
             </select>
         </div>

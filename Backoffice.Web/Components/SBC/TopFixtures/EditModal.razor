@@ -27,7 +27,7 @@
                         {
                             <tr id="match-@model.FixtureId">
                                 <td>@model.SortOrder</td>
-                                <td>@model.SportName</td>
+                                <td>@TranslationState.GetValue(model.SportName)</td>
                                 <td>@model.SegmentName</td>
                                 <td>@model.LeagueName</td>
                                 <td>

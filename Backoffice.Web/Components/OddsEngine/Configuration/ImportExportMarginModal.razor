@@ -53,7 +53,7 @@
                 <option value="0" selected>@TranslationState.GetValue("All Sports")</option>
                 @foreach(var sport in Sports)
                 {
-                    <option value="@sport.Value">@sport.Name</option>
+                    <option value="@sport.Value">@TranslationState.GetValue(sport.Name)</option>
                 }
             </select>
         </div>
@@ -63,7 +63,7 @@
     <button type="button" class="btn modal-btn btn-cancel" @onclick="OnModalCancelClickEvent">@TranslationState.GetValue("Cancel")</button>
     @if (!IsImportTab)
     {
-        <button disabled="@IsUploading" type="button" class="btn modal-btn btn-export" @onclick="OnExportClickEvent">Export</button>
+        <button disabled="@IsUploading" type="button" class="btn modal-btn btn-export" @onclick="OnExportClickEvent">@TranslationState.GetValue("Export")</button>
     }
     else
     {

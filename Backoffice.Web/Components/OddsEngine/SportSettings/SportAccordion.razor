@@ -12,7 +12,7 @@
                 </div>
             }
             <span class="sport-name @(_page == EditSportSettingsPage.Sport || _isOpen ? "" : "fw-bold") py-2">
-                @_sportName
+                @TranslationState.GetValue(_sportName)
             </span>
             @if (_page != EditSportSettingsPage.Sport && _sportId < 1000)
             {

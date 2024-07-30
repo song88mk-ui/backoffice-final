@@ -16,12 +16,12 @@
                     <thead>
                         <tr>
                             <th valign="middle" align="left"><strong>#</strong></th>
-                            <th valign="middle" align="left"><strong>Date</strong></th>
+                            <th valign="middle" align="left"><strong>@TranslationState.GetValue("Date")</strong></th>
                             <th valign="middle" align="left"><strong>@TranslationState.GetValue("Client name")</strong></th>
-                            <th valign="middle" align="left"><strong>Activity</strong></th>
-                            <th valign="middle" align="left"><strong>From</strong></th>
-                            <th valign="middle" align="left"><strong>To</strong></th>
-                            <th valign="middle" align="left"><strong>Updated By</strong></th>
+                            <th valign="middle" align="left"><strong>@TranslationState.GetValue("Activity")</strong></th>
+                            <th valign="middle" align="left"><strong>@TranslationState.GetValue("From")</strong></th>
+                            <th valign="middle" align="left"><strong>@TranslationState.GetValue("To")</strong></th>
+                            <th valign="middle" align="left"><strong>@TranslationState.GetValue("Updated By")</strong></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,11 +58,11 @@
                                 <th scope="col">Date</th>
                                 <th scope="col">@TranslationState.GetValue("Client name")</th>
                                 <th scope="col">@TranslationState.GetValue("Sports")</th>
-                                <th scope="col">Details</th>
-                                <th scope="col">Activity</th>
-                                <th scope="col">From</th>
-                                <th scope="col">To</th>
-                                <th scope="col">Updated By</th>
+                                <th scope="col">@TranslationState.GetValue("Details")</th>
+                                <th scope="col">@TranslationState.GetValue("Activity")</th>
+                                <th scope="col">@TranslationState.GetValue("From")</th>
+                                <th scope="col">@TranslationState.GetValue("To")</th>
+                                <th scope="col">@TranslationState.GetValue("Updated By")</th>
                             </tr>
                         </thead>
                         <tbody>

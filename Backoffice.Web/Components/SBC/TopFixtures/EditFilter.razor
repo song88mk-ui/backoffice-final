@@ -10,14 +10,7 @@
                 {
                     foreach (var sport in SportsTree.Sports)
                     {
-                        if (SelectedSport != null && sport.SportId == SelectedSport.SportId)
-                        {
-                            <option value="@sport.SportId" selected>@sport.SportName</option>
-                        }
-                        else
-                        {
-                            <option value="@sport.SportId">@sport.SportName</option>
-                        }
+                        <option value="@sport.SportId" selected="@(SelectedSport != null && sport.SportId == SelectedSport.SportId)">@TranslationState.GetValue(sport.SportName)</option>
                     }
                 }
             </select>

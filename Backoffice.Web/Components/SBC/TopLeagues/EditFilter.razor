@@ -10,14 +10,7 @@
                 {
                     foreach (var segment in SelectedSport.Segments)
                     {
-                        if (SelectedSegment != null && segment.SegmentId == SelectedSegment.SegmentId)
-                        {
-                            <option value="@segment.SegmentId" selected>@segment.SegmentName</option>
-                        }
-                        else
-                        {
-                            <option value="@segment.SegmentId">@segment.SegmentName</option>
-                        }
+                        <option value="@segment.SegmentId" selected="@(SelectedSegment != null && SelectedSegment.SegmentId == SelectedSport.SportId)">@TranslationState.GetValue(segment.SegmentName)</option>
                     }
                 }
             </select>

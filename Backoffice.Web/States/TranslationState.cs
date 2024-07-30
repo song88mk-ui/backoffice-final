@@ -42,7 +42,7 @@ namespace Backoffice.Web.States
             var translated = Model.TryGetValue(key, out string? value) ? value : word;
 
             if (placeHolders.Any() && translated.Contains("{&}"))
-                return TransformPlaceHolder(word, "{&}", placeHolders.ToArray());
+                return TransformPlaceHolder(translated, "{&}", placeHolders.ToArray());
 
             return translated.Replace("{", "").Replace("}", "");
         }
@@ -72,8 +72,8 @@ namespace Backoffice.Web.States
             MatchCollection matches = regex.Matches(input);
             foreach (Match match in matches)
             {
-                var matchVal = $"{{{match.Groups[1].Value}}}";
-                input = input.Replace(matchVal, "{&}");
+                var matchVal = $"{match.Groups[1].Value}";
+                input = input.Replace($"{{{matchVal}}}", "{&}");
                 result.Add(matchVal);
             }
 

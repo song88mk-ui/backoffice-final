@@ -7,6 +7,7 @@ namespace Backoffice.Shared.Enums
     public enum LanguageCode
     {
         EN,
-        ZH
+        ZH,
+        KO
     }
 }

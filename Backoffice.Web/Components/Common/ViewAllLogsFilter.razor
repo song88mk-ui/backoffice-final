@@ -68,14 +68,7 @@
                             {
                                 @foreach (var sport in FilterModel.Sports.SportLookup)
                                 {
-                                    @if (sport.SportId == FilterModel.SportId)
-                                    {
-                                        <option value="@sport.SportId" selected>@sport.SportName</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@sport.SportId">@sport.SportName</option>
-                                    }
+                                    <option value="@sport.SportId" selected="@(sport.SportId == FilterModel.SportId)">@TranslationState.GetValue(sport.SportName)</option>
                                 }
                             }
                         </optgroup>
@@ -89,14 +82,7 @@
                             {
                                 @foreach (var segment in FilterModel.Segments.SegmentLookup)
                                 {
-                                    @if (segment.SegmentId == FilterModel.SegmentId)
-                                    {
-                                        <option value="@segment.SegmentId" selected>@segment.SegmentName</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@segment.SegmentId">@segment.SegmentName</option>
-                                    }
+                                    <option value="@segment.SegmentId" selected="@(segment.SegmentId == FilterModel.SportId)">@TranslationState.GetValue(segment.SegmentName)</option>
                                 }
                             }
                         </optgroup>
@@ -110,14 +96,7 @@
                             {
                                 @foreach (var league in FilterModel.Leagues.LeagueLookup)
                                 {
-                                    @if (league.LeagueId == FilterModel.LeagueId)
-                                    {
-                                        <option value="@league.LeagueId" selected>@league.LeagueName</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@league.LeagueId">@league.LeagueName</option>
-                                    }
+                                    <option value="@league.LeagueId" selected="@(league.LeagueId == FilterModel.SportId)">@TranslationState.GetValue(league.LeagueName)</option>
                                 }
                             }
                         </optgroup>
@@ -134,7 +113,7 @@
                     <select class="form-select" @onchange="OnPageSelectionChangedEvent">
                         @foreach (var item in Pages)
                         {
-                            <option value="@item.Key" selected="@(SelectedPage == item.Key)">@item.Value</option>
+                            <option value="@item.Key" selected="@(SelectedPage == item.Key)">@TranslationState.GetValue(item.Value)</option>
                         }
                     </select>
                 </div>

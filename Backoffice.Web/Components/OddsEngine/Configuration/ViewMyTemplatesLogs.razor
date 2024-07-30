@@ -8,7 +8,7 @@
                         <select class="form-select" @onchange="OnSportClickEvent">
                             @foreach (var item in Sports)
                             {
-                                <option value="@item.Value" selected="@(item.Value == FilterModel.SelectedSportId.ToString())">@item.Name</option>
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.SelectedSportId.ToString())">@TranslationState.GetValue(item.Name)</option>
                             }
                         </select>
                     }
@@ -18,7 +18,7 @@
                         <select class="form-select" @onchange="OnScopeClickEvent">
                             @foreach (var item in Scopes)
                             {
-                                <option value="@item.Value" selected="@(item.Value == FilterModel.SelectedScopeId.ToString())">@item.Name</option>
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.SelectedScopeId.ToString())">@TranslationState.GetValue(item.Name)</option>
                             }
                         </select>
                     }
@@ -27,7 +27,7 @@
 
                 <EditForm Model="FilterModel" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                     <div class="input-group">
-                        <input id="search" placeholder="Search" class="form-control search-text valid border-end-0" @bind-value="FilterModel.SearchText" />
+                        <input id="search" placeholder="@($"{TranslationState.GetValue("Search")}") class="form-control search-text valid border-end-0" @bind-value="FilterModel.SearchText" />
                         <span class="input-group-text border-start-0">
                             <i class="fa fa-search"></i>
                         </span>
@@ -42,9 +42,9 @@
             <table class="table table-bordered table-striped table-logs">
                 <thead>
                     <tr>
-                        <th scope="col" class="date">Date</th>
+                        <th scope="col" class="date">@TranslationState.GetValue("Date")</th>
                         <th scope="col">@TranslationState.GetValue("Sports")</th>
-                        <th scope="col">Scope</th>
+                        <th scope="col">@TranslationState.GetValue("Scope")</th>
                         <th scope="col">Template</th>
                         <th scope="col">Changes Made</th>
                         <th scope="col">From</th>

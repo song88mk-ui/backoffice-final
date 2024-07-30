@@ -37,14 +37,7 @@
                         {
                             @foreach (var item in Sports)
                             {
-                                if (item.Value == SelectedSportId.ToString())
-                                {
-                                    <option value="@item.Value" selected>@item.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@item.Value">@item.Name</option>
-                                }
+                                <option value="@item.Value" selected="@(item.Value == SelectedSportId.ToString())">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                         else
@@ -58,14 +51,7 @@
                         {
                             @foreach (var item in Scopes)
                             {
-                                if (item.Value == SelectedScopeId.ToString())
-                                {
-                                    <option value="@item.Value" selected>@item.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@item.Value">@item.Name</option>
-                                }
+                                <option value="@item.Value" selected="@(item.Value == SelectedScopeId.ToString())">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -115,7 +101,7 @@
                                     var isReadOnly = !(configTemplate.ClientsCount > 0 && configTemplate.LeaguesCount > 0);
                                     <tr>
                                         <th class="px-4" scope="row" @onclick="() => OnEditTemplateClickEvent(configTemplate)">@configTemplate.Name</th>
-                                        <td class="px-4" @onclick="() => OnEditTemplateClickEvent(configTemplate)">@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()) != null ? $"{Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()).Name}" : "")</td>
+                                        <td class="px-4" @onclick="() => OnEditTemplateClickEvent(configTemplate)">@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()) != null ? $"{TranslationState.GetValue(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString())?.Name ?? "")}" : "")</td>
                                         <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@($"{configTemplate.ClientsCount} Client{(configTemplate.ClientsCount > 1 ? "s" : "")}")</td>
                                         <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@($"{configTemplate.LeaguesCount} League{(configTemplate.LeaguesCount > 1 ? "s" : "")}")</td>
                                         <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@(configTemplate.Timestamp.ToString("HH:mm dd/MM/yyyy"))</td>

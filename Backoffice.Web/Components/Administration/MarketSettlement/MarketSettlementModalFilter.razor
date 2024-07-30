@@ -7,14 +7,7 @@
                 {
                     @foreach (var item in Sports)
                     {
-                        @if (item.Value == AddMarketSettlement.SportId)
-                        {
-                            <option value="@item.Value" selected>@item.Name</option>
-                        }
-                        else
-                        {
-                            <option value="@item.Value">@item.Name</option>
-                        }
+                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.SportId)">@TranslationState.GetValue(item.Name)</option>
                     }
                 }
             </optgroup>
@@ -28,14 +21,7 @@
                 {
                     @foreach (var item in Segments)
                     {
-                        @if (item.Value == AddMarketSettlement.SegmentId)
-                        {
-                            <option value="@item.Value" selected>@item.Name</option>
-                        }
-                        else
-                        {
-                            <option value="@item.Value">@item.Name</option>
-                        }
+                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.SegmentId)">@TranslationState.GetValue(item.Name)</option>
                     }
 
                 }
@@ -50,14 +36,7 @@
                 {
                     @foreach (var item in Leagues)
                     {
-                        @if (item.Value == AddMarketSettlement.LeagueId)
-                        {
-                            <option value="@item.Value" selected>@item.Name</option>
-                        }
-                        else
-                        {
-                            <option value="@item.Value">@item.Name</option>
-                        }
+                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.LeagueId)">@TranslationState.GetValue(item.Name)</option>
                     }
                 }
             </optgroup>
@@ -71,14 +50,7 @@
                 {
                     @foreach (var item in Fixtures)
                     {
-                        @if (item.Value == AddMarketSettlement.FixtureId)
-                        {
-                            <option value="@item.Value" selected>@item.Name</option>
-                        }
-                        else
-                        {
-                            <option value="@item.Value">@item.Name</option>
-                        }
+                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.FixtureId)">@TranslationState.GetValue(item.Name)</option>
                     }
                 }
             </optgroup>
@@ -94,14 +66,7 @@
                         {
                             @foreach (var item in Markets)
                             {
-                                @if (item.Value == AddMarketSettlement.MarketId)
-                                {
-                                    <option value="@item.Value" selected>@item.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@item.Value">@item.Name</option>
-                                }
+                                <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.MarketId)">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                     </optgroup>

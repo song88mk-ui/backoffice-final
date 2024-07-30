@@ -6,7 +6,7 @@
             <li id="@item.Value">
                 <div class="form-check ms-2">
                     <input type="checkbox" class="form-check-input" @onclick="() => CheckboxClicked(item)" checked="@item.IsChecked" disabled="@IsReadOnly"/>
-                    <label class="form-check-label">@item.Name</label>
+                    <label class="form-check-label">@TranslationState.GetValue(item.Name)</label>
                 </div>
             </li>
         }

@@ -55,7 +55,7 @@
                                 <Virtualize Items="_priceBoostList" Context="priceboost" OverscanCount="20">
                                     <tr class="@(priceboost.FixtureStatusId >= (int)FixtureStatus.Live ? "disabled" : "")">
                                         <td>@priceboost.ClientName</td>
-                                        <td>@priceboost.SportName</td>
+                                        <td>@TranslationState.GetValue(priceboost.SportName)</td>
                                         <td>
                                             <span class="d-block selection-name fw-bold">@priceboost.SelectionName</span>
                                             <span class="d-block market">@priceboost.MarketName</span>

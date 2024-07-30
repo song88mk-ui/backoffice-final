@@ -18,7 +18,7 @@
             <tr>
                 <th scope="row" rowspan="@(AddPriceBoostFilterModel.PriceBoostConfigList.Count+1)">
                     <div class="d-flex flex-column">
-                        <span><b>@AddPriceBoostFilterModel.SelectionName</b></span>
+                        <span><b>@TranslationState.GetValue(AddPriceBoostFilterModel.SelectionName)</b></span>
                         <span>@AddPriceBoostFilterModel.MarketName</span>
                         <span>@AddPriceBoostFilterModel.SegmentName</span>
                         <span>@AddPriceBoostFilterModel.LeagueName</span>
@@ -27,7 +27,7 @@
                         <span>@(AddPriceBoostFilterModel.PriceBoostConfigList.FirstOrDefault()?.TimeStamp.ToString("HH:mm"))</span>
                     </div>
                 </th>
-                <td rowspan="@(AddPriceBoostFilterModel.PriceBoostConfigList.Count+1)">@AddPriceBoostFilterModel.SportName</td>
+                <td rowspan="@(AddPriceBoostFilterModel.PriceBoostConfigList.Count+1)">@TranslationState.GetValue(AddPriceBoostFilterModel.SportName)</td>
             </tr>
             @foreach (var config in AddPriceBoostFilterModel.PriceBoostConfigList)
             {

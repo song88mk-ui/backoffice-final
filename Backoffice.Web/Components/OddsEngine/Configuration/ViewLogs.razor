@@ -8,15 +8,15 @@
             <table class="table table-bordered mt-3">
                 <thead>
                     <tr>
-                        <th scope="col">Date</th>
+                        <th scope="col">@TranslationState.GetValue("Date")</th>
                         <th scope="col">@TranslationState.GetValue("Client")</th>
                         <th scope="col">@TranslationState.GetValue("Sports")</th>
                         <th scope="col">@TranslationState.GetValue("Segment")</th>
                         <th scope="col">@TranslationState.GetValue("League")</th>
-                        <th scope="col">Changes Made</th>
-                        <th scope="col">From</th>
-                        <th scope="col">To</th>
-                        <th scope="col">Updated By</th>
+                        <th scope="col">@TranslationState.GetValue("Changes Made")</th>
+                        <th scope="col">@TranslationState.GetValue("From")</th>
+                        <th scope="col">@TranslationState.GetValue("To")</th>
+                        <th scope="col">@TranslationState.GetValue("Updated By")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,9 +25,9 @@
                         <tr>
                             <td>@log.Date</td>
                             <td>@log.Client</td>
-                            <td>@log.Sports</td>
-                            <td>@log.Segment</td>
-                            <td>@log.League</td>
+                            <td>@TranslationState.GetValue(log.Sports)</td>
+                            <td>@TranslationState.GetValue(log.Segment)</td>
+                            <td>@TranslationState.GetValue(log.League)</td>
                             <td>@log.ChangesMade</td>
                             <td>@((MarkupString)log.OldValue)</td>
                             <td>@((MarkupString)log.NewValue)</td>

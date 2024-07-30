@@ -62,19 +62,12 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnSportsChangedEvent">
                         <optgroup label="Sports">
-                            <option value="0">Select Sports</option>
+                            <option value="0">@TranslationState.GetValue("Select Sports")</option>
                             @if (ConfigLogsFilterModel != null && ConfigLogsFilterModel.Sports != null && ConfigLogsFilterModel.Sports.Any())
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.Sports)
                                 {
-                                    if (item.Value == ConfigLogsFilterModel.SportId)
-                                    {
-                                        <option value="@item.Value" selected>@item.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item.Value">@item.Name</option>
-                                    }
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.SportId)">@TranslationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -88,14 +81,7 @@
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.Segments)
                                 {
-                                    if (item.Value == ConfigLogsFilterModel.SegmentId)
-                                    {
-                                        <option value="@item.Value" selected>@item.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item.Value">@item.Name</option>
-                                    }
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.SegmentId)">@TranslationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -109,14 +95,7 @@
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.Leagues)
                                 {
-                                    if (item.Value == ConfigLogsFilterModel.LeagueId)
-                                    {
-                                        <option value="@item.Value" selected>@item.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item.Value">@item.Name</option>
-                                    }
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.LeagueId)">@TranslationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -130,14 +109,7 @@
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.MarketTemplateGroups)
                                 {
-                                    if (item.Value == ConfigLogsFilterModel.MarketTemplateGroupId)
-                                    {
-                                        <option value="@item.Value" selected>@item.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item.Value">@item.Name</option>
-                                    }
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.MarketTemplateGroupId)">@TranslationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -154,14 +126,7 @@
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.Markets)
                                 {
-                                    if (item.Value == ConfigLogsFilterModel.MarketId)
-                                    {
-                                        <option value="@item.Value" selected>@item.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item.Value">@item.Name</option>
-                                    }
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.MarketId)">@TranslationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -175,14 +140,7 @@
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.Scopes)
                                 {
-                                    if (item.Value == ConfigLogsFilterModel.Scope)
-                                    {
-                                        <option value="@item.Value" selected>@item.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item.Value">@item.Name</option>
-                                    }
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.Scope)">@TranslationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>

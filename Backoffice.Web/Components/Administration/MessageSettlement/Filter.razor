@@ -37,14 +37,7 @@
                         {
                             @foreach (var item in Sports)
                             {
-                                if (item.Value == FilterModel.SportId)
-                                {
-                                    <option value="@item.Value" selected>@item.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@item.Value">@item.Name</option>
-                                }
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.SportId)">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -58,14 +51,7 @@
                         {
                             @foreach (var item in Segments)
                             {
-                                if (item.Value == FilterModel.SegmentId)
-                                {
-                                    <option value="@item.Value" selected>@item.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@item.Value">@item.Name</option>
-                                }
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.SegmentId)">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -79,14 +65,7 @@
                         {
                             @foreach (var item in Leagues)
                             {
-                                if (item.Value == FilterModel.LeagueId)
-                                {
-                                    <option value="@item.Value" selected>@item.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@item.Value">@item.Name</option>
-                                }
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.LeagueId)">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -100,14 +79,7 @@
                         {
                             @foreach (var item in Fixtures)
                             {
-                                if (item.Value == FilterModel.FixtureId)
-                                {
-                                    <option value="@item.Value" selected>@item.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@item.Value">@item.Name</option>
-                                }
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.FixtureId)">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -118,14 +90,7 @@
                             <option value="0" selected>All Status</option>
                             @foreach (var item in Statuses)
                             {
-                                if (item.Value == FilterModel.ToStatus)
-                                {
-                                    <option value="@item.Value" selected>@item.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@item.Value">@item.Name</option>
-                                }
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.ToStatus)">@TranslationState.GetValue(item.Name)</option>
                             }
                         </optgroup>
                     </select>
@@ -140,14 +105,7 @@
                             {
                                 @foreach (var item in Markets)
                                 {
-                                    if (item.Value == FilterModel.MarketId)
-                                    {
-                                        <option value="@item.Value" selected>@item.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item.Value">@item.Name</option>
-                                    }
+                                    <option value="@item.Value" selected="@(item.Value == FilterModel.MarketId)">@TranslationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -161,14 +119,7 @@
                             {
                                 @foreach (var item in Selections)
                                 {
-                                    if (item.Value == FilterModel.SelectionId)
-                                    {
-                                        <option value="@item.Value" selected>@item.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item.Value">@item.Name</option>
-                                    }
+                                    <option value="@item.Value" selected="@(item.Value == FilterModel.SelectionId)">@TranslationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
