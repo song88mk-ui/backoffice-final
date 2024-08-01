@@ -14,7 +14,7 @@
     Layout = null;
 }
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -47,12 +47,13 @@
             <div class="row h-100">
                 <div class="col-6 first-banner d-flex flex-column justify-content-center align-items-center">
                     <div class="first-header-text">
-                        @* @Model.ViewData["welcome_to"] *@
-                        Welcome To
+                        @Model.WelcomeTo
+                        @* Welcome To *@
                     </div>
                     <div class="second-header-text mb-3">
                         @* @Model.ViewData["back_office"] *@
-                        Back Office
+                        @Model._translationState.GetValue("Back Office")
+                        @* Back Office *@
                     </div>
                     <div class="banner-icons">
                         <img src="icons/svg/login-banner-icons.svg" alt="login banner icons" />
@@ -60,22 +61,46 @@
                 </div>
                 <div class="col-6 second-banner d-flex flex-column justify-content-center align-items-center">
                     <div class="w-75 mx-4 login-container">
-                        @* <div class="col-12 d-flex justify-content-end">
-                            <component type="typeof(Backoffice.Web.Shared.LanguageDropDown)" render-mode="ServerPrerendered" on/>
-                        </div> *@
-                        <div class="login-header">
-                            <div class="logo">
-                                <img src="icons/svg/song88-login-logo.svg" alt="login logo" />
-                            </div>
-                            <div class="row d-flex flex-column">
-                                <div class="title text-center mt-4 mb-0">
-                                    @* @ViewData["login"] *@
-                                    Login
+                        <div class="col-12 d-flex justify-content-end">
+                            @* Translation *@
+                            <form method="post">
+                                <div class="d-flex align-items-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary @(Model._translationState.LanguageCodes.Any() ? "dropdown-toggle" : "") d-flex align-items-center font-white" type="button" id="dropdownLanguage" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="d-flex">
+                                                <i class="@($"ico-flag flag-{Model._translationState.ActiveLanguageCode.ToString().ToLower()}") me-2" aria-hidden="true"></i>
+                                                <span>@Model._translationState.ActiveLanguageCode.ToString()</span>
+                                            </span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownLanguage">
+                                            @foreach (var langCode in Model._translationState.LanguageCodes.Select(s => s.ToString()))
+                                            {
+                                                <button type="submit" class="w-100 dropdown-item position-relative d-flex align-items-center" name="action" value="@langCode">
+                                                    <span class="d-flex">
+                                                        <i class="@($"ico-flag flag-{langCode.ToLower()}") me-2" aria-hidden="true">
+                                                        </i>@langCode
+                                                    </span>
+                                                </button>
+                                            }
+                                        </ul>
+                                    </div>
                                 </div>
-                                <hr class="col-lg-5 col-md-7 col-sm-10 align-self-center title-break" />
-                            </div>
+                            </form>
                         </div>
+
                         <form method="post">
+                            <div class="login-header">
+                                <div class="logo">
+                                    <img src="icons/svg/song88-login-logo.svg" alt="login logo" />
+                                </div>
+                                <div class="row d-flex flex-column">
+                                    <div class="title text-center mt-4 mb-0">
+                                        @* @ViewData["login"] *@
+                                        Login
+                                    </div>
+                                    <hr class="col-lg-5 col-md-7 col-sm-10 align-self-center title-break" />
+                                </div>
+                            </div>
                             <div class="login-body mb-3">
                                 <div class="mb-4">
                                     <label class="form-label">
@@ -108,7 +133,7 @@
                                 }
                                 <div class="row my-4">
                                     <div class="col-md-6">
-                                        @Html.CheckBoxFor(m => m.IsSaveCookie, new {@class = "form-check-input m8e-1", @id="rememberMe" })
+                                        @Html.CheckBoxFor(m => m.IsSaveCookie, new { @class = "form-check-input m8e-1", @id = "rememberMe" })
                                         <label class="form-check-label">
                                             @* @ViewData["remember_information"] *@
                                             Remember Information
@@ -117,7 +142,7 @@
                                 </div>
                             </div>
                             <div class="login-footer">
-                                <button type="submit" class="d-block rounded-2 text-decoration-none text-center col-12 border-0">
+                                <button type="submit" class="d-block rounded-2 text-decoration-none text-center col-12 border-0" name="action" value="login">
                                     @* @ViewData["login"] *@
                                     Login
                                 </button>

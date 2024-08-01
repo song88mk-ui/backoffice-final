@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Services;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.JSInterop;
 using System.Text.RegularExpressions;
 
 namespace Backoffice.Web.States
@@ -49,7 +50,7 @@ namespace Backoffice.Web.States
 
         private async void ReloadModel()
         {
-            Model = await _translationService.GetTranslations(_activeLangCode);
+            Model = await _translationService.GetTranslationsAsync(_activeLangCode);
         }
         private string TransformPlaceHolder(string word, string placeholder, params object[] values)
         {
@@ -64,7 +65,7 @@ namespace Backoffice.Web.States
 
             return word;
         }
-        public List<string> ExtractPlaceholders(ref string input)
+        private List<string> ExtractPlaceholders(ref string input)
         {
             List<string> result = new List<string>();
             Regex regex = new Regex(@"\{(.*?)\}");

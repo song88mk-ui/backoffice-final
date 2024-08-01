@@ -587,7 +587,7 @@ window.getCookie = (name) => {
     return null;
 }
 
-window.languageChanged = function (language, value, days) {
-    setCookie(language, value, days);
+window.languageChanged = function (name, value, days) {
+    setCookie(name, value, days);
     window.location.reload();
 }

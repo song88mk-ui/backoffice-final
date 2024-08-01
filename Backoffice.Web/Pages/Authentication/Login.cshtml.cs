@@ -3,13 +3,12 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.States;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.JSInterop;
 using Serilog;
 using System.ComponentModel;
+using System.Data;
 using System.Text.Json;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
 namespace Backoffice.Web.Pages.Authentication
@@ -18,10 +17,10 @@ namespace Backoffice.Web.Pages.Authentication
     {
         #region Properties
 
-        [Inject] public NavigationManager NavigationManager { get; set; }
         [TempData] public string ErrorMessage { get; set; }
         [BindProperty] public LogInModel UserModel { get; set; } = new LogInModel();
         [BindProperty] public bool IsSaveCookie { get; set; }
+        [FromQuery] public string LanguageCode { get; set; }
 
         public bool IsValidLogin { get; set; }
         public string ReturnUrl { get; set; }
@@ -32,7 +31,6 @@ namespace Backoffice.Web.Pages.Authentication
         #endregion
 
         #region Fields
-
         private readonly IAuthenticationService _authenticationService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         public readonly TranslationState _translationState;
@@ -41,27 +39,36 @@ namespace Backoffice.Web.Pages.Authentication
 
         #region Ctor
 
-        public LoginModel(IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor, TranslationState translationState)
+        public LoginModel(IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor, TranslationState translationState, IJSRuntime jSRuntime)
         {
             _authenticationService = authenticationService;
             _httpContextAccessor = httpContextAccessor;
             _access = new List<string>() { PermissionCategory.SBC.ToString().ToUpper(), PermissionCategory.Admin.ToString().ToUpper() };
             _translationState = translationState;
 
-            //_translationState.PropertyChanged += TranslationStatePropertyChanged;
+            _jsRuntime = jSRuntime;
+
+            _translationState.PropertyChanged += TranslationStatePropertyChanged;
         }
 
         #endregion
 
         #region Methods
+        public async Task OnEdit()
+        {
+
+        }
         public async Task<IActionResult> OnGet(string? returnUrl = null)
         {
-            _translationState.ActiveLanguageCode = LanguageCode.EN;
+            if (Enum.TryParse(LanguageCode, out LanguageCode langCode))
+            {
+                if (_translationState.ActiveLanguageCode != langCode)
+                    _translationState.ActiveLanguageCode = langCode;
+            }
 
-            ViewData["welcome_to"] = _translationState.GetValue("Welcome to");
+            WelcomeTo = _translationState.GetValue("Welcome to");
             ViewData["back_office"] = _translationState.GetValue("Back Office");
             ViewData["login"] = _translationState.GetValue("Login");
-
 
             ViewData["username"] = _translationState.GetValue("Username");
             ViewData["enter_your_username"] = _translationState.GetValue("Enter your username");
@@ -165,75 +172,90 @@ namespace Backoffice.Web.Pages.Authentication
 
             return Page();
         }
-
         public async Task<IActionResult> OnPostAsync()
         {
-            if (ModelState.IsValid)
+            var action = Request.Form["action"];
+            if (action == "login")
             {
-                var policies = new List<string>();
-                TempData["HasError"] = false;
-                var result = await _authenticationService.Login(UserModel);
-
-                if (result.Result.Item1)
+                if (ModelState.IsValid)
                 {
-                    SetRememberMePreference(IsSaveCookie, result.Result.Item3);
-                    policies = result.Result.Item2.Where(x => _access.Contains(x.ToUpper())).ToList();
-                    if (policies.Count == 1)
+                    var policies = new List<string>();
+                    TempData["HasError"] = false;
+                    var result = await _authenticationService.Login(UserModel);
+
+                    if (result.Result.Item1)
                     {
-                        switch (policies.FirstOrDefault().ToString().ToUpper())
+                        SetRememberMePreference(IsSaveCookie, result.Result.Item3);
+                        policies = result.Result.Item2.Where(x => _access.Contains(x.ToUpper())).ToList();
+                        if (policies.Count == 1)
                         {
-                            case "ADMIN":
-                                return LocalRedirect("/admin/dashboard");
-                            case "SBC":
-                            case "PM":
-                                return LocalRedirect("/dashboard");
-                            //    return LocalRedirect("/pm/dashboard");
-                            default:
-                                return LocalRedirect("/choose-access");
+                            switch (policies.FirstOrDefault().ToString().ToUpper())
+                            {
+                                case "ADMIN":
+                                    return LocalRedirect("/admin/dashboard");
+                                case "SBC":
+                                case "PM":
+                                    return LocalRedirect("/dashboard");
+                                //    return LocalRedirect("/pm/dashboard");
+                                default:
+                                    return LocalRedirect("/choose-access");
+                            }
                         }
+                        else if (policies.Count > 1)
+                        {
+                            return LocalRedirect("/choose-access");
+                        }
+                        else if (!policies.Any())
+                        {
+                            TempData["HasError"] = true;
+                            ModelState.AddModelError(string.Empty, "No permissions enabled for this user account. Contact admin.");
+                            return Page();
+                        }
+
+                        //_navigationManager.NavigateTo("/");
                     }
-                    else if (policies.Count > 1)
+
+                    TempData["HasError"] = true;
+                    TempData["LogError"] = $"<script>console.log(\"{result.StatusCode.ToString()} - {result.Message} -\n{JsonSerializer.Serialize(UserModel).Replace("\"", "")}\")</script>";
+
+                    if (!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
                     {
-                        return LocalRedirect("/choose-access");
+                        ModelState.AddModelError(string.Empty, result.Message);
                     }
-                    else if (!policies.Any())
+                    else
                     {
-                        TempData["HasError"] = true;
-                        ModelState.AddModelError(string.Empty, "No permissions enabled for this user account. Contact admin.");
-                        return Page();
+                        ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
                     }
-
-                    NavigationManager.NavigateTo("/");
                 }
+            }
+            else
+            {
+                if (_translationState.ActiveLanguageCode.ToString() == action)
+                    return Page();
 
-                TempData["HasError"] = true;
-                TempData["LogError"] = $"<script>console.log(\"{result.StatusCode.ToString()} - {result.Message} -\n{JsonSerializer.Serialize(UserModel).Replace("\"", "")}\")</script>";
-
-                if (!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
+                if (Enum.TryParse(action, out LanguageCode langCode))
                 {
-                    ModelState.AddModelError(string.Empty, result.Message);
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
+                    if (_translationState.ActiveLanguageCode != langCode)
+                        _translationState.ActiveLanguageCode = langCode;
                 }
             }
             return Page();
         }
+
+        public string WelcomeTo { get; set; }
         private void TranslationStatePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            ViewData["welcome_to"] = _translationState.GetValue("Welcome to");
+            WelcomeTo = _translationState.GetValue("Welcome to");
             ViewData["back_office"] = _translationState.GetValue("Back Office");
             ViewData["login"] = _translationState.GetValue("Login");
-
 
             ViewData["username"] = _translationState.GetValue("Username");
             ViewData["enter_your_username"] = _translationState.GetValue("Enter your username");
             ViewData["password"] = _translationState.GetValue("Password");
             ViewData["enter_your_password"] = _translationState.GetValue("Enter your password");
             ViewData["remember_information"] = _translationState.GetValue("Remember Information");
-
-            NavigationManager.NavigateTo("");
+            
+            //RedirectToPage("/", new { LanguageCode = _translationState.ActiveLanguageCode.ToString() });
         }
 
         #endregion

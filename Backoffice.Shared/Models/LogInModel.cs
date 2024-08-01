@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RabbitMQ.Client.Framing.Impl;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Backoffice.Shared.Models
@@ -15,6 +16,7 @@ namespace Backoffice.Shared.Models
         public string UserAgent { get; set; } = "";
         public string IpAddress { get; set; } = "";
         public string Country { get; set; } = "";
+        public string LanguageCode { get; set; } = "";
         public DateTime Date { get; set; } = DateTime.UtcNow;
     }
 }

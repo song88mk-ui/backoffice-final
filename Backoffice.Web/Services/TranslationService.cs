@@ -14,7 +14,7 @@ namespace Backoffice.Web.Services
             _backofficeService = backofficeService;
         }
 
-        public async Task<Dictionary<string, string>> GetTranslations(LanguageCode langCode)
+        public async Task<Dictionary<string, string>> GetTranslationsAsync(LanguageCode langCode)
         {
             var response = await _backofficeService.GetTranslation(langCode);
 
