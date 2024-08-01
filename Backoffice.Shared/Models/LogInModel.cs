@@ -1,5 +1,4 @@
-﻿using RabbitMQ.Client.Framing.Impl;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Backoffice.Shared.Models

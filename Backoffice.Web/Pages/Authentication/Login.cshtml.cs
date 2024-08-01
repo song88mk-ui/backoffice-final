@@ -177,6 +177,7 @@ namespace Backoffice.Web.Pages.Authentication
             var action = Request.Form["action"];
             if (action == "login")
             {
+                ModelState["LanguageCode"].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
                 if (ModelState.IsValid)
                 {
                     var policies = new List<string>();
