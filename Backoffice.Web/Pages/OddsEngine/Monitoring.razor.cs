@@ -78,7 +78,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 _pageHeaderModel = new PageHeaderModel()
                 {
-                    Title = $"{SelectedSport.SportName} - {SelectedSport.SegmentName} - {SelectedSport.LeagueName}",
+                    Title = $"{TranslationState.GetValue(SelectedSport.SportName)} - {SelectedSport.SegmentName} - {SelectedSport.LeagueName}",
                     IconClass = $"iconfont iconfont-{SelectedSport.SportName.ToLower().Replace(" ", "-")}",
                     ShowLanguageDropDown = false
                 };
