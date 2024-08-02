@@ -1,5 +1,4 @@
 using Backoffice.Shared.Enums;
-using Backoffice.Shared.Extensions;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Services;
@@ -60,19 +59,20 @@ namespace Backoffice.Web.Pages.Authentication
         #endregion
 
         #region Methods
-        public async Task OnEdit()
+
+        public async Task<IActionResult> OnGet(string? returnUrl = null, string languageCode = "")
         {
+            var langCodeCookie = Request.Cookies["c-langCode"]?.ToString() ?? "EN";
+            var selectedLangCode = !string.IsNullOrEmpty(languageCode) ? languageCode : langCodeCookie;
 
-        }
-
-        public async Task<IActionResult> OnGet(string? returnUrl = null, string? languageCode = "EN")
-        {
-            CurrentLanguageCode = languageCode;
-
-            if (!string.IsNullOrEmpty(CurrentLanguageCode))
+            if (Translations == null || (!string.IsNullOrEmpty(selectedLangCode) && CurrentLanguageCode != selectedLangCode))
             {
-                Enum.TryParse(CurrentLanguageCode, out LanguageCode langCode);
+                Enum.TryParse(selectedLangCode, out LanguageCode langCode);
                 Translations = await _translationService.GetTranslationsAsync(langCode);
+
+                CurrentLanguageCode = selectedLangCode;
+                Response.Cookies.Delete("c-langCode");
+                Response.Cookies.Append("c-langCode" , selectedLangCode);
             }
 
             IsSaveCookie = false;

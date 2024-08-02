@@ -1,9 +1,11 @@
-﻿using Backoffice.Web.ActionFilter;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Pages
@@ -14,6 +16,7 @@ namespace Backoffice.Web.Pages
 
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] public IModalService ModalService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
@@ -35,7 +38,16 @@ namespace Backoffice.Web.Pages
 
             UserClaims.AddRange(authState.User.Claims.Where(c => validClaimValues.Contains(c.Value)).ToList());
         }
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            var cookieValue = await JSRuntime.InvokeAsync<string>("getCookie", "c-langCode");
 
+            if (Enum.TryParse(cookieValue, out LanguageCode langCode))
+            {
+                TranslationState.ActiveLanguageCode = langCode;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
         public async Task OnLogoutClickEvent()
         {
             var parameters = new ModalParameters();

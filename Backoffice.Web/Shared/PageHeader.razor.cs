@@ -1,7 +1,5 @@
 ﻿using Backoffice.Web.Models;
-using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
-using System.Diagnostics;
 
 namespace Backoffice.Web.Shared
 {
