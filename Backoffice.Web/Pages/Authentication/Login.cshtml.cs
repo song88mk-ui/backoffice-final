@@ -1,16 +1,17 @@
 using Backoffice.Shared.Enums;
+using Backoffice.Shared.Extensions;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
-using Backoffice.Web.States;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.JSInterop;
 using Serilog;
-using System.ComponentModel;
 using System.Data;
 using System.Text.Json;
 using IAuthenticationService = Backoffice.Web.Services.IAuthenticationService;
+
 namespace Backoffice.Web.Pages.Authentication
 {
     public class LoginModel : PageModel
@@ -20,35 +21,40 @@ namespace Backoffice.Web.Pages.Authentication
         [TempData] public string ErrorMessage { get; set; }
         [BindProperty] public LogInModel UserModel { get; set; } = new LogInModel();
         [BindProperty] public bool IsSaveCookie { get; set; }
-        [FromQuery] public string LanguageCode { get; set; }
 
         public bool IsValidLogin { get; set; }
         public string ReturnUrl { get; set; }
         public string Error { get; set; }
-        private IJSRuntime _jsRuntime;
-        private readonly List<string> _access;
+
+        public Dictionary<string, string> Translations { get; set; }
+        public List<LanguageCode> LanguageCodes { get; set; }
+        public string CurrentLanguageCode { get; set; }
 
         #endregion
 
         #region Fields
+
+        private IJSRuntime _jsRuntime;
+        private readonly ITranslationService _translationService;
         private readonly IAuthenticationService _authenticationService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public readonly TranslationState _translationState;
+
+        private readonly List<string> _access = new List<string>() { PermissionCategory.SBC.ToString().ToUpper(), PermissionCategory.Admin.ToString().ToUpper() };
+
 
         #endregion
 
         #region Ctor
 
-        public LoginModel(IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor, TranslationState translationState, IJSRuntime jSRuntime)
+        public LoginModel(IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor, IJSRuntime jSRuntime, ITranslationService translationService)
         {
             _authenticationService = authenticationService;
             _httpContextAccessor = httpContextAccessor;
-            _access = new List<string>() { PermissionCategory.SBC.ToString().ToUpper(), PermissionCategory.Admin.ToString().ToUpper() };
-            _translationState = translationState;
-
             _jsRuntime = jSRuntime;
+            _translationService = translationService;
 
-            _translationState.PropertyChanged += TranslationStatePropertyChanged;
+            Translations = new Dictionary<string, string>();
+            LanguageCodes = Enum.GetValues<LanguageCode>().Select(s => s).ToList();
         }
 
         #endregion
@@ -58,24 +64,16 @@ namespace Backoffice.Web.Pages.Authentication
         {
 
         }
-        public async Task<IActionResult> OnGet(string? returnUrl = null)
+
+        public async Task<IActionResult> OnGet(string? returnUrl = null, string? languageCode = "EN")
         {
-            if (Enum.TryParse(LanguageCode, out LanguageCode langCode))
+            CurrentLanguageCode = languageCode;
+
+            if (!string.IsNullOrEmpty(CurrentLanguageCode))
             {
-                if (_translationState.ActiveLanguageCode != langCode)
-                    _translationState.ActiveLanguageCode = langCode;
+                Enum.TryParse(CurrentLanguageCode, out LanguageCode langCode);
+                Translations = await _translationService.GetTranslationsAsync(langCode);
             }
-
-            WelcomeTo = _translationState.GetValue("Welcome to");
-            ViewData["back_office"] = _translationState.GetValue("Back Office");
-            ViewData["login"] = _translationState.GetValue("Login");
-
-            ViewData["username"] = _translationState.GetValue("Username");
-            ViewData["enter_your_username"] = _translationState.GetValue("Enter your username");
-            ViewData["password"] = _translationState.GetValue("Password");
-            ViewData["enter_your_password"] = _translationState.GetValue("Enter your password");
-            ViewData["remember_information"] = _translationState.GetValue("Remember Information");
-
 
             IsSaveCookie = false;
             if (Request.Cookies.ContainsKey("RememberMePreference"))
@@ -172,12 +170,14 @@ namespace Backoffice.Web.Pages.Authentication
 
             return Page();
         }
+
         public async Task<IActionResult> OnPostAsync()
         {
             var action = Request.Form["action"];
             if (action == "login")
             {
-                ModelState["LanguageCode"].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
+                //ModelState["LanguageCode"].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
+
                 if (ModelState.IsValid)
                 {
                     var policies = new List<string>();
@@ -228,40 +228,22 @@ namespace Backoffice.Web.Pages.Authentication
                         ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
                     }
                 }
+
+                return Page();
             }
             else
             {
-                if (_translationState.ActiveLanguageCode.ToString() == action)
+                if (CurrentLanguageCode == action)
                     return Page();
 
-                if (Enum.TryParse(action, out LanguageCode langCode))
-                {
-                    if (_translationState.ActiveLanguageCode != langCode)
-                        _translationState.ActiveLanguageCode = langCode;
-                }
+                return Redirect($"/login?languageCode={action}");
             }
-            return Page();
-        }
-
-        public string WelcomeTo { get; set; }
-        private void TranslationStatePropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            WelcomeTo = _translationState.GetValue("Welcome to");
-            ViewData["back_office"] = _translationState.GetValue("Back Office");
-            ViewData["login"] = _translationState.GetValue("Login");
-
-            ViewData["username"] = _translationState.GetValue("Username");
-            ViewData["enter_your_username"] = _translationState.GetValue("Enter your username");
-            ViewData["password"] = _translationState.GetValue("Password");
-            ViewData["enter_your_password"] = _translationState.GetValue("Enter your password");
-            ViewData["remember_information"] = _translationState.GetValue("Remember Information");
-            
-            //RedirectToPage("/", new { LanguageCode = _translationState.ActiveLanguageCode.ToString() });
         }
 
         #endregion
 
         #region Utilities
+
         private void SetRememberMePreference(bool value, TokenModel token = null)
         {
             if (value && token != null)
@@ -281,6 +263,7 @@ namespace Backoffice.Web.Pages.Authentication
 
             IsSaveCookie = value;
         }
+
         #endregion
     }
 }
