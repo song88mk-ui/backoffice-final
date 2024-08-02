@@ -22,6 +22,7 @@ using System.Text.Json.Serialization;
 
 namespace Backoffice.API
 {
+    //
     public class Startup
     {
         public Startup(IConfiguration configuration)
