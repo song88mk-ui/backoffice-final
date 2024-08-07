@@ -62,29 +62,32 @@
                     <div class="w-75 mx-4 login-container">
                         <div class="col-12 d-flex justify-content-end">
                             @* Translation *@
-                            <form method="post">
-                                <div class="d-flex align-items-center">
-                                    <div class="dropdown">
-                                        <button class="btn btn-secondary @(Model.LanguageCodes.Any() ? "dropdown-toggle" : "") d-flex align-items-center font-white" type="button" id="dropdownLanguage" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <span class="d-flex">
-                                                <i class="@($"ico-flag flag-{Model.CurrentLanguageCode.ToLower()}") me-2" aria-hidden="true"></i>
-                                                <span>@Model.CurrentLanguageCode.ToString()</span>
-                                            </span>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="dropdownLanguage">
-                                            @foreach (var langCode in Model.LanguageCodes.Select(s => s.ToString()))
-                                            {
-                                                <button type="submit" class="w-100 dropdown-item position-relative d-flex align-items-center" name="action" value="@langCode">
-                                                    <span class="d-flex">
-                                                        <i class="@($"ico-flag flag-{langCode.ToLower()}") me-2" aria-hidden="true">
-                                                        </i>@langCode
-                                                    </span>
-                                                </button>
-                                            }
-                                        </ul>
+                            @if (Model.LanguageCodes != null)
+                            {
+                                <form method="post">
+                                    <div class="d-flex align-items-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary @(Model.LanguageCodes.Any() ? "dropdown-toggle" : "") d-flex align-items-center font-white" type="button" id="dropdownLanguage" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="d-flex">
+                                                    <i class="@($"ico-flag flag-{Model.CurrentLanguageCode.ToLower()}") me-2" aria-hidden="true"></i>
+                                                    <span>@Model.CurrentLanguageCode.ToString()</span>
+                                                </span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownLanguage">
+                                                @foreach (var langCode in Model.LanguageCodes.Select(s => s.ToString()))
+                                                {
+                                                    <button type="submit" class="w-100 dropdown-item position-relative d-flex align-items-center" name="action" value="@langCode">
+                                                        <span class="d-flex">
+                                                            <i class="@($"ico-flag flag-{langCode.ToLower()}") me-2" aria-hidden="true">
+                                                            </i>@langCode
+                                                        </span>
+                                                    </button>
+                                                }
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
-                            </form>
+                                </form>
+                            }
                         </div>
 
                         <form method="post">
@@ -138,7 +141,7 @@
                             </div>
                             <div class="login-footer">
                                 <button type="submit" class="d-block rounded-2 text-decoration-none text-center col-12 border-0" name="action" value="login">
-                                    @Model.Translations.GetValue("Login");
+                                    @Model.Translations.GetValue("Login")
                                 </button>
                             </div>
                         </form>

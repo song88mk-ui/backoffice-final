@@ -26,7 +26,7 @@ namespace Backoffice.Web.Pages.Authentication
         public string Error { get; set; }
 
         public Dictionary<string, string> Translations { get; set; }
-        public List<LanguageCode> LanguageCodes { get; set; }
+        public List<LanguageCode> LanguageCodes { get; set; } = new List<LanguageCode>();
         public string CurrentLanguageCode { get; set; }
 
         #endregion
