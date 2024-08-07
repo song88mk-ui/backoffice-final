@@ -6,6 +6,7 @@ using Backoffice.Web.Components.SBC.Clients;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Globalization;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -28,6 +29,8 @@ namespace Backoffice.Web.Pages.SBC
         public decimal Opacity { get; set; }
 
         private static int[] virtualSportIds = new int[] { 1001, 1002, 1003, 1005, 1021 };
+        private string[] cryptoCurrencies = new string[] { Currency.BTC.ToString(), Currency.ETH.ToString() };
+
 
         #endregion
         private PageHeaderModel _pageHeaderModel;
@@ -154,37 +157,37 @@ namespace Backoffice.Web.Pages.SBC
             foreach (var betSetting in client.BetSettings)
             {
                 #region Soccer
-                betSetting.BetSettingSoccer.MaxPerTicket = betSetting.BetSettingSoccer.MaxPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingSoccer.MaxPerTicket.Value.ToString("#.00")) : 0.00m;
-                betSetting.BetSettingSoccer.MinPerTicket = betSetting.BetSettingSoccer.MinPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingSoccer.MinPerTicket.Value.ToString("#.00")) : 0.00m;
-                betSetting.BetSettingSoccer.MaxPerGame = betSetting.BetSettingSoccer.MaxPerGame.HasValue ? decimal.Parse(betSetting.BetSettingSoccer.MaxPerGame.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingSoccer.MaxPerTicket = betSetting.BetSettingSoccer.MaxPerTicket.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingSoccer.MaxPerTicket.Value) : 0.00m;
+                betSetting.BetSettingSoccer.MinPerTicket = betSetting.BetSettingSoccer.MinPerTicket.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingSoccer.MinPerTicket.Value) : 0.00m;
+                betSetting.BetSettingSoccer.MaxPerGame = betSetting.BetSettingSoccer.MaxPerGame.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingSoccer.MaxPerGame.Value) : 0.00m;
                 #endregion
 
                 #region Cricket
-                betSetting.BetSettingCricket.MaxPerTicket = betSetting.BetSettingCricket.MaxPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingCricket.MaxPerTicket.Value.ToString("#.00")) : 0.00m;
-                betSetting.BetSettingCricket.MinPerTicket = betSetting.BetSettingCricket.MinPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingCricket.MinPerTicket.Value.ToString("#.00")) : 0.00m;
-                betSetting.BetSettingCricket.MaxPerGame = betSetting.BetSettingCricket.MaxPerGame.HasValue ? decimal.Parse(betSetting.BetSettingCricket.MaxPerGame.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingCricket.MaxPerTicket = betSetting.BetSettingCricket.MaxPerTicket.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingCricket.MaxPerTicket.Value) : 0.00m;
+                betSetting.BetSettingCricket.MinPerTicket = betSetting.BetSettingCricket.MinPerTicket.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingCricket.MinPerTicket.Value) : 0.00m;
+                betSetting.BetSettingCricket.MaxPerGame = betSetting.BetSettingCricket.MaxPerGame.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingCricket.MaxPerGame.Value) : 0.00m;
                 #endregion
 
                 #region Other Sports
-                betSetting.BetSettingAllSports.MaxPerTicket = betSetting.BetSettingAllSports.MaxPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingAllSports.MaxPerTicket.Value.ToString("#.00")) : 0.00m;
-                betSetting.BetSettingAllSports.MinPerTicket = betSetting.BetSettingAllSports.MinPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingAllSports.MinPerTicket.Value.ToString("#.00")) : 0.00m;
-                betSetting.BetSettingAllSports.MaxPerGame = betSetting.BetSettingAllSports.MaxPerGame.HasValue ? decimal.Parse(betSetting.BetSettingAllSports.MaxPerGame.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingAllSports.MaxPerTicket = betSetting.BetSettingAllSports.MaxPerTicket.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingAllSports.MaxPerTicket.Value) : 0.00m;
+                betSetting.BetSettingAllSports.MinPerTicket = betSetting.BetSettingAllSports.MinPerTicket.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingAllSports.MinPerTicket.Value) : 0.00m;
+                betSetting.BetSettingAllSports.MaxPerGame = betSetting.BetSettingAllSports.MaxPerGame.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingAllSports.MaxPerGame.Value) : 0.00m;
                 #endregion
 
                 #region Parlay
-                betSetting.BetSettingParlay.MaxPerTicket = betSetting.BetSettingParlay.MaxPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingParlay.MaxPerTicket.Value.ToString("#.00")) : 0.00m;
-                betSetting.BetSettingParlay.MinPerTicket = betSetting.BetSettingParlay.MinPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingParlay.MinPerTicket.Value.ToString("#.00")) : 0.00m;
-                betSetting.BetSettingParlay.MaxPayoutPerTicket = betSetting.BetSettingParlay.MaxPayoutPerTicket.HasValue ? decimal.Parse(betSetting.BetSettingParlay.MaxPayoutPerTicket.Value.ToString("#.00")) : 0.00m;
-                betSetting.BetSettingParlay.MaxWinningsBonus = betSetting.BetSettingParlay.MaxWinningsBonus.HasValue ? decimal.Parse(betSetting.BetSettingParlay.MaxWinningsBonus.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingParlay.MaxPerTicket = betSetting.BetSettingParlay.MaxPerTicket.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingParlay.MaxPerTicket.Value) : 0.00m;
+                betSetting.BetSettingParlay.MinPerTicket = betSetting.BetSettingParlay.MinPerTicket.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingParlay.MinPerTicket.Value) : 0.00m;
+                betSetting.BetSettingParlay.MaxPayoutPerTicket = betSetting.BetSettingParlay.MaxPayoutPerTicket.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingParlay.MaxPayoutPerTicket.Value) : 0.00m;
+                betSetting.BetSettingParlay.MaxWinningsBonus = betSetting.BetSettingParlay.MaxWinningsBonus.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingParlay.MaxWinningsBonus.Value) : 0.00m;
                 #endregion
 
                 #region Priceboost
-                betSetting.BetSettingPriceboost.MaxStake = betSetting.BetSettingPriceboost.MaxStake.HasValue ? decimal.Parse(betSetting.BetSettingPriceboost.MaxStake.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingPriceboost.MaxStake = betSetting.BetSettingPriceboost.MaxStake.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingPriceboost.MaxStake.Value) : 0.00m;
                 #endregion
 
                 #region BetSettingBuilder
-                betSetting.BetSettingBetBuilder.MaxStake = betSetting.BetSettingBetBuilder.MaxStake.HasValue ? decimal.Parse(betSetting.BetSettingBetBuilder.MaxStake.Value.ToString("#.00")) : 0.00m;
-                betSetting.BetSettingBetBuilder.MinStake = betSetting.BetSettingBetBuilder.MinStake.HasValue ? decimal.Parse(betSetting.BetSettingBetBuilder.MinStake.Value.ToString("#.00")) : 0.00m;
+                betSetting.BetSettingBetBuilder.MaxStake = betSetting.BetSettingBetBuilder.MaxStake.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingBetBuilder.MaxStake.Value) : 0.00m;
+                betSetting.BetSettingBetBuilder.MinStake = betSetting.BetSettingBetBuilder.MinStake.HasValue ? Truncate(betSetting.CurrencyCode, betSetting.BetSettingBetBuilder.MinStake.Value) : 0.00m;
                 #endregion
             }
 
@@ -304,6 +307,37 @@ namespace Backoffice.Web.Pages.SBC
             }
 
             return new ClientListResponse();
+        }
+
+
+        private decimal Truncate(string currencyCode, decimal value)
+        {
+
+            int places = 2;
+            var formatter = "N2";
+
+            if (cryptoCurrencies.Contains(currencyCode))
+            {
+                places = 12;
+                formatter = "N12";
+
+                var result = Truncate(value, places, formatter).TrimEnd('0').TrimEnd('.');
+                return Convert.ToDecimal(result.Split(".").LastOrDefault()?.Length <= 1 ? Truncate(value, 2, "N2") : result);
+            }
+
+            return Convert.ToDecimal(Truncate(value, places, formatter));
+        }
+
+        private string Truncate(decimal value, int places = 2, string formatter = "")
+        {
+            try
+            {
+                return (Math.Truncate(value * (decimal)Math.Pow(10, places)) / (decimal)Math.Pow(10, places)).ToString(formatter, CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return "0";
+            }
         }
 
         #endregion
