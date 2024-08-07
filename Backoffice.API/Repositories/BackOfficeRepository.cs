@@ -874,27 +874,39 @@ namespace Backoffice.API.Repositories
                         };
                     }
 
-                }
-
-                if (request.RevenueShare.SportsbookShare < 0 || request.RevenueShare.SportsbookShare > 1m)
-                {
-                    return new BaseResponse<bool>
+                    if (request.RevenueShare.SportsbookShare < 0 || request.RevenueShare.SportsbookShare > 1m)
                     {
-                        StatusCode = StatusCode.Error,
-                        Message = "Sportsbook revenue share must be between 0 - 100%.",
-                        Result = false
-                    };
-                }
+                        request.RevenueShare.SportsbookShare = 0m;
+                    }
 
-                if (request.RevenueShare.JackpotShare < 0 || request.RevenueShare.JackpotShare > 1m)
-                {
-                    return new BaseResponse<bool>
+                    if (request.RevenueShare.JackpotShare < 0 || request.RevenueShare.JackpotShare > 1m)
                     {
-                        StatusCode = StatusCode.Error,
-                        Message = "JackpotShare revenue share must be between 0 - 100%.",
-                        Result = false
-                    };
+                        request.RevenueShare.JackpotShare = 0;
+                    }
                 }
+                else
+                {
+                    if (request.RevenueShare.SportsbookShare < 0 || request.RevenueShare.SportsbookShare > 1m)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "Sportsbook revenue share must be between 0 - 100%.",
+                            Result = false
+                        };
+                    }
+
+                    if (request.RevenueShare.JackpotShare < 0 || request.RevenueShare.JackpotShare > 1m)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = "JackpotShare revenue share must be between 0 - 100%.",
+                            Result = false
+                        };
+                    }
+                }
+                
 
                 if (GetClientInformation().Any(c => c.Brand == request.ClientCode && c.ClientId != request.ClientId))
                 {
