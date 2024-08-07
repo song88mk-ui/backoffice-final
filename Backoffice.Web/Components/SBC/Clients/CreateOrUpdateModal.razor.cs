@@ -480,14 +480,11 @@ namespace Backoffice.Web.Components.SBC.Clients
                     }
 
                 }
-                else
-                {
-                    if (clientRequest.RevenueShare.SportsbookShare > 0)
-                        clientRequest.RevenueShare.SportsbookShare = clientRequest.RevenueShare.SportsbookShare / 100m;
-                    if (clientRequest.RevenueShare.JackpotShare > 0)
-                        clientRequest.RevenueShare.JackpotShare = clientRequest.RevenueShare.JackpotShare / 100m;
 
-                }
+                if (clientRequest.RevenueShare.SportsbookShare > 0)
+                    clientRequest.RevenueShare.SportsbookShare = clientRequest.RevenueShare.SportsbookShare / 100m;
+                if (clientRequest.RevenueShare.JackpotShare > 0)
+                    clientRequest.RevenueShare.JackpotShare = clientRequest.RevenueShare.JackpotShare / 100m;
 
                 var response = (await BackofficeService.AddOrUpdateClient(clientRequest));
 
