@@ -875,28 +875,25 @@ namespace Backoffice.API.Repositories
                     }
 
                 }
-                else
+
+                if (request.RevenueShare.SportsbookShare < 0 || request.RevenueShare.SportsbookShare > 1m)
                 {
-                    if (request.RevenueShare.SportsbookShare < 0 || request.RevenueShare.SportsbookShare > 1m)
+                    return new BaseResponse<bool>
                     {
-                        return new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = "Sportsbook revenue share must be between 0 - 100%.",
-                            Result = false
-                        };
-                    }
+                        StatusCode = StatusCode.Error,
+                        Message = "Sportsbook revenue share must be between 0 - 100%.",
+                        Result = false
+                    };
+                }
 
-                    if (request.RevenueShare.JackpotShare < 0 || request.RevenueShare.JackpotShare > 1m)
+                if (request.RevenueShare.JackpotShare < 0 || request.RevenueShare.JackpotShare > 1m)
+                {
+                    return new BaseResponse<bool>
                     {
-                        return new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = "JackpotShare revenue share must be between 0 - 100%.",
-                            Result = false
-                        };
-                    }
-
+                        StatusCode = StatusCode.Error,
+                        Message = "JackpotShare revenue share must be between 0 - 100%.",
+                        Result = false
+                    };
                 }
 
                 if (GetClientInformation().Any(c => c.Brand == request.ClientCode && c.ClientId != request.ClientId))
