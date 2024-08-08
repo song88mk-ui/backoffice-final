@@ -23,7 +23,7 @@
     @if (IsImportTab)
     {
         <select class="form-select import-select d-block" multiple="multiple" disabled="@IsUploading">
-            <option value="0" selected>All Clients</option>
+            <option value="0" selected>TranslationState.GetValue("All Clients")</option>
             @foreach (var client in Clients)
             {
                 <option value="@client.Value">@client.Name</option>

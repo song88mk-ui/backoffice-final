@@ -9,11 +9,11 @@
                         {
                             if (Clients.Count - 1 == SelectedClientCount)
                             {
-                                <span>All Clients (@SelectedClientCount)</span>
+                                <span>TranslationState.GetValue("All Clients") (@SelectedClientCount)</span>
                             }
                             else
                             {
-                                <span>@(SelectedClientCount == 1 ? SelectedClientName : $"Clients ({SelectedClientCount})")</span>
+                                <span>@(SelectedClientCount == 1 ? SelectedClientName : $"{TranslationState.GetValue("Clients")} ({SelectedClientCount})")</span>
                             }
                         }
                         else

@@ -42,7 +42,7 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnClientChangedEvent">
                         <optgroup label="Clients">
-                            <option value="ALL">All Clients</option>
+                            <option value="ALL">@TranslationState.GetValue("All Clients")</option>
                             @if (FilterModel != null && FilterModel.Clients != null)
                             {
                                 @foreach (var client in FilterModel.Clients)
