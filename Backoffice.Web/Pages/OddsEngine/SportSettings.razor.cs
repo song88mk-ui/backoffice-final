@@ -5,7 +5,6 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.OddsEngine.SportSettings;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
-using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
@@ -53,7 +52,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _breadcrumbs.Add(new BreadcrumbModel
             {
-                Name = "Sport Settings",
+                Name = "Sports Settings",
                 Url = _pageUrl,
                 IsCurrentPage = true
             });
@@ -63,7 +62,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _pageHeaderModel = new PageHeaderModel
             {
-                Title = "Sport Settings",
+                Title = "Sports Settings",
                 ShowLanguageDropDown = false
             };
             await Task.CompletedTask;

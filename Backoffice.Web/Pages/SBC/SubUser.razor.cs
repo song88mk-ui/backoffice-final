@@ -106,7 +106,7 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("IsEdit", false);
 
             var options = new ModalOptions();
-            ModalService.Open<CreateOrUpdateModal>("Create Sub-Users", parameters, options);
+            ModalService.Open<CreateOrUpdateModal>("Create Sub User", parameters, options);
         }
 
         public async Task OnEditSubUserClickEvent(UserResponse user)
