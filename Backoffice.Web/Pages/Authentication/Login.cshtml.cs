@@ -1,4 +1,5 @@
 using Backoffice.Shared.Enums;
+using Backoffice.Shared.Extensions;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Services;
@@ -127,11 +128,11 @@ namespace Backoffice.Web.Pages.Authentication
 
                             if (!string.IsNullOrEmpty(authenticate.Message) && !authenticate.Message.Contains("Incorrect password"))
                             {
-                                ModelState.AddModelError(string.Empty, authenticate.Message);
+                                ModelState.AddModelError(string.Empty, Translations.GetValue(authenticate.Message));
                             }
                             else
                             {
-                                ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
+                                ModelState.AddModelError(string.Empty, Translations.GetValue("Username or Password is incorrect"));
                             }
                         }
                     }
@@ -209,7 +210,7 @@ namespace Backoffice.Web.Pages.Authentication
                         else if (!policies.Any())
                         {
                             TempData["HasError"] = true;
-                            ModelState.AddModelError(string.Empty, "No permissions enabled for this user account. Contact admin.");
+                            ModelState.AddModelError(string.Empty, Translations.GetValue("No permissions enabled for this user account. Contact admin."));
                             return Page();
                         }
 
@@ -221,11 +222,11 @@ namespace Backoffice.Web.Pages.Authentication
 
                     if (!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
                     {
-                        ModelState.AddModelError(string.Empty, result.Message);
+                        ModelState.AddModelError(string.Empty, Translations.GetValue(result.Message));
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
+                        ModelState.AddModelError(string.Empty, Translations.GetValue("Username or Password is incorrect"));
                     }
                 }
 

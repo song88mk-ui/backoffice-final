@@ -30,7 +30,7 @@
                     <input type="text" class="form-control @(IsValidEmail ? "valid" : "invalid")" placeholder="Enter Email Address" @bind-value="UserRegister.Email" @oninput="@(() => RemoveError("email"))" />
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Password</label>
+                    <label class="form-label">@TranslationState.GetValue("Password")</label>
                     <div class="input-group">
                         <input id="password" type="password" class="form-control pe-5 @(IsValidPassword ? "valid" : "invalid")" placeholder="Enter your password" @bind-value="UserRegister.Password" @oninput="@(() => RemoveError("password"))" />
                         <button type="button" class="d-flex align-items-center position-absolute end-0 h-100 bg-transparent border-0 password-eye" onclick="password_show_hide();">
