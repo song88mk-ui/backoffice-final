@@ -4,9 +4,9 @@
             <img src="icons/svg/warning-icon.svg" />
         </div>
         <div class="text-center">
-            Are you sure you want to copy <b>@SelectedFromClient.Value</b> to <b>@ToClient.ClientName</b>?
+            @((MarkupString)TranslationState.GetValue($"Are you sure you want to copy {{{$"<b>{SelectedFromClient.Value}</b>"}}} to {{{$"<b>{ToClient.ClientName}</b>"}}}?"))
             <br />
-            You can't undo this action.
+            @TranslationState.GetValue("You can't undo this action.")
         </div>
         @if(_isProcessing)
         {
