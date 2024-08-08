@@ -43,15 +43,15 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="inputPassword" class="form-label">Password</label>
+                        <label for="inputPassword" class="form-label">@TranslationState.GetValue("Password")</label>
                         <div class="input-group">
                             @if (IsTogglePassword)
                             {
-                                <input type="text" class="form-control" id="inputPassword" placeholder="Enter your Password" @bind-value="SubUser.Password">
+                                <input type="text" class="form-control" id="inputPassword" placeholder="@TranslationState.GetValue("Enter your Password")" @bind-value="SubUser.Password">
                             }
                             else
                             {
-                                <input type="password" class="form-control" id="inputPassword" placeholder="Enter your Password" @bind-value="SubUser.Password">
+                                <input type="password" class="form-control" id="inputPassword" placeholder="@TranslationState.GetValue("Enter your Password")" @bind-value="SubUser.Password">
                             }
                             <span class="input-group-text" @onclick="OnTogglePasswordClickEvent">
                                 <i class="@(IsTogglePassword ? "fa fa-eye" : "fa fa-eye-slash")" id="togglePassword"></i>

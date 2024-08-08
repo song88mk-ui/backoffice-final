@@ -3,7 +3,7 @@
 <div class="permission-container">
     <div class="row">
         <div class="col-md-12 mb-1">
-            <h6 class="title fw-bold ps-2 py-1">Permissions</h6>
+            <h6 class="title fw-bold ps-2 py-1">@TranslationState.GetValue("Permissions")</h6>
         </div>
     </div>
     <div class="row">
@@ -17,7 +17,7 @@
                             <div class="header-title">
                                 <h6 class="fw-bold d-inline-block " @onclick="() => OnDropCategoryClickEvent(category)">
                                     <i class="fa fa-plus me-3"></i>
-                                    @category.CategoryName
+                                    @TranslationState.GetValue(category.CategoryName)
                                 </h6>
                                 <div class="form-switch d-inline-block pull-right">
                                     @if (category.CategoryId == SelectedCategoryId && IsSubUser == false)
@@ -54,7 +54,7 @@
                                 }
                                 else if (category.CategoryId == (int)PermissionCategory.SBC)
                                 {
-                                    <label>Create and manage user and user groups, modify, settle, or cancel bets, and view manual bet settlement history</label>
+                                    <label>@TranslationState.GetValue("Sportsbook Clients details")</label>
                                 }
                             </div>
                         </div>
@@ -74,7 +74,7 @@
                                                     @if (!IsSubUser)
                                                     {
                                                         <button class="btn clients-btn dropdown-toggle ps-4" type="button" id="clientDropdown" data-bs-toggle="dropdown" data-bs-auto-close="dropdown" aria-expanded="false" disabled=@(!category.IsEnabled)>
-                                                            Select Clients
+                                                            @TranslationState.GetValue("Select Clients")
                                                         </button>
                                                         @if (ClientModel.Clients.Any())
                                                         {
