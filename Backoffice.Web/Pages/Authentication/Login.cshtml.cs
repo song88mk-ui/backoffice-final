@@ -184,10 +184,6 @@ namespace Backoffice.Web.Pages.Authentication
                     if (Enum.TryParse(UserModel.LanguageCode, out LanguageCode langCode))
                     {
                         Translations = await _translationService.GetTranslationsAsync(langCode);
-                        UserModel.LanguageCode = action;
-
-                        Response.Cookies.Delete("c-langCode");
-                        Response.Cookies.Append("c-langCode", action);
                     }
                 }
                 //ModelState["LanguageCode"].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;

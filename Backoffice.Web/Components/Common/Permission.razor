@@ -102,7 +102,7 @@
                                                 if (category.SubCategories[rowCount].ColPosition != "RIGHT")
                                                 {
                                                     <div class="category mb-3">
-                                                        <div class="category-title fw-bold mb-1">@category.SubCategories[rowCount].SubCategoryName</div>
+                                                        <div class="category-title fw-bold mb-1">@TranslationState.GetValue(category.SubCategories[rowCount].SubCategoryName)</div>
 
                                                         @if (!category.SubCategories[rowCount].Groups.Any())
                                                         {
@@ -146,7 +146,7 @@
                                                 if (category.SubCategories[rowCount].ColPosition != "LEFT")
                                                 {
                                                     <div class="category mb-3">
-                                                        <div class="category-title fw-bold mb-1">@category.SubCategories[rowCount].SubCategoryName</div>
+                                                        <div class="category-title fw-bold mb-1">@TranslationState.GetValue(category.SubCategories[rowCount].SubCategoryName)</div>
 
                                                         @if (!category.SubCategories[rowCount].Groups.Any())
                                                         {

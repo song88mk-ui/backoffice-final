@@ -82,7 +82,7 @@ else
         if (group.Claims.Any())
         {
             <div class="category mb-3 px-4 border-left">
-                <div class="category-title fw-bold mb-1">@group.GroupName</div>
+                <div class="category-title fw-bold mb-1">@TranslationState.GetValue(group.GroupName)</div>
                 @for (int ctr = 0; ctr < @group.Claims.Count; ctr++)
                 {
                     var claim = @group.Claims[ctr];
