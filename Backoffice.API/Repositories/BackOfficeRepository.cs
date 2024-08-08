@@ -2338,7 +2338,8 @@ namespace Backoffice.API.Repositories
         }
         private List<Translation> GetTranslations()
         {
-            return _memCache.GetCache("tr", () => _backofficeContext.Translation.AsNoTracking().ToList(), 24);
+            //return _memCache.GetCache("tr", () => _backofficeContext.Translation.AsNoTracking().ToList(), 24);
+            return _backofficeContext.Translation.AsNoTracking().ToList();
         }
 
         private async Task<decimal> GetExchangeRate(string currencyCode)
