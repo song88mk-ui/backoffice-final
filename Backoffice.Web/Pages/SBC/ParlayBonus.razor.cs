@@ -301,7 +301,7 @@ namespace Backoffice.Web.Pages.SBC
                     Name = TranslationState.GetValue("No Clients Available")
                 });
             else
-                Clients.Insert(0, new SelectListItemModel<Client> { Value = new Client(), Name = "Choose client..." });
+                Clients.Insert(0, new SelectListItemModel<Client> { Value = new Client(), Name = "Choose client" });
 
             //var selectedClients = Clients.Where(c => !string.IsNullOrEmpty(c.Value.ClientCode)).Select(s => s.Value).ToList();            
         }

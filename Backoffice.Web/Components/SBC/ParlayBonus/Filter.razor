@@ -8,14 +8,7 @@
                     <select class="form-control form-select mr-sm-2" @onchange="OnClientChangedEvent" disabled="@IsDisableAction">
                         @foreach (var item in Clients)
                         {
-                            if (item.Value.ClientId.ToString() == ClientId)
-                            {
-                                <option value="@item.Value.ClientId" selected>@item.Name</option>
-                            }
-                            else
-                            {
-                                <option value="@item.Value.ClientId">@item.Name</option>
-                            }
+                            <option value="@item.Value.ClientId" selected=@(item.Value.ClientId.ToString() == ClientId)>@TranslationState.GetValue(item.Name)</option>
                         }
                     </select>
                 }
@@ -23,14 +16,14 @@
             <div class="odds-container d-flex justify-content-center align-self-end">
                 <div class="input-group border-0">
                     <span class="input-group-text min-odds-text">@TranslationState.GetValue("Minimum Odds Per Selection")</span>
-                @*     @if (IsEdit)
+                    @*     @if (IsEdit)
                     { *@
-                        <input type="number" @ref="ParlayBonusMinOddsElementReference" @bind="ClientParlayBonusResponse.ParlayBonusMinOdds"
-                               class="form-control pe-5 min-odds-input text-center @(IsFormValid ? "border-danger":"")" @oninput="ValidateParlayBonusMinOdds" disabled="@(!IsEdit ||IsDisableAction)" />
-                  @*   }
+                    <input type="number" @ref="ParlayBonusMinOddsElementReference" @bind="ClientParlayBonusResponse.ParlayBonusMinOdds"
+                           class="form-control pe-5 min-odds-input text-center @(IsFormValid ? "border-danger":"")" @oninput="ValidateParlayBonusMinOdds" disabled="@(!IsEdit ||IsDisableAction)" />
+                    @*   }
                     else
                     {
-                        <input type="number" @bind="@ClientParlayBonusResponse.ParlayBonusMinOdds" @bind:event="oninput" class="form-control pe-5 min-odds-input text-center" disabled />
+                    <input type="number" @bind="@ClientParlayBonusResponse.ParlayBonusMinOdds" @bind:event="oninput" class="form-control pe-5 min-odds-input text-center" disabled />
                     } *@
                     <span class="tooltip2 fa fa-info-circle me-2">
                         <span class="tooltiptext">@TranslationState.GetValue("minimum value"): 1.20</span>
