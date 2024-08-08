@@ -28,7 +28,6 @@ namespace Backoffice.Web.Pages.Authentication
 
         public Dictionary<string, string> Translations { get; set; }
         public List<LanguageCode> LanguageCodes { get; set; } = new List<LanguageCode>();
-        public string CurrentLanguageCode { get; set; }
 
         #endregion
 
@@ -53,7 +52,6 @@ namespace Backoffice.Web.Pages.Authentication
             _jsRuntime = jSRuntime;
             _translationService = translationService;
 
-            Translations = new Dictionary<string, string>();
             LanguageCodes = Enum.GetValues<LanguageCode>().Select(s => s).ToList();
         }
 
@@ -66,14 +64,17 @@ namespace Backoffice.Web.Pages.Authentication
             var langCodeCookie = Request.Cookies["c-langCode"]?.ToString() ?? "EN";
             var selectedLangCode = !string.IsNullOrEmpty(languageCode) ? languageCode : langCodeCookie;
 
-            if (Translations == null || (!string.IsNullOrEmpty(selectedLangCode) && CurrentLanguageCode != selectedLangCode))
+            if (Translations == null || (!string.IsNullOrEmpty(selectedLangCode) && UserModel.LanguageCode != selectedLangCode))
             {
-                Enum.TryParse(selectedLangCode, out LanguageCode langCode);
-                Translations = await _translationService.GetTranslationsAsync(langCode);
+                if (Enum.TryParse(selectedLangCode, out LanguageCode langCode))
+                {
+                    UserModel.LanguageCode = selectedLangCode;
 
-                CurrentLanguageCode = selectedLangCode;
-                Response.Cookies.Delete("c-langCode");
-                Response.Cookies.Append("c-langCode" , selectedLangCode);
+                    Translations = await _translationService.GetTranslationsAsync(langCode);
+
+                    Response.Cookies.Delete("c-langCode");
+                    Response.Cookies.Append("c-langCode", selectedLangCode);
+                }
             }
 
             IsSaveCookie = false;
@@ -175,8 +176,20 @@ namespace Backoffice.Web.Pages.Authentication
         public async Task<IActionResult> OnPostAsync()
         {
             var action = Request.Form["action"];
+
             if (action == "login")
             {
+                if (!(Translations?.Any() ?? false))
+                {
+                    if (Enum.TryParse(UserModel.LanguageCode, out LanguageCode langCode))
+                    {
+                        Translations = await _translationService.GetTranslationsAsync(langCode);
+                        UserModel.LanguageCode = action;
+
+                        Response.Cookies.Delete("c-langCode");
+                        Response.Cookies.Append("c-langCode", action);
+                    }
+                }
                 //ModelState["LanguageCode"].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
 
                 if (ModelState.IsValid)
@@ -210,7 +223,7 @@ namespace Backoffice.Web.Pages.Authentication
                         else if (!policies.Any())
                         {
                             TempData["HasError"] = true;
-                            ModelState.AddModelError(string.Empty, Translations.GetValue("No permissions enabled for this user account. Contact admin."));
+                            ModelState.AddModelError(string.Empty, "No permissions enabled for this user account. Contact admin.");
                             return Page();
                         }
 
@@ -222,23 +235,30 @@ namespace Backoffice.Web.Pages.Authentication
 
                     if (!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
                     {
-                        ModelState.AddModelError(string.Empty, Translations.GetValue(result.Message));
+                        ModelState.AddModelError(string.Empty, result.Message);
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, Translations.GetValue("Username or Password is incorrect"));
+                        ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
                     }
                 }
-
-                return Page();
             }
             else
             {
-                if (CurrentLanguageCode == action)
-                    return Page();
+                if (!(Translations?.Any() ?? false))
+                {
+                    if (Enum.TryParse(action, out LanguageCode langCode))
+                    {
+                        Translations = await _translationService.GetTranslationsAsync(langCode);
+                        UserModel.LanguageCode = action;
 
-                return Redirect($"/login?languageCode={action}");
+                        Response.Cookies.Delete("c-langCode");
+                        Response.Cookies.Append("c-langCode", action);
+                    }
+                }
             }
+
+            return Page();
         }
 
         #endregion
