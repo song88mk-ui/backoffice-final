@@ -207,7 +207,8 @@ namespace Backoffice.Web.Components.Common
                 Alerts.Add(new AlertModel
                 {
                     Status = AlertStatus.Error,
-                    Message = "Password must be 8-15 characters long, which should contain uppercase and lowercase characters, with any digit from 0-9, and must include at least one special character.",
+                    //Message = "Password must be 8-15 characters long, which should contain uppercase and lowercase characters, with any digit from 0-9, and must include at least one special character.",
+                    Message = "password_criteria",
                     Opacity = 1.0m
                 });
             }

@@ -11,11 +11,11 @@
                     <h5 class="modal-title fw-bold @_titleClass">
                         @if (HasHeaderBackButton)
                         {
-                            <button type="button" class="back-button" @onclick="_ => OnBack()"><i class="fa fa-2x fa-angle-left p-r-10"></i></button> <span style="top: -5px; position: relative">@_modalTitle</span>
+                            <button type="button" class="back-button" @onclick="_ => OnBack()"><i class="fa fa-2x fa-angle-left p-r-10"></i></button> <span style="top: -5px; position: relative">@TranslationState.GetValue(_modalTitle)</span>
                         }
                         else
                         {
-                            @_modalTitle
+                            @TranslationState.GetValue(_modalTitle)
                         }
                     </h5>
                 }
@@ -29,11 +29,11 @@
                         <h5 class="modal-title">
                             @if (HasHeaderBackButton)
                             {
-                                <button type="button" class="btn-close" @onclick="_ => Close()"></button> <span style="top: -5px; position: relative">@_modalTitle</span>
+                                <button type="button" class="btn-close" @onclick="_ => Close()"></button> <span style="top: -5px; position: relative">@TranslationState.GetValue(_modalTitle)</span>
                             }
                             else
                             {
-                                @_modalTitle
+                                @TranslationState.GetValue(_modalTitle)
                             }
                         </h5>
                     </Tooltip>

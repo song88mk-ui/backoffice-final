@@ -57,7 +57,8 @@
                                 <i class="@(IsTogglePassword ? "fa fa-eye" : "fa fa-eye-slash")" id="togglePassword"></i>
                             </span>
                         </div>
-                        <p class="fst-italic p-desc">Password must contain any character from A-Z or a-z with any digit from 0-9 and between 8 to 15 characters long</p>
+                        @* <p class="fst-italic p-desc">Password must contain any character from A-Z or a-z with any digit from 0-9 and between 8 to 15 characters long</p> *@
+                        <p class="fst-italic p-desc">@TranslationState.GetValue("password_criteria")</p>
                     </div>
                     @if (IsEdit == true)
                     {

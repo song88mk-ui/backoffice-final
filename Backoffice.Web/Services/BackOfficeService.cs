@@ -1,21 +1,15 @@
-﻿using Backoffice.Shared.Data.Backoffice.Entities;
-using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
-using Newtonsoft.Json.Linq;
+using Serilog;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Serilog;
-using System.Runtime.CompilerServices;
-using Google.Protobuf.WellKnownTypes;
-using System.Linq;
 
 namespace Backoffice.Web.Services
 {

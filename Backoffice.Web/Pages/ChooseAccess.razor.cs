@@ -40,12 +40,14 @@ namespace Backoffice.Web.Pages
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            var cookieValue = await JSRuntime.InvokeAsync<string>("getCookie", "c-langCode");
-
-            if (Enum.TryParse(cookieValue, out LanguageCode langCode))
+            if (firstRender)
             {
-                TranslationState.ActiveLanguageCode = langCode;
-                await InvokeAsync(StateHasChanged);
+                var cookieValue = await JSRuntime.InvokeAsync<string>("getCookie", "c-langCode");
+
+                if (Enum.TryParse(cookieValue, out LanguageCode langCode))
+                {
+                    TranslationState.ActiveLanguageCode = langCode;
+                }
             }
         }
         public async Task OnLogoutClickEvent()

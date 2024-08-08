@@ -29,12 +29,14 @@
                         <thead>
                             <tr>
                                 <th valign="middle" align="left"><strong>#</strong></th>
-                                <th valign="middle" align="left"><strong>Date</strong></th>
+                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("Date")</strong></th>
                                 <th valign="middle" align="left"><strong>@TranslationState.GetValue("Client name")</strong></th>
-                                <th valign="middle" align="left"><strong>Activity</strong></th>
-                                <th valign="middle" align="left"><strong>Changed From</strong></th>
-                                <th valign="middle" align="left"><strong>Changed To</strong></th>
-                                <th valign="middle" align="left"><strong>Updated By</strong></th>
+                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("Activity")</strong></th>
+                                @* <th valign="middle" align="left"><strong>Changed From</strong></th>
+                                <th valign="middle" align="left"><strong>Changed To</strong></th> *@
+                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("From")</strong></th>
+                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("To")</strong></th>
+                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("Updated By")</strong></th>
                             </tr>
                         </thead>
                         <tbody>

@@ -46,7 +46,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
                                         <div class="nav-item">
                                             <NavLink class="nav-link" href="@submenu.Url">
                                                 <span class="ico ico-@(submenu.IconName)" aria-hidden="true"></span>
-                                                <span class="nav-menu-text">@(submenu.Name.ToString(new CultureInfo("zh-hans")))</span>
+                                                <span class="nav-menu-text">@TranslationState.GetValue(submenu.Name)</span>
                                             </NavLink>
                                         </div>
                                     }
@@ -154,14 +154,14 @@ else if (NavMenuAccess == PermissionCategory.OE)
                 <div class="nav-item px-3">
                     <NavLink class="nav-link switch-access justify-content-center" href="choose-access">
                         <span class="ico ico-switch-access" aria-hidden="true"></span>
-                        <span class="const-menu-item nav-menu-text">Switch Access</span>
+                        <span class="const-menu-item nav-menu-text">@TranslationState.GetValue("Switch Access")</span>
                     </NavLink>
                 </div>
             }
             <div class="nav-item px-3">
                 <NavLink class="nav-link logout justify-content-center" href="javascript:void(0)" @onclick="OnLogoutClickEvent">
                     <span class="ico ico-logout" aria-hidden="true"></span>
-                    <span class="const-menu-item nav-menu-text">Logout</span>
+                    <span class="const-menu-item nav-menu-text">@TranslationState.GetValue("logout")</span>
                 </NavLink>
             </div>
         </nav>

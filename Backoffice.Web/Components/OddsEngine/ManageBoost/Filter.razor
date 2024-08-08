@@ -9,14 +9,7 @@
                         {
                             @foreach (var item in _clients)
                             {
-                                if (item.Value == SelectedClientCode)
-                                {
-                                    <option value="@item.Value" selected>@item.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@item.Value">@item.Name</option>
-                                }
+                                <option value="@item.Value" selected="@(item.Value == SelectedClientCode)">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                         else
