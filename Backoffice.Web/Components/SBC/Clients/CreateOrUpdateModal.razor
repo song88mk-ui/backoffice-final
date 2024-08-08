@@ -635,7 +635,10 @@
                                                 Min Per Ticket
                                             </label>
                                             <InputDecimal CurrencyCode="@SelectedCurrency" Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.soccerMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingSoccer.MinPerTicket" IsNullable=false/>
-                                            <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                            @if(!cryptoCurrencies.Contains(SelectedCurrency.ToUpper()))
+                                            {
+                                                <p class="fst-italic p-desc">Minimum is 0.02</p>                                                
+                                            }
                                         </div>
 
                                         <div class="d-flex flex-column">
@@ -664,7 +667,10 @@
                                                 Min Per Ticket
                                             </label>
                                             <InputDecimal CurrencyCode="@SelectedCurrency" Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.cricketMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingCricket.MinPerTicket" IsNullable=false />
-                                            <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                            @if (!cryptoCurrencies.Contains(SelectedCurrency.ToUpper()))
+                                            {
+                                                <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                            }
                                         </div>
 
                                         <div class="d-flex flex-column">
@@ -694,7 +700,10 @@
                                                 Min Per Ticket
                                             </label>
                                             <InputDecimal CurrencyCode="@SelectedCurrency" Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.othersMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingAllSports.MinPerTicket" IsNullable=false/>
-                                            <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                            @if (!cryptoCurrencies.Contains(SelectedCurrency.ToUpper()))
+                                            {
+                                                <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                            }
                                         </div>
 
                                         <div class="d-flex flex-column">
@@ -722,7 +731,10 @@
                                                 Min Per Ticket
                                             </label>
                                             <InputDecimal CurrencyCode="@SelectedCurrency" Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.parlayMinTicketField")" @bind-Value="SelectedBetSetting.BetSettingParlay.MinPerTicket" IsNullable=false />
-                                            <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                            @if (!cryptoCurrencies.Contains(SelectedCurrency.ToUpper()))
+                                            {
+                                                <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                            }
                                         </div>
 
                                         <div class="d-flex flex-column">
@@ -774,7 +786,10 @@
                                             <div class="col-md-6">
                                                 <label class="form-label" for="@($"{SelectedCurrency}.betBuilderMinTicket")">Min Per Ticket</label>
                                                 <InputDecimal CurrencyCode="@SelectedCurrency" Min="0.02m" class="form-control" id="@($"{SelectedCurrency}.betBuilderMinTicket")" @bind-Value="SelectedBetSetting.BetSettingBetBuilder.MinStake" IsNullable=false />
-                                                <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                                @if (!cryptoCurrencies.Contains(SelectedCurrency.ToUpper()))
+                                                {
+                                                    <p class="fst-italic p-desc">Minimum is 0.02</p>
+                                                }
                                             </div>
 
                                             <div class="col-md-6">
