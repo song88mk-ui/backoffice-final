@@ -77,7 +77,7 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnSegmentChangedEvent">
                         <optgroup label="Segment">
-                            <option value="0">Select Segment</option>
+                            <option value="0">@TranslationState.GetValue("Select Segment")</option>
                             @if (FilterModel != null && FilterModel.Segments != null)
                             {
                                 @foreach (var segment in FilterModel.Segments.SegmentLookup)
@@ -91,7 +91,7 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnLeagueChangedEvent">
                         <optgroup label="League">
-                            <option value="0">Select League</option>
+                            <option value="0">@TranslationState.GetValue("Select League")</option>
                             @if (FilterModel != null && FilterModel.Leagues != null)
                             {
                                 @foreach (var league in FilterModel.Leagues.LeagueLookup)

@@ -29,14 +29,7 @@
                     <select class="form-select d-block" @onchange="OnFixtureStatusChangedEvent">
                         @foreach (var fixtureStatus in FixtureStatuses)
                         {
-                            @if (SelectedFixtureStatusId == fixtureStatus.Value)
-                            {
-                                <option value="@fixtureStatus.Value" selected>@fixtureStatus.Name</option>
-                            }
-                            else
-                            {
-                                <option value="@fixtureStatus.Value">@fixtureStatus.Name</option>
-                            }
+                            <option value="@fixtureStatus.Value" selected="@(fixtureStatus.Value == SelectedFixtureStatusId)">@TranslationState.GetValue(fixtureStatus.Name)</option>
                         }
                     </select>
                 </div>

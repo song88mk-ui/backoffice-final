@@ -29,7 +29,7 @@
         <div class="col-6">
             <label for="segmentSelect" class="form-label">@TranslationState.GetValue("Segment")</label>
             <select class="form-select" id="segmentSelect" @onchange="OnSegmentSelectChanged">
-                <option value="0">Select Segment</option>
+                <option value="0">@TranslationState.GetValue("Select Segment")</option>
                 @foreach (var item in Model.Segments)
                 {
                     <option value="@item.Value" selected="@(item.Value == Model.SegmentId)">@TranslationState.GetValue(item.Name)</option>
@@ -42,7 +42,7 @@
         <div class="col-6">
             <label for="leagueSelect" class="form-label">@TranslationState.GetValue("League")</label>
             <select class="form-select" id="LeagueSelect" @onchange="OnLeagueSelectChanged">
-                <option value="0">Select League</option>
+                <option value="0">@TranslationState.GetValue("Select League")</option>
                 @foreach (var item in Model.Leagues)
                 {
                     <option value="@item.Value" selected="@(item.Value == Model.LeagueId)">@TranslationState.GetValue(item.Name)</option>
@@ -52,7 +52,7 @@
         <div class="col-6">
             <label for="fixtureSelect" class="form-label">Fixture</label>
             <select class="form-select" id="fixtureSelect" @onchange="OnFixtureSelectChanged">
-                <option value="">Select Fixture</option>
+                <option value="">@TranslationState.GetValue("Select Fixture")</option>
                 @foreach (var item in Model.Fixtures)
                 {
                     <option value="@item.Value" selected="@(item.Value == Model.ProviderFixtureId)">@TranslationState.GetValue(item.Name)</option>
@@ -73,9 +73,9 @@
             </select>
         </div>
         <div class="col-6">
-            <label for="selectionSelect" class="form-label">Selection</label>
+            <label for="selectionSelect" class="form-label">@TranslationState.GetValue("Selection")</label>
             <select class="form-select" id="selectionSelect" @onchange="OnSelectionSelectChanged">
-                <option value="">Select Selection</option>
+                <option value="">@TranslationState.GetValue("Select Selection")</option>
                 @foreach (var item in Model.Selections)
                 {
                     <option value="@item.Value" selected="@(item.Value == Model.SelectionName)">@TranslationState.GetValue(item.Name)</option>
