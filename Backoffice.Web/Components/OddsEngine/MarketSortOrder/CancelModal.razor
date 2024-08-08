@@ -4,7 +4,7 @@
             <img src="icons/svg/warning-icon.svg" />
         </div>
         <div class="text-center mt-4">
-            Are you sure you want to discard all the changes in @ClientName?
+            @TranslationState.GetValue($"Are you sure you want to discard all the changes in {ClientName}")
             <br />
             @TranslationState.GetValue("Please be certain as this cannot be undone")
         </div>
@@ -12,5 +12,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickEvent">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn btn-continue" @onclick="OnContinueClickEvent">Continue</button>
+    <button type="button" class="btn modal-btn btn-continue" @onclick="OnContinueClickEvent">@TranslationState.GetValue("Continue")</button>
 </div>

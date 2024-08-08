@@ -14,7 +14,7 @@
             <div class="d-flex align-items-center justify-content-between mx-4 p-2 border">
                 <div class="col d-inline-flex align-items-center">
                     <div class="selection-logo"><i class="ico ico-top-leagues mx-4" aria-hidden="true"></i></div>
-                    <p class="lbl-selection m-0">@((_selectedConfigClients?.Count ?? 0) >= 2 ? $"{_selectedConfigClients?.Count ?? 0} Leagues selected" : $"{_selectedConfigClients?.Count ?? 0} League selected")</p>
+                    <p class="lbl-selection m-0">@(TranslationState.GetValue((_selectedConfigClients?.Count ?? 0) >= 2 ? $"{_selectedConfigClients?.Count ?? 0} Leagues selected" : $"{_selectedConfigClients?.Count ?? 0} League selected"))</p>
                 </div>
                 <div class="d-flex h-75 justify-content-end">
                     <button href="javascript:void(0)" @onclick="OnSelectAllClickedEvent" class="btn btn-selection-all px-4">@TranslationState.GetValue("Select All")</button>

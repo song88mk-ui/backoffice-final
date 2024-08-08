@@ -5,6 +5,6 @@
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-back" @onclick="OnBackClickedEvent">Go Back</button>
-    <button type="button" class="btn modal-btn modal-clear" @onclick="OnClearClickedEvent">Clear</button>
+    <button type="button" class="btn modal-btn modal-back" @onclick="OnBackClickedEvent">@TranslationState.GetValue("Go Back")</button>
+    <button type="button" class="btn modal-btn modal-clear" @onclick="OnClearClickedEvent">@TranslationState.GetValue("Clear")</button>
 </div>
