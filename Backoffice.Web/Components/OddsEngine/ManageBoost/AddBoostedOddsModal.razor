@@ -11,7 +11,7 @@
 
         <div>
             <input type="radio" class="btn-check" name="matchTabOptions" id="outrights" @onclick="@(e => OnMatchTypeChanged(FixtureType.Outright))" />
-            <label class="btn match-tab-lbl" for="outrights">Outrights</label>
+            <label class="btn match-tab-lbl" for="outrights">@TranslationState.GetValue("Outrights")</label>
         </div>
     </div>
 

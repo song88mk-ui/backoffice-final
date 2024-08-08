@@ -100,7 +100,7 @@
                 <div class="col-2 me-2">
                     <select class="form-select d-block" @onchange="OnMarketChangedEvent">
                         <optgroup label="Market">
-                            <option value="0" selected>All Markets</option>
+                            <option value="0" selected>@TranslationState.GetValue("All Markets")</option>
                             @if (Markets != null && Markets.Any())
                             {
                                 @foreach (var item in Markets)

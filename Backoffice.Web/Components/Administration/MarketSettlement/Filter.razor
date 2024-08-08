@@ -79,7 +79,7 @@
             <div class="d-flex">
                 <div class="me-4 select-container">
                     <select class="form-select d-block" @onchange="OnMarketChangedEvent">
-                        <option value="0" selected>All Markets</option>
+                        <option value="0" selected>@TranslationState.GetValue("All Markets")</option>
                         @foreach (var item in Markets)
                         {
                             <option value="@item.Value" selected="@(item.Value == FilterModel.MarketId)">@TranslationState.GetValue(item.Name)</option>
