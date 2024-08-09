@@ -50,7 +50,7 @@
             </select>
         </div>
         <div class="col-6">
-            <label for="fixtureSelect" class="form-label">Fixture</label>
+            <label for="fixtureSelect" class="form-label">@TranslationState.GetValue("Fixture")</label>
             <select class="form-select" id="fixtureSelect" @onchange="OnFixtureSelectChanged">
                 <option value="">@TranslationState.GetValue("Select Fixture")</option>
                 @foreach (var item in Model.Fixtures)
@@ -65,7 +65,7 @@
         <div class="col-6">
             <label for="marketSelect" class="form-label">@TranslationState.GetValue("Market")</label>
             <select class="form-select" id="marketSelect" @onchange="OnMarketSelectChanged">
-                <option value="">Select Market</option>
+                <option value="">@TranslationState.GetValue("Select Market")</option>
                 @foreach (var item in Model.Markets)
                 {
                     <option value="@item.Value" selected="@(item.Value == Model.MarketName)">@TranslationState.GetValue(item.Name)</option>

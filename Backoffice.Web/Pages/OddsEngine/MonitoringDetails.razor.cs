@@ -219,7 +219,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 SportId = Fixture.SportId;
                 _pageHeaderModel = new()
                 {
-                    Title = $"{Fixture.SportName} - {Fixture.SegmentName} - {Fixture.LeagueName}",
+                    Title = $"{TranslationState.GetValue(Fixture.SportName)} - {Fixture.SegmentName} - {Fixture.LeagueName}",
                     IconClass = $"iconfont iconfont-{Fixture.SportName.ToLower().Replace(" ", "-")}",
                     ShowLanguageDropDown = false
                 };
