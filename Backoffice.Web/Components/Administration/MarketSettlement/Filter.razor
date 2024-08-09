@@ -39,7 +39,7 @@
                 </div>
                 <div class="me-4 select-container">
                     <select class="form-select d-block" @onchange="OnSegmentChangedEvent">
-                        <option value="0">All Segments</option>
+                        <option value="0">@TranslationState.GetValue("All Segments")</option>
                         @foreach (var item in Segments)
                         {
                             <option value="@item.Value" selected="@(item.Value == FilterModel.SegmentId)">@TranslationState.GetValue(item.Name)</option>
