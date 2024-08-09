@@ -176,7 +176,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-            ModalService.Open<MarketGroupViewLogsModal>($"View Logs Market Group", parameters, options);
+            ModalService.Open<MarketGroupViewLogsModal>($"View Logs", parameters, options);
         }
 
         public async Task OnViewClickedEvent(string MarketTemplateGroupName, string marketTemplateIds)
