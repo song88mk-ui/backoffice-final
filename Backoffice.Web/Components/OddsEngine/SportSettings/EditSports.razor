@@ -6,7 +6,7 @@
             </div>
             <div class="d-flex justify-content-end">
                 <button class="bg-transparent px-2 border-0 clear-selection-btn" disabled="@(!selectedSportIds.Any())" @onclick="OnClearSportsSelectionClick">@TranslationState.GetValue("Clear Selection")</button>
-                <button class="bg-transparent px-2 border-0 remove-btn" disabled="@(!selectedSportIds.Any())" @onclick="OnRemoveClick">Remove</button>
+                <button class="bg-transparent px-2 border-0 remove-btn" disabled="@(!selectedSportIds.Any())" @onclick="OnRemoveClick">@TranslationState.GetValue("Remove")</button>
             </div>
         </div>
         <div id="sportstreeEditable" class="d-flex flex-column mx-3 connect-list">

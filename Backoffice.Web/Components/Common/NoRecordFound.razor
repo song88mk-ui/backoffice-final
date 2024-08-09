@@ -3,7 +3,14 @@
         <div class="container-no-record-found col-md-12 text-center border border-1 rounded d-flex flex-column justify-content-center align-items-center">
             <img class="no-record-found mb-4" src="icons/svg/no-record-found.svg" />
             <h4>
-                <strong>@TranslationState.GetValue("No Record Found")!</strong>
+                @if (!string.IsNullOrEmpty(Message))
+                {
+                    <strong>@Message!</strong>
+                }
+                else
+                {
+                    <strong>@TranslationState.GetValue("No Record Found")!</strong>
+                }
             </h4>
             <p style="color: #787878">@TranslationState.GetValue("no_record_message")</p>
         </div>

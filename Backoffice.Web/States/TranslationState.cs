@@ -1,7 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Services;
 using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.JSInterop;
 using System.Text.RegularExpressions;
 
 namespace Backoffice.Web.States
@@ -34,7 +33,7 @@ namespace Backoffice.Web.States
 
             if (!Model.Any())
                 ReloadModel();
-        }
+        }   
 
         public string GetValue(string word)
         {
