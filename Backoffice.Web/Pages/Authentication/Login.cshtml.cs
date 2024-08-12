@@ -59,10 +59,9 @@ namespace Backoffice.Web.Pages.Authentication
 
         #region Methods
 
-        public async Task<IActionResult> OnGet(string? returnUrl = null, string languageCode = "")
+        public async Task<IActionResult> OnGet(string? returnUrl = null)
         {
-            var langCodeCookie = Request.Cookies["c-langCode"]?.ToString() ?? "EN";
-            var selectedLangCode = !string.IsNullOrEmpty(languageCode) ? languageCode : langCodeCookie;
+            var selectedLangCode = Request.Cookies["c-langCode"]?.ToString() ?? "EN";
 
             if (Translations == null || (!string.IsNullOrEmpty(selectedLangCode) && UserModel.LanguageCode != selectedLangCode))
             {
@@ -172,85 +171,65 @@ namespace Backoffice.Web.Pages.Authentication
 
             return Page();
         }
-
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostTranslateLanguage(string languageCode)
         {
-            var action = Request.Form["action"];
+            await LoadTranslationsAsync(languageCode);
 
-            if (action == "login")
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostLogin()
+        {
+            await LoadTranslationsAsync();
+
+            if (ModelState.IsValid)
             {
-                if (!(Translations?.Any() ?? false))
+                var policies = new List<string>();
+                TempData["HasError"] = false;
+                var result = await _authenticationService.Login(UserModel);
+
+                if (result.Result.Item1)
                 {
-                    if (Enum.TryParse(UserModel.LanguageCode, out LanguageCode langCode))
+                    SetRememberMePreference(IsSaveCookie, result.Result.Item3);
+                    policies = result.Result.Item2.Where(x => _access.Contains(x.ToUpper())).ToList();
+                    if (policies.Count == 1)
                     {
-                        Translations = await _translationService.GetTranslationsAsync(langCode);
+                        switch (policies.FirstOrDefault().ToString().ToUpper())
+                        {
+                            case "ADMIN":
+                                return LocalRedirect("/admin/dashboard");
+                            case "SBC":
+                            case "PM":
+                                return LocalRedirect("/dashboard");
+                            //    return LocalRedirect("/pm/dashboard");
+                            default:
+                                return LocalRedirect("/choose-access");
+                        }
                     }
+                    else if (policies.Count > 1)
+                    {
+                        return LocalRedirect("/choose-access");
+                    }
+                    else if (!policies.Any())
+                    {
+                        TempData["HasError"] = true;
+                        ModelState.AddModelError(string.Empty, "No permissions enabled for this user account. Contact admin.");
+                        return Page();
+                    }
+
+                    //_navigationManager.NavigateTo("/");
                 }
-                //ModelState["LanguageCode"].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
 
-                if (ModelState.IsValid)
+                TempData["HasError"] = true;
+                TempData["LogError"] = $"<script>console.log(\"{result.StatusCode.ToString()} - {result.Message} -\n{JsonSerializer.Serialize(UserModel).Replace("\"", "")}\")</script>";
+
+                if (!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
                 {
-                    var policies = new List<string>();
-                    TempData["HasError"] = false;
-                    var result = await _authenticationService.Login(UserModel);
-
-                    if (result.Result.Item1)
-                    {
-                        SetRememberMePreference(IsSaveCookie, result.Result.Item3);
-                        policies = result.Result.Item2.Where(x => _access.Contains(x.ToUpper())).ToList();
-                        if (policies.Count == 1)
-                        {
-                            switch (policies.FirstOrDefault().ToString().ToUpper())
-                            {
-                                case "ADMIN":
-                                    return LocalRedirect("/admin/dashboard");
-                                case "SBC":
-                                case "PM":
-                                    return LocalRedirect("/dashboard");
-                                //    return LocalRedirect("/pm/dashboard");
-                                default:
-                                    return LocalRedirect("/choose-access");
-                            }
-                        }
-                        else if (policies.Count > 1)
-                        {
-                            return LocalRedirect("/choose-access");
-                        }
-                        else if (!policies.Any())
-                        {
-                            TempData["HasError"] = true;
-                            ModelState.AddModelError(string.Empty, "No permissions enabled for this user account. Contact admin.");
-                            return Page();
-                        }
-
-                        //_navigationManager.NavigateTo("/");
-                    }
-
-                    TempData["HasError"] = true;
-                    TempData["LogError"] = $"<script>console.log(\"{result.StatusCode.ToString()} - {result.Message} -\n{JsonSerializer.Serialize(UserModel).Replace("\"", "")}\")</script>";
-
-                    if (!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
-                    {
-                        ModelState.AddModelError(string.Empty, result.Message);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
-                    }
+                    ModelState.AddModelError(string.Empty, result.Message);
                 }
-            }
-            else
-            {
-                if (!(Translations?.Any() ?? false))
+                else
                 {
-                    if (Enum.TryParse(action, out LanguageCode langCode))
-                    {
-                        Translations = await _translationService.GetTranslationsAsync(langCode);
-                        UserModel.LanguageCode = action;
-
-                        Response.Cookies.Delete("c-langCode");
-                        Response.Cookies.Append("c-langCode", action);
-                    }
+                    ModelState.AddModelError(string.Empty, "Username or Password is incorrect");
                 }
             }
 
@@ -279,6 +258,24 @@ namespace Backoffice.Web.Pages.Authentication
             }
 
             IsSaveCookie = value;
+        }
+        private async Task LoadTranslationsAsync(string languageCode = null)
+        {
+            var langCodeCookie = Request.Cookies["c-langCode"]?.ToString() ?? "EN";
+            var selectedLangCode = !string.IsNullOrEmpty(languageCode) ? languageCode : langCodeCookie;
+
+            if (Translations == null || (!string.IsNullOrEmpty(selectedLangCode) && UserModel.LanguageCode != selectedLangCode))
+            {
+                if (Enum.TryParse(selectedLangCode, out LanguageCode langCode))
+                {
+                    UserModel.LanguageCode = selectedLangCode;
+
+                    Translations = await _translationService.GetTranslationsAsync(langCode);
+
+                    Response.Cookies.Delete("c-langCode");
+                    Response.Cookies.Append("c-langCode", selectedLangCode);
+                }
+            }
         }
 
         #endregion
