@@ -51,13 +51,13 @@ namespace Backoffice.Web.Components.Administration.ResendSettlement
 
                 ModalService.Cancel();
 
-                await OnResendSettlementCallback.InvokeAsync(response);                
+                await OnResendSettlementCallback.InvokeAsync(response);
             }
         }
 
+
         public void Dispose()
         {
-            
         }
 
         #endregion

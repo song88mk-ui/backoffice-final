@@ -1,6 +1,8 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Services;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.JSInterop;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Backoffice.Web.States
@@ -8,7 +10,7 @@ namespace Backoffice.Web.States
     public class TranslationState : BaseState<Dictionary<string, string>>
     {
         private ITranslationService _translationService;
-
+        private readonly IJSRuntime _jsRuntime;
         public readonly List<LanguageCode> LanguageCodes;
 
         private LanguageCode _activeLangCode;
@@ -25,15 +27,15 @@ namespace Backoffice.Web.States
             }
         }
 
-        public TranslationState(ITranslationService translationService) : base(new Dictionary<string, string>())
+        public TranslationState(ITranslationService translationService, IJSRuntime jsRuntime) : base(new Dictionary<string, string>())
         {
             _translationService = translationService;
-
+            _jsRuntime = jsRuntime;
             LanguageCodes = Enum.GetValues<LanguageCode>().Select(s => s).ToList();
 
             if (!Model.Any())
                 ReloadModel();
-        }   
+        }
 
         public string GetValue(string word)
         {
@@ -49,7 +51,15 @@ namespace Backoffice.Web.States
 
         private async void ReloadModel()
         {
+            var timer = new Stopwatch();
+            timer.Start();
             Model = await _translationService.GetTranslationsAsync(_activeLangCode);
+
+            timer.Stop();
+
+            TimeSpan timeTaken = timer.Elapsed;
+            string foo = "(Translation Service) Time taken: " + timeTaken.ToString(@"m\:ss\.fff");
+            await _jsRuntime.InvokeVoidAsync("console.log", foo);
         }
         private string TransformPlaceHolder(string word, string placeholder, params object[] values)
         {

@@ -23,6 +23,7 @@ namespace Backoffice.Web.Services
             {
                 var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
                 return _client;
             }
             set
@@ -30,11 +31,11 @@ namespace Backoffice.Web.Services
                 _client = value;
             }
         }
+
         private readonly IConfiguration _configuration;
         private readonly IAuthenticationService _authenticationService;
         private readonly IMessageBroker _messageBroker;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private LanguageCode _languageCode;
         #endregion
 
         #region Ctor
@@ -50,7 +51,6 @@ namespace Backoffice.Web.Services
         }
 
         #endregion
-
         private void AddOrUpdateRequestHeader(Dictionary<string, string> content)
         {
             foreach (var item in content)
@@ -942,10 +942,12 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Methods - Trading
-        public async Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId)
+        public async Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId, LanguageCode langCode)
         {
             try
             {
+                AddOrUpdateRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } });
+
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<List<MainMarketTemplateResponse>>>
                 (await _httpClient.GetStreamAsync($"api/trading/sports/topmarkets/{sportId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
@@ -970,13 +972,15 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<MarketFixtureResponse>> GetMarketFixtures(MarketFixtureRequest request)
+        public async Task<BaseResponse<MarketFixtureResponse>> GetMarketFixtures(MarketFixtureRequest request, LanguageCode langCode)
         {
             try
             {
                 var stringUri = string.IsNullOrEmpty(request.MarketTemplateId) ?
                     $"api/trading/fixtures/market/{request.FixtureTypeId}/{request.SportId}/{request.SegmentId}/{request.LeagueId}" :
                     $"api/trading/fixtures/market/{request.FixtureTypeId}/{request.SportId}/{request.SegmentId}/{request.LeagueId}/{request.MarketTemplateId}";
+
+                AddOrUpdateRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } });
 
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<MarketFixtureResponse>>
                 (await _httpClient.GetStreamAsync(stringUri), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -1003,11 +1007,13 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<MarketFixtureDetailResponse>> GetMarketFixtureDetails(string providerFixtureId)
+        public async Task<BaseResponse<MarketFixtureDetailResponse>> GetMarketFixtureDetails(string providerFixtureId, LanguageCode langCode)
         {
             try
             {
                 var stringUri = $"api/trading/fixtures2/market/details/{providerFixtureId}";
+
+                AddOrUpdateRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } });
 
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<MarketFixtureDetailResponse>>
                 (await _httpClient.GetStreamAsync(stringUri), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

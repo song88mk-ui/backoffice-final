@@ -1,17 +1,15 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.States;
-using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Http;
 using Microsoft.JSInterop;
-using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace Backoffice.Web.Shared
 {
     public partial class LanguageDropDown
     {
         [Inject] public IJSRuntime JSRuntime { get; set; }
-        [Parameter] public EventCallback OnLanguageCodeChangedCallback { get; set; }
+        [Inject] public IHttpContextAccessor _httpContextAccessor { get; set; }
         [Parameter] public string DropDownButtonClassName { get; set; }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -30,11 +28,12 @@ namespace Backoffice.Web.Shared
 
             if (Enum.TryParse(value, out LanguageCode langCode))
             {
-                await JSRuntime.InvokeVoidAsync("setCookie","c-langCode", value, 30);
-                TranslationState.ActiveLanguageCode = langCode;
-                await OnLanguageCodeChangedCallback.InvokeAsync();
 
-                await InvokeAsync(StateHasChanged);
+                TranslationState.ActiveLanguageCode = langCode;
+                await JSRuntime.InvokeVoidAsync("setCookie","c-langCode", value, 30);
+                //_httpContextAccessor.HttpContext?.Session.SetString("c-langCode", value);
+
+                StateHasChanged();
             }
         }
     }

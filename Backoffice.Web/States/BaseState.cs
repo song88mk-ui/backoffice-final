@@ -23,7 +23,7 @@ namespace Backoffice.Web.States
             _model = initialValue;
         }
         public event PropertyChangedEventHandler? PropertyChanged = null!;
-        protected void OnPropertyChanged([CallerMemberName] string name = "")
+        protected async void OnPropertyChanged([CallerMemberName] string name = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }

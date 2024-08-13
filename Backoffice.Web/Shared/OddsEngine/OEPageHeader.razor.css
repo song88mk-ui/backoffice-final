@@ -1,0 +1,18 @@
+﻿h4 {
+    margin: 0px;
+    color: #1F1F1F;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.ico {
+    display: inline-flex;
+    float: left;
+    margin-right: 20px;
+    font-size: 20px;
+}
+
+hr {
+    margin: 1.5rem 0;
+    border-top: 1.5px solid #9E9A99;
+}

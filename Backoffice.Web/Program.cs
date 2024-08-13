@@ -173,6 +173,9 @@ builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>(cl
 builder.Services.AddScoped<IModalService, ModalService>();
 builder.Services.AddScoped<INavMenuModalService, NavMenuModalService>();
 
+builder.Services.AddScoped<ITranslationService, TranslationService>();
+builder.Services.AddScoped<TranslationState>();
+
 builder.Services.AddHttpClient<ITradingService, TradingService>(client =>
 {
     client.BaseAddress = new Uri(configuration["API:Backoffice:Uri"]);
@@ -186,7 +189,6 @@ builder.Services.AddHttpClient<IBackofficeService, BackofficeService>(client =>
     client.DefaultRequestHeaders.Add("x-api-key", configuration["API:Backoffice:Security:APIKey"]);
     client.DefaultRequestHeaders.Add("x-region", configuration["API:Region"]);
 });
-builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<ICommonService, CommonService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
@@ -196,7 +198,6 @@ builder.Services.AddScoped<IExcelService, ExcelService>();
 builder.Services.AddScoped<ITableauService, TableauService>();
 builder.Services.AddScoped<IPreRenderService, PreRenderService>();
 
-builder.Services.AddScoped<TranslationState>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSignalR();

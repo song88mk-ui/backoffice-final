@@ -61,11 +61,11 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId, string region)
+        public async Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId, string region, string langCode)
         {
             try
             {
-                var response = await GetHttpClient(region).GetAsync($"sports/topmarkets/{sportId}");
+                var response = await GetHttpClient(region, langCode).GetAsync($"sports/topmarkets/{sportId}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<List<MainMarketTemplateResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -196,7 +196,8 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var payload = new {
+                var payload = new
+                {
                     SportIds = sportIds
                 };
                 var response = await GetHttpClient(region).PostAsync($"league/lookup", new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"));
@@ -292,11 +293,11 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Fixtures
-        public async Task<BaseResponse<MarketFixtureResponse>> GetFixturesByMarket(int fixtureTypeId, int sportId, int segmentId, int leagueId, string region)
+        public async Task<BaseResponse<MarketFixtureResponse>> GetFixturesByMarket(int fixtureTypeId, int sportId, int segmentId, int leagueId, string region, string langCode = "")
         {
             try
             {
-                var response = await GetHttpClient(region).GetAsync($"fixtures/market/{fixtureTypeId}/{sportId}/{segmentId}/{leagueId}");
+                var response = await GetHttpClient(region, langCode).GetAsync($"fixtures/market/{fixtureTypeId}/{sportId}/{segmentId}/{leagueId}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -323,11 +324,13 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<MarketFixtureResponse>> GetMarketFixtures(int fixtureTypeId, int sportId, int segmentId, int leagueId, string marketTemplateId, string region)
+        public async Task<BaseResponse<MarketFixtureResponse>> GetMarketFixtures(int fixtureTypeId, int sportId, int segmentId, int leagueId, string marketTemplateId, string region, string langCode = "")
         {
             try
             {
-                var response = await GetHttpClient(region).GetAsync($"fixtures/market/{fixtureTypeId}/{sportId}/{segmentId}/{leagueId}/{marketTemplateId}");
+                var response = await GetHttpClient(region, langCode).GetAsync($"fixtures/market/{fixtureTypeId}/{sportId}/{segmentId}/{leagueId}/{marketTemplateId}");
+
+                var test = response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -387,11 +390,11 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<MarketFixtureDetailResponse>> GetFixtureMarketDetails(string providerFixtureId, string region)
+        public async Task<BaseResponse<MarketFixtureDetailResponse>> GetFixtureMarketDetails(string providerFixtureId, string region, string langCode = "")
         {
             try
             {
-                var response = await GetHttpClient(region).GetAsync($"fixtures2/market/details/{providerFixtureId}");
+                var response = await GetHttpClient(region, langCode).GetAsync($"fixtures2/market/details/{providerFixtureId}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<MarketFixtureDetailResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -1790,7 +1793,7 @@ namespace Backoffice.API.Repositories
         }
 
         #region Utilities
-        private HttpClient GetHttpClient(string region)
+        private HttpClient GetHttpClient(string region, string langCode = "")
         {
             var uri = GetBaseUrl(region);
             if (uri.LastOrDefault() != '/')
@@ -1801,6 +1804,9 @@ namespace Backoffice.API.Repositories
                 BaseAddress = new Uri($"{uri}api/v1/trading/")
             };
             client.DefaultRequestHeaders.Add("x-api-key", GetApikey(region));
+
+            if (!string.IsNullOrEmpty(langCode))
+                client.DefaultRequestHeaders.Add("x-language-code", langCode);
 
             return client;
         }

@@ -42,6 +42,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private bool _isPreloader;
         private AlertModel _alertModel;
+        private LanguageCode _languageCode;
         #endregion
 
         #region Methods
@@ -71,10 +72,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2)
             {
-                var isSportChanged = _sportId != SelectedSport.SportId || _leagueId != SelectedSport.LeagueId;
+                var isSportChanged = _sportId != SelectedSport.SportId || _leagueId != SelectedSport.LeagueId || _languageCode != TranslationState.ActiveLanguageCode;
                 _sportId = SelectedSport.SportId;
                 _segmentId = SelectedSport.SegmentId;
                 _leagueId = SelectedSport.LeagueId;
+                _languageCode = TranslationState.ActiveLanguageCode;
 
                 _pageHeaderModel = new PageHeaderModel()
                 {
@@ -85,7 +87,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 if (isSportChanged && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
                 {
-                    _fixtureMarkets = new();
                     await OnInitializeEvent(_monitoringCallbackModel);
                 }
             }
@@ -126,6 +127,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             });
 
             _isPreloader = false;
+            StateHasChanged();
         }
 
         private async Task MonitoringCallback(MonitoringCallbackModel model)
@@ -138,11 +140,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (clients != null)
             {
                 _clients = clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => new Client
-                            {
-                                ClientCode = s.Value,
-                                ClientName = s.Name,
-                                Region = _region
-                            }).ToList();
+                {
+                    ClientCode = s.Value,
+                    ClientName = s.Name,
+                    Region = _region
+                }).ToList();
             }
         }
 
@@ -175,10 +177,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
-        public async ValueTask DisposeAsync()
-        {
-            this.Dispose();
-        }
+        public async ValueTask DisposeAsync() => Dispose();
 
         public async void Dispose()
         {
@@ -236,7 +235,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async Task<List<FixtureMarketModel>> GetFixtures(MarketFixtureRequest request)
         {
-            var response = await BackofficeService.GetMarketFixtures(request);
+            var response = await BackofficeService.GetMarketFixtures(request, _languageCode);
             var marketFixtures = response.Result;
 
             if (marketFixtures.Fixtures.Count == 0)

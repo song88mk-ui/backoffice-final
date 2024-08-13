@@ -52,7 +52,7 @@ namespace Backoffice.Web.ActionFilter
         {
             var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken");
             var claims = new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(token), "jwtAuthType"));
-            claims.Claims.Append(new Claim(ClaimTypes.Name, email));
+            _ = claims.Claims.Append(new Claim(ClaimTypes.Name, email));
 
             var authState = Task.FromResult(new AuthenticationState(claims));
 

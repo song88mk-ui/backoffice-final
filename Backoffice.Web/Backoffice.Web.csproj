@@ -35,5 +35,11 @@
     <ProjectReference Include="..\Backoffice.Shared\Backoffice.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Shared\OddsEngine\OEPageHeader.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 
 </Project>

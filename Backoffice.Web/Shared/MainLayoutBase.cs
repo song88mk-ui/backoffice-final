@@ -26,7 +26,6 @@ namespace Backoffice.Web.Shared
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IConfiguration Configuration { get; set; }
-        [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] public IPreRenderService PreRenderService { get; set; }
         [Inject] public TranslationState TranslationState { get; set; }
@@ -72,7 +71,7 @@ namespace Backoffice.Web.Shared
 
                 InlineSpinnerCss = "width:10rem;height:10rem;";
 
-                if (HttpContextAccessor?.HttpContext?.Session.GetString("UserToken") == null)
+                if (_httpContextAccessor?.HttpContext?.Session.GetString("UserToken") == null)
                 {
                     NavigationManager.NavigateTo("login", true);
                     IsPreLoader = false;
@@ -280,6 +279,8 @@ namespace Backoffice.Web.Shared
                     await _hubConnection.DisposeAsync();
                 }
             }
+
+            Dispose();
         }
 
         [JSInvokable]
@@ -311,7 +312,7 @@ namespace Backoffice.Web.Shared
 
         public void Dispose()
         {
-            BackofficeService.Dispose();
+            TranslationState.PropertyChanged -= async (s, e) => await InvokeAsync(StateHasChanged);
 
             toasterService.Dispose();
             _toasterService.Dispose();

@@ -48,8 +48,9 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetTopMarkets(int sportId)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetTopMarkets(sportId, region);
+            var result = await _tradingRepository.GetTopMarkets(sportId, region, langCode);
 
             switch (result.StatusCode)
             {
@@ -150,8 +151,9 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetFixturesByMarket(int fixtureTypeId, int sportId, int segmentId, int leagueId)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetFixturesByMarket(fixtureTypeId, sportId, segmentId, leagueId, region);
+            var result = await _tradingRepository.GetFixturesByMarket(fixtureTypeId, sportId, segmentId, leagueId, region, langCode);
 
             switch (result.StatusCode)
             {
@@ -166,8 +168,9 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetMarketFixtures(int fixtureTypeId, int sportId, int segmentId, int leagueId, string marketTemplateId)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetMarketFixtures(fixtureTypeId, sportId, segmentId, leagueId, marketTemplateId, region);
+            var result = await _tradingRepository.GetMarketFixtures(fixtureTypeId, sportId, segmentId, leagueId, marketTemplateId, region, langCode);
 
             switch (result.StatusCode)
             {
@@ -198,8 +201,9 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetMarketFixtureDetails(string providerFixtureId)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetFixtureMarketDetails(providerFixtureId, region);
+            var result = await _tradingRepository.GetFixtureMarketDetails(providerFixtureId, region, langCode);
 
             switch (result.StatusCode)
             {

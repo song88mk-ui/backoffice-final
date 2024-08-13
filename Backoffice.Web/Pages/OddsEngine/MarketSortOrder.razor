@@ -10,7 +10,7 @@
             <Breadcrumb Breadcrumbs="_breadcrumbs" Region="@Region" />
         </div>
         <div class="col-md-12">
-            <PageHeader PageHeaderModel="_pageHeaderModel" />
+            <OEPageHeader PageHeaderModel="_pageHeaderModel" />
         </div>
         <div class="col-md-12">
             <Filter @bind-IsUpdate="_isUpdate" @bind-IsPreLoader="_isPreLoader" OnInitializeEventCallback="PrepareMarketSortOrderModel" OnUpdateCallback="OnUpdateClickEvent" OnCancelCallback="OnCancelClickEvent" OnSaveCallback="OnSaveClickEvent" Region="Region" />
@@ -31,7 +31,7 @@
                                 {
                                     <div class="me-2">
                                         <a href="javascript:void(0)" class="btn btn-market-group @(_selectedMarketGroupId == model.Id ? "active" : "") px-3" id="mtg-@model.Id" @onclick="() => OnMarketGroupClickEvent(model.Id)">
-                                            @model.Name
+                                            @TranslationState.GetValue(model.Name)
                                         </a>
                                     </div>
                                 }

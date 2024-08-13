@@ -34,7 +34,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Parameter] public string Id { get; set; }
 
         private string _region = "hk";
-        private HubConnection _hubConnection { get; set; }
+        private HubConnection? _hubConnection { get; set; }
 
         private List<BreadcrumbModel> Breadcrumbs { get; set; }
         private MarketFixtureResponse.FixtureModel Fixture { get; set; }
@@ -55,6 +55,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private PageHeaderModel _pageHeaderModel;
         private bool _isPlayerProps;
         private List<Client>? _clients;
+        private LanguageCode _languageCode;
         #endregion
 
         #region Methods
@@ -73,8 +74,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarginMarket = new MarketModel();
 
             await AuthenticateAccess.InvokeAsync();
-
-            await PrepareMonitoringDetails();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -93,6 +92,14 @@ namespace Backoffice.Web.Pages.OddsEngine
                     if (ex.StackTrace != null)
                         Log.Error(ex.StackTrace.ToString());
                 }
+            }
+        }
+        protected override async Task OnParametersSetAsync()
+        {
+            if (_languageCode != TranslationState.ActiveLanguageCode)
+            {
+                _languageCode = TranslationState.ActiveLanguageCode;
+                await PrepareMonitoringDetails();
             }
         }
 
@@ -211,7 +218,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (!_isPreLoader)
                 _isPreLoader = true;
 
-            var marketFixtureResponse = await BackofficeService.GetMarketFixtureDetails(Id);
+            var marketFixtureResponse = await BackofficeService.GetMarketFixtureDetails(Id, _languageCode);
 
             if (marketFixtureResponse.StatusCode == StatusCode.Success)
             {
@@ -331,7 +338,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             //    }).Where(c => c.Selections.Any());
             //}
 
-            MarginMarket =   filteredMarkets.FirstOrDefault(f => f.MarketStatusId == (int)MarketStatus.Active) ?? filteredMarkets.FirstOrDefault() ?? new();
+            MarginMarket = filteredMarkets.FirstOrDefault(f => f.MarketStatusId == (int)MarketStatus.Active) ?? filteredMarkets.FirstOrDefault() ?? new();
 
             return PrepareFixtureMarkets(filteredMarkets.ToList()).Result;
         }
@@ -624,10 +631,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                     activeSelections = selections.Where(c => c.IsActive == true && Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
                 }
 
-				if (activeSelections.Count == 1)
-					activeSelections = selections.Where(c => Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
+                if (activeSelections.Count == 1)
+                    activeSelections = selections.Where(c => Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
 
-				var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(GetClientOdds(s, clientCode)))) - 100) / 100;
+                var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(GetClientOdds(s, clientCode)))) - 100) / 100;
 
                 return ((int)((margin * 100) + 100)).ToString();
             }
@@ -657,12 +664,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 newactiveSelections = selections.Where(c => c.IsActive == true).ToList();
 
-				if (newactiveSelections.Count == 1)
-					newactiveSelections = selections.Where(c => Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
+                if (newactiveSelections.Count == 1)
+                    newactiveSelections = selections.Where(c => Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
 
-			}
+            }
 
-			var computedMargin = $"{(Math.Round(newactiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId).Odds)) - 100) + 100}";
+            var computedMargin = $"{(Math.Round(newactiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId).Odds)) - 100) + 100}";
 
             if (newMargin != computedMargin)
                 newMargin = $"{newMargin} ({computedMargin})";

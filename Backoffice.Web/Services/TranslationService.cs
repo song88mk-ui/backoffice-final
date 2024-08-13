@@ -1,17 +1,16 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Web.States;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using System.ComponentModel;
 
 namespace Backoffice.Web.Services
 {
     public class TranslationService : ITranslationService
     {
         private readonly IBackofficeService _backofficeService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TranslationService(IBackofficeService backofficeService)
+        public TranslationService(IBackofficeService backofficeService, IHttpContextAccessor httpContextAccessor)
         {
             _backofficeService = backofficeService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Dictionary<string, string>> GetTranslationsAsync(LanguageCode langCode)

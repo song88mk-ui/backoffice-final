@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
+using Backoffice.Web.Pages;
 using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -46,9 +47,9 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
             if (clients != null)
             {
-                _clientFilter = UserClientCodes != null && UserClientCodes.Any() ?
-                    clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()))
-                        .Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList() : new();
+                _clientFilter = UserClientCodes != null && UserClientCodes.Any() 
+                    ? clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList() 
+                    : new();
 
                 _clientFilter.Insert(0, new SelectListItemWithCheckboxModel<string>
                 {
@@ -79,7 +80,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
             {
                 _sportId = SportId;
 
-                var topMarketsResponse = await BackofficeService.GetTopMarkets(_sportId);
+                var topMarketsResponse = await BackofficeService.GetTopMarkets(_sportId, TranslationState.ActiveLanguageCode);
                 _topMarketTemplates = topMarketsResponse.Result;
                 _marketTemplateId = _topMarketTemplates.FirstOrDefault()?.MainMarketTemplateId ?? string.Empty;
 
@@ -121,7 +122,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         {
             _selectedClientName = string.Empty;
             _selectedClientCount = items.Count;
-            
+
             if (_selectedClientCount == 1)
                 _selectedClientName = items.FirstOrDefault().Value;
 

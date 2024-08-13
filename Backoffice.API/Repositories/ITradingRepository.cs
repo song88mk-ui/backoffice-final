@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
@@ -58,7 +59,7 @@ namespace Backoffice.API.Repositories
 
         #region Sports
         Task<BaseResponse<SportsTreeResponse>> GetSports(int fixtureTypeId, string region);
-        Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId, string region);
+        Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId, string region, string langCode);
         Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region = "");
         Task<BaseResponse<SportSelectorMarketTemplateResponse>> GetSelectorMarketTemplates(string region);
         #endregion
@@ -74,10 +75,10 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Fixtures
-        Task<BaseResponse<MarketFixtureResponse>> GetFixturesByMarket(int fixtureTypeId, int sportId, int segmentId, int leagueId, string region);
-        Task<BaseResponse<MarketFixtureResponse>> GetMarketFixtures(int fixtureTypeId, int sportId, int segmentId, int leagueId, string marketTemplateId, string region);
+        Task<BaseResponse<MarketFixtureResponse>> GetFixturesByMarket(int fixtureTypeId, int sportId, int segmentId, int leagueId, string region, string langCode = "");
+        Task<BaseResponse<MarketFixtureResponse>> GetMarketFixtures(int fixtureTypeId, int sportId, int segmentId, int leagueId, string marketTemplateId, string region, string langCode = "");
         Task<BaseResponse<FixtureOddsHistoryResponse>> GetFixtureMarketSelections(int fixtureTypeId, string providerFixtureId, string providerMarketId, string providerSelectionId, string region);
-        Task<BaseResponse<MarketFixtureDetailResponse>> GetFixtureMarketDetails(string providerFixtureId, string region);
+        Task<BaseResponse<MarketFixtureDetailResponse>> GetFixtureMarketDetails(string providerFixtureId, string region, string langCode = "");
         #endregion
 
         #region BET

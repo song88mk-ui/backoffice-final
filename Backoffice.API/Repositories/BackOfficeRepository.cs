@@ -2006,17 +2006,17 @@ namespace Backoffice.API.Repositories
         public async Task<BaseResponse<TranslationResponse>> GetTranslationsByLanguageCode(LanguageCode langCode)
         {
             var languageCode = langCode.ToString().ToUpper();
-            //var key = $"tr-{languageCode}";
+            var key = $"tr-{languageCode}";
 
-            //var cache = _memCache.GetCache<TranslationResponse>(key);
+            var cache = _memCache.GetCache<TranslationResponse>(key);
 
-            //if (cache != null)
-            //    return new BaseResponse<TranslationResponse>
-            //    {
-            //        StatusCode = StatusCode.Success,
-            //        Message = StatusCode.Success.ToString(),
-            //        Result = cache
-            //    };
+            if (cache != null)
+                return new BaseResponse<TranslationResponse>
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = cache
+                };
 
             var translations = GetTranslations();
             var englishTranslations = translations.Where(c => c.LanguageCode == "EN").ToList();
@@ -2038,7 +2038,7 @@ namespace Backoffice.API.Repositories
                 .Select(s => new
                 {
                     Name = s.Key,
-                    Value = s.OrderByDescending(x => reqTranslations.Contains(x)).First().Value
+                    s.OrderByDescending(x => reqTranslations.Contains(x)).First().Value
                 })
                 .ToDictionary(s => s.Name, x => x.Value);
 
@@ -2048,7 +2048,7 @@ namespace Backoffice.API.Repositories
                 Translations = combinedResult
             };
 
-            //_memCache.AddOrUpdateCache(key, result, 24);
+            _memCache.AddOrUpdateCache(key, result, 24);
 
             return new BaseResponse<TranslationResponse>()
             {
