@@ -103,7 +103,7 @@ namespace Backoffice.API.Controllers.Trading
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
             var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetSegmentLookup(sportId, region);
+            var result = await _tradingRepository.GetSegmentLookup(sportId, langCode, region);
 
             switch (result.StatusCode)
             {
@@ -122,7 +122,7 @@ namespace Backoffice.API.Controllers.Trading
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
             var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetLeagueLookup(sportId, segmentId, region);
+            var result = await _tradingRepository.GetLeagueLookup(sportId, segmentId, langCode, region);
 
             switch (result.StatusCode)
             {

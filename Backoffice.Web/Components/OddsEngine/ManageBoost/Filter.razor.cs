@@ -36,6 +36,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         private List<SelectListItemModel<int>> _sports;
         private List<SelectListItemModel<int>> _segments;
         private List<SelectListItemModel<int>> _leagues;
+        private LanguageCode _languageCode;
         #endregion
 
         #region Methods
@@ -49,16 +50,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             SearchForm = new SearchFormModel();
 
-
-            _clients = await LoadClients();
-            SelectedClientCode = _clients.FirstOrDefault().Value;
-            _sports = await LoadSports();
-            SelectedSportId = 0;
-            _segments = await LoadSegments(SelectedSportId);
-            SelectedSegmentId = 0;
-            _leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
-            SelectedLeagueId = 0;
-
             await OnInitCallback.InvokeAsync();
         }
         protected override async Task OnParametersSetAsync()
@@ -67,6 +58,20 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             {
                 _region = Region.ToUpper();
                 TradingService.Region = _region;
+            }
+
+            if (_languageCode != TranslationState.ActiveLanguageCode)
+            {
+                _languageCode = TranslationState.ActiveLanguageCode;
+
+                _clients = await LoadClients();
+                SelectedClientCode = _clients.FirstOrDefault().Value;
+                _sports = await LoadSports();
+                SelectedSportId = 0;
+                _segments = await LoadSegments(SelectedSportId);
+                SelectedSegmentId = 0;
+                _leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
+                SelectedLeagueId = 0;
             }
         }
 
@@ -209,7 +214,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         private async Task<List<SelectListItemModel<int>>> LoadSegments(int sportId)
         {
-            var response = await TradingService.GetSegmentLookup(sportId);
+            var response = await TradingService.GetSegmentLookup(sportId, _languageCode);
 
             var segmentsLookup = response.Result;
             if (segmentsLookup == null)
@@ -232,7 +237,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         private async Task<List<SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
         {
-            var response = await TradingService.GetLeagueLookup(sportId, segmentId);
+            var response = await TradingService.GetLeagueLookup(sportId, segmentId, _languageCode);
 
             var leaguesLookup = response.Result;
             if (leaguesLookup == null)

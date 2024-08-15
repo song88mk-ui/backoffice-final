@@ -149,7 +149,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/trading/segment/lookup/{sportId}");
+                var response = await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } }).GetAsync($"api/trading/segment/lookup/{sportId}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -196,7 +196,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/trading/league/lookup/{sportId}/{segmentId}");
+                var response = await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } }).GetAsync($"api/trading/league/lookup/{sportId}/{segmentId}");
 
                 if (response.IsSuccessStatusCode)
                 {

@@ -158,11 +158,11 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Segment
-        public async Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string region = "")
+        public async Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, string langCode, string region = "")
         {
             try
             {
-                var response = await GetHttpClient(region).GetAsync($"segment/lookup/{sportId}");
+                var response = await GetHttpClient(region, langCode).GetAsync($"segment/lookup/{sportId}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<SegmentLookupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -227,11 +227,11 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string region = "")
+        public async Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, string langCode, string region = "")
         {
             try
             {
-                var response = await GetHttpClient(region).GetAsync($"league/lookup/{sportId}/{segmentId}");
+                var response = await GetHttpClient(region, langCode).GetAsync($"league/lookup/{sportId}/{segmentId}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<LeagueLookupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
