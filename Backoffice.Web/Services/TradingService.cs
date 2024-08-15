@@ -2,10 +2,13 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Extensions;
+using Backoffice.Web.Models;
 using Serilog;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using static Backoffice.Shared.Models.Response.SportsTreeResponse;
 
 namespace Backoffice.Web.Services
 {
@@ -46,7 +49,7 @@ namespace Backoffice.Web.Services
             _httpClient = httpClient;
         }
 
-        public async Task<BaseResponse<Models.SportsTreeModel>> GetSports(int fixtureTypeId)
+        public async Task<BaseResponse<SportsTreeModel>> GetSports(int fixtureTypeId)
         {
             try
             {
@@ -54,25 +57,25 @@ namespace Backoffice.Web.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return JsonSerializer.Deserialize<BaseResponse<Models.SportsTreeModel>>
+                    return JsonSerializer.Deserialize<BaseResponse<SportsTreeModel>>
                         (
                             await response.Content.ReadAsStringAsync(),
                             new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                        ) ?? new BaseResponse<Models.SportsTreeModel>();
+                        ) ?? new BaseResponse<SportsTreeModel>();
                 }
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
                     {
-                        return JsonSerializer.Deserialize<BaseResponse<Models.SportsTreeModel>>
+                        return JsonSerializer.Deserialize<BaseResponse<SportsTreeModel>>
                         (
                             await response.Content.ReadAsStringAsync(),
                             new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
-                        ) ?? new BaseResponse<Models.SportsTreeModel>();
+                        ) ?? new BaseResponse<SportsTreeModel>();
                     }
                     else
                     {
-                        return new BaseResponse<Models.SportsTreeModel>
+                        return new BaseResponse<SportsTreeModel>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -86,7 +89,7 @@ namespace Backoffice.Web.Services
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
 
-                return new BaseResponse<Models.SportsTreeModel>
+                return new BaseResponse<SportsTreeModel>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
@@ -94,11 +97,12 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup()
+        public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string langCode)
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/trading/sports/lookup");
+                var response = await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
+                                                .GetAsync($"api/trading/sports/lookup");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -141,7 +145,7 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId)
+        public async Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, LanguageCode langCode = LanguageCode.EN)
         {
             try
             {
@@ -188,7 +192,7 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId)
+        public async Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, LanguageCode langCode = LanguageCode.EN)
         {
             try
             {

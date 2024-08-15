@@ -79,7 +79,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                 });
             }
 
-            var sports = (await TradingService.GetSportLookup()).Result;
+            var sports = (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString())).Result;
 
             if (sports != null)
             {

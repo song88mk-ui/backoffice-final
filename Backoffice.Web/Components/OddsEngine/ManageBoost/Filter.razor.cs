@@ -186,7 +186,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         private async Task<List<SelectListItemModel<int>>> LoadSports()
         {
-            var response = await TradingService.GetSportLookup();
+            var response = await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString());
 
             var sportsLookup = response.Result;
             if (sportsLookup == null)

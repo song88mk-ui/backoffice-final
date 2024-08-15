@@ -75,7 +75,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
                 SelectedClientCode = Clients.FirstOrDefault().Value;
 
-                var sports = (await TradingService.GetSportLookup()).Result;
+                var sports = (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString())).Result;
 
                 if (sports != null)
                 {

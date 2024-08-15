@@ -38,6 +38,7 @@ namespace Backoffice.Web.Shared
         private bool _showSwitchAccess;
         private string _page;
         private NavMenuModel _navMenus;
+        private LanguageCode _languageCode;
         #endregion
 
         #region Methods
@@ -69,8 +70,9 @@ namespace Backoffice.Web.Shared
         {
             await InvokeAsync(StateHasChanged);
 
-            if (NavMenuAccess != _navMenuAccess)
+            if (_navMenuAccess != NavMenuAccess || _languageCode != TranslationState.ActiveLanguageCode)
             {
+                _languageCode = TranslationState.ActiveLanguageCode;
                 _navMenuAccess = NavMenuAccess;
                 if (_navMenuAccess == PermissionCategory.OE)
                 {
@@ -246,7 +248,7 @@ namespace Backoffice.Web.Shared
 
         private async Task<List<SportModel>> GetSportsTreeMenu()
         {
-            var response = await BackofficeService.GetSportsTreeAsync((int)FixtureType.Match);
+            var response = await BackofficeService.GetSportsTreeAsync((int)FixtureType.Match, TranslationState.ActiveLanguageCode);
             var result = new List<SportModel>();
 
             if (response.StatusCode == StatusCode.Success)

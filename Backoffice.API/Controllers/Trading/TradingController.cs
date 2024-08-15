@@ -32,8 +32,9 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetSports(int fixtureTypeId)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetSports(fixtureTypeId, region);
+            var result = await _tradingRepository.GetSports(fixtureTypeId, region, langCode);
 
             switch (result.StatusCode)
             {
@@ -65,8 +66,9 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetSportLookup()
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetSportLookup(region);
+            var result = await _tradingRepository.GetSportLookup(langCode, region);
 
             switch (result.StatusCode)
             {
@@ -99,6 +101,7 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetSegmentLookup(int sportId)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetSegmentLookup(sportId, region);
 
@@ -117,6 +120,7 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetLeagueLookup(int sportId, int segmentId)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
             var result = await _tradingRepository.GetLeagueLookup(sportId, segmentId, region);
 
@@ -468,8 +472,9 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetClientSportOrderList([FromBody] ClientSportOrderListRequest request)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetClientSportOrderList(request, region);
+            var result = await _tradingRepository.GetClientSportOrderList(request, langCode, region);
 
             switch (result.StatusCode)
             {
@@ -679,8 +684,9 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetFastOddsSports(int fixtureTypeId)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetSports(fixtureTypeId, region);
+            var result = await _tradingRepository.GetSports(fixtureTypeId, region, langCode);
 
             switch (result.StatusCode)
             {
@@ -875,7 +881,7 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> DeactivateFixtureMarkets([FromBody] DeactivateFixtureMarketRequest request)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
-            
+
             var result = await _tradingRepository.DeactivateFixtureMarkets(request, region);
 
             switch (result.StatusCode)

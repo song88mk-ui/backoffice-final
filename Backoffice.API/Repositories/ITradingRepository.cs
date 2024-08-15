@@ -1,13 +1,11 @@
-﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.OutgoingEngineMessages;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Transactions;
+using static Backoffice.Shared.Models.Response.SportsTreeResponse;
+using static Backoffice.Shared.Models.Response.SportsTreeResponse;
 
 namespace Backoffice.API.Repositories
 {
@@ -24,7 +22,7 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<List<ClientMarketConfig>>> GetClientMarketConfig(string clientCode, string region);
         Task<BaseResponse<List<ClientMarketConfig>>> GetClientMarketConfig(int pageSize, int page, string clientCode, string region);
         Task<BaseResponse<ClientSportSettingResponse>> AddOrUpdateClientSportSettings(ClientSportSettingRequest request, string region);
-        Task<BaseResponse<List<ClientSportOrderListResponse>>> GetClientSportOrderList(ClientSportOrderListRequest request, string region);
+        Task<BaseResponse<List<ClientSportOrderListResponse>>> GetClientSportOrderList(ClientSportOrderListRequest request, string langCode, string region);
         Task<BaseResponse<List<ClientSportOrderAuditResponse>>> GetClientSportOrderAuditList(ClientSportOrderAuditRequest request, string region);
         Task<BaseResponse<List<ClientSegmentOrderListResponse>>> GetClientSegmentOrderList(ClientSegmentOrderListRequest request, string region);
         Task<BaseResponse<List<ClientLeagueOrderListResponse>>> GetClientLeagueOrderList(ClientLeagueOrderListRequest request, string region);
@@ -58,9 +56,9 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Sports
-        Task<BaseResponse<SportsTreeResponse>> GetSports(int fixtureTypeId, string region);
+        Task<BaseResponse<SportsTreeResponse>> GetSports(int fixtureTypeId, string region, string langCode);
         Task<BaseResponse<List<MainMarketTemplateResponse>>> GetTopMarkets(int sportId, string region, string langCode);
-        Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region = "");
+        Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string langCode, string region = "");
         Task<BaseResponse<SportSelectorMarketTemplateResponse>> GetSelectorMarketTemplates(string region);
         #endregion
 

@@ -367,7 +367,7 @@ namespace Backoffice.Web.Components.Common
 
         private async Task<SportsLookupResponse> GetSports()
         {
-            return (await TradingService.GetSportLookup()).Result;
+            return (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString().ToUpper())).Result;
         }
 
         private async Task<SegmentLookupResponse> GetSegments(int sportId)

@@ -10,6 +10,8 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Backoffice.Web.Extensions;
+using static Backoffice.Shared.Models.Response.SportsTreeResponse;
 
 namespace Backoffice.Web.Services
 {
@@ -51,16 +53,6 @@ namespace Backoffice.Web.Services
         }
 
         #endregion
-        private void AddOrUpdateRequestHeader(Dictionary<string, string> content)
-        {
-            foreach (var item in content)
-            {
-                if (_client.DefaultRequestHeaders.Contains(item.Key))
-                    _client.DefaultRequestHeaders.Remove(item.Key);
-
-                _client.DefaultRequestHeaders.Add(item.Key, item.Value);
-            }
-        }
 
         #region Method - Maintenance
 
@@ -766,12 +758,13 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Methods - Others
-        public async Task<BaseResponse<SportsTreeResponse>> GetSportsTreeAsync(int fixtureTypeId)
+        public async Task<BaseResponse<SportsTreeResponse>> GetSportsTreeAsync(int fixtureTypeId, LanguageCode langCode)
         {
             try
             {
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsTreeResponse>>
-                (await _httpClient.GetStreamAsync($"api/trading/sports/{fixtureTypeId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
+                                  .GetStreamAsync($"api/trading/sports/{fixtureTypeId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result ?? new BaseResponse<SportsTreeResponse>
                 {
@@ -946,10 +939,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                AddOrUpdateRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } });
-
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<List<MainMarketTemplateResponse>>>
-                (await _httpClient.GetStreamAsync($"api/trading/sports/topmarkets/{sportId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
+                                  .GetStreamAsync($"api/trading/sports/topmarkets/{sportId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result ?? new BaseResponse<List<MainMarketTemplateResponse>>
                 {
@@ -980,10 +972,9 @@ namespace Backoffice.Web.Services
                     $"api/trading/fixtures/market/{request.FixtureTypeId}/{request.SportId}/{request.SegmentId}/{request.LeagueId}" :
                     $"api/trading/fixtures/market/{request.FixtureTypeId}/{request.SportId}/{request.SegmentId}/{request.LeagueId}/{request.MarketTemplateId}";
 
-                AddOrUpdateRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } });
-
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<MarketFixtureResponse>>
-                (await _httpClient.GetStreamAsync(stringUri), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
+                                  .GetStreamAsync(stringUri), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result ?? new BaseResponse<MarketFixtureResponse>
                 {
@@ -1013,10 +1004,9 @@ namespace Backoffice.Web.Services
             {
                 var stringUri = $"api/trading/fixtures2/market/details/{providerFixtureId}";
 
-                AddOrUpdateRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } });
-
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<MarketFixtureDetailResponse>>
-                (await _httpClient.GetStreamAsync(stringUri), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
+                                  .GetStreamAsync(stringUri), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result ?? new BaseResponse<MarketFixtureDetailResponse>
                 {
@@ -1336,8 +1326,8 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                AddOrUpdateRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } });
-                var response = await _httpClient.GetAsync($"api/config/translations");
+                var response = await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
+                                                .GetAsync($"api/config/translations");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<TranslationResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

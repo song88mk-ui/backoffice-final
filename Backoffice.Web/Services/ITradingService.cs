@@ -1,7 +1,9 @@
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
+using static Backoffice.Shared.Models.Response.SportsTreeResponse;
 
 namespace Backoffice.Web.Services
 {
@@ -9,9 +11,9 @@ namespace Backoffice.Web.Services
     {
         string Region { get; set; }
         Task<BaseResponse<SportsTreeModel>> GetSports(int fixtureTypeId);
-        Task<BaseResponse<SportsLookupResponse>> GetSportLookup();
-        Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId);
-        Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId);
+        Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string langCode);
+        Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, LanguageCode langCode = LanguageCode.EN);
+        Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, LanguageCode langCode = LanguageCode.EN);
         Task<BaseResponse<List<ClientInformationModel>>> GetClientList();
         Task<BaseResponse<List<PriceBoostConfigModel>>> GetPriceBoostConfig(PriceBoostConfigRequest request);
         Task<BaseResponse<List<BoostedSettingsModel>>> GetBoostedSettings(BoostedSettingsRequest request);

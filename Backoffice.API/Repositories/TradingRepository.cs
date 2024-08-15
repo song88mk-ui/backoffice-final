@@ -29,11 +29,11 @@ namespace Backoffice.API.Repositories
         }
 
         #region SPORTS
-        public async Task<BaseResponse<SportsTreeResponse>> GetSports(int fixtureTypeId, string region)
+        public async Task<BaseResponse<SportsTreeResponse>> GetSports(int fixtureTypeId, string region, string langCode)
         {
             try
             {
-                var response = await GetHttpClient(region).GetAsync($"sports2/{fixtureTypeId}");
+                var response = await GetHttpClient(region, langCode).GetAsync($"sports/tree/{fixtureTypeId}");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -92,11 +92,11 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string region = "")
+        public async Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string langCode, string region = "")
         {
             try
             {
-                var response = await GetHttpClient(region).GetAsync($"sports/lookup");
+                var response = await GetHttpClient(region, langCode).GetAsync($"sports/lookup");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<SportsLookupResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -718,11 +718,11 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<List<ClientSportOrderListResponse>>> GetClientSportOrderList(ClientSportOrderListRequest request, string region)
+        public async Task<BaseResponse<List<ClientSportOrderListResponse>>> GetClientSportOrderList(ClientSportOrderListRequest request, string langCode, string region)
         {
             try
             {
-                var response = await GetHttpClient(region).PostAsync($"client/sportorder/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var response = await GetHttpClient(region, langCode).PostAsync($"client/sportorder/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<List<ClientSportOrderListResponse>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

@@ -1,8 +1,7 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages;
-using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -30,6 +29,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         private string _marketTemplateId = string.Empty;
         private int _selectedClientCount;
         private string _selectedClientName;
+        private LanguageCode _languageCode;
         #endregion
 
         #region Methods
@@ -76,13 +76,14 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         protected override async Task OnParametersSetAsync()
         {
-            if (_sportId != SportId)
+            if (_sportId != SportId || _languageCode != TranslationState.ActiveLanguageCode)
             {
                 _sportId = SportId;
+                _languageCode = TranslationState.ActiveLanguageCode;
 
-                var topMarketsResponse = await BackofficeService.GetTopMarkets(_sportId, TranslationState.ActiveLanguageCode);
+                var topMarketsResponse = await BackofficeService.GetTopMarkets(_sportId, _languageCode);
                 _topMarketTemplates = topMarketsResponse.Result;
-                _marketTemplateId = _topMarketTemplates.FirstOrDefault()?.MainMarketTemplateId ?? string.Empty;
+                _marketTemplateId = _topMarketTemplates?.FirstOrDefault()?.MainMarketTemplateId ?? string.Empty;
 
                 if (!string.IsNullOrEmpty(_marketTemplateId))
                 {

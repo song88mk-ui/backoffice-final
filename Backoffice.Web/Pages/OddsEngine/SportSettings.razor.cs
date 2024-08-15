@@ -39,6 +39,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isUpdate;
         private bool _hasChanges;
         private bool _allowedLeave;
+        private LanguageCode _languageCode;
 
         private EditSportSettingsPage _currentEditPage;
         private IDisposable registration;
@@ -57,9 +58,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 IsCurrentPage = true
             });
 
-            _segmentLookupTask = Task.Run(() => TradingService.GetSegmentLookup(0));
-            _leagueLookupTask = Task.Run(() => TradingService.GetLeagueLookup(0, 0));
-
             _pageHeaderModel = new PageHeaderModel
             {
                 Title = "Sports Settings",
@@ -67,6 +65,18 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
             await Task.CompletedTask;
             _isUpdate = false;
+        }
+        protected override async Task OnParametersSetAsync()
+        {
+            if(_languageCode != TranslationState.ActiveLanguageCode)
+            {
+                _languageCode = TranslationState.ActiveLanguageCode;
+
+                _segmentLookupTask = Task.Run(() => TradingService.GetSegmentLookup(0, _languageCode));
+                _leagueLookupTask = Task.Run(() => TradingService.GetLeagueLookup(0, 0, _languageCode));
+            }
+
+            await Task.CompletedTask;
         }
         protected override void OnAfterRender(bool firstRender)
         {
@@ -120,14 +130,16 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isPreload = true;
             if (!_sportLookupSettings.Any())
             {
-                var sportLookupResponse = await TradingService.GetSportLookup();
-                var segmentLookupResponse = await TradingService.GetSegmentLookup(0);
-                var leagueLookupResponse = await TradingService.GetLeagueLookup(0, 0);
+                var sportLookupResponse = await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString());
 
-                if (sportLookupResponse.StatusCode == StatusCode.Success && segmentLookupResponse.StatusCode == StatusCode.Success && leagueLookupResponse.StatusCode == StatusCode.Success)
+                await Task.WhenAll(_leagueLookupTask, _segmentLookupTask);
+                var leagueLookupResponse = _leagueLookupTask.Result.Result;
+                var segmentLookupResponse = _segmentLookupTask.Result.Result;
+
+                if (sportLookupResponse.StatusCode == StatusCode.Success && _segmentLookupTask.Result.StatusCode == StatusCode.Success && _leagueLookupTask.Result.StatusCode == StatusCode.Success)
                 {
-                    var segmentSettings = segmentLookupResponse.Result.SegmentLookup
-                    .GroupJoin(leagueLookupResponse.Result.LeagueLookup,
+                    var segmentSettings = segmentLookupResponse.SegmentLookup
+                    .GroupJoin(leagueLookupResponse.LeagueLookup,
                     segment => new { SpId = segment.SportId, SegId = segment.SegmentId },
                     league => new { SpId = league.SportId, SegId = league.SegmentId },
                     (segment, league) => new SportSettingSegment
@@ -378,7 +390,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             LeagueId = temp.Lookup.LeagueId,
                             LeagueName = temp.Lookup.LeagueName.TrimEnd(),
                             IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
-                            SortOrder = temp.LookupOrder.FirstOrDefault() != null ? temp.LookupOrder.FirstOrDefault().SortOrder : 1000
+                            SortOrder = temp.LookupOrder.FirstOrDefault()?.SortOrder ?? 1000
                         })
                         .OrderBy(o => o.SortOrder)
                         .ToList();
@@ -395,7 +407,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         SegmentId = temp.Lookup.SegmentId,
                         SegmentName = temp.Lookup.SegmentName.TrimEnd(),
                         IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
-                        SortOrder = temp.LookupOrder.FirstOrDefault() != null ? temp.LookupOrder.FirstOrDefault().SortOrder : 1000,
+                        SortOrder = temp.LookupOrder.FirstOrDefault()?.SortOrder ?? 1000,
                         IsOpen = false,
                         Leagues = leagues.Where(c => c.SportId == temp.Lookup.SportId && c.SegmentId == temp.Lookup.SegmentId).ToList()
                     })

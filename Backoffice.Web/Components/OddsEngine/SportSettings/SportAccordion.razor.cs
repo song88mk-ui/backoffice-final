@@ -87,8 +87,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         public async Task OnToggleClick()
         {
-            //_showSegments = !_showSegments;
-
             if (_isOpen && _page == EditSportSettingsPage.SegmentAndLeagues)
             {
                 await JSRuntime.InvokeVoidAsync("disableSortOrder2", $"#segmentEditable-{Sport.SportId}");
@@ -96,18 +94,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             }
 
             await OnSportToggleCallback.InvokeAsync(_isOpen ? -1 : _sportId);
-            //_shouldRender = true;
         }
-        private async Task OnSportAccordionSelectedEvent(int segmentId)
-        {
-            _segments.ForEach(x =>
-            {
-                if (segmentId == x.SegmentId)
-                    x.IsOpen = true;
-                else
-                    x.IsOpen = false;
-            });
-        }
+        private async Task OnSportAccordionSelectedEvent(int segmentId) => _segments.ForEach(x => x.IsOpen = segmentId == x.SegmentId);
 
         public async Task OnCheckboxChanged(ChangeEventArgs e)
         {
@@ -117,8 +105,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             _isSelected = isSelected;
 
             await OnCheckboxChangedCallback.InvokeAsync(new Tuple<int, bool>(_sportId, _isSelected));
-
-            //_shouldRender = true;
         }
     }
 }

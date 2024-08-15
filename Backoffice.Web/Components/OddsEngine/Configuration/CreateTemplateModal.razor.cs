@@ -115,7 +115,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private async Task<List<SelectListItemModel<int>>> LoadSports()
         {
-            var result = (await TradingService.GetSportLookup()).Result;
+            var result = (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString().ToUpper())).Result;
 
             if (result == null)
                 return new List<SelectListItemModel<int>>();

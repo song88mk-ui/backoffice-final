@@ -29,6 +29,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         private int _selectedClientCount;
         private string _selectedClientName;
         private LanguageCode _languageCode;
+        private int _sportId;
         #endregion
 
         #region Methods
@@ -73,11 +74,12 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         }
         protected override async Task OnParametersSetAsync()
         {
-            if (_languageCode != TranslationState.ActiveLanguageCode)
+            if (_sportId != SportId || _languageCode != TranslationState.ActiveLanguageCode)
             {
+                _sportId = SportId;
                 _languageCode = TranslationState.ActiveLanguageCode;
 
-                var mainMarketTemplateResponse = await BackofficeService.GetTopMarkets(SportId, _languageCode);
+                var mainMarketTemplateResponse = await BackofficeService.GetTopMarkets(_sportId, _languageCode);
 
                 if (mainMarketTemplateResponse.StatusCode == StatusCode.Success)
                 {

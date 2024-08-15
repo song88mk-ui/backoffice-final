@@ -6,6 +6,8 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Drawing;
+using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 {
@@ -23,7 +25,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public FixtureType SelectedFixtureType { get; set; }
         public AddPriceBoostFilterModel Model { get; set; }
-        public SportsTreeModel Sports { get; set; }        
+        public SportsTreeModel Sports { get; set; }
         public MarketFixtureResponse MarketFixtureResponse { get; set; }
         private string Region { get; set; }
 
@@ -45,11 +47,15 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             Model = new AddPriceBoostFilterModel();
 
-            
+
             TradingService.Region = Region = ModalParameters.TryGet<string>("Region").ToUpper();
-            Model.Sports = await GetSports(SelectedFixtureType);
 
             IsPreloader = false;
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            Model.Sports = await GetSports(SelectedFixtureType);
         }
 
         public async Task OnMatchTypeChanged(FixtureType fixtureType)
@@ -108,7 +114,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     SportId = Model.SportId,
                     LeagueId = Model.LeagueId,
                     SegmentId = Model.SegmentId,
-                    FixtureTypeId = (int) SelectedFixtureType,
+                    FixtureTypeId = (int)SelectedFixtureType,
                     ProviderFixtureId = Model.ProviderFixtureId,
                     MarketTemplateId = Model.MarketTemplateId,
                     SelectionTemplateId = Model.SelectionTemplateId,
@@ -329,7 +335,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             IsPreloader = false;
             await InvokeAsync(StateHasChanged);
-        }      
+        }
 
         public async Task OnMarketSelectChanged(ChangeEventArgs e)
         {
@@ -369,7 +375,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public void Dispose()
         {
-            
+
         }
 
         #endregion
@@ -380,7 +386,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             Sports = new SportsTreeModel();
 
-            Sports = (await TradingService.GetSports((int)fixtureType)).Result;
+            var sportResponse = await TradingService.GetSports((int)fixtureType);
+
+            Sports = sportResponse.Result;
 
             if (Sports == null)
                 return new List<SelectListItemModel<int>>();
@@ -435,7 +443,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         }
 
         private async Task<List<SelectListItemModel<string>>> GetFixtures(int sportId, int segmentId, int leagueId)
-        {            
+        {
             if (SelectedFixtureType == FixtureType.Match)
             {
                 MarketFixtureResponse = (await TradingService.GetSportsBookFixtures(new MarketFixtureRequest
@@ -529,7 +537,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             var clients = (await TradingService.GetClientList()).Result;
 
-            clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Where(c => UserClientCodes.Contains(c.ClientCode)).ToList(): new List<ClientInformationModel>();
+            clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Where(c => UserClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
 
             if (!string.IsNullOrEmpty(Model.ClientCode))
                 clients = clients.Where(c => c.ClientCode == Model.ClientCode).ToList();

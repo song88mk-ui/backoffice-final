@@ -140,50 +140,35 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #endregion
 
         #region Utilities
-        private List<SelectListItemModel<int>> GetFixtureTypes()
-        {
-            return new List<SelectListItemModel<int>>()
+        private List<SelectListItemModel<int>> GetFixtureTypes() => new List<SelectListItemModel<int>>()
             {
                 new SelectListItemModel<int> { Value = 0, Name = "Match" },
                 new SelectListItemModel<int> {  Value = 1, Name = "Outrights" }
             };
-        }
 
-        private async Task<List<SelectListItemModel<Guid>>> GetClients()
+        private async Task<List<SelectListItemModel<Guid>>> GetClients() => (await TradingService.GetClientList()).Result.Where(x => UserClientCodes != null && UserClientCodes.Contains(x.ClientCode)).Select(c => new SelectListItemModel<Guid>()
         {
-            return (await TradingService.GetClientList()).Result.Where(x => UserClientCodes != null && UserClientCodes.Contains(x.ClientCode)).Select(c => new SelectListItemModel<Guid>()
-            {
-                Value = c.ClientId,
-                Name = c.ClientName
-            }).ToList();
-        }
+            Value = c.ClientId,
+            Name = c.ClientName
+        }).ToList();
 
-        private async Task<List<SelectListItemModel<int>>> GetSports()
+        private async Task<List<SelectListItemModel<int>>> GetSports() => (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString())).Result.SportLookup.Select(c => new SelectListItemModel<int>()
         {
-            return (await TradingService.GetSportLookup()).Result.SportLookup.Select(c => new SelectListItemModel<int>()
-            {
-                Value = c.SportId,
-                Name = c.SportName
-            }).ToList();
-        }
+            Value = c.SportId,
+            Name = c.SportName
+        }).ToList();
 
-        private async Task<List<SelectListItemModel<int>>> GetSegments(int sportId)
+        private async Task<List<SelectListItemModel<int>>> GetSegments(int sportId) => (await TradingService.GetSegmentLookup(sportId)).Result.SegmentLookup.Select(c => new SelectListItemModel<int>()
         {
-            return (await TradingService.GetSegmentLookup(sportId)).Result.SegmentLookup.Select(c => new SelectListItemModel<int>()
-            {
-                Value = c.SegmentId,
-                Name = c.SegmentName
-            }).ToList();
-        }
+            Value = c.SegmentId,
+            Name = c.SegmentName
+        }).ToList();
 
-        private async Task<List<SelectListItemModel<int>>> GetLeagues(int sportId, int segmentId)
+        private async Task<List<SelectListItemModel<int>>> GetLeagues(int sportId, int segmentId) => (await TradingService.GetLeagueLookup(sportId, segmentId)).Result.LeagueLookup.Select(c => new SelectListItemModel<int>()
         {
-            return (await TradingService.GetLeagueLookup(sportId, segmentId)).Result.LeagueLookup.Select(c => new SelectListItemModel<int>()
-            {
-                Value = c.LeagueId,
-                Name = c.LeagueName
-            }).ToList();
-        }
+            Value = c.LeagueId,
+            Name = c.LeagueName
+        }).ToList();
 
         private async Task<List<SelectListItemModel<int>>> GetMarketGroups(int fixtureTypeId, int sportId)
         {
@@ -253,14 +238,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             }).ToList();
         }
 
-        private List<SelectListItemModel<string>> GetScopes()
-        {
-            return new List<SelectListItemModel<string>>()
+        private List<SelectListItemModel<string>> GetScopes() => new List<SelectListItemModel<string>>()
             {
                 new SelectListItemModel<string> { Value = "Prematch", Name = "Prematch" },
                 new SelectListItemModel<string> {  Value = "Live", Name = "Live" }
             };
-        }
         #endregion
     }
 }

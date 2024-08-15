@@ -16,15 +16,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             return base.OnParametersSetAsync();
         }
-        private void OnSportAccordionSelectedEvent(int sportId)
-        {
-            SportSettings.ForEach(x =>
-            {
-                if (sportId == x.SportId)
-                    x.IsOpen = true;
-                else
-                    x.IsOpen = false;
-            });
-        }
+        private void OnSportAccordionSelectedEvent(int sportId) => SportSettings.ForEach(x => x.IsOpen = sportId == x.SportId);
     }
 }

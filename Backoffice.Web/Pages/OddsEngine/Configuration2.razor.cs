@@ -141,7 +141,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 var attempt = 0;
 
-                while(attempt < 3)
+                while (attempt < 3)
                 {
                     var response = await BackofficeService.GetTemplateConfigCount(ConfigState.UnAssigned.ToString());
                     if (response.StatusCode == StatusCode.Success)
@@ -160,7 +160,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async Task<List<SelectListItemModel<string>>> LoadSports()
         {
-            var response = (await TradingService.GetSportLookup()).Result;
+            var response = (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString())).Result;
             var result = new List<SelectListItemModel<string>>();
 
             if (response == null)
@@ -202,14 +202,11 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             return result;
         }
-        private async Task<List<SelectListItemModel<string>>> LoadScopes()
-        {
-            return new List<SelectListItemModel<string>>()
+        private async Task<List<SelectListItemModel<string>>> LoadScopes() => new List<SelectListItemModel<string>>()
             {
                 new SelectListItemModel<string>() { Name = "Live", Value = ((int)Scope.Live).ToString() },
                 new SelectListItemModel<string>() { Name = "Prematch", Value = ((int)Scope.Prematch).ToString() }
             };
-        }
         #endregion
     }
 }
