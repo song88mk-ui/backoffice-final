@@ -551,8 +551,9 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetClientMarketTemplates(string clientCode, int sportId, int fixtureStatusId)
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
 
-            var result = await _tradingRepository.GetClientMarketTemplates(clientCode, sportId, fixtureStatusId, region);
+            var result = await _tradingRepository.GetClientMarketTemplates(clientCode, sportId, fixtureStatusId, langCode, region);
 
             switch (result.StatusCode)
             {

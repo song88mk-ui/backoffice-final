@@ -188,7 +188,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             if (!string.IsNullOrEmpty(SelectedClientCode) && SelectedSportId != 0)
             {
-                var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId)).Result;
+                var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId, TranslationState.ActiveLanguageCode)).Result;
 
                 if(marketTemplateResponse != null)
                 {

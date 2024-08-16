@@ -274,14 +274,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task OnSaveCopyClickEvent()
+        public async Task OnSaveCopyClickEvent() => _alertModel = new()
         {
-            _alertModel = new()
-            {
-                Status = AlertStatus.Success,
-                Message = "Market Sort Order settings copied successfully."
-            };
-        }
+            Status = AlertStatus.Success,
+            Message = "Market Sort Order settings copied successfully."
+        };
 
         public async ValueTask DisposeAsync()
         {
@@ -347,7 +344,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _marketTemplates = new();
             if (!string.IsNullOrEmpty(_filterModel.SelectedClientCode) && _filterModel.SelectedClientCode != "NA" && _filterModel.SelectedSportId != 0)
             {
-                var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
+                var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId, TranslationState.ActiveLanguageCode)).Result;
 
                 var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
 
