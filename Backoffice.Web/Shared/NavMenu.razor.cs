@@ -248,7 +248,7 @@ namespace Backoffice.Web.Shared
 
         private async Task<List<SportModel>> GetSportsTreeMenu()
         {
-            var response = await BackofficeService.GetSportsTreeAsync((int)FixtureType.Match, TranslationState.ActiveLanguageCode);
+            var response = await BackofficeService.GetSportsTreeAsync((int)FixtureType.Match, _languageCode);
             var result = new List<SportModel>();
 
             if (response.StatusCode == StatusCode.Success)
@@ -269,12 +269,11 @@ namespace Backoffice.Web.Shared
                                 LeagueId = le.LeagueId,
                                 LeagueName = le.LeagueName,
                                 SortOrder = le.SortOrder,
-                            }).OrderBy(o => o.LeagueName)
+                            })
                             .ToList()
-                        }).OrderBy(o => o.SegmentName)
+                        })
                         .ToList()
                     })
-                    .OrderBy(o => o.SportName)
                     .ToList();
             }
             return result;
