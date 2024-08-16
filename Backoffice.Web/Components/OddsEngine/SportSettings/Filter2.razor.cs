@@ -29,6 +29,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         private string _selectedClientCode;
 
         private int _counter;
+        private LanguageCode _languageCode;
 
         //private bool _init;
         //private bool _shouldRender;
@@ -39,39 +40,24 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 return;
 
             //_init = true;
+            var clientResponse = await TradingService.GetClientList();
 
-            TradingService.Region = "HK";
-
-            if (UserClientCodes != null && UserClientCodes.Any())
+            if (clientResponse.StatusCode == StatusCode.Success)
             {
-                var clientResponse = await TradingService.GetClientList();
+                clientResponse.Result = clientResponse.Result.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
-                if (clientResponse.StatusCode == StatusCode.Success)
+                _clients = clientResponse.Result.Select(s => new SelectListItemModel<string>
                 {
-                    clientResponse.Result = clientResponse.Result.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                    Value = s.ClientCode,
+                    Name = s.ClientName,
+                }).OrderBy(x => x.Name).ToList();
 
-                    _clients = clientResponse.Result.Select(s => new SelectListItemModel<string>
-                    {
-                        Value = s.ClientCode,
-                        Name = s.ClientName,
-                    }).OrderBy(x => x.Name).ToList();
+                _selectedClientCode = _clients.FirstOrDefault().Value;
+                await OnClientChangedCallback.InvokeAsync(_selectedClientCode);
 
-                    _selectedClientCode = _clients.FirstOrDefault().Value;
-                    await OnClientChangedCallback.InvokeAsync(_selectedClientCode);
-                }
+                TradingService.Region = "HK";
+
             }
-        }
-
-        protected override async Task OnParametersSetAsync()
-        {
-            //_shouldRender = _init ? _init : Render;
-
-            //if (!_shouldRender)
-            //    return;
-
-            //Debug.WriteLine($"Filter2: {_counter++}");
-
-            //_init = false;
         }
 
         //protected override bool ShouldRender() => _shouldRender;

@@ -350,6 +350,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
 
                 var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
+
                 _clientMarketTemplateGroupsRef = marketTemplateGroupResponse?.ClientMarketTemplateGroups
                     .Select(s => new ClientMarketTemplateGroup
                     {
@@ -360,7 +361,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         IsSelected = s.Name == "All Markets" ? true : false,
                     }).ToList() ?? new();
 
-                _filteredMarketTemplatesRef = marketTemplateResponse.MarketTemplates
+                _filteredMarketTemplatesRef = marketTemplateResponse?.MarketTemplates
                     .OrderBy(o => o.SortOrder)
                     .Select((s, index) => new ClientMarketTemplate
                     {
@@ -368,7 +369,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         MarketTemplateId = s.MarketTemplateId,
                         MarketTemplateName = s.MarketTemplateName,
                         SortOrder = s.SortOrder
-                    }).ToList();
+                    }).ToList() ?? new List<ClientMarketTemplate>();
             }
 
             _selectedMarketGroupId = _clientMarketTemplateGroupsRef.FirstOrDefault(x => x.Name.ToUpper() == "ALL MARKETS")?.Id ?? -1;

@@ -63,6 +63,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Title = "Sports Settings",
                 ShowLanguageDropDown = false
             };
+
+            _isPreload = true;
+
+            _segmentLookupTask = Task.Run(() => TradingService.GetSegmentLookup(0, _languageCode));
+            _leagueLookupTask = Task.Run(() => TradingService.GetLeagueLookup(0, 0, _languageCode));
+
             await Task.CompletedTask;
             _isUpdate = false;
         }
@@ -71,12 +77,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             if(_languageCode != TranslationState.ActiveLanguageCode)
             {
                 _languageCode = TranslationState.ActiveLanguageCode;
-
-                _segmentLookupTask = Task.Run(() => TradingService.GetSegmentLookup(0, _languageCode));
-                _leagueLookupTask = Task.Run(() => TradingService.GetLeagueLookup(0, 0, _languageCode));
+                await GetSports();
             }
-
-            await Task.CompletedTask;
         }
         protected override void OnAfterRender(bool firstRender)
         {
@@ -457,7 +459,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             _isPreload = false;
-            await InvokeAsync(StateHasChanged);
+            StateHasChanged();
             //_renderFilter = true;
         }
 

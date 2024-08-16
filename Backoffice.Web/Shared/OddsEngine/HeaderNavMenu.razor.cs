@@ -27,6 +27,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         #endregion
 
         private OeNavMenu _menu;
+        private string _activePage;
 
         #region Methods
 
@@ -37,6 +38,13 @@ namespace Backoffice.Web.Shared.OddsEngine
         protected override async Task OnParametersSetAsync()
         {
             _address = $"{Region.ToLower()}/odds-engine";
+            var page = NavigationManager?.Uri.Replace(NavigationManager.BaseUri, "");
+
+            if (_activePage != page)
+            {
+                _activePage = page;
+                ActivateMenu(page);
+            }
         }
         private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
         {

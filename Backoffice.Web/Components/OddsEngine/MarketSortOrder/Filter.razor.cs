@@ -3,7 +3,6 @@ using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 {
@@ -230,7 +229,10 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             if (!string.IsNullOrEmpty(_filterModel.SelectedClientCode) && _filterModel.SelectedClientCode != "NA" && _filterModel.SelectedSportId != 0)
             {
                 var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
-                ClientMarketTemplateGroups = marketTemplateGroupResponse.ClientMarketTemplateGroups
+
+                if(marketTemplateGroupResponse != null)
+                {
+                    ClientMarketTemplateGroups = marketTemplateGroupResponse.ClientMarketTemplateGroups
                     .Select(s => new MarketSortOrderModel.ClientMarketTemplateGroup
                     {
                         Id = s.MarketTemplateGroupId,
@@ -239,6 +241,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                         SortOrder = s.SortOrder,
                         IsSelected = s.Name == "All Markets" ? true : false,
                     }).ToList();
+                }
 
                 await OnInitializeEventCallback.InvokeAsync(_filterModel);
             }

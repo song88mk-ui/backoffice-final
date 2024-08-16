@@ -1805,6 +1805,7 @@ namespace Backoffice.API.Repositories
             };
             client.DefaultRequestHeaders.Add("x-api-key", GetApikey(region));
 
+            client.DefaultRequestHeaders.Remove("x-language-code");
             if (!string.IsNullOrEmpty(langCode))
                 client.DefaultRequestHeaders.Add("x-language-code", langCode);
 
