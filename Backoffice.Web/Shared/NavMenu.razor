@@ -1,5 +1,6 @@
 ﻿@using Backoffice.Web.Models
 @using Backoffice.Shared.Enums
+@using Backoffice.Web.Utilities
 
 @if (NavMenuAccess == PermissionCategory.SBC || NavMenuAccess == PermissionCategory.Admin)
 {
@@ -89,7 +90,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
                     {
                         <div class="nav-item px-3">
                             <NavLink class="nav-link" @onclick="_ => OnSportClickEvent(sport.SportId)">
-                                <span class="@($"iconfont iconfont-{sport.SportName.ToLower().Replace(' ', '-')}")" aria-hidden="true"></span>
+                                <span class="@($"iconfont iconfont-{Utility.GetSportIcon(sport.SportId)}")" aria-hidden="true"></span>
                                 <span class="nav-menu-text">@TranslationState.GetValue(sport.SportName)</span>
                                 <span class="@(sport.SportId == _selectedSport.SportId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
                             </NavLink>

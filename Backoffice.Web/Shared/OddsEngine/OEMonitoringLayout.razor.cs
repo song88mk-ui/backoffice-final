@@ -19,7 +19,7 @@ namespace Backoffice.Web.Shared.OddsEngine
                 var regions = new List<string>() { "HK", "SA" };
                 Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToLower() : null;
             }
-        }        
+        }
         #endregion
     }
 }
