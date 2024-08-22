@@ -12,14 +12,7 @@
                 <select class="form-select d-block" @onchange="OnSortByChangedEvent">
                     @foreach (var item in SelectSortByList)
                     {
-                        if (SortBy == item.Value)
-                        {
-                            <option value="@item.Value" selected>@item.Name</option>
-                        }
-                        else
-                        {
-                            <option value="@item.Value">@item.Name</option>
-                        }
+                        <option value="@item.Value" selected="@(SortBy == item.Value)">@TranslationState.GetValue(item.Name)</option>
                     }
                 </select>
             </div>

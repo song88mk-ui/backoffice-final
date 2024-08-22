@@ -5,7 +5,7 @@
         </div>
         <div class="col">
             <select class="form-select" @onchange="OnClientChangedEvent">
-                <option value="" selected>Select Client</option>
+                <option value="" selected>@TranslationState.GetValue("Select Client")</option>
                 @foreach (var item in Clients)
                 {
                     if (item.Value == SelectedClientCode)

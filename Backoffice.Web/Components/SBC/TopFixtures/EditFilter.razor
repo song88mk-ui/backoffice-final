@@ -5,7 +5,7 @@
             <label class="my-1 mr-2">@TranslationState.GetValue("Sport")</label>
 
             <select class="form-control form-select my-1 mr-sm-2" @onchange="OnSportChangedEvent">
-                <option value="0" selected>ALL</option>
+                <option value="0" selected>@TranslationState.GetValue("ALL")</option>
                 @if (SportsTree.Sports.Any())
                 {
                     foreach (var sport in SportsTree.Sports)
@@ -19,7 +19,7 @@
             <label class="my-1 mr-2">@TranslationState.GetValue("Segment")</label>
 
             <select class="form-control form-select my-1 mr-sm-2" @onchange="OnSegmentChangedEvent">
-                <option value="0" selected>ALL</option>
+                <option value="0" selected>@TranslationState.GetValue("ALL")</option>
                 @if (SelectedSport != null && SelectedSport.Segments.Any())
                 {
                     foreach (var segment in SelectedSport.Segments)
@@ -40,7 +40,7 @@
             <label class="my-1 mr-2">@TranslationState.GetValue("League")</label>
 
             <select class="form-control form-select my-1 mr-sm-2" @onchange="OnLeagueChangedEvent">
-                <option value="0" selected>ALL</option>
+                <option value="0" selected>@TranslationState.GetValue("ALL")</option>
                 @if (SelectedSegment != null && SelectedSegment.Leagues.Any())
                 {
                     foreach (var league in SelectedSegment.Leagues)
@@ -61,7 +61,7 @@
             <label class="my-1 mr-2">@TranslationState.GetValue("Game")</label>
 
             <select class="form-control form-select my-1 mr-sm-2" @onchange="OnGameChangedEvent">
-                <option value="0" selected>ALL</option>
+                <option value="0" selected>@TranslationState.GetValue("ALL")</option>
                 @if (SelectedLeague != null && SelectedLeague.Fixtures.Any())
                 {
                     foreach (var fixture in SelectedLeague.Fixtures)
@@ -81,8 +81,8 @@
         <div class="col-2">
             <label class="my-1 mr-2">@TranslationState.GetValue("Sort Kickoff Date & Time")</label>
             <select class="form-control form-select my-1 mr-sm-2" @onchange="OnSortChangedEvent">
-                <option value="1" selected>Default List</option>
-                <option value="2">Date & Time (Ascending)</option>
+                <option value="1" selected>@TranslationState.GetValue("Default List")</option>
+                <option value="2">@TranslationState.GetValue("Date & Time") (@TranslationState.GetValue("Ascending"))</option>
             </select>
         </div>
     </div>
