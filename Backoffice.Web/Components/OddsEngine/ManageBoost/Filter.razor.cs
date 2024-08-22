@@ -50,6 +50,15 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             SearchForm = new SearchFormModel();
 
+            _clients = await LoadClients();
+            SelectedClientCode = _clients.FirstOrDefault().Value;
+            _sports = await LoadSports();
+            SelectedSportId = 0;
+            _segments = await LoadSegments(SelectedSportId);
+            SelectedSegmentId = 0;
+            _leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
+            SelectedLeagueId = 0;
+
             await OnInitCallback.InvokeAsync();
         }
         protected override async Task OnParametersSetAsync()
@@ -59,19 +68,18 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 _region = Region.ToUpper();
                 TradingService.Region = _region;
             }
-
             if (_languageCode != TranslationState.ActiveLanguageCode)
             {
                 _languageCode = TranslationState.ActiveLanguageCode;
 
-                _clients = await LoadClients();
-                SelectedClientCode = _clients.FirstOrDefault().Value;
                 _sports = await LoadSports();
                 SelectedSportId = 0;
                 _segments = await LoadSegments(SelectedSportId);
                 SelectedSegmentId = 0;
                 _leagues = await LoadLeagues(SelectedSportId, SelectedSegmentId);
                 SelectedLeagueId = 0;
+
+                StateHasChanged();
             }
         }
 
@@ -191,7 +199,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         private async Task<List<SelectListItemModel<int>>> LoadSports()
         {
-            var response = await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString());
+            var response = await TradingService.GetSportLookup(_languageCode.ToString());
 
             var sportsLookup = response.Result;
             if (sportsLookup == null)
