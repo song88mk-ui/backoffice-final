@@ -63,7 +63,7 @@
                         else
                         {
                             <span>
-                                @(SelectedSportCount == 1 ? SelectedSportName : @TranslationState.GetValue($"Sports({{{SelectedSportCount}}})"))
+                                @(SelectedSportCount == 1 ? TranslationState.GetValue(SelectedSportName) : TranslationState.GetValue($"Sports({{{SelectedSportCount}}})"))
                             </span>
                         }
                     }

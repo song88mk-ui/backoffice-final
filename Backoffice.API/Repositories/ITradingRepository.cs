@@ -4,8 +4,6 @@ using Backoffice.Shared.Models.Response;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using static Backoffice.Shared.Models.Response.SportsTreeResponse;
-using static Backoffice.Shared.Models.Response.SportsTreeResponse;
 
 namespace Backoffice.API.Repositories
 {

@@ -2,7 +2,7 @@
     <div class="col-2">
         <select class="form-select" @onchange="OnSportChangedEvent">
             <optgroup label="Sports">
-                <option value="0">Select Sport</option>
+                <option value="0">@TranslationState.GetValue("Select Sport")</option>
                 @if (Sports != null && Sports.Any())
                 {
                     @foreach (var item in Sports)

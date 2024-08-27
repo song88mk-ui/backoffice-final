@@ -63,7 +63,7 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnSportChangedEvent">
                         <optgroup label="Sports">
-                            <option value="0">Select Sports</option>
+                            <option value="0">@TranslationState.GetValue("Select Sports")</option>
                             @if (FilterModel != null && FilterModel.Sports != null)
                             {
                                 @foreach (var sport in FilterModel.Sports.SportLookup)
