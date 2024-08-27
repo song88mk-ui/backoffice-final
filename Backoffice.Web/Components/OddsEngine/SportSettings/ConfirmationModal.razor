@@ -5,31 +5,30 @@
 else
 {
     <div class="modal-body">
-        <div class="d-flex flex-column justify-content-center p-5">
+        <div class="d-flex flex-column justify-content-center align-items-center p-5">
             <div class="text-center">
                 <img src="icons/svg/warning-icon.svg" />
             </div>
             @if (_userAction == 0)
             {
                 <div class="text-center mt-4">
-                    Are you sure you want to cancel?
+                    @TranslationState.GetValue("Are you sure you want to cancel?")
                     <br />
-                    All your progress won’t be saved.
+                    @TranslationState.GetValue("All your progress won’t be saved.")
+                    
                 </div>
             }
             else if (_userAction == 1)
             {
-                <div class="text-center mt-4">
-                    Do you want to save your changes before navigating
-                    <br />
-                    away from this page?
+                <div class="col-8 text-center mt-4 col-5">
+                    @TranslationState.GetValue("Do you want to save your changes before navigating away from this page?")
                 </div>
             }
         </div>
         @* <AlertMessage AlertModel="@AlertModel" /> *@
     </div>
     <div class="modal-footer mx-4">
-        <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCacnelClicked">No</button>
-        <button type="button" class="btn modal-btn btn-apply" @onclick="OnYesBtnClicked" disabled="@IsUpdating">@_buttonYesDisplay</button>
+        <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCacnelClicked">@TranslationState.GetValue("No")</button>
+        <button type="button" class="btn modal-btn btn-apply" @onclick="OnYesBtnClicked" disabled="@IsUpdating">@TranslationState.GetValue(_buttonYesDisplay)</button>
     </div>
 }
