@@ -56,6 +56,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isPlayerProps;
         private List<Client>? _clients;
         private LanguageCode _languageCode;
+        private bool _isInit;
+        private string _id;
         #endregion
 
         #region Methods
@@ -72,6 +74,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             FixtureMarketTemplates = new List<FixtureMarketModel>();
             MarketTemplateNavigation = new List<MarketNavigationModel2>();
             MarginMarket = new MarketModel();
+            _isInit = true;
 
             await AuthenticateAccess.InvokeAsync();
         }
@@ -96,10 +99,13 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         protected override async Task OnParametersSetAsync()
         {
-            if (_languageCode != TranslationState.ActiveLanguageCode)
+            if (_isInit || _languageCode != TranslationState.ActiveLanguageCode || Id != _id)
             {
+                _id = Id;
                 _languageCode = TranslationState.ActiveLanguageCode;
+
                 await PrepareMonitoringDetails();
+                _isInit = false;
             }
         }
 
