@@ -63,7 +63,7 @@ namespace Backoffice.Web.Shared
             if (PreRenderService.IsPreRendering)
                 return;
 
-            TranslationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
+            await JSRuntime.InvokeVoidAsync("console.log", "MainLayout Initialized");
 
             try
             {
