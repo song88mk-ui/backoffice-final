@@ -14,10 +14,10 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public ITableauService TableauService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
-        [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
 
         public string IFrameSrc { get; set; }
 
@@ -35,9 +35,6 @@ namespace Backoffice.Web.Pages.SBC
                 IconClass = "ico ico-dashboard"
             };
             await AuthenticateAccess.InvokeAsync();
-
-            await JSRuntime.InvokeVoidAsync("console.log", "Dashboard Initialized");
-
 
             await Initialize();
         }

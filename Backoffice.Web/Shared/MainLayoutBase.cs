@@ -19,7 +19,6 @@ namespace Backoffice.Web.Shared
     public class MainLayoutBase : LayoutComponentBase, IAsyncDisposable, IDisposable
     {
         #region Properties
-        [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] private ToastService? _toasterService { get; set; }
         [Inject] private IHttpContextAccessor _httpContextAccessor { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
@@ -62,8 +61,6 @@ namespace Backoffice.Web.Shared
         {
             if (PreRenderService.IsPreRendering)
                 return;
-
-            await JSRuntime.InvokeVoidAsync("console.log", "MainLayout Initialized");
 
             try
             {
