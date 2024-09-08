@@ -1083,15 +1083,15 @@ namespace Backoffice.API.Repositories
                             if ((int)BetSettingCategory.Priceboost != i)
                             {
 
-                                if (minStake < suggestedMinimumBet)
-                                {
-                                    return new BaseResponse<bool>
-                                    {
-                                        StatusCode = StatusCode.Error,
-                                        Message = "Suggested minimum bet not met.",
-                                        Result = false
-                                    };
-                                }
+                                //if (minStake < suggestedMinimumBet)
+                                //{
+                                //    return new BaseResponse<bool>
+                                //    {
+                                //        StatusCode = StatusCode.Error,
+                                //        Message = "Suggested minimum bet not met.",
+                                //        Result = false
+                                //    };
+                                //}
 
                                 if (minStake > maxStake)
                                 {
