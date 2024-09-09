@@ -131,8 +131,8 @@ namespace Backoffice.Web.Components.SBC.Clients
                 Client.BetSettings = new List<ClientListResponse.BetSetting>();
                 foreach (var currency in Currencies)
                 {
-                    decimal suggestedMinimumBet = await GetSuggestedMinimumBet(currency);
-                    decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
+                    decimal suggestedMinimumBet = await GetBaseSettings(currency);
+                    decimal suggestedMaximumBet = suggestedMinimumBet * 1000;
 
                     Client.BetSettings.Add(new ClientListResponse.BetSetting
                     {
@@ -171,10 +171,11 @@ namespace Backoffice.Web.Components.SBC.Clients
                 var existingCurrencies = Client.BetSettings.Select(s => s.CurrencyCode).ToList();
                 foreach (var currency in Currencies)
                 {
-                    decimal suggestedMinimumBet = await GetSuggestedMinimumBet(currency);
-                    decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
                     if (!existingCurrencies.Contains(currency))
                     {
+                        decimal suggestedMinimumBet = await GetSuggestedMinimumBet(currency);
+                        decimal suggestedMaximumBet = suggestedMinimumBet <= 100 ? 100 : suggestedMinimumBet;
+
                         Client.BetSettings.Add(new ClientListResponse.BetSetting
                         {
                             CurrencyCode = currency,
@@ -522,7 +523,7 @@ namespace Backoffice.Web.Components.SBC.Clients
 
             foreach(var betSetting in Client.BetSettings)
             {
-                var suggestedMinBet = GetExchangeRate(betSetting.CurrencyCode);
+                var suggestedMinBet = await GetBaseSettings(betSetting.CurrencyCode);
 
                 betSetting.BetSettingAllSports.MinPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet);
                 betSetting.BetSettingAllSports.MaxPerTicket = Truncate(betSetting.CurrencyCode, suggestedMinBet * 1000);
@@ -903,14 +904,25 @@ namespace Backoffice.Web.Components.SBC.Clients
         {
             var suggestedMinimumBet = 0.02m;
 
-            if (Enum.TryParse<Currency>(currencyCode.ToUpper(), out var currency))
+            if (cryptoCurrencies.Contains(currencyCode.ToUpper()))
             {
-                suggestedMinimumBet = GetExchangeRate(currencyCode);
+                suggestedMinimumBet = 0.000000000001m;
             }
 
             return suggestedMinimumBet;
         }
 
+        private async Task<decimal> GetBaseSettings(string currencyCode)
+        {
+            var baseSettings = 0.02m;
+
+            if (Enum.TryParse<Currency>(currencyCode.ToUpper(), out var currency))
+            {
+                baseSettings = GetExchangeRate(currencyCode);
+            }
+
+            return baseSettings;
+        }
 
         private decimal Truncate(string currencyCode, decimal value)
         {

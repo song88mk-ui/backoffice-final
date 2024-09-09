@@ -2202,36 +2202,11 @@ namespace Backoffice.API.Repositories
         {
             var currency = (Currency)Enum.Parse(typeof(Currency), currencyCode);
 
-            var suggestedMinimumBet = await GetExchangeRate(currencyCode);
-            ;
-            var highValueArr = new Currency[] { Currency.KRW, Currency.VND, Currency.KHR, Currency.IDR, Currency.MMK };
-            var minValue100Arr = new Currency[] { Currency.CDF, Currency.TZS };
-            var minValue1Arr = new Currency[] { Currency.PKR };
+            var suggestedMinimumBet = 0.02m;
 
-            if (highValueArr.Contains(currency))
+            if (currency == Currency.BTC || currency == Currency.ETH)
             {
-                if (suggestedMinimumBet > 1000m)
-                    suggestedMinimumBet = 1000m;
-            }
-            else if (minValue100Arr.Contains(currency))
-            {
-                if (suggestedMinimumBet > 100m)
-                    suggestedMinimumBet = 100m;
-            }
-            else if (currency == Currency.BTC || currency == Currency.ETH)
-            {
-                if (suggestedMinimumBet > 0.00010000m)
-                    suggestedMinimumBet = 0.00010000m; // FCI-6803
-            }
-            else if (minValue1Arr.Contains(currency))
-            {
-                if (suggestedMinimumBet > 1m)
-                    suggestedMinimumBet = 1m;
-            }
-            else
-            {
-                if (suggestedMinimumBet > 0.02m)
-                    suggestedMinimumBet = 0.02m;
+                suggestedMinimumBet = 0.000000000001m;
             }
 
             return Truncate(currencyCode, suggestedMinimumBet);
@@ -2342,11 +2317,6 @@ namespace Backoffice.API.Repositories
             return _backofficeContext.Translation.AsNoTracking().ToList();
         }
 
-        private async Task<decimal> GetExchangeRate(string currencyCode)
-        {
-            var exchangeRates = (await GetExchangeRates()).Result.ExchangeRates;
-            return exchangeRates?.FirstOrDefault(e => e.CurrencyCode == currencyCode)?.ExchangeRate ?? 0;
-        }
         #endregion
     }
 }
