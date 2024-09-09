@@ -1088,7 +1088,7 @@ namespace Backoffice.API.Repositories
                                     return new BaseResponse<bool>
                                     {
                                         StatusCode = StatusCode.Error,
-                                        Message = "Suggested minimum bet not met.",
+                                        Message = $"Suggested minimum bet not met. ({betSetting.CurrencyCode})",
                                         Result = false
                                     };
                                 }
@@ -1098,7 +1098,7 @@ namespace Backoffice.API.Repositories
                                     return new BaseResponse<bool>
                                     {
                                         StatusCode = StatusCode.Error,
-                                        Message = "Max amount must be greater than minimum amount.",
+                                        Message = $"Max amount must be greater than minimum amount. ({betSetting.CurrencyCode})",
                                         Result = false
                                     };
                                 }
@@ -1111,7 +1111,7 @@ namespace Backoffice.API.Repositories
                                     return new BaseResponse<bool>
                                     {
                                         StatusCode = StatusCode.Error,
-                                        Message = "Max Winnings Bonus must be at least 0.02",
+                                        Message = $"Max Winnings Bonus must be at least 0.02. ({betSetting.CurrencyCode})",
                                         Result = false
                                     };
                                 }
@@ -1124,7 +1124,7 @@ namespace Backoffice.API.Repositories
                                     return new BaseResponse<bool>
                                     {
                                         StatusCode = StatusCode.Error,
-                                        Message = "Maximum stake must be lower or equal 99999999999.",
+                                        Message = $"Maximum stake must be lower or equal 99999999999. ({betSetting.CurrencyCode})",
                                         Result = false
                                     };
                                 }
