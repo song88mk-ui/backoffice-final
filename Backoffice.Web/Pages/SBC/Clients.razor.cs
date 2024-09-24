@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         
         public MetaData MetaData { get; set; }
@@ -57,7 +57,7 @@ namespace Backoffice.Web.Pages.SBC
                 TotalPages = 1,
             };
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
         public async Task OnInitEvent(ClientListCallbackModel request)
@@ -243,8 +243,6 @@ namespace Backoffice.Web.Pages.SBC
         {
             ClientListModel = null;
             Alerts = null;
-
-            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }

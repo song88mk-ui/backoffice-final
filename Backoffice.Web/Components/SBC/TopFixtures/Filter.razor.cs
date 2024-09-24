@@ -11,7 +11,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public EventCallback<TopFixtureCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<TopFixtureCallbackModel> OnFilterCallback { get; set; }
@@ -40,7 +40,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
             if (clients != null && clients.Clients.Any())
             {
-                    clients.Clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
+                clients.Clients = UserModel.ClientCodes.Any() ? clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
 
                 Clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
                 {

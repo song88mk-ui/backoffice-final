@@ -4,6 +4,8 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Shared
@@ -15,9 +17,9 @@ namespace Backoffice.Web.Shared
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public INavMenuModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel? UserModel { get; set; }
-        [CascadingParameter(Name = "UserClaims")] public List<Claim>? UserClaims { get; set; }
+        [Inject] IJSRuntime JSRuntime { get; set; }
 
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public PermissionCategory NavMenuAccess { get; set; }
         [Parameter] public NavMenuModel? NavMenus { get; set; }
@@ -29,7 +31,7 @@ namespace Backoffice.Web.Shared
         #region Fields
 
         private bool collapseNavMenu = true;
-        private PermissionCategory _navMenuAccess;
+        private PermissionCategory? _navMenuAccess;
         private SportsTreeModel _menu;
         private SportClickCallbackModel _selectedSport;
         private bool _showSwitchAccess;
@@ -39,9 +41,10 @@ namespace Backoffice.Web.Shared
         #endregion
 
         #region Methods
-
-        protected override async void OnInitialized()
+        private bool _isInit;
+        protected override async Task OnInitializedAsync()
         {
+            _isInit = true;
             _menu = new SportsTreeModel();
             _selectedSport = new SportClickCallbackModel();
 
@@ -53,22 +56,23 @@ namespace Backoffice.Web.Shared
                 var regions = new List<string>() { "HK", "SA" };
                 Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToUpper() : null;
             }
-
             var permissionCategories = new string[] { nameof(PermissionCategory.Admin), nameof(PermissionCategory.SBC) };
             var access = new string[] { ((int)Access.View).ToString(), ((int)Access.Edit).ToString() };
 
-            var categories = UserClaims?.Where(c => access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
+            var categories = UserModel.Claims?.Where(c => access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
             categories = categories?.Where(c => permissionCategories.Contains(c)).ToList();
 
             if (categories != null && categories.Count > 1)
                 _showSwitchAccess = true;
+
         }
         protected override async Task OnParametersSetAsync()
         {
-            await InvokeAsync(StateHasChanged);
-
-            if (_navMenuAccess != NavMenuAccess || _languageCode != TranslationState.ActiveLanguageCode)
+            var test = NavMenus?.Menus.Count ?? -999;
+            JSRuntime.InvokeVoidAsync("console.log", $"Nav param Set {test}");
+            if (_isInit || _navMenuAccess != NavMenuAccess || _languageCode != TranslationState.ActiveLanguageCode)
             {
+                _isInit = false;
                 _languageCode = TranslationState.ActiveLanguageCode;
                 _navMenuAccess = NavMenuAccess;
                 if (_navMenuAccess == PermissionCategory.OE)
@@ -236,7 +240,6 @@ namespace Backoffice.Web.Shared
 
         public void Dispose()
         {
-            BackofficeService.Dispose();
         }
 
         #endregion

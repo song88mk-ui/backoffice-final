@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         public MarketSettlementModalFilterModel ModalFilter { get; set; } = new MarketSettlementModalFilterModel();
         public List<ManualMarketSettlementAuditModel> ManualMarketSettlements { get; set; }
@@ -57,7 +57,7 @@ namespace Backoffice.Web.Pages.Administration
                 ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
             };
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
         public async Task GetContent()
@@ -122,11 +122,6 @@ namespace Backoffice.Web.Pages.Administration
             ModalFilter = null;
             ManualMarketSettlements = null;
             MetaData = null;
-
-            TradingService.Dispose();
-            BackofficeService.Dispose();
-            ToasterService.Dispose();
-            _toasterService.Dispose();
 
             GC.SuppressFinalize(this);
         }

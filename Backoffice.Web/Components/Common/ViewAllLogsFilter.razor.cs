@@ -16,7 +16,7 @@ public partial class ViewAllLogsFilter : IDisposable
     [Parameter] public EventCallback<PriceBoostLogFilterModel> OnFilterChangedEventCallback { get; set; }
     [Parameter] public PriceBoostLogFilterModel FilterModel { get; set; } = new PriceBoostLogFilterModel();
     [Parameter] public EventCallback<PriceBoostLogFilterModel> FilterModelChanged { get; set; }
-    [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+    [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
     public Dictionary<SportsbookClientPermission, string> Pages { get; set; }
     #endregion
 
@@ -117,7 +117,7 @@ public partial class ViewAllLogsFilter : IDisposable
         {
             foreach (var client in response.Result)
             {
-                if (UserClientCodes != null && UserClientCodes.Contains(client.ClientCode, StringComparer.OrdinalIgnoreCase))
+                if (UserModel.ClientCodes.Contains(client.ClientCode, StringComparer.OrdinalIgnoreCase))
                 {
                     KeyValuePair<string, string> Client = new KeyValuePair<string, string>(client.ClientCode, client.ClientName);
 
