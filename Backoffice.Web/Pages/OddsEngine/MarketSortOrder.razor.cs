@@ -20,7 +20,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         [Parameter] public string Region { get; set; } = "hk";
 
@@ -78,7 +78,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 IsCurrentPage = true
             });
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -291,7 +291,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
-            TradingService.Dispose();
             //GC.SuppressFinalize(this);
         }
 

@@ -28,7 +28,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public string Id { get; set; }
@@ -76,7 +76,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarginMarket = new MarketModel();
             _isInit = true;
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -211,8 +211,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
-            TradingService.Dispose();
-            BackofficeService.Dispose();
         }
 
         #endregion

@@ -14,7 +14,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public ITableauService TableauService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public string IFrameSrc { get; set; }
@@ -32,7 +32,7 @@ namespace Backoffice.Web.Pages.SBC
                 Title = "Monitor Users",
                 IconClass = "ico ico-monitor-users"
             };
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
 
 
 
