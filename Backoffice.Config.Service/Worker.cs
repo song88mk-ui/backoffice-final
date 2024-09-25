@@ -1,13 +1,9 @@
-using Backoffice.Shared.Data.Backoffice.Entities;
-using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Utility.Repository;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry;
 using RabbitMQ.Client.Events;
 using System;
-using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -56,8 +52,8 @@ namespace Backoffice.Config.Service
                 switch (messageType)
                 {
                     case "UpdateClientMargin":
-                        var configTemplateId = JsonSerializer.Deserialize<long>(payload);
-                        _backofficeRepository.UpdateClientMargin(configTemplateId, _messageBroker);
+                        var config = JsonSerializer.Deserialize<long>(payload);
+                        _backofficeRepository.UpdateClientMargin(config, _messageBroker);
                         break;
                 }
             }
