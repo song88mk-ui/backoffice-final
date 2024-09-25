@@ -41,7 +41,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                PKG_VERSION=$(jq -r '.version' .version)
+                PKG_VERSION=v$(jq -r '.version' .version)
                 BUILD_NUMBER="BO-Web-${PKG_VERSION}.${BUILD_BUILDID}"
                 echo "##vso[task.setvariable variable=VERSION]${PKG_VERSION}"
                 echo "##vso[build.updatebuildnumber]${BUILD_NUMBER}"
@@ -56,6 +56,7 @@ stages:
             displayName: Docker Build
             inputs:
               command: buildAndPush
+              buildContext: $(Build.SourcesDirectory)
               repository: $(ImageRepository)
               containerRegistry: $(ContainerRegistry)
               Dockerfile: Backoffice.Web/Dockerfile
