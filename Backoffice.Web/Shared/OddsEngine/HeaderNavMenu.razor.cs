@@ -2,6 +2,9 @@
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Security.Claims;
 
 namespace Backoffice.Web.Shared.OddsEngine
 {
@@ -10,9 +13,8 @@ namespace Backoffice.Web.Shared.OddsEngine
         #region Properties
 
         [Inject] public NavigationManager? NavigationManager { get; set; }
+        [CascadingParameter(Name = "UserClaims")] public List<Claim>? UserClaims { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
-
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         private bool _showPriceBoostMenu;
         private bool _showMarketSettingsMenu;

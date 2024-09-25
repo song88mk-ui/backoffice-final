@@ -18,7 +18,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [SupplyParameterFromQuery(Name = "M")]
         public string? QueryMessage { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        
+        [CascadingParameter(Name = "UserClientCodes")] public List<string> UserClientCodes { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
         public List<SelectListItemModel<string>> Sports { get; set; }
         public List<SelectListItemModel<string>> Scopes { get; set; }
@@ -56,7 +57,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task Init()
         {
-            await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await AuthenticateAccess.InvokeAsync();
 
             Sports = new List<SelectListItemModel<string>>();
             Scopes = new List<SelectListItemModel<string>>();
@@ -180,8 +181,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (response != null && response.Any())
             {
-                if (UserModel.ClientCodes.Any())
-                    response = response.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                if (UserClientCodes.Any())
+                    response = response.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
                 result = response.Select(e =>
                     new SelectListItemWithCheckboxModel<string>()

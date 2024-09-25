@@ -10,7 +10,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         #region Properties
         [Inject] public IBackofficeService BackofficeService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnFilterCallback { get; set; }
 
@@ -45,7 +45,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
             if (clients != null && clients.Clients.Any())
             {
-                clients.Clients = UserModel.ClientCodes.Any() ? clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
+                clients.Clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
 
                 TopLeaguesFilterModel.Clients = clients.Clients
                     .Select(s => new TopLeaguesFilterModel.Client

@@ -5,6 +5,9 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Drawing;
+using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 {
@@ -17,7 +20,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [Inject] IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel? UserModel { get; set; }
 
         public FixtureType SelectedFixtureType { get; set; }
         public AddPriceBoostFilterModel Model { get; set; }
@@ -115,8 +119,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     MarketTemplateId = Model.MarketTemplateId,
                     SelectionTemplateId = Model.SelectionTemplateId,
                     SelectionSpecifier = Model.SelectionSpecifier,
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName,
+                    UserId = UserModel?.Id ?? string.Empty,
+                    UserName = UserModel?.UserName ?? string.Empty,
                     TimeStamp = DateTime.Now,
                     MarketSpecifier = Model.MarketSpecifier
                 };
@@ -533,7 +537,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             var clients = (await TradingService.GetClientList()).Result;
 
-            clients = UserModel.ClientCodes.Any() ? clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
+            clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Where(c => UserClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
 
             if (!string.IsNullOrEmpty(Model.ClientCode))
                 clients = clients.Where(c => c.ClientCode == Model.ClientCode).ToList();

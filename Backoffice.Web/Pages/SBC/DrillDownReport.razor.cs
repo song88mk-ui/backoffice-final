@@ -16,7 +16,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public ITableauService TableauService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
-        
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public string IFrameSrc { get; set; }
@@ -34,7 +34,7 @@ namespace Backoffice.Web.Pages.SBC
                 Title = "Drill Down Report",
                 IconClass = "ico ico-drill-down-report"
             };
-            await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await AuthenticateAccess.InvokeAsync();
 
 
 

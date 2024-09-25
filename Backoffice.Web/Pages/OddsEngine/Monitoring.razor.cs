@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using Serilog;
-using Backoffice.Web.States;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -22,7 +21,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
-        
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
 
         [Parameter] public int SportId { get; set; }
         [Parameter] public int SegmentId { get; set; }
@@ -43,13 +43,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isPreloader;
         private AlertModel _alertModel;
         private LanguageCode _languageCode;
-        private bool _isInit;
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            _isInit = false;
             _isPreloader = true;
             _clients = new();
             _alertModel = new();
@@ -67,12 +65,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
             _slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
 
-            await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await AuthenticateAccess.InvokeAsync();
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            if (_isInit || (SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2))
+            if (SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2)
             {
                 var isSportChanged = _sportId != SelectedSport.SportId || _leagueId != SelectedSport.LeagueId || _languageCode != TranslationState.ActiveLanguageCode;
                 _sportId = SelectedSport.SportId;
@@ -87,7 +85,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     ShowLanguageDropDown = false
                 };
 
-                if (!_isInit && isSportChanged && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
+                if (isSportChanged && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
                 {
                     await OnInitializeEvent(_monitoringCallbackModel);
                 }
@@ -132,7 +130,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             StateHasChanged();
         }
 
-        private async Task MonitoringCallback(MonitoringCallbackModel model) => await OnInitializeEvent(_monitoringCallbackModel = model);
+        private async Task MonitoringCallback(MonitoringCallbackModel model)
+        {
+            await OnInitializeEvent(_monitoringCallbackModel = model);
+        }
 
         private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
         {
