@@ -5,7 +5,6 @@ using Backoffice.Web.Services;
 using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Shared
@@ -38,6 +37,9 @@ namespace Backoffice.Web.Shared
         private string _page;
         private NavMenuModel _navMenus;
         private LanguageCode _languageCode;
+        private List<Claim> _userClaims = new List<Claim>();
+        private string[] _permissionCategories = new string[] { nameof(PermissionCategory.Admin), nameof(PermissionCategory.SBC) };
+        private string[] _access = new string[] { ((int)Access.View).ToString(), ((int)Access.Edit).ToString() };
         #endregion
 
         #region Methods
@@ -56,25 +58,31 @@ namespace Backoffice.Web.Shared
                 var regions = new List<string>() { "HK", "SA" };
                 Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToUpper() : null;
             }
-            var permissionCategories = new string[] { nameof(PermissionCategory.Admin), nameof(PermissionCategory.SBC) };
-            var access = new string[] { ((int)Access.View).ToString(), ((int)Access.Edit).ToString() };
-
-            var categories = UserModel.Claims?.Where(c => access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
-            categories = categories?.Where(c => permissionCategories.Contains(c)).ToList();
-
-            if (categories != null && categories.Count > 1)
-                _showSwitchAccess = true;
 
         }
         protected override async Task OnParametersSetAsync()
         {
-            var test = NavMenus?.Menus.Count ?? -999;
-            JSRuntime.InvokeVoidAsync("console.log", $"Nav param Set {test}");
+            if (!_userClaims.SequenceEqual(UserModel.Claims))
+            {
+                _userClaims = new List<Claim>(UserModel.Claims);
+
+                var categories = UserModel.Claims?.Where(c => _access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
+                categories = categories?.Where(c => _permissionCategories.Contains(c)).ToList();
+
+                _showSwitchAccess = categories != null && categories.Count > 1;
+            }
+
             if (_isInit || _navMenuAccess != NavMenuAccess || _languageCode != TranslationState.ActiveLanguageCode)
             {
                 _isInit = false;
                 _languageCode = TranslationState.ActiveLanguageCode;
                 _navMenuAccess = NavMenuAccess;
+
+                var categories = _userClaims?.Where(c => _access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
+                categories = categories?.Where(c => _permissionCategories.Contains(c)).ToList();
+
+                _showSwitchAccess = categories != null && categories.Count > 1;
+
                 if (_navMenuAccess == PermissionCategory.OE)
                 {
                     _menu.Sports = await GetSportsTreeMenu();
@@ -144,6 +152,7 @@ namespace Backoffice.Web.Shared
                 };
             }
         }
+
         private void OnSportClickEvent(int sportId)
         {
             if (_selectedSport.SportId != sportId)
