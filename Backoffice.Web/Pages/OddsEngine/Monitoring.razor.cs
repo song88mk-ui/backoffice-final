@@ -132,10 +132,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             StateHasChanged();
         }
 
-        private async Task MonitoringCallback(MonitoringCallbackModel model)
-        {
-            await OnInitializeEvent(_monitoringCallbackModel);
-        }
+        private async Task MonitoringCallback(MonitoringCallbackModel model) => await OnInitializeEvent(_monitoringCallbackModel = model);
 
         private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
         {

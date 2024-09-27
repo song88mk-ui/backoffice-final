@@ -17,7 +17,7 @@
                         <tr>
                             <td class="td-min-width">
                                 <span>
-                                    @Fixture.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")
+                                    @Fixture.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)
                                     <br>
                                     <strong>@Fixture.FixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
                                 </span>

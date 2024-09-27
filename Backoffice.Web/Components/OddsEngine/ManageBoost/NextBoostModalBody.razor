@@ -23,7 +23,7 @@
                         <span>@AddPriceBoostFilterModel.SegmentName</span>
                         <span>@AddPriceBoostFilterModel.LeagueName</span>
                         <span>@AddPriceBoostFilterModel.FixtureName</span>
-                        <span>@(AddPriceBoostFilterModel.PriceBoostConfigList.FirstOrDefault()?.TimeStamp.ToString("dd/MM/yy"))</span>
+                        <span>@(AddPriceBoostFilterModel.PriceBoostConfigList.FirstOrDefault()?.TimeStamp.ToString("dd/MM/yy", CultureInfo.InvariantCulture))</span>
                         <span>@(AddPriceBoostFilterModel.PriceBoostConfigList.FirstOrDefault()?.TimeStamp.ToString("HH:mm"))</span>
                     </div>
                 </th>

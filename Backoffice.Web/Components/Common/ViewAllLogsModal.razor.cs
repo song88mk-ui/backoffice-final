@@ -337,7 +337,7 @@ namespace Backoffice.Web.Components.Common
                 stringBuilder.Append($"<span>{activityLog.To.SegmentName}</span><br>");
                 stringBuilder.Append($"<span>{activityLog.To.LeagueName}</span><br>");
                 stringBuilder.Append($"{activityLog.To.FixtureName}<br>");
-                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy")}</span><br>");
+                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)}</span><br>");
                 stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("HH:mm")}</span>");
             }
             else
@@ -347,7 +347,7 @@ namespace Backoffice.Web.Components.Common
                 stringBuilder.Append($"<span>{activityLog.From.SegmentName}</span><br>");
                 stringBuilder.Append($"<span>{activityLog.From.LeagueName}</span><br>");
                 stringBuilder.Append($"{activityLog.From.FixtureName}<br>");
-                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy")}</span><br>");
+                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)}</span><br>");
                 stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("HH:mm")}</span>");
             }
 

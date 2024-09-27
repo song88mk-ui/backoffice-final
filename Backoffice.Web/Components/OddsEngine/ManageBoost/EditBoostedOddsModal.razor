@@ -39,7 +39,7 @@ else
                         }
                         else
                         {
-                            <span>@_priceBoostConfigModel.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")</span>
+                            <span>@_priceBoostConfigModel.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)</span>
                             <span>@_priceBoostConfigModel.FixtureStartDate.ToLocalTime().ToString("HH:mm")</span>
                         }
                     </td>
