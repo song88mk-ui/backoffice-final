@@ -1,0 +1,7 @@
+.git
+.github
+.ci
+**/bin
+**/obj
+**/*.md
+**/Dockerfile
