@@ -120,6 +120,8 @@ stages:
   - stage: stage_production_release
     dependsOn: stage_staging_release
     displayName: Production - Deploy ACA
+    variables:
+      - group: PRODUCTION_TRIGGER_STAGE1 # requires approval
     jobs:
       - deployment: Deployment
         displayName: Deploy to ACA
