@@ -164,7 +164,7 @@ stages:
                     inputs:
                       targetType: inline
                       script: |
-                        curl -sd "{\"text\": \"Deployment Backoffice.Web, Build: ${BUILD_BUILDID} to STAGING failed.\"}" ${SLACK_URL}
+                        curl -sd "{\"text\": \"Deployment Backoffice.Web, Build: ${BUILD_BUILDID} to PRODUCTION failed.\"}" ${SLACK_URL}
               success:
                 steps:
                   - task: Bash@3
@@ -172,4 +172,4 @@ stages:
                     inputs:
                       targetType: inline
                       script: |
-                        curl -sd "{\"text\": \"Deployment Backoffice.Web, Build: ${BUILD_BUILDID} to STAGING succeeded.\"}" ${SLACK_URL}
+                        curl -sd "{\"text\": \"Deployment Backoffice.Web, Build: ${BUILD_BUILDID} to PRODUCTION succeeded.\"}" ${SLACK_URL}
