@@ -137,6 +137,11 @@ namespace Backoffice.Web.Helpers
                 menu.IconName = "parlay-bonus";
                 menu.Url = "/parlay-bonus";
             }
+            else if (claim.Type == SportsbookClientPermission.SBC_Settings_Announcements.ToString().Replace('_', '.'))
+            {
+                menu.IconName = "announcements";
+                menu.Url = "/announcements";
+            }
             else if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.'))
             {
                 menu.IconName = "sub-user";

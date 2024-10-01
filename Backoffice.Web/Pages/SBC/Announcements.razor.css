@@ -1,0 +1,98 @@
+﻿.main-content {
+    background-color: #FFFFFF;
+    border-radius: 3px;
+}
+
+.table-head-pb {
+    background-color: #354156;
+    color: #fff;
+}
+
+.table thead th, .table tbody td {
+    font-size: 0.9rem;
+    font-weight: inherit;
+    text-align: center;
+}
+
+.td-parlay-bonus {
+    color: #E4422E;
+}
+
+    .td-parlay-bonus input[type=number] {
+        text-align: center;
+        color: red;
+    }
+
+.tl-link-add, .tl-link-minus, .tl-link-edit {
+    color: #1F1F1F;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.th-number {
+    width: 30%;
+}
+
+.th-parlay-bonus {
+    width: 50%;
+}
+
+.th-action {
+    width: 20%;
+}
+
+.tooltip2 {
+    position: relative;
+    display: inline-block;
+}
+
+    .tooltip2 .tooltiptext {
+        visibility: hidden;
+        width: 10rem;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        top: -0.8rem;
+        left: 2rem;
+    }
+
+        .tooltip2 .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: 100%;
+            margin-top: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent black transparent transparent;
+        }
+
+    .tooltip2:hover .tooltiptext {
+        visibility: visible;
+    }
+
+.parlay-bonus-input {
+    width: 10rem;
+    margin: auto;
+    display: inline-block;
+}
+
+.td-parlay-bonus .border-danger {
+    box-shadow: 0 0 0 0.25rem rgb(253 13 13 / 25%);
+}
+/*remove arrows for input[type=number]*/
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button, ::deep input::-webkit-outer-spin-button, ::deep input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number], ::deep input[type=number] {
+    -moz-appearance: textfield;
+}

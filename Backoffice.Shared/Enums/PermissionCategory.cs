@@ -50,6 +50,7 @@ namespace Backoffice.Shared.Enums
         SBC_Settings_TopLeagues,
         SBC_Settings_TopFixtures,
         SBC_Settings_ParlayBonus,
+        SBC_Settings_Announcements,
         SBC_SubUsers,
         SBC_Clients,
         SBC_Clients_Access,

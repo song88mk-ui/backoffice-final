@@ -259,6 +259,10 @@ a, .btn-link {
     content: "\112C";
 }
 
+.ico-announcements:before {
+    content: "\112D";
+}
+
 iframe {
     width: 100% !important;
 }

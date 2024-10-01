@@ -1,0 +1,40 @@
+﻿@using Backoffice.Web.Components.Common
+@using Backoffice.Web.Components.SBC.ParlayBonus
+
+@page "/announcements"
+<AuthorizeView Policy="sbc-announcements">
+    <Authorized>
+        <div class="row">
+            <div class="main-content col-md-12 mb-4 pb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <PageHeader PageHeaderModel="_pageHeaderModel" />
+                    </div>
+                    @*<div class="col-md-12">
+                        <Filter Clients="@Clients" ClientParlayBonusResponse="ClientParlayBonusModel"
+                                @bind-IsEdit="IsEdit" IsDisableAction="@_isSaving"
+                                OnUpdateClickCallback="OnUpdateClickEvent" OnAddClickCallback="OnAddClickEvent"
+                                OnSaveClickCallback="OnSaveClickEvent" OnCancelClickCallback="OnCancelClickEvent"
+                                OnClientChangedCallback="OnClientChangedEvent" />
+                    </div>*@
+                    <div class="col-md-12">
+                        @if (IsPreloading)
+                        {
+                            <Preloader />
+                        }
+                        else
+                        {
+                            <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <CustomModal />
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <RedirectToPage FromPage="@SportsbookClientPermission.SBC_Settings_Announcements.ToString().Replace('_', '.')" />
+    </NotAuthorized>
+</AuthorizeView>
