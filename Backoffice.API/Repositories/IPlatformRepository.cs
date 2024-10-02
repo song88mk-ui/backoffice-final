@@ -42,5 +42,9 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<ResendSettlementResponse>> ResendSettlement(ResendSettlementRequest request, string region);
         Task<BaseResponse<BetModifyResponse>> CancelBet(BetModifyRequest request, string region);
         #endregion
+
+        #region Announcements
+        Task<BaseResponse<AnnouncementResponse>> GetAnnouncements(AnnouncementRequest request);
+        #endregion
     }
 }

@@ -188,5 +188,22 @@ namespace Backoffice.API.Controllers.SportsbookClients
             }
         }
         #endregion
+
+        #region Announcements
+
+        [HttpPost("announcements")]
+        public async Task<IActionResult> GetAnnouncements([FromBody] AnnouncementRequest request)
+        {
+            var result = await _platformRepository.GetAnnouncements(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        #endregion
     }
 }
