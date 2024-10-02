@@ -1,3 +1,5 @@
+using Azure.Identity;
+using Microsoft.AspNetCore.DataProtection;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.ActionFilter;
@@ -7,6 +9,7 @@ using Backoffice.Web.Services;
 using Backoffice.Web.States;
 using Backoffice.Web.Telemetry;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.ResponseCompression;
 using OpenTelemetry.Exporter;
@@ -86,6 +89,7 @@ if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
 // end of telemetry
 
 // Add services to the container.
+builder.Services.AddHealthChecks();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor().AddCircuitOptions(o =>
 {
@@ -163,6 +167,15 @@ builder.Services.AddAuthorization(options =>
     #endregion
 });
 
+// data protection keys / dpk
+if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CONTAINER_APP_ENV_DNS_SUFFIX")))
+{
+    var envName = Environment.GetEnvironmentVariable("TELEMETRY__ENVIRONMENT");
+    var dpkUri = $"https://song88dpk.blob.core.windows.net/{envName}/bo-web/dpk";
+    builder.Services.AddDataProtection()
+        .PersistKeysToAzureBlobStorage(new Uri(dpkUri), new DefaultAzureCredential());
+}
+
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddSession();
 
@@ -225,7 +238,8 @@ if (!app.Environment.IsDevelopment())
 app.UseSession();
 app.UseMiddleware<RabbitMQMiddleware>();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+app.MapHealthChecks("/healthz");
 
 app.UseStaticFiles();
 
