@@ -25,7 +25,8 @@ namespace Backoffice.API.ActionFilter
     {
         private IConfiguration _configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json").Build();
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables().Build();
         private HttpClient _httpClient { get; set; }
         private Claim _requiredClaim;
 
