@@ -9,6 +9,7 @@ namespace Backoffice.Web.Services
 {
     public interface IBackofficeService
     {
+        string Page { get; set; }
         Task<BaseResponse<bool>> GetMaintenance();
         Task<BaseResponse<bool>> SetMaintenance(bool request);
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
@@ -27,7 +28,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<GetAllLeaguesModel>> GetAllLeaguesAsync(GetAllLeaguesRequest request);
         Task<BaseResponse<TopLeaguesModel>> GetTopLeaguesAsync(GetTopLeaguesRequest request);
         Task<BaseResponse<PlatformMessageModel>> PostTopLeaguesAsync(PostTopLeaguesRequest request);
-        Task<BaseResponse<bool>> CopyTopLeaguesAsync(CopyTopLeaguesRequest request);        
+        Task<BaseResponse<bool>> CopyTopLeaguesAsync(CopyTopLeaguesRequest request);
         Task<BaseResponse<SportsTreeModel>> GetSportstreeByClientId(int clientId);
         Task<BaseResponse<SportsTreeResponse>> GetSportsTreeAsync(int fixtureTypeId, LanguageCode langCode);
         Task<BaseResponse<SportsLookupModel>> GetSportsAsync();
@@ -39,7 +40,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<MarketTemplateGroupResponse>> GetMarketTemplateGroups(int fixtureTypeId);
         Task<BaseResponse<List<MarketTemplatePlayerPropsResponse>>> GetMarketTemplatePlayerProps(MarketTemplatePlayerPropsRequest request);
         Task<BaseResponse<ManualBetDetailsResponse>> GetManualBetDetails(ManualBetDetailsRequest request);
-        Task<BaseResponse<ManualBetSettlementResponse>> ManualSettlement(ManualBetSettlementRequest request);        
+        Task<BaseResponse<ManualBetSettlementResponse>> ManualSettlement(ManualBetSettlementRequest request);
         Task<BaseResponse<ResendSettlementBetDetailModel>> GetResendSettlementBetDetails(ResendSettlementBetDetailRequest request);
         Task<BaseResponse<ResendSettlementResponse>> ResendSettlement(ResendSettlementRequest request);
         Task<BaseResponse<BetModifyResponse>> CancelBet(BetModifyRequest request);
@@ -48,11 +49,11 @@ namespace Backoffice.Web.Services
         #region ConfigTemplate
         Task<BaseResponse<TranslationResponse>> GetTranslation(LanguageCode langCode);
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId);
-        Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1);
+        Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, CancellationToken cancellationToken = default);
         Task<BaseResponse<long>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
         Task<BaseResponse<bool>> SetLeagueState(ConfigState state, ConfigSetLeagueStateRequest payload);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(long id);
-        Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload, int templateId= -1);
+        Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload, long templateId = -1, CancellationToken token = default);
         Task<BaseResponse<int>> GetTemplateConfigCount(string state = "", CancellationToken token = default);
         Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMargin(long configTemplateId);
         Task<BaseResponse<bool>> AddOrUpdateConfigTemplateMargin(ConfigTemplateMarginModel request);

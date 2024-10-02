@@ -1,11 +1,12 @@
-﻿<AuthorizeView Policy="sbc-config">
+﻿@using Backoffice.Web.Components.OddsEngine.Configuration
+<AuthorizeView Policy="sbc-config">
     <Authorized>
         <div class="col-md-12 mb-4">
             <AlertMessage AlertClass="mx-3" AlertModel="@_alertModel"></AlertMessage>
             <div class="d-flex justify-content-between m-4">
 
                 <div>
-                    <h4 class="page-title">@TranslationState.GetValue(PageTitle)</h4>
+                    <h4 class="page-title">@TranslationState.GetValue(_pageTitle)</h4>
                 </div>
 
                 <div>
@@ -32,12 +33,12 @@
                     </div>
 
                     <select class="form-select" @onchange="OnSportChangedEvent">
-                        <option value="-1" selected="@SelectedSportId == -1">@TranslationState.GetValue("All Sports")</option>
-                        @if (Sports.Any())
+                        <option value="-1" selected="@_selectedSportId == -1">@TranslationState.GetValue("All Sports")</option>
+                        @if (_sports.Any())
                         {
-                            @foreach (var item in Sports)
+                            @foreach (var item in _sports)
                             {
-                                <option value="@item.Value" selected="@(item.Value == SelectedSportId.ToString())">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == _selectedSportId.ToString())">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                         else
@@ -47,11 +48,11 @@
                     </select>
 
                     <select class="form-select" @onchange="OnScopeChangedEvent">
-                        @if (Scopes.Any())
+                        @if (_scopes.Any())
                         {
-                            @foreach (var item in Scopes)
+                            @foreach (var item in _scopes)
                             {
-                                <option value="@item.Value" selected="@(item.Value == SelectedScopeId.ToString())">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == _selectedScopeId.ToString())">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -84,7 +85,7 @@
                     </thead>
 
                     <tbody>
-                        @if (IsPreloader)
+                        @if (_isPreloader)
                         {
                             <tr>
                                 <td colspan="7">
@@ -94,45 +95,11 @@
                         }
                         else
                         {
-                            @if (ConfigTemplates != null && ConfigTemplates.Any())
+                            @if (_configTemplates != null && _configTemplates.Any())
                             {
-                                foreach (var configTemplate in ConfigTemplates)
+                                foreach (var config in _configTemplates)
                                 {
-                                    var isReadOnly = !(configTemplate.ClientsCount > 0 && configTemplate.LeaguesCount > 0);
-                                    <tr>
-                                        <th class="px-4" scope="row" @onclick="() => OnEditTemplateClickEvent(configTemplate)">@configTemplate.Name</th>
-                                        <td class="px-4" @onclick="() => OnEditTemplateClickEvent(configTemplate)">@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()) != null ? $"{TranslationState.GetValue(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString())?.Name ?? "")}" : "")</td>
-                                        <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@($"{configTemplate.ClientsCount} Client{(configTemplate.ClientsCount > 1 ? "s" : "")}")</td>
-                                        <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@($"{configTemplate.LeaguesCount} League{(configTemplate.LeaguesCount > 1 ? "s" : "")}")</td>
-                                        <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@(configTemplate.Timestamp.ToString("HH:mm dd/MM/yyyy"))</td>
-                                        <td>
-                                            <div class="manage-cell">
-                                                <AuthorizeView Policy="sbc-config-canedit">
-                                                    <Authorized Context="ActivateAll">
-                                                        <a class= href="javascript:void(0)" @onclick="() => OnEditTemplateClickEvent(configTemplate)" title="Edit Template">
-                                                            <i class="fa fa-edit"></i>
-                                                        </a>
-                                                        <a href="javascript:void(0)" @onclick="() => OnCopyTemplateClickEvent(configTemplate)" title="Copy Template">
-                                                            <i class="fa fa-copy"></i>
-                                                        </a>
-                                                    </Authorized>
-                                                </AuthorizeView>
-                                                <a href="javascript:void(0)" @onclick="() => OnExportTemplateClickEvent(configTemplate)" title="Export Template">
-                                                    <i class="fa fa-file-archive-o"></i>
-                                                </a>
-                                                <AuthorizeView Policy="sbc-config-canedit">
-                                                    <Authorized Context="ActivateAll">
-                                                        <a href="javascript:void(0)" @onclick="() => OnDeleteTemplateClickEvent(configTemplate)" title="Delete Template">
-                                                            <i class="fa fa-trash"></i>
-                                                        </a>
-                                                    </Authorized>
-                                                </AuthorizeView>
-                                                <a href="javascript:void(0)" @onclick="() => OnViewAssignedClickEvent(configTemplate)" title="View Assigned" class="@(isReadOnly ? "disabled" : "")">
-                                                    <i class="fa fa-list"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <ConfigMyTemplateRow ConfigTemplate="config" ModalClickedCallback="OnModalClicked" />
                                 }
                             }
                             else

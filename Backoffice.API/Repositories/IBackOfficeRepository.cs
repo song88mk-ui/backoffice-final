@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Backoffice.API.Models;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -21,10 +22,11 @@ namespace Backoffice.API.Repositories
         Task<BaseResponse<ExchangeRatesResponse>> GetExchangeRates();
         #region Config
         Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(string searchText, List<int> sportIds = null, List<int> scopeIds = null);
+        Task<BaseResponse<int>> GetConfigTemplatesCount();
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long templateId);
         Task<BaseResponse<long>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
         Task<BaseResponse<bool>> SetConfigState(ConfigState configState, ConfigSetLeagueStateRequest request);
-        Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string id);
+        Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string id, RequesterInfo requesterInfo);
         Task<BaseResponse<int>> GetTemplateConfigCount(List<string> clientCodes, string state);
         Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1);
         Task<BaseResponse<ConfigTemplateMarginModel>> GetConfigTemplateMarginById(long templateId);

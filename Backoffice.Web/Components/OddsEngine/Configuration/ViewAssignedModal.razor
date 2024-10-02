@@ -15,7 +15,7 @@
             </div>
         }
         <div class="accordion" id="viewAssignedAccordion">
-            @foreach (var client in Leagues.Select(x => new
+            @foreach (var client in _leagues.Select(x => new
             {
                 ClientId = x.ClientId,
                 ClientCode = x.ClientCode,
@@ -32,7 +32,7 @@
                     <div id="collapse-@client.ClientId" class="accordion-collapse collapse" aria-labelledby="header2">
                         <div class="accordion-body">
                             <ul class="list-group">
-                                @foreach (var item in Leagues.Where(x => x.ClientCode == client.ClientCode).ToList())
+                                @foreach (var item in _leagues.Where(x => x.ClientId == client.ClientId).ToList())
                                 {
                                     <li class="list-group-item">@item.LeagueName</li>
                                 }

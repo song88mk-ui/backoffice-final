@@ -13,34 +13,30 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IBackofficeService BackofficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
-        public List<ConfigClientModel> Leagues { get; set; }
         #endregion
         private bool _isPreloader;
         private bool _isComplete = false;
+        private List<ConfigClientModel> _leagues { get; set; }
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
             _isPreloader = true;
-            var configTemplateModel = ModalParameters.TryGet<ConfigTemplateModel>("ConfigTemplateModel");
-            Leagues = new List<ConfigClientModel>();
+            var configTemplateId = ModalParameters.TryGet<long>("ConfigTemplateId");
+            _leagues = new List<ConfigClientModel>();
 
-            var assignedLeagues = await BackofficeService.GetConfigClient(ConfigState.Assigned, new ConfigTemplateLeagueRequest(), (int)configTemplateModel.Id);
+            var assignedLeagues = await BackofficeService.GetConfigClient(ConfigState.Assigned, new ConfigTemplateLeagueRequest(), configTemplateId);
             if (assignedLeagues.StatusCode == StatusCode.Success)
             {
-                Leagues = assignedLeagues.Result?.ClientConfigs ?? new List<ConfigClientModel>();
+                _leagues = assignedLeagues.Result?.ClientConfigs ?? new List<ConfigClientModel>();
                 _isComplete = assignedLeagues.Result?.IsComplete ?? false;
             }
             _isPreloader = false;
         }
 
-        public async Task OnCloseClickEvent()
-        {
-            ModalService.Cancel();
-        }
+        public void OnCloseClickEvent() => ModalService.Cancel();
 
         public void Dispose()
         {

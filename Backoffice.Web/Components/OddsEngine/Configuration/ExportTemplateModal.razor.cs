@@ -26,10 +26,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private string _errorMessage = "";
 
         #region Methods
-        protected override void OnInitialized()
-        {
-            _filename = ModalParameters.TryGet<string>("ConfigTemplateName");
-        }
+        protected override void OnInitialized() => _filename = ModalParameters.TryGet<string>("ConfigTemplateName");
         public async Task OnExportClickEvent()
         {
             _errorMessage = string.Empty;
@@ -49,10 +46,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 AccessToken = HttpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty
             };
 
-            await Task.Run(() =>
-            {
-                MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportOeConfigTemplate", $"r.bo.util.export", Guid.NewGuid().ToString());
-            });
+            await Task.Run(() => MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportOeConfigTemplate", $"r.bo.util.export", Guid.NewGuid().ToString()));
 
             ModalService.Cancel();
         }

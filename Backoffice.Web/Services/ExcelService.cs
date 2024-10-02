@@ -300,7 +300,7 @@ namespace Backoffice.Web.Services
 
         public void Dispose()
         {
-            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+            ////Console.WriteLine("- {0} was disposed!", this.GetType().Name);
         }
 
         #endregion

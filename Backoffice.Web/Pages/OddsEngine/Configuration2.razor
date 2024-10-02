@@ -6,28 +6,29 @@
 
 <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region" />
 
-@if (IsPreleader)
+@if (_isPreleader)
 {
     <Preloader />
 }
 else
 {
     <div class="col-md-12 mb-2">
-        <ConfigNavMenu Region="@Region" MyTemplatesCount="@_myTemplatesCount" AssignedLeaguesCount="@_assignedLeaguesCount" UnAssignedLeaguesCount="@_unAssignedLeaguesCount" SelectConfigNavMenuCallback="OnConfigNavMenuSelected" SelectCopyClientCallback="OnCopyClientSettings" />
+        <ConfigNavMenu
+            ParamModel="_navMenuParamModel"
+            SelectConfigNavMenuCallback="OnConfigNavMenuSelected" 
+            SelectCopyClientCallback="OnCopyClientSettings" />
     </div>
 
-    <AlertMessage AlertClass="mx-3" AlertModel="@_alertModel"></AlertMessage>
+    <AlertMessage AlertClass="mx-3" AlertModel="_alertModel"></AlertMessage>
 
-    @if (SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
+    @if (_selectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
     {
-        <ConfigMyTemplates Sports="@Sports" Scopes="@Scopes" QueryMessage="@QueryMessage" OnStateHasChanged="@OnNavMenuCallback" />
+        <ConfigMyTemplates FilterModel="_contentFilterModel" QueryMessage="@QueryMessage" OnStateHasChanged="OnNavMenuCallback" />
     }
-    else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
+    else if (_selectedConfigNavMenu == ConfigTemplateNavMenu.Assigned || _selectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
     {
-        <ConfigAssigned State="ConfigState.Assigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" OnStateHasChanged="@OnNavMenuCallback" />
-    }
-    if (SelectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
-    {
-        <ConfigAssigned State="@ConfigState.UnAssigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" OnStateHasChanged="@OnNavMenuCallback" />
+        var state = _selectedConfigNavMenu == ConfigTemplateNavMenu.Assigned ? ConfigState.Assigned : ConfigState.UnAssigned;
+
+        <ConfigAssigned State="state" FilterModel="_contentFilterModel" OnStateHasChanged="OnNavMenuCallback" />
     }
 }

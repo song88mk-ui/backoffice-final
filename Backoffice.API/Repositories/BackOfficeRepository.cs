@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Data.Backoffice;
+﻿using Backoffice.API.Models;
+using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
@@ -1389,6 +1390,7 @@ namespace Backoffice.API.Repositories
             {
                 var query = _backofficeContext.ConfigTemplate.AsNoTracking();
 
+
                 if (!string.IsNullOrEmpty(searchText))
                     query = query.Where(x => x.Name.ToLower().Contains(searchText.ToLower()));
 
@@ -1400,9 +1402,13 @@ namespace Backoffice.API.Repositories
 
                 var configTemplates = await query.ToListAsync();
 
+                var tempsSportIds = query.Select(s => s.SportId).ToList();
+                var configTemplateAssigned = _backofficeContext.ConfigTemplateAssigned.Where(s => tempsSportIds.Contains(s.SportId)).ToList();
+
                 var result = configTemplates.Select(x =>
                 {
-                    var leagues = _backofficeContext.ConfigTemplateAssigned.Where(p => p.SportId == x.SportId && (p.PrematchConfigTemplateId == x.Id || p.LiveConfigTemplateId == x.Id)).AsNoTracking().ToList();
+                    var leagues = configTemplateAssigned.Where(p => p.SportId == x.SportId && (p.PrematchConfigTemplateId == x.Id || p.LiveConfigTemplateId == x.Id)).ToList();
+
                     return new ConfigTemplateModel()
                     {
                         Id = x.Id,
@@ -1430,6 +1436,29 @@ namespace Backoffice.API.Repositories
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString()}: {ex.Message}",
                     Result = new List<ConfigTemplateModel>()
+                };
+            }
+        }
+        public async Task<BaseResponse<int>> GetConfigTemplatesCount()
+        {
+            try
+            {
+                var result = _backofficeContext.ConfigTemplate.AsNoTracking().Count();
+
+                return new BaseResponse<int>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<int>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString()}: {ex.Message}",
+                    Result = -1
                 };
             }
         }
@@ -1611,11 +1640,24 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<bool>() { StatusCode = StatusCode.Error, Message = ex.Message };
             }
         }
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string id)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string id, RequesterInfo requesterInfo)
         {
             try
             {
-                var config = _backofficeContext.ConfigTemplate.Where(x => x.Id.ToString() == id).AsNoTracking().FirstOrDefault();
+                var activity = new ActivityLogModel()
+                {
+                    Page = requesterInfo.Page,
+                    To = "-",
+                    Activity = Activity.Delete.ToString(),
+                    UserId = requesterInfo.UserId,
+                    UserName = requesterInfo.UserName,
+                    TimeStamp = DateTime.UtcNow
+                };
+
+                var config = await _backofficeContext.ConfigTemplate.FindAsync(id);
+
+                activity.Payload = $"{config.SportId}.{config.FixtureStatusId}.{config.Name}.T".Replace(" ", "_");
+                activity.From = JsonSerializer.Serialize(config);
 
                 if (config != null)
                 {
@@ -1623,6 +1665,7 @@ namespace Backoffice.API.Repositories
                 }
 
                 await _backofficeContext.SaveChangesAsync();
+                await AddActivityLog(activity);
 
                 return await GetConfigTemplates("");
             }
@@ -1635,140 +1678,26 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var clientConfigs = new List<ConfigClientModel>();
-                var isCompleteClient = false;
+                var clientList = GetFilteredClientList(clientCodes, payload);
+                var query = BuildQuery(clientList, payload, templateId);
 
-                var clientList = GetTradingClientInformation();
-                var allClientsCount = clientList.Count;
-                var metaData = payload?.MetaData;
+                var isCompleteClient = clientList.Count == GetTradingClientInformation().Count;
+                var clientConfigs = await GetClientConfigs(query, configState, payload, clientList);
 
-                if (clientCodes.Count() == 1)
+                if (payload?.MetaData != null)
                 {
-                    if (clientCodes.FirstOrDefault().ToUpper() != "ALL")
-                    {
-                        clientList = new List<ClientInformationModel>();
-                    }
-                }
-                else
-                {
-                    clientList = clientList.Where(x => clientCodes.Contains(x.ClientCode)).ToList();
+                    ApplyPagination(clientConfigs, payload.MetaData);
                 }
 
-                if (payload != null)
-                {
-                    clientList = clientList.Where(x => payload.ClientCodes?.ToList()?.Contains(x.ClientCode) ?? false).ToList();
-                }
-
-                var query = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(x => clientList.Select(cl => cl.ClientCode).Contains(x.ClientCode.ToUpper()));
-
-                if (templateId != -1)
-                    query = query.Where(x => x.PrematchConfigTemplateId == templateId || x.LiveConfigTemplateId == templateId);
-
-                if (payload != null && payload.SportId != -1)
-                {
-                    query = query.Where(x => x.SportId == payload.SportId);
-                }
-
-                if (payload != null && !string.IsNullOrEmpty(payload.SearchText))
-                {
-                    query = query.Where(x => x.ClientName.ToLower().Contains(payload.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(payload.SearchText.ToLower()));
-                }
-
-                if (query != null && query.Any())
-                {
-                    isCompleteClient = clientList.Count() == allClientsCount;
-                }
-
-                switch (configState)
-                {
-                    case ConfigState.Assigned:
-                        clientConfigs = query.Select(x => new ConfigClientModel()
-                        {
-                            Id = x.Id,
-                            ClientId = x.ClientId.ToString(),
-                            ClientCode = x.ClientCode,
-                            ClientName = x.ClientName,
-                            SportId = x.SportId,
-                            SportName = x.SportName,
-                            SegmentId = x.SegmentId,
-                            SegmentName = x.SegmentName,
-                            LeagueId = x.LeagueId,
-                            LeagueName = x.LeagueName,
-                            PrematchTemplateId = x.PrematchConfigTemplateId,
-                            LiveTemplateId = x.LiveConfigTemplateId,
-                            PrematchTemplateName = _backofficeContext.ConfigTemplate.Where(cl => cl.Id == x.PrematchConfigTemplateId).Select(x => x.Name).FirstOrDefault(),
-                            LiveTemplateName = _backofficeContext.ConfigTemplate.Where(cl => cl.Id == x.LiveConfigTemplateId).Select(x => x.Name).FirstOrDefault()
-                        }).ToList();
-                        break;
-                    case ConfigState.UnAssigned:
-                        var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup(payload.SportId == -1 ? "" : string.Join(',', payload.SportId));
-                        if (leagueLookupResponse.Result != null)
-                        {
-                            var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
-
-                            foreach (var client in clientList)
-                            {
-                                var userLeagues = query.Where(x => x.ClientCode == client.ClientCode).ToList();
-                                var leagues = leagueLookup.Where(x => !userLeagues.Any(u => u.SportId == x.SportId && u.SegmentId == x.SegmentId && u.LeagueId == x.LeagueId)).ToList();
-
-                                if (leagues != null && leagues.Any())
-                                {
-                                    clientConfigs.AddRange(leagues.Select(x => new ConfigClientModel()
-                                    {
-                                        Id = -1,
-                                        ClientId = client.ClientId.ToString(),
-                                        ClientCode = client.ClientCode.ToUpper(),
-                                        ClientName = client.ClientName,
-                                        SportId = x.SportId,
-                                        SportName = x.SportName,
-                                        SegmentId = x.SegmentId,
-                                        SegmentName = x.SegmentName,
-                                        LeagueId = x.LeagueId,
-                                        LeagueName = x.LeagueName
-                                    }));
-                                }
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(payload.SearchText))
-                        {
-                            clientConfigs = clientConfigs.Where(x => x.ClientName.ToLower().Contains(payload.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(payload.SearchText.ToLower())).ToList();
-                        }
-                        break;
-
-                }
-
-                if (clientConfigs != null && clientConfigs.Any())
-                {
-                    clientConfigs = clientConfigs
-                        .OrderBy(x => x.ClientCode)
-                        .ThenBy(x => x.SportName)
-                        .ThenBy(x => x.LeagueName)
-                        .ToList();
-                }
-
-                if (metaData != null)
-                {
-                    metaData.TotalCount = clientConfigs.Count();
-                    metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
-
-                    var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
-                    metaData.PageSize = metaData.PageSize == -1 ? metaData.TotalCount : metaData.PageSize;
-                    if (metaData.CurrentPage > 0)
-                        clientConfigs = clientConfigs.Skip(skip).Take(metaData.PageSize).ToList();
-                    else
-                        clientConfigs = clientConfigs.Skip(0).Take(metaData.PageSize).ToList();
-                }
-
-                return new BaseResponse<ConfigTemplateLeagueResponse>()
+                return new BaseResponse<ConfigTemplateLeagueResponse>
                 {
                     StatusCode = StatusCode.Success,
                     Message = StatusCode.Success.ToString(),
-                    Result = new ConfigTemplateLeagueResponse()
+                    Result = new ConfigTemplateLeagueResponse
                     {
                         IsComplete = isCompleteClient,
                         ClientConfigs = clientConfigs,
-                        MetaData = metaData
+                        MetaData = payload.MetaData
                     }
                 };
             }
@@ -1776,27 +1705,6 @@ namespace Backoffice.API.Repositories
             {
                 return new BaseResponse<ConfigTemplateLeagueResponse>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
             }
-        }
-        private async Task<int> GetUnAssignedCount(List<string> clientCodes)
-        {
-            var result = 0;
-            var assignedConfigTask = GetConfigState(clientCodes, null, ConfigState.Assigned);
-            var leagueLookupResponseTask = _tradingRepository.GetAllLeagueLookup("");
-
-            await Task.WhenAll(leagueLookupResponseTask, assignedConfigTask);
-
-            var leagueLookupResponse = leagueLookupResponseTask.Result;
-            var assignedConfig = assignedConfigTask.Result;
-
-            if (leagueLookupResponse.StatusCode == StatusCode.Success)
-            {
-                var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
-                var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
-
-                result = (leagueLookup.Count * GetTradingClientInformation().Count) - assignedLeagues;
-            }
-
-            return result;
         }
         public async Task<BaseResponse<int>> GetTemplateConfigCount(List<string> clientCodes, string state)
         {
@@ -1814,9 +1722,8 @@ namespace Backoffice.API.Repositories
                 }
                 else
                 {
-                    var configTemplate = await GetConfigTemplates("");
-                    var templates = configTemplate.Result;
-                    count = templates.Count();
+                    var configTemplate = await GetConfigTemplatesCount();
+                    count = configTemplate.Result;
                 }
 
                 return new BaseResponse<int>
@@ -1959,8 +1866,6 @@ namespace Backoffice.API.Repositories
                             }
 
                             context.ConfigTemplateAssigned.RemoveRange(toClientConfigTemplateAssigned);
-
-                            context.SaveChanges();
                         }
 
                         //assign all config templates assigned from FromClientCode into ToClientCode
@@ -2315,6 +2220,197 @@ namespace Backoffice.API.Repositories
         {
             //return _memCache.GetCache("tr", () => _backofficeContext.Translation.AsNoTracking().ToList(), 24);
             return _backofficeContext.Translation.AsNoTracking().ToList();
+        }
+        private async Task<int> GetAssignedCount(List<string> clientCodes)
+        {
+            var prematchTask = _backofficeContext.ConfigTemplateAssigned.CountAsync(e => e.PrematchConfigTemplateId != -1);
+
+            var liveTask = _backofficeContext.ConfigTemplateAssigned.CountAsync(e => e.LiveConfigTemplateId != -1);
+
+            var result = 0;
+            var assignedConfigTask = GetConfigState(clientCodes, null, ConfigState.Assigned);
+            var leagueLookupResponseTask = _tradingRepository.GetAllLeagueLookup("");
+
+            await Task.WhenAll(leagueLookupResponseTask, assignedConfigTask);
+
+            var leagueLookupResponse = leagueLookupResponseTask.Result;
+            var assignedConfig = assignedConfigTask.Result;
+
+            if (leagueLookupResponse.StatusCode == StatusCode.Success)
+            {
+                var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
+                var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
+
+                result = (leagueLookup.Count * GetTradingClientInformation().Count) - assignedLeagues;
+            }
+
+            return result;
+        }
+        private async Task<int> GetUnAssignedCount(List<string> clientCodes)
+        {
+            var result = 0;
+            var assignedConfigTask = GetConfigState(clientCodes, null, ConfigState.Assigned);
+            var leagueLookupResponseTask = _tradingRepository.GetAllLeagueLookup("");
+
+            await Task.WhenAll(leagueLookupResponseTask, assignedConfigTask);
+
+            var leagueLookupResponse = leagueLookupResponseTask.Result;
+            var assignedConfig = assignedConfigTask.Result;
+
+            if (leagueLookupResponse.StatusCode == StatusCode.Success)
+            {
+                var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
+                var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
+
+                result = (leagueLookup.Count * GetTradingClientInformation().Count) - assignedLeagues;
+            }
+
+            return result;
+        }
+        private List<ClientInformationModel> GetFilteredClientList(List<string> clientCodes, ConfigTemplateLeagueRequest payload)
+        {
+            var clientList = GetTradingClientInformation();
+
+            if (clientCodes.Count == 1 && clientCodes.FirstOrDefault().ToUpper() != "ALL")
+            {
+                return clientList.Where(c => c.ClientCode == clientCodes.First()).ToList();
+            }
+
+            if (payload?.ClientCodes != null)
+            {
+                return clientList.Where(c => payload.ClientCodes.Contains(c.ClientCode)).ToList();
+            }
+
+            return clientList;
+        }
+        private IQueryable<ConfigTemplateAssigned> BuildQuery(List<ClientInformationModel> clientList, ConfigTemplateLeagueRequest payload, int templateId)
+        {
+            var query = _backofficeContext.ConfigTemplateAssigned.AsNoTracking()
+                .Where(x => clientList.Select(cl => cl.ClientCode.ToUpper()).Contains(x.ClientCode.ToUpper()));
+
+            if (templateId != -1)
+            {
+                query = query.Where(x => x.PrematchConfigTemplateId == templateId || x.LiveConfigTemplateId == templateId);
+            }
+
+            if (payload != null && payload.SportId != -1)
+            {
+                query = query.Where(x => x.SportId == payload.SportId);
+            }
+
+            if (!string.IsNullOrEmpty(payload?.SearchText))
+            {
+                var searchText = payload.SearchText.ToLower();
+                query = query.Where(x => x.ClientName.ToLower().Contains(searchText) || x.LeagueName.ToLower().Contains(searchText));
+            }
+
+            return query;
+        }
+        private async Task<List<ConfigClientModel>> GetClientConfigs(IQueryable<ConfigTemplateAssigned> query, ConfigState configState, ConfigTemplateLeagueRequest payload, List<ClientInformationModel> clientList)
+        {
+            switch (configState)
+            {
+                case ConfigState.Assigned:
+                    return await GetAssignedClientConfigs(query);
+                case ConfigState.UnAssigned:
+                    return await GetUnassignedClientConfigs(clientList, query, payload);
+                default:
+                    return new List<ConfigClientModel>();
+            }
+        }
+        private async Task<List<ConfigClientModel>> GetAssignedClientConfigs(IQueryable<ConfigTemplateAssigned> query)
+        {
+            var configList = query
+                .Select(x => new
+                {
+                    x.Id,
+                    x.ClientId,
+                    x.ClientCode,
+                    x.ClientName,
+                    x.SportId,
+                    x.SportName,
+                    x.SegmentId,
+                    x.SegmentName,
+                    x.LeagueId,
+                    x.LeagueName,
+                    x.PrematchConfigTemplateId,
+                    x.LiveConfigTemplateId
+                })
+                .ToList();
+
+            var prematchTemplateIds = configList.Select(c => c.PrematchConfigTemplateId).Distinct().ToList();
+            var liveTemplateIds = configList.Select(c => c.LiveConfigTemplateId).Distinct().ToList();
+
+            var templateNames = await _backofficeContext.ConfigTemplate
+                .Where(c => prematchTemplateIds.Contains(c.Id) || liveTemplateIds.Contains(c.Id))
+                .ToDictionaryAsync(s => s.Id, s => s.Name);
+
+            var mappedConfigList = configList.Select(x => new ConfigClientModel
+            {
+                Id = x.Id,
+                ClientId = x.ClientId.ToString(),
+                ClientCode = x.ClientCode,
+                ClientName = x.ClientName,
+                SportId = x.SportId,
+                SportName = x.SportName,
+                SegmentId = x.SegmentId,
+                SegmentName = x.SegmentName,
+                LeagueId = x.LeagueId,
+                LeagueName = x.LeagueName,
+                PrematchTemplateId = x.PrematchConfigTemplateId,
+                LiveTemplateId = x.LiveConfigTemplateId,
+                PrematchTemplateName = templateNames.GetValueOrDefault(x.PrematchConfigTemplateId),
+                LiveTemplateName = templateNames.GetValueOrDefault(x.LiveConfigTemplateId)
+            })
+            .OrderBy(x => x.ClientCode)
+            .ThenBy(x => x.SportName)
+            .ThenBy(x => x.LeagueName)
+            .ToList();
+
+            return mappedConfigList;
+
+        }
+        private async Task<List<ConfigClientModel>> GetUnassignedClientConfigs(List<ClientInformationModel> clientList, IQueryable<ConfigTemplateAssigned> query, ConfigTemplateLeagueRequest payload)
+        {
+            var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup(payload?.SportId == -1 ? "" : string.Join(',', payload.SportId));
+
+            if (leagueLookupResponse.StatusCode != StatusCode.Success)
+                return new List<ConfigClientModel>();
+
+            var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
+            var clientConfigs = new List<ConfigClientModel>();
+
+            foreach (var client in clientList)
+            {
+                var userLeagues = query.Where(x => x.ClientCode == client.ClientCode).ToList();
+                var leagues = leagueLookup.Where(x => !userLeagues.Any(u => u.SportId == x.SportId && u.SegmentId == x.SegmentId && u.LeagueId == x.LeagueId)).ToList();
+
+                clientConfigs.AddRange(leagues.Select(x => new ConfigClientModel
+                {
+                    Id = -1,
+                    ClientId = client.ClientId.ToString(),
+                    ClientCode = client.ClientCode.ToUpper(),
+                    ClientName = client.ClientName,
+                    SportId = x.SportId,
+                    SportName = x.SportName,
+                    SegmentId = x.SegmentId,
+                    SegmentName = x.SegmentName,
+                    LeagueId = x.LeagueId,
+                    LeagueName = x.LeagueName
+                }));
+            }
+
+            return clientConfigs;
+        }
+        private void ApplyPagination<T>(List<T> contents, MetaData metaData)
+        {
+            metaData.TotalCount = contents.Count;
+            metaData.TotalPages = (int)Math.Ceiling((decimal)metaData.TotalCount / metaData.PageSize);
+
+            var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
+            metaData.PageSize = metaData.PageSize == -1 ? metaData.TotalCount : metaData.PageSize;
+
+            contents = contents.Skip(Math.Max(0, skip)).Take(metaData.PageSize).ToList();
         }
 
         #endregion

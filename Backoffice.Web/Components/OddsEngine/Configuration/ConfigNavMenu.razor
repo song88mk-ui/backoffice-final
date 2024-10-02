@@ -1,8 +1,11 @@
 ﻿<div class="d-flex justify-content-between col mx-4 config-nav-container">
     <div>
-        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.MyTemplates)">@TranslationState.GetValue("My Templates") (@(MyTemplatesCount != null && MyTemplatesCount >= 0 ? String.Format("{0:N0}", MyTemplatesCount) : $"{@TranslationState.GetValue("Calculating")}..."))</a>
-        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.Assigned)">@TranslationState.GetValue("Assigned") (@(AssignedLeaguesCount != null && AssignedLeaguesCount >= 0 ? String.Format("{0:N0}", AssignedLeaguesCount) : $"{@TranslationState.GetValue("Calculating")}..."))</a>
-        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.UnAssigned)">@TranslationState.GetValue("UnAssigned") (@(UnAssignedLeaguesCount != null && UnAssignedLeaguesCount >= 0 ? String.Format("{0:N0}", UnAssignedLeaguesCount) : $"{@TranslationState.GetValue("Calculating")}..."))</a>
+        <a href="javascript:void(0)" class="@(_currentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav")"
+           @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.MyTemplates)">@($"{_myTemplateTitle} ({(_myTemplateCount > 0 ? _myTemplateCount : _calculatingText)}"))</a>
+        <a href="javascript:void(0)" class="@(_currentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav")" 
+        @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.Assigned)">@($"{_assignedTitle} ({(_assignedCount > 0 ? _assignedCount : _calculatingText)})")</a>
+        <a href="javascript:void(0)" class="@(_currentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav")"
+           @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.UnAssigned)">@($"{_unAssignedTitle} ({(_unAssignedCount > 0 ? _unAssignedCount : _calculatingText)})")</a>
     </div>
     <div>
         <a class="btn btn-copy-client" href="javascript:(0)" @onclick="SelectCopyClientSettings">@TranslationState.GetValue("Copy Client Settings")</a>
