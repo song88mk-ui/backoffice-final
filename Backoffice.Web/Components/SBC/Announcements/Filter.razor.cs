@@ -60,7 +60,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
                 var selectedClients = _clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
 
-                _filterModel.ClientIds = string.Join(",", selectedClients);
+                _filterModel.ClientCodes = string.Join(",", selectedClients);
             }
             else
             {
@@ -73,7 +73,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         public async Task OnClientCheckboxClickEvent(string selectedItems)
         {
-            _filterModel.ClientIds = selectedItems;
+            _filterModel.ClientCodes = selectedItems;
 
             await OnFilterCallback.InvokeAsync(_filterModel);
         }

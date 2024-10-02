@@ -1,14 +1,9 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Web.Components.Common;
-using Backoffice.Web.Components.SBC.ParlayBonus;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
-using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -26,6 +21,7 @@ namespace Backoffice.Web.Pages.SBC
         #endregion
 
         #region Fields
+        private AnnouncementsModel _model;
         private PageHeaderModel _pageHeaderModel;
         private bool _isPreLoader = true;
         #endregion
@@ -95,10 +91,34 @@ namespace Backoffice.Web.Pages.SBC
             var languageCode = (LanguageCode)Enum.Parse(typeof(LanguageCode), model.LanguageCode, true);
             var response = await BackofficeService.GetAnnouncements(new AnnouncementRequest
             {
-                ClientIds = model.ClientIds,
+                ClientCodes = model.ClientCodes,
                 LanguageCode = languageCode,
                 SearchText = model.Search
             });
+
+            _model = new AnnouncementsModel
+            {
+                Announcements = response.Result.Announcements
+            };
+
+            MetaData.TotalCount = _model.Announcements.Count;
+            MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
+
+            //var skip = (MetaData.CurrentPage - 1) * MetaData.PageSize;
+
+            //if (MetaData.CurrentPage > 0)
+            //{
+            //    _model.Announcements = _model.Announcements
+            //        .Skip(skip).Take(MetaData.PageSize)
+            //        .Select((s, index) => new ClientTopLeague
+            //        {
+            //            RowNo = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
+            //            ClientIdRef = s.ClientIdRef,
+            //            ClientName = s.ClientName,
+            //            TopLeagues = s.TopLeagues
+            //        })
+            //        .ToList();
+            //}
 
             //if (response.StatusCode != Backoffice.Shared.Enums.StatusCode.Success)
             //{
@@ -139,9 +159,6 @@ namespace Backoffice.Web.Pages.SBC
             //    TopLeaguesList = new TopLeaguesModel();
             //    TopLeaguesList.ClientTopLeagues = new List<ClientTopLeague>();
             //}
-
-            //MetaData.TotalCount = TopLeaguesList.ClientTopLeagues.Count;
-            //MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
 
             //var skip = (MetaData.CurrentPage - 1) * MetaData.PageSize;
 
