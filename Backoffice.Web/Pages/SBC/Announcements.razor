@@ -1,5 +1,5 @@
 ﻿@using Backoffice.Web.Components.Common
-@using Backoffice.Web.Components.SBC.ParlayBonus
+@using Backoffice.Web.Components.SBC.Announcements
 
 @page "/announcements"
 <AuthorizeView Policy="sbc-announcements">
@@ -10,15 +10,11 @@
                     <div class="col-md-12">
                         <PageHeader PageHeaderModel="_pageHeaderModel" />
                     </div>
-                    @*<div class="col-md-12">
-                        <Filter Clients="@Clients" ClientParlayBonusResponse="ClientParlayBonusModel"
-                                @bind-IsEdit="IsEdit" IsDisableAction="@_isSaving"
-                                OnUpdateClickCallback="OnUpdateClickEvent" OnAddClickCallback="OnAddClickEvent"
-                                OnSaveClickCallback="OnSaveClickEvent" OnCancelClickCallback="OnCancelClickEvent"
-                                OnClientChangedCallback="OnClientChangedEvent" />
-                    </div>*@
                     <div class="col-md-12">
-                        @if (IsPreloading)
+                        <Filter OnInitCallback="OnInitEvent" OnFilterCallback="OnFilterEvent" />
+                    </div>
+                    <div class="col-md-12">
+                        @if (_isPreLoader)
                         {
                             <Preloader />
                         }

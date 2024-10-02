@@ -1,0 +1,35 @@
+﻿<div class="dropdown">
+    @if(Multiple)
+    {
+        <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            @if (_items.Any())
+            {
+                if (_items.Count - 1 == _selectedCount)
+                {
+                    <span>@TranslationState.GetValue($"All {DropdownName}") (@_selectedCount)</span>
+                }
+                else
+                {
+                    <span>@(_selectedCount == 1 ? _selectedName : $"{TranslationState.GetValue(DropdownName)} ({_selectedCount})")</span>
+                }
+            }
+            else
+            {
+                <span>@TranslationState.GetValue($"No {DropdownName} Available")</span>
+            }
+        </button>
+        @if (_items.Any())
+        {
+            <SelectWithCheckbox Items="_items" OnCheckboxCallback="OnCheckboxClickEvent" AriaLabel="client-dropdown" />
+        }
+    }
+    else
+    {
+        <select class="form-control form-select mr-sm-2" @onchange="OnCheckboxChangedEvent">
+            @foreach (var item in _items)
+            {
+                <option value="@item.Value" selected=@(item.Value == _selectedName)>@TranslationState.GetValue(item.Name)</option>
+            }
+        </select>
+    }
+</div>

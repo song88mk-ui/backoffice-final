@@ -1,0 +1,35 @@
+﻿<div class="content-filter mx-3">
+    <div class="d-flex flex-row justify-content-between">
+        <div class="select-container d-flex">
+            <div class="me-4 w-100">
+                <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <InputText id="search" placeholder=@TranslationState.GetValue("find_title_description") class="form-control search-text valid" @bind-Value="_searchForm.SearchText" />
+                    </div>
+                </EditForm>
+            </div>
+            <div class="me-4 w-100">
+                @if (_clients != null)
+                {
+                    <Dropdown DropdownName="Clients" OnClickEventCallback="OnClientCheckboxClickEvent" Items="_clients" Multiple=true />
+                }
+            </div>
+            <div class="me-4 w-100">
+                <Dropdown DropdownName="Languages" OnClickEventCallback="OnLanguageCheckboxClickEvent" Items="_languageCodes" Multiple=false />
+            </div>
+        </div>
+        <div class="button-container d-flex flex-row-reverse align-items-end">
+            <AuthorizeView Policy="sbc-announcements-canedit">
+                <Authorized Context="ActivateAll">
+                    <a href="javascript:void(0)" class="btn btn-create px-4" @onclick="OnCreateAnnouncementClickEvent">Add</a>
+                </Authorized>
+                <NotAuthorized Context="ActivateAll">
+                    <a href="javascript:void(0)" class="btn btn-create px-4" disabled>Add</a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </div>
+</div>

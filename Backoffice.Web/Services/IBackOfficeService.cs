@@ -44,7 +44,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ResendSettlementResponse>> ResendSettlement(ResendSettlementRequest request);
         Task<BaseResponse<BetModifyResponse>> CancelBet(BetModifyRequest request);
         Task<BaseResponse<bool>> DeactivateFixtureMarkets(DeactivateFixtureMarketRequest request);
-
+        Task<BaseResponse<AnnouncementResponse>> GetAnnouncements(AnnouncementRequest request);
         #region ConfigTemplate
         Task<BaseResponse<TranslationResponse>> GetTranslation(LanguageCode langCode);
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId);
