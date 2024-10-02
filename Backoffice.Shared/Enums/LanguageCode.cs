@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Backoffice.Shared.Enums
+﻿namespace Backoffice.Shared.Enums
 {
     public enum LanguageCode
     {
-        EN,
-        ZH,
-        KO
+        EN = 1,
+        KO = 5,
+        ZH = 6
     }
 }
