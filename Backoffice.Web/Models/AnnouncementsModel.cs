@@ -1,4 +1,5 @@
-﻿using static Backoffice.Shared.Models.Response.AnnouncementResponse;
+﻿using Microsoft.AspNetCore.Components.Web;
+using static Backoffice.Shared.Models.Response.AnnouncementResponse;
 
 namespace Backoffice.Web.Models
 {
@@ -15,5 +16,7 @@ namespace Backoffice.Web.Models
     public class Announcements : AnnouncementDTO
     {
         public int Row { get; set; }
+        public Action<MouseEventArgs> EditAction { get; set; }
+        public Action<MouseEventArgs> DeleteAction { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -122,6 +123,7 @@ namespace Backoffice.Web.Pages.SBC
                 }).ToList()
             };
 
+            SetItemAction();
             //if (response.StatusCode != Backoffice.Shared.Enums.StatusCode.Success)
             //{
             //    _toasterService.AddToast(Toast.NewToast
@@ -151,6 +153,46 @@ namespace Backoffice.Web.Pages.SBC
 
             _isPreLoader = false;
         }
+
+        private void SetItemAction()
+        {
+            foreach (var item in _model.Announcements)
+            {
+                item.EditAction = _ => OnEditClickEvent(item);
+                item.DeleteAction = _ => OnDeleteClickEvent(item);
+            }
+        }
+
+        public async Task OnEditClickEvent(Models.Announcements model)
+        {
+            //var parameters = new ModalParameters();
+
+            //parameters.Add("ModalClass", "modal-center modal-show");
+            //parameters.Add("ModalDialogClass", "modal-lg");
+            //parameters.Add("ClientId", model.ClientIdRef);
+            //parameters.Add("CurrentTopLeagues", model.TopLeagues);
+            //parameters.Add("SportId", FilterModel.SportId);
+            //parameters.Add("SportName", FilterModel.SportName);
+
+            //var options = new ModalOptions();
+            //ModalService.Open<EditModal>($"Set the Top Leagues of {{{model.ClientName}}} ({{{FilterModel.SportName}}})", parameters, options);
+        }
+
+        public async Task OnDeleteClickEvent(Models.Announcements model)
+        {
+            //var parameters = new ModalParameters();
+
+            //parameters.Add("ModalClass", "modal-center modal-show");
+            //parameters.Add("ModalDialogClass", "modal-lg");
+            //parameters.Add("ClientId", model.ClientIdRef);
+            //parameters.Add("CurrentTopLeagues", model.TopLeagues);
+            //parameters.Add("SportId", FilterModel.SportId);
+            //parameters.Add("SportName", FilterModel.SportName);
+
+            //var options = new ModalOptions();
+            //ModalService.Open<EditModal>($"Set the Top Leagues of {{{model.ClientName}}} ({{{FilterModel.SportName}}})", parameters, options);
+        }
+
         #endregion
     }
 }
