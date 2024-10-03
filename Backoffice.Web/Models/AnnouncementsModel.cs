@@ -6,9 +6,14 @@ namespace Backoffice.Web.Models
     {
         public AnnouncementsModel()
         {
-            Announcements = new List<AnnouncementDTO>();
+            Announcements = new List<Announcements>();
         }
-        public List<AnnouncementDTO> Announcements { get; set; }
+        public List<Announcements> Announcements { get; set; }
 
+    }
+
+    public class Announcements : AnnouncementDTO
+    {
+        public int Row { get; set; }
     }
 }

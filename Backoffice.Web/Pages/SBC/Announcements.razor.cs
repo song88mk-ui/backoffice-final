@@ -21,6 +21,7 @@ namespace Backoffice.Web.Pages.SBC
         #endregion
 
         #region Fields
+        private CancellationTokenSource _cts;
         private AnnouncementsModel _model;
         private PageHeaderModel _pageHeaderModel;
         private bool _isPreLoader = true;
@@ -82,43 +83,44 @@ namespace Backoffice.Web.Pages.SBC
         #region Utilities
         private async Task GetContent(AnnouncementsFilterModel model)
         {
+            _cts?.Cancel();
+
+            _cts = new CancellationTokenSource();
+
             if (!_isPreLoader)
             {
                 _isPreLoader = true;
                 StateHasChanged();
             }
 
+            var token = _cts.Token;
             var languageCode = (LanguageCode)Enum.Parse(typeof(LanguageCode), model.LanguageCode, true);
             var response = await BackofficeService.GetAnnouncements(new AnnouncementRequest
             {
                 ClientCodes = model.ClientCodes,
                 LanguageCode = languageCode,
                 SearchText = model.Search
-            });
+            }, token);
+
+            if (token.IsCancellationRequested) 
+                return;
+
+            MetaData.TotalCount = response.Result.Announcements.Count;
+            MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
 
             _model = new AnnouncementsModel
             {
-                Announcements = response.Result.Announcements
+                Announcements = response.Result.Announcements.Select((s, index) => new Models.Announcements
+                {
+                    ClientCodes = s.ClientCodes.Where(c => model.UserClientCodes.Contains(c)).ToList(),
+                    EndDate = s.EndDate,
+                    StartDate = s.StartDate,
+                    IsActive = s.IsActive,
+                    Message = s.Message,
+                    Title = s.Title,
+                    Row = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
+                }).ToList()
             };
-
-            MetaData.TotalCount = _model.Announcements.Count;
-            MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
-
-            //var skip = (MetaData.CurrentPage - 1) * MetaData.PageSize;
-
-            //if (MetaData.CurrentPage > 0)
-            //{
-            //    _model.Announcements = _model.Announcements
-            //        .Skip(skip).Take(MetaData.PageSize)
-            //        .Select((s, index) => new ClientTopLeague
-            //        {
-            //            RowNo = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
-            //            ClientIdRef = s.ClientIdRef,
-            //            ClientName = s.ClientName,
-            //            TopLeagues = s.TopLeagues
-            //        })
-            //        .ToList();
-            //}
 
             //if (response.StatusCode != Backoffice.Shared.Enums.StatusCode.Success)
             //{
@@ -130,35 +132,6 @@ namespace Backoffice.Web.Pages.SBC
             //}
 
             //TopLeaguesList = topLeaguesResponse.Result;
-
-            //if (TopLeaguesList != null)
-            //{
-            //    TopLeaguesList.ClientTopLeagues = TopLeaguesList.ClientTopLeagues.Join(model.Clients,
-            //        le => le.ClientIdRef,
-            //        c => c.ClientId,
-            //        (le, c) => new ClientTopLeague
-            //        {
-            //            ClientIdRef = le.ClientIdRef,
-            //            ClientName = c.ClientName,
-            //            TopLeagues = le.TopLeagues
-            //        }).ToList();
-
-            //    if (!string.IsNullOrWhiteSpace(model.Search))
-            //    {
-            //        var result = TopLeaguesList.ClientTopLeagues.Where(c => c.ClientName.ToUpper().Contains(model.Search.ToUpper())
-            //        || c.TopLeagues.Any(tf => tf.SportName.ToUpper().Contains(model.Search.ToUpper()))
-            //        || c.TopLeagues.Any(tf => tf.SegmentName.ToUpper().Contains(model.Search.ToUpper()))
-            //        || c.TopLeagues.Any(tf => tf.LeagueName.ToUpper().Contains(model.Search.ToUpper()))).ToList();
-
-            //        if (result != null)
-            //            TopLeaguesList.ClientTopLeagues = result;
-            //    }
-            //}
-            //else
-            //{
-            //    TopLeaguesList = new TopLeaguesModel();
-            //    TopLeaguesList.ClientTopLeagues = new List<ClientTopLeague>();
-            //}
 
             //var skip = (MetaData.CurrentPage - 1) * MetaData.PageSize;
 

@@ -3,96 +3,90 @@
     border-radius: 3px;
 }
 
-.table-head-pb {
+.table > tbody > tr:nth-child(2n) > td, .table > tbody > tr:nth-child(2n) > th {
+    background-color: #F5F5F5;
+}
+
+.table-head {
     background-color: #354156;
     color: #fff;
 }
 
-.table thead th, .table tbody td {
+.table thead th, .table tbody td, ::deep .table tfoot td {
     font-size: 0.9rem;
     font-weight: inherit;
+    vertical-align: middle;
+}
+
+table thead th, .table tbody td {
     text-align: center;
 }
 
-.td-parlay-bonus {
-    color: #E4422E;
+table thead th:first-child {
+    border-top-left-radius: 3px;
 }
 
-    .td-parlay-bonus input[type=number] {
-        text-align: center;
-        color: red;
-    }
+table thead th:last-child {
+    border-top-right-radius: 3px;
+}
 
-.tl-link-add, .tl-link-minus, .tl-link-edit {
-    color: #1F1F1F;
-    font-size: 1rem;
-    cursor: pointer;
+table tfoot td:first-child {
+    border-bottom-left-radius: 3px;
+}
+
+table tfoot td:last-child {
+    border-bottom-right-radius: 3px;
 }
 
 .th-number {
-    width: 30%;
+    width: 5%;
 }
 
-.th-parlay-bonus {
-    width: 50%;
+.th-title {
+    width: 5%;
+}
+
+.th-client {
+    width: 15%;
+}
+
+.th-description {
+    width: 40%;
+}
+
+.th-date {
+    width: 10%;
+}
+
+.th-status {
+    width: 5%;
 }
 
 .th-action {
-    width: 20%;
+    width: 10%;
 }
 
-.tooltip2 {
-    position: relative;
-    display: inline-block;
+.tl-fixture {
+    background-color: #9AA0AB;
+    color: #FFF;
+    width: fit-content;
 }
 
-    .tooltip2 .tooltiptext {
-        visibility: hidden;
-        width: 10rem;
-        background-color: black;
-        color: #fff;
-        text-align: center;
-        border-radius: 6px;
-        padding: 5px 0;
-        position: absolute;
-        z-index: 1;
-        top: -0.8rem;
-        left: 2rem;
-    }
-
-        .tooltip2 .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            right: 100%;
-            margin-top: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: transparent black transparent transparent;
-        }
-
-    .tooltip2:hover .tooltiptext {
-        visibility: visible;
-    }
-
-.parlay-bonus-input {
-    width: 10rem;
-    margin: auto;
-    display: inline-block;
+.tl-link-edit {
+    color: #1F1F1F;
+    font-size: 1rem;
 }
 
-.td-parlay-bonus .border-danger {
-    box-shadow: 0 0 0 0.25rem rgb(253 13 13 / 25%);
-}
-/*remove arrows for input[type=number]*/
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button, ::deep input::-webkit-outer-spin-button, ::deep input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+.tl-link-copy {
+    color: #1F1F1F;
+    font-size: 1rem;
 }
 
-/* Firefox */
-input[type=number], ::deep input[type=number] {
-    -moz-appearance: textfield;
+.tl-link-copy-disabled {
+    color: #979797;
+    font-size: 1rem;
+}
+
+::deep .modal-dialog {
+    max-width: 1500px;
 }

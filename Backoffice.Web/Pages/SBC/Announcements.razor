@@ -18,9 +18,13 @@
                             <table class="table table-hover table-borderless mt-4">
                                 <thead class="table-head">
                                     <tr>
-                                        <th class="th-number py-2">@TranslationState.GetValue("Title")</th>
-                                        <th class="th-client py-2">@TranslationState.GetValue("Message")</th>
-                                        <th class="th-top-leagues py-2">@TranslationState.GetValue("Clients")</th>
+                                        <th class="th-number py-2">@TranslationState.GetValue("No.")</th>
+                                        <th class="th-title py-2">@TranslationState.GetValue("Title")</th>
+                                        <th class="th-client py-2">@TranslationState.GetValue("Clients")</th>
+                                        <th class="th-description py-2">@TranslationState.GetValue("Description")</th>
+                                        <th class="th-date py-2">@TranslationState.GetValue("Start Date")</th>
+                                        <th class="th-date py-2">@TranslationState.GetValue("End Date")</th>
+                                        <th class="th-status py-2">@TranslationState.GetValue("Status")</th>
                                         <th class="th-action py-2">@TranslationState.GetValue("Action")</th>
                                     </tr>
                                 </thead>
@@ -28,7 +32,7 @@
                                     @if (_isPreLoader)
                                     {
                                         <tr>
-                                            <td colspan=4>
+                                            <td colspan=8>
                                                 <Preloader />
                                             </td>
                                         </tr>
@@ -41,20 +45,32 @@
                                             {
                                                 <tr>
                                                     <td class="py-2">
+                                                        <span>@item.Row</span>
+                                                    </td>
+                                                    <td class="py-2">
                                                         <span>@item.Title</span>
                                                     </td>
                                                     <td class="py-2">
-                                                        <span>@item.Message</span>
-                                                    </td>
-                                                    <td class="py-2">
                                                         <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
-                                                            @foreach (var x in item.ClientIds)
+                                                            @foreach (var x in item.ClientCodes)
                                                             {
                                                                 <div class="tl-fixture m-1 py-1 rounded-2">
                                                                     <span class="px-3">@x</span>
                                                                 </div>
                                                             }
                                                         </div>
+                                                    </td>
+                                                    <td class="py-2">
+                                                        <span>@item.Message</span>
+                                                    </td>
+                                                    <td class="py-2">
+                                                        <span>@item.StartDate.ToString("MM/dd/yy HH:mm")</span>
+                                                    </td>
+                                                    <td class="py-2">
+                                                        <span>@item.EndDate.ToString("MM/dd/yy HH:mm")</span>
+                                                    </td>
+                                                    <td class="py-2">
+                                                        <span>@item.IsActive</span>
                                                     </td>
                                                     <td class="py-2">
                                                         @*<AuthorizeView Policy="sbc-announcements-canedit">
@@ -92,14 +108,14 @@
                                         else
                                         {
                                             <tr>
-                                                <td colspan=4>
+                                                <td colspan=8>
                                                     <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
                                                 </td>
                                             </tr>
                                         }
                                     }
                                 </tbody>
-                                <Pagination MetaData="MetaData" Spread="3" PaginationColspan="3" SelectPageEvent="SelectPage" />
+                                <Pagination MetaData="MetaData" Spread="3" PaginationColspan="7" SelectPageEvent="SelectPage" />
                             </table>
                         </div>
                     </div>

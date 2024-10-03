@@ -61,6 +61,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 var selectedClients = _clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
 
                 _filterModel.ClientCodes = string.Join(",", selectedClients);
+                _filterModel.UserClientCodes = clients.Clients.Select(s => s.ClientCode).ToList();
             }
             else
             {

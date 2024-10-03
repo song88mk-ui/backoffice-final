@@ -1100,11 +1100,11 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Methods - Announcements
-        public async Task<BaseResponse<AnnouncementResponse>> GetAnnouncements(AnnouncementRequest request)
+        public async Task<BaseResponse<AnnouncementResponse>> GetAnnouncements(AnnouncementRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var Model = await _httpClient.PostAsync($"sportsbook/settings/announcements", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var Model = await _httpClient.PostAsync($"sportsbook/settings/announcements", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
 
                 if (Model.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<AnnouncementResponse>();
