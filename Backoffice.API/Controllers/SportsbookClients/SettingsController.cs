@@ -204,6 +204,20 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
+
+        [HttpPost("announcements/post")]
+        public async Task<IActionResult> AddOrUpdateAnnouncements([FromBody] AddOrUpdateAnnouncementRequest request)
+        {
+            var result = await _platformRepository.AddOrUpdateAnnouncements(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         #endregion
     }
 }

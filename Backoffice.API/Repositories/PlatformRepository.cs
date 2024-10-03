@@ -655,6 +655,38 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+
+        public async Task<BaseResponse<AddOrUpdateAnnouncementResponse>> AddOrUpdateAnnouncements(AddOrUpdateAnnouncementRequest request)
+        {
+            try
+            {
+                var response = await GetHttpClient("HK").PostAsync($"v1/client/announcements/post", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                    return JsonConvert.DeserializeObject<BaseResponse<AddOrUpdateAnnouncementResponse>>(await response.Content.ReadAsStringAsync());
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonConvert.DeserializeObject<BaseResponse<AddOrUpdateAnnouncementResponse>>(await response.Content.ReadAsStringAsync());
+                    else
+                    {
+                        return new BaseResponse<AddOrUpdateAnnouncementResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<AddOrUpdateAnnouncementResponse>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
         #endregion
 
         public async Task<BaseResponse<SportsTreeResponse>> GetSportstreeDetails(int clientId, string region)
