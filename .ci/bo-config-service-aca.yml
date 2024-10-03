@@ -95,7 +95,7 @@ stages:
                         -g rg-production-song88 \
                         --output json \
                         -i song88.azurecr.io/bo-config-service:${TAG} \
-                        --container-name api | jq -r '.properties.provisioningState')
+                        --container-name service | jq -r '.properties.provisioningState')
                       [[ $ret == "Succeeded" ]] && echo "Status: Success" && exit 0
                       echo "Status: ${ret}"
                       exit 1
@@ -152,7 +152,7 @@ stages:
                         -g rg-production-song88 \
                         --output json \
                         -i song88.azurecr.io/bo-config-service:${TAG} \
-                        --container-name api | jq -r '.properties.provisioningState')
+                        --container-name service | jq -r '.properties.provisioningState')
                       [[ $ret == "Succeeded" ]] && echo "Status: Success" && exit 0
                       echo "Status: ${ret}"
                       exit 1
