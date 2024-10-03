@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Backoffice.Shared.Models.Requests;
+using System;
 using System.Collections.Generic;
 
 namespace Backoffice.Shared.Models.Response
@@ -18,9 +19,9 @@ namespace Backoffice.Shared.Models.Response
         {
             public AnnouncementDTO()
             {
-                ClientCodes = new List<string>();
+                Clients = new List<ClientInfo>();
             }
-            public List<string> ClientCodes { get; set; }
+            public List<ClientInfo> Clients { get; set; }
             public bool IsActive { get; set; }
             public string Title { get; set; }
             public DateTime StartDate { get; set; }
@@ -28,6 +29,11 @@ namespace Backoffice.Shared.Models.Response
             public string Message { get; set; }
         }
 
+        public class ClientInfo
+        {
+            public Guid ClientId { get; set; }
+            public string ClientCode { get; set; }
+        }
         #endregion
     }
 }
