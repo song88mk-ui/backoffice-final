@@ -18,9 +18,9 @@ namespace Backoffice.Shared.Models.Response
         {
             public AnnouncementDTO()
             {
-                ClientIds = new List<string>();
+                ClientCodes = new List<string>();
             }
-            public List<string> ClientIds { get; set; }
+            public List<string> ClientCodes { get; set; }
             public bool IsActive { get; set; }
             public string Title { get; set; }
             public DateTime StartDate { get; set; }
