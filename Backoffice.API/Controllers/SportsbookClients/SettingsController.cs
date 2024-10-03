@@ -193,7 +193,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
 
         [HttpPost("announcements")]
         public async Task<IActionResult> GetAnnouncements([FromBody] AnnouncementRequest request)
-        {//
+        {
             var result = await _platformRepository.GetAnnouncements(request);
 
             switch (result.StatusCode)
