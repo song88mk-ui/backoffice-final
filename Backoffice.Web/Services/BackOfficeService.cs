@@ -11,7 +11,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Backoffice.Web.Extensions;
-using static Backoffice.Shared.Models.Response.SportsTreeResponse;
 
 namespace Backoffice.Web.Services
 {
@@ -1104,20 +1103,20 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var Model = await _httpClient.PostAsync($"sportsbook/settings/announcements", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
+                var response = await _httpClient.PostAsync($"sportsbook/settings/announcements", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
 
-                if (Model.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<AnnouncementResponse>();
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<AnnouncementResponse>();
                 else
                 {
-                    if (Model.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<AnnouncementResponse>();
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<AnnouncementResponse>();
                     else
                     {
                         return new BaseResponse<AnnouncementResponse>
                         {
                             StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
                         };
                     }
                 }
@@ -1136,24 +1135,24 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<AddOrUpdateAnnouncementResponse>> AddOrUpdateAnnouncements(AddOrUpdateAnnouncementRequest request, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AnnouncementResponse>> AddOrUpdateAnnouncements(AddOrUpdateAnnouncementRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var Model = await _httpClient.PostAsync($"sportsbook/settings/announcements/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
+                var response = await _httpClient.PostAsync($"sportsbook/settings/announcements/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
 
-                if (Model.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<AddOrUpdateAnnouncementResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<AddOrUpdateAnnouncementResponse>();
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<AnnouncementResponse>();
                 else
                 {
-                    if (Model.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<AddOrUpdateAnnouncementResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<AddOrUpdateAnnouncementResponse>();
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<AnnouncementResponse>();
                     else
                     {
-                        return new BaseResponse<AddOrUpdateAnnouncementResponse>
+                        return new BaseResponse<AnnouncementResponse>
                         {
                             StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
                         };
                     }
                 }
@@ -1164,7 +1163,7 @@ namespace Backoffice.Web.Services
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
 
-                return new BaseResponse<AddOrUpdateAnnouncementResponse>
+                return new BaseResponse<AnnouncementResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
