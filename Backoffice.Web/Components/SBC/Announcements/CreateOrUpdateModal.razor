@@ -1,4 +1,6 @@
-﻿<div class="modal-body">
+﻿@using BlazorDateRangePicker
+
+<div class="modal-body">
     @if (_isPreload)
     {
         <div class="col-md-12">
@@ -10,39 +12,103 @@
     else
     {
         <EditForm EditContext="EditContext">
-            <div class="business-container">
+            <div class="announcement-container">
                 <div class="row">
                     <div class="col-md-12">
-                        <!-- title here -->
+                        <div class="form-switch d-inline-block pull-right">
+                            @if (_announcement.IsActive)
+                            {
+                                <input class="form-check-input" type="checkbox" role="switch" checked @onclick="OnStatusClickEvent" />
+                            }
+                            else
+                            {
+                                <input class="form-check-input" type="checkbox" role="switch" @onclick="OnStatusClickEvent" />
+                            }
+                        </div>
+                        <label class="form-check-label pull-right" for="@_announcement.IsActive">@TranslationState.GetValue(_announcement.IsActive? "Active" : "Inactive")</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
                         <h6 class="title fw-bold ps-2 py-1">Title</h6>
                     </div>
                     <div class="col-md-12">
                         <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="businessNameField" class="form-label">The title of your announcement</label>
-                                <input type="text" class="form-control" id="businessNameField" placeholder="Enter title" @bind-value="_announcement.Title" />
+                            <div class="col">
+                                <label for="titleField" class="form-label">The title of your announcement</label>
+                                <input type="text" class="form-control" id="titleField" placeholder="Enter title" @bind-value="_announcement.Title" />
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <!-- title here -->
-                        <h6 class="title fw-bold ps-2 py-1">Start Date</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <h6 class="title fw-bold ps-2 py-1">Start Date</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="title fw-bold ps-2 py-1">End Date</h6>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-12">
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <input type="text" class="form-control" id="businessNameField" placeholder="Enter start date" @bind-value="_announcement.StartDate" />
+                                <DateRangePicker class="form-control"
+                                                 StartDate="_announcement.StartDate"
+                                                 OnRangeSelect="OnRangeSelectStartDate"
+                                                 TimePicker="true"
+                                                 TimePicker24Hour="true"
+                                                 SingleDatePicker="true"
+                                                 DateFormat="@($"MMM dd, yyyy HH:mm")" />
                             </div>
                             <div class="col-md-4">
-                                <input type="text" class="form-control" id="businessNameField" placeholder="Enter end date" @bind-value="_announcement.EndDate" />
+                                <DateRangePicker class="form-control"
+                                                 MinDate="_announcement.StartDate"
+                                                 StartDate="_announcement.EndDate"
+                                                 OnRangeSelect="OnRangeSelectEndDate"
+                                                 TimePicker="true"
+                                                 TimePicker24Hour="true"
+                                                 SingleDatePicker="true"
+                                                 DateFormat="@($"MMM dd, yyyy HH:mm")" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="title fw-bold ps-2 py-1">Clients</h6>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="titleField" class="form-label">Select the clients who will see this announcement.</label>
+                                <select id="select-@_announcement.Id" class="form-select d-block" multiple="multiple">
+                                    @foreach (var clientCode in _clientCodes)
+                                    {
+                                        <option value="@clientCode" selected=@(_clientCodes.Contains(clientCode))>@clientCode</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="title fw-bold ps-2 py-1">Message</h6>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="messageField" class="form-label">Enter the message of your announcement</label>
+                                <input type="text" class="form-control" id="messageField" placeholder="Enter the message of your announcement" @bind-value="_announcement.Message" multiple />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
         </EditForm>
     }
 </div>

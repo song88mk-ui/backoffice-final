@@ -3,6 +3,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
+using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Serilog;
@@ -29,6 +30,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         private List<AlertModel> _alerts;
         private CancellationTokenSource _cts;
         private Models.Announcements _announcement;
+        private List<string> _clientCodes;
         #endregion
 
         #region Methods
@@ -38,9 +40,24 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _isPreload = false;
             _alerts = new List<AlertModel>();
             _announcement = ModalParameters.TryGet<Models.Announcements>("Announcement");
+            _clientCodes = ModalParameters.TryGet<List<string>>("ClientCodes");
             _isEdit = ModalParameters.TryGet<bool>("IsEdit");
-
             EditContext = new EditContext(_announcement);
+        }
+
+        public async Task OnStatusClickEvent()
+        {
+            _announcement.IsActive = !_announcement.IsActive;
+        }
+
+        public async Task OnRangeSelectStartDate(DateRange range)
+        {
+            _announcement.StartDate = range.Start.LocalDateTime;
+        }
+
+        public async Task OnRangeSelectEndDate(DateRange range)
+        {
+            _announcement.EndDate = range.Start.LocalDateTime;
         }
 
         public async Task OnCancelClickEvent()

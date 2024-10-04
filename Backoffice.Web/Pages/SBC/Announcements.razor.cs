@@ -63,12 +63,20 @@ namespace Backoffice.Web.Pages.SBC
                 var parameters = new ModalParameters();
 
                 parameters.Add("ModalClass", "modal-center modal-show");
-                parameters.Add("ModalDialogClass", "modal-xl");
-                parameters.Add("Client", new ClientListResponse.Client());
+                parameters.Add("ModalDialogClass", "modal-l");
+                parameters.Add("Announcement", new Models.Announcements
+                {
+                    StartDate = DateTime.Now.ToLocalTime(),
+                    EndDate = DateTime.Now.ToLocalTime(),
+                    LanguageCode = LanguageCode.EN,
+                    IsActive = true
+                });
+                parameters.Add("ClientCodes", model.UserClientCodes);
                 parameters.Add("IsEdit", false);
 
                 var options = new ModalOptions();
-                ModalService.Open<CreateOrUpdateModal>("Create Client", parameters, options);
+                options.HideCloseButton = true;
+                ModalService.Open<CreateOrUpdateModal>("Add Announcements", parameters, options);
 
                 model.IsAddAnnouncement = false;
             }
