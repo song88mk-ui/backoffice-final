@@ -219,6 +219,20 @@ namespace Backoffice.API.Controllers.SportsbookClients
                     return BadRequest(result);
             }
         }
+
+        [HttpPost("announcements/delete")]
+        public async Task<IActionResult> DeleteAnnouncements([FromBody] DeleteAnnouncementRequest request)
+        {
+            var result = await _platformRepository.DeleteAnnouncements(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         #endregion
     }
 }

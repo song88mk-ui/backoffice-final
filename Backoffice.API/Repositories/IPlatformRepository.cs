@@ -46,6 +46,7 @@ namespace Backoffice.API.Repositories
         #region Announcements
         Task<BaseResponse<AnnouncementResponse>> GetAnnouncements(AnnouncementRequest request);
         Task<BaseResponse<AnnouncementResponse>> AddOrUpdateAnnouncements(AddOrUpdateAnnouncementRequest request);
+        Task<BaseResponse<bool>> DeleteAnnouncements(DeleteAnnouncementRequest request);
         #endregion
     }
 }
