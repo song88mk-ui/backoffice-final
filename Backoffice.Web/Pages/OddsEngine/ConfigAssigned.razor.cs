@@ -7,8 +7,6 @@ using Backoffice.Web.Models.OddsEngine.Config;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Drawing.Text;
-using System.Threading;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -344,7 +342,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 return;
 
             if (response.StatusCode == StatusCode.Success)
-            {
+            {   
                 ConfigClients = new List<ConfigClientViewModel>();
                 MetaData = new MetaData();
 
