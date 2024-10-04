@@ -7,12 +7,16 @@ namespace Backoffice.Shared.Models.Requests
     public class AddOrUpdateAnnouncementRequest
     {
         public int Id { get; set; }
-        public LanguageCode LanguageCode { get; set; }
         public List<string> ClientCodes { get; set; }
+        public List<AnnouncementMessage> AnnouncementMessages { get; set; }
         public string Title { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public string Message { get; set; }
         public bool IsActive { get; set; }
+    }
+    public class AnnouncementMessage
+    {
+        public LanguageCode LanguageCode { get; set; }
+        public string Message { get; set; }
     }
 }
