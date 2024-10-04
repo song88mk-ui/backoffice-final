@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Azure;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -6,7 +7,6 @@ using Backoffice.Web.Components.SBC.Announcements;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -26,8 +26,11 @@ namespace Backoffice.Web.Pages.SBC
         #region Fields
         private CancellationTokenSource _cts;
         private AnnouncementsModel _model;
+        private List<AlertModel> _alerts;
+        private List<string> _userClientCodes;
         private PageHeaderModel _pageHeaderModel;
         private bool _isPreLoader = true;
+        private decimal _opacity;
         #endregion
 
         #region Methods     
@@ -39,7 +42,10 @@ namespace Backoffice.Web.Pages.SBC
                 Title = "Announcements",
                 IconClass = "ico ico-parlay-bonus"
             };
-            
+
+            _alerts = new List<AlertModel>();
+            _opacity = 0m;
+
             MetaData = new MetaData()
             {
                 CurrentPage = 1,
@@ -53,6 +59,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public async Task OnInitEvent(AnnouncementsFilterModel model)
         {
+            _userClientCodes = model.UserClientCodes;
             await GetContent(model);
         }
 
@@ -60,6 +67,8 @@ namespace Backoffice.Web.Pages.SBC
         {
             if(model.IsAddAnnouncement)
             {
+                _alerts.Clear();
+
                 var parameters = new ModalParameters();
 
                 parameters.Add("ModalClass", "modal-center modal-show");
@@ -92,6 +101,79 @@ namespace Backoffice.Web.Pages.SBC
 
                 await GetContent(model);
             }
+
+        }
+
+        public async Task OnEditClickEvent(Models.Announcements model)
+        {
+            _alerts.Clear();
+
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-l");
+            parameters.Add("Announcement", model);
+            parameters.Add("ClientCodes", _userClientCodes);
+            parameters.Add("IsEdit", true);
+
+            var options = new ModalOptions();
+            options.HideCloseButton = true;
+            ModalService.Open<CreateOrUpdateModal>("Edit Announcements", parameters, options);
+        }
+
+        public async Task OnDeleteClickEvent(Models.Announcements model)
+        {
+            _alerts.Clear();
+
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalDialogClass", "modal-l");
+            parameters.Add("Announcement", model);
+
+            var options = new ModalOptions();
+            options.HideCloseButton = true;
+            ModalService.Open<DeleteAnnouncementModal>("Delete Announcement", parameters, options);
+        }
+
+        public async Task OnSaveClickEvent(object item)
+        {
+            _opacity = _opacity == 1m ? 0.99m : 1m;
+
+            var message = "Announcement successfully updated";
+            if (item.GetType() != typeof(bool))
+            {
+                message = "Announcement successfully created";
+
+                var result = (AnnouncementResponse)item;
+
+                MetaData.TotalCount = MetaData.TotalCount + result.Announcements.Count;
+                MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
+
+                _model.Announcements.AddRange(result.Announcements.Select((s, index) =>
+                    new Models.Announcements
+                    {
+                        Id = s.Id,
+                        IsActive = s.IsActive,
+                        Clients = s.Clients,
+                        Message = s.Message,
+                        Title = s.Title,
+                        LanguageCode = s.LanguageCode,
+                        StartDate = s.StartDate,
+                        EndDate = s.EndDate,
+                        Row = index + result.Announcements.Count + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
+                    }).ToList());
+
+                SetItemAction();
+            }
+
+            _alerts.Clear();
+            _alerts.Add(new AlertModel
+            {
+                Status = AlertStatus.Success,
+                Message = message,
+                Opacity = _opacity
+            });
 
         }
 
@@ -191,36 +273,6 @@ namespace Backoffice.Web.Pages.SBC
                 item.EditAction = _ => OnEditClickEvent(item);
                 item.DeleteAction = _ => OnDeleteClickEvent(item);
             }
-        }
-
-        public async Task OnEditClickEvent(Models.Announcements model)
-        {
-            //var parameters = new ModalParameters();
-
-            //parameters.Add("ModalClass", "modal-center modal-show");
-            //parameters.Add("ModalDialogClass", "modal-lg");
-            //parameters.Add("ClientId", model.ClientIdRef);
-            //parameters.Add("CurrentTopLeagues", model.TopLeagues);
-            //parameters.Add("SportId", FilterModel.SportId);
-            //parameters.Add("SportName", FilterModel.SportName);
-
-            //var options = new ModalOptions();
-            //ModalService.Open<EditModal>($"Set the Top Leagues of {{{model.ClientName}}} ({{{FilterModel.SportName}}})", parameters, options);
-        }
-
-        public async Task OnDeleteClickEvent(Models.Announcements model)
-        {
-            //var parameters = new ModalParameters();
-
-            //parameters.Add("ModalClass", "modal-center modal-show");
-            //parameters.Add("ModalDialogClass", "modal-lg");
-            //parameters.Add("ClientId", model.ClientIdRef);
-            //parameters.Add("CurrentTopLeagues", model.TopLeagues);
-            //parameters.Add("SportId", FilterModel.SportId);
-            //parameters.Add("SportName", FilterModel.SportName);
-
-            //var options = new ModalOptions();
-            //ModalService.Open<EditModal>($"Set the Top Leagues of {{{model.ClientName}}} ({{{FilterModel.SportName}}})", parameters, options);
         }
 
         #endregion

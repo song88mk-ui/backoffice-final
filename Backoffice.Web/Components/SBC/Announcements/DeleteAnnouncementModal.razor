@@ -1,0 +1,38 @@
+﻿<div class="modal-body">
+    <div class="row mb-2">
+        <div class="col text-center">
+            <img src="icons/svg/warning-icon.svg" />
+        </div>
+    </div>
+    <div class="row">
+        @if (_isPreload)
+        {
+            <Preloader />
+        }
+        else
+        {
+            <div class="col text-center">
+                <p>
+                    Are you sure you want to permanently delete this Announcement?
+                </p>
+            </div>
+        }
+    </div>
+    @if (_alert != null && string.IsNullOrEmpty(_alert.Message))
+    {
+        <AlertMessage AlertModel="@_alert" />
+    }
+</div>
+<div class="modal-footer">
+
+    @if (_isPreload)
+    {
+        <button type="button" class="btn modal-btn modal-cancel" disabled>@TranslationState.GetValue("Cancel")</button>
+        <button type="button" class="btn modal-btn modal-delete" disabled>@TranslationState.GetValue("Delete")</button>
+    }
+    else
+    {
+        <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">@TranslationState.GetValue("Cancel")</button>
+        <button type="button" class="btn modal-btn modal-delete" @onclick="OnDeleteModalClick">@TranslationState.GetValue("Delete")</button>
+    }
+</div>

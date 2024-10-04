@@ -2,5 +2,8 @@
     padding: unset;
 }
 .modal-z-index {
-    z-index: 1051;
+    z-index: 1050;
+}
+.modal-backdrop {
+    z-index: 1049;
 }

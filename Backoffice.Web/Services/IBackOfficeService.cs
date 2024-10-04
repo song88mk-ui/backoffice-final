@@ -46,6 +46,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<bool>> DeactivateFixtureMarkets(DeactivateFixtureMarketRequest request);
         Task<BaseResponse<AnnouncementResponse>> GetAnnouncements(AnnouncementRequest request, CancellationToken cancellationToken);
         Task<BaseResponse<AnnouncementResponse>> AddOrUpdateAnnouncements(AddOrUpdateAnnouncementRequest request, CancellationToken cancellationToken);
+        Task<BaseResponse<bool>> DeleteAnnouncements(DeleteAnnouncementRequest request, CancellationToken cancellationToken);
 
         #region ConfigTemplate
         Task<BaseResponse<TranslationResponse>> GetTranslation(LanguageCode langCode);

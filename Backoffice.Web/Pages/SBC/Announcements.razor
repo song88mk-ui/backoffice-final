@@ -10,6 +10,17 @@
                     <div class="col-md-12">
                         <PageHeader PageHeaderModel="_pageHeaderModel" />
                     </div>
+                    @if (_alerts != null && _alerts.Any())
+                    {
+                        foreach (var alert in _alerts)
+                        {
+                            <div class="col-md-12 mt-4 ">
+                                <div class="mx-3">
+                                    <AlertMessage AlertModel="@alert" />
+                                </div>
+                            </div>
+                        }
+                    }
                     <div class="col-md-12">
                         <Filter OnInitCallback="OnInitEvent" OnFilterCallback="OnFilterEvent" />
                     </div>
@@ -113,7 +124,7 @@
             </div>
         </div>
         <div>
-            <CustomModal />
+            <CustomModal OnSaveClickCallback="OnSaveClickEvent" />
         </div>
     </Authorized>
     <NotAuthorized>

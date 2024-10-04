@@ -79,11 +79,11 @@
                 <div class="row">
                     <div class="col-md-12">
                         <h6 class="title fw-bold ps-2 py-1">Clients</h6>
+                        <label for="titleField" class="form-label">Select the clients who will see this announcement.</label>
                     </div>
                     <div class="col-md-12">
                         <div class="row mb-3">
                             <div class="col">
-                                <label for="titleField" class="form-label">Select the clients who will see this announcement.</label>
                                 <select id="select-@_announcement.Id" class="@_selectClass form-select d-block" multiple="multiple">
                                     @foreach (var cc in _clientCodes)
                                     {

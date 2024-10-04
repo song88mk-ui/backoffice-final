@@ -31,7 +31,7 @@ namespace Backoffice.Web.States
         {
             _translationService = translationService;
             _jsRuntime = jsRuntime;
-            LanguageCodes = Enum.GetValues<LanguageCode>().Select(s => s).ToList();
+            LanguageCodes = new List<LanguageCode> { LanguageCode.EN, LanguageCode.ZH, LanguageCode.KO };  //Enum.GetValues<LanguageCode>().Select(s => s).ToList();
 
             if (!Model.Any())
                 ReloadModel();

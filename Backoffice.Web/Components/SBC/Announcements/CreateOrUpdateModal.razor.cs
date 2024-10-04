@@ -1,14 +1,15 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages.OddsEngine;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using Serilog;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
 namespace Backoffice.Web.Components.SBC.Announcements
 {
@@ -24,6 +25,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         [CascadingParameter] public CustomModal Modal { get; set; }
 
         private EditContext EditContext { get; set; }
+        private static List<string> SelectedClientCodes { get; set; }
         #endregion
 
         #region Fields
@@ -35,6 +37,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         private List<AlertModel> _alerts;
         private CancellationTokenSource _cts;
         private Models.Announcements _announcement;
+        private Models.Announcements _prevAnnouncement;
         private List<string> _clientCodes;
         private Dictionary<LanguageCode, string> _announcementMessages;
 
@@ -47,10 +50,20 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _isPreload = false;
             _initSelect = true;
             
-            _selectClass = "client-select";
+            _selectClass = "client-code-select";
 
             _alerts = new List<AlertModel>();
             _announcement = ModalParameters.TryGet<Models.Announcements>("Announcement");
+            _prevAnnouncement = new Models.Announcements
+            {
+                Id = _announcement.Id,
+                Clients = _announcement.Clients.Select(s => new AnnouncementResponse.ClientInfo { ClientCode = s.ClientCode, ClientId = s.ClientId }).ToList(),
+                IsActive = _announcement.IsActive,
+                Title = _announcement.Title,
+                Message = _announcement.Message,
+                StartDate = _announcement.StartDate,
+                EndDate = _announcement.EndDate,
+            };
             _clientCodes = ModalParameters.TryGet<List<string>>("ClientCodes");
             _isEdit = ModalParameters.TryGet<bool>("IsEdit");
 
@@ -58,14 +71,15 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _announcementMessages[_announcement.LanguageCode] = _announcement.Message ?? string.Empty;
 
             EditContext = new EditContext(_announcement);
+            SelectedClientCodes = _announcement.Clients.Select(s => s.ClientCode).ToList();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (_initSelect)
             {
-                await JSRuntime.InvokeVoidAsync("initSelect2", $".{_selectClass}", "OnClientChangedEvent");
-                await JSRuntime.InvokeVoidAsync("enableSelect2", $".{_selectClass}");
+                JSRuntime.InvokeVoidAsync("initSelect2", $".{_selectClass}", "OnClientChangedEvent");
+                //await JSRuntime.InvokeVoidAsync("enableSelect2", $".{_selectClass}");
 
                 _initSelect = false;
             }
@@ -90,6 +104,13 @@ namespace Backoffice.Web.Components.SBC.Announcements
         {
             if (_isPreload)
                 return;
+
+            _announcement.Clients = _prevAnnouncement.Clients.Select(s => new AnnouncementResponse.ClientInfo { ClientCode = s.ClientCode, ClientId = s.ClientId }).ToList();
+            _announcement.IsActive = _prevAnnouncement.IsActive;
+            _announcement.Title = _prevAnnouncement.Title;
+            _announcement.Message = _prevAnnouncement.Message;
+            _announcement.StartDate = _prevAnnouncement.StartDate;
+            _announcement.EndDate = _prevAnnouncement.EndDate;
 
             ModalService.Cancel();
         }
@@ -128,6 +149,46 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     return;
                 }
 
+                if (string.IsNullOrEmpty(_announcement.Title))
+                {
+                    _alerts.Add(new AlertModel
+                    {
+                        Status = AlertStatus.Error,
+                        Message = "Title is required",
+                        Opacity = _opacity
+                    });
+                }
+
+                if (string.IsNullOrEmpty(_announcement.Message))
+                {
+                    _alerts.Add(new AlertModel
+                    {
+                        Status = AlertStatus.Error,
+                        Message = "Message is required",
+                        Opacity = _opacity
+                    });
+                }
+
+                if (_announcement.StartDate > _announcement.EndDate)
+                {
+                    _alerts.Add(new AlertModel
+                    {
+                        Status = AlertStatus.Error,
+                        Message = "Start Date should be less than End Date",
+                        Opacity = _opacity
+                    });
+                }
+
+                if (!SelectedClientCodes.Any())
+                {
+                    _alerts.Add(new AlertModel
+                    {
+                        Status = AlertStatus.Error,
+                        Message = "Please assign at least 1 client",
+                        Opacity = _opacity
+                    });
+                }
+
                 if (_alerts.Any())
                 {
                     _isPreload = false;
@@ -146,8 +207,13 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     EndDate = _announcement.EndDate,
                     IsActive = _announcement.IsActive,
                     AnnouncementMessages = _announcementMessages.Select(s => new AnnouncementMessage { LanguageCode = s.Key, Message = s.Value }).ToList(),
-                    ClientCodes = _announcement.Clients.Select(s => s.ClientCode).ToList()
+                    ClientCodes = SelectedClientCodes
                 };
+
+                if(_isEdit)
+                {
+                    _announcement.Clients = SelectedClientCodes.Select(s => new AnnouncementResponse.ClientInfo { ClientCode = s }).ToList();
+                }
 
                 var response = await BackofficeService.AddOrUpdateAnnouncements(request, token);
 
@@ -155,7 +221,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 {
                     ModalService.Cancel();
 
-                    await Modal.OnSaveClickCallback.InvokeAsync(_isEdit);
+                    await Modal.OnSaveClickCallback.InvokeAsync(_isEdit ? true : response.Result);
                 }
                 else
                 {
@@ -180,29 +246,20 @@ namespace Backoffice.Web.Components.SBC.Announcements
         public static void OnClientChangedEvent(SelectedModel model)
         {
             var clientCode = model.SelectedOptionId;
-            //var marketGroup = _marketGroups.FirstOrDefault(c => c.Value == marketGroupId);
 
-            //if (marketGroup != null)
-            //{
-            //    var marketTemplateId = model.ParentId.Split('-')[1];
-
-            //    if (model.IsSelect)
-            //    {
-            //        foreach (var market in _marketTemplates.Where(c => c.MarketTemplateId == marketTemplateId))
-            //        {
-            //            if (!market.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(marketGroup.Name.ToLower()))
-            //                market.MarketTemplateGroupNames.Add(marketGroup.Name);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        foreach (var market in _marketTemplates.Where(c => c.MarketTemplateId == marketTemplateId))
-            //        {
-            //            if (market.MarketTemplateGroupNames.Select(s => s.ToLower()).Contains(marketGroup.Name.ToLower()))
-            //                market.MarketTemplateGroupNames.Remove(marketGroup.Name);
-            //        }
-            //    }
-            //}
+            if (model.IsSelect)
+            {
+                if (!SelectedClientCodes.Any(c => c == clientCode))
+                    SelectedClientCodes.Add(clientCode);
+            }
+            else
+            {
+                var client = SelectedClientCodes.FirstOrDefault(c => c == clientCode);
+                if (client != null)
+                {
+                    SelectedClientCodes.Remove(client);
+                }
+            }
         }
 
         public void Dispose()
