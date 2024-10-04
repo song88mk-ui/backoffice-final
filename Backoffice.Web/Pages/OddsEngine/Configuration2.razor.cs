@@ -107,7 +107,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
 
         public void OnNavMenuCallback() => CalculateConfigCounts();
-        //public async Task OnModalSavedEvent(object payload) => StateHasChanged();
         public void Dispose()
         {
 
@@ -130,6 +129,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 if (response.StatusCode == StatusCode.Success)
                     _navMenuParamModel.MyTemplatesCount = response.Result;
+
+                StateHasChanged();
             }, token);
 
             await ExecuteWithCancellation(async () =>
@@ -138,6 +139,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 if (response.StatusCode == StatusCode.Success)
                     _navMenuParamModel.AssignedLeaguesCount = response.Result;
+
+                StateHasChanged();
             }, token);
 
             await ExecuteWithCancellation(async () =>
@@ -155,9 +158,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     attempt++;
                 }
+
+                StateHasChanged();
             }, token);
 
-            await InvokeAsync(StateHasChanged);
         }
 
         private async Task ExecuteWithCancellation(Func<Task> action, CancellationToken token)

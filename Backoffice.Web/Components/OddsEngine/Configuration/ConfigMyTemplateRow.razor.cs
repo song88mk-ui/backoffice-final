@@ -1,10 +1,6 @@
-﻿using Backoffice.Shared.Models;
-using Backoffice.Web.Models;
+﻿using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Config;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Drawing;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -27,7 +23,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             parameters.Add("ModalType", "ExportTemplateModal");
             parameters.Add("ModalClass", "modal-show");
-            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
+            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");                                                                                                                                                                                                                                          
             parameters.Add("Region", _region);
             parameters.Add("ConnectionId", UserModel.ConnectionId);
             parameters.Add("UserId", UserModel.Id);

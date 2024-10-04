@@ -37,8 +37,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             _currentMenu = (int)ConfigTemplateNavMenu.MyTemplates;
             _init = true;
-
-            Console.WriteLine($"{this.GetType().Name} - Init");
         }
 
         protected override void OnParametersSet()
@@ -68,17 +66,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             _init = false;
             _shouldRender = hasChange;
-            Console.WriteLine($"{this.GetType().Name} - Param {_shouldRender}");
         }
         protected override bool ShouldRender() => _shouldRender;
-        private int _renderCount;
-        protected override void OnAfterRender(bool firstRender)
-        {
-            Console.WriteLine($"{this.GetType().Name} - Render {_renderCount}");
-            _renderCount++;
-
-            _shouldRender = false;
-        }
+        protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
         public async Task OnSelectConfigNavMenu(ConfigTemplateNavMenu configNavMenu) {
             await SelectConfigNavMenuCallback.InvokeAsync(_currentMenu = configNavMenu);
 
