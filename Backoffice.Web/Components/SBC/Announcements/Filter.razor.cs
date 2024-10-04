@@ -72,6 +72,12 @@ namespace Backoffice.Web.Components.SBC.Announcements
             await OnInitCallback.InvokeAsync(_filterModel);
         }
 
+        //private int ctr = 0;
+        //protected override async Task OnParametersSetAsync()
+        //{
+        //    ctr++;
+        //}
+
         public async Task OnClientCheckboxClickEvent(string selectedItems)
         {
             _filterModel.ClientCodes = selectedItems;

@@ -52,10 +52,10 @@
                                                     </td>
                                                     <td class="py-2">
                                                         <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
-                                                            @foreach (var x in item.ClientCodes)
+                                                            @foreach (var x in item.Clients)
                                                             {
                                                                 <div class="tl-fixture m-1 py-1 rounded-2">
-                                                                    <span class="px-3">@x</span>
+                                                                    <span class="px-3">@x.ClientCode</span>
                                                                 </div>
                                                             }
                                                         </div>

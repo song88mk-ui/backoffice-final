@@ -1,0 +1,61 @@
+﻿<div class="modal-body">
+    @if (_isPreload)
+    {
+        <div class="col-md-12">
+            <div class="mt-4 mx-3">
+                <Preloader />
+            </div>
+        </div>
+    }
+    else
+    {
+        <EditForm EditContext="EditContext">
+            <div class="business-container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- title here -->
+                        <h6 class="title fw-bold ps-2 py-1">Title</h6>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="businessNameField" class="form-label">The title of your announcement</label>
+                                <input type="text" class="form-control" id="businessNameField" placeholder="Enter title" @bind-value="_announcement.Title" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- title here -->
+                        <h6 class="title fw-bold ps-2 py-1">Start Date</h6>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="businessNameField" placeholder="Enter start date" @bind-value="_announcement.StartDate" />
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="businessNameField" placeholder="Enter end date" @bind-value="_announcement.EndDate" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </EditForm>
+    }
+</div>
+<div class="modal-footer">
+    @if (_alerts != null && _alerts.Any())
+    {
+        <div class="col-md-8">
+            @foreach (var alert in _alerts)
+            {
+                <AlertMessage AlertModel="@alert" />
+            }
+        </div>
+    }
+    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled=@_isPreload>@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled=@_isPreload>@TranslationState.GetValue("Save")</button>
+</div>

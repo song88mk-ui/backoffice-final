@@ -1,6 +1,8 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Components.SBC.Announcements;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -56,15 +58,33 @@ namespace Backoffice.Web.Pages.SBC
 
         public async Task OnFilterEvent(AnnouncementsFilterModel model)
         {
-            MetaData = new MetaData
+            if(model.IsAddAnnouncement)
             {
-                CurrentPage = 1,
-                PageSize = 25,
-                TotalCount = 0,
-                TotalPages = 1,
-            };
+                var parameters = new ModalParameters();
 
-            await GetContent(model);
+                parameters.Add("ModalClass", "modal-center modal-show");
+                parameters.Add("ModalDialogClass", "modal-xl");
+                parameters.Add("Client", new ClientListResponse.Client());
+                parameters.Add("IsEdit", false);
+
+                var options = new ModalOptions();
+                ModalService.Open<CreateOrUpdateModal>("Create Client", parameters, options);
+
+                model.IsAddAnnouncement = false;
+            }
+            else
+            {
+                MetaData = new MetaData
+                {
+                    CurrentPage = 1,
+                    PageSize = 25,
+                    TotalCount = 0,
+                    TotalPages = 1,
+                };
+
+                await GetContent(model);
+            }
+
         }
 
         public async Task SelectPage(int page)
@@ -113,12 +133,14 @@ namespace Backoffice.Web.Pages.SBC
             {
                 Announcements = response.Result.Announcements.Select((s, index) => new Models.Announcements
                 {
-                    ClientCodes = s.ClientCodes.Where(c => model.UserClientCodes.Contains(c)).ToList(),
+                    Id = s.Id,
+                    Clients = s.Clients.Where(c => model.UserClientCodes.Contains(c.ClientCode)).ToList(),
                     EndDate = s.EndDate,
                     StartDate = s.StartDate,
                     IsActive = s.IsActive,
                     Message = s.Message,
                     Title = s.Title,
+                    LanguageCode = s.LanguageCode,
                     Row = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
                 }).ToList()
             };

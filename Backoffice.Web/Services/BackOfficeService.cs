@@ -1135,6 +1135,42 @@ namespace Backoffice.Web.Services
                 };
             }
         }
+
+        public async Task<BaseResponse<AddOrUpdateAnnouncementResponse>> AddOrUpdateAnnouncements(AddOrUpdateAnnouncementRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var Model = await _httpClient.PostAsync($"sportsbook/settings/announcements/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"), cancellationToken);
+
+                if (Model.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<AddOrUpdateAnnouncementResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<AddOrUpdateAnnouncementResponse>();
+                else
+                {
+                    if (Model.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<AddOrUpdateAnnouncementResponse>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<AddOrUpdateAnnouncementResponse>();
+                    else
+                    {
+                        return new BaseResponse<AddOrUpdateAnnouncementResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<AddOrUpdateAnnouncementResponse>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
         #endregion
 
         #region Bet Settlement
