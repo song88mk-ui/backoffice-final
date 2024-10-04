@@ -41,7 +41,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         protected override void OnParametersSet()
         {
-            var hasChange = false;
+            //var hasChange = true;
 
             if (_init || _languageCode != TranslationState.ActiveLanguageCode)
             {
@@ -52,7 +52,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 _assignedTitle = TranslationState.GetValue("Assigned");
                 _unAssignedTitle = TranslationState.GetValue("UnAssigned");
 
-                hasChange = true;
+                //hasChange = true;
             }
 
             if (_init || ParamModel.MyTemplatesCount != _myTemplateCount || ParamModel.AssignedLeaguesCount != _assignedCount || ParamModel.UnAssignedLeaguesCount != _unAssignedCount)
@@ -61,14 +61,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 _assignedCount = ParamModel.AssignedLeaguesCount;
                 _unAssignedCount = ParamModel.UnAssignedLeaguesCount;
 
-                hasChange = true;
+                //hasChange = true;
             }
 
-            _init = false;
-            _shouldRender = hasChange;
+            //_init = false;
+            //_shouldRender = hasChange;
         }
-        protected override bool ShouldRender() => _shouldRender;
-        protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
+        //protected override bool ShouldRender() => _shouldRender;
+        //protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
         public async Task OnSelectConfigNavMenu(ConfigTemplateNavMenu configNavMenu) {
             await SelectConfigNavMenuCallback.InvokeAsync(_currentMenu = configNavMenu);
 
