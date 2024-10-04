@@ -40,7 +40,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            Console.WriteLine($"{this.GetType().Name} - Start");
             await PageState.AuthenticateAccessEvent.InvokeAsync();
             _selectedConfigNavMenu = ConfigTemplateNavMenu.MyTemplates;
             _scopes = new List<SelectListItemModel<string>>()
@@ -70,7 +69,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async void Init()
         {
-            Console.WriteLine($"{this.GetType().Name} - Init");
             CalculateConfigCounts();
 
             _isPreleader = true;

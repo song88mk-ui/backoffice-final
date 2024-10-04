@@ -106,14 +106,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _shouldRender;
         protected override bool ShouldRender() => _shouldRender;
 
-        private int _renderCount;
-        protected override void OnAfterRender(bool firstRender)
-        {
-            Console.WriteLine($" config-template {_renderCount}");
-            _renderCount++;
-
-            _shouldRender = false;
-        }
+        protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
 
 
         public void OnEditTemplateClickEvent(ConfigTemplateModel configTemplateModel) => NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{configTemplateModel.Id}");
