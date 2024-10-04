@@ -656,21 +656,21 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        public async Task<BaseResponse<AddOrUpdateAnnouncementResponse>> AddOrUpdateAnnouncements(AddOrUpdateAnnouncementRequest request)
+        public async Task<BaseResponse<AnnouncementResponse>> AddOrUpdateAnnouncements(AddOrUpdateAnnouncementRequest request)
         {
             try
             {
                 var response = await GetHttpClient("HK").PostAsync($"v1/client/announcements/post", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
-                    return JsonConvert.DeserializeObject<BaseResponse<AddOrUpdateAnnouncementResponse>>(await response.Content.ReadAsStringAsync());
+                    return JsonConvert.DeserializeObject<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync());
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonConvert.DeserializeObject<BaseResponse<AddOrUpdateAnnouncementResponse>>(await response.Content.ReadAsStringAsync());
+                        return JsonConvert.DeserializeObject<BaseResponse<AnnouncementResponse>>(await response.Content.ReadAsStringAsync());
                     else
                     {
-                        return new BaseResponse<AddOrUpdateAnnouncementResponse>
+                        return new BaseResponse<AnnouncementResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -680,7 +680,7 @@ namespace Backoffice.API.Repositories
             }
             catch (Exception ex)
             {
-                return new BaseResponse<AddOrUpdateAnnouncementResponse>()
+                return new BaseResponse<AnnouncementResponse>()
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
