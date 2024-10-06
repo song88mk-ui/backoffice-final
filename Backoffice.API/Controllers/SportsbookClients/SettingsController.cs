@@ -208,7 +208,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
 
         [HttpPost("announcements/post")]
         public async Task<IActionResult> AddOrUpdateAnnouncements([FromBody] AddOrUpdateAnnouncementRequest request)
-        {//
+        {
             var result = await _platformRepository.AddOrUpdateAnnouncements(request);
 
             switch (result.StatusCode)
