@@ -1,4 +1,8 @@
-﻿
+﻿.dropdown .btn {
+    background: transparent;
+    color: #212529;
+}
+
 button.form-select {
     background-color: #fff;
     text-align: left;

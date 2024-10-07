@@ -3,6 +3,9 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
+using System.Diagnostics.Metrics;
+using System.Diagnostics;
 
 namespace Backoffice.Web.Components.Common
 {
@@ -14,13 +17,17 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public EventCallback<string> OnClickEventCallback { get; set; }
         [Parameter] public string DropdownName { get; set; }
         [Parameter] public bool Multiple { get; set; }
+        [Parameter] public string ImageClass { get; set; }
 
         #endregion
 
         #region Fields
+
+        private bool _shouldRender = true;
         private int _selectedCount;
         private string _selectedName;
         private List<SelectListItemWithCheckboxModel<string>> _items;
+
         #endregion
 
         #region Method
@@ -43,6 +50,18 @@ namespace Backoffice.Web.Components.Common
             }
         }
 
+        protected override async Task OnParametersSetAsync()
+        {
+            _shouldRender = false;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            _shouldRender = false;
+        }
+
+        protected override bool ShouldRender() => _shouldRender;
+
         public async Task OnCheckboxClickEvent(Dictionary<string, string> items)
         {
             _selectedName = string.Empty;
@@ -59,11 +78,20 @@ namespace Backoffice.Web.Components.Common
         }
 
 
-        public async Task OnCheckboxChangedEvent(ChangeEventArgs e)
+        public async Task OnCheckboxChangedEvent(SelectListItemWithCheckboxModel<string> item)
         {
-            _selectedName = e.Value.ToString();
+            _selectedName = item.Value.ToString();
 
             await OnClickEventCallback.InvokeAsync(_selectedName);
+        }
+
+        #endregion
+
+        #region Utilities
+
+        public bool ValidateParameters()
+        {
+            return true;
         }
 
         #endregion

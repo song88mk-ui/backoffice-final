@@ -25,11 +25,26 @@
     }
     else
     {
-        <select class="form-control form-select mr-sm-2" @onchange="OnCheckboxChangedEvent">
+        <button class="btn btn-secondary @(_items.Any() ? "dropdown-toggle" : "") d-flex align-items-center" type="button" id="dropdownLanguage" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="d-flex">
+                <i class="@($"ico-flag flag-{_selectedName.ToString().ToLower()}") me-2" aria-hidden="true"></i>
+                <span>@_selectedName</span>
+            </span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownLanguage">
             @foreach (var item in _items)
             {
-                <option value="@item.Value" selected=@(item.Value == _selectedName)>@TranslationState.GetValue(item.Name)</option>
+                <button class="w-100 dropdown-item position-relative d-flex align-items-center" @onclick="() => OnCheckboxChangedEvent(item)">
+                    <span class="d-flex">
+                        @if (!string.IsNullOrEmpty(ImageClass))
+                        {
+                            <i class="@($"{ImageClass}{item.Name.ToLower()}") me-2" aria-hidden="true" />
+                        }
+                        @item.Value
+                    </span>
+                </button>
             }
-        </select>
+        </ul>
+
     }
 </div>

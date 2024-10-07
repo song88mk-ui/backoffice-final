@@ -64,7 +64,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
             var clients = ModalParameters.TryGet <List<SelectListItemWithCheckboxModel<string>>>("Clients");
             _isEdit = ModalParameters.TryGet<bool>("IsEdit");
-            _languageCodes = Enum.GetValues<LanguageCode>().Select(s => s).ToList();
+            _languageCodes = _isEdit ? new List<LanguageCode> { _announcement.LanguageCode } : Enum.GetValues<LanguageCode>().Select(s => s).ToList();
             _selectedLanguage = _announcement.LanguageCode;
 
             _announcementMessages = new Dictionary<LanguageCode, string>();
@@ -88,17 +88,6 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
             EditContext = new EditContext(_announcement);
         }
-
-        //protected override async Task OnAfterRenderAsync(bool firstRender)
-        //{
-        //    if (_initSelect)
-        //    {
-        //        JSRuntime.InvokeVoidAsync("initSelect2", $".{_selectClass}", "OnClientChangedEvent");
-        //        //await JSRuntime.InvokeVoidAsync("enableSelect2", $".{_selectClass}");
-
-        //        _initSelect = false;
-        //    }
-        //}
 
         public async Task OnStatusClickEvent()
         {
@@ -225,6 +214,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
                 if(_isEdit)
                 {
+                    _announcement.Message = _announcementMessages[_announcement.LanguageCode].ToString();
                     _announcement.Clients = _selectedClientCodes.Select(s => new AnnouncementResponse.ClientInfo { ClientCode = s }).ToList();
                 }
 

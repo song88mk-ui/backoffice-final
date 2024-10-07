@@ -16,7 +16,14 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         [Parameter] public EventCallback<AnnouncementsFilterModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<AnnouncementsFilterModel> OnFilterCallback { get; set; }
-        
+
+        #endregion
+
+        #region Fields
+
+        private bool _init;
+        private bool _shouldRender = true;
+
         private SearchFormModel _searchForm;
         private AnnouncementsFilterModel _filterModel;
         private List<SelectListItemWithCheckboxModel<string>> _clients;
@@ -28,6 +35,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         protected override async Task OnInitializedAsync()
         {
+            _init = true;
             _filterModel = new AnnouncementsFilterModel();
 
             _searchForm = new SearchFormModel()
@@ -43,7 +51,6 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 IsChecked = true
             }).ToList();
             _filterModel.LanguageCode = _languageCodes.FirstOrDefault()?.Value ?? string.Empty;
-
 
             var clients = (await BackofficeService.GetClients()).Result;
 
@@ -70,13 +77,23 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
             _filterModel.Search = string.Empty;
             await OnInitCallback.InvokeAsync(_filterModel);
+
         }
 
-        //private int ctr = 0;
-        //protected override async Task OnParametersSetAsync()
-        //{
-        //    ctr++;
-        //}
+        protected override async Task OnParametersSetAsync()
+        {
+            _shouldRender = _init && _clients != null;
+
+            if(_clients != null)
+                _init = false;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            _shouldRender = false;
+        }
+
+        protected override bool ShouldRender() => _shouldRender;
 
         public async Task OnClientCheckboxClickEvent(string selectedItems)
         {
