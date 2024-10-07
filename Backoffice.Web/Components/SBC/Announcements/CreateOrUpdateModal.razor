@@ -84,13 +84,34 @@
                     <div class="col-md-12">
                         <div class="row mb-3">
                             <div class="col">
-                                <select id="select-@_announcement.Id" class="@_selectClass form-select d-block" multiple="multiple">
-                                    @foreach (var cc in _clientCodes)
-                                    {
-                                        <option value="@cc" selected=@(_announcement.Clients.Any(c => c.ClientCode == cc))>@cc</option>
-                                    }
-                                </select>
+                                @if (_clients != null)
+                                {
+                                    <Dropdown DropdownName="Clients" OnClickEventCallback="OnClientCheckboxClickEvent" Items="_clients" Multiple=true />
+                                }
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="title fw-bold ps-2 py-1">Language</h6>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row mb-3">
+                            @foreach (var language in _languageCodes)
+                            {
+                                <div class="col">
+                                    @if (_selectedLanguage == language)
+                                    {
+                                        <input type="radio" class="btn-check" name="currencyOptions" id="@language" @onchange="() => OnLanguageClicked(language)" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="radio" class="btn-check" name="currencyOptions" id="@language" @onchange="() => OnLanguageClicked(language)" />
+                                    }
+                                    <label class="btn modalTab" for="@language">@language</label>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -102,7 +123,7 @@
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="messageField" class="form-label">Enter the message of your announcement</label>
-                                <input type="text" class="form-control" id="messageField" placeholder="Enter the message of your announcement" @bind-value="_announcement.Message" multiple />
+                                <input type="text" class="form-control" id="messageField" placeholder="Enter the message of your announcement" @bind-value="_announcementMessages[_selectedLanguage]" multiple />
                             </div>
                         </div>
                     </div>

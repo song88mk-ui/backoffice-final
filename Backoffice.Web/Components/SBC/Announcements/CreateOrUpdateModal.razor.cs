@@ -7,9 +7,7 @@ using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.JSInterop;
 using Serilog;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
 namespace Backoffice.Web.Components.SBC.Announcements
 {
@@ -17,7 +15,6 @@ namespace Backoffice.Web.Components.SBC.Announcements
     {
         #region Properties
 
-        [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
@@ -25,21 +22,24 @@ namespace Backoffice.Web.Components.SBC.Announcements
         [CascadingParameter] public CustomModal Modal { get; set; }
 
         private EditContext EditContext { get; set; }
-        private static List<string> SelectedClientCodes { get; set; }
+        
         #endregion
 
         #region Fields
+
         private bool _isEdit;
         private bool _isPreload;
-        private bool _initSelect;
-        private string _selectClass;
         private decimal _opacity;
+        private LanguageCode _selectedLanguage;
+
         private List<AlertModel> _alerts;
         private CancellationTokenSource _cts;
+        private List<LanguageCode> _languageCodes;
         private Models.Announcements _announcement;
         private Models.Announcements _prevAnnouncement;
-        private List<string> _clientCodes;
+        private List<SelectListItemWithCheckboxModel<string>> _clients;
         private Dictionary<LanguageCode, string> _announcementMessages;
+        private List<string> _selectedClientCodes;
 
         #endregion
 
@@ -48,9 +48,6 @@ namespace Backoffice.Web.Components.SBC.Announcements
         protected override async Task OnInitializedAsync()
         {
             _isPreload = false;
-            _initSelect = true;
-            
-            _selectClass = "client-code-select";
 
             _alerts = new List<AlertModel>();
             _announcement = ModalParameters.TryGet<Models.Announcements>("Announcement");
@@ -64,26 +61,38 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 StartDate = _announcement.StartDate,
                 EndDate = _announcement.EndDate,
             };
-            _clientCodes = ModalParameters.TryGet<List<string>>("ClientCodes");
+
+            _clients = ModalParameters.TryGet <List<SelectListItemWithCheckboxModel<string>>>("Clients");
             _isEdit = ModalParameters.TryGet<bool>("IsEdit");
+            _languageCodes = Enum.GetValues<LanguageCode>().Select(s => s).ToList();
 
             _announcementMessages = new Dictionary<LanguageCode, string>();
-            _announcementMessages[_announcement.LanguageCode] = _announcement.Message ?? string.Empty;
+
+            foreach(var language in _languageCodes)
+            {
+                if(language == _announcement.LanguageCode)
+                    _announcementMessages[language] = _announcement.Message ?? string.Empty;
+                else
+                    _announcementMessages[language] = string.Empty;
+            }
+
+            _selectedLanguage = _announcement.LanguageCode;
 
             EditContext = new EditContext(_announcement);
-            SelectedClientCodes = _announcement.Clients.Select(s => s.ClientCode).ToList();
+            _selectedClientCodes = _isEdit ? _announcement.Clients.Select(s => s.ClientCode).ToList() 
+                : _clients.Where(s => s.IsChecked).Select(s => s.Value).ToList();
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (_initSelect)
-            {
-                JSRuntime.InvokeVoidAsync("initSelect2", $".{_selectClass}", "OnClientChangedEvent");
-                //await JSRuntime.InvokeVoidAsync("enableSelect2", $".{_selectClass}");
+        //protected override async Task OnAfterRenderAsync(bool firstRender)
+        //{
+        //    if (_initSelect)
+        //    {
+        //        JSRuntime.InvokeVoidAsync("initSelect2", $".{_selectClass}", "OnClientChangedEvent");
+        //        //await JSRuntime.InvokeVoidAsync("enableSelect2", $".{_selectClass}");
 
-                _initSelect = false;
-            }
-        }
+        //        _initSelect = false;
+        //    }
+        //}
 
         public async Task OnStatusClickEvent()
         {
@@ -159,7 +168,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     });
                 }
 
-                if (string.IsNullOrEmpty(_announcement.Message))
+                if (!_announcementMessages.Any(m => !string.IsNullOrEmpty(m.Value)))
                 {
                     _alerts.Add(new AlertModel
                     {
@@ -179,7 +188,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     });
                 }
 
-                if (!SelectedClientCodes.Any())
+                if (!_selectedClientCodes.Any())
                 {
                     _alerts.Add(new AlertModel
                     {
@@ -196,8 +205,6 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 }
 
                 var token = _cts.Token;
-                //TODO: logic to assign list of Messages
-                _announcementMessages[_announcement.LanguageCode] = _announcement.Message ?? string.Empty;
 
                 var request = new AddOrUpdateAnnouncementRequest
                 {
@@ -206,13 +213,13 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     StartDate = _announcement.StartDate,
                     EndDate = _announcement.EndDate,
                     IsActive = _announcement.IsActive,
-                    AnnouncementMessages = _announcementMessages.Select(s => new AnnouncementMessage { LanguageCode = s.Key, Message = s.Value }).ToList(),
-                    ClientCodes = SelectedClientCodes
+                    AnnouncementMessages = _announcementMessages.Where(m => !string.IsNullOrEmpty(m.Value)).Select(s => new AnnouncementMessage { LanguageCode = s.Key, Message = s.Value }).ToList(),
+                    ClientCodes = _selectedClientCodes
                 };
 
                 if(_isEdit)
                 {
-                    _announcement.Clients = SelectedClientCodes.Select(s => new AnnouncementResponse.ClientInfo { ClientCode = s }).ToList();
+                    _announcement.Clients = _selectedClientCodes.Select(s => new AnnouncementResponse.ClientInfo { ClientCode = s }).ToList();
                 }
 
                 var response = await BackofficeService.AddOrUpdateAnnouncements(request, token);
@@ -242,24 +249,17 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _isPreload = false;
         }
 
-        [JSInvokable("OnClientChangedEvent")]
-        public static void OnClientChangedEvent(SelectedModel model)
+        public async Task OnLanguageClicked(LanguageCode languageCode)
         {
-            var clientCode = model.SelectedOptionId;
+            if (_isPreload)
+                return;
 
-            if (model.IsSelect)
-            {
-                if (!SelectedClientCodes.Any(c => c == clientCode))
-                    SelectedClientCodes.Add(clientCode);
-            }
-            else
-            {
-                var client = SelectedClientCodes.FirstOrDefault(c => c == clientCode);
-                if (client != null)
-                {
-                    SelectedClientCodes.Remove(client);
-                }
-            }
+            _selectedLanguage = languageCode;
+        }
+
+        public async Task OnClientCheckboxClickEvent(string selectedItems)
+        {
+            _selectedClientCodes = selectedItems.Split(",").ToList();
         }
 
         public void Dispose()

@@ -40,3 +40,14 @@
 .modalSave {
     background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
 }
+
+.btn-check:checked + label {
+    border-bottom: solid 3px #E12E22;
+    color: black;
+}
+
+.modalTab {
+    box-shadow: none !important;
+    color: black;
+    border-radius: 0;
+}

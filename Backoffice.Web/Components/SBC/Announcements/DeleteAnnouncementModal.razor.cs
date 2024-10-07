@@ -65,20 +65,31 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     Message = $"Announcement {_announcement.Title} is successfully deleted."
                 };
 
+                var oldData = new
+                {
+                    Id = _announcement.Id,
+                    Message = _announcement.Message,
+                    LanguageCode = _announcement.LanguageCode,
+                    Title = _announcement.Title,
+                    StartDate = _announcement.StartDate,
+                    EndDate =_announcement.EndDate,
+                    Clients = _announcement.Clients
+                };
+
                 //activity log
                 await BackofficeService.AddActivityLog(new ActivityLogModel
                 {
                     Page = SportsbookClientPermission.SBC_Settings_Announcements.ToString().Replace("_", "."),
                     Payload = $"{_announcement.Id}.{_announcement.LanguageCode}",
                     Activity = Activity.Delete.ToString(),
-                    From = JsonSerializer.Serialize(_announcement),
+                    From = JsonSerializer.Serialize(oldData),
                     To = "-",
                     UserId = UserModel.Id,
                     UserName = UserModel.UserName
                 });
 
                 ModalService.Cancel();
-                //await Modal.OnSaveClickCallback.InvokeAsync();
+                await Modal.OnSaveClickCallback.InvokeAsync(_announcement.Id);
             }
             else
             {

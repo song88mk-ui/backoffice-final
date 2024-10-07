@@ -17,6 +17,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public MetaData MetaData { get; set; }
@@ -24,11 +25,12 @@ namespace Backoffice.Web.Pages.SBC
         #endregion
 
         #region Fields
+
         private CancellationTokenSource _cts;
         private AnnouncementsModel _model;
         private List<AlertModel> _alerts;
-        private List<string> _userClientCodes;
         private PageHeaderModel _pageHeaderModel;
+        private List<SelectListItemWithCheckboxModel<string>> _clients;
         private bool _isPreLoader = true;
         private decimal _opacity;
         #endregion
@@ -54,18 +56,35 @@ namespace Backoffice.Web.Pages.SBC
                 TotalPages = 100,
             };
 
+            var clients = (await BackofficeService.GetClients()).Result;
+
+            if (clients != null && clients.Clients.Any())
+            {
+                clients.Clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
+
+                _clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
+                {
+                    Value = s.ClientCode,
+                    Name = s.ClientName,
+                    IsChecked = true
+                }).ToList();
+            }
+            else
+            {
+                _clients = new List<SelectListItemWithCheckboxModel<string>>();
+            }
+
             await AuthenticateAccess.InvokeAsync();
         }
 
         public async Task OnInitEvent(AnnouncementsFilterModel model)
         {
-            _userClientCodes = model.UserClientCodes;
             await GetContent(model);
         }
 
         public async Task OnFilterEvent(AnnouncementsFilterModel model)
         {
-            if(model.IsAddAnnouncement)
+            if (model.IsAddAnnouncement)
             {
                 _alerts.Clear();
 
@@ -80,7 +99,7 @@ namespace Backoffice.Web.Pages.SBC
                     LanguageCode = LanguageCode.EN,
                     IsActive = true
                 });
-                parameters.Add("ClientCodes", model.UserClientCodes);
+                parameters.Add("Clients", _clients);
                 parameters.Add("IsEdit", false);
 
                 var options = new ModalOptions();
@@ -113,7 +132,7 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-l");
             parameters.Add("Announcement", model);
-            parameters.Add("ClientCodes", _userClientCodes);
+            parameters.Add("Clients", _clients);
             parameters.Add("IsEdit", true);
 
             var options = new ModalOptions();
@@ -141,13 +160,13 @@ namespace Backoffice.Web.Pages.SBC
             _opacity = _opacity == 1m ? 0.99m : 1m;
 
             var message = "Announcement successfully updated";
-            if (item.GetType() != typeof(bool))
+            if (item.GetType() == typeof(AnnouncementResponse))
             {
                 message = "Announcement successfully created";
 
                 var result = (AnnouncementResponse)item;
 
-                MetaData.TotalCount = MetaData.TotalCount + result.Announcements.Count;
+                MetaData.TotalCount = _model.Announcements.Count + result.Announcements.Count;
                 MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
 
                 _model.Announcements.AddRange(result.Announcements.Select((s, index) =>
@@ -161,10 +180,23 @@ namespace Backoffice.Web.Pages.SBC
                         LanguageCode = s.LanguageCode,
                         StartDate = s.StartDate,
                         EndDate = s.EndDate,
-                        Row = index + result.Announcements.Count + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
+                        Row = index + _model.Announcements.Count + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
                     }).ToList());
 
                 SetItemAction();
+            }
+            else if (item.GetType() == typeof(int))
+            {
+                message = "Announcement successfully deleted";
+
+                var announcement = _model.Announcements.FirstOrDefault(a => a.Id == (int)item);
+                if (announcement != null)
+                    _model.Announcements.Remove(announcement);
+
+
+                MetaData.TotalCount = _model.Announcements.Count;
+                MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
+
             }
 
             _alerts.Clear();
@@ -213,7 +245,7 @@ namespace Backoffice.Web.Pages.SBC
                 SearchText = model.Search
             }, token);
 
-            if (token.IsCancellationRequested) 
+            if (token.IsCancellationRequested)
                 return;
 
             MetaData.TotalCount = response.Result.Announcements.Count;
@@ -224,7 +256,7 @@ namespace Backoffice.Web.Pages.SBC
                 Announcements = response.Result.Announcements.Select((s, index) => new Models.Announcements
                 {
                     Id = s.Id,
-                    Clients = s.Clients.Where(c => model.UserClientCodes.Contains(c.ClientCode)).ToList(),
+                    Clients = s.Clients.Where(c => _clients.Select(s => s.Value).Contains(c.ClientCode)).ToList(),
                     EndDate = s.EndDate,
                     StartDate = s.StartDate,
                     IsActive = s.IsActive,
