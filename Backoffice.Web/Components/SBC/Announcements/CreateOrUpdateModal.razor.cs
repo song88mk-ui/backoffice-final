@@ -62,25 +62,31 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 EndDate = _announcement.EndDate,
             };
 
-            _clients = ModalParameters.TryGet <List<SelectListItemWithCheckboxModel<string>>>("Clients");
+            var clients = ModalParameters.TryGet <List<SelectListItemWithCheckboxModel<string>>>("Clients");
             _isEdit = ModalParameters.TryGet<bool>("IsEdit");
             _languageCodes = Enum.GetValues<LanguageCode>().Select(s => s).ToList();
+            _selectedLanguage = _announcement.LanguageCode;
 
             _announcementMessages = new Dictionary<LanguageCode, string>();
-
             foreach(var language in _languageCodes)
             {
-                if(language == _announcement.LanguageCode)
+                if(language == _selectedLanguage)
                     _announcementMessages[language] = _announcement.Message ?? string.Empty;
                 else
                     _announcementMessages[language] = string.Empty;
             }
 
-            _selectedLanguage = _announcement.LanguageCode;
+            _clients = clients.Select(s => new SelectListItemWithCheckboxModel<string>
+            {
+                Value = s.Value,
+                Name = s.Name,
+                IsChecked = _isEdit ? _announcement.Clients.Select(s => s.ClientCode).Contains(s.Value) : true,
+                IsSelectAll = s.IsSelectAll
+            }).ToList();
+
+            _selectedClientCodes =_clients.Where(c => c.IsChecked).Select(s => s.Value).ToList();
 
             EditContext = new EditContext(_announcement);
-            _selectedClientCodes = _isEdit ? _announcement.Clients.Select(s => s.ClientCode).ToList() 
-                : _clients.Where(s => s.IsChecked).Select(s => s.Value).ToList();
         }
 
         //protected override async Task OnAfterRenderAsync(bool firstRender)

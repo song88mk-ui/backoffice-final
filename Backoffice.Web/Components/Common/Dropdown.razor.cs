@@ -27,17 +27,19 @@ namespace Backoffice.Web.Components.Common
         protected override async Task OnInitializedAsync()
         {
             _items = Items;
-            _selectedCount = _items.Count;
-            _selectedName = _selectedCount > 0 ? string.Empty : _items?.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Name ?? string.Empty;
+
+            _selectedCount = _items?.Count(c => c.Value != "all" && c.IsChecked) ?? 0;
+            _selectedName = _selectedCount == 0 ? string.Empty : _items?.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Name ?? string.Empty;
 
             if(Multiple)
             {
-                _items.Insert(0, new SelectListItemWithCheckboxModel<string>
-                {
-                    Value = "all",
-                    Name = $"All {DropdownName}",
-                    IsChecked = true
-                });
+                if(!_items?.Any(i => i.Value == "all") ?? false)
+                    _items.Insert(0, new SelectListItemWithCheckboxModel<string>
+                    {
+                        Value = "all",
+                        Name = $"All {DropdownName}",
+                        IsChecked = true
+                    });
             }
         }
 

@@ -1,7 +1,7 @@
 ﻿<div class="content-filter mx-3">
     <div class="d-flex flex-row justify-content-between">
-        <div class="select-container d-flex">
-            <div class="me-4 w-100">
+        <div class="select-container d-flex w-75">
+            <div class="me-4 w-50">
                 <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                     <div class="input-group">
                         <span class="input-group-text">
@@ -11,13 +11,13 @@
                     </div>
                 </EditForm>
             </div>
-            <div class="me-4 w-100">
+            <div class="me-4 w-10">
                 @if (_clients != null)
                 {
                     <Dropdown DropdownName="Clients" OnClickEventCallback="OnClientCheckboxClickEvent" Items="_clients" Multiple=true />
                 }
             </div>
-            <div class="me-4 w-100">
+            <div class="me-4 w-00">
                 <Dropdown DropdownName="Languages" OnClickEventCallback="OnLanguageCheckboxClickEvent" Items="_languageCodes" Multiple=false />
             </div>
         </div>

@@ -12,11 +12,11 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
 
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+
         [Parameter] public EventCallback<AnnouncementsFilterModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<AnnouncementsFilterModel> OnFilterCallback { get; set; }
-        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
-
-
+        
         private SearchFormModel _searchForm;
         private AnnouncementsFilterModel _filterModel;
         private List<SelectListItemWithCheckboxModel<string>> _clients;
@@ -44,12 +44,23 @@ namespace Backoffice.Web.Components.SBC.Announcements
             }).ToList();
             _filterModel.LanguageCode = _languageCodes.FirstOrDefault()?.Value ?? string.Empty;
 
-            if (Clients != null && Clients.Any())
+
+            var clients = (await BackofficeService.GetClients()).Result;
+
+            if (clients != null && clients.Clients.Any())
             {
-                _clients = Clients;
+                clients.Clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
+
+                _clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
+                {
+                    Value = s.ClientCode,
+                    Name = s.ClientName,
+                    IsChecked = true
+                }).ToList();
 
                 var selectedClients = _clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
 
+                _filterModel.Clients = _clients;
                 _filterModel.ClientCodes = string.Join(",", selectedClients);
             }
             else

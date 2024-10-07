@@ -1,5 +1,4 @@
-﻿using Azure;
-using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -17,7 +16,6 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public MetaData MetaData { get; set; }
@@ -33,6 +31,7 @@ namespace Backoffice.Web.Pages.SBC
         private List<SelectListItemWithCheckboxModel<string>> _clients;
         private bool _isPreLoader = true;
         private decimal _opacity;
+
         #endregion
 
         #region Methods     
@@ -42,7 +41,7 @@ namespace Backoffice.Web.Pages.SBC
             _pageHeaderModel = new()
             {
                 Title = "Announcements",
-                IconClass = "ico ico-parlay-bonus"
+                IconClass = "ico ico-announcements"
             };
 
             _alerts = new List<AlertModel>();
@@ -56,29 +55,12 @@ namespace Backoffice.Web.Pages.SBC
                 TotalPages = 100,
             };
 
-            var clients = (await BackofficeService.GetClients()).Result;
-
-            if (clients != null && clients.Clients.Any())
-            {
-                clients.Clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
-
-                _clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
-                {
-                    Value = s.ClientCode,
-                    Name = s.ClientName,
-                    IsChecked = true
-                }).ToList();
-            }
-            else
-            {
-                _clients = new List<SelectListItemWithCheckboxModel<string>>();
-            }
-
             await AuthenticateAccess.InvokeAsync();
         }
 
         public async Task OnInitEvent(AnnouncementsFilterModel model)
         {
+            _clients = model.Clients;
             await GetContent(model);
         }
 
