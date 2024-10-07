@@ -39,6 +39,9 @@ namespace Backoffice.Web.States
 
         public string GetValue(string word)
         {
+            if (string.IsNullOrEmpty(word))
+                return word;
+
             var key = word.Replace(" ", "_").ToLower();
             var placeHolders = ExtractPlaceholders(ref key);
             var translated = Model.TryGetValue(key, out string? value) ? value : word;

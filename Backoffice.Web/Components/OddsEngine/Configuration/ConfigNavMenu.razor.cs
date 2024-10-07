@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public EventCallback<ConfigTemplateNavMenu> SelectConfigNavMenuCallback { get; set; }
         [Parameter] public EventCallback SelectCopyClientCallback { get; set; }
 
-        private ConfigTemplateNavMenu _currentMenu { get; set; }
+        private ConfigTemplateNavMenu _currentMenu = (int)ConfigTemplateNavMenu.MyTemplates;
 
         private string _myTemplateTitle;
         private string _assignedTitle;
@@ -28,21 +28,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private string _calculatingText;
 
         private LanguageCode _languageCode;
-        private bool _init;
-        private bool _shouldRender;
+        private bool _init = true;
+        private bool _shouldRender = true;
         #endregion
 
         #region Methods
-        protected override void OnInitialized()
-        {
-            _currentMenu = (int)ConfigTemplateNavMenu.MyTemplates;
-            _init = true;
-        }
 
         protected override void OnParametersSet()
         {
-            //var hasChange = true;
-
             if (_init || _languageCode != TranslationState.ActiveLanguageCode)
             {
                 _languageCode = TranslationState.ActiveLanguageCode;
@@ -52,7 +45,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 _assignedTitle = TranslationState.GetValue("Assigned");
                 _unAssignedTitle = TranslationState.GetValue("UnAssigned");
 
-                //hasChange = true;
+                _shouldRender = true;
             }
 
             if (_init || ParamModel.MyTemplatesCount != _myTemplateCount || ParamModel.AssignedLeaguesCount != _assignedCount || ParamModel.UnAssignedLeaguesCount != _unAssignedCount)
@@ -61,15 +54,15 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 _assignedCount = ParamModel.AssignedLeaguesCount;
                 _unAssignedCount = ParamModel.UnAssignedLeaguesCount;
 
-                //hasChange = true;
+                _shouldRender = true;
             }
 
-            //_init = false;
-            //_shouldRender = hasChange;
+            _init = false;
         }
-        //protected override bool ShouldRender() => _shouldRender;
-        //protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
-        public async Task OnSelectConfigNavMenu(ConfigTemplateNavMenu configNavMenu) {
+        protected override bool ShouldRender() => _shouldRender;
+        protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
+        public async Task OnSelectConfigNavMenu(ConfigTemplateNavMenu configNavMenu)
+        {
             await SelectConfigNavMenuCallback.InvokeAsync(_currentMenu = configNavMenu);
 
             _shouldRender = true;

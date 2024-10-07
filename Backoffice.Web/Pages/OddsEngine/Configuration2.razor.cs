@@ -12,24 +12,24 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class Configuration2 : IDisposable
     {
         #region Properties
-        [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IBackofficeService BackofficeService { get; set; }
+        [Inject] private ITradingService TradingService {  get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; } // move to import with _ prefix
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
-        [Parameter] public string Region { get; set; } = "hk";
+        [Parameter] public string Region { get; set; } = "hk"; // to be remove
 
         [Parameter]
         [SupplyParameterFromQuery(Name = "M")]
         public string? QueryMessage { get; set; }
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
-        public List<BreadcrumbModel> Breadcrumbs { get; set; }
 
         #endregion
         private ConfigContentFilterModel _contentFilterModel = new ConfigContentFilterModel();
         private ConfigTemplateNavMenu _selectedConfigNavMenu;
         private ConfigNavMenuParamModel _navMenuParamModel;
+        private List<BreadcrumbModel> _breadcrumbs;
         private bool _isPreleader = true;
         private AlertModel _alertModel;
 
@@ -54,7 +54,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 UnAssignedLeaguesCount = -1
             };
 
-            Breadcrumbs = new List<BreadcrumbModel>()
+            _breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
                 {
