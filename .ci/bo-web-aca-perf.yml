@@ -19,7 +19,6 @@ trigger:
 variables:
   SLACK_URL: "https://hooks.slack.com/services/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"  # ci-cd
   DOCKER_BUILDKIT: 1
-  ContainerRegistryConnection: 'd9ff7663-ca22-49ae-be23-83dd308dcef4'
   ImageRepository: bo-web-perf
   ContainerRegistry: song88.azurecr.io
   AzureConnection: azurerm-song88-prod-service
@@ -50,7 +49,7 @@ stages:
             displayName: Login to ACR
             inputs:
               command: login
-              containerRegistry: $(ContainerRegistryConnection)
+              containerRegistry: $(ContainerRegistry)
 
           - task: Docker@2
             displayName: Docker Build
