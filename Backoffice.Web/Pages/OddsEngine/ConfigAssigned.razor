@@ -126,12 +126,9 @@
                 {
                     @if (_configClients != null && _configClients.Any())
                     {
-                        foreach (var config in _configClients)
-                        {
-                            var index = (_configClients.IndexOf(config) + 1) + ((_metaData.CurrentPage * _metaData.PageSize) - _metaData.PageSize);
-
-                            <ConfigStateRow State="_state" Index="@index" Config="config" ItemSelectionChangedEvent="@OnConfigSelectionChanged" />
-                        }
+                        <Virtualize Items="_configClients" Context="config" SpacerElement="tr">
+                            <ConfigStateRow State="_state" Config="config" ItemSelectionChangedEvent="@OnConfigSelectionChanged" />
+                        </Virtualize>
                     }
                     else
                     {

@@ -10,6 +10,7 @@ namespace Backoffice.Web.Services
     public interface IBackofficeService
     {
         string Page { get; set; }
+        LanguageCode LanguageCode { get; set; }
         Task<BaseResponse<bool>> GetMaintenance();
         Task<BaseResponse<bool>> SetMaintenance(bool request);
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);

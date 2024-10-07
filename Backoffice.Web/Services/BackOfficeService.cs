@@ -20,6 +20,7 @@ namespace Backoffice.Web.Services
     {
         #region Fields
         public string Page { get; set; } = string.Empty;
+        public LanguageCode LanguageCode { get; set; } = LanguageCode.EN;
         private HttpClient _client;
         private HttpClient _httpClient
         {
@@ -32,8 +33,14 @@ namespace Backoffice.Web.Services
                 {
                     _client.DefaultRequestHeaders.Remove("x-page");
                 }
+                if(_client.DefaultRequestHeaders.Contains("x-language-code"))
+                    _client.DefaultRequestHeaders.Remove("x-language-code");
+
                 if (!string.IsNullOrEmpty(Page))
                     _client.DefaultRequestHeaders.Add("x-page", Page);
+
+                    _client.DefaultRequestHeaders.Add("x-language-code", LanguageCode.ToString());
+
 
                 return _client;
             }

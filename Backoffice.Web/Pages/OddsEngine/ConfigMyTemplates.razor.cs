@@ -13,9 +13,6 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class ConfigMyTemplates : IDisposable
     {
         #region Properties
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackofficeService { get; set; }
-        [Inject] private NavigationManager NavigationManager { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
@@ -28,34 +25,25 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isPreloader;
         private int _selectedSportId;
         private int _selectedScopeId;
-        private SearchFormModel _searchForm;
+        private SearchFormModel _searchForm = new();
         private AlertModel _alertModel;
 
-        private string _pageTitle;
+        private string _pageTitle = "My Templates";
         private List<BreadcrumbModel> _breadcrumbs;
-        private string _region;
-        private List<SelectListItemWithCheckboxModel<string>> _clients;
-        private List<SelectListItemModel<string>> _sports;
-        private List<SelectListItemModel<string>> _scopes;
+        private List<SelectListItemWithCheckboxModel<string>> _clients = new();
+        private List<SelectListItemModel<string>> _sports = new();
+        private List<SelectListItemModel<string>> _scopes = new();
 
         private List<ConfigMyTemplateModel>? _configTemplates = null;
 
         private CancellationTokenSource _cancellationToken;
-
+        private LanguageCode _languageCode;
+        private bool _init = true;
+        private bool _shouldRender = true;
         #endregion
 
         #region Methods
-        protected override async Task OnInitializedAsync()
-        {
-            _searchForm = new();
-            _clients = new();
-            _sports = new();
-            _scopes = new();
-
-            _isPreloader = true;
-            _pageTitle = "My Templates";
-
-            _breadcrumbs = new List<BreadcrumbModel>()
+        protected override void OnInitialized() => _breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
                 {
@@ -64,48 +52,38 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
-        }
         protected override async Task OnParametersSetAsync()
         {
-            var hasChange = false;
+            _shouldRender = ValidateParameters();
 
-            if (FilterModel.Region != _region)
+            if (_shouldRender)
             {
-                _region = FilterModel.Region;
-                hasChange = true;
-            }
-
-            if (!_clients.SequenceEqual(FilterModel.Clients) || !_sports.SequenceEqual(FilterModel.Sports) || !_scopes.SequenceEqual(FilterModel.Scopes))
-            {
+                _languageCode = TranslationState.ActiveLanguageCode;
+                if(FilterModel?.Clients != null)
                 _clients = new List<SelectListItemWithCheckboxModel<string>>(FilterModel.Clients);
-                _sports = new List<SelectListItemModel<string>>(FilterModel.Sports);
-                _scopes = new List<SelectListItemModel<string>>(FilterModel.Scopes);
+                if (FilterModel?.Sports != null)
+                    _sports = new List<SelectListItemModel<string>>(FilterModel.Sports);
+                if (FilterModel?.Scopes != null)
+                    _scopes = new List<SelectListItemModel<string>>(FilterModel.Scopes);
 
                 _selectedSportId = -1;
                 _selectedScopeId = int.Parse(_scopes.FirstOrDefault()?.Value ?? "-1");
 
-                hasChange = true;
-            }
-
-            if (QueryMessage != null && !string.IsNullOrEmpty(QueryMessage))
-            {
                 _alertModel = new AlertModel();
                 _alertModel.Message = QueryMessage;
                 _alertModel.Status = AlertStatus.Success;
                 _alertModel.Opacity = 1.0m;
-            }
 
-            if (hasChange)
                 await LoadConfigTemplates();
+            }
         }
-        private bool _shouldRender;
         protected override bool ShouldRender() => _shouldRender;
-
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
+        private bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode || !_clients.SequenceEqual(FilterModel.Clients) || !_sports.SequenceEqual(FilterModel.Sports) || !_scopes.SequenceEqual(FilterModel.Scopes) || (QueryMessage != null && !string.IsNullOrEmpty(QueryMessage) && _alertModel.Message != QueryMessage);
 
 
-        public void OnEditTemplateClickEvent(ConfigTemplateModel configTemplateModel) => NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{configTemplateModel.Id}");
-        public void OnCopyTemplateClickEvent(ConfigTemplateModel configTemplateModel) => NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/copy/{configTemplateModel.Id}");
+        public void OnEditTemplateClickEvent(ConfigTemplateModel configTemplateModel) => _navigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{configTemplateModel.Id}");
+        public void OnCopyTemplateClickEvent(ConfigTemplateModel configTemplateModel) => _navigationManager.NavigateTo($"/hk/odds-engine/config-templates/copy/{configTemplateModel.Id}");
 
         public void OnLogsClickEvent()
         {
@@ -118,7 +96,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
 
-            ModalService.Open<ViewMyTemplatesLogs>("View Logs", parameters, options);
+            _modalService.Open<ViewMyTemplatesLogs>("View Logs", parameters, options);
         }
         public void OnCreateNewTemplateClickEvent()
         {
@@ -130,7 +108,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
 
-            ModalService.Open<CreateTemplateModal>($"Create Template", parameters, options);
+            _modalService.Open<CreateTemplateModal>($"Create Template", parameters, options);
         }
 
         public void OnModalClicked(ModalParameters parameters)
@@ -143,13 +121,13 @@ namespace Backoffice.Web.Pages.OddsEngine
                 switch (type)
                 {
                     case "ExportTemplateModal":
-                        ModalService.Open<ExportTemplateModal>($"Export Templates", parameters, options);
+                        _modalService.Open<ExportTemplateModal>($"Export Templates", parameters, options);
                         break;
                     case "ViewAssignedModal":
-                        ModalService.Open<ViewAssignedModal>($"View Assigned", parameters, options);
+                        _modalService.Open<ViewAssignedModal>($"View Assigned", parameters, options);
                         break;
                     case "DeleteTemplateModal":
-                        ModalService.Open<DeleteTemplateModal>($"Delete Template", parameters, options);
+                        _modalService.Open<DeleteTemplateModal>($"Delete Template", parameters, options);
                         break;
                 }
             }
@@ -183,7 +161,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             }
 
-            LoadConfigTemplates();
+            Task task = LoadConfigTemplates();
         }
 
         public async Task OnInputSearchEvent() => await LoadConfigTemplates();
@@ -206,14 +184,15 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (!_isPreloader)
             {
                 _isPreloader = true;
-                ComponentStateHasChanged();
+                _shouldRender = true;
+                await InvokeAsync(StateHasChanged);
             }
 
             try
             {
                 var token = _cancellationToken.Token;
 
-                var configTemplateResponse = await BackofficeService.GetConfigTemplate(
+                var configTemplateResponse = await _backofficeService.GetConfigTemplate(
                     _searchForm.SearchText,
                     _selectedSportId,
                     _selectedScopeId,
@@ -234,7 +213,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }).ToList() ?? new List<ConfigMyTemplateModel>();
 
                 _isPreloader = false;
-                ComponentStateHasChanged();
+                _shouldRender = true;
             }
             catch (TaskCanceledException)
             {
@@ -242,11 +221,5 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
 
         #endregion
-
-        private async void ComponentStateHasChanged()
-        {
-            _shouldRender = true;
-            await InvokeAsync(StateHasChanged);
-        }
     }
 }

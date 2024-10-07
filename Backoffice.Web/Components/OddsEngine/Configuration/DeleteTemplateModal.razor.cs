@@ -11,14 +11,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class DeleteTemplateModal : IDisposable
     {
         #region Properties
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-
-        //public ConfigTemplateModel ConfigTemplateModel { get; set; }
 
         #endregion
         private bool _isPreloader;
@@ -30,18 +26,18 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         protected override void OnInitialized()
         {
-            BackofficeService.Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", ".");
+            _backofficeService.Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", ".");
             _templateId = ModalParameters.TryGet<long>("ConfigTemplateId");
             _templateName = ModalParameters.TryGet<string>("ConfigTemplateName");
             _isReadOnly = ModalParameters.TryGet<bool>("IsReadOnly");
         }
 
-        public void OnCancelClickEvent() => ModalService.Cancel();
+        public void OnCancelClickEvent() => _modalService.Cancel();
 
         public async Task OnApplyClickEvent()
         {
             _isPreloader = true;
-            var response = await BackofficeService.DeleteConfigTemplate(_templateId);
+            var response = await _backofficeService.DeleteConfigTemplate(_templateId);
 
             if (response.StatusCode == StatusCode.Success)
             {
@@ -49,13 +45,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             }
 
             _isPreloader = false;
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
-        public void OnCloseClickEvent()
-        {
-            ModalService.Cancel();
-        }
+        public void OnCloseClickEvent() => _modalService.Cancel();
 
         public void Dispose()
         {

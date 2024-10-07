@@ -17,7 +17,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private EventCallback<AlertModel> OnCopyClientSettingsCallback { get; set; }
 
         private List<ClientInformationModel> Clients { get; set; }
-        private string Region { get; set; }
 
         private KeyValuePair<string, string> SelectedFromClient { get; set; }
         private KeyValuePair<string, string> SelectedToClient { get; set; }
@@ -27,8 +26,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             Clients = new List<ClientInformationModel>();
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback<AlertModel>>("OnCopyClientSettingsCallback");
-            Region = ModalParameters.TryGet<string>("Region").ToUpper();
-            TradingService.Region = Region.ToUpper();
 
             await Initialize();
         }
@@ -84,7 +81,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             parameters.Add("ToClient", Clients.FirstOrDefault(c => c.ClientCode == SelectedToClient.Key));
             parameters.Add("SelectedFromClient", SelectedFromClient);
             parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);
-            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<ConfirmCopyClientSettingsModal>($"Copy Client Settings", parameters);

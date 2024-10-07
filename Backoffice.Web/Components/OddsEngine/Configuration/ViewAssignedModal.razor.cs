@@ -10,8 +10,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class ViewAssignedModal : IDisposable
     {
         #region Properties
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackofficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
         #endregion
@@ -27,7 +25,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var configTemplateId = ModalParameters.TryGet<long>("ConfigTemplateId");
             _leagues = new List<ConfigClientModel>();
 
-            var assignedLeagues = await BackofficeService.GetConfigClient(ConfigState.Assigned, new ConfigTemplateLeagueRequest(), configTemplateId);
+            var assignedLeagues = await _backofficeService.GetConfigClient(ConfigState.Assigned, new ConfigTemplateLeagueRequest(), configTemplateId);
             if (assignedLeagues.StatusCode == StatusCode.Success)
             {
                 _leagues = assignedLeagues.Result?.ClientConfigs ?? new List<ConfigClientModel>();
@@ -36,7 +34,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _isPreloader = false;
         }
 
-        public void OnCloseClickEvent() => ModalService.Cancel();
+        public void OnCloseClickEvent() => _modalService.Cancel();
 
         public void Dispose()
         {

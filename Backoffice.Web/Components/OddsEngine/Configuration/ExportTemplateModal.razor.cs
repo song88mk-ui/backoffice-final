@@ -16,7 +16,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class ExportTemplateModal : IDisposable
     {
         #region Properties
-        [Inject] private IModalService ModalService { get; set; }
         [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
@@ -48,7 +47,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             await Task.Run(() => MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportOeConfigTemplate", $"r.bo.util.export", Guid.NewGuid().ToString()));
 
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         public void Dispose()

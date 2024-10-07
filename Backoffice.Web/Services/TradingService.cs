@@ -14,7 +14,7 @@ namespace Backoffice.Web.Services
 {
     public class TradingService : ITradingService, IDisposable
     {
-        public string Region { get; set; }
+        public string Region { get; set; } = "HK";
         private HttpClient _client;
         private HttpClient _httpClient
         {

@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Azure.Storage.Blobs.Models;
+using Backoffice.Shared.Enums;
 using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Config;
@@ -12,12 +13,8 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class Configuration2 : IDisposable
     {
         #region Properties
-        [Inject] private ITradingService TradingService {  get; set; }
-        [Inject] private IBackofficeService BackofficeService { get; set; } // move to import with _ prefix
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
-
-        [Parameter] public string Region { get; set; } = "hk"; // to be remove
 
         [Parameter]
         [SupplyParameterFromQuery(Name = "M")]
@@ -29,8 +26,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Fields
 
-        private ConfigTemplateNavMenu _selectedConfigNavMenu;
-
         private ConfigContentFilterModel _contentFilterModel = new ConfigContentFilterModel();
         private ConfigNavMenuParamModel _navMenuParamModel;
         private AlertModel _alertModel;
@@ -38,8 +33,14 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private List<BreadcrumbModel> _breadcrumbs;
         private List<SelectListItemModel<string>> _scopes;
+        private ConfigState _currentState;
+        private List<string> _userClientCodes = new();
+        private string? _queryMessage;
 
         private bool _isPreloader = true;
+        private bool _shouldRender = true;
+        private LanguageCode _languageCode;
+        private bool _init = true;
 
         #endregion
 
@@ -48,7 +49,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             await PageState.AuthenticateAccessEvent.InvokeAsync();
 
-            _selectedConfigNavMenu = ConfigTemplateNavMenu.MyTemplates;
             _scopes = new List<SelectListItemModel<string>>()
             {
                 new SelectListItemModel<string>() { Name = "Live", Value = ((int)Scope.Live).ToString() },
@@ -61,6 +61,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 UnAssignedLeaguesCount = -1
             };
 
+            SetCurrentState(ConfigTemplateNavMenu.MyTemplates);
+
             _breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
@@ -70,45 +72,45 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
-
-            Init();
         }
-
-        public async void Init()
+        protected override void OnParametersSet()
         {
-            CalculateConfigCounts();
+            _shouldRender = ValidateParameters();
 
-            _isPreloader = true;
-            _contentFilterModel = new ConfigContentFilterModel();
-            _contentFilterModel.Scopes = _scopes;
+            if (_shouldRender)
+            {
+                _userClientCodes = new(UserModel.ClientCodes);
+                _languageCode = TranslationState.ActiveLanguageCode;
+                _queryMessage = QueryMessage;
 
-            await Task.WhenAll(new[] {
-                Task.Run(async () => {_contentFilterModel.Clients = await LoadClients();}),
-                Task.Run(async () => { _contentFilterModel.Sports = await  LoadSports();})
-            });
+                Init();
+            }
 
-            _isPreloader = false;
-            await InvokeAsync(StateHasChanged);
+            _init = false;
         }
-        public void OnConfigNavMenuSelected(ConfigTemplateNavMenu configNavMenu) => _selectedConfigNavMenu = configNavMenu;
+
+        protected override bool ShouldRender() => _shouldRender;
+        protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
+        private bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode || !_userClientCodes.SequenceEqual(UserModel.ClientCodes) || _queryMessage != QueryMessage;
+
+        public void OnConfigNavMenuSelected(ConfigTemplateNavMenu configNavMenu) => SetCurrentState(configNavMenu);
 
         public void OnCopyClientSettings()
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-md");
-            parameters.Add("Region", Region);
             parameters.Add("OnCopyClientSettingsCallback", EventCallback.Factory.Create(this, (AlertModel alert) => OnCopyClientSettingsAlert(alert)));
 
             var options = new ModalOptions();
             ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
         }
 
-        public async Task OnCopyClientSettingsAlert(AlertModel alert)
+        public void OnCopyClientSettingsAlert(AlertModel alert)
         {
-            Init();
-
             _alertModel = alert;
+
+            Init();
         }
 
         public void OnNavMenuCallback() => CalculateConfigCounts();
@@ -122,6 +124,24 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Utilities
 
+        private async void Init()
+        {
+            CalculateConfigCounts();
+
+            _isPreloader = true;
+            _shouldRender = true;
+            _contentFilterModel = new ConfigContentFilterModel();
+            _contentFilterModel.Scopes = _scopes;
+
+            await Task.WhenAll(new[] {
+                Task.Run(async () => { _contentFilterModel.Clients = await LoadClients(); _shouldRender = true; }),
+                Task.Run(async () => { _contentFilterModel.Sports = await LoadSports(); _shouldRender = true;})
+            });
+
+            _isPreloader = false;
+            _shouldRender = true;
+            await InvokeAsync(StateHasChanged);
+        }
         private async void CalculateConfigCounts()
         {
             _cancellationTokenSource?.Cancel();
@@ -131,7 +151,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             await ExecuteWithCancellation(async () =>
             {
-                var response = await BackofficeService.GetTemplateConfigCount(token: token);
+                var response = await _backofficeService.GetTemplateConfigCount(token: token);
 
                 if (response.StatusCode == StatusCode.Success)
                     _navMenuParamModel.MyTemplatesCount = response.Result;
@@ -145,7 +165,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             await ExecuteWithCancellation(async () =>
             {
-                var response = await BackofficeService.GetTemplateConfigCount(ConfigState.Assigned.ToString(), token);
+                var response = await _backofficeService.GetTemplateConfigCount(ConfigState.Assigned.ToString(), token);
 
                 if (response.StatusCode == StatusCode.Success)
                     _navMenuParamModel.AssignedLeaguesCount = response.Result;
@@ -164,7 +184,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var attempt = 0;
                 while (attempt < 3)
                 {
-                    var response = await BackofficeService.GetTemplateConfigCount(ConfigState.UnAssigned.ToString(), token);
+                    var response = await _backofficeService.GetTemplateConfigCount(ConfigState.UnAssigned.ToString(), token);
 
                     if (response.StatusCode == StatusCode.Success)
                     {
@@ -204,7 +224,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async Task<List<SelectListItemModel<string>>> LoadSports()
         {
-            var response = await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString());
+            var response = await _tradingService.GetSportLookup(_languageCode.ToString());
 
             if (response.StatusCode != StatusCode.Success)
                 return new List<SelectListItemModel<string>>();
@@ -219,15 +239,15 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async Task<List<SelectListItemWithCheckboxModel<string>>> LoadClients()
         {
-            var response = await TradingService.GetClientList();
+            var response = await _tradingService.GetClientList();
 
             if (response.StatusCode != StatusCode.Success)
                 return new List<SelectListItemWithCheckboxModel<string>>();
 
             var clientsLookup = response.Result;
 
-            if (UserModel.ClientCodes.Any())
-                clientsLookup = clientsLookup.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+            if (_userClientCodes.Any())
+                clientsLookup = clientsLookup.Where(c => _userClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
             if (!clientsLookup.Any())
                 return new List<SelectListItemWithCheckboxModel<string>>();
@@ -249,6 +269,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                 });
 
             return result;
+        }
+        private void SetCurrentState(ConfigTemplateNavMenu menu)
+        {
+            _navMenuParamModel.SelectedNavMenu = menu;
+            _currentState = menu == ConfigTemplateNavMenu.Assigned ? ConfigState.Assigned : ConfigState.UnAssigned;
+            _shouldRender = true;
         }
         #endregion
     }

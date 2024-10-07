@@ -1384,12 +1384,12 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Config
+
         public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(string searchText, List<int> sportIds = null, List<int> scopeIds = null)
         {
             try
             {
                 var query = _backofficeContext.ConfigTemplate.AsNoTracking();
-
 
                 if (!string.IsNullOrEmpty(searchText))
                     query = query.Where(x => x.Name.ToLower().Contains(searchText.ToLower()));
@@ -1674,7 +1674,7 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<List<ConfigTemplateModel>>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
             }
         }
-        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1)
+        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1, LanguageCode langCode = LanguageCode.EN)
         {
             try
             {
@@ -1714,13 +1714,15 @@ namespace Backoffice.API.Repositories
 
                 if (payload != null && !string.IsNullOrEmpty(payload.SearchText))
                 {
-                    query = query.Where(x => x.ClientName.ToLower().Contains(payload.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(payload.SearchText.ToLower()));
+                    query = query.Where(x => x.ClientName.ToLower().Contains(payload.SearchText.ToLower()) || x.SegmentName.ToLower().Contains(payload.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(payload.SearchText.ToLower()));
                 }
 
                 if (query != null && query.Any())
                 {
                     isCompleteClient = clientList.Count() == allClientsCount;
                 }
+
+                var sportsTranslationLookup = GetSportsLookup(langCode);
 
                 switch (configState)
                 {
@@ -1732,7 +1734,7 @@ namespace Backoffice.API.Repositories
                             ClientCode = x.ClientCode,
                             ClientName = x.ClientName,
                             SportId = x.SportId,
-                            SportName = x.SportName,
+                            SportName = langCode == LanguageCode.EN ? x.SportName : sportsTranslationLookup.FirstOrDefault(c => c.SportId == x.SportId).SportName,
                             SegmentId = x.SegmentId,
                             SegmentName = x.SegmentName,
                             LeagueId = x.LeagueId,
@@ -2263,6 +2265,15 @@ namespace Backoffice.API.Repositories
             }
         }
 
+        private List<SportLookup>? GetSportsLookup(LanguageCode langCode)
+        {
+            if (langCode == LanguageCode.EN)
+                return null;
+
+            var cache = _memCache.GetCache($"sp-tr-{langCode.ToString().ToUpper()}", async () => await _tradingRepository.GetSportLookup(langCode.ToString().ToUpper()), 1);
+
+            return cache.Result?.Result?.SportLookup ?? null;
+        }
 
         private List<ActivityLogModel> FilterManualSettlementLogs(List<ActivityLogModel> activityLogs, ManualBetSettlementCallbackModel callbackModel)
         {

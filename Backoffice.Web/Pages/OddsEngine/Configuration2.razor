@@ -4,7 +4,7 @@
 
 @page "/hk/odds-engine/config-templates"
 
-<Breadcrumb Breadcrumbs="_breadcrumbs" Region="@Region" />
+<Breadcrumb Breadcrumbs="_breadcrumbs" />
 
 @if (_isPreloader)
 {
@@ -18,14 +18,14 @@ else
 
     <AlertMessage AlertClass="mx-3" AlertModel="_alertModel"></AlertMessage>
 
-    @if (_selectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
+    @switch (_navMenuParamModel.SelectedNavMenu)
     {
-        <ConfigMyTemplates FilterModel="_contentFilterModel" QueryMessage="@QueryMessage" OnStateHasChanged="OnNavMenuCallback" />
-    }
-    else if (_selectedConfigNavMenu == ConfigTemplateNavMenu.Assigned || _selectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
-    {
-        var state = _selectedConfigNavMenu == ConfigTemplateNavMenu.Assigned ? ConfigState.Assigned : ConfigState.UnAssigned;
-
-        <ConfigAssigned State="state" FilterModel="_contentFilterModel" OnStateHasChanged="OnNavMenuCallback" />
+        case ConfigTemplateNavMenu.MyTemplates:
+            <ConfigMyTemplates FilterModel="_contentFilterModel" QueryMessage="@QueryMessage" OnStateHasChanged="OnNavMenuCallback" />
+            break;
+        case ConfigTemplateNavMenu.Assigned:
+        case ConfigTemplateNavMenu.UnAssigned:
+            <ConfigAssigned State="_currentState" FilterModel="_contentFilterModel" OnStateHasChanged="OnNavMenuCallback" />
+            break;
     }
 }

@@ -76,8 +76,8 @@
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th class="px-4" scope="col">@TranslationState.GetValue("Template Name")</th>
-                            <th class="px-4" scope="col">@TranslationState.GetValue("Sports")</th>
+                            <th class="px-4 w-25" scope="col">@TranslationState.GetValue("Template Name")</th>
+                            <th class="px-4 w-25" scope="col">@TranslationState.GetValue("Sports")</th>
                             <th class="text-center" scope="col">@TranslationState.GetValue("Client Assigned")</th>
                             <th class="text-center" scope="col">@TranslationState.GetValue("League Assigned")</th>
                             <th class="text-center" scope="col">@TranslationState.GetValue("Date Created")</th>
@@ -101,11 +101,6 @@
                                 <Virtualize Items="_configTemplates" Context="config" SpacerElement="tr">
                                     <ConfigMyTemplateRow ConfigTemplate="config" ModalClickedCallback="OnModalClicked" />
                                 </Virtualize>
-
-                                @*foreach (var config in _configTemplates)
-                                {
-                                    <ConfigMyTemplateRow ConfigTemplate="config" ModalClickedCallback="OnModalClicked" />
-                                }*@
                             }
                             else
                             {

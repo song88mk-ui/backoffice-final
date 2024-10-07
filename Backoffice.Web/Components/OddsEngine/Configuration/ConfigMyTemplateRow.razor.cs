@@ -10,7 +10,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public ConfigMyTemplateModel ConfigTemplate { get; set; }
-
         [Parameter] public EventCallback<ModalParameters> ModalClickedCallback { get; set; }
 
         private string _region = "HK";
