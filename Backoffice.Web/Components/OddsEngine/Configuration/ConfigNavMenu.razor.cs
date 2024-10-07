@@ -9,12 +9,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class ConfigNavMenu : IDisposable
     {
         #region Properties
-        [Inject] private IBackofficeService BackofficeService { get; set; }
-        [Inject] private IJSRuntime JSRuntime { get; set; }
 
         [Parameter] public ConfigNavMenuParamModel ParamModel { get; set; }
         [Parameter] public EventCallback<ConfigTemplateNavMenu> SelectConfigNavMenuCallback { get; set; }
         [Parameter] public EventCallback SelectCopyClientCallback { get; set; }
+
+        #endregion
+
+        #region Fields
 
         private ConfigTemplateNavMenu _currentMenu = (int)ConfigTemplateNavMenu.MyTemplates;
 
@@ -30,13 +32,16 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private LanguageCode _languageCode;
         private bool _init = true;
         private bool _shouldRender = true;
+
         #endregion
 
         #region Methods
 
         protected override void OnParametersSet()
         {
-            if (_init || _languageCode != TranslationState.ActiveLanguageCode)
+            _shouldRender = ValidateParameters();
+
+            if (_shouldRender)
             {
                 _languageCode = TranslationState.ActiveLanguageCode;
                 _calculatingText = $"{TranslationState.GetValue("Calculating")}...";
@@ -45,22 +50,18 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 _assignedTitle = TranslationState.GetValue("Assigned");
                 _unAssignedTitle = TranslationState.GetValue("UnAssigned");
 
-                _shouldRender = true;
-            }
-
-            if (_init || ParamModel.MyTemplatesCount != _myTemplateCount || ParamModel.AssignedLeaguesCount != _assignedCount || ParamModel.UnAssignedLeaguesCount != _unAssignedCount)
-            {
                 _myTemplateCount = ParamModel.MyTemplatesCount;
                 _assignedCount = ParamModel.AssignedLeaguesCount;
                 _unAssignedCount = ParamModel.UnAssignedLeaguesCount;
-
-                _shouldRender = true;
             }
 
             _init = false;
         }
+
         protected override bool ShouldRender() => _shouldRender;
+
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
+
         public async Task OnSelectConfigNavMenu(ConfigTemplateNavMenu configNavMenu)
         {
             await SelectConfigNavMenuCallback.InvokeAsync(_currentMenu = configNavMenu);
@@ -69,6 +70,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         }
 
         public async Task SelectCopyClientSettings() => await SelectCopyClientCallback.InvokeAsync();
+
+        public bool ValidateParameters()
+        {
+            return _init || _languageCode != TranslationState.ActiveLanguageCode || ParamModel.MyTemplatesCount != _myTemplateCount || ParamModel.AssignedLeaguesCount != _assignedCount || ParamModel.UnAssignedLeaguesCount != _unAssignedCount;
+        }
 
         public void Dispose()
         {

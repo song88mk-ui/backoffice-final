@@ -1,18 +1,12 @@
-﻿using Backoffice.Shared.Data.Backoffice.Entities;
-using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Config;
-using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
-using RabbitMQ.Client.Apigen.Attributes;
 using System.Globalization;
-using System.Threading;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -47,6 +41,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private List<ConfigMyTemplateModel>? _configTemplates = null;
 
         private CancellationTokenSource _cancellationToken;
+
         #endregion
 
         #region Methods

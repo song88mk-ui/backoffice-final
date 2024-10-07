@@ -26,21 +26,28 @@ namespace Backoffice.Web.Pages.OddsEngine
 
 
         #endregion
-        private ConfigContentFilterModel _contentFilterModel = new ConfigContentFilterModel();
-        private ConfigTemplateNavMenu _selectedConfigNavMenu;
-        private ConfigNavMenuParamModel _navMenuParamModel;
-        private List<BreadcrumbModel> _breadcrumbs;
-        private bool _isPreleader = true;
-        private AlertModel _alertModel;
 
+        #region Fields
+
+        private ConfigTemplateNavMenu _selectedConfigNavMenu;
+
+        private ConfigContentFilterModel _contentFilterModel = new ConfigContentFilterModel();
+        private ConfigNavMenuParamModel _navMenuParamModel;
+        private AlertModel _alertModel;
+        private CancellationTokenSource _cancellationTokenSource;
+
+        private List<BreadcrumbModel> _breadcrumbs;
         private List<SelectListItemModel<string>> _scopes;
 
-        private string _logTitle = "config";
+        private bool _isPreloader = true;
+
+        #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
             await PageState.AuthenticateAccessEvent.InvokeAsync();
+
             _selectedConfigNavMenu = ConfigTemplateNavMenu.MyTemplates;
             _scopes = new List<SelectListItemModel<string>>()
             {
@@ -71,7 +78,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             CalculateConfigCounts();
 
-            _isPreleader = true;
+            _isPreloader = true;
             _contentFilterModel = new ConfigContentFilterModel();
             _contentFilterModel.Scopes = _scopes;
 
@@ -80,7 +87,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Task.Run(async () => { _contentFilterModel.Sports = await  LoadSports();})
             });
 
-            _isPreleader = false;
+            _isPreloader = false;
             await InvokeAsync(StateHasChanged);
         }
         public void OnConfigNavMenuSelected(ConfigTemplateNavMenu configNavMenu) => _selectedConfigNavMenu = configNavMenu;
@@ -97,7 +104,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
         }
 
-        public void OnCopyClientSettingsAlert(AlertModel alert)
+        public async Task OnCopyClientSettingsAlert(AlertModel alert)
         {
             Init();
 
@@ -105,6 +112,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
 
         public void OnNavMenuCallback() => CalculateConfigCounts();
+
         public void Dispose()
         {
 
@@ -113,7 +121,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-        private CancellationTokenSource _cancellationTokenSource;
+
         private async void CalculateConfigCounts()
         {
             _cancellationTokenSource?.Cancel();
@@ -128,6 +136,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (response.StatusCode == StatusCode.Success)
                     _navMenuParamModel.MyTemplatesCount = response.Result;
 
+                var rand = new Random();
+
+                _navMenuParamModel.MyTemplatesCount = rand.Next(1, 1000);
+
                 StateHasChanged();
             }, token);
 
@@ -137,6 +149,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 if (response.StatusCode == StatusCode.Success)
                     _navMenuParamModel.AssignedLeaguesCount = response.Result;
+
+                //await Task.Delay(5000);
+
+                //var rand = new Random();
+
+                //_navMenuParamModel.AssignedLeaguesCount = rand.Next(1, 1000);
 
                 StateHasChanged();
             }, token);
@@ -154,12 +172,18 @@ namespace Backoffice.Web.Pages.OddsEngine
                         break;
                     }
 
+                    //await Task.Delay(8000);
+
+                    //var rand = new Random();
+
+                    //_navMenuParamModel.UnAssignedLeaguesCount = rand.Next(1, 1000);
+                    //break;
+
                     attempt++;
                 }
 
                 StateHasChanged();
             }, token);
-
         }
 
         private async Task ExecuteWithCancellation(Func<Task> action, CancellationToken token)

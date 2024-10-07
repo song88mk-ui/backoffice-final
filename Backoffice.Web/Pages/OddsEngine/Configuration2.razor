@@ -6,17 +6,14 @@
 
 <Breadcrumb Breadcrumbs="_breadcrumbs" Region="@Region" />
 
-@if (_isPreleader)
+@if (_isPreloader)
 {
     <Preloader />
 }
 else
 {
     <div class="col-md-12 mb-2">
-        <ConfigNavMenu
-            ParamModel="_navMenuParamModel"
-            SelectConfigNavMenuCallback="OnConfigNavMenuSelected" 
-            SelectCopyClientCallback="OnCopyClientSettings" />
+        <ConfigNavMenu ParamModel="_navMenuParamModel" SelectConfigNavMenuCallback="OnConfigNavMenuSelected" SelectCopyClientCallback="OnCopyClientSettings" />
     </div>
 
     <AlertMessage AlertClass="mx-3" AlertModel="_alertModel"></AlertMessage>

@@ -1,4 +1,5 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.Configuration
+
 <AuthorizeView Policy="sbc-config">
     <Authorized>
         <div class="col-md-12 mb-4">
@@ -97,10 +98,14 @@
                         {
                             @if (_configTemplates != null && _configTemplates.Any())
                             {
-                                foreach (var config in _configTemplates)
+                                <Virtualize Items="_configTemplates" Context="config" SpacerElement="tr">
+                                    <ConfigMyTemplateRow ConfigTemplate="config" ModalClickedCallback="OnModalClicked" />
+                                </Virtualize>
+
+                                @*foreach (var config in _configTemplates)
                                 {
                                     <ConfigMyTemplateRow ConfigTemplate="config" ModalClickedCallback="OnModalClicked" />
-                                }
+                                }*@
                             }
                             else
                             {
