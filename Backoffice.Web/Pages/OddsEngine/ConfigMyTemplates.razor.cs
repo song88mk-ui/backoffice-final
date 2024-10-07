@@ -43,7 +43,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Methods
-        protected override void OnInitialized() => _breadcrumbs = new List<BreadcrumbModel>()
+        protected override void OnInitialized() =>
+            _breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
                 {
@@ -58,14 +59,14 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (_shouldRender)
             {
-                _languageCode = TranslationState.ActiveLanguageCode;
-                if(FilterModel?.Clients != null)
-                _clients = new List<SelectListItemWithCheckboxModel<string>>(FilterModel.Clients);
+                if (FilterModel?.Clients != null)
+                    _clients = new List<SelectListItemWithCheckboxModel<string>>(FilterModel.Clients);
                 if (FilterModel?.Sports != null)
                     _sports = new List<SelectListItemModel<string>>(FilterModel.Sports);
                 if (FilterModel?.Scopes != null)
                     _scopes = new List<SelectListItemModel<string>>(FilterModel.Scopes);
 
+                _languageCode = TranslationState.ActiveLanguageCode;
                 _selectedSportId = -1;
                 _selectedScopeId = int.Parse(_scopes.FirstOrDefault()?.Value ?? "-1");
 
@@ -76,10 +77,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 await LoadConfigTemplates();
             }
+
+            _init = false;
         }
         protected override bool ShouldRender() => _shouldRender;
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
-        private bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode || !_clients.SequenceEqual(FilterModel.Clients) || !_sports.SequenceEqual(FilterModel.Sports) || !_scopes.SequenceEqual(FilterModel.Scopes) || (QueryMessage != null && !string.IsNullOrEmpty(QueryMessage) && _alertModel.Message != QueryMessage);
+        private bool ValidateParameters() => _init || !_clients.SequenceEqual(FilterModel.Clients) || !_sports.Select(c => c.Value).SequenceEqual(FilterModel.Sports.Select(c => c.Value)) || _languageCode != TranslationState.ActiveLanguageCode || !_scopes.Select(c => c.Value).SequenceEqual(FilterModel.Scopes.Select(c => c.Value)) || (QueryMessage != null && !string.IsNullOrEmpty(QueryMessage) && _alertModel.Message != QueryMessage);
 
 
         public void OnEditTemplateClickEvent(ConfigTemplateModel configTemplateModel) => _navigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{configTemplateModel.Id}");
@@ -185,7 +188,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 _isPreloader = true;
                 _shouldRender = true;
-                await InvokeAsync(StateHasChanged);
             }
 
             try
@@ -214,6 +216,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 _isPreloader = false;
                 _shouldRender = true;
+                StateHasChanged();
             }
             catch (TaskCanceledException)
             {

@@ -72,18 +72,28 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
+
+            Init();
         }
-        protected override void OnParametersSet()
+        protected override async Task OnParametersSetAsync()
         {
             _shouldRender = ValidateParameters();
 
             if (_shouldRender)
             {
-                _userClientCodes = new(UserModel.ClientCodes);
-                _languageCode = TranslationState.ActiveLanguageCode;
-                _queryMessage = QueryMessage;
+                if (!_userClientCodes.SequenceEqual(UserModel.ClientCodes))
+                {
+                    _userClientCodes = new(UserModel.ClientCodes);
+                    _contentFilterModel.Clients = await LoadClients();
+                }
+                if (_languageCode != TranslationState.ActiveLanguageCode)
+                {
+                    _languageCode = TranslationState.ActiveLanguageCode;
+                    _contentFilterModel.Sports = await LoadSports();
+                }
 
-                Init();
+                _queryMessage = QueryMessage;
+                _shouldRender = true;
             }
 
             _init = false;
