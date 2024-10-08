@@ -22,18 +22,16 @@ namespace Backoffice.Web.Shared.OddsEngine
         private bool _isActiveSportSettings;
         private bool _isActiveMarketSettings;
         private string _address = string.Empty;
+        private CancellationTokenSource? _cts;
         #endregion
 
         private OeNavMenu _menu;
-        private string _activePage;
+        private string? _activePage;
 
         #region Methods
 
-        protected override async Task OnInitializedAsync()
-        {
-            NavigationManager.LocationChanged += HandleLocationChanged;
-        }
-        protected override async Task OnParametersSetAsync()
+        protected override async Task OnInitializedAsync() => NavigationManager.LocationChanged += HandleLocationChanged;
+        protected override void OnParametersSet()
         {
             _address = $"{Region.ToLower()}/odds-engine";
             var page = NavigationManager?.Uri.Replace(NavigationManager.BaseUri, "");
@@ -49,17 +47,16 @@ namespace Backoffice.Web.Shared.OddsEngine
             var page = NavigationManager?.Uri.Replace(NavigationManager.BaseUri, "");
             ActivateMenu(page);
         }
-        private CancellationTokenSource _cancellationSource;
-        public async void ActivateMenu(string? menu = null)
+        public void ActivateMenu(string? menu = null)
         {
-            _cancellationSource?.Cancel();
-            _cancellationSource = new CancellationTokenSource();
+            _cts?.Cancel();
+            _cts = new CancellationTokenSource();
 
-            var token = _cancellationSource.Token;
+            var token = _cts.Token;
             var tempMenu = _menu;
             HideAllMenu();
 
-            if (menu != null)
+            if (!string.IsNullOrEmpty(menu))
             {
                 if (menu.Contains("hk/odds-engine/"))
                     menu = menu.Replace("hk/odds-engine/", "");
@@ -92,7 +89,7 @@ namespace Backoffice.Web.Shared.OddsEngine
             else
                 _showPriceBoostMenu = false;
         }
-        private async Task OnMarketSettingsClickEvent()
+        private void OnMarketSettingsClickEvent()
         {
             if (!_showMarketSettingsMenu)
             {
@@ -103,10 +100,7 @@ namespace Backoffice.Web.Shared.OddsEngine
             else
                 _showMarketSettingsMenu = false;
         }
-        public void Dispose()
-        {
-            NavigationManager.LocationChanged -= HandleLocationChanged;
-        }
+        public void Dispose() => NavigationManager.LocationChanged -= HandleLocationChanged;
 
         #endregion
 

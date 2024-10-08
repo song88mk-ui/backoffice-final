@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         {
             _page = Page;
 
-            base.OnParametersSet();
+            base.OnParametersSet(page);
         }
     }
 }

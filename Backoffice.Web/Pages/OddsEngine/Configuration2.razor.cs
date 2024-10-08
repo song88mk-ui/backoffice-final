@@ -29,7 +29,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private ConfigContentFilterModel _contentFilterModel = new ConfigContentFilterModel();
         private ConfigNavMenuParamModel _navMenuParamModel;
         private AlertModel _alertModel;
-        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource? _cts;
 
         private List<BreadcrumbModel> _breadcrumbs;
         private List<SelectListItemModel<string>> _scopes;
@@ -81,11 +81,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (_shouldRender)
             {
-                if (!_userClientCodes.SequenceEqual(UserModel.ClientCodes))
-                {
-                    _userClientCodes = new(UserModel.ClientCodes);
-                    _contentFilterModel.Clients = await LoadClients();
-                }
                 if (_languageCode != TranslationState.ActiveLanguageCode)
                 {
                     _languageCode = TranslationState.ActiveLanguageCode;
@@ -101,29 +96,34 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override bool ShouldRender() => _shouldRender;
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
-        private bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode || !_userClientCodes.SequenceEqual(UserModel.ClientCodes) || _queryMessage != QueryMessage;
+        private bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode ||  _queryMessage != QueryMessage;
 
-        public void OnConfigNavMenuSelected(ConfigTemplateNavMenu configNavMenu) => SetCurrentState(configNavMenu);
+        public void HandleConfigNavMenuSelection(ConfigTemplateNavMenu configNavMenu)
+        {
+            SetCurrentState(configNavMenu);
 
-        public void OnCopyClientSettings()
+            _shouldRender = true;
+        }
+
+        public void HandleCopyClientClick()
         {
             var parameters = new ModalParameters();
             parameters.Add("ModalClass", "modal-center");
             parameters.Add("ModalDialogClass", "modal-md");
-            parameters.Add("OnCopyClientSettingsCallback", EventCallback.Factory.Create(this, (AlertModel alert) => OnCopyClientSettingsAlert(alert)));
+            parameters.Add("OnCopyClientSettingsCallback", EventCallback.Factory.Create(this, (AlertModel alert) => HandleCopyClientSettingsAlert(alert)));
 
             var options = new ModalOptions();
             ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
         }
 
-        public void OnCopyClientSettingsAlert(AlertModel alert)
+        public void HandleCopyClientSettingsAlert(AlertModel alert)
         {
             _alertModel = alert;
 
             Init();
         }
 
-        public void OnNavMenuCallback() => CalculateConfigCounts();
+        public void HandleNavMenuCallback() => CalculateConfigCounts();
 
         public void Dispose()
         {
@@ -154,10 +154,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async void CalculateConfigCounts()
         {
-            _cancellationTokenSource?.Cancel();
+            _cts?.Cancel();
 
-            _cancellationTokenSource = new CancellationTokenSource();
-            var token = _cancellationTokenSource.Token;
+            _cts = new CancellationTokenSource();
+            var token = _cts.Token;
 
             await ExecuteWithCancellation(async () =>
             {
@@ -284,7 +284,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             _navMenuParamModel.SelectedNavMenu = menu;
             _currentState = menu == ConfigTemplateNavMenu.Assigned ? ConfigState.Assigned : ConfigState.UnAssigned;
-            _shouldRender = true;
         }
         #endregion
     }

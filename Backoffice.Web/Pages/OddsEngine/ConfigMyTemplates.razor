@@ -11,7 +11,7 @@
                 </div>
 
                 <div>
-                    <a class="btn btn-logs" href="javascript:void(0)" @onclick="OnLogsClickEvent">
+                    <a class="btn btn-logs" href="javascript:void(0)" @onclick="HandleLogsClick">
                         <i class="fa fa-list"></i>
                         <span>@TranslationState.GetValue("Logs")</span>
                     </a>
@@ -23,7 +23,7 @@
             <div class="d-flex justify-content-between mx-4">
                 <div class="d-flex filter-div">
                     <div class="input-container d-flex">
-                        <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                        <EditForm Model="_searchForm" OnValidSubmit="HandleSearchInput" Context="FormContext">
                             <div class="input-group">
                                 <InputText id="search" placeholder="@TranslationState.GetValue("Find")" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
                                 <button class="input-group-text border-start-0">
@@ -33,11 +33,11 @@
                         </EditForm>
                     </div>
 
-                    <select class="form-select" @onchange="OnSportChangedEvent">
+                    <select class="form-select" @onchange="HandleSportChange">
                         <option value="-1" selected="@_selectedSportId == -1">@TranslationState.GetValue("All Sports")</option>
-                        @if (_sports.Any())
+                        @if (FilterModel.Sports.Any())
                         {
-                            @foreach (var item in _sports)
+                            @foreach (var item in FilterModel.Sports)
                             {
                                 <option value="@item.Value" selected="@(item.Value == _selectedSportId.ToString())">@TranslationState.GetValue(item.Name)</option>
                             }
@@ -48,10 +48,10 @@
                         }
                     </select>
 
-                    <select class="form-select" @onchange="OnScopeChangedEvent">
-                        @if (_scopes.Any())
+                    <select class="form-select" @onchange="HandleScopeChange">
+                        @if (FilterModel.Scopes.Any())
                         {
-                            @foreach (var item in _scopes)
+                            @foreach (var item in FilterModel.Scopes)
                             {
                                 <option value="@item.Value" selected="@(item.Value == _selectedScopeId.ToString())">@TranslationState.GetValue(item.Name)</option>
                             }
@@ -62,7 +62,7 @@
                 <div>
                     <AuthorizeView Policy="sbc-config-canedit">
                         <Authorized Context="ActivateAll">
-                            <button class="btn btn-create" @onclick="OnCreateNewTemplateClickEvent">
+                            <button class="btn btn-create" @onclick="HandleNewTemplateClick">
                                 @TranslationState.GetValue("Create New")
                             </button>
                         </Authorized>
@@ -99,7 +99,7 @@
                             @if (_configTemplates != null && _configTemplates.Any())
                             {
                                 <Virtualize Items="_configTemplates" Context="config" SpacerElement="tr">
-                                    <ConfigMyTemplateRow ConfigTemplate="config" ModalClickedCallback="OnModalClicked" />
+                                    <ConfigMyTemplateRow ConfigTemplate="config" ModalClickedCallback="HandleModalClick" />
                                 </Virtualize>
                             }
                             else
@@ -117,6 +117,6 @@
         </div>
 
 
-        <CustomModal OnSaveClickCallback="OnModalSaveEvent" />
+        <CustomModal OnSaveClickCallback="HandleModalSave" />
     </Authorized>
 </AuthorizeView>

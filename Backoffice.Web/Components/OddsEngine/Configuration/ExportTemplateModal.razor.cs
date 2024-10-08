@@ -26,7 +26,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         #region Methods
         protected override void OnInitialized() => _filename = ModalParameters.TryGet<string>("ConfigTemplateName");
-        public async Task OnExportClickEvent()
+        public async Task HandleExportClick()
         {
             _errorMessage = string.Empty;
 

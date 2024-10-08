@@ -16,7 +16,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Parameter] public ConfigState State { get; set; }
         [Parameter] public ConfigContentFilterModel FilterModel { get; set; }
-        [Parameter] public EventCallback OnStateHasChanged { get; set; }
+        [Parameter] public EventCallback OnStateHasChange { get; set; }
 
         #endregion
 
@@ -24,7 +24,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         private List<BreadcrumbModel> _breadcrumbs;
         private List<ConfigClientViewModel> _configClients = new();
         private List<ConfigClientViewModel>? _selectedConfigClients = new();
-        private List<SelectListItemWithCheckboxModel<string>>? _clients;
 
         private bool _isSelectedLeagueShowing;
         private string _pageTitle;
@@ -32,8 +31,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string _iconClass = "";
         private bool _isPreloader = true;
         private bool _isEdit = false;
+        private bool _init = true;
+
         private ConfigState? _state = null;
-        private List<SelectListItemModel<string>> _sports = new();
         private ConfigStateFilterModel _stateFilterModel = new();
         private SearchFormModel _searchForm = new();
         private AlertModel _alertModel = new();
@@ -42,7 +42,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private int _selectedClientCount;
         private LanguageCode _languageCode;
 
-        private CancellationTokenSource? _cancellationTokenSource;
+        private CancellationTokenSource? _cts;
         #endregion
 
         #region Methods
@@ -70,8 +70,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 _languageCode = TranslationState.ActiveLanguageCode;
                 _selectedClientName = string.Empty;
-                _clients = new List<SelectListItemWithCheckboxModel<string>>(FilterModel.Clients);
-                _sports = new List<SelectListItemModel<string>>(FilterModel.Sports);
                 _languageCode = TranslationState.ActiveLanguageCode;
                 _backofficeService.LanguageCode = _languageCode;
                 _state = State;
@@ -79,27 +77,31 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _searchForm.SearchText = "";
                 _pageTitle = State == ConfigState.Assigned ? "Assigned Leagues" : "Unassigned Leagues";
 
+                var firstSport = FilterModel.Sports.FirstOrDefault();
+
                 _stateFilterModel = new()
                 {
-                    ClientCodes = _clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
-                    SportId = int.Parse(_sports.FirstOrDefault()?.Value ?? "-1"),
-                    SportName = _sports.FirstOrDefault()?.Name ?? "-",
+                    ClientCodes = FilterModel.Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
+                    SportId = int.Parse(firstSport?.Value ?? "-1"),
+                    SportName = firstSport?.Name ?? "-",
                     SearchText = _searchForm.SearchText
                 };
 
                 _selectedClientCount = _stateFilterModel.ClientCodes.Count();
 
                 if (_selectedClientCount == 1)
-                    _selectedClientName = _clients?.FirstOrDefault(x => x.IsChecked && x.Value.ToUpper() != "ALL")?.Name ?? string.Empty;
+                    _selectedClientName = FilterModel.Clients?.FirstOrDefault(x => x.IsChecked && x.Value.ToUpper() != "ALL")?.Name ?? string.Empty;
 
-                await LoadLeagues(_stateFilterModel);
+                await LoadLeagues();
             }
+
+            _init = false;
         }
         protected override bool ShouldRender() => _shouldRender;
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
-        private bool ValidateParameters() => _clients == null || !FilterModel.Clients.SequenceEqual(_clients) || !FilterModel.Sports.SequenceEqual(_sports) || State != _state  || _languageCode != TranslationState.ActiveLanguageCode;
+        private bool ValidateParameters() => _init || State != _state || _languageCode != TranslationState.ActiveLanguageCode;
 
-        public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
+        public async Task HandleClientCheckboxClick(Dictionary<string, string> items)
         {
             _selectedClientName = string.Empty;
             _selectedClientCount = items.Count;
@@ -123,10 +125,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _selectedConfigClients = new();
 
-            await SelectedPage(1);
+            await HandledPageSelect(1);
         }
 
-        public async Task OnSportCheckboxClickEvent(ChangeEventArgs e)
+        public async Task HandleSportCheckboxClick(ChangeEventArgs e)
         {
             if (_isSelectedLeagueShowing)
             {
@@ -138,25 +140,26 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (e != null)
             {
-                _stateFilterModel.SportId = int.Parse((e == null ? _sports.FirstOrDefault()?.Value : e.Value?.ToString()) ?? "-1");
-                _stateFilterModel.SportName = (e == null ? _sports.FirstOrDefault()?.Name : _sports.FirstOrDefault(x => x.Value == e.Value.ToString())?.Name) ?? string.Empty;
+                var firstSport = FilterModel.Sports.FirstOrDefault(c => c.Value == e.Value.ToString());
+
+                _stateFilterModel.SportId = int.Parse(firstSport?.Value ?? "-1");
+                _stateFilterModel.SportName = firstSport?.Name ?? string.Empty;
             }
-            await SelectedPage(1);
+            await HandledPageSelect(1);
         }
 
-        public async Task OnModalSaveEvent(object e)
+        public async Task HandleModalSave(object e)
         {
             _selectedConfigClients = new();
             _alertModel = new();
-            await OnStateHasChanged.InvokeAsync();
-            await LoadLeagues(_stateFilterModel);
+            await LoadLeagues();
 
             if (e is AlertModel)
             {
                 _alertModel = (AlertModel)e;
             }
 
-            await SelectedPage(1);
+            await HandledPageSelect(1);
             if (_isSelectedLeagueShowing)
             {
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
@@ -164,34 +167,19 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
-        public async Task OnInputSearchEvent()
+        public async Task HandleSearchInput()
         {
             _stateFilterModel.SearchText = _searchForm.SearchText;
-            await LoadLeagues(_stateFilterModel);
+            await LoadLeagues();
         }
 
-        public async Task SelectedPage(int selectedPage)
+        public async Task HandledPageSelect(int selectedPage)
         {
             _metaData.CurrentPage = selectedPage;
-            await LoadLeagues(_stateFilterModel);
+            await LoadLeagues();
         }
 
-        public async Task OnResetClickEvent()
-        {
-            _metaData = new MetaData();
-            _searchForm.SearchText = "";
-            _stateFilterModel = new ConfigStateFilterModel()
-            {
-                ClientCodes = _clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
-                SportId = int.Parse(_sports.FirstOrDefault().Value),
-                SportName = _sports.FirstOrDefault().Name,
-                SearchText = _searchForm.SearchText
-            };
-            _selectedClientCount = (_clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>()).Count();
-
-            await LoadLeagues(_stateFilterModel);
-        }
-        public async Task OnConfigSelectionChanged(ConfigClientViewModel config)
+        public async Task HandleConfigSelectionChange(ConfigClientViewModel config)
         {
             if (_configClients.Any(x => x.IsChecked))
                 _isEdit = true;
@@ -218,7 +206,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
             }
         }
-        public async Task OnClearSelectionClickedEvent()
+        public async Task HandleClearSelectionClick()
         {
             _configClients.ForEach(x => x.IsChecked = false);
             _isEdit = false;
@@ -238,7 +226,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _shouldRender = true;
         }
-        public void OnSelectAllClickedEvent()
+        public void HandleSelectAllClick()
         {
             _configClients.ForEach(x => x.IsChecked = true);
             var configs = _configClients.Where(x => x.IsChecked).ToList();
@@ -251,7 +239,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _shouldRender = true;
         }
-        public void OnEditTemplateClickedEvent()
+        public void HandleEditTemplateClick()
         {
             var leagues = _selectedConfigClients?.Where(x => x.IsChecked).ToList();
 
@@ -295,9 +283,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-        private async Task LoadLeagues(ConfigStateFilterModel filter = null)
+        private async Task LoadLeagues()
         {
-            _cancellationTokenSource?.Cancel();
+            _cts?.Cancel();
 
             if (!_isPreloader)
             {
@@ -307,17 +295,17 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             var payload = new ConfigTemplateLeagueRequest();
-            if (filter != null)
+            if (_stateFilterModel != null)
             {
-                payload.ClientCodes = filter.ClientCodes ?? new List<string>();
-                payload.SportId = filter.SportId;
-                payload.SearchText = filter.SearchText;
+                payload.ClientCodes = _stateFilterModel.ClientCodes ?? new List<string>();
+                payload.SportId = _stateFilterModel.SportId;
+                payload.SearchText = _stateFilterModel.SearchText;
             }
             payload.MetaData = _metaData;
 
-            _cancellationTokenSource = new CancellationTokenSource();
+            _cts = new CancellationTokenSource();
 
-            var token = _cancellationTokenSource.Token;
+            var token = _cts.Token;
             var response = await _backofficeService.GetConfigClient(_state ?? ConfigState.Assigned, payload, token: token);
 
             if (token.IsCancellationRequested)

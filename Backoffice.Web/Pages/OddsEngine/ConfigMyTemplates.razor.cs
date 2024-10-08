@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public ConfigContentFilterModel FilterModel { get; set; }
-        [Parameter] public EventCallback OnStateHasChanged { get; set; }
+        [Parameter] public EventCallback OnStateHasChange { get; set; }
         [Parameter] public string QueryMessage { get; set; }
 
         private bool _isPreloader;
@@ -28,21 +28,18 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private string _pageTitle = "My Templates";
         private List<BreadcrumbModel> _breadcrumbs;
-        private List<SelectListItemWithCheckboxModel<string>> _clients = new();
-        private List<SelectListItemModel<string>> _sports = new();
-        private List<SelectListItemModel<string>> _scopes = new();
 
         private List<ConfigMyTemplateModel>? _configTemplates = null;
 
-        private CancellationTokenSource _cancellationSource;
+        private CancellationTokenSource? _cts;
         private LanguageCode _languageCode;
         private bool _init = true;
         private bool _shouldRender = true;
         #endregion
 
         #region Methods
-        protected override void OnInitialized() =>
-            _breadcrumbs = new List<BreadcrumbModel>()
+        protected override void OnInitialized()
+            => _breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
                 {
@@ -51,22 +48,16 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
+
         protected override async Task OnParametersSetAsync()
         {
             _shouldRender = ValidateParameters();
 
             if (_shouldRender)
             {
-                if (FilterModel?.Clients != null)
-                    _clients = new List<SelectListItemWithCheckboxModel<string>>(FilterModel.Clients);
-                if (FilterModel?.Sports != null)
-                    _sports = new List<SelectListItemModel<string>>(FilterModel.Sports);
-                if (FilterModel?.Scopes != null)
-                    _scopes = new List<SelectListItemModel<string>>(FilterModel.Scopes);
-
                 _languageCode = TranslationState.ActiveLanguageCode;
                 _selectedSportId = -1;
-                _selectedScopeId = int.Parse(_scopes.FirstOrDefault()?.Value ?? "-1");
+                _selectedScopeId = int.Parse(FilterModel.Scopes.FirstOrDefault()?.Value ?? "-1");
 
                 _alertModel = new AlertModel();
                 _alertModel.Message = QueryMessage;
@@ -78,15 +69,14 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _init = false;
         }
+
         protected override bool ShouldRender() => _shouldRender;
+
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
-        private bool ValidateParameters() => _init || !_clients.SequenceEqual(FilterModel.Clients) || !_sports.Select(c => c.Value).SequenceEqual(FilterModel.Sports.Select(c => c.Value)) || _languageCode != TranslationState.ActiveLanguageCode || !_scopes.Select(c => c.Value).SequenceEqual(FilterModel.Scopes.Select(c => c.Value)) || (QueryMessage != null && !string.IsNullOrEmpty(QueryMessage) && _alertModel.Message != QueryMessage);
 
+        private bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode || (!string.IsNullOrEmpty(QueryMessage) && _alertModel.Message != QueryMessage);
 
-        public void OnEditTemplateClickEvent(ConfigTemplateModel configTemplateModel) => _navigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{configTemplateModel.Id}");
-        public void OnCopyTemplateClickEvent(ConfigTemplateModel configTemplateModel) => _navigationManager.NavigateTo($"/hk/odds-engine/config-templates/copy/{configTemplateModel.Id}");
-
-        public void OnLogsClickEvent()
+        public void HandleLogsClick()
         {
             var parameters = new ModalParameters();
 
@@ -99,7 +89,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _modalService.Open<ViewMyTemplatesLogs>("View Logs", parameters, options);
         }
-        public void OnCreateNewTemplateClickEvent()
+        public void HandleNewTemplateClick()
         {
             var parameters = new ModalParameters();
 
@@ -112,7 +102,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _modalService.Open<CreateTemplateModal>($"Create Template", parameters, options);
         }
 
-        public void OnModalClicked(ModalParameters parameters)
+        public void HandleModalClick(ModalParameters parameters)
         {
             if (parameters != null)
             {
@@ -134,21 +124,21 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
-        public async Task OnSportChangedEvent(ChangeEventArgs e)
+        public async Task HandleSportChange(ChangeEventArgs e)
         {
             _selectedSportId = int.Parse(e.Value.ToString());
 
             await LoadConfigTemplates();
         }
-        public async Task OnScopeChangedEvent(ChangeEventArgs e)
+        public async Task HandleScopeChange(ChangeEventArgs e)
         {
             _selectedScopeId = int.Parse(e.Value.ToString());
 
             await LoadConfigTemplates();
         }
-        public async Task OnModalSaveEvent(object e)
+        public async Task HandleModalSave(object e)
         {
-            await OnStateHasChanged.InvokeAsync();
+            await OnStateHasChange.InvokeAsync();
 
             if (e is string)
             {
@@ -165,7 +155,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             Task task = LoadConfigTemplates();
         }
 
-        public async Task OnInputSearchEvent() => await LoadConfigTemplates();
+        public async Task HandleSearchInput() => await LoadConfigTemplates();
 
         public void Dispose()
         {
@@ -178,9 +168,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task LoadConfigTemplates()
         {
-            _cancellationSource?.Cancel();
+            _cts?.Cancel();
 
-            _cancellationSource = new CancellationTokenSource();
+            _cts = new CancellationTokenSource();
 
             if (!_isPreloader)
             {
@@ -190,7 +180,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             try
             {
-                var token = _cancellationSource.Token;
+                var token = _cts.Token;
 
                 var configTemplateResponse = await _backofficeService.GetConfigTemplate(
                     _searchForm.SearchText,
@@ -205,7 +195,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     Id = config.Id,
                     Name = config.Name,
-                    SportName = _sports.FirstOrDefault(e => e.Value == config.SportId.ToString()) != null ? $"{_sports.FirstOrDefault(e => e.Value == config.SportId.ToString())?.Name ?? ""}" : "",
+                    SportName = FilterModel.Sports.FirstOrDefault(e => e.Value == config.SportId.ToString())?.Name ?? "",
                     ClientAssigned = $"{config.ClientsCount} Client{(config.ClientsCount > 1 ? "s" : "")}",
                     LeagueAssigned = $"{config.LeaguesCount} League{(config.LeaguesCount > 1 ? "s" : "")}",
                     DateCreated = config.Timestamp.ToString("HH:mm dd/MM/yyyy", CultureInfo.InvariantCulture),

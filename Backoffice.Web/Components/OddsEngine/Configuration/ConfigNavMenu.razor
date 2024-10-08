@@ -1,13 +1,13 @@
 ﻿<div class="d-flex justify-content-between col mx-4 config-nav-container">
     <div>
-        <a href="javascript:void(0)" class="@(_currentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav")"
-           @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.MyTemplates)">@($"{_myTemplateTitle} ({(_myTemplateCount > 0 ? _myTemplateCount : _calculatingText)}"))</a>
-        <a href="javascript:void(0)" class="@(_currentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav")" 
-        @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.Assigned)">@($"{_assignedTitle} ({(_assignedCount > 0 ? _assignedCount : _calculatingText)})")</a>
-        <a href="javascript:void(0)" class="@(_currentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav")"
-           @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.UnAssigned)">@($"{_unAssignedTitle} ({(_unAssignedCount > 0 ? _unAssignedCount : _calculatingText)})")</a>
+        <a href="javascript:void(0)" class="@_myTemplateCss"
+           @onclick="_ => HandleConfigNavMenuClick(ConfigTemplateNavMenu.MyTemplates)">@_myTemplateText</a>
+        <a href="javascript:void(0)" class="@_assignedCss"
+           @onclick="_ => HandleConfigNavMenuClick(ConfigTemplateNavMenu.Assigned)">@_assignedText</a>
+        <a href="javascript:void(0)" class="@_unAssignedCss"
+           @onclick="_ => HandleConfigNavMenuClick(ConfigTemplateNavMenu.UnAssigned)">@_unAssignedText</a>
     </div>
     <div>
-        <a class="btn btn-copy-client" href="javascript:(0)" @onclick="SelectCopyClientSettings">@TranslationState.GetValue("Copy Client Settings")</a>
+        <a class="btn btn-copy-client" href="javascript:(0)" @onclick="HandleCopyClientSettingsSelect">@TranslationState.GetValue("Copy Client Settings")</a>
     </div>
 </div>

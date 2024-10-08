@@ -34,7 +34,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _isPreloader = false;
         }
 
-        public void OnCloseClickEvent() => _modalService.Cancel();
+        public void HandleCloseClick() => _modalService.Cancel();
 
         public void Dispose()
         {

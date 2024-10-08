@@ -11,8 +11,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Properties
 
         [Parameter] public ConfigNavMenuParamModel ParamModel { get; set; }
-        [Parameter] public EventCallback<ConfigTemplateNavMenu> SelectConfigNavMenuCallback { get; set; }
-        [Parameter] public EventCallback SelectCopyClientCallback { get; set; }
+        [Parameter] public EventCallback<ConfigTemplateNavMenu> OnConfigNavMenuClick { get; set; }
+        [Parameter] public EventCallback OnCopyClientSelect { get; set; }
 
         #endregion
 
@@ -20,14 +20,18 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private ConfigTemplateNavMenu _currentMenu;
 
-        private string _myTemplateTitle;
-        private string _assignedTitle;
-        private string _unAssignedTitle;
+        private string _myTemplateText;
+        private string _assignedText;
+        private string _unAssignedText;
 
+        private string _myTemplateCss;
+        private string _assignedCss;
+        private string _unAssignedCss;
+
+        private string _calculatingText;
         private int _myTemplateCount;
         private int _assignedCount;
         private int _unAssignedCount;
-        private string _calculatingText;
 
         private LanguageCode _languageCode;
         private bool _init = true;
@@ -46,14 +50,18 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 _languageCode = TranslationState.ActiveLanguageCode;
                 _calculatingText = $"{TranslationState.GetValue("Calculating")}...";
 
-                _myTemplateTitle = TranslationState.GetValue("My Templates");
-                _assignedTitle = TranslationState.GetValue("Assigned");
-                _unAssignedTitle = TranslationState.GetValue("UnAssigned");
-
                 _currentMenu = ParamModel.SelectedNavMenu;
                 _myTemplateCount = ParamModel.MyTemplatesCount;
                 _assignedCount = ParamModel.AssignedLeaguesCount;
                 _unAssignedCount = ParamModel.UnAssignedLeaguesCount;
+
+                _myTemplateText = $"{TranslationState.GetValue("My Templates")} ({(_myTemplateCount > 0 ? _myTemplateCount : _calculatingText)}";
+                _unAssignedText = $"{TranslationState.GetValue("UnAssigned")} ({(_unAssignedCount > 0 ? _unAssignedCount : _calculatingText)})";
+                _assignedText = $"{TranslationState.GetValue("Assigned")} ({(_assignedCount > 0 ? _assignedCount : _calculatingText)})";
+
+                _myTemplateCss = _currentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav";
+                _unAssignedCss = _currentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav";
+                _assignedCss = _currentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav";
             }
 
             _init = false;
@@ -63,14 +71,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
 
-        public async Task OnSelectConfigNavMenu(ConfigTemplateNavMenu configNavMenu)
+        public async Task HandleConfigNavMenuClick(ConfigTemplateNavMenu configNavMenu)
         {
-            await SelectConfigNavMenuCallback.InvokeAsync(_currentMenu = configNavMenu);
+            await OnConfigNavMenuClick.InvokeAsync(_currentMenu = configNavMenu);
 
             _shouldRender = true;
         }
 
-        public async Task SelectCopyClientSettings() => await SelectCopyClientCallback.InvokeAsync();
+        public async Task HandleCopyClientSettingsSelect() => await OnCopyClientSelect.InvokeAsync();
 
         public bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode || ParamModel.MyTemplatesCount != _myTemplateCount || ParamModel.AssignedLeaguesCount != _assignedCount || ParamModel.UnAssignedLeaguesCount != _unAssignedCount || _currentMenu != ParamModel.SelectedNavMenu;
 

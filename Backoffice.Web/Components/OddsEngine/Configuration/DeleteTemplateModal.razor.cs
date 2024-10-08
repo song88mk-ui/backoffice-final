@@ -34,7 +34,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public void OnCancelClickEvent() => _modalService.Cancel();
 
-        public async Task OnApplyClickEvent()
+        public async Task HandleApplyClick()
         {
             _isPreloader = true;
             var response = await _backofficeService.DeleteConfigTemplate(_templateId);
