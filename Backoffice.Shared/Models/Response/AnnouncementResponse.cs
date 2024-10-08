@@ -21,15 +21,17 @@ namespace Backoffice.Shared.Models.Response
             public AnnouncementDTO()
             {
                 Clients = new List<ClientInfo>();
+                Languages = new List<AnnouncementMessage>();
             }
             public int Id { get; set; }
-            public List<ClientInfo> Clients { get; set; }
             public bool IsActive { get; set; }
             public string Title { get; set; }
             public DateTime StartDate { get; set; }
             public DateTime EndDate { get; set; }
             public string Message { get; set; }
             public LanguageCode LanguageCode { get; set; }
+            public List<ClientInfo> Clients { get; set; }
+            public List<AnnouncementMessage> Languages { get; set; }
         }
 
         public class ClientInfo

@@ -211,7 +211,6 @@ namespace Backoffice.Web.Pages.SBC
         private async Task GetContent(AnnouncementsFilterModel model)
         {
             _cts?.Cancel();
-
             _cts = new CancellationTokenSource();
 
             if (!_isPreLoader)
@@ -240,13 +239,14 @@ namespace Backoffice.Web.Pages.SBC
                 Announcements = response.Result.Announcements.Select((s, index) => new Models.Announcements
                 {
                     Id = s.Id,
-                    Clients = s.Clients.Where(c => _clients.Select(s => s.Value).Contains(c.ClientCode)).ToList(),
                     EndDate = s.EndDate,
                     StartDate = s.StartDate,
                     IsActive = s.IsActive,
                     Message = s.Message,
                     Title = s.Title,
                     LanguageCode = s.LanguageCode,
+                    Clients = s.Clients.Where(c => _clients.Select(s => s.Value).Contains(c.ClientCode)).ToList(),
+                    Languages = s.Languages,
                     Row = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
                 }).ToList()
             };

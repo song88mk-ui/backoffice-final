@@ -32,6 +32,7 @@
                                         <th class="th-number py-2">@TranslationState.GetValue("No.")</th>
                                         <th class="th-title py-2">@TranslationState.GetValue("Title")</th>
                                         <th class="th-client py-2">@TranslationState.GetValue("Clients")</th>
+                                        <th class="th-client py-2">@TranslationState.GetValue("Languages")</th>
                                         <th class="th-description py-2">@TranslationState.GetValue("Description")</th>
                                         <th class="th-date py-2">@TranslationState.GetValue("Start Date")</th>
                                         <th class="th-date py-2">@TranslationState.GetValue("End Date")</th>
@@ -67,6 +68,16 @@
                                                             {
                                                                 <div class="tl-fixture m-1 py-1 rounded-2">
                                                                     <span class="px-3">@x.ClientCode</span>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-2">
+                                                        <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
+                                                            @foreach (var x in item.Languages)
+                                                            {
+                                                                <div class="tl-fixture m-1 py-1 rounded-2">
+                                                                    <span class="px-3">@x.LanguageCode.ToString()</span>
                                                                 </div>
                                                             }
                                                         </div>

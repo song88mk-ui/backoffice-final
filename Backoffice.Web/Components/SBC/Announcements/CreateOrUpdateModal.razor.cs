@@ -3,6 +3,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
+using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
@@ -60,20 +61,27 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 Message = _announcement.Message,
                 StartDate = _announcement.StartDate,
                 EndDate = _announcement.EndDate,
+                Languages = _announcement.Languages.Select(l => new AnnouncementMessage { LanguageCode = l.LanguageCode, Message = l.Message}).ToList(),
             };
 
             var clients = ModalParameters.TryGet <List<SelectListItemWithCheckboxModel<string>>>("Clients");
             _isEdit = ModalParameters.TryGet<bool>("IsEdit");
-            _languageCodes = _isEdit ? new List<LanguageCode> { _announcement.LanguageCode } : Enum.GetValues<LanguageCode>().Select(s => s).ToList();
+            _languageCodes = Enum.GetValues<LanguageCode>().Select(s => s).ToList();
             _selectedLanguage = _announcement.LanguageCode;
 
             _announcementMessages = new Dictionary<LanguageCode, string>();
             foreach(var language in _languageCodes)
             {
-                if(language == _selectedLanguage)
-                    _announcementMessages[language] = _announcement.Message ?? string.Empty;
-                else
-                    _announcementMessages[language] = string.Empty;
+                _announcementMessages[language] = string.Empty;
+
+                foreach (var message in _announcement.Languages)
+                {
+                    if (language == message.LanguageCode)
+                    {
+                        _announcementMessages[language] = message.Message ?? string.Empty;
+                        break;
+                    }
+                }
             }
 
             _clients = clients.Select(s => new SelectListItemWithCheckboxModel<string>
@@ -115,6 +123,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _announcement.Message = _prevAnnouncement.Message;
             _announcement.StartDate = _prevAnnouncement.StartDate;
             _announcement.EndDate = _prevAnnouncement.EndDate;
+            _announcement.Languages = _prevAnnouncement.Languages;
 
             ModalService.Cancel();
         }
