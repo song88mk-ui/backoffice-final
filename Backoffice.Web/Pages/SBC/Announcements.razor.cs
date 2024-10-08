@@ -83,10 +83,11 @@ namespace Backoffice.Web.Pages.SBC
                 });
                 parameters.Add("Clients", _clients);
                 parameters.Add("IsEdit", false);
+                parameters.Add("ModalHeaderClass", "announcements-modal-header");
 
                 var options = new ModalOptions();
                 options.HideCloseButton = true;
-                ModalService.Open<CreateOrUpdateModal>("Add Announcements", parameters, options);
+                ModalService.Open<CreateOrUpdateModal>("Announcements", parameters, options);
 
                 model.IsAddAnnouncement = false;
             }

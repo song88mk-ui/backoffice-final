@@ -13,9 +13,11 @@
     {
         <EditForm EditContext="EditContext">
             <div class="announcement-container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-switch d-inline-block pull-right">
+                <div class="announcement-header-container">
+                    <span class="announcement-header-title">@TranslationState.GetValue("Announcements")</span>
+                    <div class="announcement-switch-container">
+                        <span class="announcement-switch-label" for="@_announcement.IsActive">@TranslationState.GetValue(_announcement.IsActive? "Active" : "Inactive")</span>
+                        <div class="form-switch">
                             @if (_announcement.IsActive)
                             {
                                 <input class="form-check-input" type="checkbox" role="switch" checked @onclick="OnStatusClickEvent" />
@@ -25,108 +27,66 @@
                                 <input class="form-check-input" type="checkbox" role="switch" @onclick="OnStatusClickEvent" />
                             }
                         </div>
-                        <label class="form-check-label pull-right" for="@_announcement.IsActive">@TranslationState.GetValue(_announcement.IsActive? "Active" : "Inactive")</label>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <h6 class="title fw-bold ps-2 py-1">Title</h6>
+                <div class="announcement-title-container">
+                    <div class="announcement-title-label">Title</div>
+                    <div class="announcement-title-sub-label">The title of your announcement.</div>
+                    <input type="text" class="form-control" id="titleField" placeholder="Enter title" @bind-value="_announcement.Title" />
+                </div>
+                <div class="announcement-dates-container">
+                    <div class="announcement-start-date-container">
+                        <span class="announcement-start-date-title">Start Date / Time</span>
+                        <DateRangePicker class="form-control"
+                            StartDate="_announcement.StartDate"
+                            OnRangeSelect="OnRangeSelectStartDate"
+                            TimePicker="true"
+                            TimePicker24Hour="true"
+                            SingleDatePicker="true"
+                            DateFormat="@($"MMM dd, yyyy HH:mm")" 
+                        />
+                        <i class="ico ico-calendar" />
                     </div>
-                    <div class="col-md-12">
-                        <div class="row mb-3">
-                            <div class="col">
-                                <label for="titleField" class="form-label">The title of your announcement</label>
-                                <input type="text" class="form-control" id="titleField" placeholder="Enter title" @bind-value="_announcement.Title" />
-                            </div>
-                        </div>
+                    <div class="announcement-end-date-container">
+                        <span class="announcement-end-date-title">End Date / Time</span>
+                        <DateRangePicker class="form-control"
+                            MinDate="_announcement.StartDate"
+                            StartDate="_announcement.EndDate"
+                            OnRangeSelect="OnRangeSelectEndDate"
+                            TimePicker="true"
+                            TimePicker24Hour="true"
+                            SingleDatePicker="true"
+                            DateFormat="@($"MMM dd, yyyy HH:mm")" 
+                        />
+                        <i class="ico ico-calendar" />
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <h6 class="title fw-bold ps-2 py-1">Start Date</h6>
+                <div class="announcement-clients-container">
+                    <span class="announcement-clients-label">Clients</span>
+                    <span class="announcement-clients-sub-label">Select the clients who will see this announcement.</span>
+                    @if (_clients != null)
+                    {
+                        <Dropdown DropdownClass="announcements" DropdownName="Clients" OnClickEventCallback="OnClientCheckboxClickEvent" Items="_clients" Multiple=true />
+                    }
+                </div>
+                <div class="announcement-language-container">
+                    <span class="announcement-language-label">Language</span>
+                    <span class="announcement-language-sub-label">Select the language to display this announcement to all selected clients.</span>
+                    <div class="announcement-language-list">
+                        @foreach (var language in _languageCodes)
+                        {
+                            <div key="@(language)-lang" class="announcement-language-item" @onclick="() => OnLanguageClicked(language)">
+                                <img class="announcement-language-item-icon @(_selectedLanguage == language ? "selected" : "")" src="/icons/svg/flags/@(language.ToString().ToLower()).svg" />
+                                <span class="announcement-language-item-label">@language</span>
                             </div>
-                            <div class="col-md-4">
-                                <h6 class="title fw-bold ps-2 py-1">End Date</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <DateRangePicker class="form-control"
-                                                 StartDate="_announcement.StartDate"
-                                                 OnRangeSelect="OnRangeSelectStartDate"
-                                                 TimePicker="true"
-                                                 TimePicker24Hour="true"
-                                                 SingleDatePicker="true"
-                                                 DateFormat="@($"MMM dd, yyyy HH:mm")" />
-                            </div>
-                            <div class="col-md-4">
-                                <DateRangePicker class="form-control"
-                                                 MinDate="_announcement.StartDate"
-                                                 StartDate="_announcement.EndDate"
-                                                 OnRangeSelect="OnRangeSelectEndDate"
-                                                 TimePicker="true"
-                                                 TimePicker24Hour="true"
-                                                 SingleDatePicker="true"
-                                                 DateFormat="@($"MMM dd, yyyy HH:mm")" />
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <h6 class="title fw-bold ps-2 py-1">Clients</h6>
-                        <label for="titleField" class="form-label">Select the clients who will see this announcement.</label>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="row mb-3">
-                            <div class="col">
-                                @if (_clients != null)
-                                {
-                                    <Dropdown DropdownName="Clients" OnClickEventCallback="OnClientCheckboxClickEvent" Items="_clients" Multiple=true />
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <h6 class="title fw-bold ps-2 py-1">Language</h6>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="row mb-3">
-                            @foreach (var language in _languageCodes)
-                            {
-                                <div class="col">
-                                    @if (_selectedLanguage == language)
-                                    {
-                                        <input type="radio" class="btn-check" name="currencyOptions" id="@language" @onchange="() => OnLanguageClicked(language)" checked />
-                                    }
-                                    else
-                                    {
-                                        <input type="radio" class="btn-check" name="currencyOptions" id="@language" @onchange="() => OnLanguageClicked(language)" />
-                                    }
-                                    <label class="btn modalTab" for="@language">@language</label>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <h6 class="title fw-bold ps-2 py-1">Message</h6>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="row mb-3">
-                            <div class="col">
-                                <label for="messageField" class="form-label">Enter the message of your announcement</label>
-                                <input type="text" class="form-control" id="messageField" placeholder="Enter the message of your announcement" @bind-value="_announcementMessages[_selectedLanguage]" multiple />
-                            </div>
-                        </div>
-                    </div>
+                <div class="announcement-message-container">
+                    <span class="announcement-message-label">Clients</span>
+                    <span class="announcement-message-sub-label">Select the clients who will see this announcement.</span>
+@*                     <input type="textarea" class="form-control" id="messageField" placeholder="Enter the message of your announcement" @bind-value="_announcementMessages[_selectedLanguage]" multiple /> *@
+                    <textarea class="announcement-message-input" placeholder="Enter the message of your announcement" @bind="_announcementMessages[_selectedLanguage]" rows="4"/>
                 </div>
             </div>
 
@@ -143,6 +103,6 @@
             }
         </div>
     }
-    <button type="button" class="btn modalBtn modalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled=@_isPreload>@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modalBtn modalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled=@_isPreload>@TranslationState.GetValue("Save")</button>
+    <button type="button" class="announcement-cancel-btn" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled=@_isPreload>@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="announcement-save-btn" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled=@_isPreload>@TranslationState.GetValue("Save Announcement")</button>
 </div>

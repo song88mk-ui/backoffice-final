@@ -18,6 +18,7 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public string DropdownName { get; set; }
         [Parameter] public bool Multiple { get; set; }
         [Parameter] public string ImageClass { get; set; }
+        [Parameter] public string DropdownClass { get; set; }
 
         #endregion
 

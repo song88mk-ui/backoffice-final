@@ -1,6 +1,6 @@
 @font-face {
     font-family: "s88-icon";
-    src: url('../css/font-bo/bo-icons.woff');
+    src: url('../css/font-bo/bo-icons.v2.woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -261,6 +261,10 @@ a, .btn-link {
 
 .ico-announcements:before {
     content: "\112D";
+}
+
+.ico-calendar:before {
+    content: "\112E";
 }
 
 iframe {
