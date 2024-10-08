@@ -13,6 +13,9 @@ namespace Backoffice.Shared.Models.Response
         }
 
         public List<AnnouncementDTO> Announcements { get; set; }
+        public int TotalCount { get; set; }
+        public int TotalPage { get; set; }
+
 
         #region Nested Class
 
