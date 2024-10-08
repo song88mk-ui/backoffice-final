@@ -23,3 +23,8 @@ button:focus:not(:focus-visible) {
 .dropdown-toggle::after {
     content: unset;
 }
+
+/*Announcements client dropdown*/
+.dropdown.announcements, .dropdown.announcements > .btn.form-select {
+    width: 100%;
+}

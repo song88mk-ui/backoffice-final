@@ -84,7 +84,6 @@ namespace Backoffice.Web.Pages.SBC
                 parameters.Add("Clients", _clients);
                 parameters.Add("IsEdit", false);
                 parameters.Add("ModalHeaderClass", "announcements-modal-header");
-                parameters.Add("ModalClass", "announcements-modal");
 
                 var options = new ModalOptions();
                 options.HideCloseButton = true;
