@@ -9,77 +9,52 @@ namespace Backoffice.Web.Shared.OddsEngine
     {
         #region Properties
 
-        [Inject] public NavigationManager? NavigationManager { get; set; }
-        [Parameter] public string Region { get; set; } = "hk";
-
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
+        #endregion
+
+        #region Fields
+
+        private OeNavMenu _menu;
+
+        private string _activePage;
+        private string _address = "hk/odds-engine";
 
         private bool _showPriceBoostMenu;
         private bool _showMarketSettingsMenu;
-        private bool _isActiveMonitoring;
-        private bool _isActiveConfig;
-        private bool _isActivePriceBoost;
-        private bool _isActiveSportSettings;
-        private bool _isActiveMarketSettings;
-        private string _address = string.Empty;
-        private CancellationTokenSource? _cts;
-        #endregion
+        private bool _init = true;
+        private bool _shouldRender;
 
-        private OeNavMenu _menu;
-        private string? _activePage;
+        #endregion
 
         #region Methods
 
-        protected override async Task OnInitializedAsync() => NavigationManager.LocationChanged += HandleLocationChanged;
-        protected override void OnParametersSet()
+        protected override async Task OnInitializedAsync()
         {
-            _address = $"{Region.ToLower()}/odds-engine";
-            var page = NavigationManager?.Uri.Replace(NavigationManager.BaseUri, "");
+            _navigationManager.LocationChanged += HandleLocationChanged;
+        }
 
-            if (_activePage != page)
+        protected override async Task OnParametersSetAsync()
+        {
+            _shouldRender = ValidateParameters();
+
+            if (_shouldRender)
             {
+                var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
+
                 _activePage = page;
                 ActivateMenu(page);
             }
+
+            if (UserModel.Claims.Any())
+                _init = false;
         }
-        private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
-        {
-            var page = NavigationManager?.Uri.Replace(NavigationManager.BaseUri, "");
-            ActivateMenu(page);
-        }
-        public void ActivateMenu(string? menu = null)
-        {
-            _cts?.Cancel();
-            _cts = new CancellationTokenSource();
 
-            var token = _cts.Token;
-            var tempMenu = _menu;
-            HideAllMenu();
+        protected override bool ShouldRender() => _shouldRender;
 
-            if (!string.IsNullOrEmpty(menu))
-            {
-                if (menu.Contains("hk/odds-engine/"))
-                    menu = menu.Replace("hk/odds-engine/", "");
-                if (menu.Contains("hk/odds-engine"))
-                    menu = menu.Replace("hk/odds-engine", "");
+        protected override async Task OnAfterRenderAsync(bool firstRender) => _shouldRender = false;
 
-                tempMenu = menu.ToUpper() switch
-                {
-                    "CONFIG" or "CONFIG-TEMPLATES" => OeNavMenu.Config,
-                    "PRICEBOOST" or "MANAGE-BOOST" or "BOOSTED-SETTINGS" => OeNavMenu.PriceBoost,
-                    "SPORT-SETTINGS" => OeNavMenu.SportSettings,
-                    "MARKET-SETTINGS" or "MARKET-SORT-ORDER" or "MARKET-GROUPS" => OeNavMenu.MarketSettings,
-                    _ or "MONITORING" => OeNavMenu.Monitoring
-                };
-
-                if (token.IsCancellationRequested)
-                    return;
-
-                _menu = tempMenu;
-                StateHasChanged();
-            }
-        }
-        private async Task OnPriceBoostClickEvent()
+        public async Task HandlePriceBoostClick()
         {
             if (!_showPriceBoostMenu)
             {
@@ -89,7 +64,8 @@ namespace Backoffice.Web.Shared.OddsEngine
             else
                 _showPriceBoostMenu = false;
         }
-        private void OnMarketSettingsClickEvent()
+
+        public async Task HandleMarketSettingsClick()
         {
             if (!_showMarketSettingsMenu)
             {
@@ -100,7 +76,55 @@ namespace Backoffice.Web.Shared.OddsEngine
             else
                 _showMarketSettingsMenu = false;
         }
-        public void Dispose() => NavigationManager.LocationChanged -= HandleLocationChanged;
+
+        public async void ActivateMenu(string? menu = null)
+        {
+            HideAllMenu();
+
+            if (menu != null)
+            {
+                if (menu.Contains("hk/odds-engine/"))
+                    menu = menu.Replace("hk/odds-engine/", "");
+                if (menu.Contains("hk/odds-engine"))
+                    menu = menu.Replace("hk/odds-engine", "");
+
+                switch (menu.ToUpper())
+                {
+                    case "CONFIG":
+                    case "CONFIG-TEMPLATES":
+                        _menu = OeNavMenu.Config;
+                        break;
+                    case "PRICEBOOST":
+                    case "MANAGE-BOOST":
+                    case "BOOSTED-SETTINGS":
+                        _menu = OeNavMenu.PriceBoost;
+                        break;
+                    case "SPORT-SETTINGS":
+                        _menu = OeNavMenu.SportSettings;
+                        break;
+                    case "MARKET-SETTINGS":
+                    case "MARKET-SORT-ORDER":
+                    case "MARKET-GROUPS":
+                        _menu = OeNavMenu.MarketSettings;
+                        break;
+                    default:
+                        _menu = OeNavMenu.Monitoring;
+                        break;
+                }
+            }
+        }
+
+        public bool ValidateParameters()
+        {
+            var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
+
+            return _init || _activePage != page;
+        }
+
+        public void Dispose()
+        {
+            _navigationManager.LocationChanged -= HandleLocationChanged;
+        }
 
         #endregion
 
@@ -111,6 +135,13 @@ namespace Backoffice.Web.Shared.OddsEngine
             _showPriceBoostMenu = false;
             _showMarketSettingsMenu = false;
         }
+
+        private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+        {
+            var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
+            ActivateMenu(page);
+        }
+
         #endregion
     }
 }

@@ -20,7 +20,7 @@
         || x.Type == $"{SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace("_", ".")}") ?? false)
         {
             <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.PriceBoost ? "active" : "")">
-                <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="OnPriceBoostClickEvent">
+                <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="HandlePriceBoostClick">
                     <span class="me-3">@TranslationState.GetValue("Price Boost")</span>
                     @if (_showPriceBoostMenu)
                     {
@@ -66,7 +66,7 @@
         || x.Type == $"{SportsbookClientPermission.SBC_OE_MarketSetting_SortOrder.ToString().Replace("_", ".")}") ?? false)
         {
             <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.MarketSettings ? "active" : "")">
-                <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="OnMarketSettingsClickEvent">
+                <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="HandleMarketSettingsClick">
                     <span class="me-3">@TranslationState.GetValue("Market Settings")</span>
                     @if (_showMarketSettingsMenu)
                     {
