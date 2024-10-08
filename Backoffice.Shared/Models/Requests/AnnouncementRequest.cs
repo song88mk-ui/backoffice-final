@@ -7,5 +7,7 @@ namespace Backoffice.Shared.Models.Requests
         public LanguageCode LanguageCode { get; set; }
         public string ClientCodes { get; set; }
         public string SearchText { get; set; }
+        public int Page { get; set; }
+        public int PageSize { get; set; } = 20;
     }
 }
