@@ -16,16 +16,6 @@
     font-size: 0.8rem;
 }
 
-.form-check-input {
-    height: 1.2em;
-    width: 2.3em;
-}
-
-.form-check-input:checked {
-    background-color: #E43F2C;
-    border-color: #E12E22;
-}
-
 .modalBtn {
     width: 112px;
     height: 40px;
@@ -50,4 +40,102 @@
     box-shadow: none !important;
     color: black;
     border-radius: 0;
+}
+
+
+
+
+.announcement-header-container {
+    width: 100%;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #EBE9E9;
+}
+
+.announcement-header-title {
+    color: #000;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.announcement-switch-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.announcement-switch-label {
+    color: #757575;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    margin-left: 10px;
+}
+
+.form-switch {
+    height: 16px;
+    width: 36px;
+}
+
+.form-switch:checked {
+    background-color: #3AA93D;
+    border-color: none; 
+}
+
+.announcement-title-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.announcement-title-label {
+    color: #0B0B0B;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.announcement-title-sub-label {
+    color: #636363;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.announcement-dates-container {
+    width: 100%;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.announcement-start-date-container, .announcement-end-date-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.announcement-start-date-title, .announcement-end-date-title {
+    color: #000;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
 }
