@@ -7,3 +7,11 @@
 .modal-backdrop {
     z-index: 1049;
 }
+
+.announcements-modal-header {
+    display: none;
+}
+
+.announcements-modal {
+    padding: 27px 30px;
+}
