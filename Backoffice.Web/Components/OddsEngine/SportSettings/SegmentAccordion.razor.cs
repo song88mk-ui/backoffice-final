@@ -39,7 +39,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             _page = Page;
 
-            base.OnParametersSet(page);
+            base.OnParametersSet();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

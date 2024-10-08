@@ -10,7 +10,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         private int _counter;
 
-        protected override Task OnParametersSet()
+        protected override Task OnParametersSetAsync()
         {
             Debug.WriteLine($"Main: {_counter++}");
 

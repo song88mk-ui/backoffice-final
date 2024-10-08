@@ -45,7 +45,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 s.Segments.ForEach(seg => seg.IsOpen = false);
             });
         }
-        protected override Task OnParametersSet()
+        protected override Task OnParametersSetAsync()
         {
             _sportSettingsCache = _sportSettings.Select(x => $"{x.SportId}.{x.SortOrder}").ToList();
             _sportLookupSettingsCache = _sportLookupSettings.Select(x => $"{x.SportId}").ToList();
