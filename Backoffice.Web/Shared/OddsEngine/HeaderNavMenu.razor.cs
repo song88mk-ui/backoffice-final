@@ -49,41 +49,36 @@ namespace Backoffice.Web.Shared.OddsEngine
             var page = NavigationManager?.Uri.Replace(NavigationManager.BaseUri, "");
             ActivateMenu(page);
         }
-        public void ActivateMenu(string? menu = null)
+        private CancellationTokenSource _cancellationSource;
+        public async void ActivateMenu(string? menu = null)
         {
+            _cancellationSource?.Cancel();
+            _cancellationSource = new CancellationTokenSource();
+
+            var token = _cancellationSource.Token;
+            var tempMenu = _menu;
             HideAllMenu();
 
             if (menu != null)
             {
                 if (menu.Contains("hk/odds-engine/"))
                     menu = menu.Replace("hk/odds-engine/", "");
-                //if (menu.Contains("hk/odds-engine"))
-                //    menu = menu.Replace("hk/odds-engine", "");
+                if (menu.Contains("hk/odds-engine"))
+                    menu = menu.Replace("hk/odds-engine", "");
 
-                switch (menu.ToUpper())
+                tempMenu = menu.ToUpper() switch
                 {
-                    case "":
-                    case "MONITORING":
-                        _menu = OeNavMenu.Monitoring;
-                        break;
-                    case "CONFIG":
-                    case "CONFIG-TEMPLATES":
-                        _menu = OeNavMenu.Config;
-                        break;
-                    case "PRICEBOOST":
-                    case "MANAGE-BOOST":
-                    case "BOOSTED-SETTINGS":
-                        _menu = OeNavMenu.PriceBoost;
-                        break;
-                    case "SPORT-SETTINGS":
-                        _menu = OeNavMenu.SportSettings;
-                        break;
-                    case "MARKET-SETTINGS":
-                    case "MARKET-SORT-ORDER":
-                    case "MARKET-GROUPS":
-                        _menu = OeNavMenu.MarketSettings;
-                        break;
-                }
+                    "CONFIG" or "CONFIG-TEMPLATES" => OeNavMenu.Config,
+                    "PRICEBOOST" or "MANAGE-BOOST" or "BOOSTED-SETTINGS" => OeNavMenu.PriceBoost,
+                    "SPORT-SETTINGS" => OeNavMenu.SportSettings,
+                    "MARKET-SETTINGS" or "MARKET-SORT-ORDER" or "MARKET-GROUPS" => OeNavMenu.MarketSettings,
+                    _ or "MONITORING" => OeNavMenu.Monitoring
+                };
+
+                if (token.IsCancellationRequested)
+                    return;
+
+                _menu = tempMenu;
                 StateHasChanged();
             }
         }

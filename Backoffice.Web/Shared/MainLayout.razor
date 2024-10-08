@@ -5,7 +5,7 @@
     <ChildContent>
         @if (!PreRenderService.IsPreRendering)
         {
-            <CascadingValue Value="UserModel" Name="UserModel">
+            <CascadingValue Value="UserModel" Name="UserModel" IsFixed>
                 @* <CascadingValue Value="UserClaims" Name="UserClaims">
             <CascadingValue Value="UserClientCodes" Name="UserClientCodes" IsFixed> *@
                 @if (NavigationManager.Uri.Contains("/admin"))

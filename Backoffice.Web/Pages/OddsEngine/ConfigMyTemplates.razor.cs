@@ -3,7 +3,6 @@ using Backoffice.Shared.Models;
 using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Config;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Globalization;
@@ -18,7 +17,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public ConfigContentFilterModel FilterModel { get; set; }
-
         [Parameter] public EventCallback OnStateHasChanged { get; set; }
         [Parameter] public string QueryMessage { get; set; }
 
@@ -36,7 +34,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private List<ConfigMyTemplateModel>? _configTemplates = null;
 
-        private CancellationTokenSource _cancellationToken;
+        private CancellationTokenSource _cancellationSource;
         private LanguageCode _languageCode;
         private bool _init = true;
         private bool _shouldRender = true;
@@ -180,9 +178,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task LoadConfigTemplates()
         {
-            _cancellationToken?.Cancel();
+            _cancellationSource?.Cancel();
 
-            _cancellationToken = new CancellationTokenSource();
+            _cancellationSource = new CancellationTokenSource();
 
             if (!_isPreloader)
             {
@@ -192,7 +190,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             try
             {
-                var token = _cancellationToken.Token;
+                var token = _cancellationSource.Token;
 
                 var configTemplateResponse = await _backofficeService.GetConfigTemplate(
                     _searchForm.SearchText,
