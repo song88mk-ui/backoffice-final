@@ -28,7 +28,7 @@ namespace Backoffice.Web.Pages.SBC
         private AnnouncementsModel _model;
         private List<AlertModel> _alerts;
         private PageHeaderModel _pageHeaderModel;
-        private List<SelectListItemWithCheckboxModel<string>> _clients;
+        private AnnouncementsFilterModel _filterModel;
         private bool _isPreLoader = true;
         private decimal _opacity;
 
@@ -60,7 +60,7 @@ namespace Backoffice.Web.Pages.SBC
 
         public async Task OnInitEvent(AnnouncementsFilterModel model)
         {
-            _clients = model.Clients;
+            _filterModel = model;
             await GetContent(model);
         }
 
@@ -81,7 +81,7 @@ namespace Backoffice.Web.Pages.SBC
                     LanguageCode = LanguageCode.EN,
                     IsActive = true
                 });
-                parameters.Add("Clients", _clients);
+                parameters.Add("Clients", model.Clients);
                 parameters.Add("IsEdit", false);
                 parameters.Add("ModalHeaderClass", "announcements-modal-header");
 
@@ -115,7 +115,7 @@ namespace Backoffice.Web.Pages.SBC
             parameters.Add("ModalClass", "modal-center modal-show");
             parameters.Add("ModalDialogClass", "modal-l");
             parameters.Add("Announcement", model);
-            parameters.Add("Clients", _clients);
+            parameters.Add("Clients", _filterModel.Clients);
             parameters.Add("IsEdit", true);
 
             var options = new ModalOptions();
@@ -196,7 +196,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             MetaData.CurrentPage = page;
 
-            //await OnInitEvent(FilterModel);
+            await GetContent(_filterModel);
         }
 
         public void Dispose()
@@ -224,14 +224,16 @@ namespace Backoffice.Web.Pages.SBC
             {
                 ClientCodes = model.ClientCodes,
                 LanguageCode = languageCode,
-                SearchText = model.Search
+                SearchText = model.Search,
+                Page = MetaData.CurrentPage,
+                PageSize = MetaData.PageSize
             }, token);
 
             if (token.IsCancellationRequested)
                 return;
 
-            MetaData.TotalCount = response.Result.Announcements.Count;
-            MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
+            MetaData.TotalCount = response.Result.TotalCount;
+            MetaData.TotalPages = response.Result.TotalPage;
 
             _model = new AnnouncementsModel
             {
@@ -244,39 +246,13 @@ namespace Backoffice.Web.Pages.SBC
                     Message = s.Message,
                     Title = s.Title,
                     LanguageCode = s.LanguageCode,
-                    Clients = s.Clients.Where(c => _clients.Select(s => s.Value).Contains(c.ClientCode)).ToList(),
+                    Clients = s.Clients.Where(c => _filterModel.Clients.Select(s => s.Value).Contains(c.ClientCode)).ToList(),
                     Languages = s.Languages,
                     Row = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
                 }).ToList()
             };
 
             SetItemAction();
-            //if (response.StatusCode != Backoffice.Shared.Enums.StatusCode.Success)
-            //{
-            //    _toasterService.AddToast(Toast.NewToast
-            //            ("Client Top Fixtures",
-            //            $"{topLeaguesResponse.Message}"));
-            //    IsPreLoader = false;
-            //    return;
-            //}
-
-            //TopLeaguesList = topLeaguesResponse.Result;
-
-            //var skip = (MetaData.CurrentPage - 1) * MetaData.PageSize;
-
-            //if (MetaData.CurrentPage > 0)
-            //{
-            //    TopLeaguesList.ClientTopLeagues = TopLeaguesList.ClientTopLeagues
-            //        .Skip(skip).Take(MetaData.PageSize)
-            //        .Select((s, index) => new ClientTopLeague
-            //        {
-            //            RowNo = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
-            //            ClientIdRef = s.ClientIdRef,
-            //            ClientName = s.ClientName,
-            //            TopLeagues = s.TopLeagues
-            //        })
-            //        .ToList();
-            //}
 
             _isPreLoader = false;
         }
