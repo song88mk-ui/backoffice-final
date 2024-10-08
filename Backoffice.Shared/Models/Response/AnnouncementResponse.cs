@@ -21,7 +21,7 @@ namespace Backoffice.Shared.Models.Response
             public AnnouncementDTO()
             {
                 Clients = new List<ClientInfo>();
-                Languages = new List<LanguageCode>();
+                Languages = new List<AnnouncementMessage>();
             }
             public int Id { get; set; }
             public bool IsActive { get; set; }
@@ -31,7 +31,7 @@ namespace Backoffice.Shared.Models.Response
             public string Message { get; set; }
             public LanguageCode LanguageCode { get; set; }
             public List<ClientInfo> Clients { get; set; }
-            public List<LanguageCode> Languages { get; set; }
+            public List<AnnouncementMessage> Languages { get; set; }
         }
 
         public class ClientInfo
