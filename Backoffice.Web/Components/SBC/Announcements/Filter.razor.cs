@@ -21,8 +21,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         #region Fields
 
-        private bool _init;
-        private bool _shouldRender = true;
+        private bool _init = true;
+        private bool _shouldRender;
 
         private SearchFormModel _searchForm;
         private AnnouncementsFilterModel _filterModel;
@@ -35,7 +35,6 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         protected override async Task OnInitializedAsync()
         {
-            _init = true;
             _filterModel = new AnnouncementsFilterModel();
 
             _searchForm = new SearchFormModel()
@@ -82,7 +81,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         protected override async Task OnParametersSetAsync()
         {
-            _shouldRender = _init && _clients != null;
+            _shouldRender = ValidateParameters();
 
             if(_clients != null)
                 _init = false;
@@ -121,6 +120,11 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _filterModel.IsAddAnnouncement = true;
 
             await OnFilterCallback.InvokeAsync(_filterModel);
+        }
+
+        private bool ValidateParameters()
+        {
+            return _init && _clients != null;
         }
 
         public void Dispose()

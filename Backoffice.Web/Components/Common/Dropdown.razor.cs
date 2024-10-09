@@ -1,15 +1,11 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Models;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Collections.Generic;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
-using System.Diagnostics.Metrics;
-using System.Diagnostics;
 
 namespace Backoffice.Web.Components.Common
 {
-    public partial class Dropdown : ComponentBase
+    public partial class Dropdown
     {
         #region Properties
 
@@ -24,9 +20,11 @@ namespace Backoffice.Web.Components.Common
 
         #region Fields
 
-        private bool _shouldRender = true;
+        private bool _init = true;
+        private bool _shouldRender;
         private int _selectedCount;
         private string _selectedName;
+        private LanguageCode _languageCode;
         private List<SelectListItemWithCheckboxModel<string>> _items;
 
         #endregion
@@ -49,11 +47,18 @@ namespace Backoffice.Web.Components.Common
                         IsChecked = true
                     });
             }
+
         }
 
-        protected override async Task OnParametersSetAsync()
+        protected override Task OnParametersSetAsync()
         {
-            _shouldRender = false;
+            _shouldRender = ValidateParameters();
+
+            if (_shouldRender)
+                _languageCode = TranslationState.ActiveLanguageCode;
+
+            _init = false;
+            return base.OnParametersSetAsync();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -76,6 +81,7 @@ namespace Backoffice.Web.Components.Common
             var selectedNames = string.Join(",", items.Select(s => s.Key));
 
             await OnClickEventCallback.InvokeAsync(selectedNames);
+            _shouldRender = true;
         }
 
 
@@ -84,15 +90,16 @@ namespace Backoffice.Web.Components.Common
             _selectedName = item.Value.ToString();
 
             await OnClickEventCallback.InvokeAsync(_selectedName);
+            _shouldRender = true;
         }
 
         #endregion
 
         #region Utilities
 
-        public bool ValidateParameters()
+        private bool ValidateParameters()
         {
-            return true;
+            return _init || _languageCode != TranslationState.ActiveLanguageCode;
         }
 
         #endregion
