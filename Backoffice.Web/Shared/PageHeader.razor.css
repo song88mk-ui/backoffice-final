@@ -16,3 +16,19 @@ hr {
     margin: 1.5rem 0;
     border-top: 1.5px solid #9E9A99;
 }
+
+.announcements {
+    margin-bottom: 28px;
+}
+
+.announcements hr {
+    display: none;
+}
+
+.announcements h4 {
+    color: #1F1F1F;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
