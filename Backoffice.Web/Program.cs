@@ -20,6 +20,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using System.Reflection;
+using Microsoft.AspNetCore.Http.Connections;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
@@ -95,7 +96,14 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor().AddCircuitOptions(o =>
 {
     o.DetailedErrors = true;
+}).AddHubOptions(o =>
+{
+    //o.MaximumReceiveMessageSize = 64 * 1024;
+    o.MaximumReceiveMessageSize = 5000000;
+    o.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    o.EnableDetailedErrors = true;
 });
+
 if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CONTAINER_APP_ENV_DNS_SUFFIX")))
 {
     var envName = Environment.GetEnvironmentVariable("TELEMETRY__ENVIRONMENT");
@@ -103,6 +111,7 @@ if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CONTAINER_APP_ENV_
     builder.Services.AddDataProtection()
         .PersistKeysToAzureBlobStorage(new Uri(dpkUri), new DefaultAzureCredential());
 }
+
 
 builder.Services.AddSingleton<IMemCache, MemCache>();
 builder.Services.AddBlazoredLocalStorage();
@@ -142,7 +151,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.MapBlazorHub();
+app.MapBlazorHub(o => { o.Transports = HttpTransportType.WebSockets; });
 app.MapFallbackToPage("/_Host");
 app.MapHub<BoHub>("/bohub");
 
