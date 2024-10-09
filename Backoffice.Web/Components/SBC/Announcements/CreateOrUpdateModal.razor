@@ -32,33 +32,45 @@
                 <div class="announcement-title-container">
                     <div class="announcement-title-label">Title</div>
                     <div class="announcement-title-sub-label">The title of your announcement.</div>
-                    <input type="text" class="form-control" id="titleField" placeholder="Enter title" @bind-value="_announcement.Title" />
+                    <input type="text" class="form-control @(ShowNoTitleAlert() ? "has-error" : "")" id="titleField" placeholder="Enter title" @bind-value="_announcement.Title" @onblur="HandleBlur" />
+                    @if (ShowNoTitleAlert())
+                    {
+                        <span class="announcement-error-message">@(NO_TITLE_ERR_MSG)</span>
+                    }
                 </div>
                 <div class="announcement-dates-container">
                     <div class="announcement-start-date-container">
                         <span class="announcement-start-date-title">Start Date / Time</span>
-                        <DateRangePicker class="form-control"
-                            StartDate="_announcement.StartDate"
-                            OnRangeSelect="OnRangeSelectStartDate"
-                            TimePicker="true"
-                            TimePicker24Hour="true"
-                            SingleDatePicker="true"
-                            DateFormat="@($"MMM dd, yyyy HH:mm")" 
-                        />
-                        <i class="ico ico-calendar" />
+                        <div class="announcement-date-input-wrapper @GetDateRangeClass()">
+                            <DateRangePicker class="form-control"
+                                StartDate="_announcement.StartDate"
+                                OnRangeSelect="OnRangeSelectStartDate"
+                                TimePicker="true"
+                                TimePicker24Hour="true"
+                                SingleDatePicker="true"
+                                DateFormat="@($"MMM dd, yyyy HH:mm")"
+                                />
+                            <i class="ico ico-calendar" />
+                        </div>
+                        @if (ShowInvalidStartDateAlert())
+                        {
+                            <span class="announcement-error-message">@(INVALID_START_DATE_ERR_MSG)</span>
+                        }
                     </div>
                     <div class="announcement-end-date-container">
                         <span class="announcement-end-date-title">End Date / Time</span>
-                        <DateRangePicker class="form-control"
-                            MinDate="_announcement.StartDate"
-                            StartDate="_announcement.EndDate"
-                            OnRangeSelect="OnRangeSelectEndDate"
-                            TimePicker="true"
-                            TimePicker24Hour="true"
-                            SingleDatePicker="true"
-                            DateFormat="@($"MMM dd, yyyy HH:mm")" 
-                        />
-                        <i class="ico ico-calendar" />
+                        <div class="announcement-date-input-wrapper">
+                            <DateRangePicker class="form-control"
+                                MinDate="_announcement.StartDate"
+                                StartDate="_announcement.EndDate"
+                                OnRangeSelect="OnRangeSelectEndDate"
+                                TimePicker="true"
+                                TimePicker24Hour="true"
+                                SingleDatePicker="true"
+                                DateFormat="@($"MMM dd, yyyy HH:mm")" 
+                            />
+                            <i class="ico ico-calendar" />
+                        </div>
                     </div>
                 </div>
                 <div class="announcement-clients-container">
@@ -66,7 +78,13 @@
                     <span class="announcement-clients-sub-label">Select the clients who will see this announcement.</span>
                     @if (_clients != null)
                     {
-                        <Dropdown DropdownClass="announcements" DropdownName="Clients" OnClickEventCallback="OnClientCheckboxClickEvent" Items="_clients" Multiple=true />
+                        <div class="announcement-clients-input-wrapper @(ShowNoClientAlert() ? "has-error" : "")" @onblur="HandleBlur">
+                            <Dropdown DropdownClass="announcements" DropdownName="Clients" OnClickEventCallback="OnClientCheckboxClickEvent" Items="_clients" Multiple=true />
+                        </div>
+                    }
+                    @if (ShowNoClientAlert())
+                    {
+                        <span class="announcement-error-message">@(NO_CLIENT_ERR_MSG)</span>
                     }
                 </div>
                 <div class="announcement-language-container">
@@ -83,10 +101,13 @@
                     </div>
                 </div>
                 <div class="announcement-message-container">
-                    <span class="announcement-message-label">Clients</span>
-                    <span class="announcement-message-sub-label">Select the clients who will see this announcement.</span>
-@*                     <input type="textarea" class="form-control" id="messageField" placeholder="Enter the message of your announcement" @bind-value="_announcementMessages[_selectedLanguage]" multiple /> *@
-                    <textarea class="announcement-message-input" placeholder="Enter the message of your announcement" @bind="_announcementMessages[_selectedLanguage]" rows="4"/>
+                    <span class="announcement-message-label">Message</span>
+                    <span class="announcement-message-sub-label">Enter the message of your announcement.</span>
+                    <textarea class="announcement-message-input @(ShowNoMessageAlert() ? "has-error" : "")" placeholder="Enter the message of your announcement" @bind="_announcementMessages[_selectedLanguage]" rows="4" @onblur="HandleBlur" />
+                    @if (ShowNoMessageAlert())
+                    {
+                        <span class="announcement-error-message">@(NO_MSG_ERR_MSG)</span>
+                    }
                 </div>
             </div>
 
@@ -94,10 +115,10 @@
     }
 </div>
 <div class="modal-footer">
-    @if (_alerts != null && _alerts.Any())
+    @if (ShowGeneralErrorAlert())
     {
         <div class="col-md-8">
-            @foreach (var alert in _alerts)
+            @foreach (var alert in _alerts.Where(a => a.AnnouncementAlertType == AnnouncementAlertType.GeneralError).ToList())
             {
                 <AlertMessage AlertModel="@alert" />
             }
