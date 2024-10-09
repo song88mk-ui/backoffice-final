@@ -24,13 +24,18 @@ namespace Backoffice.Web.Pages.SBC
 
         #region Fields
 
-        private CancellationTokenSource _cts;
+        private decimal _opacity;
+
+        private bool _init = true;
+        private bool _shouldRender;
+        private bool _isPreLoader = true;
+
+        private LanguageCode _languageCode;
         private AnnouncementsModel _model;
         private List<AlertModel> _alerts;
+        private CancellationTokenSource _cts;
         private PageHeaderModel _pageHeaderModel;
         private AnnouncementsFilterModel _filterModel;
-        private bool _isPreLoader = true;
-        private decimal _opacity;
 
         #endregion
 
@@ -58,10 +63,30 @@ namespace Backoffice.Web.Pages.SBC
             await AuthenticateAccess.InvokeAsync();
         }
 
+        protected override Task OnParametersSetAsync()
+        {
+            _shouldRender = ValidateParameters();
+
+            if (_shouldRender)
+                _languageCode = TranslationState.ActiveLanguageCode;
+
+            _init = false;
+            return base.OnParametersSetAsync();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            _shouldRender = false;
+        }
+
+        protected override bool ShouldRender() => _shouldRender;
+
         public async Task OnInitEvent(AnnouncementsFilterModel model)
         {
             _filterModel = model;
             await GetContent(model);
+
+            _shouldRender = true;
         }
 
         public async Task OnFilterEvent(AnnouncementsFilterModel model)
@@ -104,6 +129,7 @@ namespace Backoffice.Web.Pages.SBC
                 await GetContent(model);
             }
 
+            _shouldRender = true;
         }
 
         public async Task OnEditClickEvent(Models.Announcements model)
@@ -121,6 +147,8 @@ namespace Backoffice.Web.Pages.SBC
             var options = new ModalOptions();
             options.HideCloseButton = true;
             ModalService.Open<CreateOrUpdateModal>("Edit Announcements", parameters, options);
+
+            _shouldRender = true;
         }
 
         public async Task OnDeleteClickEvent(Models.Announcements model)
@@ -136,6 +164,8 @@ namespace Backoffice.Web.Pages.SBC
             var options = new ModalOptions();
             options.HideCloseButton = true;
             ModalService.Open<DeleteAnnouncementModal>("Delete Announcement", parameters, options);
+
+            _shouldRender = true;
         }
 
         public async Task OnSaveClickEvent(object item)
@@ -190,6 +220,7 @@ namespace Backoffice.Web.Pages.SBC
                 Opacity = _opacity
             });
 
+            _shouldRender = true;
         }
 
         public async Task SelectPage(int page)
@@ -197,6 +228,7 @@ namespace Backoffice.Web.Pages.SBC
             MetaData.CurrentPage = page;
 
             await GetContent(_filterModel);
+            _shouldRender = true;
         }
 
         public void Dispose()
@@ -207,16 +239,19 @@ namespace Backoffice.Web.Pages.SBC
         #endregion
 
         #region Utilities
+
+        private bool ValidateParameters()
+        {
+            return _init || _languageCode != TranslationState.ActiveLanguageCode;
+        }
+
         private async Task GetContent(AnnouncementsFilterModel model)
         {
             _cts?.Cancel();
             _cts = new CancellationTokenSource();
 
             if (!_isPreLoader)
-            {
                 _isPreLoader = true;
-                StateHasChanged();
-            }
 
             var token = _cts.Token;
             var languageCode = (LanguageCode)Enum.Parse(typeof(LanguageCode), model.LanguageCode, true);

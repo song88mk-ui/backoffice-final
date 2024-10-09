@@ -138,10 +138,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     return;
 
                 _isPreload = true;
-                StateHasChanged();
 
                 _alerts.Clear();
-
                 _opacity = _opacity == 1m ? 0.99m : 1m;
 
                 if (!EditContext.Validate())
@@ -225,6 +223,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 {
                     _announcement.Message = _announcementMessages[_announcement.LanguageCode].ToString();
                     _announcement.Clients = _selectedClientCodes.Select(s => new AnnouncementResponse.ClientInfo { ClientCode = s }).ToList();
+                    _announcement.Languages = request.AnnouncementMessages;
                 }
 
                 var response = await BackofficeService.AddOrUpdateAnnouncements(request, token);

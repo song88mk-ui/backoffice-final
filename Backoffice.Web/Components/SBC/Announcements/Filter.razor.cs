@@ -83,8 +83,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         {
             _shouldRender = ValidateParameters();
 
-            if(_clients != null)
-                _init = false;
+            _init = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -124,7 +123,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         private bool ValidateParameters()
         {
-            return _init && _clients != null;
+            return _init || _clients != null;
         }
 
         public void Dispose()
