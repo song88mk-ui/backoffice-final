@@ -28,3 +28,7 @@ button:focus:not(:focus-visible) {
 .dropdown.announcements, .dropdown.announcements > .btn.form-select {
     width: 100%;
 }
+
+.dropdown.announcements-page-clients, .dropdown.announcements-page-language {
+    background: #FFF;
+}
