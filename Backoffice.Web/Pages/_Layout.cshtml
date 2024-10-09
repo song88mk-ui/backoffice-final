@@ -200,6 +200,9 @@
         if (!baseUri.Contains("localhost"))
             baseUri = baseUri.Replace("http:", "https:");
 
+        if (baseUri.EndsWith("/"))
+            baseUri = baseUri.TrimEnd('/');
+
         return $"{baseUri}/_blazor";
     }
 }
