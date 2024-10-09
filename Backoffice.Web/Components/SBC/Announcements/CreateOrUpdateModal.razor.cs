@@ -30,6 +30,9 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         private bool _isEdit;
         private bool _isPreload;
+        private bool _init = true;
+        private bool _shouldRender;
+
         private decimal _opacity;
         private LanguageCode _selectedLanguage;
 
@@ -97,6 +100,21 @@ namespace Backoffice.Web.Components.SBC.Announcements
             EditContext = new EditContext(_announcement);
         }
 
+        protected override Task OnParametersSetAsync()
+        {
+            _shouldRender = ValidateParameters();
+
+            _init = false;
+            return base.OnParametersSetAsync();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            _shouldRender = false;
+        }
+
+        protected override bool ShouldRender() => _shouldRender;
+
         public async Task OnStatusClickEvent()
         {
             _announcement.IsActive = !_announcement.IsActive;
@@ -126,6 +144,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _announcement.Languages = _prevAnnouncement.Languages;
 
             ModalService.Cancel();
+
+            _shouldRender = true;
         }
 
         public async Task OnSaveClickEvent()
@@ -251,6 +271,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     Log.Error(ex.StackTrace.ToString());
             }
             _isPreload = false;
+            _shouldRender = true;
         }
 
         public async Task OnLanguageClicked(LanguageCode languageCode)
@@ -259,11 +280,13 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 return;
 
             _selectedLanguage = languageCode;
+            _shouldRender = true;
         }
 
         public async Task OnClientCheckboxClickEvent(string selectedItems)
         {
             _selectedClientCodes = selectedItems.Split(",").ToList();
+            _shouldRender = true;
         }
 
         public void Dispose()
@@ -274,6 +297,11 @@ namespace Backoffice.Web.Components.SBC.Announcements
         #endregion
 
         #region Utilities
+
+        private bool ValidateParameters()
+        {
+            return _init;
+        }
 
         #endregion
     }
