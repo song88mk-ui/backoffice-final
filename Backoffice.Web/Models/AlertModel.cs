@@ -11,8 +11,14 @@ namespace Backoffice.Web.Models
         public string Message { get; set; }
         public bool IsAlwaysShown { get; set; } = false;
     }
+
     public class CancelBetAlertModel : AlertModel
     {
         public string Control { get; set; } = "";
+    }
+
+    public class AnnouncementsAlertModel: AlertModel
+    {
+        public AnnouncementAlertType AnnouncementAlertType { get; set; }
     }
 }
