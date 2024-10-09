@@ -76,7 +76,7 @@
                         @foreach (var language in _languageCodes)
                         {
                             <div key="@(language)-lang" class="announcement-language-item" @onclick="() => OnLanguageClicked(language)">
-                                <img class="announcement-language-item-icon @(_selectedLanguage == language ? "selected" : "")" src="/icons/svg/flags/@(language.ToString().ToLower()).svg" />
+                                <i class="announcement-language-item-icon @($"ico-flag flag-{language.ToString().ToLower()}") @(_selectedLanguage == language ? "selected" : "")" aria-hidden="true" />
                                 <span class="announcement-language-item-label">@language</span>
                             </div>
                         }
