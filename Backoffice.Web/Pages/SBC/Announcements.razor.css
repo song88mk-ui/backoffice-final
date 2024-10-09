@@ -1,33 +1,160 @@
 ﻿.main-content {
-    background-color: #FFFFFF;
+    background-color: transparent;
     border-radius: 3px;
 }
 
-.table > tbody > tr:nth-child(2n) > td, .table > tbody > tr:nth-child(2n) > th {
+/*.table > tbody > tr:nth-child(2n) > td, .table > tbody > tr:nth-child(2n) > th {
     background-color: #F5F5F5;
+}*/
+
+.announcements-header {
+    background-color: #transparent;
+}
+
+.announcements-filter-group {
+    margin-bottom: 28px;
+}
+
+.announcements-content {
+    background-color: #FFF;
 }
 
 .table-head {
-    background-color: #354156;
-    color: #fff;
+    background-color: #FFF;
+    color: #4F4F50;
+    border: 1px solid #E9EAED;
+    font-size: 14px;
+    font-style: normal; 
+    font-weight: 600;
+    line-height: 20px;
 }
 
-.table thead th, .table tbody td, ::deep .table tfoot td {
-    font-size: 0.9rem;
-    font-weight: inherit;
-    vertical-align: middle;
+table thead th {
+    padding-top: 17px;
+    padding-bottom: 17px;
+}
+ 
+tbody tr td:first-child {
+    padding-left: 16px;
 }
 
-table thead th, .table tbody td {
-    text-align: center;
+tbody tr td:last-child {
+    padding-right: 16px;
+}
+
+tbody .content-row {
+    border: 1px solid #E9EAED;
+}
+
+tbody .content-row:hover {
+    background-color: #ECECEC;
+}
+
+tbody .content-cell {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    height: 100%;
+}
+
+tbody .content-cell.title {
+    color: #4F4F50;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+}
+
+tbody .content-cell.client {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+tbody .content-cell.client .clients-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+}
+
+tbody .content-cell.client .clients-count {
+    background-color: #FFE7D6;
+    color: #FF6B00;
+    padding: 1px 8px;
+    border-radius: 4px;
+}
+
+tbody .content-cell.message {
+    padding-right: 30px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 160%;
+}
+
+tbody .content-cell.message .text {
+    display: -webkit-box;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+tbody .content-cell.status {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+tbody .content-cell.status .status-container {
+    background-color: #FFF;
+    color: #232323;
+    border: 1px solid #EFEFEF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 16px;
+    letter-spacing: 0.24px;
+}
+
+tbody .content-cell.status .status-container .dot {
+    min-width: 10px;
+    min-height: 10px;
+    border-radius: 20px;
+}
+
+tbody .content-cell.status .status-container.active-status .dot {
+    background-color: #FF6B00;
+}
+
+tbody .content-cell.status .status-container.inactive-status .dot {
+    background-color: #FFE7D6;
+}
+
+tbody .content-cell.actions {
+    padding-top: 9px;
 }
 
 table thead th:first-child {
     border-top-left-radius: 3px;
+    padding-left: 16px;
 }
 
 table thead th:last-child {
     border-top-right-radius: 3px;
+    padding-right: 16px;
 }
 
 table tfoot td:first-child {
@@ -39,23 +166,27 @@ table tfoot td:last-child {
 }
 
 .th-number {
-    width: 5%;
+    width: 5%; 
 }
 
 .th-title {
-    width: 5%;
+    width: 12%;
 }
 
 .th-client {
+    width: 10%;
+}
+
+.th-languages {
     width: 15%;
 }
 
 .th-description {
-    width: 40%;
+    width: 31%;
 }
 
 .th-date {
-    width: 10%;
+    width: 8%;
 }
 
 .th-status {
@@ -63,18 +194,25 @@ table tfoot td:last-child {
 }
 
 .th-action {
-    width: 10%;
+    width: 6%;
 }
 
-.tl-fixture {
+.lang-icon {
     background-color: #9AA0AB;
     color: #FFF;
     width: fit-content;
 }
 
 .tl-link-edit {
-    color: #1F1F1F;
-    font-size: 1rem;
+    color: #606060;
+    font-size: 20px;
+    margin-right: 16px;
+}
+
+.tl-link-delete {
+    color: #606060;
+    font-size: 20px;
+    padding-bottom: 2px;
 }
 
 .tl-link-copy {
