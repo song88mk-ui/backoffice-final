@@ -298,7 +298,13 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         public async Task OnClientCheckboxClickEvent(string selectedItems)
         {
-            _selectedClientCodes = selectedItems.Split(",").ToList();
+            if (selectedItems.Length > 0)
+            {
+                _selectedClientCodes = selectedItems.Split(",").ToList();
+            } else
+            {
+                _selectedClientCodes.Clear();
+            }
             _shouldRender = true;
         }
 
