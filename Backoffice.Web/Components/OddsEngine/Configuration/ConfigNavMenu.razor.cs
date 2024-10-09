@@ -2,6 +2,7 @@
 using Backoffice.Web.Models.OddsEngine.Config;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
@@ -37,9 +38,19 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private bool _init = true;
         private bool _shouldRender = true;
 
+        private Action<MouseEventArgs> _myTemplateClickEvent;
+        private Action<MouseEventArgs> _assignedClickEvent;
+        private Action<MouseEventArgs> _unAssignedClickEvent;
+
         #endregion
 
         #region Methods
+
+        protected override void OnInitialized() {
+            _myTemplateClickEvent = async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.MyTemplates);
+            _assignedClickEvent =  async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.Assigned);
+            _unAssignedClickEvent = async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.Assigned);
+        }
 
         protected override void OnParametersSet()
         {

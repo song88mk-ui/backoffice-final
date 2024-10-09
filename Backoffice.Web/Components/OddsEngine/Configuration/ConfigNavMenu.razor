@@ -1,11 +1,11 @@
 ﻿<div class="d-flex justify-content-between col mx-4 config-nav-container">
     <div>
         <a href="javascript:void(0)" class="@_myTemplateCss"
-           @onclick="_ => HandleConfigNavMenuClick(ConfigTemplateNavMenu.MyTemplates)">@_myTemplateText</a>
+           @onclick="_myTemplateClickEvent">@_myTemplateText</a>
         <a href="javascript:void(0)" class="@_assignedCss"
-           @onclick="_ => HandleConfigNavMenuClick(ConfigTemplateNavMenu.Assigned)">@_assignedText</a>
+           @onclick="_assignedClickEvent">@_assignedText</a>
         <a href="javascript:void(0)" class="@_unAssignedCss"
-           @onclick="_ => HandleConfigNavMenuClick(ConfigTemplateNavMenu.UnAssigned)">@_unAssignedText</a>
+           @onclick="_unAssignedClickEvent">@_unAssignedText</a>
     </div>
     <div>
         <a class="btn btn-copy-client" href="javascript:(0)" @onclick="HandleCopyClientSettingsSelect">@TranslationState.GetValue("Copy Client Settings")</a>
