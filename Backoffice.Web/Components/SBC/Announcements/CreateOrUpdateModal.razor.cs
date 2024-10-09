@@ -33,10 +33,15 @@ namespace Backoffice.Web.Components.SBC.Announcements
         private bool _init = true;
         private bool _shouldRender;
 
+        private string NO_TITLE_ERR_MSG = "Title is required";
+        private string NO_MSG_ERR_MSG = "Message is required";
+        private string NO_CLIENT_ERR_MSG = "Please assign at least 1 client";
+        private string INVALID_START_DATE_ERR_MSG = "Start Date should be less than End Date";
+
         private decimal _opacity;
         private LanguageCode _selectedLanguage;
 
-        private List<AlertModel> _alerts;
+        private List<AnnouncementsAlertModel> _alerts;
         private CancellationTokenSource _cts;
         private List<LanguageCode> _languageCodes;
         private Models.Announcements _announcement;
@@ -53,7 +58,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         {
             _isPreload = false;
 
-            _alerts = new List<AlertModel>();
+            _alerts = new List<AnnouncementsAlertModel>();
             _announcement = ModalParameters.TryGet<Models.Announcements>("Announcement");
             _prevAnnouncement = new Models.Announcements
             {
@@ -123,6 +128,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         public async Task OnRangeSelectStartDate(DateRange range)
         {
             _announcement.StartDate = range.Start.LocalDateTime;
+            _shouldRender = true;
         }
 
         public async Task OnRangeSelectEndDate(DateRange range)
@@ -168,8 +174,9 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     {
                         if (!_alerts.Any(a => a.Message == message))
                         {
-                            _alerts.Add(new AlertModel
+                            _alerts.Add(new AnnouncementsAlertModel
                             {
+                                AnnouncementAlertType = AnnouncementAlertType.GeneralError,
                                 Status = AlertStatus.Error,
                                 Message = $"{message}",
                                 Opacity = _opacity
@@ -182,46 +189,51 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
                 if (string.IsNullOrEmpty(_announcement.Title))
                 {
-                    _alerts.Add(new AlertModel
+                    _alerts.Add(new AnnouncementsAlertModel
                     {
+                        AnnouncementAlertType = AnnouncementAlertType.NoTitle,
                         Status = AlertStatus.Error,
-                        Message = "Title is required",
+                        Message = NO_TITLE_ERR_MSG,
                         Opacity = _opacity
                     });
                 }
 
                 if (!_announcementMessages.Any(m => !string.IsNullOrEmpty(m.Value)))
                 {
-                    _alerts.Add(new AlertModel
+                    _alerts.Add(new AnnouncementsAlertModel
                     {
+                        AnnouncementAlertType = AnnouncementAlertType.NoMessage,
                         Status = AlertStatus.Error,
-                        Message = "Message is required",
+                        Message = NO_MSG_ERR_MSG,
                         Opacity = _opacity
                     });
                 }
 
                 if (_announcement.StartDate > _announcement.EndDate)
                 {
-                    _alerts.Add(new AlertModel
+                    _alerts.Add(new AnnouncementsAlertModel
                     {
+                        AnnouncementAlertType = AnnouncementAlertType.InvalidStartDate,
                         Status = AlertStatus.Error,
-                        Message = "Start Date should be less than End Date",
+                        Message = INVALID_START_DATE_ERR_MSG,
                         Opacity = _opacity
                     });
                 }
 
                 if (!_selectedClientCodes.Any())
                 {
-                    _alerts.Add(new AlertModel
+                    _alerts.Add(new AnnouncementsAlertModel
                     {
+                        AnnouncementAlertType = AnnouncementAlertType.NoClient,
                         Status = AlertStatus.Error,
-                        Message = "Please assign at least 1 client",
+                        Message = NO_CLIENT_ERR_MSG,
                         Opacity = _opacity
                     });
                 }
 
                 if (_alerts.Any())
                 {
+                    _shouldRender = true;
                     _isPreload = false;
                     return;
                 }
@@ -256,8 +268,9 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 }
                 else
                 {
-                    _alerts.Add(new AlertModel
+                    _alerts.Add(new AnnouncementsAlertModel
                     {
+                        AnnouncementAlertType = AnnouncementAlertType.GeneralError,
                         Status = AlertStatus.Error,
                         Message = $"{response.Message}",
                         Opacity = _opacity
@@ -285,7 +298,25 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         public async Task OnClientCheckboxClickEvent(string selectedItems)
         {
-            _selectedClientCodes = selectedItems.Split(",").ToList();
+            if (selectedItems.Length > 0)
+            {
+                _selectedClientCodes = selectedItems.Split(",").ToList();
+            } else
+            {
+                _selectedClientCodes.Clear();
+            }
+            _shouldRender = true;
+        }
+
+        public bool ShowNoTitleAlert() => _alerts.Any(a => a.AnnouncementAlertType == AnnouncementAlertType.NoTitle) && string.IsNullOrEmpty(_announcement.Title);
+        public bool ShowNoMessageAlert() => _alerts.Any(a => a.AnnouncementAlertType == AnnouncementAlertType.NoMessage) && !_announcementMessages.Any(m => !string.IsNullOrEmpty(m.Value));
+        public bool ShowInvalidStartDateAlert() => _alerts.Any(a => a.AnnouncementAlertType == AnnouncementAlertType.InvalidStartDate) && _announcement.StartDate > _announcement.EndDate;
+        public bool ShowNoClientAlert() => _alerts.Any(a => a.AnnouncementAlertType == AnnouncementAlertType.NoClient) && !_selectedClientCodes.Any();
+        public bool ShowGeneralErrorAlert() => _alerts.Any(a => a.AnnouncementAlertType == AnnouncementAlertType.GeneralError);
+        public string GetDateRangeClass() => ShowInvalidStartDateAlert() ? "has-error" : "";
+
+        public async Task HandleBlur()
+        {
             _shouldRender = true;
         }
 

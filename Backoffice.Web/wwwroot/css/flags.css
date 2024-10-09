@@ -1278,6 +1278,11 @@
     width: 32px;
 }
 
+.flag-zht {
+    content: url('../icons/svg/flags/zht.svg');
+    width: 32px;
+}
+
 .flag-zm {
     content: url('../icons/svg/flags/zm.svg');
     width: 32px;
@@ -1285,5 +1290,15 @@
 
 .flag-zw {
     content: url('../icons/svg/flags/zw.svg');
+    width: 32px;
+}
+
+.flag-lo {
+    content: url('../icons/svg/flags/lo.svg');
+    width: 32px;
+}
+
+.flag-sw {
+    content: url('../icons/svg/flags/sw.svg');
     width: 32px;
 }

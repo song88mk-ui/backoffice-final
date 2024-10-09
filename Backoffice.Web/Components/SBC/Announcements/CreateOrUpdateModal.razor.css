@@ -113,7 +113,13 @@
 .ico-calendar {
     position: absolute;
     right: 12px;
-    top: 50%;
+    top: 6px;
+}
+
+.announcement-date-input-wrapper {
+    width: 100%;
+    border-radius: 0.25rem;
+    position: relative;
 }
 
 .announcement-clients-container {
@@ -140,6 +146,11 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+}
+
+.announcement-clients-input-wrapper {
+    width: 100%;
+    border-radius: 0.25rem;
 }
 
 .announcement-cancel-btn {
@@ -256,4 +267,21 @@
 
 .announcement-message-input {
     width: 100%;
+    border-radius: 0.25rem;
+}
+
+.announcement-message-input.has-error:focus {
+    outline: 2px solid red;
+}
+
+.has-error {
+    outline: 2px solid red;
+}
+
+.announcement-error-message {
+    color: red;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
