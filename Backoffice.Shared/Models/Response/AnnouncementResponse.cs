@@ -33,6 +33,8 @@ namespace Backoffice.Shared.Models.Response
             public DateTime EndDate { get; set; }
             public string Message { get; set; }
             public LanguageCode LanguageCode { get; set; }
+            public string UserId { get; set; }
+            public string UserRoleId { get; set; }
             public List<ClientInfo> Clients { get; set; }
             public List<AnnouncementMessage> Languages { get; set; }
         }

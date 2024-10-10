@@ -17,6 +17,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public MetaData MetaData { get; set; }
 
@@ -136,6 +137,12 @@ namespace Backoffice.Web.Pages.SBC
         {
             _alerts.Clear();
 
+            if (model.UserRoleId != UserModel.RoleId)
+            {
+                _shouldRender = true;
+                return;
+            }
+
             var parameters = new ModalParameters();
 
             parameters.Add("ModalClass", "modal-center modal-show");
@@ -154,6 +161,12 @@ namespace Backoffice.Web.Pages.SBC
         public async Task OnDeleteClickEvent(Models.Announcements model)
         {
             _alerts.Clear();
+
+            if (model.UserRoleId != UserModel.RoleId)
+            {
+                _shouldRender = true;
+                return;
+            }
 
             var parameters = new ModalParameters();
 
@@ -222,7 +235,7 @@ namespace Backoffice.Web.Pages.SBC
                 Message = message,
                 Opacity = _opacity
             });
-
+            
             _shouldRender = true;
         }
 

@@ -92,10 +92,10 @@
                                                     <td class="content-cell actions">
                                                         <AuthorizeView Policy="sbc-announcements-canedit">
                                                             <Authorized Context="ActivateAll">
-                                                                <a class="tl-link-edit" href="javascript:(0)" @onclick="item.EditAction">
+                                                                <a class="tl-link-edit" href="javascript:(0)" @onclick="item.EditAction" disabled="@(item.UserRoleId!=UserModel.RoleId)">
                                                                     <i class="fa fa-edit" />
                                                                 </a>
-                                                                <a class="tl-link-delete" href="javascript:(0)" @onclick="item.DeleteAction">
+                                                                <a class="tl-link-delete" href="javascript:(0)" @onclick="item.DeleteAction" disabled="@(item.UserRoleId!=UserModel.RoleId)">
                                                                     <i class="fa fa-trash" />
                                                                 </a>
                                                             </Authorized>

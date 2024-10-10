@@ -19,6 +19,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
 
@@ -240,6 +241,9 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
                 var token = _cts.Token;
 
+                var userId = UserModel.Id;
+                var userRoleId = UserModel.RoleId;
+
                 var request = new AddOrUpdateAnnouncementRequest
                 {
                     Id = _announcement.Id,
@@ -248,7 +252,9 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     EndDate = _announcement.EndDate,
                     IsActive = _announcement.IsActive,
                     AnnouncementMessages = _announcementMessages.Where(m => !string.IsNullOrEmpty(m.Value)).Select(s => new AnnouncementMessage { LanguageCode = s.Key, Message = s.Value }).ToList(),
-                    ClientCodes = _selectedClientCodes
+                    ClientCodes = _selectedClientCodes,
+                    UserId = userId,
+                    UserRoleId = userRoleId
                 };
 
                 if(_isEdit)
