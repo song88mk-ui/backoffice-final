@@ -80,11 +80,11 @@
     </div>
 
     <script>
-        window.clearSessionStorage = () => {
-            sessionStorage.clear();
-        };
+        // window.clearSessionStorage = () => {
+        //     sessionStorage.clear();
+        // };
     </script>
-    <script src="_framework/blazor.server.js" autostart="false"></script>
+    <script src="_framework/blazor.server.js"></script>
 
     @* <script src="~/js/boot.js"></script> *@
 
@@ -95,64 +95,64 @@
     @* <script src="https://bifrost.integration.oddin.gg/script.js" type="text/javascript"></script> *@
 
     <script>
-        (() => {
-            const maximumRetryCount = 3;
-            const retryIntervalMilliseconds = 5000;
+        // (() => {
+        //     const maximumRetryCount = 3;
+        //     const retryIntervalMilliseconds = 5000;
 
-            const startReconnectionProcess = () => {
+        //     const startReconnectionProcess = () => {
 
-                let isCanceled = false;
+        //         let isCanceled = false;
 
-                (async () => {
-                    for (let i = 0; i < maximumRetryCount; i++) {
-                        console.log(`Attempting to reconnect: ${i + 1} of ${maximumRetryCount}`);
+        //         (async () => {
+        //             for (let i = 0; i < maximumRetryCount; i++) {
+        //                 console.log(`Attempting to reconnect: ${i + 1} of ${maximumRetryCount}`);
 
-                        await new Promise(resolve => setTimeout(resolve, retryIntervalMilliseconds));
+        //                 await new Promise(resolve => setTimeout(resolve, retryIntervalMilliseconds));
 
-                        if (isCanceled) {
-                            return;
-                        }
+        //                 if (isCanceled) {
+        //                     return;
+        //                 }
 
-                        try {
-                            const result = await Blazor.reconnect();
-                            if (!result) {
-                                console.log('The server was reached, but the connection was rejected; reload the page.');
-                                location.reload();
-                                return;
-                            }
+        //                 try {
+        //                     const result = await Blazor.reconnect();
+        //                     if (!result) {
+        //                         console.log('The server was reached, but the connection was rejected; reload the page.');
+        //                         location.reload();
+        //                         return;
+        //                     }
 
-                            // Successfully reconnected to the server.
-                            return;
-                        } catch {
-                            // Didn't reach the server; try again.
-                        }
-                    }
+        //                     // Successfully reconnected to the server.
+        //                     return;
+        //                 } catch {
+        //                     // Didn't reach the server; try again.
+        //                 }
+        //             }
 
-                    // Retried too many times; reload the page.
-                    location.reload();
-                })();
+        //             // Retried too many times; reload the page.
+        //             location.reload();
+        //         })();
 
-                return {
-                    cancel: () => {
-                        isCanceled = true;
-                    },
-                };
-            };
+        //         return {
+        //             cancel: () => {
+        //                 isCanceled = true;
+        //             },
+        //         };
+        //     };
 
-            let currentReconnectionProcess = null;
-            var signalRUrl = '@GetCustomDomain()';
+        //     let currentReconnectionProcess = null;
+        //     var signalRUrl = '@GetCustomDomain()';
 
-            Blazor.start({
-                reconnectionHandler: {
-                    onConnectionDown: () => currentReconnectionProcess ??= startReconnectionProcess(),
-                    onConnectionUp: () => {
-                        currentReconnectionProcess?.cancel();
-                        currentReconnectionProcess = null;
-                    }
-                },
-                configureSignalR: builder => builder.withUrl(signalRUrl, { skipNegotiation: true, transport: 1 })
-            });
-        })();
+        //     Blazor.start({
+        //         reconnectionHandler: {
+        //             onConnectionDown: () => currentReconnectionProcess ??= startReconnectionProcess(),
+        //             onConnectionUp: () => {
+        //                 currentReconnectionProcess?.cancel();
+        //                 currentReconnectionProcess = null;
+        //             }
+        //         },
+        //         configureSignalR: builder => builder.withUrl(signalRUrl, { skipNegotiation: true, transport: 1 })
+        //     });
+        // })();
     </script>
     <script>
         // Wait until a reload button appears
