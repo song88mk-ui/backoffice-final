@@ -1,8 +1,28 @@
-﻿@using Microsoft.AspNetCore.Components
+﻿@using Microsoft.AspNetCore.Components;
 @using Microsoft.AspNetCore.Components.Web
+@using System.Net;
 
 @namespace Backoffice.Web.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@inject IHttpContextAccessor _httpContextAccessor
+
+@{
+    var host = $"{_httpContextAccessor.HttpContext?.Request?.Scheme}://{_httpContextAccessor.HttpContext?.Request?.Host.Value}" ?? string.Empty;
+
+    string GetCustomDomain()
+    {
+        var baseUri = host;
+
+        if (!baseUri.Contains("localhost"))
+            baseUri = baseUri.Replace("http:", "https:");
+
+        if (baseUri.EndsWith("/"))
+            baseUri = baseUri.TrimEnd('/');
+
+        return $"{baseUri}/_blazor";
+    }
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -188,21 +208,3 @@
     </script>
 </body>
 </html>
-
-
-@inject NavigationManager _navigationManager;
-@{
-
-    string GetCustomDomain()
-    {
-        var baseUri = _navigationManager.BaseUri;
-
-        if (!baseUri.Contains("localhost"))
-            baseUri = baseUri.Replace("http:", "https:");
-
-        if (baseUri.EndsWith("/"))
-            baseUri = baseUri.TrimEnd('/');
-
-        return $"{baseUri}/_blazor";
-    }
-}
