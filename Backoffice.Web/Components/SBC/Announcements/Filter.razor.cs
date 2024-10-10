@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
+using Backoffice.Web.Utilities;
 using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Components.SBC.Announcements
@@ -46,7 +47,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _languageCodes = Enum.GetValues<LanguageCode>().Select(s => new SelectListItemWithCheckboxModel<string>
             {
                 Value = s.ToString(),
-                Name = s.ToString(),
+                Name = Utility.GetLanguageCodeFullLabel(s),
                 IsChecked = true
             }).ToList();
             _filterModel.LanguageCode = _languageCodes.FirstOrDefault()?.Value ?? string.Empty;

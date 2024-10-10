@@ -157,13 +157,16 @@ namespace Backoffice.Web.Pages.SBC
 
             var parameters = new ModalParameters();
 
-            parameters.Add("ModalClass", "modal-center modal-show");
+            parameters.Add("ModalClass", "modal-center modal-show announcements-delete");
+            parameters.Add("ModalHeaderClass", "announcements-delete-header");
             parameters.Add("ModalDialogClass", "modal-l");
             parameters.Add("Announcement", model);
+            parameters.Add("ModalIcon", 
+                $"<div class=\"announcements-delete-container\" style=\"padding: 9px 10px; border-radius: 50%; background-color: #FEF3F2;\"><i class=\"fa fa-trash\" style=\"padding: 6px 10px; border-radius: 50%; background-color: #FEE4E2; color: #D92D20; font-size: 24px;\"/></div>");
 
             var options = new ModalOptions();
-            options.HideCloseButton = true;
-            ModalService.Open<DeleteAnnouncementModal>("Delete Announcement", parameters, options);
+            options.HideCloseButton = false;
+            ModalService.Open<DeleteAnnouncementModal>("", parameters, options);
 
             _shouldRender = true;
         }

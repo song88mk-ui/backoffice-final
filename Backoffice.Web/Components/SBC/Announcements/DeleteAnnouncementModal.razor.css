@@ -1,15 +1,54 @@
-﻿.modal-btn {
-    color: white;
+﻿.modal-body {
+    padding: 0px 24px 24px 24px;
+    display: flex;
+    flex-direction: column;
 }
 
-.modal-lg {
-    max-width: 15rem;
+.bold-text {
+    color: #101828;
+    margin-bottom: 4px;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 28px;
 }
 
-.modal-cancel {
-    background-color: #9AA0AB;
+.sub-text {
+    color: #475467;
+    margin-bottom: 32px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
 }
 
-.modal-delete {
-    background: transparent linear-gradient(270deg, #EA6442 0%, #E43F2C 51%, #E12E22 100%) 0% 0% no-repeat padding-box;
+.btns-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
+
+.btn.modal-btn {
+    width: 49%;
+    padding: 10px 0px;
+    border-radius: 8px;
+    outline: none;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px
+}
+
+.btn.modal-btn.modal-cancel {
+    background-color: #FFF;
+    color: #344054;
+    border: 1px solid #D0D5DD;
+}
+
+.btn.modal-btn.modal-delete {
+    background-color: #D92D20;
+    color: #FFF;
+    border: none;
+}
+
