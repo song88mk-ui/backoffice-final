@@ -333,6 +333,13 @@ namespace Backoffice.Web.Pages.SBC
             return isActive ? TranslationState.GetValue("Active").ToUpper() : TranslationState.GetValue("Inactive").ToUpper();
         }
 
+        private string GetLanguagesConcat(List<AnnouncementMessage> langList)
+        {
+            if (!langList.Any()) return string.Empty;
+
+            return String.Join(", ", langList.Select(s => s.LanguageCode).ToList());
+        }
+
         #endregion
     }
 }
