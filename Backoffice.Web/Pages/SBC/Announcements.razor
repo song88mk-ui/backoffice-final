@@ -71,23 +71,16 @@
                                                             }
                                                         </div>
                                                     </td>
-                                                    <td class="content-cell">
-                                                        <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
-                                                            @foreach (var x in item.Languages)
-                                                            {
-                                                                <div class="lang-icon m-1 py-1 rounded-2">
-                                                                    <span class="px-3">@x.LanguageCode.ToString()</span>
-                                                                </div>
-                                                            }
-                                                        </div>
+                                                    <td class="content-cell languages">
+                                                        <span class="languages-concat">@(GetLanguagesConcat(item.Languages))</span>
                                                     </td>
                                                     <td class="content-cell message">
                                                         <span class="text">@item.Message</span>
                                                     </td>
-                                                    <td class="content-cell">
+                                                    <td class="content-cell date">
                                                         <span>@item.StartDate.ToString("MM/dd/yy HH:mm")</span>
                                                     </td>
-                                                    <td class="content-cell">
+                                                    <td class="content-cell date">
                                                         <span>@item.EndDate.ToString("MM/dd/yy HH:mm")</span>
                                                     </td>
                                                     <td class="content-cell status">
