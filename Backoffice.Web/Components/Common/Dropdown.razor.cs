@@ -77,7 +77,8 @@ namespace Backoffice.Web.Components.Common
 
             if (_selectedCount == 1)
             {
-                _selectedName = items.FirstOrDefault().Value;
+                _selectedName = items.FirstOrDefault().Key;
+                _selectedValue = items.FirstOrDefault().Value;
             }
 
             var selectedNames = string.Join(",", items.Select(s => s.Key));
