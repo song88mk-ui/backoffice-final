@@ -46,7 +46,7 @@ namespace Backoffice.Web.Pages.SBC
             _pageHeaderModel = new()
             {
                 Title = "Announcements",
-                IconClass = "ico ico-announcements"
+                //IconClass = "ico ico-announcements"
             };
 
             _alerts = new List<AlertModel>();
@@ -299,6 +299,32 @@ namespace Backoffice.Web.Pages.SBC
                 item.EditAction = _ => OnEditClickEvent(item);
                 item.DeleteAction = _ => OnDeleteClickEvent(item);
             }
+        }
+
+        private string GetClientsConcat(List<AnnouncementResponse.ClientInfo> clients)
+        {
+            if (!clients.Any()) return "";
+
+            var tempConcat = String.Join(", ", clients.Select(c => c.ClientCode).Take(3).ToList());
+
+            return clients.Count > 3 ? tempConcat + "..." : tempConcat;
+        }
+
+        private int GetHiddenClientsCount(List<AnnouncementResponse.ClientInfo> clients)
+        {
+            if (clients.Count <= 3) return 0;
+
+            return clients.Count - 3;
+        }
+
+        private bool ShowClientsCount(List<AnnouncementResponse.ClientInfo> clients)
+        {
+            return clients.Count > 3;
+        }
+
+        private string GetStatusLabel(bool isActive)
+        {
+            return isActive ? TranslationState.GetValue("Active").ToUpper() : TranslationState.GetValue("Inactive").ToUpper();
         }
 
         #endregion

@@ -14,11 +14,11 @@
             <div class="me-4 w-10">
                 @if (_clients != null)
                 {
-                    <Dropdown DropdownName="Clients" OnClickEventCallback="OnClientCheckboxClickEvent" Items="_clients" Multiple=true />
+                    <Dropdown DropdownName="Clients" OnClickEventCallback="OnClientCheckboxClickEvent" Items="_clients" Multiple=true DropdownClass="announcements-page-clients" />
                 }
             </div>
             <div class="me-4 w-00">
-                <Dropdown ImageClass="ico-flag flag-" DropdownName="Languages" OnClickEventCallback="OnLanguageCheckboxClickEvent" Items="_languageCodes" Multiple=false />
+                <Dropdown ImageClass="ico-flag flag-" DropdownName="Languages" OnClickEventCallback="OnLanguageCheckboxClickEvent" Items="_languageCodes" Multiple=false DropdownClass="announcements-page-language" />
             </div>
         </div>
         <div class="button-container d-flex flex-row-reverse align-items-end">

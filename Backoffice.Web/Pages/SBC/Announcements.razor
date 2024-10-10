@@ -7,8 +7,8 @@
         <div class="row">
             <div class="main-content col-md-12 mb-4 pb-3">
                 <div class="row">
-                    <div class="col-md-12">
-                        <PageHeader PageHeaderModel="_pageHeaderModel" />
+                    <div class="announcements-header col-md-12">
+                        <PageHeader PageHeaderModel="_pageHeaderModel" PageHeaderClass="announcements" />
                     </div>
                     @if (_alerts != null && _alerts.Any())
                     {
@@ -21,23 +21,23 @@
                             </div>
                         }
                     }
-                    <div class="col-md-12">
+                    <div class="announcements-filter-group col-md-12">
                         <Filter OnInitCallback="OnInitEvent" OnFilterCallback="OnFilterEvent" />
                     </div>
                     <div class="col-md-12">
-                        <div class="content mx-3">
-                            <table class="table table-hover table-borderless mt-4">
+                        <div class="announcements-content mx-3">
+                            <table class="table table-borderless">
                                 <thead class="table-head">
                                     <tr>
-                                        <th class="th-number py-2">@TranslationState.GetValue("No.")</th>
-                                        <th class="th-title py-2">@TranslationState.GetValue("Title")</th>
-                                        <th class="th-client py-2">@TranslationState.GetValue("Clients")</th>
-                                        <th class="th-client py-2">@TranslationState.GetValue("Languages")</th>
-                                        <th class="th-description py-2">@TranslationState.GetValue("Description")</th>
-                                        <th class="th-date py-2">@TranslationState.GetValue("Start Date")</th>
-                                        <th class="th-date py-2">@TranslationState.GetValue("End Date")</th>
-                                        <th class="th-status py-2">@TranslationState.GetValue("Status")</th>
-                                        <th class="th-action py-2">@TranslationState.GetValue("Action")</th>
+                                        <th class="th-number">@TranslationState.GetValue("No.")</th>
+                                        <th class="th-title">@TranslationState.GetValue("Title")</th>
+                                        <th class="th-client">@TranslationState.GetValue("Clients")</th>
+                                        <th class="th-languages">@TranslationState.GetValue("Languages")</th>
+                                        <th class="th-description">@TranslationState.GetValue("Description")</th>
+                                        <th class="th-date">@TranslationState.GetValue("Start Date")</th>
+                                        <th class="th-date">@TranslationState.GetValue("End Date")</th>
+                                        <th class="th-status">@TranslationState.GetValue("Status")</th>
+                                        <th class="th-action"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -55,60 +55,62 @@
                                         {
                                             foreach (var item in _model.Announcements)
                                             {
-                                                <tr>
-                                                    <td class="py-2">
+                                                <tr class="content-row">
+                                                    <td class="content-cell">
                                                         <span>@item.Row</span>
                                                     </td>
-                                                    <td class="py-2">
-                                                        <span>@item.Title</span>
+                                                    <td class="content-cell title">
+                                                        <span>@item.Title.ToUpper()</span>
                                                     </td>
-                                                    <td class="py-2">
-                                                        <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
-                                                            @foreach (var x in item.Clients)
+                                                    <td class="content-cell client">
+                                                        <div class="clients-container">
+                                                            <span class="client-visible">@(GetClientsConcat(item.Clients))</span>
+                                                            @if (ShowClientsCount(item.Clients))
                                                             {
-                                                                <div class="tl-fixture m-1 py-1 rounded-2">
-                                                                    <span class="px-3">@x.ClientCode</span>
-                                                                </div>
+                                                                <div class="clients-count">+@(GetHiddenClientsCount(item.Clients))</div>
                                                             }
                                                         </div>
                                                     </td>
-                                                    <td class="py-2">
+                                                    <td class="content-cell">
                                                         <div class="w-100 m-auto d-flex flex-row flex-wrap justify-content-start align-items-center">
                                                             @foreach (var x in item.Languages)
                                                             {
-                                                                <div class="tl-fixture m-1 py-1 rounded-2">
+                                                                <div class="lang-icon m-1 py-1 rounded-2">
                                                                     <span class="px-3">@x.LanguageCode.ToString()</span>
                                                                 </div>
                                                             }
                                                         </div>
                                                     </td>
-                                                    <td class="py-2">
-                                                        <span>@item.Message</span>
+                                                    <td class="content-cell message">
+                                                        <span class="text">@item.Message</span>
                                                     </td>
-                                                    <td class="py-2">
+                                                    <td class="content-cell">
                                                         <span>@item.StartDate.ToString("MM/dd/yy HH:mm")</span>
                                                     </td>
-                                                    <td class="py-2">
+                                                    <td class="content-cell">
                                                         <span>@item.EndDate.ToString("MM/dd/yy HH:mm")</span>
                                                     </td>
-                                                    <td class="py-2">
-                                                        <span>@item.IsActive</span>
+                                                    <td class="content-cell status">
+                                                        <div class="status-container @(item.IsActive ? "active-status" : "inactive-status")">
+                                                            <div class="dot"></div>
+                                                            <span>@(GetStatusLabel(item.IsActive))</span>
+                                                        </div>
                                                     </td>
-                                                    <td class="py-2">
+                                                    <td class="content-cell actions">
                                                         <AuthorizeView Policy="sbc-announcements-canedit">
                                                             <Authorized Context="ActivateAll">
-                                                                <a class="tl-link-edit me-2" href="javascript:(0)" @onclick="item.EditAction">
+                                                                <a class="tl-link-edit" href="javascript:(0)" @onclick="item.EditAction">
                                                                     <i class="fa fa-edit" />
                                                                 </a>
-                                                                <a class="link-delete me-2" href="javascript:(0)" @onclick="item.DeleteAction">
+                                                                <a class="tl-link-delete" href="javascript:(0)" @onclick="item.DeleteAction">
                                                                     <i class="fa fa-trash" />
                                                                 </a>
                                                             </Authorized>
                                                             <NotAuthorized Context="ActivateAll">
-                                                                <a class="tl-link-edit me-2" href="javascript:(0)" disabled>
+                                                                <a class="tl-link-edit" href="javascript:(0)" disabled>
                                                                     <i class="fa fa-edit"></i>
                                                                 </a>
-                                                                <a class="tl-link-delete me-2" href="javascript:(0)" disabled>
+                                                                <a class="tl-link-delete" href="javascript:(0)" disabled>
                                                                     <i class="fa fa-trash"></i>
                                                                 </a>
                                                             </NotAuthorized>
