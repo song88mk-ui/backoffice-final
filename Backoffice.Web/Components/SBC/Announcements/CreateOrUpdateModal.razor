@@ -103,7 +103,7 @@
                 <div class="announcement-message-container">
                     <span class="announcement-message-label">Message</span>
                     <span class="announcement-message-sub-label">Enter the message of your announcement.</span>
-                    <textarea class="announcement-message-input @(ShowNoMessageAlert() ? "has-error" : "")" placeholder="Enter the message of your announcement" @bind="_announcementMessages[_selectedLanguage]" rows="4" @onblur="HandleBlur" />
+                    <textarea class="announcement-message-input @(ShowNoMessageAlert() ? "has-error" : "")" maxlength="500" placeholder="Enter the message of your announcement" @bind="_announcementMessages[_selectedLanguage]" rows="4" @onblur="HandleBlur" />
                     @if (ShowNoMessageAlert())
                     {
                         <span class="announcement-error-message">@(NO_MSG_ERR_MSG)</span>

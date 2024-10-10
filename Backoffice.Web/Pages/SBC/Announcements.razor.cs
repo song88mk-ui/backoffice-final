@@ -251,7 +251,10 @@ namespace Backoffice.Web.Pages.SBC
             _cts = new CancellationTokenSource();
 
             if (!_isPreLoader)
+            {
                 _isPreLoader = true;
+                _shouldRender = true;
+            }
 
             var token = _cts.Token;
             var languageCode = (LanguageCode)Enum.Parse(typeof(LanguageCode), model.LanguageCode, true);
