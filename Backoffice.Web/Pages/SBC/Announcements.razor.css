@@ -228,7 +228,3 @@ table tfoot td:last-child {
 ::deep .modal-dialog {
     max-width: 1500px;
 }
-
-.modal-header {
-    display: none;
-}
