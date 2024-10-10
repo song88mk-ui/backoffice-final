@@ -228,3 +228,9 @@ table tfoot td:last-child {
 ::deep .modal-dialog {
     max-width: 1500px;
 }
+
+@media only screen and (max-width: 1280px) {
+    th.th-client, th.th-languages, tbody .content-cell.client, tbody .content-cell.languages {
+        display: none;
+    }
+}
