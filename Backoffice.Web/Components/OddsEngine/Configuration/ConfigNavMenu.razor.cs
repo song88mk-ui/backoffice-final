@@ -49,7 +49,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         protected override void OnInitialized() {
             _myTemplateClickEvent = async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.MyTemplates);
             _assignedClickEvent =  async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.Assigned);
-            _unAssignedClickEvent = async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.Assigned);
+            _unAssignedClickEvent = async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.UnAssigned);
         }
 
         protected override void OnParametersSet()
@@ -66,7 +66,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 _assignedCount = ParamModel.AssignedLeaguesCount;
                 _unAssignedCount = ParamModel.UnAssignedLeaguesCount;
 
-                _myTemplateText = $"{TranslationState.GetValue("My Templates")} ({(_myTemplateCount > 0 ? _myTemplateCount : _calculatingText)}";
+                _myTemplateText = $"{TranslationState.GetValue("My Templates")} ({(_myTemplateCount > 0 ? _myTemplateCount : _calculatingText)})";
                 _unAssignedText = $"{TranslationState.GetValue("UnAssigned")} ({(_unAssignedCount > 0 ? _unAssignedCount : _calculatingText)})";
                 _assignedText = $"{TranslationState.GetValue("Assigned")} ({(_assignedCount > 0 ? _assignedCount : _calculatingText)})";
 
@@ -84,7 +84,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task HandleConfigNavMenuClick(ConfigTemplateNavMenu configNavMenu)
         {
-            await OnConfigNavMenuClick.InvokeAsync(_currentMenu = configNavMenu);
+            await OnConfigNavMenuClick.InvokeAsync(configNavMenu);
 
             _shouldRender = true;
         }

@@ -92,6 +92,8 @@ namespace Backoffice.Web.Shared.OddsEngine
                 if (menu.Contains("hk/odds-engine"))
                     menu = menu.Replace("hk/odds-engine", "");
 
+                menu = menu.Split('/').FirstOrDefault() ?? string.Empty;
+
                 switch (menu.ToUpper())
                 {
                     case "CONFIG":
