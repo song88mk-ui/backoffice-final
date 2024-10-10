@@ -1,4 +1,6 @@
-﻿namespace Backoffice.Web.Utilities
+﻿using Backoffice.Shared.Enums;
+
+namespace Backoffice.Web.Utilities
 {
     public static class Utility
     {
@@ -91,6 +93,39 @@
             };
 
             if (sportIconMapping.TryGetValue(sportId, out string? val))
+                return val ?? string.Empty;
+
+            return string.Empty;
+        }
+
+        public static string GetLanguageCodeFullLabel(LanguageCode langCode)
+        {
+            var langFullMapping = new Dictionary<LanguageCode, string>() {
+                {LanguageCode.EN, "English" },
+                {LanguageCode.TH, "Thai" },
+                {LanguageCode.MY, "Burmese" },
+                {LanguageCode.LO, "Lao" },
+                {LanguageCode.KO, "Korean" },
+                {LanguageCode.ZH, "Simplified Chinese" },
+                {LanguageCode.ZHT, "Traditional Chinese" },
+                {LanguageCode.VI, "Vietnamese" },
+                {LanguageCode.ID, "Indonesian" },
+                {LanguageCode.KM, "Khmer" },
+                {LanguageCode.JA, "Japanese" },
+                {LanguageCode.MS, "Malay" },
+                {LanguageCode.TR, "Turkish" },
+                {LanguageCode.SW, "Swahili" },
+                {LanguageCode.FR, "French" },
+                {LanguageCode.PT, "Portuguese" },
+                {LanguageCode.AM, "Amharic" },
+                {LanguageCode.ES, "Spanish" },
+                {LanguageCode.BR, "Brazilian Portuguese" },
+                {LanguageCode.DE, "German" },
+                {LanguageCode.NL, "Dutch" },
+                {LanguageCode.FI, "Finnish" },
+            };
+
+            if (langFullMapping.TryGetValue(langCode, out string? val))
                 return val ?? string.Empty;
 
             return string.Empty;
