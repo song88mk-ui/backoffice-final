@@ -63,6 +63,8 @@ namespace Backoffice.Web.Shared.OddsEngine
             }
             else
                 _showPriceBoostMenu = false;
+
+            _shouldRender = true;
         }
 
         public async Task HandleMarketSettingsClick()
@@ -75,6 +77,8 @@ namespace Backoffice.Web.Shared.OddsEngine
             }
             else
                 _showMarketSettingsMenu = false;
+
+            _shouldRender = true;
         }
 
         public async void ActivateMenu(string? menu = null)
