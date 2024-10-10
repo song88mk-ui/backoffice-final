@@ -23,6 +23,7 @@ namespace Backoffice.Web.Components.Common
         private bool _shouldRender;
         private int _selectedCount;
         private string _selectedName;
+        private string _selectedValue;
         private LanguageCode _languageCode;
         private List<SelectListItemWithCheckboxModel<string>> _items;
 
@@ -35,8 +36,9 @@ namespace Backoffice.Web.Components.Common
 
             _selectedCount = _items?.Count(c => c.Value != "all" && c.IsChecked) ?? 0;
             _selectedName = _selectedCount == 0 ? string.Empty : _items?.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Name ?? string.Empty;
+            _selectedValue = _selectedCount == 0 ? string.Empty : _items?.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Value ?? string.Empty;
 
-            if(Multiple)
+            if (Multiple)
             {
                 if(!_items?.Any(i => i.Value == "all") ?? false)
                     _items.Insert(0, new SelectListItemWithCheckboxModel<string>
@@ -70,6 +72,7 @@ namespace Backoffice.Web.Components.Common
         public async Task OnCheckboxClickEvent(Dictionary<string, string> items)
         {
             _selectedName = string.Empty;
+            _selectedValue = string.Empty;
             _selectedCount = items.Count;
 
             if (_selectedCount == 1)
@@ -86,9 +89,10 @@ namespace Backoffice.Web.Components.Common
 
         public async Task OnCheckboxChangedEvent(SelectListItemWithCheckboxModel<string> item)
         {
-            _selectedName = item.Value.ToString();
+            _selectedName = item.Name.ToString();
+            _selectedValue = item.Value.ToString();
 
-            await OnClickEventCallback.InvokeAsync(_selectedName);
+            await OnClickEventCallback.InvokeAsync(_selectedValue);
             _shouldRender = true;
         }
 
