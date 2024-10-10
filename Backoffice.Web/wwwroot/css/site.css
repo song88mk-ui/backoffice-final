@@ -1,6 +1,6 @@
 @font-face {
     font-family: "s88-icon";
-    src: url('../css/font-bo/bo-icons.v2.woff');
+    src: url('../css/font-bo/bo-icons.v3.woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -12,6 +12,7 @@ html, body {
     /*font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;*/
     font-family: 'Open Sans', sans-serif !important;
     font-size: 14px;
+    background: #F5F5F5;
 }
 
 h1:focus {
@@ -265,6 +266,9 @@ a, .btn-link {
 
 .ico-calendar:before {
     content: "\112E";
+}
+.ico-info-circle:before {
+    content: "\112F";
 }
 
 iframe {

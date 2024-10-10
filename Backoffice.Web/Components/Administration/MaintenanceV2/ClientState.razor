@@ -1,0 +1,23 @@
+﻿<div class="maintenance-header row py-3 px-3 mx-3 mb-3 h-100">
+    <div class="d-flex p-0">
+        <span>
+            <i class="ico ico-info-circle d-block text-center mr-3"></i>
+        </span>
+        <p>@_headerText</p>
+        <div class="d-flex border rounded-3 mx-2">
+            <p class="state-icon rounded-circle align-self-center @_stateCss"></p>
+            <p class="me-2">@_stateText</p>
+        </div>
+    </div>
+    @if (_isShowClient)
+    {
+        <div class="client-list-container d-flex gap-2 border border-2 p-2 align-items-center mt-3">
+            @foreach (var client in Clients)
+            {
+                <div class="client-item border border-dark rounded-pill bg-dark text-white px-3 py-1">
+                    <p>@client</p>
+                </div>
+            }
+        </div>
+    }
+</div>

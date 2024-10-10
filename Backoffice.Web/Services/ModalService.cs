@@ -1,5 +1,4 @@
-﻿using Backoffice.Shared.Data.Backoffice.Entities;
-using Backoffice.Web.Models;
+﻿using Backoffice.Web.Models;
 using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
 
@@ -8,11 +7,12 @@ namespace Backoffice.Web.Services
     public class ModalService : IModalService, IDisposable
     {
         private readonly TranslationState _translationState;
-        
+
 
         public event Action<ModalResult> OnClose;
         internal event Action CloseModal;
         internal event Action<string, RenderFragment, ModalParameters, ModalOptions> OnOpen;
+        internal event Action OnOpenV2;
         private Type _modalType;
         public ModalService(TranslationState translationState)
         {
@@ -23,6 +23,10 @@ namespace Backoffice.Web.Services
             Open<T>(title, parameters, new ModalOptions());
         }
 
+        public void Open<T>(ModalParameters parameters, ModalOptions options) where T : ComponentBase
+        {
+            Open(typeof(T), string.Empty, parameters, options);
+        }
         public void Open<T>(string title, ModalParameters parameters = null, ModalOptions options = null) where T : ComponentBase
         {
             Open(typeof(T), title, parameters, options);
@@ -38,7 +42,8 @@ namespace Backoffice.Web.Services
             var content = new RenderFragment(s => { s.OpenComponent(1, contentComponent); s.CloseComponent(); });
             _modalType = contentComponent;
 
-             OnOpen?.Invoke(_translationState.GetValue(title), content, parameters, options);
+            OnOpen?.Invoke(_translationState.GetValue(title), content, parameters, options);
+            OnOpenV2?.Invoke();
         }
 
         public void Cancel()

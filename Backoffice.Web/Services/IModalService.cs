@@ -8,6 +8,7 @@ namespace Backoffice.Web.Services
         event Action<ModalResult> OnClose;
 
         void Open<T>(string title, ModalParameters parameters) where T : ComponentBase;
+        void Open<T>(ModalParameters parameters, ModalOptions options) where T : ComponentBase;
 
         void Open<T>(string title, ModalParameters parameters = null, ModalOptions options = null) where T : ComponentBase;
 

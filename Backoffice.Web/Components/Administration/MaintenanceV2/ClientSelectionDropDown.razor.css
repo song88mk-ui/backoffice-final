@@ -1,0 +1,45 @@
+﻿.client-list-container {
+    border-radius: 0.5rem;
+    flex-wrap: wrap;
+    background: #FFFFFF;
+}
+
+.client-item {
+    display: flex;
+    align-items: center;
+}
+    .client-item p {
+        padding: 0 0.5rem;
+        font-weight: 600;
+    }
+
+li:hover {
+    background-color: #1E90FF !important;
+}
+
+input.search-client {
+    border: none;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.dropdown-menu .input-group .input-group-text {
+    opacity: 0.3;
+}
+
+.fa {
+    font-size: 20px;
+    padding-right: .25rem;
+    cursor: pointer
+}
+
+p, i {
+    margin: 0;
+}
+
+.dropdown-menu {
+    border-radius: 6px;
+    font-size: 14px;
+    max-height: 380px;
+    overflow-y: auto;
+}
