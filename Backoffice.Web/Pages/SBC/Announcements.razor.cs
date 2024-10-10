@@ -209,6 +209,8 @@ namespace Backoffice.Web.Pages.SBC
                         LanguageCode = s.LanguageCode,
                         StartDate = s.StartDate,
                         EndDate = s.EndDate,
+                        UserId = s.UserId,
+                        UserRoleId = s.UserRoleId,
                         Row = index + _model.Announcements.Count + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
                     }).ToList());
 
@@ -302,6 +304,8 @@ namespace Backoffice.Web.Pages.SBC
                     LanguageCode = s.LanguageCode,
                     Clients = s.Clients.Where(c => _filterModel.Clients.Select(s => s.Value).Contains(c.ClientCode)).ToList(),
                     Languages = s.Languages,
+                    UserRoleId = s.UserRoleId,
+                    UserId = s.UserId,
                     Row = index + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
                 }).ToList()
             };
