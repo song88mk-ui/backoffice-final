@@ -11,3 +11,19 @@
 .announcements-modal-header {
     display: none;
 }
+
+.modal.announcements-delete .modal-dialog {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.modal.announcements-delete .modal-content {
+    width: 350px;
+    border-radius: 12px;
+}
+
+.modal-header.announcements-delete-header {
+    border: none;
+    padding-bottom: 16px;
+}
