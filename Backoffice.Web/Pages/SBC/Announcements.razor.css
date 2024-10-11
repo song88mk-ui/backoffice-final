@@ -153,6 +153,7 @@ tbody .content-cell.status .status-container.inactive-status .dot {
 
 tbody .content-cell.actions {
     padding-top: 9px;
+    min-width: 85px;
 }
 
 table thead th:first-child {
@@ -203,6 +204,7 @@ table tfoot td:last-child {
 
 .th-action {
     width: 6%;
+    min-width:  85px;
 }
 
 .lang-icon {
@@ -231,6 +233,10 @@ table tfoot td:last-child {
 .tl-link-copy-disabled {
     color: #979797;
     font-size: 1rem;
+}
+
+.tl-link-edit.disabled-action, .tl-link-delete.disabled-action {
+    opacity: 0.5;
 }
 
 ::deep .modal-dialog {
