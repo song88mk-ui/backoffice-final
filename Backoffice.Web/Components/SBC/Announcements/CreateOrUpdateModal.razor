@@ -91,11 +91,11 @@
                     <span class="announcement-language-label">Language</span>
                     <span class="announcement-language-sub-label">Select the language to display this announcement to all selected clients.</span>
                     <div class="announcement-language-list">
-                        @foreach (var language in _languageCodes)
+                        @foreach (var language in _languages.Languages)
                         {
-                            <div key="@(language)-lang" class="announcement-language-item" @onclick="() => OnLanguageClicked(language)">
-                                <i class="announcement-language-item-icon @($"ico-flag flag-{language.ToString().ToLower()}") @(_selectedLanguage == language ? "selected" : "")" aria-hidden="true" />
-                                <span class="announcement-language-item-label">@language</span>
+                            <div key="@(language)-lang" class="announcement-language-item" @onclick="language.ClickAction">
+                                <i class="announcement-language-item-icon @($"ico-flag flag-{language.Language.ToString().ToLower()}") @(_selectedLanguage == language.Language ? "selected" : "")" aria-hidden="true" />
+                                <span class="announcement-language-item-label">@language.Language</span>
                             </div>
                         }
                     </div>

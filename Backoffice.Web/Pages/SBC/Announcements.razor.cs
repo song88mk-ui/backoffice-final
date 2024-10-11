@@ -137,7 +137,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             _alerts.Clear();
 
-            if (model.UserRoleId != UserModel.RoleId)
+            if (!string.IsNullOrEmpty(model.DisabledClass))
             {
                 _shouldRender = true;
                 return;
@@ -162,7 +162,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             _alerts.Clear();
 
-            if (model.UserRoleId != UserModel.RoleId)
+            if (!string.IsNullOrEmpty(model.DisabledClass))
             {
                 _shouldRender = true;
                 return;
@@ -195,26 +195,11 @@ namespace Backoffice.Web.Pages.SBC
 
                 var result = (AnnouncementResponse)item;
 
-                MetaData.TotalCount = _model.Announcements.Count + result.Announcements.Count;
+                MetaData.TotalCount = MetaData.TotalCount + result.Announcements.Count;
                 MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
+                MetaData.CurrentPage = MetaData.TotalPages;
 
-                _model.Announcements.AddRange(result.Announcements.Select((s, index) =>
-                    new Models.Announcements
-                    {
-                        Id = s.Id,
-                        IsActive = s.IsActive,
-                        Clients = s.Clients,
-                        Message = s.Message,
-                        Title = s.Title,
-                        LanguageCode = s.LanguageCode,
-                        StartDate = s.StartDate,
-                        EndDate = s.EndDate,
-                        UserId = s.UserId,
-                        UserRoleId = s.UserRoleId,
-                        Row = index + _model.Announcements.Count + ((MetaData.CurrentPage - 1) * MetaData.PageSize) + 1,
-                    }).ToList());
-
-                SetItemAction();
+                await GetContent(_filterModel);
             }
             else if (item.GetType() == typeof(int))
             {
@@ -222,12 +207,11 @@ namespace Backoffice.Web.Pages.SBC
 
                 var announcement = _model.Announcements.FirstOrDefault(a => a.Id == (int)item);
                 if (announcement != null)
+                {
                     _model.Announcements.Remove(announcement);
 
-
-                MetaData.TotalCount = _model.Announcements.Count;
-                MetaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(MetaData.TotalCount) / Convert.ToDecimal(MetaData.PageSize)));
-
+                    await GetContent(_filterModel);
+                }
             }
 
             _alerts.Clear();
@@ -321,6 +305,7 @@ namespace Backoffice.Web.Pages.SBC
             {
                 item.EditAction = _ => OnEditClickEvent(item);
                 item.DeleteAction = _ => OnDeleteClickEvent(item);
+                item.DisabledClass = item.UserRoleId != UserModel.RoleId ? "disabled-action" : "";
             }
         }
 

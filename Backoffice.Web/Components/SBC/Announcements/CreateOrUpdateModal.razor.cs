@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
@@ -8,6 +9,7 @@ using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using Serilog;
 
 namespace Backoffice.Web.Components.SBC.Announcements
@@ -40,16 +42,18 @@ namespace Backoffice.Web.Components.SBC.Announcements
         private string INVALID_START_DATE_ERR_MSG = "Start Date should be less than End Date";
 
         private decimal _opacity;
+
         private LanguageCode _selectedLanguage;
 
-        private List<AnnouncementsAlertModel> _alerts;
         private CancellationTokenSource _cts;
-        private List<LanguageCode> _languageCodes;
         private Models.Announcements _announcement;
         private Models.Announcements _prevAnnouncement;
-        private List<SelectListItemWithCheckboxModel<string>> _clients;
-        private Dictionary<LanguageCode, string> _announcementMessages;
+
         private List<string> _selectedClientCodes;
+        private List<AnnouncementsAlertModel> _alerts;
+        private List<SelectListItemWithCheckboxModel<string>> _clients;
+        private LanguageOptionsModel _languages;
+        private Dictionary<LanguageCode, string> _announcementMessages;
 
         #endregion
 
@@ -75,19 +79,24 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
             var clients = ModalParameters.TryGet <List<SelectListItemWithCheckboxModel<string>>>("Clients");
             _isEdit = ModalParameters.TryGet<bool>("IsEdit");
-            _languageCodes = Enum.GetValues<LanguageCode>().Select(s => s).ToList();
+
+            _languages = new LanguageOptionsModel
+            {
+                Languages = Enum.GetValues<LanguageCode>().Select(s => new LanguageOptions { Language = s, ClickAction = (_ => OnLanguageClicked(s)) }).ToList()
+            };
+
             _selectedLanguage = _announcement.LanguageCode;
 
             _announcementMessages = new Dictionary<LanguageCode, string>();
-            foreach(var language in _languageCodes)
+            foreach(var language in _languages.Languages)
             {
-                _announcementMessages[language] = string.Empty;
+                _announcementMessages[language.Language] = string.Empty;
 
                 foreach (var message in _announcement.Languages)
                 {
-                    if (language == message.LanguageCode)
+                    if (language.Language == message.LanguageCode)
                     {
-                        _announcementMessages[language] = message.Message ?? string.Empty;
+                        _announcementMessages[language.Language] = message.Message ?? string.Empty;
                         break;
                     }
                 }

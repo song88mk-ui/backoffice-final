@@ -18,5 +18,6 @@ namespace Backoffice.Web.Models
         public int Row { get; set; }
         public Action<MouseEventArgs> EditAction { get; set; }
         public Action<MouseEventArgs> DeleteAction { get; set; }
+        public string DisabledClass { get; set; }
     }
 }
