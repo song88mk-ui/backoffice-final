@@ -5,15 +5,15 @@
         <div class="form-switch mb-2">
             @if (Claim.Name.Contains("readonly", StringComparison.OrdinalIgnoreCase) && Claim.ClaimValue == "2")
             {
-                <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked disabled="@IsReadOnly">
+                <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked disabled="@Claim.IsReadOnly">
             }
             else if (Claim.ClaimValue == "1")
             {
-                <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@IsReadOnly">
+                <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@Claim.IsReadOnly">
             }
             else
             {
-                <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@IsReadOnly">
+                <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@Claim.IsReadOnly">
             }
             <label class="form-check-label" for="@Claim.ClaimType">@TranslationState.GetValue(Claim.Name)</label>
 
@@ -26,12 +26,12 @@
             <div class="form-switch mb-2">
                 @if (Claim.ClaimValue == "2")
                 {
-                    <input class="form-check-input me-4" type="checkbox" value="" id="@(Claim.ClaimType)-readonly" checked="@(Claim.ClaimValue == "2")" @onchange="(e) => OnCheckboxClicked(e, true)" disabled="@IsReadOnly">
+                    <input class="form-check-input me-4" type="checkbox" value="" id="@(Claim.ClaimType)-readonly" checked="@(Claim.ClaimValue == "2")" @onchange="(e) => OnCheckboxClicked(e, true)" disabled="@Claim.IsReadOnly">
                     <label class="form-check-label" for="@(Claim.ClaimType)-readonly">@TranslationState.GetValue(Claim.Name) (@TranslationState.GetValue("Readonly"))</label>
                 }
                 else
                 {
-                    <input class="form-check-input me-4" type="checkbox" value="" id="@(Claim.ClaimType)-readonly" @onchange="(e) => OnCheckboxClicked(e, true)" disabled="@IsReadOnly">
+                    <input class="form-check-input me-4" type="checkbox" value="" id="@(Claim.ClaimType)-readonly" @onchange="(e) => OnCheckboxClicked(e, true)" disabled="@Claim.IsReadOnly">
                     <label class="form-check-label" for="@(Claim.ClaimType)-readonly">@TranslationState.GetValue(Claim.Name) (@TranslationState.GetValue("Readonly"))</label>
                 }
             </div>
@@ -43,15 +43,15 @@ else
     <div class="form-switch mb-2">
         @if (Claim.Name.Contains("readonly", StringComparison.OrdinalIgnoreCase) && Claim.ClaimValue == "2")
         {
-            <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked disabled="@IsReadOnly">
+            <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked disabled="@Claim.IsReadOnly">
         }
         else if (Claim.ClaimValue == "1")
         {
-            <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@IsReadOnly">
+            <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" checked @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@Claim.IsReadOnly">
         }
         else
         {
-            <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@IsReadOnly">
+            <input class="form-check-input me-4" type="checkbox" value="" id="@Claim.ClaimType" @onchange="(e) => OnCheckboxClicked(e, false)" disabled="@Claim.IsReadOnly">
         }
         <label class="form-check-label" for="@Claim.ClaimType">@TranslationState.GetValue(Claim.Name)</label>
 
@@ -62,12 +62,12 @@ else
         <div class="form-switch mb-2">
             @if (Claim.ClaimValue == "2")
             {
-                <input class="form-check-input me-4" type="checkbox" value="" id="@(Claim.ClaimType)-readonly" checked="@(Claim.ClaimValue == "2")" @onchange="(e) => OnCheckboxClicked(e, true)" disabled="@IsReadOnly">
+                <input class="form-check-input me-4" type="checkbox" value="" id="@(Claim.ClaimType)-readonly" checked="@(Claim.ClaimValue == "2")" @onchange="(e) => OnCheckboxClicked(e, true)" disabled="@Claim.IsReadOnly">
                 <label class="form-check-label" for="@(Claim.ClaimType)-readonly">@TranslationState.GetValue(Claim.Name) (@TranslationState.GetValue("Readonly"))</label>
             }
             else
             {
-                <input class="form-check-input me-4" type="checkbox" value="" id="@(Claim.ClaimType)-readonly" @onchange="(e) => OnCheckboxClicked(e, true)" disabled="@IsReadOnly">
+                <input class="form-check-input me-4" type="checkbox" value="" id="@(Claim.ClaimType)-readonly" @onchange="(e) => OnCheckboxClicked(e, true)" disabled="@Claim.IsReadOnly">
                 <label class="form-check-label" for="@(Claim.ClaimType)-readonly">@TranslationState.GetValue(Claim.Name) (@TranslationState.GetValue("Readonly"))</label>
             }
         </div>
@@ -87,7 +87,7 @@ else
                 {
                     var claim = @group.Claims[ctr];
 
-                    <PermissionRow Claim="@claim" IsReadOnly="@IsReadOnly" Permissions="@Permissions" IsSubUser="@IsSubUser"/>
+                    <PermissionRow Claim="@claim" IsAdmin="@IsAdmin" Permissions="@Permissions" IsSubUser="@IsSubUser"/>
                 }
             </div>
 

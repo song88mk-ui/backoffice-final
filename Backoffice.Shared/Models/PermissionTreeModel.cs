@@ -56,6 +56,7 @@ namespace Backoffice.Shared.Models
             public bool IsSubUser { get; set; }
             public string ClaimValue { get; set; }
             public int Availability { get; set; }
+            public bool IsReadOnly { get; set; }
         }
     }
 

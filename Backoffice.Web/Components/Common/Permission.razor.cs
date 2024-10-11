@@ -31,6 +31,10 @@ namespace Backoffice.Web.Components.Common
 
         #endregion
 
+        #region Fields
+        private bool _isAdmin = false;
+        #endregion
+
         #region Methods
         protected override async Task OnInitializedAsync()
         {
@@ -67,6 +71,11 @@ namespace Backoffice.Web.Components.Common
             {
                 await OnDisableClickEvent(category);
             }
+
+            if (category.CategoryId == (int)PermissionCategory.Admin)
+                _isAdmin = category.IsEnabled;
+
+            await SetupClaimsReadonly();
         }
 
         public async Task OnDisableClickEvent(PermissionTreeModel.PermissionCategoryModel category)
@@ -174,12 +183,12 @@ namespace Backoffice.Web.Components.Common
 
             SelectItems = new List<SelectListItemWithCheckboxModel<string>>();
 
-            SelectItems = ClientModel.Clients.Select( x => new SelectListItemWithCheckboxModel<string>()
-                                                        {
-                                                            Name = x.ClientName,
-                                                            Value = x.ClientCode,
-                                                            IsChecked = SelectedClients.Contains(x.ClientCode)
-                                                        }).ToList();
+            SelectItems = ClientModel.Clients.Select(x => new SelectListItemWithCheckboxModel<string>()
+            {
+                Name = x.ClientName,
+                Value = x.ClientCode,
+                IsChecked = SelectedClients.Contains(x.ClientCode)
+            }).ToList();
 
             SelectItems.Insert(0, new SelectListItemWithCheckboxModel<string>()
             {
@@ -188,11 +197,7 @@ namespace Backoffice.Web.Components.Common
                 IsChecked = ClientModel.Clients.Count == SelectedClients.Count ? true : false
             });
 
-            foreach (var category in PermissionTree.Permissions)
-            {
-                if (category.SubCategories.Any(s => s.Claims.Any(c => c.ClaimValue != "0")))
-                    category.IsEnabled = true;
-            }
+            await SetupClaimsReadonly();
 
             var permission = Permissions.FirstOrDefault(permission => permission.ClaimType == SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."));
             if (permission != null)
@@ -299,7 +304,38 @@ namespace Backoffice.Web.Components.Common
             return permissionTree;
         }
 
-        
+
+        private Task SetupClaimsReadonly()
+        {
+
+            foreach (var category in PermissionTree.Permissions)
+            {
+                if (category.SubCategories.Any(s => s.Claims.Any(c => c.ClaimValue != "0")))
+                    category.IsEnabled = true;
+
+                if (category.CategoryId == (int)PermissionCategory.Admin)
+                    _isAdmin = category.IsEnabled;
+
+                if (category.SubCategories.Any())
+                {
+                    foreach (var subCategory in category.SubCategories)
+                    {
+                        if (subCategory.Claims.Any())
+                        {
+                            foreach (var claim in subCategory.Claims)
+                            {
+                                claim.IsReadOnly = IsReadOnly
+                                                || !category.IsEnabled
+                                                || (IsSubUser && claim.Availability == 0);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
         #endregion
     }
 }
