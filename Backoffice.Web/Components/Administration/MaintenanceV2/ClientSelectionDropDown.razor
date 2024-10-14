@@ -1,13 +1,13 @@
 ﻿<div class="dropdown p-0">
-    <button class="client-list-container d-flex gap-2 border border-2 p-2 align-items-center mt-3 btn w-100 @_selectionCss" disabled="@Disable" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false" @onclick="HandleEditListClick">
+    <div class="client-list-container d-flex gap-2 border border-2 p-2 align-items-center mt-3 btn w-100 @_selectionCss" disabled="@Disable" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false" @onclick="HandleEditListClick">
         @if (_activeClients?.Any() ?? false)
         {
             foreach (var client in Clients)
             {
-                <div class="client-item border border-dark rounded-pill bg-dark text-white p-1">
+                <div key=@(client) class="client-item border border-dark rounded-pill bg-dark text-white p-1">
                     <p>@client</p>
-                    <span @onclick="e => HandleRemoveClientClick(client)">
-                        <i class="fa fa-times-circle"></i>
+                    <span class="pe-auto" @onclick="e => HandleRemoveClientClick(client)">
+                        <i class="fa fa-times-circle" ></i>
                     </span>
                 </div>
             }
@@ -16,7 +16,7 @@
         {
             <p class="placeholder bg-white">Click here to select clients</p>
         }
-    </button>
+    </div>
     @if (Clients != null && Clients.Any())
     {
         <ul class="dropdown-menu w-100 pt-0">

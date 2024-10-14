@@ -1,12 +1,10 @@
 ﻿<div class="maintenance-header row py-3 px-3 mx-3 mb-3 h-100">
     <div class="d-flex p-0">
-        <span>
-            <i class="ico ico-info-circle d-block text-center mr-3"></i>
-        </span>
-        <p>@_headerText</p>
+	<i class="ico ico-info-circle text-center icon-header" />
+        <p class="align-self-center">@_headerText</p>
         <div class="d-flex border rounded-3 mx-2">
             <p class="state-icon rounded-circle align-self-center @_stateCss"></p>
-            <p class="me-2">@_stateText</p>
+            <p class="me-2 align-self-center">@_stateText</p>
         </div>
     </div>
     @if (_isShowClient)
