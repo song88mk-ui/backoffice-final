@@ -102,7 +102,7 @@ builder.Services.AddServerSideBlazor().AddCircuitOptions(o =>
 if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CONTAINER_APP_ENV_DNS_SUFFIX")))
 {
     var envName = Environment.GetEnvironmentVariable("TELEMETRY__ENVIRONMENT");
-    var dpkUri = $"https://song88dpk.blob.core.windows.net/{envName}/bo-web/dpk-perf";
+    var dpkUri = $"https://song88dpk.blob.core.windows.net/{envName}/bo-web/dpk";
     builder.Services.AddDataProtection()
         .PersistKeysToAzureBlobStorage(new Uri(dpkUri), new DefaultAzureCredential());
 }

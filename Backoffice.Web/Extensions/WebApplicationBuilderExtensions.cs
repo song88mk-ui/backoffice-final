@@ -35,6 +35,8 @@ namespace Backoffice.Web.Extensions
                 options.AddPolicy("sbc-topfixtures-canedit", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_TopFixtures.ToString().Replace('_', '.')}", $"{(int)Access.Edit}"));
                 options.AddPolicy("sbc-parlaybonus", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_ParlayBonus.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
                 options.AddPolicy("sbc-parlaybonus-canedit", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_ParlayBonus.ToString().Replace('_', '.')}", $"{(int)Access.Edit}"));
+                options.AddPolicy("sbc-announcements", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_Announcements.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
+                options.AddPolicy("sbc-announcements-canedit", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Settings_Announcements.ToString().Replace('_', '.')}", $"{(int)Access.Edit}"));
                 options.AddPolicy("sbc-subusers", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
                 options.AddPolicy("sbc-subusers-canedit", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_SubUsers.ToString().Replace('_', '.')}", $"{(int)Access.Edit}"));
                 options.AddPolicy("sbc-clients", policy => policy.RequireClaim($"{SportsbookClientPermission.SBC_Clients.ToString().Replace('_', '.')}", $"{(int)Access.Edit}", $"{(int)Access.View}"));
