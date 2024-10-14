@@ -1,9 +1,9 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Web.Models.OddsEngine.Config;
+using Backoffice.Shared.Models;
+using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
+using System.Threading;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -11,87 +11,50 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
 
-        [Parameter] public ConfigNavMenuParamModel ParamModel { get; set; }
-        [Parameter] public EventCallback<ConfigTemplateNavMenu> OnConfigNavMenuClick { get; set; }
-        [Parameter] public EventCallback OnCopyClientSelect { get; set; }
+        [Parameter] public string Region { get; set; }
+
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
+
+        [Parameter] public EventCallback<ConfigTemplateNavMenu> SelectConfigNavMenuCallback { get; set; }
+        [Parameter] public EventCallback SelectCopyClientCallback { get; set; }
+        [Parameter] public int? MyTemplatesCount { get; set; }
+        [Parameter] public int? AssignedLeaguesCount { get; set; }
+        [Parameter] public int? UnAssignedLeaguesCount { get; set; }
+
+        [Inject] private IBackofficeService BackofficeService { get; set; }
+
+        public TemplateConfigCount TemplateConfigCount { get; set; }
+
+        public ConfigTemplateNavMenu CurrentMenu { get; set; }
 
         #endregion
 
-        #region Fields
+        private CancellationTokenSource _cancellationTokenSource;
 
-        private ConfigTemplateNavMenu _currentMenu;
-
-        private string _myTemplateText;
-        private string _assignedText;
-        private string _unAssignedText;
-
-        private string _myTemplateCss;
-        private string _assignedCss;
-        private string _unAssignedCss;
-
-        private string _calculatingText;
-        private int _myTemplateCount;
-        private int _assignedCount;
-        private int _unAssignedCount;
-
-        private LanguageCode _languageCode;
-        private bool _init = true;
-        private bool _shouldRender = true;
-
-        private Action<MouseEventArgs> _myTemplateClickEvent;
-        private Action<MouseEventArgs> _assignedClickEvent;
-        private Action<MouseEventArgs> _unAssignedClickEvent;
-
-        #endregion
-
-        #region Methods
-
-        protected override void OnInitialized() {
-            _myTemplateClickEvent = async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.MyTemplates);
-            _assignedClickEvent =  async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.Assigned);
-            _unAssignedClickEvent = async _ => await HandleConfigNavMenuClick(ConfigTemplateNavMenu.UnAssigned);
-        }
-
-        protected override void OnParametersSet()
+        #region Methods                                          
+        protected override async Task OnInitializedAsync()
         {
-            _shouldRender = ValidateParameters();
+            CurrentMenu = (int)ConfigTemplateNavMenu.MyTemplates;
 
-            if (_shouldRender)
-            {
-                _languageCode = TranslationState.ActiveLanguageCode;
-                _calculatingText = $"{TranslationState.GetValue("Calculating")}...";
+            _cancellationTokenSource = new();
 
-                _currentMenu = ParamModel.SelectedNavMenu;
-                _myTemplateCount = ParamModel.MyTemplatesCount;
-                _assignedCount = ParamModel.AssignedLeaguesCount;
-                _unAssignedCount = ParamModel.UnAssignedLeaguesCount;
-
-                _myTemplateText = $"{TranslationState.GetValue("My Templates")} ({(_myTemplateCount > 0 ? _myTemplateCount : _calculatingText)})";
-                _unAssignedText = $"{TranslationState.GetValue("UnAssigned")} ({(_unAssignedCount > 0 ? _unAssignedCount : _calculatingText)})";
-                _assignedText = $"{TranslationState.GetValue("Assigned")} ({(_assignedCount > 0 ? _assignedCount : _calculatingText)})";
-
-                _myTemplateCss = _currentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav";
-                _unAssignedCss = _currentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav";
-                _assignedCss = _currentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav";
-            }
-
-            _init = false;
+            TemplateConfigCount = new TemplateConfigCount();
+            MyTemplatesCount = -1;
+            AssignedLeaguesCount = -1;
+            UnAssignedLeaguesCount = -1;
+            await SelectConfigNavMenuCallback.InvokeAsync(CurrentMenu);
         }
 
-        protected override bool ShouldRender() => _shouldRender;
-
-        protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
-
-        public async Task HandleConfigNavMenuClick(ConfigTemplateNavMenu configNavMenu)
+        public async Task OnSelectConfigNavMenu(ConfigTemplateNavMenu configNavMenu)
         {
-            await OnConfigNavMenuClick.InvokeAsync(configNavMenu);
-
-            _shouldRender = true;
+            CurrentMenu = configNavMenu;
+            await SelectConfigNavMenuCallback.InvokeAsync(configNavMenu);
         }
 
-        public async Task HandleCopyClientSettingsSelect() => await OnCopyClientSelect.InvokeAsync();
-
-        public bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode || ParamModel.MyTemplatesCount != _myTemplateCount || ParamModel.AssignedLeaguesCount != _assignedCount || ParamModel.UnAssignedLeaguesCount != _unAssignedCount || _currentMenu != ParamModel.SelectedNavMenu;
+        public async Task SelectCopyClientSettings()
+        {
+            await SelectCopyClientCallback.InvokeAsync();
+        }
 
         public void Dispose()
         {
@@ -99,6 +62,5 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         }
 
         #endregion
-
     }
 }

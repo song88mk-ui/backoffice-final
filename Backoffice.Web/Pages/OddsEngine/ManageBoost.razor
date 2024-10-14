@@ -8,7 +8,7 @@
 <AuthorizeView Policy="sbc-priceboost-manage">
     <Authorized>
         <div class="col-md-12">
-            <Breadcrumb Breadcrumbs="_breadcrumbs" />
+            <Breadcrumb Breadcrumbs="_breadcrumbs" Region="Region" />
         </div>
         <div class="col-md-12">
             <OEPageHeader PageHeaderModel="_pageHeaderModel" />
@@ -61,7 +61,7 @@
                                             <span class="d-block market">@priceboost.MarketName</span>
                                             <span class="d-block segment">@priceboost.SegmentName</span>
                                             <span class="d-block league">@priceboost.LeagueName</span>
-                                            <span class="d-block date">@priceboost.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)</span>
+                                            <span class="d-block date">@priceboost.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")</span>
                                             <span class="d-block time">@priceboost.FixtureStartDate.ToLocalTime().ToString("HH:mm")</span>
                                             @if (priceboost.FixtureStatusId == (int)FixtureStatus.Live)
                                             {

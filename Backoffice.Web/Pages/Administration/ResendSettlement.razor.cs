@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
 
-        
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public List<AlertModel> Alerts { get; set; }
         private List<ResendSettlementBetDetailModel> ResendSettlementModel { get; set; }
@@ -45,7 +45,7 @@ namespace Backoffice.Web.Pages.Administration
             ResendSettlementModel = new List<ResendSettlementBetDetailModel>();
             Alerts = new List<AlertModel>();
 
-            await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await AuthenticateAccess.InvokeAsync();
 
             if (ResendSettlementModel.Count == 0)
             {
@@ -222,6 +222,8 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
+            BackofficeService.Dispose();
+
             GC.SuppressFinalize(this);
         }
 

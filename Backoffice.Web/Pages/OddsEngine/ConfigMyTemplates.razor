@@ -1,17 +1,15 @@
-﻿@using Backoffice.Web.Components.OddsEngine.Configuration
-
-<AuthorizeView Policy="sbc-config">
+﻿<AuthorizeView Policy="sbc-config">
     <Authorized>
         <div class="col-md-12 mb-4">
             <AlertMessage AlertClass="mx-3" AlertModel="@_alertModel"></AlertMessage>
             <div class="d-flex justify-content-between m-4">
 
                 <div>
-                    <h4 class="page-title">@TranslationState.GetValue(_pageTitle)</h4>
+                    <h4 class="page-title">@TranslationState.GetValue(PageTitle)</h4>
                 </div>
 
                 <div>
-                    <a class="btn btn-logs" href="javascript:void(0)" @onclick="HandleLogsClick">
+                    <a class="btn btn-logs" href="javascript:void(0)" @onclick="OnLogsClickEvent">
                         <i class="fa fa-list"></i>
                         <span>@TranslationState.GetValue("Logs")</span>
                     </a>
@@ -23,7 +21,7 @@
             <div class="d-flex justify-content-between mx-4">
                 <div class="d-flex filter-div">
                     <div class="input-container d-flex">
-                        <EditForm Model="_searchForm" OnValidSubmit="HandleSearchInput" Context="FormContext">
+                        <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                             <div class="input-group">
                                 <InputText id="search" placeholder="@TranslationState.GetValue("Find")" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
                                 <button class="input-group-text border-start-0">
@@ -33,13 +31,13 @@
                         </EditForm>
                     </div>
 
-                    <select class="form-select" @onchange="HandleSportChange">
-                        <option value="-1" selected="@_selectedSportId == -1">@TranslationState.GetValue("All Sports")</option>
-                        @if (FilterModel.Sports.Any())
+                    <select class="form-select" @onchange="OnSportChangedEvent">
+                        <option value="-1" selected="@SelectedSportId == -1">@TranslationState.GetValue("All Sports")</option>
+                        @if (Sports.Any())
                         {
-                            @foreach (var item in FilterModel.Sports)
+                            @foreach (var item in Sports)
                             {
-                                <option value="@item.Value" selected="@(item.Value == _selectedSportId.ToString())">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == SelectedSportId.ToString())">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                         else
@@ -48,12 +46,12 @@
                         }
                     </select>
 
-                    <select class="form-select" @onchange="HandleScopeChange">
-                        @if (FilterModel.Scopes.Any())
+                    <select class="form-select" @onchange="OnScopeChangedEvent">
+                        @if (Scopes.Any())
                         {
-                            @foreach (var item in FilterModel.Scopes)
+                            @foreach (var item in Scopes)
                             {
-                                <option value="@item.Value" selected="@(item.Value == _selectedScopeId.ToString())">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == SelectedScopeId.ToString())">@TranslationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -62,7 +60,7 @@
                 <div>
                     <AuthorizeView Policy="sbc-config-canedit">
                         <Authorized Context="ActivateAll">
-                            <button class="btn btn-create" @onclick="HandleNewTemplateClick">
+                            <button class="btn btn-create" @onclick="OnCreateNewTemplateClickEvent">
                                 @TranslationState.GetValue("Create New")
                             </button>
                         </Authorized>
@@ -76,8 +74,8 @@
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th class="px-4 w-25" scope="col">@TranslationState.GetValue("Template Name")</th>
-                            <th class="px-4 w-25" scope="col">@TranslationState.GetValue("Sports")</th>
+                            <th class="px-4" scope="col">@TranslationState.GetValue("Template Name")</th>
+                            <th class="px-4" scope="col">@TranslationState.GetValue("Sports")</th>
                             <th class="text-center" scope="col">@TranslationState.GetValue("Client Assigned")</th>
                             <th class="text-center" scope="col">@TranslationState.GetValue("League Assigned")</th>
                             <th class="text-center" scope="col">@TranslationState.GetValue("Date Created")</th>
@@ -86,7 +84,7 @@
                     </thead>
 
                     <tbody>
-                        @if (_isPreloader)
+                        @if (IsPreloader)
                         {
                             <tr>
                                 <td colspan="7">
@@ -96,11 +94,46 @@
                         }
                         else
                         {
-                            @if (_configTemplates != null && _configTemplates.Any())
+                            @if (ConfigTemplates != null && ConfigTemplates.Any())
                             {
-                                <Virtualize Items="_configTemplates" Context="config" SpacerElement="tr">
-                                    <ConfigMyTemplateRow ConfigTemplate="config" ModalClickedCallback="HandleModalClick" />
-                                </Virtualize>
+                                foreach (var configTemplate in ConfigTemplates)
+                                {
+                                    var isReadOnly = !(configTemplate.ClientsCount > 0 && configTemplate.LeaguesCount > 0);
+                                    <tr>
+                                        <th class="px-4" scope="row" @onclick="() => OnEditTemplateClickEvent(configTemplate)">@configTemplate.Name</th>
+                                        <td class="px-4" @onclick="() => OnEditTemplateClickEvent(configTemplate)">@(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString()) != null ? $"{TranslationState.GetValue(Sports.FirstOrDefault(e => e.Value == configTemplate.SportId.ToString())?.Name ?? "")}" : "")</td>
+                                        <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@($"{configTemplate.ClientsCount} Client{(configTemplate.ClientsCount > 1 ? "s" : "")}")</td>
+                                        <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@($"{configTemplate.LeaguesCount} League{(configTemplate.LeaguesCount > 1 ? "s" : "")}")</td>
+                                        <td @onclick="() => OnEditTemplateClickEvent(configTemplate)" class="text-center">@(configTemplate.Timestamp.ToString("HH:mm dd/MM/yyyy"))</td>
+                                        <td>
+                                            <div class="manage-cell">
+                                                <AuthorizeView Policy="sbc-config-canedit">
+                                                    <Authorized Context="ActivateAll">
+                                                        <a class= href="javascript:void(0)" @onclick="() => OnEditTemplateClickEvent(configTemplate)" title="Edit Template">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
+                                                        <a href="javascript:void(0)" @onclick="() => OnCopyTemplateClickEvent(configTemplate)" title="Copy Template">
+                                                            <i class="fa fa-copy"></i>
+                                                        </a>
+                                                    </Authorized>
+                                                </AuthorizeView>
+                                                <a href="javascript:void(0)" @onclick="() => OnExportTemplateClickEvent(configTemplate)" title="Export Template">
+                                                    <i class="fa fa-file-archive-o"></i>
+                                                </a>
+                                                <AuthorizeView Policy="sbc-config-canedit">
+                                                    <Authorized Context="ActivateAll">
+                                                        <a href="javascript:void(0)" @onclick="() => OnDeleteTemplateClickEvent(configTemplate)" title="Delete Template">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </Authorized>
+                                                </AuthorizeView>
+                                                <a href="javascript:void(0)" @onclick="() => OnViewAssignedClickEvent(configTemplate)" title="View Assigned" class="@(isReadOnly ? "disabled" : "")">
+                                                    <i class="fa fa-list"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                             }
                             else
                             {
@@ -117,6 +150,6 @@
         </div>
 
 
-        <CustomModal OnSaveClickCallback="HandleModalSave" />
+        <CustomModal OnSaveClickCallback="OnModalSaveEvent" />
     </Authorized>
 </AuthorizeView>

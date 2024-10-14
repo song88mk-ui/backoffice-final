@@ -17,7 +17,8 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] List<string>? UserClientCodes { get; set; }
 
         public MetaData MetaData { get; set; }
         public ClientParlayBonusModel ClientParlayBonusModel { get; set; }
@@ -66,7 +67,7 @@ namespace Backoffice.Web.Pages.SBC
 
             OnDisableSaveActionAsync = DisableSaveButton;
 
-            await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await AuthenticateAccess.InvokeAsync();
 
             await LoadClients();
         }
@@ -261,6 +262,8 @@ namespace Backoffice.Web.Pages.SBC
             TempConfig = null;
             Clients = null;
 
+            BackofficeService.Dispose();
+
             GC.SuppressFinalize(this);
         }
 
@@ -278,9 +281,9 @@ namespace Backoffice.Web.Pages.SBC
             var clients = (await BackofficeService.GetClients()).Result;
             if (clients != null)
             {
-                if (UserModel.ClientCodes.Any())
+                if (UserClientCodes != null && UserClientCodes.Any())
                 {
-                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                    clients.Clients = clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                 }
 
                 Clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemModel<Client>

@@ -2,6 +2,9 @@
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Security.Claims;
 
 namespace Backoffice.Web.Shared.OddsEngine
 {
@@ -9,79 +12,46 @@ namespace Backoffice.Web.Shared.OddsEngine
     {
         #region Properties
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
-        #endregion
-
-        #region Fields
-
-        private OeNavMenu _menu;
-
-        private string _activePage;
-        private string _address = "hk/odds-engine";
+        [Inject] public NavigationManager? NavigationManager { get; set; }
+        [CascadingParameter(Name = "UserClaims")] public List<Claim>? UserClaims { get; set; }
+        [Parameter] public string Region { get; set; } = "hk";
 
         private bool _showPriceBoostMenu;
         private bool _showMarketSettingsMenu;
-        private bool _init = true;
-        private bool _shouldRender;
-
+        private bool _isActiveMonitoring;
+        private bool _isActiveConfig;
+        private bool _isActivePriceBoost;
+        private bool _isActiveSportSettings;
+        private bool _isActiveMarketSettings;
+        private string _address = string.Empty;
         #endregion
+
+        private OeNavMenu _menu;
+        private string _activePage;
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            _navigationManager.LocationChanged += HandleLocationChanged;
+            NavigationManager.LocationChanged += HandleLocationChanged;
         }
-
         protected override async Task OnParametersSetAsync()
         {
-            _shouldRender = ValidateParameters();
+            _address = $"{Region.ToLower()}/odds-engine";
+            var page = NavigationManager?.Uri.Replace(NavigationManager.BaseUri, "");
 
-            if (_shouldRender)
+            if (_activePage != page)
             {
-                var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
-
                 _activePage = page;
                 ActivateMenu(page);
             }
-
-            if (UserModel.Claims.Any())
-                _init = false;
         }
-
-        protected override bool ShouldRender() => _shouldRender;
-
-        protected override async Task OnAfterRenderAsync(bool firstRender) => _shouldRender = false;
-
-        public async Task HandlePriceBoostClick()
+        private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
         {
-            if (!_showPriceBoostMenu)
-            {
-                HideAllMenu();
-                _showPriceBoostMenu = true;
-            }
-            else
-                _showPriceBoostMenu = false;
-
-            _shouldRender = true;
+            var page = NavigationManager?.Uri.Replace(NavigationManager.BaseUri, "");
+            ActivateMenu(page);
         }
-
-        public async Task HandleMarketSettingsClick()
-        {
-            if (!_showMarketSettingsMenu)
-            {
-                HideAllMenu();
-
-                _showMarketSettingsMenu = true;
-            }
-            else
-                _showMarketSettingsMenu = false;
-
-            _shouldRender = true;
-        }
-
-        public async void ActivateMenu(string? menu = null)
+        public void ActivateMenu(string? menu = null)
         {
             HideAllMenu();
 
@@ -89,13 +59,15 @@ namespace Backoffice.Web.Shared.OddsEngine
             {
                 if (menu.Contains("hk/odds-engine/"))
                     menu = menu.Replace("hk/odds-engine/", "");
-                if (menu.Contains("hk/odds-engine"))
-                    menu = menu.Replace("hk/odds-engine", "");
-
-                menu = menu.Split('/').FirstOrDefault() ?? string.Empty;
+                //if (menu.Contains("hk/odds-engine"))
+                //    menu = menu.Replace("hk/odds-engine", "");
 
                 switch (menu.ToUpper())
                 {
+                    case "":
+                    case "MONITORING":
+                        _menu = OeNavMenu.Monitoring;
+                        break;
                     case "CONFIG":
                     case "CONFIG-TEMPLATES":
                         _menu = OeNavMenu.Config;
@@ -113,23 +85,34 @@ namespace Backoffice.Web.Shared.OddsEngine
                     case "MARKET-GROUPS":
                         _menu = OeNavMenu.MarketSettings;
                         break;
-                    default:
-                        _menu = OeNavMenu.Monitoring;
-                        break;
                 }
+                StateHasChanged();
             }
         }
-
-        public bool ValidateParameters()
+        private async Task OnPriceBoostClickEvent()
         {
-            var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
-
-            return _init || _activePage != page;
+            if (!_showPriceBoostMenu)
+            {
+                HideAllMenu();
+                _showPriceBoostMenu = true;
+            }
+            else
+                _showPriceBoostMenu = false;
         }
+        private async Task OnMarketSettingsClickEvent()
+        {
+            if (!_showMarketSettingsMenu)
+            {
+                HideAllMenu();
 
+                _showMarketSettingsMenu = true;
+            }
+            else
+                _showMarketSettingsMenu = false;
+        }
         public void Dispose()
         {
-            _navigationManager.LocationChanged -= HandleLocationChanged;
+            NavigationManager.LocationChanged -= HandleLocationChanged;
         }
 
         #endregion
@@ -141,13 +124,6 @@ namespace Backoffice.Web.Shared.OddsEngine
             _showPriceBoostMenu = false;
             _showMarketSettingsMenu = false;
         }
-
-        private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
-        {
-            var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
-            ActivateMenu(page);
-        }
-
         #endregion
     }
 }

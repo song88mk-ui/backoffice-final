@@ -16,7 +16,8 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
 
         public string IFrameSrc { get; set; }
 
@@ -33,7 +34,7 @@ namespace Backoffice.Web.Pages.SBC
                 Title = "Dashboard",
                 IconClass = "ico ico-dashboard"
             };
-            await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await AuthenticateAccess.InvokeAsync();
 
             await Initialize();
         }

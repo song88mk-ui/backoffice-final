@@ -25,7 +25,7 @@
                             @foreach (var logs in ActivityLogs)
                             {
                                 <tr>
-                                    <td>@logs.TimeStamp.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture) @logs.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
+                                    <td>@logs.TimeStamp.ToLocalTime().ToString("dd/MM/yy") @logs.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
                                     <td>@logs.Activity</td>
                                     <td>@((MarkupString)CommonService.GetActivity<SportsbookClientPermission>(logs.From, logs.To, SportsbookClientPermission.SBC_OE_MarketSetting_Group, logs.Activity, true))</td>
                                     <td>@((MarkupString)CommonService.GetActivity<SportsbookClientPermission>(logs.From, logs.To, SportsbookClientPermission.SBC_OE_MarketSetting_Group, logs.Activity, false))</td>

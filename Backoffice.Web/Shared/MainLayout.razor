@@ -1,48 +1,52 @@
 ﻿@using Backoffice.Shared.Enums
-@inherits LayoutBase
+@inherits MainLayoutBase
 
 <ErrorBoundary @ref="_errorBoundary">
     <ChildContent>
         @if (!PreRenderService.IsPreRendering)
         {
-            <CascadingValue Value="UserModel" Name="UserModel" IsFixed>
-                @* <CascadingValue Value="UserClaims" Name="UserClaims">
-            <CascadingValue Value="UserClientCodes" Name="UserClientCodes" IsFixed> *@
-                @if (NavigationManager.Uri.Contains("/admin"))
-                {
-                    <PageTitle>Backoffice - Administration</PageTitle>
-                }
-                else
-                {
-                    <PageTitle>Backoffice - SBC</PageTitle>
-                }
-
-                @if (IsPreloader)
-                {
-                    <div class="preload-container d-flex justify-content-center align-items-center">
-                        <Preloader InlineSpinnerCss="@InlineSpinnerCss" />
-                    </div>
-                }
-                else
-                {
-                    <div class="page">
-                        <div class="sidebar">
+            <CascadingValue Value="AuthenticateAccessEvent" Name="AuthenticateAccessEvent">
+                <CascadingValue Value="UserModel" Name="UserModel">
+                    <CascadingValue Value="UserClaims" Name="UserClaims">
+                        <CascadingValue Value="UserClientCodes" Name="UserClientCodes" IsFixed>
                             @if (NavigationManager.Uri.Contains("/admin"))
                             {
-                                <NavMenu NavMenuAccess="PermissionCategory.Admin" NavMenus="NavMenus" />
+                                <PageTitle>Backoffice - Administration</PageTitle>
                             }
                             else
                             {
-                                <NavMenu NavMenuAccess="PermissionCategory.SBC" NavMenus="NavMenus" />
+                                <PageTitle>Backoffice - SBC</PageTitle>
                             }
-                        </div>
-                        <main>
-                            <article class="content px-4">
-                                @Body
-                            </article>
-                        </main>
-                    </div>
-                }
+
+                            @if (IsPreLoader)
+                            {
+                                <div class="preload-container d-flex justify-content-center align-items-center">
+                                    <Preloader InlineSpinnerCss="@InlineSpinnerCss" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="page">
+                                    <div class="sidebar">
+                                        @if (NavigationManager.Uri.Contains("/admin"))
+                                        {
+                                            <NavMenu NavMenuAccess="PermissionCategory.Admin" NavMenus="NavMenus" />
+                                        }
+                                        else
+                                        {
+                                            <NavMenu NavMenuAccess="PermissionCategory.SBC" NavMenus="NavMenus" />
+                                        }
+                                    </div>
+                                    <main>
+                                        <article class="content px-4">
+                                            @Body
+                                        </article>
+                                    </main>
+                                </div>
+                            }
+                        </CascadingValue>
+                    </CascadingValue>
+                </CascadingValue>
             </CascadingValue>
             <ToastComponent />
         }

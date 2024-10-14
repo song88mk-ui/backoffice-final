@@ -1,14 +1,16 @@
 ﻿@using Backoffice.Shared.Enums
-@inherits LayoutBase
+@using Backoffice.Web.Models
 
-<ErrorBoundary @ref="_errorBoundary">
-    <ChildContent>
-        @if (!PreRenderService.IsPreRendering)
-        {
-            <CascadingValue Value="UserModel" Name="UserModel">
+@inherits MainLayoutBase
+
+<ToastComponent />
+<CascadingValue Value="AuthenticateAccessEvent" Name="AuthenticateAccessEvent">
+    <CascadingValue Value="UserModel" Name="UserModel">
+        <CascadingValue Value="UserClaims" Name="UserClaims">
+            <CascadingValue Value="UserClientCodes" Name="UserClientCodes">
                 <PageTitle>Backoffice - SBC - Odds Engine</PageTitle>
                 <div class="page">
-                    @if (IsPreloader)
+                    @if (IsPreLoader)
                     {
                         <div class="preload-container d-flex justify-content-center align-items-center">
                             <Preloader InlineSpinnerCss="@InlineSpinnerCss" />
@@ -25,7 +27,7 @@
                                     <div class="main-content col-md-12 mb-4 pb-3 rounded">
                                         <div class="row">
                                             <div class="header-container col-md-12">
-                                                <HeaderNavMenu @ref="HeaderNavMenuReference" />
+                                                <HeaderNavMenu @ref="HeaderNavMenuReference" Region="@Region" />
                                             </div>
 
                                             <CascadingValue Value="SelectedSport" Name="SelectedSport">
@@ -41,32 +43,6 @@
                     }
                 </div>
             </CascadingValue>
-            <ToastComponent />
-        }
-    </ChildContent>
-    <ErrorContent Context="errorException">
-        <div id="blazor-error-ui">
-            <div class="blazor-error-body">
-                @{
-                    LogError(errorException);
-                }
-            </div>
-        </div>
-    </ErrorContent>
-</ErrorBoundary>
-
-
-@code {
-    [Inject] public IJSRuntime JsRuntime { get; set; }
-    private ErrorBoundary? _errorBoundary;
-
-    protected override void OnParametersSet()
-    {
-        _errorBoundary?.Recover();
-    }
-
-    private async void LogError(Exception ex)
-    {
-        await JsRuntime.InvokeAsync<string>("console.log", $"{ex.Message}\n{ex.StackTrace}");
-    }
-}
+         </CascadingValue>
+    </CascadingValue>
+</CascadingValue>

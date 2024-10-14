@@ -16,7 +16,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
-        
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         private MetaData MetaData { get; set; }
         public PermissionResponse Permissions { get; set; }
@@ -53,7 +53,7 @@ namespace Backoffice.Web.Pages.Administration
             UserList = new List<UserResponse>();
             Alerts = new List<AlertModel>();
 
-            await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await AuthenticateAccess.InvokeAsync();
 
             Permissions = await GetPermissionList();
         }
@@ -159,6 +159,7 @@ namespace Backoffice.Web.Pages.Administration
         public void Dispose()
         {
             UserList.Clear();
+            AuthenticationService.Dispose();
 
             GC.SuppressFinalize(this);
         }

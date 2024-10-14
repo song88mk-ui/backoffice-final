@@ -18,7 +18,7 @@ namespace Backoffice.Web.Pages
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
-        
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public List<Claim> UserClaims { get; set; }
 
@@ -30,7 +30,7 @@ namespace Backoffice.Web.Pages
         {
             UserClaims = new List<Claim>();
 
-            await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await AuthenticateAccess.InvokeAsync();
 
             var validClaimValues = new string[] { "1", "2", "0" };
             var authState = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();

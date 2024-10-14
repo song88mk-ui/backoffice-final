@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -31,7 +32,6 @@ namespace Backoffice.API.ActionFilter
 
         public AuthorizeAttribute(string claimType, int claimValue) : this()
         {
-
             _requiredClaim = new Claim(claimType, claimValue.ToString());
         }
         public AuthorizeAttribute()
@@ -39,7 +39,7 @@ namespace Backoffice.API.ActionFilter
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri(_configuration["API:AuthenticationAPI:Uri"]);
             _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:AuthenticationAPI:Security:APIKey"]);
+            _httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:AuthenticationAPI:Security:APIKey"]); ;
         }
         public async void OnAuthorization(AuthorizationFilterContext context)
         {
@@ -123,7 +123,6 @@ namespace Backoffice.API.ActionFilter
 
                 context.HttpContext.Items["UserToken"] = token;
                 context.HttpContext.Items["UserId"] = parsed.Where(x => x.Type.ToUpper() == "UserId".ToUpper()).FirstOrDefault()?.Value.ToString();
-                context.HttpContext.Items["UserName"] = parsed.Where(x => x.Type.ToUpper() == "UserName".ToUpper()).FirstOrDefault()?.Value.ToString();
                 context.HttpContext.Items["UserIdRef"] = parsed.Where(x => x.Type.ToUpper() == "UserIdRef".ToUpper()).FirstOrDefault()?.Value.ToString();
                 context.HttpContext.Items["ClientCodes"] = parsed.Where(x => x.Type.ToUpper() == "ClientCodes".ToUpper()).FirstOrDefault()?.Value.ToString();
             }

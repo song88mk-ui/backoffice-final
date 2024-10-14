@@ -1,5 +1,4 @@
-﻿using Backoffice.API.Models;
-using Backoffice.Shared.Data.Backoffice;
+﻿using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
@@ -907,7 +906,7 @@ namespace Backoffice.API.Repositories
                         };
                     }
                 }
-
+                
 
                 if (GetClientInformation().Any(c => c.Brand == request.ClientCode && c.ClientId != request.ClientId))
                 {
@@ -1384,7 +1383,6 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Config
-
         public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplates(string searchText, List<int> sportIds = null, List<int> scopeIds = null)
         {
             try
@@ -1402,13 +1400,9 @@ namespace Backoffice.API.Repositories
 
                 var configTemplates = await query.ToListAsync();
 
-                var tempsSportIds = query.Select(s => s.SportId).ToList();
-                var configTemplateAssigned = _backofficeContext.ConfigTemplateAssigned.Where(s => tempsSportIds.Contains(s.SportId)).ToList();
-
                 var result = configTemplates.Select(x =>
                 {
-                    var leagues = configTemplateAssigned.Where(p => p.SportId == x.SportId && (p.PrematchConfigTemplateId == x.Id || p.LiveConfigTemplateId == x.Id)).ToList();
-
+                    var leagues = _backofficeContext.ConfigTemplateAssigned.Where(p => p.SportId == x.SportId && (p.PrematchConfigTemplateId == x.Id || p.LiveConfigTemplateId == x.Id)).AsNoTracking().ToList();
                     return new ConfigTemplateModel()
                     {
                         Id = x.Id,
@@ -1436,29 +1430,6 @@ namespace Backoffice.API.Repositories
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString()}: {ex.Message}",
                     Result = new List<ConfigTemplateModel>()
-                };
-            }
-        }
-        public async Task<BaseResponse<int>> GetConfigTemplatesCount()
-        {
-            try
-            {
-                var result = _backofficeContext.ConfigTemplate.AsNoTracking().Count();
-
-                return new BaseResponse<int>()
-                {
-                    StatusCode = StatusCode.Success,
-                    Message = StatusCode.Success.ToString(),
-                    Result = result
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<int>()
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString()}: {ex.Message}",
-                    Result = -1
                 };
             }
         }
@@ -1640,24 +1611,11 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<bool>() { StatusCode = StatusCode.Error, Message = ex.Message };
             }
         }
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string id, RequesterInfo requesterInfo)
+        public async Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(string id)
         {
             try
             {
-                var activity = new ActivityLogModel()
-                {
-                    Page = requesterInfo.Page,
-                    To = "-",
-                    Activity = Shared.Enums.Activity.Delete.ToString(),
-                    UserId = requesterInfo.UserId,
-                    UserName = requesterInfo.UserName,
-                    TimeStamp = DateTime.UtcNow
-                };
-
-                var config = await _backofficeContext.ConfigTemplate.FindAsync(id);
-
-                activity.Payload = $"{config.SportId}.{config.FixtureStatusId}.{config.Name}.T".Replace(" ", "_");
-                activity.From = JsonSerializer.Serialize(config);
+                var config = _backofficeContext.ConfigTemplate.Where(x => x.Id.ToString() == id).AsNoTracking().FirstOrDefault();
 
                 if (config != null)
                 {
@@ -1665,7 +1623,6 @@ namespace Backoffice.API.Repositories
                 }
 
                 await _backofficeContext.SaveChangesAsync();
-                await AddActivityLog(activity);
 
                 return await GetConfigTemplates("");
             }
@@ -1674,7 +1631,7 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<List<ConfigTemplateModel>>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
             }
         }
-        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1, LanguageCode langCode = LanguageCode.EN)
+        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigState(List<string> clientCodes, ConfigTemplateLeagueRequest payload, ConfigState configState, int templateId = -1)
         {
             try
             {
@@ -1714,15 +1671,13 @@ namespace Backoffice.API.Repositories
 
                 if (payload != null && !string.IsNullOrEmpty(payload.SearchText))
                 {
-                    query = query.Where(x => x.ClientName.ToLower().Contains(payload.SearchText.ToLower()) || x.SegmentName.ToLower().Contains(payload.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(payload.SearchText.ToLower()));
+                    query = query.Where(x => x.ClientName.ToLower().Contains(payload.SearchText.ToLower()) || x.LeagueName.ToLower().Contains(payload.SearchText.ToLower()));
                 }
 
                 if (query != null && query.Any())
                 {
                     isCompleteClient = clientList.Count() == allClientsCount;
                 }
-
-                var sportsTranslationLookup = GetSportsLookup(langCode);
 
                 switch (configState)
                 {
@@ -1734,7 +1689,7 @@ namespace Backoffice.API.Repositories
                             ClientCode = x.ClientCode,
                             ClientName = x.ClientName,
                             SportId = x.SportId,
-                            SportName = langCode == LanguageCode.EN ? x.SportName : sportsTranslationLookup.FirstOrDefault(c => c.SportId == x.SportId).SportName,
+                            SportName = x.SportName,
                             SegmentId = x.SegmentId,
                             SegmentName = x.SegmentName,
                             LeagueId = x.LeagueId,
@@ -1822,6 +1777,27 @@ namespace Backoffice.API.Repositories
                 return new BaseResponse<ConfigTemplateLeagueResponse>() { StatusCode = StatusCode.Error, Message = ex.Message, Result = null };
             }
         }
+        private async Task<int> GetUnAssignedCount(List<string> clientCodes)
+        {
+            var result = 0;
+            var assignedConfigTask = GetConfigState(clientCodes, null, ConfigState.Assigned);
+            var leagueLookupResponseTask = _tradingRepository.GetAllLeagueLookup("");
+
+            await Task.WhenAll(leagueLookupResponseTask, assignedConfigTask);
+
+            var leagueLookupResponse = leagueLookupResponseTask.Result;
+            var assignedConfig = assignedConfigTask.Result;
+
+            if (leagueLookupResponse.StatusCode == StatusCode.Success)
+            {
+                var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
+                var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
+
+                result = (leagueLookup.Count * GetTradingClientInformation().Count) - assignedLeagues;
+            }
+
+            return result;
+        }
         public async Task<BaseResponse<int>> GetTemplateConfigCount(List<string> clientCodes, string state)
         {
             try
@@ -1838,8 +1814,9 @@ namespace Backoffice.API.Repositories
                 }
                 else
                 {
-                    var configTemplate = await GetConfigTemplatesCount();
-                    count = configTemplate.Result;
+                    var configTemplate = await GetConfigTemplates("");
+                    var templates = configTemplate.Result;
+                    count = templates.Count();
                 }
 
                 return new BaseResponse<int>
@@ -1982,6 +1959,8 @@ namespace Backoffice.API.Repositories
                             }
 
                             context.ConfigTemplateAssigned.RemoveRange(toClientConfigTemplateAssigned);
+
+                            context.SaveChanges();
                         }
 
                         //assign all config templates assigned from FromClientCode into ToClientCode
@@ -2076,7 +2055,7 @@ namespace Backoffice.API.Repositories
                 StatusCode = StatusCode.Success,
                 Message = StatusCode.Success.ToString(),
                 Result = result
-            };
+            }; ;
         }
         #endregion
 
@@ -2095,10 +2074,8 @@ namespace Backoffice.API.Repositories
                 {
                     var region = (await GetClientRegion(clientId)).Result;
 
-                    if (region == "HK")
-                        hkClientIds.Add(clientId);
-                    else if (region == "SA")
-                        saClientIds.Add(clientId);
+                    if (region == "HK") hkClientIds.Add(clientId);
+                    else if (region == "SA") saClientIds.Add(clientId);
                 }
 
                 if (!hkClientIds.Any() && !saClientIds.Any())
@@ -2265,15 +2242,6 @@ namespace Backoffice.API.Repositories
             }
         }
 
-        private List<SportLookup>? GetSportsLookup(LanguageCode langCode)
-        {
-            if (langCode == LanguageCode.EN)
-                return null;
-
-            var cache = _memCache.GetCache($"sp-tr-{langCode.ToString().ToUpper()}", async () => await _tradingRepository.GetSportLookup(langCode.ToString().ToUpper()), 1);
-
-            return cache.Result?.Result?.SportLookup ?? null;
-        }
 
         private List<ActivityLogModel> FilterManualSettlementLogs(List<ActivityLogModel> activityLogs, ManualBetSettlementCallbackModel callbackModel)
         {
@@ -2348,52 +2316,7 @@ namespace Backoffice.API.Repositories
             //return _memCache.GetCache("tr", () => _backofficeContext.Translation.AsNoTracking().ToList(), 24);
             return _backofficeContext.Translation.AsNoTracking().ToList();
         }
-        private async Task<int> GetAssignedCount(List<string> clientCodes)
-        {
-            var prematchTask = _backofficeContext.ConfigTemplateAssigned.CountAsync(e => e.PrematchConfigTemplateId != -1);
 
-            var liveTask = _backofficeContext.ConfigTemplateAssigned.CountAsync(e => e.LiveConfigTemplateId != -1);
-
-            var result = 0;
-            var assignedConfigTask = GetConfigState(clientCodes, null, ConfigState.Assigned);
-            var leagueLookupResponseTask = _tradingRepository.GetAllLeagueLookup("");
-
-            await Task.WhenAll(leagueLookupResponseTask, assignedConfigTask);
-
-            var leagueLookupResponse = leagueLookupResponseTask.Result;
-            var assignedConfig = assignedConfigTask.Result;
-
-            if (leagueLookupResponse.StatusCode == StatusCode.Success)
-            {
-                var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
-                var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
-
-                result = (leagueLookup.Count * GetTradingClientInformation().Count) - assignedLeagues;
-            }
-
-            return result;
-        }
-        private async Task<int> GetUnAssignedCount(List<string> clientCodes)
-        {
-            var result = 0;
-            var assignedConfigTask = GetConfigState(clientCodes, null, ConfigState.Assigned);
-            var leagueLookupResponseTask = _tradingRepository.GetAllLeagueLookup("");
-
-            await Task.WhenAll(leagueLookupResponseTask, assignedConfigTask);
-
-            var leagueLookupResponse = leagueLookupResponseTask.Result;
-            var assignedConfig = assignedConfigTask.Result;
-
-            if (leagueLookupResponse.StatusCode == StatusCode.Success)
-            {
-                var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
-                var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
-
-                result = (leagueLookup.Count * GetTradingClientInformation().Count) - assignedLeagues;
-            }
-
-            return result;
-        }
         #endregion
     }
 }

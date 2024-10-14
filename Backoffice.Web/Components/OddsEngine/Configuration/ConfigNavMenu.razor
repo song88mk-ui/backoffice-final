@@ -1,13 +1,10 @@
 ﻿<div class="d-flex justify-content-between col mx-4 config-nav-container">
     <div>
-        <a href="javascript:void(0)" class="@_myTemplateCss"
-           @onclick="_myTemplateClickEvent">@_myTemplateText</a>
-        <a href="javascript:void(0)" class="@_assignedCss"
-           @onclick="_assignedClickEvent">@_assignedText</a>
-        <a href="javascript:void(0)" class="@_unAssignedCss"
-           @onclick="_unAssignedClickEvent">@_unAssignedText</a>
+        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.MyTemplates)">@TranslationState.GetValue("My Templates") (@(MyTemplatesCount != null && MyTemplatesCount >= 0 ? String.Format("{0:N0}", MyTemplatesCount) : $"{@TranslationState.GetValue("Calculating")}..."))</a>
+        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.Assigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.Assigned)">@TranslationState.GetValue("Assigned") (@(AssignedLeaguesCount != null && AssignedLeaguesCount >= 0 ? String.Format("{0:N0}", AssignedLeaguesCount) : $"{@TranslationState.GetValue("Calculating")}..."))</a>
+        <a href="javascript:void(0)" class="@(CurrentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav")" @onclick="_ => OnSelectConfigNavMenu(ConfigTemplateNavMenu.UnAssigned)">@TranslationState.GetValue("UnAssigned") (@(UnAssignedLeaguesCount != null && UnAssignedLeaguesCount >= 0 ? String.Format("{0:N0}", UnAssignedLeaguesCount) : $"{@TranslationState.GetValue("Calculating")}..."))</a>
     </div>
     <div>
-        <a class="btn btn-copy-client" href="javascript:(0)" @onclick="HandleCopyClientSettingsSelect">@TranslationState.GetValue("Copy Client Settings")</a>
+        <a class="btn btn-copy-client" href="javascript:(0)" @onclick="SelectCopyClientSettings">@TranslationState.GetValue("Copy Client Settings")</a>
     </div>
 </div>

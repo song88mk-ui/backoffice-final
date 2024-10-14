@@ -11,12 +11,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
         private EventCallback<AlertModel> OnCopyClientSettingsCallback { get; set; }
 
         private List<ClientInformationModel> Clients { get; set; }
+        private string Region { get; set; }
 
         private KeyValuePair<string, string> SelectedFromClient { get; set; }
         private KeyValuePair<string, string> SelectedToClient { get; set; }
@@ -26,6 +27,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             Clients = new List<ClientInformationModel>();
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback<AlertModel>>("OnCopyClientSettingsCallback");
+            Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            TradingService.Region = Region.ToUpper();
 
             await Initialize();
         }
@@ -81,6 +84,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             parameters.Add("ToClient", Clients.FirstOrDefault(c => c.ClientCode == SelectedToClient.Key));
             parameters.Add("SelectedFromClient", SelectedFromClient);
             parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<ConfirmCopyClientSettingsModal>($"Copy Client Settings", parameters);
@@ -98,7 +102,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             clients = (await TradingService.GetClientList()).Result;
             if (clients != null)
             {
-                clients = UserModel.ClientCodes.Any() ? clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+                clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
             }
 
             return clients?.ToList() ?? new List<ClientInformationModel>();

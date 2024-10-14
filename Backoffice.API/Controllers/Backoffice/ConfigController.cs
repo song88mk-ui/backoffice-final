@@ -1,5 +1,4 @@
 ﻿using Backoffice.API.ActionFilter;
-using Backoffice.API.Models;
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
@@ -14,7 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AllowAnonymousAttribute = Backoffice.API.ActionFilter.AllowAnonymousAttribute;
 using AuthorizeAttribute = Backoffice.API.ActionFilter.AuthorizeAttribute;
-using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
+using BoStatusCode = Backoffice.Shared.Enums.StatusCode;     
 
 namespace Backoffice.API.Controllers.Backoffice
 {
@@ -27,6 +26,7 @@ namespace Backoffice.API.Controllers.Backoffice
         private readonly IMaintenanceRepository _maintenanceRepository;
         public ConfigController(IBackofficeRepository backofficeRepository, IMaintenanceRepository maintenanceRepository)
         {
+            //
             _backofficeRepository = backofficeRepository;
             _maintenanceRepository = maintenanceRepository;
         }
@@ -131,16 +131,8 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> DeleteConfigTemplate([FromRoute] string id)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
-            var userName = HttpContext.Items["UserName"]?.ToString();
 
-            var requester = new RequesterInfo()
-            {
-                UserId = userId,
-                UserName = userName,
-                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
-            };
-
-            var result = await _backofficeRepository.DeleteConfigTemplate(id, requester);
+            var result = await _backofficeRepository.DeleteConfigTemplate(id);
 
             switch (result.StatusCode)
             {
@@ -155,7 +147,6 @@ namespace Backoffice.API.Controllers.Backoffice
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
             var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
-            var languageCode = HttpContext.Items["x-language-code"]?.ToString();
 
             var result = new BaseResponse<ConfigTemplateLeagueResponse>()
             {

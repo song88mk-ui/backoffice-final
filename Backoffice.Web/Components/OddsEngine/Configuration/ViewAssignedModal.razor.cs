@@ -10,31 +10,37 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class ViewAssignedModal : IDisposable
     {
         #region Properties
+        [Inject] private IModalService ModalService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
+        public List<ConfigClientModel> Leagues { get; set; }
         #endregion
         private bool _isPreloader;
         private bool _isComplete = false;
-        private List<ConfigClientModel> _leagues { get; set; }
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
             _isPreloader = true;
-            var configTemplateId = ModalParameters.TryGet<long>("ConfigTemplateId");
-            _leagues = new List<ConfigClientModel>();
+            var configTemplateModel = ModalParameters.TryGet<ConfigTemplateModel>("ConfigTemplateModel");
+            Leagues = new List<ConfigClientModel>();
 
-            var assignedLeagues = await _backofficeService.GetConfigClient(ConfigState.Assigned, new ConfigTemplateLeagueRequest(), configTemplateId);
+            var assignedLeagues = await BackofficeService.GetConfigClient(ConfigState.Assigned, new ConfigTemplateLeagueRequest(), (int)configTemplateModel.Id);
             if (assignedLeagues.StatusCode == StatusCode.Success)
             {
-                _leagues = assignedLeagues.Result?.ClientConfigs ?? new List<ConfigClientModel>();
+                Leagues = assignedLeagues.Result?.ClientConfigs ?? new List<ConfigClientModel>();
                 _isComplete = assignedLeagues.Result?.IsComplete ?? false;
             }
             _isPreloader = false;
         }
 
-        public void HandleCloseClick() => _modalService.Cancel();
+        public async Task OnCloseClickEvent()
+        {
+            ModalService.Cancel();
+        }
 
         public void Dispose()
         {

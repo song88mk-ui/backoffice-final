@@ -686,7 +686,9 @@ namespace Backoffice.Web.Services
 
         public void Dispose()
         {
-            ////Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+            _httpClient.Dispose();
+
+            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
         }
     }
 }

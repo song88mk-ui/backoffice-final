@@ -17,31 +17,34 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Properties
         [Inject] public NavigationManager NavigationManager { get; set; }
 
+        [Inject] private IBackofficeService BackofficeService { get; set; }
+        [Inject] private ITradingService TradingService { get; set; }
+
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public long ConfigTemplateId { get; set; }
         [Parameter] public string Action { get; set; }
         [Parameter] public bool View { get; set; }
 
-        private List<BreadcrumbModel> _breadcrumbs;
-        private List<MarketLookupNavigationModel> _marketLookupNavigation;
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
+        public List<MarketLookupNavigationModel> MarketLookupNavigation { get; set; }
 
 
-        private ConfigTemplateMarginModel _configTemplateMargin;
-        private EditConfigTemplateFilterModel _editConfigTemplateFilterModel;
-        private int _selectedClientCount;
-        private string _selectedClientName;
-        private int _selectedLeagueCount;
-        private string _selectedLeagueName;
-        private string _sportIcon;
-        private string _configTemplateName;
-        private string _sportName;
-        private string _scope;
-        private string _allMarketStatusName = "ACTIVATE ALL";
-        private bool _isPreloader = true;
-        private bool _hasChanges;
-        private bool _isNameChanges;
-        private AlertModel _alertModel;
+        public ConfigTemplateMarginModel ConfigTemplateMargin { get; set; }
+        public EditConfigTemplateFilterModel EditConfigTemplateFilterModel { get; set; }
+        public int SelectedClientCount { get; set; }
+        public string SelectedClientName { get; set; } = "";
+        public int SelectedLeagueCount { get; set; }
+        public string SelectedLeagueName { get; set; } = "";
+        public string SportIcon { get; set; } = "";
+        private string ConfigTemplateName { get; set; } = "";
+        private string SportName { get; set; } = "";
+        private string Scope { get; set; } = "";
+        private string AllMarketStatusName { get; set; } = "ACTIVATE ALL";
+        public bool IsPreloader { get; set; } = true;
+        public bool HasChanges { get; set; } = false;
+        public bool IsNameChanges { get; set; } = false;
+        private AlertModel _alertModel { get; set; }
         private Activity? _activity;
         private bool _isExisitngName;
         private bool _isProcessing;
@@ -54,12 +57,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            _isPreloader = true;
+            IsPreloader = true;
 
-            _configTemplateMargin = new ConfigTemplateMarginModel();
+            ConfigTemplateMargin = new ConfigTemplateMarginModel();
 
-            _marketLookupNavigation = new List<MarketLookupNavigationModel>();
-            _breadcrumbs = new List<BreadcrumbModel>()
+            MarketLookupNavigation = new List<MarketLookupNavigationModel>();
+            Breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
                 {
@@ -82,23 +85,27 @@ namespace Backoffice.Web.Pages.OddsEngine
                 return;
             }
 
-            _hasChanges = _activity == Activity.Copy;
+            HasChanges = _activity == Activity.Copy;
 
             await LoadConfigTemplateMargin();
         }
+        protected override Task OnParametersSetAsync()
+        {
+            return base.OnParametersSetAsync();
+        }
         public async Task InitConfigEditTemplate(EditConfigTemplateFilterModel model)
         {
-            _isPreloader = true;
+            IsPreloader = true;
 
-            _editConfigTemplateFilterModel = model;
+            EditConfigTemplateFilterModel = model;
 
 
-            _sportIcon = _editConfigTemplateFilterModel.SportName.Contains(" ") ? _editConfigTemplateFilterModel.SportName.Replace(" ", "-").ToLower() : _editConfigTemplateFilterModel.SportName.ToLower();
-            _sportName = _editConfigTemplateFilterModel.SportName;
-            _configTemplateName = $"{(_activity == Activity.Copy ? "Copy of " : "")}{_editConfigTemplateFilterModel.ConfigTemplate.Name}";
-            _scope = ((FixtureStatus)_editConfigTemplateFilterModel.ScopeId).ToString();
+            SportIcon = EditConfigTemplateFilterModel.SportName.Contains(" ") ? EditConfigTemplateFilterModel.SportName.Replace(" ", "-").ToLower() : EditConfigTemplateFilterModel.SportName.ToLower();
+            SportName = EditConfigTemplateFilterModel.SportName;
+            ConfigTemplateName = $"{(_activity == Activity.Copy ? "Copy of " : "")}{EditConfigTemplateFilterModel.ConfigTemplate.Name}";
+            Scope = ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId).ToString();
 
-            _breadcrumbs = new List<BreadcrumbModel>()
+            Breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
                 {
@@ -108,7 +115,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 },
                 new BreadcrumbModel
                 {
-                    Name = $"{_configTemplateName}",
+                    Name = $"{ConfigTemplateName}",
                     Url = $"hk/odds-engine/config-templates/edit/{ConfigTemplateId}",
                     IsCurrentPage = true
                 }
@@ -116,24 +123,24 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             await LoadMarkets();
 
-            _allMarketStatusName = _marketLookupNavigation.Any(m => m.IsVisible && m.NewMarketLookup.IsActive == false) ? "ACTIVATE ALL" : "DEACTIVATE ALL";
+            AllMarketStatusName = MarketLookupNavigation.Any(m => m.IsVisible && m.NewMarketLookup.IsActive == false) ? "ACTIVATE ALL" : "DEACTIVATE ALL";
 
-            _isPreloader = false;
+            IsPreloader = false;
         }
 
         public async Task OnAllMarketStatusClickEvent()
         {
 
-            if (_allMarketStatusName == "ACTIVATE ALL")
+            if (AllMarketStatusName == "ACTIVATE ALL")
             {
-                _marketLookupNavigation.Where(m => m.IsVisible).ToList().ForEach(market => market.NewMarketLookup.IsActive = true);
+                MarketLookupNavigation.Where(m => m.IsVisible).ToList().ForEach(market => market.NewMarketLookup.IsActive = true);
             }
             else
             {
-                _marketLookupNavigation.Where(m => m.IsVisible).ToList().ForEach(market => market.NewMarketLookup.IsActive = false);
+                MarketLookupNavigation.Where(m => m.IsVisible).ToList().ForEach(market => market.NewMarketLookup.IsActive = false);
             }
 
-            _allMarketStatusName = _allMarketStatusName == "DEACTIVATE ALL" ? "ACTIVATE ALL" : "DEACTIVATE ALL";
+            AllMarketStatusName = AllMarketStatusName == "DEACTIVATE ALL" ? "ACTIVATE ALL" : "DEACTIVATE ALL";
 
             await OnTemplateMarginChange();
         }
@@ -142,22 +149,22 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (_activity == Activity.Copy)
             {
-                _hasChanges = true;
+                HasChanges = true;
             }
             else
             {
-                foreach (var market in _marketLookupNavigation)
+                foreach (var market in MarketLookupNavigation)
                 {
-                    _hasChanges = !DeepCompare(market.MarketLookup, market.NewMarketLookup);
-                    if (_hasChanges)
+                    HasChanges = !DeepCompare(market.MarketLookup, market.NewMarketLookup);
+                    if (HasChanges)
                         break;
 
-                    _hasChanges = !DeepCompare(market.PrematchSettings, market.NewPrematchSettings);
-                    if (_hasChanges)
+                    HasChanges = !DeepCompare(market.PrematchSettings, market.NewPrematchSettings);
+                    if (HasChanges)
                         break;
 
-                    _hasChanges = !DeepCompare(market.LiveSettings, market.NewLiveSettings);
-                    if (_hasChanges)
+                    HasChanges = !DeepCompare(market.LiveSettings, market.NewLiveSettings);
+                    if (HasChanges)
                         break;
 
                 }
@@ -176,7 +183,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 var referenceConfigTemplateId = ConfigTemplateId;
 
-                if (_hasChanges || _activity == Activity.Copy)
+                if (HasChanges || _activity == Activity.Copy)
                 {
                     ConfigTemplateMarginModel request = new ConfigTemplateMarginModel();
 
@@ -186,12 +193,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                     var oldMarketState = new List<ConfigMarginActivityLogModel>();
                     var newMarketState = new List<ConfigMarginActivityLogModel>();
 
-                    foreach (var market in _marketLookupNavigation)
+                    foreach (var market in MarketLookupNavigation)
                     {
                         //validate Odds
                         if (market.NewMarketLookup.IsActive)
                         {
-                            switch ((FixtureStatus)_editConfigTemplateFilterModel.ScopeId)
+                            switch ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId)
                             {
                                 case FixtureStatus.Prematch:
                                     if (market.NewPrematchSettings.Settings.Any(x => x.Key <= 101))
@@ -232,7 +239,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         else
                             prematchSettings = new List<MarketMargin>();
 
-                        switch ((FixtureStatus)_editConfigTemplateFilterModel.ScopeId)
+                        switch ((FixtureStatus)EditConfigTemplateFilterModel.ScopeId)
                         {
                             case FixtureStatus.Prematch:
                                 if (market.NewPrematchSettings.Settings.Any(x => market.PrematchSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)))
@@ -290,12 +297,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                         request.ConfigTemplateMargins.Add(new ConfigTemplateMargin
                         {
                             ConfigTemplateId = referenceConfigTemplateId,
-                            SportId = _editConfigTemplateFilterModel.SportId,
+                            SportId = EditConfigTemplateFilterModel.SportId,
                             MarketTemplateId = market.MarketLookup.MarketTemplateId,
                             FixtureTypeId = (int)FixtureType.Match,
-                            FixtureStatusId = _editConfigTemplateFilterModel.ScopeId,
+                            FixtureStatusId = EditConfigTemplateFilterModel.ScopeId,
                             IsActive = market.NewMarketLookup.IsActive,
-                            Config = _editConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Prematch ? JsonSerializer.Serialize(prematchSettings) : JsonSerializer.Serialize(livematchSettings)
+                            Config = EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Prematch ? JsonSerializer.Serialize(prematchSettings) : JsonSerializer.Serialize(livematchSettings)
                         });
                     }
 
@@ -304,20 +311,20 @@ namespace Backoffice.Web.Pages.OddsEngine
                         _isExisitngName = false;
                         var payload = new ConfigTemplateModel()
                         {
-                            SportId = _editConfigTemplateFilterModel.SportId,
+                            SportId = EditConfigTemplateFilterModel.SportId,
                             FixtureTypeId = (int)FixtureType.Match,
-                            FixtureStatusId = _editConfigTemplateFilterModel.ScopeId,
-                            Name = _configTemplateName,
+                            FixtureStatusId = EditConfigTemplateFilterModel.ScopeId,
+                            Name = ConfigTemplateName,
                         };
 
-                        var response = await _backofficeService.AddOrUpdateConfigTemplate(payload);
+                        var response = await BackofficeService.AddOrUpdateConfigTemplate(payload);
 
                         if (response.StatusCode == StatusCode.Success)
                         {
-                            await _backofficeService.AddActivityLog(new ActivityLogModel()
+                            await BackofficeService.AddActivityLog(new ActivityLogModel()
                             {
                                 Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                                Payload = $"{_editConfigTemplateFilterModel.SportId}.{_editConfigTemplateFilterModel.ScopeId}.{payload.Name}.T".Replace(" ", "_"),
+                                Payload = $"{EditConfigTemplateFilterModel.SportId}.{EditConfigTemplateFilterModel.ScopeId}.{payload.Name}.T".Replace(" ", "_"),
                                 From = "-",
                                 To = JsonSerializer.Serialize(payload),
                                 Activity = Activity.Create.ToString(),
@@ -340,15 +347,119 @@ namespace Backoffice.Web.Pages.OddsEngine
                         });
                     }
 
-                    var result = await _backofficeService.AddOrUpdateConfigTemplateMargin(request);
+                    var result = await BackofficeService.AddOrUpdateConfigTemplateMargin(request);
                     if (result.StatusCode == StatusCode.Success)
                     {
+                        //var configTemplateMargins = await GetConfigTemplateMargin(referenceConfigTemplateId);
+
+                        //var assignedLeagues = await LoadLeagues((int)referenceConfigTemplateId);
+                        //foreach (var league in assignedLeagues)
+                        //{
+                        //    ConfigSettingsModel data = new ConfigSettingsModel();
+                        //    data.ClientCode = league.ClientCode;
+                        //    data.SportId = league.SportId;
+                        //    data.SegmentId = league.SegmentId;
+                        //    data.LeagueId = league.LeagueId;
+                        //    data.ClientId = Guid.Parse(league.ClientId);
+                        //    data.UserId = UserModel.Id;
+                        //    data.UserName = UserModel.UserName;
+
+
+                        //    var marketConfigs = new List<MarketConfig>();
+                        //    var newConfigTemplateMargins = EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Prematch ? await GetConfigTemplateMargin(league.LiveTemplateId) : await GetConfigTemplateMargin(league.PrematchTemplateId);
+
+                        //    foreach (var margin in configTemplateMargins.ConfigTemplateMargins)
+                        //    {
+                        //        var marketConfig = new MarketConfig()
+                        //        {
+                        //            MarketTemplateId = margin.MarketTemplateId,
+                        //            FixtureTypeId = (int)FixtureType.Match
+                        //        };
+
+                        //        if (EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Prematch)
+                        //        {
+                        //            marketConfig.Prematch = margin.Config;
+                        //            marketConfig.Live = newConfigTemplateMargins.ConfigTemplateMargins.FirstOrDefault(f => f.MarketTemplateId == margin.MarketTemplateId)?.Config ?? string.Empty;
+                        //            marketConfig.IsActive = !string.IsNullOrEmpty(marketConfig.Live) && league.LiveTemplateId > 0 ? true : margin.IsActive;
+                        //        }
+
+                        //        if (EditConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Live)
+                        //        {
+                        //            marketConfig.Live = margin.Config;
+                        //            marketConfig.Prematch = newConfigTemplateMargins.ConfigTemplateMargins.FirstOrDefault(f => f.MarketTemplateId == margin.MarketTemplateId)?.Config ?? string.Empty;
+                        //            marketConfig.IsActive = !string.IsNullOrEmpty(marketConfig.Prematch) && league.PrematchTemplateId > 0 ? true : margin.IsActive;
+                        //        }
+
+                        //        marketConfigs.Add(marketConfig);
+                        //    }
+
+                        //    data.MarketConfig = marketConfigs.Select(s => new MarketConfigModel
+                        //    {
+                        //        IsActive = s.IsActive,
+                        //        MarketTemplateId = s.MarketTemplateId,
+                        //        PrematchSettings = string.IsNullOrEmpty(s.Prematch) ? new List<MarketMargin>() { new MarketMargin { T = -41472000, M = -1 } } : JsonSerializer.Deserialize<List<MarketMargin>>(s.Prematch)?.ToList() ?? new List<MarketMargin>(),
+                        //        LivematchSettings = string.IsNullOrEmpty(s.Live) ? new List<MarketMargin>() { new MarketMargin { T = 0, M = -1 } } : JsonSerializer.Deserialize<List<MarketMargin>>(s.Live)?.ToList() ?? new List<MarketMargin>(),
+                        //    }).ToList();
+
+                        //    data.LeagueConfig = new List<LeagueConfigModel>()
+                        //    {
+                        //        new LeagueConfigModel
+                        //        {
+                        //            IsActive = data.MarketConfig.Any(m => m.IsActive),
+                        //            LeagueId = league.LeagueId,
+                        //            SegmentId = league.SegmentId
+                        //        }
+                        //    };
+
+                        //    var tresult = await TradingService.AddOrUpdateConfig(data);
+                        //    if (tresult.StatusCode == StatusCode.Success)
+                        //    {
+
+                        //        var messageLeague = new OnLeagueConfigMessage
+                        //        {
+                        //            ClientCode = league.ClientCode,
+                        //            ClientId = Guid.Parse(league.ClientId),
+                        //            SportId = league.SportId,
+                        //            SegmentId = league.SegmentId,
+                        //            LeagueId = league.LeagueId,
+                        //            IsActive = data.MarketConfig.Any(m => m.IsActive)
+                        //        };
+
+                        //        await TradingService.Publish(new MessageRequest()
+                        //        {
+                        //            CorrelationId = Guid.NewGuid().ToString(),
+                        //            MessageType = "OnLeagueConfig",
+                        //            RoutingKey = $"r.uof.onleagueconfig",
+                        //            Payload = JsonSerializer.Serialize(messageLeague)
+                        //        });
+
+                        //        var messageMarket = new OnMarketConfigMessage
+                        //        {
+                        //            ClientCode = league.ClientCode,
+                        //            ClientId = Guid.Parse(league.ClientId),
+                        //            SportId = league.SportId,
+                        //            SegmentId = league.SegmentId,
+                        //            LeagueId = league.LeagueId,
+                        //            Markets = marketConfigs
+                        //        };
+
+                        //        await TradingService.Publish(new MessageRequest()
+                        //        {
+                        //            CorrelationId = Guid.NewGuid().ToString(),
+                        //            MessageType = "OnMarketConfig",
+                        //            RoutingKey = $"r.uof.onmarketconfig",
+                        //            Payload = JsonSerializer.Serialize(messageMarket)
+                        //        });
+
+                        //    }
+                        //}
+
                         if (new[] { oldConfigMarginsLogs, newConfigMarginsLogs }.All(x => x != null && x.Any()) && !oldConfigMarginsLogs.Equals(newConfigMarginsLogs))
                         {
-                            await _backofficeService.AddActivityLog(new ActivityLogModel()
+                            await BackofficeService.AddActivityLog(new ActivityLogModel()
                             {
                                 Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                                Payload = $"{_editConfigTemplateFilterModel.SportId}.{_editConfigTemplateFilterModel.ScopeId}.{_editConfigTemplateFilterModel.ConfigTemplate.Name}.Modified_Margins.M".Replace(" ", "_"),
+                                Payload = $"{EditConfigTemplateFilterModel.SportId}.{EditConfigTemplateFilterModel.ScopeId}.{EditConfigTemplateFilterModel.ConfigTemplate.Name}.Modified_Margins.M".Replace(" ", "_"),
                                 From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldConfigMarginsLogs),
                                 To = JsonSerializer.Serialize(newConfigMarginsLogs),
                                 Activity = Activity.Update.ToString(),
@@ -359,10 +470,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                         }
                         if (new[] { oldMarketState, newMarketState }.All(x => x != null && x.Any()) && !oldMarketState.Equals(newMarketState))
                         {
-                            await _backofficeService.AddActivityLog(new ActivityLogModel()
+                            await BackofficeService.AddActivityLog(new ActivityLogModel()
                             {
                                 Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                                Payload = $"{_editConfigTemplateFilterModel.SportId}.{_editConfigTemplateFilterModel.ScopeId}.{_editConfigTemplateFilterModel.ConfigTemplate.Name}.Changed_Market_State.M".Replace(" ", "_"),
+                                Payload = $"{EditConfigTemplateFilterModel.SportId}.{EditConfigTemplateFilterModel.ScopeId}.{EditConfigTemplateFilterModel.ConfigTemplate.Name}.Changed_Market_State.M".Replace(" ", "_"),
                                 From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldMarketState),
                                 To = JsonSerializer.Serialize(newMarketState),
                                 Activity = Activity.Update.ToString(),
@@ -377,26 +488,26 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
 
 
-                if (_isNameChanges && _activity == Activity.Update)
+                if (IsNameChanges && _activity == Activity.Update)
                 {
                     var payload = new ConfigTemplateModel()
                     {
                         Id = ConfigTemplateId,
-                        SportId = _editConfigTemplateFilterModel.SportId,
+                        SportId = EditConfigTemplateFilterModel.SportId,
                         FixtureTypeId = (int)FixtureType.Match,
-                        FixtureStatusId = _editConfigTemplateFilterModel.ScopeId,
-                        Name = _configTemplateName,
+                        FixtureStatusId = EditConfigTemplateFilterModel.ScopeId,
+                        Name = ConfigTemplateName,
                     };
 
-                    var response = await _backofficeService.AddOrUpdateConfigTemplate(payload);
-                    _isNameChanges = false;
+                    var response = await BackofficeService.AddOrUpdateConfigTemplate(payload);
+                    IsNameChanges = false;
 
                     if (response.StatusCode == StatusCode.Success)
                     {
-                        await _backofficeService.AddActivityLog(new ActivityLogModel()
+                        await BackofficeService.AddActivityLog(new ActivityLogModel()
                         {
                             Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                            Payload = $"{_editConfigTemplateFilterModel.SportId}.{_editConfigTemplateFilterModel.ScopeId}.{payload.Name}.T".Replace(" ", "_"),
+                            Payload = $"{EditConfigTemplateFilterModel.SportId}.{EditConfigTemplateFilterModel.ScopeId}.{payload.Name}.T".Replace(" ", "_"),
                             From = "-",
                             To = JsonSerializer.Serialize(payload),
                             Activity = Activity.Create.ToString(),
@@ -434,18 +545,18 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnTemplateNameClicked()
         {
             _isEdttingName = true;
-            _temporaryName = _configTemplateName.Trim();
+            _temporaryName = ConfigTemplateName.Trim();
         }
         public async Task OnSaveTemplateNameClicked()
         {
             _isEdttingName = false;
-            _configTemplateName = _temporaryName.Trim();
+            ConfigTemplateName = _temporaryName.Trim();
             _isExisitngName = false;
 
-            if (_configTemplateName != _editConfigTemplateFilterModel.ConfigTemplate.Name)
+            if (ConfigTemplateName != EditConfigTemplateFilterModel.ConfigTemplate.Name)
             {
-                _isNameChanges = true;
-                _breadcrumbs.Last().Name = _configTemplateName;
+                IsNameChanges = true;
+                Breadcrumbs.Last().Name = ConfigTemplateName;
             }
         }
         public async Task OnCancelTemplateNameClicked()
@@ -465,18 +576,18 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task LoadConfigTemplateMargin()
         {
-            var response = await _backofficeService.GetConfigTemplateMargin(ConfigTemplateId);
+            var response = await BackofficeService.GetConfigTemplateMargin(ConfigTemplateId);
 
             if (response.StatusCode == StatusCode.Success)
-                _configTemplateMargin = response.Result;
+                ConfigTemplateMargin = response.Result;
         }
 
 
         private async Task LoadMarkets()
         {
-            if (_editConfigTemplateFilterModel.MarketTemplateGroups.Count > 0)
+            if (EditConfigTemplateFilterModel.MarketTemplateGroups.Count > 0)
             {
-                await GetMarketTemplate(_editConfigTemplateFilterModel.MarketTemplateGroups);
+                await GetMarketTemplate(EditConfigTemplateFilterModel.MarketTemplateGroups);
             }
         }
 
@@ -490,32 +601,32 @@ namespace Backoffice.Web.Pages.OddsEngine
                 //    continue;
 
                 var marketTemplateGroup = MarketTemplateGroup.MarketTemplateGroup;
-                foreach (var marketLookup in _editConfigTemplateFilterModel.MarketLookup.MarketLookup)
+                foreach (var marketLookup in EditConfigTemplateFilterModel.MarketLookup.MarketLookup)
                 {
                     if (marketTemplateGroup.MarketTemplateIds.Contains(marketLookup.MarketTemplateId))
                     {
                         //if (!(string.IsNullOrEmpty(EditConfigTemplateFilterModel.SearchText) || marketLookup.MarketTemplateName.Contains(EditConfigTemplateFilterModel.SearchText, StringComparison.OrdinalIgnoreCase)))
                         //    continue;
 
-                        var isVisible = (((_editConfigTemplateFilterModel.SelectedMarkets.Any() || MarketTemplateGroups.Count == 1) && MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId == 1)
-                                || _editConfigTemplateFilterModel.SelectedMarkets.Contains(MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId.ToString()))
-                                                && (string.IsNullOrEmpty(_editConfigTemplateFilterModel.SearchText) || marketLookup.MarketTemplateName.Contains(_editConfigTemplateFilterModel.SearchText, StringComparison.OrdinalIgnoreCase))
-                                                && _editConfigTemplateFilterModel.SelectedConfigStatus.Contains(marketLookup.IsActive ? "1" : "2");
+                        var isVisible = (((EditConfigTemplateFilterModel.SelectedMarkets.Any() || MarketTemplateGroups.Count == 1) && MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId == 1)
+                                || EditConfigTemplateFilterModel.SelectedMarkets.Contains(MarketTemplateGroup.MarketTemplateGroup.MarketTemplateGroupId.ToString()))
+                                                && (string.IsNullOrEmpty(EditConfigTemplateFilterModel.SearchText) || marketLookup.MarketTemplateName.Contains(EditConfigTemplateFilterModel.SearchText, StringComparison.OrdinalIgnoreCase))
+                                                && EditConfigTemplateFilterModel.SelectedConfigStatus.Contains(marketLookup.IsActive ? "1" : "2");
 
-                        var newMarketTemplate = _marketLookupNavigation.FirstOrDefault(m => m.MarketLookup.MarketTemplateId == marketLookup.MarketTemplateId);
+                        var newMarketTemplate = MarketLookupNavigation.FirstOrDefault(m => m.MarketLookup.MarketTemplateId == marketLookup.MarketTemplateId);
                         if (newMarketTemplate == null)
                         {
 
-                            var configTemplateMargin = _configTemplateMargin.ConfigTemplateMargins.FirstOrDefault(c => c.MarketTemplateId == marketLookup.MarketTemplateId);
+                            var configTemplateMargin = ConfigTemplateMargin.ConfigTemplateMargins.FirstOrDefault(c => c.MarketTemplateId == marketLookup.MarketTemplateId);
                             if (configTemplateMargin == null)
                             {
                                 configTemplateMargin = new Backoffice.Shared.Models.ConfigTemplateMargin()
                                 {
                                     MarketTemplateId = marketLookup.MarketTemplateId,
                                     IsActive = false,
-                                    FixtureStatusId = _editConfigTemplateFilterModel.ScopeId,
+                                    FixtureStatusId = EditConfigTemplateFilterModel.ScopeId,
                                     FixtureTypeId = (int)FixtureType.Match,
-                                    SportId = _editConfigTemplateFilterModel.SportId
+                                    SportId = EditConfigTemplateFilterModel.SportId
                                 };
                             }
                             else
@@ -530,7 +641,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             var liveSettings = GetLiveSettingsTemplate(configTemplateMargin, marketLookup.MarketTemplateId);
 
 
-                            _marketLookupNavigation.Add(new MarketLookupNavigationModel()
+                            MarketLookupNavigation.Add(new MarketLookupNavigationModel()
                             {
                                 IsVisible = isVisible,
                                 IsSelected = false,
@@ -591,24 +702,27 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
         }
 
-        private PrematchSettingsTemplateModel GetPrematchSettingsTemplate(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, string marketTemplateId, string marketTemplateName) => new PrematchSettingsTemplateModel()
+        private PrematchSettingsTemplateModel GetPrematchSettingsTemplate(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, string marketTemplateId, string marketTemplateName)
         {
-            SportId = _editConfigTemplateFilterModel.ConfigTemplate.SportId,
-            FirstKey = GetFirstKey(configTemplateMargin),
-            LastKey = GetLastKey(configTemplateMargin),
-            MarketTemplateId = marketTemplateId,
-            Settings = MockData.PrematchSettings.Select(s => new Backoffice.Shared.Models.KeyTimeModel()
+            return new PrematchSettingsTemplateModel()
             {
-                Key = GetPrematchKey(s.TimeDisplay, configTemplateMargin),
-                Time = s.Time,
-                SortOrder = s.SortOrder,
-                TimeDisplay = s.TimeDisplay
-            }).ToList()
-        };
+                SportId = EditConfigTemplateFilterModel.ConfigTemplate.SportId,
+                FirstKey = GetFirstKey(configTemplateMargin),
+                LastKey = GetLastKey(configTemplateMargin),
+                MarketTemplateId = marketTemplateId,
+                Settings = MockData.PrematchSettings.Select(s => new Backoffice.Shared.Models.KeyTimeModel()
+                {
+                    Key = GetPrematchKey(s.TimeDisplay, configTemplateMargin),
+                    Time = s.Time,
+                    SortOrder = s.SortOrder,
+                    TimeDisplay = s.TimeDisplay
+                }).ToList()
+            };
+        }
 
         private async Task<ConfigTemplateMarginModel> GetConfigTemplateMargin(long configTemplateId)
         {
-            var response = await _backofficeService.GetConfigTemplateMargin(configTemplateId);
+            var response = await BackofficeService.GetConfigTemplateMargin(configTemplateId);
 
             if (response.StatusCode == StatusCode.Success)
                 return response.Result;
@@ -623,9 +737,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var payload = new ConfigTemplateLeagueRequest();
             payload.MetaData = null;
-            payload.SportId = _editConfigTemplateFilterModel.ConfigTemplate.SportId;
+            payload.SportId = EditConfigTemplateFilterModel.ConfigTemplate.SportId;
 
-            var response = await _backofficeService.GetConfigClient(ConfigState.Assigned, payload, configTemplateId);
+            var response = await BackofficeService.GetConfigClient(ConfigState.Assigned, payload, configTemplateId);
 
             if (response.StatusCode == StatusCode.Success)
             {
@@ -673,16 +787,13 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string GetFirstKey(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin)
         {
 
-            if (configTemplateMargin == null || string.IsNullOrEmpty(configTemplateMargin.Config))
-                return "101";
+            if (configTemplateMargin == null || string.IsNullOrEmpty(configTemplateMargin.Config)) return "101";
 
-            if (configTemplateMargin.Config?.Length == 0)
-                return "101";
+            if (configTemplateMargin.Config?.Length == 0) return "101";
 
             List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(configTemplateMargin.Config);
 
-            if (keyTimes == null)
-                return "";
+            if (keyTimes == null) return "";
 
             var firstKey = keyTimes.Where(s => s.M >= 101).FirstOrDefault()?.M;
             return (firstKey ?? 101).ToString();
@@ -690,15 +801,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private string GetLastKey(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin)
         {
-            if (configTemplateMargin == null || string.IsNullOrEmpty(configTemplateMargin.Config))
-                return "101";
+            if (configTemplateMargin == null || string.IsNullOrEmpty(configTemplateMargin.Config)) return "101";
 
-            if (configTemplateMargin.Config?.Length == 0)
-                return "";
+            if (configTemplateMargin.Config?.Length == 0) return "";
 
             List<MarketMargin> keyTimes = JsonSerializer.Deserialize<List<MarketMargin>>(configTemplateMargin.Config);
-            if (keyTimes == null)
-                return "";
+            if (keyTimes == null) return "";
 
             var lastKey = keyTimes.Where(s => s.M > 101).LastOrDefault()?.M;
             return lastKey == null ? "" : lastKey.ToString();
@@ -732,11 +840,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                 return null;
 
             var timeDisplay = MockData.PrematchSettings.Where(a => a.TimeDisplay == Time).FirstOrDefault();
-            if (timeDisplay == null)
-                return null;
+            if (timeDisplay == null) return null;
             var keyTime = keyTimes.Where(a => a.T == timeDisplay.Time).FirstOrDefault();
-            if (keyTime == null)
-                return null;
+            if (keyTime == null) return null;
             return keyTime.M;
         }
 
@@ -778,21 +884,17 @@ namespace Backoffice.Web.Pages.OddsEngine
                 return null;
 
             var keyTime = keyTimes.Where(a => a.T == int.Parse(Time)).FirstOrDefault();
-            if (keyTime == null)
-                return null;
+            if (keyTime == null) return null;
             return keyTime.M;
 
         }
 
         protected bool DeepCompare(object obj, object another)
         {
-            if (ReferenceEquals(obj, another))
-                return true;
-            if ((obj == null) || (another == null))
-                return false;
+            if (ReferenceEquals(obj, another)) return true;
+            if ((obj == null) || (another == null)) return false;
             //Compare two object's class, return false if they are difference
-            if (obj.GetType() != another.GetType())
-                return false;
+            if (obj.GetType() != another.GetType()) return false;
 
             var result = true;
             //Get all properties of obj

@@ -12,9 +12,9 @@ namespace Backoffice.Web.Models
         }
 
         public string ConnectionId { get; set; }
-        public string Id { get; set; } = string.Empty;
+        public string Id { get; set; }
         public string UserName { get; set; }
-        public string RoleName { get; set; } = string.Empty;
+        public string RoleName { get; set; }
         public string RoleId { get; set; }
         public string MainUserId { get; set; }
         public List<string> ClientCodes { get; set; }

@@ -22,7 +22,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        
+        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
         public List<ActivityLogModel> ActivityLogs { get; set; }
         public List<AlertModel> Alerts { get; set; }
@@ -66,7 +66,7 @@ namespace Backoffice.Web.Pages.Administration
                 TotalPages = 1,
             };
 
-            await PageState.AuthenticateAccessEvent.InvokeAsync();
+            await AuthenticateAccess.InvokeAsync();
 
             await GetContents();
         }
@@ -134,6 +134,8 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
+            BackofficeService.Dispose();
+
             GC.SuppressFinalize(this);
         }
 

@@ -1,45 +1,52 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Backoffice.Shared.Data.Backoffice.Entities;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
-using Backoffice.Web.Models.OddsEngine.Config;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using System.Globalization;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class ConfigMyTemplates : IDisposable
     {
         #region Properties
-        [Inject] private IJSRuntime JSRuntime { get; set; }
+        [Parameter] public string Region { get; set; } = "hk";
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
-        [Parameter] public ConfigContentFilterModel FilterModel { get; set; }
-        [Parameter] public EventCallback OnStateHasChange { get; set; }
+        [Inject] private IModalService ModalService { get; set; }
+        [Inject] private IBackofficeService BackofficeService { get; set; }
+        [Inject] private NavigationManager NavigationManager { get; set; }
+
+        [Parameter] public EventCallback OnStateHasChanged { get; set; }
+        [Parameter] public List<SelectListItemModel<string>> Sports { get; set; }
+        [Parameter] public List<SelectListItemModel<string>> Scopes { get; set; }
         [Parameter] public string QueryMessage { get; set; }
+        public List<BreadcrumbModel> Breadcrumbs { get; set; }
+        public List<ConfigTemplateModel> ConfigTemplates { get; set; }
 
-        private bool _isPreloader;
-        private int _selectedSportId;
-        private int _selectedScopeId;
-        private SearchFormModel _searchForm = new();
-        private AlertModel _alertModel;
-
-        private string _pageTitle = "My Templates";
-        private List<BreadcrumbModel> _breadcrumbs;
-
-        private List<ConfigMyTemplateModel>? _configTemplates = null;
-
-        private CancellationTokenSource? _cts;
-        private LanguageCode _languageCode;
-        private bool _init = true;
-        private bool _shouldRender = true;
+        public bool IsPreloader { get; set; } = true;
+        public string PageTitle { get; set; }
+        public string IconClass { get; set; }
+        public int SelectedSportId { get; set; }
+        public int SelectedScopeId { get; set; }
+        private SearchFormModel _searchForm;
+        private AlertModel _alertModel { get; set; }
         #endregion
 
         #region Methods
-        protected override void OnInitialized()
-            => _breadcrumbs = new List<BreadcrumbModel>()
+        protected override async Task OnInitializedAsync()
+        {
+            _searchForm = new();
+            IsPreloader = true;
+            PageTitle = "My Templates";
+            IconClass = "";
+
+            ConfigTemplates = new List<ConfigTemplateModel>();
+
+            Breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
                 {
@@ -49,113 +56,142 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
 
-        protected override async Task OnParametersSetAsync()
+            SelectedSportId = -1;
+            SelectedScopeId = int.Parse(Scopes.FirstOrDefault().Value);
+
+
+            await LoadConfigTemplates();
+        }
+        protected override void OnParametersSet()
         {
-            _shouldRender = ValidateParameters();
-
-            if (_shouldRender)
+            if (QueryMessage != null && !string.IsNullOrEmpty(QueryMessage))
             {
-                _languageCode = TranslationState.ActiveLanguageCode;
-                _selectedSportId = -1;
-                _selectedScopeId = int.Parse(FilterModel.Scopes.FirstOrDefault()?.Value ?? "-1");
-
                 _alertModel = new AlertModel();
                 _alertModel.Message = QueryMessage;
                 _alertModel.Status = AlertStatus.Success;
                 _alertModel.Opacity = 1.0m;
-
-                await LoadConfigTemplates();
             }
-
-            _init = false;
         }
-
-        protected override bool ShouldRender() => _shouldRender;
-
-        protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
-
-        private bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode || (!string.IsNullOrEmpty(QueryMessage) && _alertModel.Message != QueryMessage);
-
-        public void HandleLogsClick()
+        public async Task OnLogsClickEvent()
         {
             var parameters = new ModalParameters();
 
-            parameters.Add("FilterModel", FilterModel);
+            parameters.Add("Sports", Sports);
+            parameters.Add("Scopes", Scopes);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
             parameters.Add("DialogStyle", "max-width:1500px");
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
 
-            _modalService.Open<ViewMyTemplatesLogs>("View Logs", parameters, options);
+            ModalService.Open<ViewMyTemplatesLogs>("View Logs", parameters, options);
         }
-        public void HandleNewTemplateClick()
+
+        public async Task OnCreateNewTemplateClickEvent()
         {
             var parameters = new ModalParameters();
 
-            parameters.Add("FilterModel", FilterModel);
+            parameters.Add("Sports", Sports);
+            parameters.Add("Scopes", Scopes);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
+            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
 
-            _modalService.Open<CreateTemplateModal>($"Create Template", parameters, options);
+            ModalService.Open<CreateTemplateModal>($"Create Template", parameters, options);
         }
 
-        public void HandleModalClick(ModalParameters parameters)
+        public async Task OnEditTemplateClickEvent(ConfigTemplateModel configTemplateModel)
         {
-            if (parameters != null)
-            {
-                var type = parameters.TryGet<string>("ModalType");
-                var options = new ModalOptions();
-
-                switch (type)
-                {
-                    case "ExportTemplateModal":
-                        _modalService.Open<ExportTemplateModal>($"Export Templates", parameters, options);
-                        break;
-                    case "ViewAssignedModal":
-                        _modalService.Open<ViewAssignedModal>($"View Assigned", parameters, options);
-                        break;
-                    case "DeleteTemplateModal":
-                        _modalService.Open<DeleteTemplateModal>($"Delete Template", parameters, options);
-                        break;
-                }
-            }
+            NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/edit/{configTemplateModel.Id}");
+        }
+        public async Task OnCopyTemplateClickEvent(ConfigTemplateModel configTemplateModel)
+        {
+            NavigationManager.NavigateTo($"/hk/odds-engine/config-templates/copy/{configTemplateModel.Id}");
         }
 
-        public async Task HandleSportChange(ChangeEventArgs e)
+        public async Task OnDeleteTemplateClickEvent(ConfigTemplateModel configTemplateModel)
         {
-            _selectedSportId = int.Parse(e.Value.ToString());
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-show");
+            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
+            parameters.Add("Region", Region);
+            parameters.Add("ConfigTemplateModel", configTemplateModel);
+
+            var options = new ModalOptions();
+
+            ModalService.Open<DeleteTemplateModal>($"Delete Template", parameters, options);
+        }
+
+        public async Task OnExportTemplateClickEvent(ConfigTemplateModel configTemplate)
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-show");
+            parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
+            parameters.Add("Region", Region);
+            parameters.Add("ConnectionId", UserModel.ConnectionId);
+            parameters.Add("UserId", UserModel.Id);
+            parameters.Add("ConfigTemplateId", configTemplate.Id);
+            parameters.Add("ConfigTemplateName", configTemplate.Name);
+
+            var options = new ModalOptions();
+
+            ModalService.Open<ExportTemplateModal>($"Export Templates", parameters, options);
+        }
+
+        public async Task OnViewAssignedClickEvent(ConfigTemplateModel configTemplateModel)
+        {
+            var parameters = new ModalParameters();
+
+            parameters.Add("ModalClass", "modal-show");
+            parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
+            parameters.Add("Region", Region);
+            parameters.Add("ConfigTemplateModel", configTemplateModel);
+
+            var options = new ModalOptions();
+
+            ModalService.Open<ViewAssignedModal>($"View Assigned", parameters, options);
+        }
+
+        public async Task OnSportChangedEvent(ChangeEventArgs e)
+        {
+            SelectedSportId = int.Parse(e.Value.ToString());
 
             await LoadConfigTemplates();
         }
-        public async Task HandleScopeChange(ChangeEventArgs e)
+        public async Task OnModalSaveEvent(object e)
         {
-            _selectedScopeId = int.Parse(e.Value.ToString());
+            await OnStateHasChanged.InvokeAsync();
 
-            await LoadConfigTemplates();
-        }
-        public async Task HandleModalSave(object e)
-        {
-            await OnStateHasChange.InvokeAsync();
-
-            if (e is string)
+            if(e is string)
             {
-                if (!string.IsNullOrEmpty((string)e))
+                if(!string.IsNullOrEmpty((string)e))
                 {
                     _alertModel = new()
                     {
                         Status = AlertStatus.Success,
-                        Message = (string)e
+                        Message =(string)e
                     };
                 }
             }
+            await LoadConfigTemplates();
+        }
+        public async Task OnScopeChangedEvent(ChangeEventArgs e)
+        {
+            SelectedScopeId = int.Parse(e.Value.ToString());
 
-            Task task = LoadConfigTemplates();
+            await LoadConfigTemplates();
         }
 
-        public async Task HandleSearchInput() => await LoadConfigTemplates();
+
+        public async Task OnInputSearchEvent()
+        {
+            await LoadConfigTemplates();
+        }
 
         public void Dispose()
         {
@@ -168,47 +204,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task LoadConfigTemplates()
         {
-            _cts?.Cancel();
+            IsPreloader = true;
+            StateHasChanged();
 
-            _cts = new CancellationTokenSource();
+            ConfigTemplates = (await BackofficeService.GetConfigTemplate(_searchForm.SearchText, SelectedSportId, SelectedScopeId)).Result;
 
-            if (!_isPreloader)
-            {
-                _isPreloader = true;
-                _shouldRender = true;
-            }
-
-            try
-            {
-                var token = _cts.Token;
-
-                var configTemplateResponse = await _backofficeService.GetConfigTemplate(
-                    _searchForm.SearchText,
-                    _selectedSportId,
-                    _selectedScopeId,
-                    token);
-
-                if (token.IsCancellationRequested)
-                    return;
-
-                _configTemplates = configTemplateResponse?.Result?.Select(config => new ConfigMyTemplateModel()
-                {
-                    Id = config.Id,
-                    Name = config.Name,
-                    SportName = FilterModel.Sports.FirstOrDefault(e => e.Value == config.SportId.ToString())?.Name ?? "",
-                    ClientAssigned = $"{config.ClientsCount} Client{(config.ClientsCount > 1 ? "s" : "")}",
-                    LeagueAssigned = $"{config.LeaguesCount} League{(config.LeaguesCount > 1 ? "s" : "")}",
-                    DateCreated = config.Timestamp.ToString("HH:mm dd/MM/yyyy", CultureInfo.InvariantCulture),
-                    IsReadOnly = !(config.ClientsCount > 0 && config.LeaguesCount > 0)
-                }).ToList() ?? new List<ConfigMyTemplateModel>();
-
-                _isPreloader = false;
-                _shouldRender = true;
-                StateHasChanged();
-            }
-            catch (TaskCanceledException)
-            {
-            }
+            IsPreloader = false;
         }
 
         #endregion

@@ -20,14 +20,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
-        private List<SelectListItemModel<int>> _sports;
-        private List<SelectListItemModel<int>> _scopes;
+        public List<SelectListItemModel<int>> Sports { get; set; }
+        public List<SelectListItemModel<int>> Scopes { get; set; }
 
-        private int _selectedSportId;
-        private int _selectedScopeId;
-        private string _templateName;
-        private bool _isConfigNameExisting;
-        private bool _isPreloader;
+        public int SelectedSportId { get; set; }
+        public int SelectedScopeId { get; set; }
+        public string TemplateName { get; set; }
+        public bool IsConfigNameExisting { get; set; }
 
         #endregion
 
@@ -35,8 +34,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         protected override async Task OnInitializedAsync()
         {
-            _sports = new List<SelectListItemModel<int>>();
-            _scopes = new List<SelectListItemModel<int>>()
+            Sports = new List<SelectListItemModel<int>>();
+            Scopes = new List<SelectListItemModel<int>>()
             {
                 new SelectListItemModel<int>()
                 {
@@ -50,19 +49,19 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 }
             }.OrderBy(x => x.Name).ToList();
 
-            _sports = await LoadSports();
-            _selectedSportId = _sports.FirstOrDefault()?.Value ?? -1;
-            _selectedScopeId = _scopes.FirstOrDefault()?.Value ?? -1;
+            Sports = await LoadSports();
+            SelectedSportId = Sports.FirstOrDefault()?.Value ?? -1;
+            SelectedScopeId = Scopes.FirstOrDefault()?.Value ?? -1;
         }
 
         public async Task OnSportSelectChanged(ChangeEventArgs e)
         {
-            _selectedSportId = int.Parse(e.Value.ToString());
+            SelectedSportId = int.Parse(e.Value.ToString());
         }
 
         public async Task OnScopeSelectChanged(ChangeEventArgs e)
         {
-            _selectedScopeId = int.Parse(e.Value.ToString());
+            SelectedScopeId = int.Parse(e.Value.ToString());
         }
 
         public async Task OnCancelClickEvent()
@@ -72,15 +71,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnSaveClickEvent()
         {
-            _isPreloader = true;
-            var isSuccess = false;
-            _isConfigNameExisting = false;
+            IsConfigNameExisting = false;
             var payload = new ConfigTemplateModel()
             {
-                SportId = _selectedSportId,
+                SportId = SelectedSportId,
                 FixtureTypeId = (int)FixtureType.Match,
-                FixtureStatusId = _selectedScopeId,
-                Name = _templateName,
+                FixtureStatusId = SelectedScopeId,
+                Name = TemplateName,
             };
 
             var response = await BackofficeService.AddOrUpdateConfigTemplate(payload);
@@ -90,7 +87,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 await BackofficeService.AddActivityLog(new ActivityLogModel()
                 {
                     Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                    Payload = $"{_selectedSportId}.{_selectedScopeId}.{payload.Name}.T".Replace(" ", "_"),
+                    Payload = $"{SelectedSportId}.{SelectedScopeId}.{payload.Name}.T".Replace(" ", "_"),
                     From = "-",
                     To = JsonSerializer.Serialize(payload),
                     Activity = Activity.Create.ToString(),
@@ -99,22 +96,18 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     TimeStamp = DateTime.UtcNow
                 });
 
-                isSuccess = true;
-                await Modal.OnSaveClickCallback.InvokeAsync($"{_templateName} has successfully been added");
+                await Modal.OnSaveClickCallback.InvokeAsync($"{TemplateName} has successfully been added");
+                ModalService.Cancel();
             }
             else
             {
-                _isConfigNameExisting = true;
+                IsConfigNameExisting = true;
             }
-
-            _isPreloader = false;
-            if (isSuccess)
-                ModalService.Cancel();
         }
 
         public void Dispose()
         {
-
+            
         }
         #endregion
 

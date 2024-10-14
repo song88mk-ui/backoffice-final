@@ -4,7 +4,6 @@ namespace Backoffice.Web.Models
 {
     public class ConfigClientViewModel
     {
-        public int Index { get; set; }
         public bool IsChecked { get; set; } = false;
         public long Id { get; set; }
         public string ClientId { get; set; }
@@ -22,6 +21,6 @@ namespace Backoffice.Web.Models
         public string LiveTemplateName { get; set; } = "";
 
         public static implicit operator ConfigClientViewModel(ConfigClientModel payload) => new ConfigClientViewModel() { Id = payload.Id, ClientId = payload.ClientId, ClientCode = payload.ClientCode, ClientName = payload.ClientName, SportId = payload.SportId, SportName = payload.SportName, SegmentId = payload.SegmentId, SegmentName = payload.SegmentName, LeagueId = payload.LeagueId, LeagueName = payload.LeagueName, PrematchTemplateId = payload.PrematchTemplateId, PrematchTemplateName = payload.PrematchTemplateName, LiveTemplateId = payload.LiveTemplateId, LiveTemplateName = payload.LiveTemplateName };
-        public static List<ConfigClientViewModel> ConvertList(List<ConfigClientModel> payload) => payload.Select((x, i) => new ConfigClientViewModel() { Index = i, Id = x.Id, ClientId = x.ClientId, ClientCode = x.ClientCode, ClientName = x.ClientName, SportId = x.SportId, SportName = x.SportName, SegmentId = x.SegmentId, SegmentName = x.SegmentName, LeagueId = x.LeagueId, LeagueName = x.LeagueName, PrematchTemplateId = x.PrematchTemplateId, PrematchTemplateName = x.PrematchTemplateName, LiveTemplateId = x.LiveTemplateId, LiveTemplateName = x.LiveTemplateName }).ToList();
+        public static List<ConfigClientViewModel> ConvertList(List<ConfigClientModel> payload) => payload.Select(x => new ConfigClientViewModel() { Id = x.Id, ClientId = x.ClientId, ClientCode = x.ClientCode, ClientName = x.ClientName, SportId = x.SportId, SportName = x.SportName, SegmentId = x.SegmentId, SegmentName = x.SegmentName, LeagueId = x.LeagueId, LeagueName = x.LeagueName, PrematchTemplateId = x.PrematchTemplateId, PrematchTemplateName = x.PrematchTemplateName, LiveTemplateId = x.LiveTemplateId, LiveTemplateName = x.LiveTemplateName }).ToList();
     }
 }

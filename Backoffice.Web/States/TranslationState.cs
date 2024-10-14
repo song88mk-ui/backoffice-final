@@ -39,9 +39,6 @@ namespace Backoffice.Web.States
 
         public string GetValue(string word)
         {
-            if (string.IsNullOrEmpty(word))
-                return word;
-
             var key = word.Replace(" ", "_").ToLower();
             var placeHolders = ExtractPlaceholders(ref key);
             var translated = Model.TryGetValue(key, out string? value) ? value : word;
@@ -52,7 +49,18 @@ namespace Backoffice.Web.States
             return translated.Replace("{", "").Replace("}", "");
         }
 
-        private async void ReloadModel() => Model = await _translationService.GetTranslationsAsync(_activeLangCode);
+        private async void ReloadModel()
+        {
+            var timer = new Stopwatch();
+            timer.Start();
+            Model = await _translationService.GetTranslationsAsync(_activeLangCode);
+
+            timer.Stop();
+
+            TimeSpan timeTaken = timer.Elapsed;
+            string foo = "(Translation Service) Time taken: " + timeTaken.ToString(@"m\:ss\.fff");
+            await _jsRuntime.InvokeVoidAsync("console.log", foo);
+        }
         private string TransformPlaceHolder(string word, string placeholder, params object[] values)
         {
             var index = -1;

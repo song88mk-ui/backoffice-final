@@ -25,7 +25,7 @@
                             @foreach (var logs in ActivityLogs)
                             {
                                 <tr>
-                                    <td>@logs.TimeStamp.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture) @logs.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
+                                    <td>@logs.TimeStamp.ToLocalTime().ToString("dd/MM/yy") @logs.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
                                     <td>@logs.Activity</td>
                                     <td class="td-left">@((MarkupString)CommonService.GetActivity<AdminPermission>(logs.From, logs.To, AdminPermission.Admin_ManageUserGroups, logs.Activity, true))</td>
                                     <td class="td-left">@((MarkupString)CommonService.GetActivity<AdminPermission>(logs.From, logs.To, AdminPermission.Admin_ManageUserGroups, logs.Activity, false))</td>
