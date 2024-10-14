@@ -37,7 +37,11 @@
                                         <th class="th-date">@TranslationState.GetValue("Start Date (UTC)")</th>
                                         <th class="th-date">@TranslationState.GetValue("End Date (UTC)")</th>
                                         <th class="th-status">@TranslationState.GetValue("Status")</th>
-                                        <th class="th-action"></th>
+                                        <AuthorizeView Policy="sbc-announcements-canedit">
+                                            <Authorized Context="ActivateAll">
+                                                <th class="th-action"></th>
+                                            </Authorized>
+                                        </AuthorizeView>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -89,18 +93,18 @@
                                                             <span>@(GetStatusLabel(item.IsActive))</span>
                                                         </div>
                                                     </td>
-                                                    <td class="content-cell actions">
-                                                        <AuthorizeView Policy="sbc-announcements-canedit">
-                                                            <Authorized Context="ActivateAll">
+                                                    <AuthorizeView Policy="sbc-announcements-canedit">
+                                                        <Authorized Context="ActivateAll">
+                                                            <td class="content-cell actions">
                                                                 <a class="tl-link-edit @item.DisabledClass" href="javascript:(0)" @onclick="item.EditAction">
                                                                     <i class="fa fa-edit" />
                                                                 </a>
                                                                 <a class="tl-link-delete @item.DisabledClass" href="javascript:(0)" @onclick="item.DeleteAction">
                                                                     <i class="fa fa-trash" />
                                                                 </a>
-                                                            </Authorized>
-                                                        </AuthorizeView>
-                                                    </td>
+                                                            </td>
+                                                        </Authorized>
+                                                    </AuthorizeView>
                                                 </tr>
                                             }
                                         }
