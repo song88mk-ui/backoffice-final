@@ -2,7 +2,7 @@
     <div class="client-list-container d-flex gap-2 border border-2 p-2 align-items-center mt-3 btn w-100 @_selectionCss" disabled="@Disable" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false" @onclick="HandleEditListClick">
         @if (_activeClients?.Any() ?? false)
         {
-            foreach (var client in Clients)
+            foreach (var client in _activeClients)
             {
                 <div key=@(client) class="client-item border border-dark rounded-pill bg-dark text-white p-1">
                     <p>@client</p>
