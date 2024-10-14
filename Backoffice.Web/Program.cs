@@ -35,7 +35,7 @@ builder.Services.AddSingleton<Instrumentation>();
 
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
+    .Enrich.FromLogContext()    
     .CreateLogger();
 
 Log.Logger = logger;

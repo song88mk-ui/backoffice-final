@@ -4,10 +4,10 @@
         {
             foreach (var client in _activeClients)
             {
-                <div key=@(client) class="client-item border border-dark rounded-pill bg-dark text-white p-1">
-                    <p>@client</p>
-                    <span class="pe-auto" @onclick="e => HandleRemoveClientClick(client)">
-                        <i class="fa fa-times-circle" ></i>
+                <div class="client-item border border-dark rounded-pill bg-dark text-white p-1">
+                    <p>@client.Name</p>
+                    <span @onclick="e => HandleRemoveClientClick(client.Value)">
+                        <i class="fa fa-times-circle"></i>
                     </span>
                 </div>
             }
@@ -28,13 +28,13 @@
                     <input id="search" placeholder=@TranslationState.GetValue("Find client") class="search-client form-control border-bottom px-0" @bind="@_searchField" />
                 </div>
             </li>
-            @foreach (var item in Clients.Where(x => x.Contains(_searchField, StringComparison.OrdinalIgnoreCase)))
+            @foreach (var item in Clients)
             {
                 <li id="@item">
                     <div class="form-check ms-2">
                         @* <input type="checkbox" class="form-check-input" @onclick="() => CheckboxClicked(item)" checked="@item.IsChecked" disabled="@IsReadOnly" /> *@
-                        <input type="checkbox" class="form-check-input" />
-                        <label class="form-check-label fw-bold">@TranslationState.GetValue(item)</label>
+                        <input type="checkbox" class="form-check-input" @onclick="() => HandleCheckboxCheck(item)" checked="@item.IsChecked" />
+                        <label class="form-check-label fw-bold">@TranslationState.GetValue(item.Name)</label>
                     </div>
                 </li>
             }

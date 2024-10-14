@@ -11,6 +11,8 @@ namespace Backoffice.Web.Pages.Administration
     public partial class MaintenanceV2
     {
         [Inject] public IModalService ModalService { get; set; }
+        [Inject] public ITradingService TradingService { get; set; }
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         private string _title = "Maintenance";
         private PageHeaderModel _pageHeaderModel;
@@ -23,22 +25,20 @@ namespace Backoffice.Web.Pages.Administration
         private Action<EventArgs> _allClientsEvent;
         private Action<EventArgs> _specificClientsEvent;
 
-        private List<string> _clients { get; set; }
+        private List<SelectListItemWithCheckboxModel<string>> _clients { get; set; }
         protected override async Task OnInitializedAsync()
         {
-            _clients = new List<string>()
-            {
-                "Alpha88", "EKings Thailand", "Khelraja", "WSGaming" , "W88"
-            };
-
             _pageHeaderModel = new()
             {
                 Title = "Maintenance",
                 IconClass = "ico ico-maintenance"
             };
 
-            _allClientsEvent = _ => ChangeMode(true);
-            _specificClientsEvent = _ => ChangeMode(false);
+
+            _clients = await LoadClients();
+
+            _allClientsEvent = _ => ChangeMode(_clients.All(c => c.IsChecked));
+            _specificClientsEvent = _ => ChangeMode(!_clients.All(c => c.IsChecked));
 
             ChangeMode(true);
         }
@@ -71,6 +71,24 @@ namespace Backoffice.Web.Pages.Administration
 
             var options = new ModalOptions();
             ModalService.Open<MaintenanceModal>(parameters, options);
+        }
+        private async Task<List<SelectListItemWithCheckboxModel<string>>> LoadClients()
+        {
+            var response = (await TradingService.GetClientList()).Result;
+            var result = new List<SelectListItemWithCheckboxModel<string>>();
+
+            if (response != null && response.Any())
+            {
+                result = response.Select(e =>
+                    new SelectListItemWithCheckboxModel<string>()
+                    {
+                        IsChecked = true,
+                        Name = e.ClientName,
+                        Value = e.ClientCode.ToString()
+                    }).ToList();
+            }
+
+            return result;
         }
     }
 }
