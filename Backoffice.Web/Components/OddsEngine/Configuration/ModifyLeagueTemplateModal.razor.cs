@@ -85,7 +85,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         }
 
-        public async Task OnPrematchTemplateSelectChanged(SelectListItemModel<long> e)
+        public async Task HandlePrematchTemplateSelectChange(SelectListItemModel<long> e)
         {
             _prematchSelectedItem = new SelectListItemModel<long>();
             _prematchSelectedItem = e;
@@ -100,7 +100,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             }
         }
 
-        public async Task OnLiveTemplateSelectChanged(SelectListItemModel<long> e)
+        public async Task HandleLiveTemplateSelectChange(SelectListItemModel<long> e)
         {
             _liveSelectedItem = new SelectListItemModel<long>();
             _liveSelectedItem = e;
@@ -115,12 +115,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             }
         }
 
-        public async Task OnCancelClickedEvent()
+        public async Task HandleCancelClick()
         {
             ModalService.Cancel();
         }
 
-        public async Task OnSaveClickedEvent()
+        public async Task HandleSaveClick()
         {
             IsPreLoader = true;
             StateHasChanged();
@@ -410,7 +410,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ModalService.Cancel();
         }
 
-        public async Task OnShowAllClickedEvent()
+        public async Task HandleShowAllClick()
         {
             IsShowAll = !IsShowAll;
         }

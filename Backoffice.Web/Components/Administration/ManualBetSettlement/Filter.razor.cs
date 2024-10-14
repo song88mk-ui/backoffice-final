@@ -21,7 +21,7 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
         [Parameter] public bool IsExportDisabled { get; set; }
         [Parameter] public EventCallback<bool> IsExportDisabledChanged { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] private List<string> UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
@@ -255,8 +255,8 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
             if (clients != null && clients.Clients.Any())
             {
-                if (UserClientCodes != null && UserClientCodes.Any())
-                    clients.Clients = clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                if (UserModel.ClientCodes.Any())
+                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
                 Clients = clients.Clients.Select(s => new SelectListItemWithCheckboxModel<string>
                 {

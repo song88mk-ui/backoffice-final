@@ -10,10 +10,10 @@
             <div class="text-center">
                 <icon class="ico ico-warning"></icon>
             </div>
-            @if (_isEmptyLeagues)
+            @if (_isReadOnly)
             {
                 <div class="text-center">
-                    Are you sure want to delete "<span class="fw-bold">@ConfigTemplateModel.Name</span>"
+                    Are you sure want to delete "<span class="fw-bold">@_templateName</span>"
                     <br />
                     You can't undo this action.
                 </div>
@@ -28,9 +28,9 @@
     }
 </div>
 <div class="modal-footer">
-    <button class="btn modal-btn modal-@(!_isEmptyLeagues ? "apply" : "cancel" )" @onclick="OnCancelClickEvent" disabled="@_isPreloader">@TranslationState.GetValue("Cancel")</button>
-    @if (_isEmptyLeagues)
+    <button class="btn modal-btn modal-@(!_isReadOnly ? "apply" : "cancel" )" @onclick="OnCancelClickEvent" disabled="@_isPreloader">@TranslationState.GetValue("Cancel")</button>
+    @if (_isReadOnly)
     {
-        <button class="btn modal-btn modal-apply" @onclick="OnApplyClickEvent" disabled="@_isPreloader">@TranslationState.GetValue("Apply")</button>
+        <button class="btn modal-btn modal-apply" @onclick="HandleApplyClick" disabled="@_isPreloader">@TranslationState.GetValue("Apply")</button>
     }
 </div>

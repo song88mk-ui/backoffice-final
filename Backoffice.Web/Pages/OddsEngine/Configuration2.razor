@@ -4,30 +4,28 @@
 
 @page "/hk/odds-engine/config-templates"
 
-<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region" />
+<Breadcrumb Breadcrumbs="_breadcrumbs" />
 
-@if (IsPreleader)
+@if (_isPreloader)
 {
     <Preloader />
 }
 else
 {
     <div class="col-md-12 mb-2">
-        <ConfigNavMenu Region="@Region" MyTemplatesCount="@_myTemplatesCount" AssignedLeaguesCount="@_assignedLeaguesCount" UnAssignedLeaguesCount="@_unAssignedLeaguesCount" SelectConfigNavMenuCallback="OnConfigNavMenuSelected" SelectCopyClientCallback="OnCopyClientSettings" />
+        <ConfigNavMenu ParamModel="_navMenuParamModel" OnConfigNavMenuClick="HandleConfigNavMenuSelection" OnCopyClientSelect="HandleCopyClientClick" />
     </div>
 
-    <AlertMessage AlertClass="mx-3" AlertModel="@_alertModel"></AlertMessage>
+    <AlertMessage AlertClass="mx-3" AlertModel="_alertModel"></AlertMessage>
 
-    @if (SelectedConfigNavMenu == ConfigTemplateNavMenu.MyTemplates)
+    @switch (_navMenuParamModel.SelectedNavMenu)
     {
-        <ConfigMyTemplates Sports="@Sports" Scopes="@Scopes" QueryMessage="@QueryMessage" OnStateHasChanged="@OnNavMenuCallback" />
-    }
-    else if (SelectedConfigNavMenu == ConfigTemplateNavMenu.Assigned)
-    {
-        <ConfigAssigned State="ConfigState.Assigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" OnStateHasChanged="@OnNavMenuCallback" />
-    }
-    if (SelectedConfigNavMenu == ConfigTemplateNavMenu.UnAssigned)
-    {
-        <ConfigAssigned State="@ConfigState.UnAssigned" Region="@Region" Clients="@Clients" Sports="@Sports" Scopes="@Scopes" OnStateHasChanged="@OnNavMenuCallback" />
+        case ConfigTemplateNavMenu.MyTemplates:
+            <ConfigMyTemplates FilterModel="_contentFilterModel" QueryMessage="@QueryMessage" OnStateHasChange="HandleNavMenuCallback" />
+            break;
+        case ConfigTemplateNavMenu.Assigned:
+        case ConfigTemplateNavMenu.UnAssigned:
+            <ConfigAssigned State="_currentState" FilterModel="_contentFilterModel" OnStateHasChange="HandleNavMenuCallback" />
+            break;
     }
 }

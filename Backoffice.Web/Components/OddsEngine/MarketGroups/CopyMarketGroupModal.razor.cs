@@ -15,8 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel? UserModel { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
 
         public List<ClientInformationModel> ClientInformations { get; set; }
@@ -54,14 +53,14 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 try
                 {
                     CopyToClientCode = ModalParameters.TryGet<string>("ClientCode");
-                    if (UserClientCodes != null && UserClientCodes.Any())
+                    if (UserModel.ClientCodes.Any())
                     {
                         ClientInformations = (await TradingService.GetClientList()).Result;
 
-                        var roleName = UserModel?.RoleName;
+                        var roleName = UserModel.RoleName;
                         if (roleName != "Super Admin")
                         {
-                            var clientCodes = UserClientCodes;
+                            var clientCodes = UserModel.ClientCodes;
                             ClientInformations = ClientInformations.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
                         }
                         Clients = ClientInformations.Where(x => x.ClientCode != CopyToClientCode).Select(s => new SelectListItemModel<string>

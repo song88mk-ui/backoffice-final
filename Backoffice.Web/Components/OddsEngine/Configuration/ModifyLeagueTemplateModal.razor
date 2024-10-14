@@ -9,7 +9,7 @@
             <div class="mb-2 d-flex justify-content-between">
                 <label class="text-secondary fw-bold">@TranslationState.GetValue("Leagues selected")</label>
 
-                <a href="javascript:void(0)" @onclick="OnShowAllClickedEvent">@(!IsShowAll ? "Show All" : "Show Less")</a>
+                <a href="javascript:void(0)" @onclick="HandleShowAllClick">@(!IsShowAll ? "Show All" : "Show Less")</a>
             </div>
             <div class="row league-body">
                 @if (Leagues != null && Leagues.Any())
@@ -43,7 +43,7 @@
                     </button>
                     @if (PrematchTemplates != null && PrematchTemplates.Any())
                     {
-                        <SelectWithSearch SelectedItem="_prematchSelectedItem" State="State" Items="PrematchTemplates" AriaLabel="scope-dropdown" OnSelectionCallback="OnPrematchTemplateSelectChanged" />
+                        <SelectWithSearch SelectedItem="_prematchSelectedItem" State="State" Items="PrematchTemplates" AriaLabel="scope-dropdown" OnSelectionCallback="HandlePrematchTemplateSelectChange" />
                     }
                 </div>
             </div>            
@@ -64,7 +64,7 @@
                     </button>
                     @if (LiveTemplates != null && LiveTemplates.Any())
                     {
-                        <SelectWithSearch SelectedItem="_liveSelectedItem" State="State" Items="LiveTemplates" AriaLabel="scope-dropdown" OnSelectionCallback="OnLiveTemplateSelectChanged" />
+                        <SelectWithSearch SelectedItem="_liveSelectedItem" State="State" Items="LiveTemplates" AriaLabel="scope-dropdown" OnSelectionCallback="HandleLiveTemplateSelectChange" />
                     }
                 </div>
             </div>
@@ -81,6 +81,6 @@
     }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickedEvent" disabled="@IsPreLoader">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickedEvent" disabled="@(IsPreLoader || !_hasChanged)">@TranslationState.GetValue("Apply")</button>
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="HandleCancelClick" disabled="@IsPreLoader">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn btn-save" @onclick="HandleSaveClick" disabled="@(IsPreLoader || !_hasChanged)">@TranslationState.GetValue("Apply")</button>
 </div>

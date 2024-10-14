@@ -16,7 +16,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class ExportTemplateModal : IDisposable
     {
         #region Properties
-        [Inject] private IModalService ModalService { get; set; }
         [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
@@ -26,11 +25,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private string _errorMessage = "";
 
         #region Methods
-        protected override void OnInitialized()
-        {
-            _filename = ModalParameters.TryGet<string>("ConfigTemplateName");
-        }
-        public async Task OnExportClickEvent()
+        protected override void OnInitialized() => _filename = ModalParameters.TryGet<string>("ConfigTemplateName");
+        public async Task HandleExportClick()
         {
             _errorMessage = string.Empty;
 
@@ -49,12 +45,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 AccessToken = HttpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty
             };
 
-            await Task.Run(() =>
-            {
-                MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportOeConfigTemplate", $"r.bo.util.export", Guid.NewGuid().ToString());
-            });
+            await Task.Run(() => MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportOeConfigTemplate", $"r.bo.util.export", Guid.NewGuid().ToString()));
 
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         public void Dispose()
