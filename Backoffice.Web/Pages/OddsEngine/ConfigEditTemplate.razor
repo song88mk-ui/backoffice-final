@@ -5,7 +5,7 @@
 @page "/hk/odds-engine/config-templates/{Action}/{configTemplateId:long}"
 @page "/hk/odds-engine/config-templates/{Action}/{configTemplateId:long}/{view:bool}"
 
-<Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region" />
+<Breadcrumb Breadcrumbs="_breadcrumbs" />
 
 <div class="col-md-12 mb-4">
     <div class="col-md-12 my-4">
@@ -13,9 +13,9 @@
             @if (!_isEdttingName)
             {
                 <div class="d-flex align-items-center">
-                    <h4 class="page-title fw-bold m-0">@ConfigTemplateName</h4>
+                    <h4 class="page-title fw-bold m-0">@_configTemplateName</h4>
 
-                    @if (!string.IsNullOrEmpty(ConfigTemplateName))
+                    @if (!string.IsNullOrEmpty(_configTemplateName))
                     {
                         <icon class="btn border-0 ico ico-pen mx-2" @onclick="OnTemplateNameClicked"></icon>
                     }
@@ -33,7 +33,7 @@
                 @if (!View)
                 {
                     <button type="button" class="btn btn-cancel mx-1" @onclick="OnCancelMarginTemplate">@TranslationState.GetValue("Cancel")</button>
-                    <button type="button" class="btn btn-save mx-1" disabled="@(!(HasChanges || IsNameChanges) || IsPreloader || _isProcessing || _isEdttingName)" @onclick="OnSaveMarginTemplate">@TranslationState.GetValue("Save Changes")</button>
+                    <button type="button" class="btn btn-save mx-1" disabled="@(!(_hasChanges || _isNameChanges) || _isPreloader || _isProcessing || _isEdttingName)" @onclick="OnSaveMarginTemplate">@TranslationState.GetValue("Save Changes")</button>
                 }
             </div>
         </div>
@@ -49,12 +49,12 @@
         <div class="d-flex card-flex">
             <div class="border card-block">
                 <div class="card-icon">
-                    <i class=@($"iconfont iconfont-{SportIcon}")></i>
+                    <i class=@($"iconfont iconfont-{_sportIcon}")></i>
                 </div>
 
                 <div class="card-desc">
                     <label class="fw-bold">@TranslationState.GetValue("Sport")</label>
-                    <label>@TranslationState.GetValue(SportName)</label>
+                    <label>@TranslationState.GetValue(_sportName)</label>
                 </div>
             </div>
 
@@ -65,7 +65,7 @@
 
                 <div class="card-desc">
                     <label class="fw-bold">@TranslationState.GetValue("Scope")</label>
-                    <label>@TranslationState.GetValue(Scope)</label>
+                    <label>@TranslationState.GetValue(_scope)</label>
                 </div>
             </div>
         </div>
@@ -79,24 +79,24 @@
 <EditConfigTemplateFilter ConfigTemplateId="@ConfigTemplateId" EditConfigTemplateFilterCallback="InitConfigEditTemplate" />
 
 <div class="d-flex justify-content-end mb-4">
-    <button type="button" class="btn btn-activate-all fw-bold" @onclick="OnAllMarketStatusClickEvent" disabled="@View">@AllMarketStatusName</button>
+    <button type="button" class="btn btn-activate-all fw-bold" @onclick="OnAllMarketStatusClickEvent" disabled="@View">@_allMarketStatusName</button>
 </div>
 
 <div class="col-md-12 mb-4">
-    @if (IsPreloader)
+    @if (_isPreloader)
     {
         <Preloader />
     }
     else
     {
-        if (MarketLookupNavigation != null && MarketLookupNavigation.Any(m => m.IsVisible))
+        if (_marketLookupNavigation != null && _marketLookupNavigation.Any(m => m.IsVisible))
         {
-            foreach (var market in MarketLookupNavigation.Where(m => m.IsVisible))
+            foreach (var market in _marketLookupNavigation.Where(m => m.IsVisible))
             {
                 <AccordionTemplateConfiguration Market="market" IsReadOnly="View"
-                                                @key="@($"{EditConfigTemplateFilterModel.ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
-                                                FilterConfigStatus="@EditConfigTemplateFilterModel.SelectedConfigStatus"
-                                                Scope="@EditConfigTemplateFilterModel.ScopeId"
+                                                @key="@($"{_editConfigTemplateFilterModel.ConfigTemplate.SportId}-{market.MarketLookup.MarketTemplateId}")"
+                                                FilterConfigStatus="@_editConfigTemplateFilterModel.SelectedConfigStatus"
+                                                Scope="@_editConfigTemplateFilterModel.ScopeId"
                                                 OnTemplateMarginChangeCallback="OnTemplateMarginChange" />
             }
         }

@@ -22,7 +22,7 @@ namespace Backoffice.Web.Components.Common
         [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         private bool _isPreLoader;
         public SportsbookClientPermission CurrentPage { get; set; }
@@ -38,7 +38,7 @@ namespace Backoffice.Web.Components.Common
         protected override async Task OnInitializedAsync()
         {
             _isPreLoader = true;
-            _userClients = UserClientCodes != null && UserClientCodes.Any() ? UserClientCodes : new List<string>();
+            _userClients = UserModel.ClientCodes.Any() ? UserModel.ClientCodes : new List<string>();
             WithAdministrationPagesAccess = false;
             _boostedSettingsActivityLogs = new List<ActivityLogModel>();
 
@@ -337,7 +337,7 @@ namespace Backoffice.Web.Components.Common
                 stringBuilder.Append($"<span>{activityLog.To.SegmentName}</span><br>");
                 stringBuilder.Append($"<span>{activityLog.To.LeagueName}</span><br>");
                 stringBuilder.Append($"{activityLog.To.FixtureName}<br>");
-                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy")}</span><br>");
+                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)}</span><br>");
                 stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("HH:mm")}</span>");
             }
             else
@@ -347,7 +347,7 @@ namespace Backoffice.Web.Components.Common
                 stringBuilder.Append($"<span>{activityLog.From.SegmentName}</span><br>");
                 stringBuilder.Append($"<span>{activityLog.From.LeagueName}</span><br>");
                 stringBuilder.Append($"{activityLog.From.FixtureName}<br>");
-                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy")}</span><br>");
+                stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)}</span><br>");
                 stringBuilder.Append($"<span>{activityLog.TimeStamp.ToLocalTime().ToString("HH:mm")}</span>");
             }
 

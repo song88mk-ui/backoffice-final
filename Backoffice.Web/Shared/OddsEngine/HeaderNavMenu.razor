@@ -1,6 +1,6 @@
 ﻿<div class="d-flex justify-content-between">
     <div class="d-flex align-items-center">
-        @if (UserClaims != null && UserClaims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_Monitoring_MatchType.ToString().Replace("_", ".")}"))
+        @if (UserModel.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_Monitoring_MatchType.ToString().Replace("_", ".")}") ?? false)
         {
             <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.Monitoring ? "active" : "")">
                 <a class="header-link text-decoration-none" href="@_address/monitoring">
@@ -8,7 +8,7 @@
                 </a>
             </div>
         }
-        @if (UserClaims != null && UserClaims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", ".")}"))
+        @if (UserModel.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", ".")}") ?? false)
         {
             <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.Config ? "active" : "")">
                 <a class="header-link text-decoration-none" href="@_address/config-templates">
@@ -16,11 +16,11 @@
                 </a>
             </div>
         }
-        @if (UserClaims != null && UserClaims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace("_", ".")}"
-        || x.Type == $"{SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace("_", ".")}"))
+        @if (UserModel.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace("_", ".")}"
+        || x.Type == $"{SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace("_", ".")}") ?? false)
         {
             <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.PriceBoost ? "active" : "")">
-                <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="OnPriceBoostClickEvent">
+                <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="HandlePriceBoostClick">
                     <span class="me-3">@TranslationState.GetValue("Price Boost")</span>
                     @if (_showPriceBoostMenu)
                     {
@@ -34,7 +34,7 @@
                 @if (_showPriceBoostMenu)
                 {
                     <ul class="sub-menu-container rounded mt-2">
-                        @if (UserClaims != null && UserClaims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace("_", ".")}"))
+                        @if (UserModel.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace("_", ".")}") ?? false)
                         {
                             <li class="py-2">
                                 <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/manage-boost">
@@ -42,7 +42,7 @@
                                 </a>
                             </li>
                         }
-                        @if (UserClaims != null && UserClaims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace("_", ".")}"))
+                        @if (UserModel.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace("_", ".")}") ?? false)
                         {
                             <li class="py-2">
                                 <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/boosted-settings">
@@ -54,7 +54,7 @@
                 }
             </div>
         }
-        @if (UserClaims != null && UserClaims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace("_", ".")}"))
+        @if (UserModel.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace("_", ".")}") ?? false)
         {
             <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.SportSettings ? "active" : "")">
                 <a class="header-link text-decoration-none" href="@_address/sport-settings">
@@ -62,11 +62,11 @@
                 </a>
             </div>
         }
-        @if (UserClaims != null && UserClaims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", ".")}"
-        || x.Type == $"{SportsbookClientPermission.SBC_OE_MarketSetting_SortOrder.ToString().Replace("_", ".")}"))
+        @if (UserModel.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", ".")}"
+        || x.Type == $"{SportsbookClientPermission.SBC_OE_MarketSetting_SortOrder.ToString().Replace("_", ".")}") ?? false)
         {
             <div class="px-2 me-2 py-3 @(_menu == OeNavMenu.MarketSettings ? "active" : "")">
-                <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="OnMarketSettingsClickEvent">
+                <a class="header-link text-decoration-none" href="javascript:void(0)" @onclick="HandleMarketSettingsClick">
                     <span class="me-3">@TranslationState.GetValue("Market Settings")</span>
                     @if (_showMarketSettingsMenu)
                     {
@@ -80,7 +80,7 @@
                 @if (_showMarketSettingsMenu)
                 {
                     <ul class="sub-menu-container rounded mt-2">
-                        @if (UserClaims != null && UserClaims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_MarketSetting_SortOrder.ToString().Replace("_", ".")}"))
+                        @if (UserModel.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_MarketSetting_SortOrder.ToString().Replace("_", ".")}") ?? false)
                         {
                             <li class="py-2">
                                 <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/market-sort-order">
@@ -88,7 +88,7 @@
                                 </a>
                             </li>
                         }
-                        @if (UserClaims != null && UserClaims.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", ".")}"))
+                        @if (UserModel.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", ".")}") ?? false)
                         {
                             <li class="py-2">
                                 <a class="sub-header-link text-decoration-none ps-2 pe-3 d-block" href="@_address/market-groups">

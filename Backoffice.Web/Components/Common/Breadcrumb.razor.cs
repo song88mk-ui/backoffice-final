@@ -9,7 +9,6 @@ namespace Backoffice.Web.Components.Common
         #region Properties
 
         [Parameter] public List<BreadcrumbModel> Breadcrumbs { get; set; }
-        [Parameter] public string Region { get; set; }
 
         [CascadingParameter(Name = "HeaderNavMenuReference")] public HeaderNavMenu HeaderNavMenuReference { get; set; }
 

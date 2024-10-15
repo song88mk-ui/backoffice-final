@@ -1,55 +1,63 @@
 ﻿<div class="modal-body">
-    <div class="row mb-3">
-        <label for="nameTemplate" class="col-sm-2 col-form-label">Name:</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control" id="nameTemplate" @bind-value="TemplateName"/>
-            @if (IsConfigNameExisting)
-            {
-                <span class="fst-italic text-danger">Sorry, that name already exists!</span>
-            }
+    @if(_isPreloader)
+    {
+        <Preloader/>
+    }
+    else
+    {
+        <div class="row mb-3">
+            <label for="nameTemplate" class="col-sm-2 col-form-label">Name:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="nameTemplate" @bind-value="_templateName" />
+                @if (_isConfigNameExisting)
+                {
+                    <span class="fst-italic text-danger">Sorry, that name already exists!</span>
+                }
+            </div>
         </div>
-    </div>
 
-    <div class="row mb-3">
-        <label for="sportsSelect" class="col-sm-2 col-form-label">@TranslationState.GetValue("Sports"):</label>
-        <div class="col-sm-10">
-            <select class="form-select" @onchange="OnSportSelectChanged">
-                @if (Sports.Any())
-                {
-                    @foreach (var item in Sports)
+        <div class="row mb-3">
+            <label for="sportsSelect" class="col-sm-2 col-form-label">@TranslationState.GetValue("Sports"):</label>
+            <div class="col-sm-10">
+                <select class="form-select" @onchange="OnSportSelectChanged">
+                    @if (_sports.Any())
                     {
-                        <option value="@item.Value" selected="@(item.Value == SelectedSportId)">@TranslationState.GetValue(item.Name)</option>
+                        @foreach (var item in _sports)
+                        {
+                            <option value="@item.Value" selected="@(item.Value == _selectedSportId)">@TranslationState.GetValue(item.Name)</option>
+                        }
                     }
-                }
-                else
-                {
-                    <option value="-1">--</option>
-                }
-            </select>
+                    else
+                    {
+                        <option value="-1">--</option>
+                    }
+                </select>
+            </div>
         </div>
-    </div>
 
-    <div class="row mb-3">
-        <label for="scopeSelect" class="col-sm-2 col-form-label">
-            @($"{TranslationState.GetValue("Scope")}:")</label>
-        <div class="col-sm-10">
-            <select class="form-select" @onchange="OnScopeSelectChanged">
-                @if (Sports.Any())
-                {
-                    @foreach (var item in Scopes)
+        <div class="row mb-3">
+            <label for="scopeSelect" class="col-sm-2 col-form-label">
+                @($"{TranslationState.GetValue("Scope")}:")
+            </label>
+            <div class="col-sm-10">
+                <select class="form-select" @onchange="OnScopeSelectChanged">
+                    @if (_scopes.Any())
                     {
-                        <option value="@item.Value" selected="@(item.Value == SelectedScopeId)">@TranslationState.GetValue(item.Name)</option>
+                        @foreach (var item in _scopes)
+                        {
+                            <option value="@item.Value" selected="@(item.Value == _selectedScopeId)">@TranslationState.GetValue(item.Name)</option>
+                        }
                     }
-                }
-                else
-                {
-                    <option value="-1">--</option>
-                }
-            </select>
+                    else
+                    {
+                        <option value="-1">--</option>
+                    }
+                </select>
+            </div>
         </div>
-    </div>
+    }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickEvent">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickEvent">@TranslationState.GetValue("Save")</button>
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelClickEvent" disabled="@_isPreloader">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn btn-save" @onclick="OnSaveClickEvent" disabled="@_isPreloader">@TranslationState.GetValue("Save")</button>
 </div>

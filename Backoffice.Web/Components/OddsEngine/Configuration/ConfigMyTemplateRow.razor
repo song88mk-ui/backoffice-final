@@ -1,0 +1,34 @@
+﻿<tr>
+    <th class="px-4" scope="row" @onclick="OnEditTemplateClickEvent">@ConfigTemplate.Name</th>
+    <td class="px-4" @onclick="OnEditTemplateClickEvent">@ConfigTemplate.SportName</td>
+    <td @onclick="OnEditTemplateClickEvent" class="text-center">@ConfigTemplate.ClientAssigned</td>
+    <td @onclick="OnEditTemplateClickEvent" class="text-center">@ConfigTemplate.LeagueAssigned</td>
+    <td @onclick="OnEditTemplateClickEvent" class="text-center">@ConfigTemplate.DateCreated</td>
+    <td>
+        <div class="manage-cell">
+            <AuthorizeView Policy="sbc-config-canedit">
+                <Authorized Context="ActivateAll">
+                    <a class= href="javascript:void(0)" @onclick="OnEditTemplateClickEvent" title="Edit Template">
+                        <i class="fa fa-edit"></i>
+                    </a>
+                    <a href="javascript:void(0)" @onclick="OnCopyTemplateClickEvent" title="Copy Template">
+                        <i class="fa fa-copy"></i>
+                    </a>
+                </Authorized>
+            </AuthorizeView>
+            <a href="javascript:void(0)" @onclick="OnExportTemplateClickEventAsync" title="Export Template">
+                <i class="fa fa-file-archive-o"></i>
+            </a>
+            <AuthorizeView Policy="sbc-config-canedit">
+                <Authorized Context="ActivateAll">
+                    <a href="javascript:void(0)" @onclick="OnDeleteTemplateClickEventAsync" title="Delete Template">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </Authorized>
+            </AuthorizeView>
+            <a href="javascript:void(0)" @onclick="OnViewAssignedClickEventAsync" title="View Assigned" class="@(ConfigTemplate.IsReadOnly ? "disabled" : "")">
+                <i class="fa fa-list"></i>
+            </a>
+        </div>
+    </td>
+</tr>

@@ -21,11 +21,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             await OnTemplateMarginChangeCallback.InvokeAsync();
         }
 
-        public async Task OnMarginChangedEvent()
-        {
-
-            await OnTemplateMarginChangeCallback.InvokeAsync();
-        }
+        public async Task OnMarginChangedEvent() => await OnTemplateMarginChangeCallback.InvokeAsync();
 
         public void Dispose()
         {

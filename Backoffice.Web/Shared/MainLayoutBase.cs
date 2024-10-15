@@ -108,7 +108,7 @@ namespace Backoffice.Web.Shared
                         else
                         {
                             UserClientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>();
-                            Clients.Clients = Clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                            Clients.Clients = Clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                         }
                     }
 
@@ -154,13 +154,13 @@ namespace Backoffice.Web.Shared
                             var claim = UserClaims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
                             if (claim != null && claim.Value != "0")
                             {
-                                if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel?.MainUserId))
+                                if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel.MainUserId))
                                     continue;
 
                                 if (!string.IsNullOrEmpty(subMenus[0].GroupName) && subMenus[0].ClaimType.Contains(SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".")))
                                     continue;
 
-                                var menu = await MenuHelper.GetMenu(claim, subMenus[0].Name);
+                                var menu = MenuHelper.GetMenu(claim, subMenus[0].Name);
                                 NavMenus.Menus.Add(menu);
                             }
                         }
@@ -185,7 +185,7 @@ namespace Backoffice.Web.Shared
                                 var claim = UserClaims.FirstOrDefault(c => c.Type == subMenu.ClaimType);
                                 if (claim != null && claim.Value != "0")
                                 {
-                                    if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel?.MainUserId))
+                                    if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel.MainUserId))
                                         continue;
 
                                     if (claim.Type == SportsbookClientPermission.SBC_OE.ToString().Replace("_", "."))
@@ -217,7 +217,7 @@ namespace Backoffice.Web.Shared
                                     if (!string.IsNullOrEmpty(subMenu.GroupName) && subMenu.ClaimType.Contains(SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".")))
                                         continue;
 
-                                    var submenu1 = await MenuHelper.GetMenu(claim, subMenu.Name);
+                                    var submenu1 = MenuHelper.GetMenu(claim, subMenu.Name);
                                     menu.SubMenus.Add(submenu1);
                                 }
                             }

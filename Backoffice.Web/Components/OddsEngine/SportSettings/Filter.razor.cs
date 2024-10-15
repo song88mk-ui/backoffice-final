@@ -12,7 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         [Inject] public ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback OnUpdateClickCallback { get; set; }
@@ -40,7 +40,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             if (clientResponse.StatusCode == StatusCode.Success)
             {
-                clientResponse.Result = UserClientCodes != null && UserClientCodes.Any() ? clientResponse.Result.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+                clientResponse.Result = UserModel.ClientCodes.Any() ? clientResponse.Result.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
 
                 Clients = clientResponse.Result.Select(s => new SelectListItemModel<string>
                 {
