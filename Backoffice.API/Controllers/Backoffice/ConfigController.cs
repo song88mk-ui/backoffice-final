@@ -8,8 +8,10 @@ using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Azure;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using AllowAnonymousAttribute = Backoffice.API.ActionFilter.AllowAnonymousAttribute;
@@ -49,6 +51,35 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> GetMaintenance()
         {
             var result = await _maintenanceRepository.GetMaintenance();
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
+        [HttpGet("v2/maintenance")]
+        public async Task<IActionResult> GetMaintenanceV2([FromBody] SetMaintenanceRequest request)
+        {
+            var clients = request?.ClientIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToUpper()).ToList() ?? new List<string>();
+            
+            var result = await _maintenanceRepository.GetMaintenanceV2(clients);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("v2/maintenance")]
+        public async Task<IActionResult> SetMaintenanceV2([FromBody] SetMaintenanceRequest request)
+        {
+            var result = await _maintenanceRepository.SetMaintenanceV2(request);
 
             switch (result.StatusCode)
             {

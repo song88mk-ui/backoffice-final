@@ -6,29 +6,34 @@ using Azure.ResourceManager.Cdn;
 using Azure.ResourceManager.Cdn.Models;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Backoffice.API.Models.MaintenanceApi;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace Backoffice.API.Repositories
 {
     public class MaintenanceRepository : IMaintenanceRepository
     {
+        private HttpClient _httpClient { get; set; }
         private string _fileName = Path.Join("web", "config.json");
         private BlobClient _blobClient = null;
         private List<MaintenanceModel> _clientsConfigs = new List<MaintenanceModel>();
         private readonly bool _isStaging;
         private readonly string _internalClient;
 
-        public MaintenanceRepository(IConfiguration configuration)
+        public MaintenanceRepository(IConfiguration configuration, HttpClient httpClient)
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(configuration["ConnectionStrings:AzureStorage"]);
             BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("assets");
@@ -36,6 +41,8 @@ namespace Backoffice.API.Repositories
             _clientsConfigs = GetConfig();
             _isStaging = bool.Parse(configuration["IsStaging"]);
             _internalClient = "71BBE7D8-FD04-459C-6D8B-08D9354E5B64";
+
+            _httpClient = httpClient;
         }
 
         #region Methods
@@ -79,7 +86,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                if(_isStaging)
+                if (_isStaging)
                 {
                     return new BaseResponse<bool>()
                     {
@@ -103,6 +110,65 @@ namespace Backoffice.API.Repositories
                     StatusCode = StatusCode.Success,
                     Message = StatusCode.Success.ToString(),
                     Result = false
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message.ToString(),
+                    Result = false
+                };
+            }
+        }
+        public async Task<BaseResponse<List<string>>> GetMaintenanceV2(List<string> clientIds)
+        {
+            try
+            {
+                //var response = await _httpClient.GetAsync($"/v1.0/invoke/method/maintenance");
+                var response = await _httpClient.GetAsync($"/v1.0/invoke/<APP>/method/maintenance"); // ??
+
+                var content = JsonConvert.DeserializeObject<ExternalMaintenanceResponse>(response.Content.ReadAsStringAsync().Result);
+                var clients = content.Live.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()).ToList();
+
+                var result = clients.Where(c => clientIds.Contains(c, StringComparer.OrdinalIgnoreCase)).ToList();
+
+                return new BaseResponse<List<string>>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<string>>()
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = ex.Message.ToString()
+                };
+            }
+        }
+        public async Task<BaseResponse<bool>> SetMaintenanceV2(SetMaintenanceRequest request)
+        {
+            try
+            {
+                var result = await _httpClient.PostAsync($"/v1.0/invoke/method/maintenance", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+                if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                    return new BaseResponse<bool>()
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = StatusCode.Error.ToString(),
+                        Result = false
+                    };
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.Success,
+                    Message = StatusCode.Success.ToString(),
+                    Result = true
                 };
             }
             catch (Exception ex)
