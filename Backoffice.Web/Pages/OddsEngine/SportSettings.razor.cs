@@ -13,7 +13,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class SportSettings : IDisposable
     {
-        [Inject] public IPreRenderService PreRenderService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IModalService ModalService { get; set; }

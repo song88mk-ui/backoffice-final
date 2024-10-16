@@ -12,8 +12,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel? UserModel { get; set; }
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public EventCallback OnAddCallback { get; set; }
         [Parameter] public EventCallback OnUpdateCallback { get; set; }
@@ -48,14 +47,14 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 MarketGroupModel.IsUpdate = false;
                 TradingService.Region = Region.ToUpper();
 
-                if (UserClientCodes != null && UserClientCodes.Any())
+                if (UserModel.ClientCodes.Any())
                 {
                     var clients = (await TradingService.GetClientList()).Result;
 
-                    var roleName = UserModel?.RoleName;
+                    var roleName = UserModel.RoleName;
                     if (roleName != "Super Admin")
                     {
-                        var clientCodes = UserClientCodes;
+                        var clientCodes = UserModel.ClientCodes;
                         clients = clients.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
                     }
                     Clients = clients.Select(s => new SelectListItemModel<string>

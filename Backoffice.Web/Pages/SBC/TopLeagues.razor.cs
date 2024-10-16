@@ -20,7 +20,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] protected UserModel UserModel { get; set; }
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         public bool IsPreLoader { get; set; } = true;
 
@@ -55,7 +55,7 @@ namespace Backoffice.Web.Pages.SBC
                 TotalPages = 1,
             };
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
         public async Task OnInitEvent(TopLeaguesFilterModel model)
@@ -130,8 +130,6 @@ namespace Backoffice.Web.Pages.SBC
         {
             TopLeaguesList = null;
             FilterModel = null;
-
-            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }

@@ -14,7 +14,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         public string IFrameSrc { get; set; }
 
@@ -31,7 +31,7 @@ namespace Backoffice.Web.Pages.Administration
                 Title = "Sports",
                 IconClass = "ico ico-sports"
             };
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
 
             await OnInitializeEvent();
         }

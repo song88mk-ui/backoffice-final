@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         private CancelBetReferenceModel BetRefenceModel;
         private List<CancelBetAlertModel> Alerts;
@@ -37,7 +37,7 @@ namespace Backoffice.Web.Pages.Administration
                 BetReferenceIds = new() { string.Empty }
             };
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
             _pageHeaderModel = new()
             {
                 Title = "Cancel Bets",

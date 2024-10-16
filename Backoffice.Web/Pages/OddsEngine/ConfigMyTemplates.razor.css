@@ -49,22 +49,3 @@ table thead {
     color: white;
     background-color: #354156;
 }
-
-table tbody > tr {
-    cursor: pointer;
-}
-
-    table tbody > tr:hover {
-        background-color: #EEF6FF;
-    }
-
-.manage-cell {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-
-    .manage-cell > a {
-        color: black;
-        text-decoration: none;
-    }
