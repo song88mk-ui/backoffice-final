@@ -84,7 +84,6 @@ namespace Backoffice.Web.Extensions
         public static WebApplicationBuilder AddServices(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IModalService, ModalService>();
-            builder.Services.AddScoped<INavMenuModalService, NavMenuModalService>();
             builder.Services.AddSingleton<IMessageBroker, MessageBroker>();
 
             builder.Services.AddScoped<ITableauService, TableauService>();

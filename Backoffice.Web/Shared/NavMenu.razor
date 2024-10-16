@@ -162,11 +162,10 @@ else if (NavMenuAccess == PermissionCategory.OE)
             <div class="nav-item px-3">
                 <NavLink class="nav-link logout justify-content-center" href="javascript:void(0)" @onclick="OnLogoutClickEvent">
                     <span class="ico ico-logout" aria-hidden="true"></span>
-                    <span class="const-menu-item nav-menu-text">@TranslationState.GetValue("logout")</span>
+                    <span class="const-menu-item nav-menu-text">@TranslationState.GetValue("Logout")</span>
                 </NavLink>
             </div>
         </nav>
     </div>
 </div>
-
-<NavMenuCustomModal />
+<CustomModal />

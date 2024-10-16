@@ -266,19 +266,6 @@ namespace Backoffice.Web.Shared
             SelectedSport = model;
             HeaderNavMenuReference.ActivateMenu("monitoring");
         }
-        public async ValueTask DisposeAsync()
-        {
-            if (_hubConnection != null)
-            {
-                if (_hubConnection.State == HubConnectionState.Connected)
-                {
-                    await _hubConnection.StopAsync();
-                    await _hubConnection.DisposeAsync();
-                }
-            }
-
-            Dispose();
-        }
 
         [JSInvokable]
         public static async Task OnInvokeFilterEvent()
@@ -305,6 +292,28 @@ namespace Backoffice.Web.Shared
             {
                 Log.Information($"[MainLayoutBase] [Authorized] {NavigationManager.Uri}");
             }
+        }
+        public async ValueTask DisposeAsync()
+        {
+            if (_hubConnection != null)
+            {
+                if (_hubConnection.State == HubConnectionState.Connected)
+                {
+                    try
+                    {
+                        await _hubConnection.StopAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error stopping HubConnection: {ex.Message}");
+                    }
+
+                    await _hubConnection.DisposeAsync();
+                }
+                _hubConnection = null;
+            }
+
+            Dispose();
         }
 
         public void Dispose()
@@ -338,7 +347,9 @@ namespace Backoffice.Web.Shared
                 _hubConnection.Closed += async (error) =>
                 {
                     await Task.Delay(new Random().Next(0, 5) * 1000);
-                    await _hubConnection.StartAsync();
+
+                    if (_hubConnection != null)
+                        await _hubConnection.StartAsync();
                 };
 
                 await _hubConnection.StartAsync().ContinueWith(task =>

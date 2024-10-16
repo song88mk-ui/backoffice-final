@@ -10,7 +10,7 @@ namespace Backoffice.Web.Components.Common
     {
         #region Properties
 
-        [Inject] private INavMenuModalService ModalService { get; set; }
+        [Inject] private IModalService ModalService { get; set; }
         [Inject] private IAuthenticationService AuthenticationService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
