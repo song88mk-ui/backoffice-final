@@ -7,16 +7,16 @@
                     {
                         if (_clientFilter.Count == _selectedClientCount)
                         {
-                            <span>@TranslationState.GetValue("All Clients") (@_selectedClientCount)</span>
+                            <span>@_translationState.GetValue("All Clients") (@_selectedClientCount)</span>
                         }
                         else
                         {
-                            <span>@(_selectedClientCount == 1 ? _selectedClientName : $"{TranslationState.GetValue("Clients")} ({_selectedClientCount})")</span>
+                            <span>@(_selectedClientCount == 1 ? _selectedClientName : $"{_translationState.GetValue("Clients")} ({_selectedClientCount})")</span>
                         }
                     }
                     else
                     {
-                        <span>@TranslationState.GetValue("No Clients Available")</span>
+                        <span>@_translationState.GetValue("No Clients Available")</span>
                     }
                 </button>
                 @if (_clientFilter.Any())

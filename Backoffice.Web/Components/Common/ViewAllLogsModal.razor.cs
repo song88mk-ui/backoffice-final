@@ -367,7 +367,7 @@ namespace Backoffice.Web.Components.Common
 
         private async Task<SportsLookupResponse> GetSports()
         {
-            return (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString().ToUpper())).Result;
+            return (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString().ToUpper())).Result;
         }
 
         private async Task<SegmentLookupResponse> GetSegments(int sportId)
@@ -388,7 +388,7 @@ namespace Backoffice.Web.Components.Common
                 {
                     var viewData = JsonConvert.DeserializeObject<BoostedSettingsModel>(changeData);
 
-                    return $"<b><strong>% {TranslationState.GetValue("Cap of Current Odds from Boosted Odds")}</strong></b><br><p>{viewData.Cap.ToString("P2", CultureInfo.InvariantCulture)}</p>";
+                    return $"<b><strong>% {_translationState.GetValue("Cap of Current Odds from Boosted Odds")}</strong></b><br><p>{viewData.Cap.ToString("P2", CultureInfo.InvariantCulture)}</p>";
                 }
             }
             return "-";

@@ -1,7 +1,7 @@
 ﻿<tfoot class="table-borderless">
     <tr>
         <td class="py-2" colspan="@RowInfColSpan">
-            <span>@TranslationState.GetValue($"Showing {{{FromRow}}} to {{{ToRow}}} of {{{MetaData.TotalCount}}} entries")</span>
+            <span>@_translationState.GetValue($"Showing {{{FromRow}}} to {{{ToRow}}} of {{{MetaData.TotalCount}}} entries")</span>
         </td>
         <td class="py-2 text-end" colspan="@PaginationColspan">
             <div class="tbl-pagination noselect">

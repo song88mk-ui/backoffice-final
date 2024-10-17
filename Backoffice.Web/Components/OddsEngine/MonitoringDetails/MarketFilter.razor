@@ -4,7 +4,7 @@
         {
             <Virtualize Items="MarketTemplates" Context="marketTemplate" OverscanCount="15">
                 <a href="javascript:void(0);" class="d-block btn btn-market px-3 border-bottom @(marketTemplate.IsSelected ? "active" : "")" @onclick="_ => OnMarketTemplateClickEvent(marketTemplate)">
-                    @TranslationState.GetValue(marketTemplate.MarketName)
+                    @_translationState.GetValue(marketTemplate.MarketName)
                 </a>
             </Virtualize>
         }

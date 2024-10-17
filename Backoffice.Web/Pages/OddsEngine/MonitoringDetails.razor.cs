@@ -99,10 +99,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         protected override async Task OnParametersSetAsync()
         {
-            if (_isInit || _languageCode != TranslationState.ActiveLanguageCode || Id != _id)
+            if (_isInit || _languageCode != _translationState.ActiveLanguageCode || Id != _id)
             {
                 _id = Id;
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
 
                 await PrepareMonitoringDetails();
                 _isInit = false;
@@ -230,7 +230,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 SportId = Fixture.SportId;
                 _pageHeaderModel = new()
                 {
-                    Title = $"{TranslationState.GetValue(Fixture.SportName)} - {Fixture.SegmentName} - {Fixture.LeagueName}",
+                    Title = $"{_translationState.GetValue(Fixture.SportName)} - {Fixture.SegmentName} - {Fixture.LeagueName}",
                     IconClass = $"iconfont iconfont-{Fixture.SportName.ToLower().Replace(" ", "-")}",
                     ShowLanguageDropDown = false
                 };

@@ -1,7 +1,7 @@
 ﻿<div class="modal-body">
     <div class="row mb-3">
         <div class="col">
-            <label for="fromClient" class="form-label">@TranslationState.GetValue("From")</label>
+            <label for="fromClient" class="form-label">@_translationState.GetValue("From")</label>
             <select class="form-select" id="fromClient" @onchange="@(e => OnFromClientChangedEvent(e))">
                 @foreach (var item in Clients)
                 {
@@ -15,7 +15,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <label for="toClient" class="form-label">@TranslationState.GetValue("To")</label>
+            <label for="toClient" class="form-label">@_translationState.GetValue("To")</label>
             <select class="form-select" id="toClient" @onchange="OnToClientChangedEvent">
                 @foreach (var item in Clients)
                 {
@@ -29,6 +29,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" data-bs-dismiss="modal" @onclick="OnCancelModalClickEvent">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn btn-apply" @onclick="OnApplyModalClickEvent">@TranslationState.GetValue("Apply")</button>
+    <button type="button" class="btn modal-btn btn-cancel" data-bs-dismiss="modal" @onclick="OnCancelModalClickEvent">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn btn-apply" @onclick="OnApplyModalClickEvent">@_translationState.GetValue("Apply")</button>
 </div>

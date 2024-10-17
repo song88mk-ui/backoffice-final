@@ -68,13 +68,13 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     Clients.Add(new SelectListItemModel<string>
                     {
                         Value = "",
-                        Name = TranslationState.GetValue("No Clients Available")
+                        Name = _translationState.GetValue("No Clients Available")
                     });
                 }
 
                 SelectedClientCode = Clients.FirstOrDefault().Value;
 
-                var sports = (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString())).Result;
+                var sports = (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
 
                 if (sports != null)
                 {
@@ -187,7 +187,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             if (!string.IsNullOrEmpty(SelectedClientCode) && SelectedSportId != 0)
             {
-                var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId, TranslationState.ActiveLanguageCode)).Result;
+                var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId, _translationState.ActiveLanguageCode)).Result;
 
                 if(marketTemplateResponse != null)
                 {

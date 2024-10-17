@@ -31,11 +31,11 @@
                         <table class="table table-hover table-bordered mt-4">
                             <thead class="table-head">
                                 <tr>
-                                    <th class="th-no py-3">@TranslationState.GetValue("No.")</th>
-                                    <th class="th-username py-3">@TranslationState.GetValue("Username")</th>
-                                    <th class="th-status py-3">@TranslationState.GetValue("Status")</th>
-                                    <th class="th-user-group py-3">@TranslationState.GetValue("Usergroup")</th>
-                                    <th class="th-action py-3">@TranslationState.GetValue("Action")</th>
+                                    <th class="th-no py-3">@_translationState.GetValue("No.")</th>
+                                    <th class="th-username py-3">@_translationState.GetValue("Username")</th>
+                                    <th class="th-status py-3">@_translationState.GetValue("Status")</th>
+                                    <th class="th-user-group py-3">@_translationState.GetValue("Usergroup")</th>
+                                    <th class="th-action py-3">@_translationState.GetValue("Action")</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -88,7 +88,7 @@
                                     {
                                         <tr>
                                             <td colspan="5">
-                                                <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                                <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                             </td>
                                         </tr>
                                     }

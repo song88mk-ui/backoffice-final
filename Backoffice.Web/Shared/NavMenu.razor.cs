@@ -1,8 +1,10 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
+using Backoffice.Web.Models.Shared;
 using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.Metrics;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Shared
@@ -13,10 +15,8 @@ namespace Backoffice.Web.Shared
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
-        [Parameter] public PermissionCategory NavMenuAccess { get; set; }
-        [Parameter] public NavMenuModel? NavMenus { get; set; }
+        [Parameter] public NavMenuParameter NavMenuParameter { get; set; }
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
-        [Parameter] public string? Region { get; set; }
 
         #endregion
 
@@ -43,22 +43,11 @@ namespace Backoffice.Web.Shared
         #endregion
 
         #region Methods
-        protected override async Task OnInitializedAsync()
-        {
-            _page = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "");
-
-            var splitVal = _page.Split("/").FirstOrDefault();
-
-            if (splitVal != null && splitVal.Any() && Region != null)
-            {
-                var regions = new List<string>() { "HK", "SA" };
-                Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToUpper() : null;
-            }
-
-        }
 
         protected override async Task OnParametersSetAsync()
         {
+            _page = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "");
+
             if (!_userClaims.SequenceEqual(UserModel.Claims))
             {
                 _userClaims = new List<Claim>(UserModel.Claims);
@@ -69,11 +58,11 @@ namespace Backoffice.Web.Shared
                 _showSwitchAccess = categories != null && categories.Count > 1;
             }
 
-            if (_init || _navMenuAccess != NavMenuAccess || _languageCode != TranslationState.ActiveLanguageCode)
+            if (_init || _navMenuAccess != NavMenuParameter?.NavMenuAccess || _languageCode != _translationState.ActiveLanguageCode)
             {
                 _init = false;
-                _languageCode = TranslationState.ActiveLanguageCode;
-                _navMenuAccess = NavMenuAccess;
+                _languageCode = _translationState.ActiveLanguageCode;
+                _navMenuAccess = NavMenuParameter?.NavMenuAccess;
 
                 var categories = _userClaims?.Where(c => _access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
                 categories = categories?.Where(c => _permissionCategories.Contains(c)).ToList();
@@ -123,7 +112,7 @@ namespace Backoffice.Web.Shared
             {
                 _navMenus = new NavMenuModel()
                 {
-                    Menus = NavMenus?.Menus?.Select(x => new MenuModel()
+                    Menus = NavMenuParameter?.NavMenus?.Menus?.Select(x => new MenuModel()
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -134,11 +123,11 @@ namespace Backoffice.Web.Shared
                 };
             }
 
-            if (!_navMenus.Equals(NavMenus))
+            if (!_navMenus.Equals(NavMenuParameter?.NavMenus))
             {
                 _navMenus = new NavMenuModel()
                 {
-                    Menus = NavMenus?.Menus?.Select(x => new MenuModel()
+                    Menus = NavMenuParameter?.NavMenus?.Menus?.Select(x => new MenuModel()
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -212,7 +201,7 @@ namespace Backoffice.Web.Shared
 
                 if (slugs.Count != 1 && slugs[1].ToLower() != "monitoring")
                 {
-                    _navigationManager.NavigateTo($"/{Region}/odds-engine");
+                    _navigationManager.NavigateTo($"/hk/odds-engine");
                 }
 
                 await OnSportClickCallback.InvokeAsync(_selectedSport);

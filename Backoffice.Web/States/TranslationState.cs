@@ -13,30 +13,24 @@ namespace Backoffice.Web.States
         private readonly IJSRuntime _jsRuntime;
         public readonly List<LanguageCode> LanguageCodes;
 
-        private LanguageCode _activeLangCode;
-        public LanguageCode ActiveLanguageCode
-        {
-            get { return _activeLangCode; }
-            set
-            {
-                if (value != _activeLangCode || !Model.Any())
-                {
-                    _activeLangCode = value;
-                    ReloadModel();
-                }
-            }
-        }
+        public LanguageCode ActiveLanguageCode;
 
         public TranslationState(ITranslationService translationService, IJSRuntime jsRuntime) : base(new Dictionary<string, string>())
         {
             _translationService = translationService;
             _jsRuntime = jsRuntime;
+            ActiveLanguageCode = LanguageCode.EN;
             LanguageCodes = new List<LanguageCode> { LanguageCode.EN, LanguageCode.ZH, LanguageCode.KO };  //Enum.GetValues<LanguageCode>().Select(s => s).ToList();
 
             if (!Model.Any())
                 ReloadModel();
         }
 
+        public void SetLanguageCode(LanguageCode langCode)
+        {
+            ActiveLanguageCode = langCode;
+            ReloadModel();
+        }
         public string GetValue(string word)
         {
             if (string.IsNullOrEmpty(word))
@@ -52,7 +46,7 @@ namespace Backoffice.Web.States
             return translated.Replace("{", "").Replace("}", "");
         }
 
-        private async void ReloadModel() => Model = await _translationService.GetTranslationsAsync(_activeLangCode);
+        private async void ReloadModel() => Model = await _translationService.GetTranslationsAsync(ActiveLanguageCode);
         private string TransformPlaceHolder(string word, string placeholder, params object[] values)
         {
             var index = -1;

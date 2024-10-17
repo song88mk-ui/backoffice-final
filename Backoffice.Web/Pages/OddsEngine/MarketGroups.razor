@@ -39,9 +39,9 @@
                                     <th scope="col" class="th-checkbox">
                                         <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxSelectAllClickedEvent" />
                                     </th>
-                                    <th scope="col" class="text-start">@TranslationState.GetValue("Market Group Name")</th>
-                                    <th scope="col">@TranslationState.GetValue("Markets")</th>
-                                    <th scope="col">@TranslationState.GetValue("Manage")</th>
+                                    <th scope="col" class="text-start">@_translationState.GetValue("Market Group Name")</th>
+                                    <th scope="col">@_translationState.GetValue("Markets")</th>
+                                    <th scope="col">@_translationState.GetValue("Manage")</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -94,7 +94,7 @@
                     }
                     else
                     {
-                        <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                        <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                     }
                 }
             </div>

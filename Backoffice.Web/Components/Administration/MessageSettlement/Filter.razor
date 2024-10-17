@@ -16,7 +16,7 @@
                 </a>
                 <a href="javascript:void(0)" class="btn btn-filter px-3" @onclick="OnFilterClickEvent">
                     <i class="fa fa-filter me-1"></i>
-                    @TranslationState.GetValue("Filters")
+                    @_translationState.GetValue("Filters")
                 </a>
             </div>
         </div>
@@ -31,13 +31,13 @@
                 <div class="col-2 me-2">
                     <select class="form-select d-block" @onchange="OnSportChangedEvent">
                         <optgroup label="Sport">
-                            <option value="0" selected>@TranslationState.GetValue("All Sports")</option>
+                            <option value="0" selected>@_translationState.GetValue("All Sports")</option>
                         </optgroup>
                         @if (Sports != null && Sports.Any())
                         {
                             @foreach (var item in Sports)
                             {
-                                <option value="@item.Value" selected="@(item.Value == FilterModel.SportId)">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.SportId)">@_translationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -45,13 +45,13 @@
                 <div class="col-2 me-2">
                     <select class="form-select d-block" @onchange="OnSegmentChangedEvent">
                         <optgroup label="Segment">
-                            <option value="0" selected>@TranslationState.GetValue("All Segments")</option>
+                            <option value="0" selected>@_translationState.GetValue("All Segments")</option>
                         </optgroup>
                         @if (Segments != null && Segments.Any())
                         {
                             @foreach (var item in Segments)
                             {
-                                <option value="@item.Value" selected="@(item.Value == FilterModel.SegmentId)">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.SegmentId)">@_translationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -59,13 +59,13 @@
                 <div class="col-2 me-2">
                     <select class="form-select d-block" @onchange="OnLeagueChangedEvent">
                         <optgroup label="League">
-                            <option value="0" selected>@TranslationState.GetValue("All Leagues")</option>
+                            <option value="0" selected>@_translationState.GetValue("All Leagues")</option>
                         </optgroup>
                         @if (Leagues != null && Leagues.Any())
                         {
                             @foreach (var item in Leagues)
                             {
-                                <option value="@item.Value" selected="@(item.Value == FilterModel.LeagueId)">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.LeagueId)">@_translationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -79,7 +79,7 @@
                         {
                             @foreach (var item in Fixtures)
                             {
-                                <option value="@item.Value" selected="@(item.Value == FilterModel.FixtureId)">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.FixtureId)">@_translationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -90,7 +90,7 @@
                             <option value="0" selected>All Status</option>
                             @foreach (var item in Statuses)
                             {
-                                <option value="@item.Value" selected="@(item.Value == FilterModel.ToStatus)">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.ToStatus)">@_translationState.GetValue(item.Name)</option>
                             }
                         </optgroup>
                     </select>
@@ -100,12 +100,12 @@
                 <div class="col-2 me-2">
                     <select class="form-select d-block" @onchange="OnMarketChangedEvent">
                         <optgroup label="Market">
-                            <option value="0" selected>@TranslationState.GetValue("All Markets")</option>
+                            <option value="0" selected>@_translationState.GetValue("All Markets")</option>
                             @if (Markets != null && Markets.Any())
                             {
                                 @foreach (var item in Markets)
                                 {
-                                    <option value="@item.Value" selected="@(item.Value == FilterModel.MarketId)">@TranslationState.GetValue(item.Name)</option>
+                                    <option value="@item.Value" selected="@(item.Value == FilterModel.MarketId)">@_translationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -119,7 +119,7 @@
                             {
                                 @foreach (var item in Selections)
                                 {
-                                    <option value="@item.Value" selected="@(item.Value == FilterModel.SelectionId)">@TranslationState.GetValue(item.Name)</option>
+                                    <option value="@item.Value" selected="@(item.Value == FilterModel.SelectionId)">@_translationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -132,7 +132,7 @@
                     <input type="text" class="form-control" placeholder="Settled By" @bind-value="FilterModel.SettledBy" />
                 </div>
                 <div class="col-2 me-2">
-                    <button class="btn btn-search">@TranslationState.GetValue("Search")</button>
+                    <button class="btn btn-search">@_translationState.GetValue("Search")</button>
                 </div>
             </div>
         </div>

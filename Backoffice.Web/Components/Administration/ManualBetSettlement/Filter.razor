@@ -15,7 +15,7 @@
                 </button>
                 <button type="button" class="btn btn-filter px-4 py-2 me-3" @onclick="OnFilterClickEvent">
                     <i class="fa fa-filter me-3"></i>
-                    @TranslationState.GetValue("Filters")
+                    @_translationState.GetValue("Filters")
                 </button>
             </div>
         </div>
@@ -32,7 +32,7 @@
                     {
                         if (Clients.Count - 1 == SelectedClientCount)
                         {
-                            <span>@TranslationState.GetValue("All Clients") (@SelectedClientCount)</span>
+                            <span>@_translationState.GetValue("All Clients") (@SelectedClientCount)</span>
                         }
                         else
                         {
@@ -41,7 +41,7 @@
                     }
                     else
                     {
-                        <span>@TranslationState.GetValue("No Clients Available")</span>
+                        <span>@_translationState.GetValue("No Clients Available")</span>
                     }
                 </button>
                 @if (Clients.Any())
@@ -58,18 +58,18 @@
                     {
                         if (Sports.Count - 1 == SelectedSportCount)
                         {
-                            <span>@TranslationState.GetValue($"All Sports ({{{SelectedClientCount}}})")</span>
+                            <span>@_translationState.GetValue($"All Sports ({{{SelectedClientCount}}})")</span>
                         }
                         else
                         {
                             <span>
-                                @(SelectedSportCount == 1 ? TranslationState.GetValue(SelectedSportName) : TranslationState.GetValue($"Sports({{{SelectedSportCount}}})"))
+                                @(SelectedSportCount == 1 ? _translationState.GetValue(SelectedSportName) : _translationState.GetValue($"Sports({{{SelectedSportCount}}})"))
                             </span>
                         }
                     }
                     else
                     {
-                        <span>@TranslationState.GetValue("No sports Available")</span>
+                        <span>@_translationState.GetValue("No sports Available")</span>
                     }
                 </button>
                 @if (Sports.Any())
@@ -176,7 +176,7 @@
         </div>
 
         <div class="col-2">
-            <button type="button" class="btn filter-btn-search" @onclick="OnSearchButtonClickedEvent">@TranslationState.GetValue("Search")</button>
+            <button type="button" class="btn filter-btn-search" @onclick="OnSearchButtonClickedEvent">@_translationState.GetValue("Search")</button>
         </div>
     </div>
 } 

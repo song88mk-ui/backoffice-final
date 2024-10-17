@@ -46,7 +46,7 @@ namespace Backoffice.Web.Pages
 
                 if (Enum.TryParse(cookieValue, out LanguageCode langCode))
                 {
-                    TranslationState.ActiveLanguageCode = langCode;
+                    _translationState.SetLanguageCode(langCode);
                 }
             }
         }

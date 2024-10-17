@@ -11,6 +11,7 @@ namespace Backoffice.Web.Shared
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IHttpContextAccessor _httpContextAccessor { get; set; }
         [Parameter] public string DropDownButtonClassName { get; set; }
+        [Parameter] public EventCallback OnLanguageCodeChange { get; set; }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -23,15 +24,13 @@ namespace Backoffice.Web.Shared
 
         private async Task OnLanguageCodeChanged(string value)
         {
-            if (TranslationState.ActiveLanguageCode.ToString() == value)
+            if (_translationState.ActiveLanguageCode.ToString() == value)
                 return;
 
             if (Enum.TryParse(value, out LanguageCode langCode))
             {
-
-                TranslationState.ActiveLanguageCode = langCode;
+                _translationState.SetLanguageCode(langCode);
                 await JSRuntime.InvokeVoidAsync("setCookie","c-langCode", value, 30);
-                //_httpContextAccessor.HttpContext?.Session.SetString("c-langCode", value);
 
                 StateHasChanged();
             }

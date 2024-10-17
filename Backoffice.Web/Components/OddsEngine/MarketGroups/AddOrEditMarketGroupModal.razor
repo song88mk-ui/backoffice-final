@@ -1,7 +1,7 @@
 ﻿<div class="modal-body">
     <div class="row justify-content-centers align-content-center">
         <div class="col-3 text-center">
-            <span>@TranslationState.GetValue("Market Group Name")</span>
+            <span>@_translationState.GetValue("Market Group Name")</span>
         </div>
         <div class="col-7">
             <input class="form-control @(IsPreLoader ? "disable" : "")" type="text" id="marketGroupNameField" aria-label="Market Group Name Field"
@@ -10,6 +10,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnModalCancelEvent" disabled="@IsPreLoader">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn modal-save" @onclick="OnModalSaveEvent" disabled="@IsPreLoader">@TranslationState.GetValue("Save")</button>
+    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnModalCancelEvent" disabled="@IsPreLoader">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn modal-save" @onclick="OnModalSaveEvent" disabled="@IsPreLoader">@_translationState.GetValue("Save")</button>
 </div>

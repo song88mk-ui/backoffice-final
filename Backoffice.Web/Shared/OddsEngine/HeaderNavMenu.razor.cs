@@ -2,6 +2,8 @@
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using Newtonsoft.Json.Bson;
+using System.Security.Claims;
 
 namespace Backoffice.Web.Shared.OddsEngine
 {
@@ -24,6 +26,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         private bool _showMarketSettingsMenu;
         private bool _init = true;
         private bool _shouldRender;
+        private List<Claim> _userClaims = new();
 
         #endregion
 
@@ -31,8 +34,14 @@ namespace Backoffice.Web.Shared.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            _navigationManager.LocationChanged += HandleLocationChanged;
+            //_navigationManager.LocationChanged += HandleLocationChanged;
+            _translationState.PropertyChanged += async (s, e) =>
+            {
+                _shouldRender = true;
+                await InvokeAsync(StateHasChanged);
+            };
         }
+
 
         protected override async Task OnParametersSetAsync()
         {
@@ -40,6 +49,8 @@ namespace Backoffice.Web.Shared.OddsEngine
 
             if (_shouldRender)
             {
+                _userClaims = UserModel.Claims;
+
                 var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
 
                 _activePage = page;
@@ -124,12 +135,12 @@ namespace Backoffice.Web.Shared.OddsEngine
         {
             var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
 
-            return _init || _activePage != page;
+            return _init || _activePage != page || _userClaims.SequenceEqual(UserModel.Claims);
         }
 
         public void Dispose()
         {
-            _navigationManager.LocationChanged -= HandleLocationChanged;
+            //_navigationManager.LocationChanged -= HandleLocationChanged;
         }
 
         #endregion
@@ -144,8 +155,11 @@ namespace Backoffice.Web.Shared.OddsEngine
 
         private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
         {
-            var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
-            ActivateMenu(page);
+            //var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
+            //ActivateMenu(page);
+        }
+        private void HandleLanguageCHanged()
+        {
         }
 
         #endregion

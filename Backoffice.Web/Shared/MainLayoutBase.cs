@@ -27,7 +27,7 @@ namespace Backoffice.Web.Shared
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] public IPreRenderService PreRenderService { get; set; }
-        [Inject] public TranslationState TranslationState { get; set; }
+        [Inject] public TranslationState _translationState { get; set; }
 
         public SportClickCallbackModel SelectedSport { get; set; }
 
@@ -318,7 +318,7 @@ namespace Backoffice.Web.Shared
 
         public void Dispose()
         {
-            TranslationState.PropertyChanged -= async (s, e) => await InvokeAsync(StateHasChanged);
+            _translationState.PropertyChanged -= async (s, e) => await InvokeAsync(StateHasChanged);
 
             toasterService.Dispose();
             _toasterService.Dispose();

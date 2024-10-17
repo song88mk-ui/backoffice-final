@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
+using Backoffice.Web.Models.Shared;
 using Backoffice.Web.Services;
 using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
@@ -21,7 +22,7 @@ namespace Backoffice.Web.Shared
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] IBackofficeService BackofficeService { get; set; }
-        [Inject] public TranslationState TranslationState { get; set; }
+        [Inject] public TranslationState _translationState { get; set; }
         [Inject] public PageState PageState { get; set; }
         [Inject] public ToastService ToasterService { get; set; }
 
@@ -29,6 +30,7 @@ namespace Backoffice.Web.Shared
         public NavMenuModel NavMenus { get; set; } = new NavMenuModel();
         public bool IsPreloader { get; set; }
         public string InlineSpinnerCss { get; set; } = "width:10rem;height:10rem;";
+        public NavMenuParameter NavMenuParameter { get; set; }
 
         private static readonly Dictionary<string, string> PermissionMap = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
         {
@@ -62,7 +64,7 @@ namespace Backoffice.Web.Shared
         {
             try
             {
-                TranslationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
+                _translationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
 
                 if (HttpContextAccessor?.HttpContext?.Session.GetString("UserToken") == null)
                 {
@@ -131,6 +133,7 @@ namespace Backoffice.Web.Shared
                     return;
                 }
 
+                var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
                 if (userClaims != null)
                 {
                     var permissionSubCategory = permissions.Permissions.Where(p => p.CategoryId == (int)navMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.')).Select(s => s.SubCategoryName).Distinct();
@@ -220,10 +223,14 @@ namespace Backoffice.Web.Shared
                                 NavMenus.Menus.Add(menu);
                         }
                     }
-
                 }
 
-                var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+                NavMenuParameter = new NavMenuParameter()
+                {
+                    NavMenuAccess = page.Contains("/admin") ? PermissionCategory.Admin : PermissionCategory.SBC,
+                    NavMenus = NavMenus
+                };
+
                 var splitVal = page.Split("/").FirstOrDefault();
 
                 if (splitVal != null)

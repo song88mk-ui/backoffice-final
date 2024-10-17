@@ -152,7 +152,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             Name = c.ClientName
         }).ToList();
 
-        private async Task<List<SelectListItemModel<int>>> GetSports() => (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString())).Result.SportLookup.Select(c => new SelectListItemModel<int>()
+        private async Task<List<SelectListItemModel<int>>> GetSports() => (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result.SportLookup.Select(c => new SelectListItemModel<int>()
         {
             Value = c.SportId,
             Name = c.SportName

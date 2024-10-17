@@ -3,17 +3,17 @@
         <div class="input-container d-flex">
             <div class="me-4">
                 <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
-                    <InputText id="search" placeholder=@TranslationState.GetValue("Search") class="form-control search-text valid" @bind-Value="SearchForm.SearchText" />
+                    <InputText id="search" placeholder=@_translationState.GetValue("Search") class="form-control search-text valid" @bind-Value="SearchForm.SearchText" />
                 </EditForm>
             </div>
         </div>
         <div class="button-container d-flex flex-row-reverse align-items-end">
             <AuthorizeView Policy="sbc-subusers-canedit">
                 <Authorized Context="ActivateAll">
-                    <a href="javascript:void(0)" class="btn btn-create px-4" @onclick="OnCreateSubUserClickEvent">@TranslationState.GetValue("Create Sub User")</a>
+                    <a href="javascript:void(0)" class="btn btn-create px-4" @onclick="OnCreateSubUserClickEvent">@_translationState.GetValue("Create Sub User")</a>
                 </Authorized>
                 <NotAuthorized Context="ActivateAll">
-                    <a href="javascript:void(0)" class="btn btn-create px-4" disabled>@TranslationState.GetValue("Create Sub User")</a>
+                    <a href="javascript:void(0)" class="btn btn-create px-4" disabled>@_translationState.GetValue("Create Sub User")</a>
                 </NotAuthorized>
             </AuthorizeView>
         </div>

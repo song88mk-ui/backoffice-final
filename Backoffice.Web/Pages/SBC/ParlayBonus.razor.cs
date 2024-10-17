@@ -182,7 +182,7 @@ namespace Backoffice.Web.Pages.SBC
 
             if (result.StatusCode == Backoffice.Shared.Enums.StatusCode.Success)
             {
-                ToastMessage = TranslationState.GetValue("Parlay bonus updated!");
+                ToastMessage = _translationState.GetValue("Parlay bonus updated!");
             }
             else
             {
@@ -295,7 +295,7 @@ namespace Backoffice.Web.Pages.SBC
                 Clients.Add(new SelectListItemModel<Client>
                 {
                     Value = new Client(),
-                    Name = TranslationState.GetValue("No Clients Available")
+                    Name = _translationState.GetValue("No Clients Available")
                 });
             else
                 Clients.Insert(0, new SelectListItemModel<Client> { Value = new Client(), Name = "Choose client" });

@@ -32,7 +32,7 @@
                                             <th>#</th>
                                             <th>Date and Time</th>
                                             <th>Bet ID</th>
-                                            <th>@TranslationState.GetValue("Sports")</th>
+                                            <th>@_translationState.GetValue("Sports")</th>
                                             <th>Message Settled</th>
                                             <th>Settled By</th>
                                             <th>Date Settled</th>
@@ -60,7 +60,7 @@
                                                         @item.BetId
                                                     </td>
                                                     <td>
-                                                        @TranslationState.GetValue(item.Sports)
+                                                        @_translationState.GetValue(item.Sports)
                                                     </td>
                                                     <td>
                                                         @item.MessagesSettled
@@ -82,7 +82,7 @@
                                         {
                                             <tr>
                                                 <td colspan="8">
-                                                    <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                                    <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                                 </td>
                                             </tr>
                                         }

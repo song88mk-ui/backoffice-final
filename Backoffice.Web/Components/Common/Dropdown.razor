@@ -6,16 +6,16 @@
             {
                 if (_items.Count - 1 == _selectedCount)
                 {
-                    <span>@TranslationState.GetValue($"All {DropdownName}") (@_selectedCount)</span>
+                    <span>@_translationState.GetValue($"All {DropdownName}") (@_selectedCount)</span>
                 }
                 else
                 {
-                    <span>@(_selectedCount == 1 ? _selectedName : $"{TranslationState.GetValue(DropdownName)} ({_selectedCount})")</span>
+                    <span>@(_selectedCount == 1 ? _selectedName : $"{_translationState.GetValue(DropdownName)} ({_selectedCount})")</span>
                 }
             }
             else
             {
-                <span>@TranslationState.GetValue($"No {DropdownName} Available")</span>
+                <span>@_translationState.GetValue($"No {DropdownName} Available")</span>
             }
         </button>
         @if (_items.Any())

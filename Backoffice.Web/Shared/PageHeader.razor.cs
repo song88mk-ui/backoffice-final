@@ -13,6 +13,12 @@ namespace Backoffice.Web.Shared
         private bool _showLanguageDropdown;
 
         //private int counter;
+        protected override void OnInitialized() =>
+            _translationState.PropertyChanged += async (s, e) =>
+            {
+                //await InvokeAsync(StateHasChanged);
+                StateHasChanged();
+            };
 
         protected override void OnParametersSet()
         {

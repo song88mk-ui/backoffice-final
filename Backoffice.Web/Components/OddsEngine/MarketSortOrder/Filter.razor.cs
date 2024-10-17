@@ -73,11 +73,11 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                 Clients.Add(new SelectListItemModel<string>
                 {
                     Value = "",
-                    Name = TranslationState.GetValue("No Clients Available")
+                    Name = _translationState.GetValue("No Clients Available")
                 });
             }
 
-            var sports = (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString())).Result;
+            var sports = (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
 
             if (sports != null)
             {

@@ -58,17 +58,17 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             if (_shouldRender)
             {
-                _languageCode = TranslationState.ActiveLanguageCode;
-                _calculatingText = $"{TranslationState.GetValue("Calculating")}...";
+                _languageCode = _translationState.ActiveLanguageCode;
+                _calculatingText = $"{_translationState.GetValue("Calculating")}...";
 
                 _currentMenu = ParamModel.SelectedNavMenu;
                 _myTemplateCount = ParamModel.MyTemplatesCount;
                 _assignedCount = ParamModel.AssignedLeaguesCount;
                 _unAssignedCount = ParamModel.UnAssignedLeaguesCount;
 
-                _myTemplateText = $"{TranslationState.GetValue("My Templates")} ({(_myTemplateCount > 0 ? _myTemplateCount : _calculatingText)})";
-                _unAssignedText = $"{TranslationState.GetValue("UnAssigned")} ({(_unAssignedCount > 0 ? _unAssignedCount : _calculatingText)})";
-                _assignedText = $"{TranslationState.GetValue("Assigned")} ({(_assignedCount > 0 ? _assignedCount : _calculatingText)})";
+                _myTemplateText = $"{_translationState.GetValue("My Templates")} ({(_myTemplateCount > 0 ? _myTemplateCount : _calculatingText)})";
+                _unAssignedText = $"{_translationState.GetValue("UnAssigned")} ({(_unAssignedCount > 0 ? _unAssignedCount : _calculatingText)})";
+                _assignedText = $"{_translationState.GetValue("Assigned")} ({(_assignedCount > 0 ? _assignedCount : _calculatingText)})";
 
                 _myTemplateCss = _currentMenu == ConfigTemplateNavMenu.MyTemplates ? "config-nav active" : "config-nav";
                 _unAssignedCss = _currentMenu == ConfigTemplateNavMenu.UnAssigned ? "config-nav active" : "config-nav";
@@ -91,7 +91,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task HandleCopyClientSettingsSelect() => await OnCopyClientSelect.InvokeAsync();
 
-        public bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode || ParamModel.MyTemplatesCount != _myTemplateCount || ParamModel.AssignedLeaguesCount != _assignedCount || ParamModel.UnAssignedLeaguesCount != _unAssignedCount || _currentMenu != ParamModel.SelectedNavMenu;
+        public bool ValidateParameters() => _init || _languageCode != _translationState.ActiveLanguageCode || ParamModel.MyTemplatesCount != _myTemplateCount || ParamModel.AssignedLeaguesCount != _assignedCount || ParamModel.UnAssignedLeaguesCount != _unAssignedCount || _currentMenu != ParamModel.SelectedNavMenu;
 
         public void Dispose()
         {

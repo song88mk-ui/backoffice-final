@@ -26,7 +26,7 @@
                         {
                             @if (!ClientParlayBonusModel.ParlayBonusConfig.Any())
                             {
-                                <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                             }
                             else
                             {
@@ -35,10 +35,10 @@
                                         <tr>
                                             <th class="th-number py-3">No. of Selections</th>
                                             <th class="th-parlay-bonus py-3">
-                                                <span>@TranslationState.GetValue("Parlay Bonus")</span>
+                                                <span>@_translationState.GetValue("Parlay Bonus")</span>
                                                 <i class="tooltip2 fa fa-info-circle ms-5">
                                                     <span class="tooltiptext">
-                                                        @TranslationState.GetValue("minimum value"): 0.01
+                                                        @_translationState.GetValue("minimum value"): 0.01
                                                         <br />
                                                         Maximum Value: 5000
                                                     </span>

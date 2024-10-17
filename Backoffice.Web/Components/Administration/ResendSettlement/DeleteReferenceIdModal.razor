@@ -8,11 +8,11 @@
             <br />
             reference ID <span class="fw-bold">@Bet.Bet.BetId.ToString().ToUpper()</span>
             <br />
-            @TranslationState.GetValue("Please be certain as this cannot be undone")
+            @_translationState.GetValue("Please be certain as this cannot be undone")
         </div>
     </div>
 </div>
 <div class="modal-footer">
-    <button class="btn modal-btn modal-cancel" type="button" @onclick="OnModalCancel">@TranslationState.GetValue("Cancel")</button>
-    <button class="btn modal-btn modal-delete" type="button" @onclick="OnModalDelete">@TranslationState.GetValue("Delete")</button>
+    <button class="btn modal-btn modal-cancel" type="button" @onclick="OnModalCancel">@_translationState.GetValue("Cancel")</button>
+    <button class="btn modal-btn modal-delete" type="button" @onclick="OnModalDelete">@_translationState.GetValue("Delete")</button>
 </div>

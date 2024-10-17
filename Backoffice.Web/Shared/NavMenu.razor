@@ -2,7 +2,7 @@
 @using Backoffice.Shared.Enums
 @using Backoffice.Web.Utilities
 
-@if (NavMenuAccess == PermissionCategory.SBC || NavMenuAccess == PermissionCategory.Admin)
+@if (_navMenuAccess == PermissionCategory.SBC || _navMenuAccess == PermissionCategory.Admin)
 {
     <div class="top-row ps-3 navbar">
         <div class="container-fluid">
@@ -10,7 +10,7 @@
         </div>
     </div>
 }
-else if (NavMenuAccess == PermissionCategory.OE)
+else if (_navMenuAccess == PermissionCategory.OE)
 {
     <div class="top-row navbar">
         <div class="container-fluid justify-content-start">
@@ -24,7 +24,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
 
 <div class="middle-bottom-row d-flex flex-column justify-content-between">
     <div class="middle-row mt-3" @onclick="() => collapseNavMenu = !collapseNavMenu">
-        @if (NavMenuAccess == PermissionCategory.Admin || NavMenuAccess == PermissionCategory.SBC)
+        @if (_navMenuAccess == PermissionCategory.Admin || _navMenuAccess == PermissionCategory.SBC)
         {
             <nav class="flex-column">
 
@@ -37,7 +37,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
                             <div class="nav-item px-3">
                                 <NavLink class="nav-link collapsed" data-bs-toggle="collapse" href="@menu.Url" role="button" aria-expanded="false" aria-controls="@menu.Id">
                                     <span class="ico ico-@(menu.IconName)" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">@TranslationState.GetValue(menu.Name)</span>
+                                    <span class="nav-menu-text">@_translationState.GetValue(menu.Name)</span>
                                     <span class="fa fa-chevron-right"></span>
                                 </NavLink>
                                 <div class="sub-menu collapse" id="@menu.Id">
@@ -47,7 +47,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
                                         <div class="nav-item">
                                             <NavLink class="nav-link" href="@submenu.Url">
                                                 <span class="ico ico-@(submenu.IconName)" aria-hidden="true"></span>
-                                                <span class="nav-menu-text">@TranslationState.GetValue(submenu.Name)</span>
+                                                <span class="nav-menu-text">@_translationState.GetValue(submenu.Name)</span>
                                             </NavLink>
                                         </div>
                                     }
@@ -60,7 +60,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
                             <div class="nav-item px-3">
                                 <NavLink class="nav-link" href="@menu.Url">
                                     <span class="ico ico-@(menu.IconName)" aria-hidden="true"></span>
-                                    <span class="nav-menu-text">@TranslationState.GetValue(menu.Name)</span>
+                                    <span class="nav-menu-text">@_translationState.GetValue(menu.Name)</span>
                                 </NavLink>
                             </div>
                         }
@@ -75,13 +75,13 @@ else if (NavMenuAccess == PermissionCategory.OE)
                 </div>*@
             </nav>
         }
-        else if (NavMenuAccess == PermissionCategory.OE)
+        else if (_navMenuAccess == PermissionCategory.OE)
         {
             <nav class="flex-column">
                 <div class="nav-item px-3">
                     <NavLink class="nav-link header" href="javascript:void(0);">
                         <span class="fa fa-trophy all-sports" aria-hidden="true"></span>
-                        <span class="nav-menu-text">@TranslationState.GetValue("All Sports")</span>
+                        <span class="nav-menu-text">@_translationState.GetValue("All Sports")</span>
                     </NavLink>
                 </div>
                 @if (_menu != null && _menu.Sports.Any())
@@ -91,7 +91,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
                         <div class="nav-item px-3">
                             <NavLink class="nav-link" @onclick="_ => OnSportClickEvent(sport.SportId)">
                                 <span class="@($"iconfont iconfont-{Utility.GetSportIcon(sport.SportId)}")" aria-hidden="true"></span>
-                                <span class="nav-menu-text">@TranslationState.GetValue(sport.SportName)</span>
+                                <span class="nav-menu-text">@_translationState.GetValue(sport.SportName)</span>
                                 <span class="@(sport.SportId == _selectedSport.SportId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
                             </NavLink>
                             @if (sport.SportId == _selectedSport.SportId)
@@ -139,7 +139,7 @@ else if (NavMenuAccess == PermissionCategory.OE)
             </NavLink>
             </div>*@
             <div class="nav-item px-3 pb-1">
-                <span class="nav-item-header">@TranslationState.GetValue("PROFILE")</span>
+                <span class="nav-item-header">@_translationState.GetValue("PROFILE")</span>
             </div>
             <div class="nav-item info mx-3 pb-1 mb-3 d-flex justify-content-between">
                 <NavLink class="nav-link account ps-0" href="javascript:void(0)">
@@ -155,14 +155,14 @@ else if (NavMenuAccess == PermissionCategory.OE)
                 <div class="nav-item px-3">
                     <NavLink class="nav-link switch-access justify-content-center" href="choose-access">
                         <span class="ico ico-switch-access" aria-hidden="true"></span>
-                        <span class="const-menu-item nav-menu-text">@TranslationState.GetValue("Switch Access")</span>
+                        <span class="const-menu-item nav-menu-text">@_translationState.GetValue("Switch Access")</span>
                     </NavLink>
                 </div>
             }
             <div class="nav-item px-3">
                 <NavLink class="nav-link logout justify-content-center" href="javascript:void(0)" @onclick="OnLogoutClickEvent">
                     <span class="ico ico-logout" aria-hidden="true"></span>
-                    <span class="const-menu-item nav-menu-text">@TranslationState.GetValue("Logout")</span>
+                    <span class="const-menu-item nav-menu-text">@_translationState.GetValue("Logout")</span>
                 </NavLink>
             </div>
         </nav>

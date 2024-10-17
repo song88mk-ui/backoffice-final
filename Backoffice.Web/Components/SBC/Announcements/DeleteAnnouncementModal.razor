@@ -8,8 +8,8 @@
         <span class="bold-text">Delete Announcement?</span>
         <span class="sub-text">Are you sure you want to delete this? Please be certain as this action cannot be undone.</span>
         <div class="btns-container">
-            <button type="button" class="btn modal-btn modal-cancel" disabled="@_isPreload" @onclick="OnCancelModalClick">@TranslationState.GetValue("Cancel")</button>
-            <button type="button" class="btn modal-btn modal-delete" disabled="@_isPreload" @onclick="OnDeleteModalClick">@TranslationState.GetValue("Delete")</button>
+            <button type="button" class="btn modal-btn modal-cancel" disabled="@_isPreload" @onclick="OnCancelModalClick">@_translationState.GetValue("Cancel")</button>
+            <button type="button" class="btn modal-btn modal-delete" disabled="@_isPreload" @onclick="OnDeleteModalClick">@_translationState.GetValue("Delete")</button>
         </div>
     }
     @if (_alert != null && string.IsNullOrEmpty(_alert.Message))

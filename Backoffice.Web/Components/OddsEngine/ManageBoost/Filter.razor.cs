@@ -68,9 +68,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 _region = Region.ToUpper();
                 TradingService.Region = _region;
             }
-            if (_languageCode != TranslationState.ActiveLanguageCode)
+            if (_languageCode != _translationState.ActiveLanguageCode)
             {
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
 
                 _sports = await LoadSports();
                 SelectedSportId = 0;

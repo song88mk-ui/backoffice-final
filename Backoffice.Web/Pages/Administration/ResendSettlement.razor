@@ -25,7 +25,7 @@
                                         <th class="th-reference-id py-3">Reference ID</th>
                                         <th class="th-event-details py-3">Event Details</th>
                                         <th class="th-bet-date py-3">Bet Date</th>
-                                        <th class="th-status py-3">@TranslationState.GetValue("Status")</th>
+                                        <th class="th-status py-3">@_translationState.GetValue("Status")</th>
                                         <th class="th-reason py-3">Reason</th>
                                         <th class="th-action py-3">
                                             <button type="button" class="btn link-add-row" @onclick="OnAddRowClickEvent" disabled="@IsAddDisabled">
@@ -78,7 +78,7 @@
                     <div class="col-md-12">
                         <div class="d-flex flex-row-reverse mx-3 pt-4 border-top">
                             <button type="button" class="btn btn-settlement px-4 py-2" @onclick="OnResendSettlementClickEvent" disabled="@((ResendSettlementModel.Any() && !ResendSettlementModel.Any(x => !x.Bet.BetSelections.Any())) ? false : true)">Resend Settlement</button>
-                            <button type="button" class="btn btn-reset me-3 px-4 py-2" @onclick="OnResetSettlementClickEvent">@TranslationState.GetValue("Reset")</button>
+                            <button type="button" class="btn btn-reset me-3 px-4 py-2" @onclick="OnResetSettlementClickEvent">@_translationState.GetValue("Reset")</button>
                         </div>
                     </div>
                 </div>

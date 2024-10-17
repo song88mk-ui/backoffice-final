@@ -58,7 +58,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
                 Clients.Add(new SelectListItemModel<string>
                 {
                     Value = "",
-                    Name = TranslationState.GetValue("No Clients Available")
+                    Name = _translationState.GetValue("No Clients Available")
                 });
             }
         }

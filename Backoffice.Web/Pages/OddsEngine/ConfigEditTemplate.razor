@@ -32,8 +32,8 @@
             <div class="d-flex align-items-center">
                 @if (!View)
                 {
-                    <button type="button" class="btn btn-cancel mx-1" @onclick="OnCancelMarginTemplate">@TranslationState.GetValue("Cancel")</button>
-                    <button type="button" class="btn btn-save mx-1" disabled="@(!(_hasChanges || _isNameChanges) || _isPreloader || _isProcessing || _isEdttingName)" @onclick="OnSaveMarginTemplate">@TranslationState.GetValue("Save Changes")</button>
+                    <button type="button" class="btn btn-cancel mx-1" @onclick="OnCancelMarginTemplate">@_translationState.GetValue("Cancel")</button>
+                    <button type="button" class="btn btn-save mx-1" disabled="@(!(_hasChanges || _isNameChanges) || _isPreloader || _isProcessing || _isEdttingName)" @onclick="OnSaveMarginTemplate">@_translationState.GetValue("Save Changes")</button>
                 }
             </div>
         </div>
@@ -53,8 +53,8 @@
                 </div>
 
                 <div class="card-desc">
-                    <label class="fw-bold">@TranslationState.GetValue("Sport")</label>
-                    <label>@TranslationState.GetValue(_sportName)</label>
+                    <label class="fw-bold">@_translationState.GetValue("Sport")</label>
+                    <label>@_translationState.GetValue(_sportName)</label>
                 </div>
             </div>
 
@@ -64,8 +64,8 @@
                 </div>
 
                 <div class="card-desc">
-                    <label class="fw-bold">@TranslationState.GetValue("Scope")</label>
-                    <label>@TranslationState.GetValue(_scope)</label>
+                    <label class="fw-bold">@_translationState.GetValue("Scope")</label>
+                    <label>@_translationState.GetValue(_scope)</label>
                 </div>
             </div>
         </div>
@@ -102,7 +102,7 @@
         }
         else
         {
-            <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+            <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
         }
     }
 

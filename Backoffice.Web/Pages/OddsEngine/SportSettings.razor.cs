@@ -73,9 +73,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         protected override async Task OnParametersSetAsync()
         {
-            if(_languageCode != TranslationState.ActiveLanguageCode)
+            if(_languageCode != _translationState.ActiveLanguageCode)
             {
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
                 await GetSports();
             }
         }
@@ -131,7 +131,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isPreload = true;
             if (!_sportLookupSettings.Any())
             {
-                var sportLookupResponse = await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString());
+                var sportLookupResponse = await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
 
                 await Task.WhenAll(_leagueLookupTask, _segmentLookupTask);
                 var leagueLookupResponse = _leagueLookupTask.Result.Result;

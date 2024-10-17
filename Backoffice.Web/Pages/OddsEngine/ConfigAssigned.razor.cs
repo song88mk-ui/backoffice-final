@@ -68,9 +68,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (_shouldRender)
             {
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
                 _selectedClientName = string.Empty;
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
                 _backofficeService.LanguageCode = _languageCode;
                 _state = State;
 
@@ -99,7 +99,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         protected override bool ShouldRender() => _shouldRender;
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
-        private bool ValidateParameters() => _init || State != _state || _languageCode != TranslationState.ActiveLanguageCode;
+        private bool ValidateParameters() => _init || State != _state || _languageCode != _translationState.ActiveLanguageCode;
 
         public async Task HandleClientCheckboxClick(Dictionary<string, string> items)
         {

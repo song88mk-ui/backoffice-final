@@ -29,9 +29,9 @@
                     <table class="table table-bordered mt-3">
                         <thead>
                             <tr>
-                                <th><strong>@TranslationState.GetValue("Client name")</strong></th>
-                                <th><strong>% @TranslationState.GetValue("Cap of Current Odds from Boosted Odds")</strong></th>
-                                <th><strong>@TranslationState.GetValue("Manage")</strong></th>
+                                <th><strong>@_translationState.GetValue("Client name")</strong></th>
+                                <th><strong>% @_translationState.GetValue("Cap of Current Odds from Boosted Odds")</strong></th>
+                                <th><strong>@_translationState.GetValue("Manage")</strong></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -57,7 +57,7 @@
                                 {
                                     <tr>
                                         <td colspan="3">
-                                            <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                            <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                         </td>
                                     </tr>
                                 }

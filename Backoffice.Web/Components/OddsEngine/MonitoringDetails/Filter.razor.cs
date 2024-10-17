@@ -74,10 +74,10 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         }
         protected override async Task OnParametersSetAsync()
         {
-            if (_sportId != SportId || _languageCode != TranslationState.ActiveLanguageCode)
+            if (_sportId != SportId || _languageCode != _translationState.ActiveLanguageCode)
             {
                 _sportId = SportId;
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
 
                 var mainMarketTemplateResponse = await BackofficeService.GetTopMarkets(_sportId, _languageCode);
 

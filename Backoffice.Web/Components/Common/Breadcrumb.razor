@@ -6,7 +6,7 @@
         <i class="fa fa-chevron-right"></i>
     </span>
     <a href=@($"hk/odds-engine") class="me-1 text-decoration-none">
-        @TranslationState.GetValue("Odds Engine")
+        @_translationState.GetValue("Odds Engine")
     </a>
     @if (Breadcrumbs != null && Breadcrumbs.Any())
     {
@@ -18,13 +18,13 @@
             if (!string.IsNullOrEmpty(model.Url))
             {
                 <a href="@model.Url" class="me-1 text-decoration-none @(model.IsCurrentPage ? "link-page" : string.Empty)">
-                    @TranslationState.GetValue(model.Name)
+                    @_translationState.GetValue(model.Name)
                 </a>
             }
             else
             {
                 <span class="me-1 @(model.IsCurrentPage ? "link-page" : string.Empty)">
-                    @TranslationState.GetValue(model.Name)
+                    @_translationState.GetValue(model.Name)
                 </span>
             }
         }

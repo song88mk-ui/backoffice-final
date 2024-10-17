@@ -2,20 +2,20 @@
     <div class="w-100 d-flex flex-row justify-content-between">
         <div class="input-container d-flex">
             <div class="me-4">
-                <label class="form-label d-block">@TranslationState.GetValue("Client")</label>
+                <label class="form-label d-block">@_translationState.GetValue("Client")</label>
                 @if (Clients.Any())
                 {
                     <select class="form-control form-select mr-sm-2" @onchange="OnClientChangedEvent" disabled="@IsDisableAction">
                         @foreach (var item in Clients)
                         {
-                            <option value="@item.Value.ClientId" selected=@(item.Value.ClientId.ToString() == ClientId)>@TranslationState.GetValue(item.Name)</option>
+                            <option value="@item.Value.ClientId" selected=@(item.Value.ClientId.ToString() == ClientId)>@_translationState.GetValue(item.Name)</option>
                         }
                     </select>
                 }
             </div>
             <div class="odds-container d-flex justify-content-center align-self-end">
                 <div class="input-group border-0">
-                    <span class="input-group-text min-odds-text">@TranslationState.GetValue("Minimum Odds Per Selection")</span>
+                    <span class="input-group-text min-odds-text">@_translationState.GetValue("Minimum Odds Per Selection")</span>
                     @*     @if (IsEdit)
                     { *@
                     <input type="number" @ref="ParlayBonusMinOddsElementReference" @bind="ClientParlayBonusResponse.ParlayBonusMinOdds"
@@ -26,7 +26,7 @@
                     <input type="number" @bind="@ClientParlayBonusResponse.ParlayBonusMinOdds" @bind:event="oninput" class="form-control pe-5 min-odds-input text-center" disabled />
                     } *@
                     <span class="tooltip2 fa fa-info-circle me-2">
-                        <span class="tooltiptext">@TranslationState.GetValue("minimum value"): 1.20</span>
+                        <span class="tooltiptext">@_translationState.GetValue("minimum value"): 1.20</span>
                     </span>
                 </div>
             </div>
@@ -37,33 +37,33 @@
                     <!-- Update -->
                     @if (IsEdit)
                     {
-                        <button type="button" class="btn btn-cancel px-4 py-2 me-2" @onclick="OnCancelClickEvent" disabled="@IsDisableAction">@TranslationState.GetValue("Cancel")</button>
-                        <button type="button" class="btn btn-save px-4 py-2 me-2" @onclick="OnSaveClickEvent" id="saveChangesBtn" disabled="@(IsSaveDisabled || IsDisableAction)">@TranslationState.GetValue("Save Changes")</button>
+                        <button type="button" class="btn btn-cancel px-4 py-2 me-2" @onclick="OnCancelClickEvent" disabled="@IsDisableAction">@_translationState.GetValue("Cancel")</button>
+                        <button type="button" class="btn btn-save px-4 py-2 me-2" @onclick="OnSaveClickEvent" id="saveChangesBtn" disabled="@(IsSaveDisabled || IsDisableAction)">@_translationState.GetValue("Save Changes")</button>
 
                         @if (ClientParlayBonusResponse.ParlayBonusConfig.Any())
                         {
                             @if (ClientParlayBonusResponse.ParlayBonusConfig.Last().ParlayBonus == 0 || ClientParlayBonusResponse.ParlayBonusConfig.Count >= 50)
                             {
-                                <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" disabled id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference">@TranslationState.GetValue("Add")</button>
+                                <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" disabled id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference">@_translationState.GetValue("Add")</button>
                             }
                             else
                             {
-                                <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference" disabled="@IsDisableAction">@TranslationState.GetValue("Add")</button>
+                                <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference" disabled="@IsDisableAction">@_translationState.GetValue("Add")</button>
                             }
                         }
                         else
                         {
-                            <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference" disabled="@IsDisableAction">@TranslationState.GetValue("Add")</button>
+                            <button type="button" class="btn btn-add px-4 py-2 me-2" @onclick="OnAddClickEvent" id="filterAddBtn" @onmouseover="FilterAddBtnOnMouseover" @ref="FilterAddButtonElementReference" disabled="@IsDisableAction">@_translationState.GetValue("Add")</button>
                         }
                     }
                     else
                     {
-                        <button type="button" class="btn btn-update px-4 py-2" @onclick="OnUpdateClickEvent" disabled="@(ClientId == "0")">@TranslationState.GetValue("Update")</button>
+                        <button type="button" class="btn btn-update px-4 py-2" @onclick="OnUpdateClickEvent" disabled="@(ClientId == "0")">@_translationState.GetValue("Update")</button>
                     }
                 </Authorized>
                 <NotAuthorized Context="ActivateAll">
-                    <button type="button" class="btn btn-cancel px-4 py-2 me-2" disabled>@TranslationState.GetValue("Cancel")</button>
-                    <button type="button" class="btn btn-save px-4 py-2 me-2" id="saveChangesBtn" disabled>@TranslationState.GetValue("Save Changes")</button>
+                    <button type="button" class="btn btn-cancel px-4 py-2 me-2" disabled>@_translationState.GetValue("Cancel")</button>
+                    <button type="button" class="btn btn-save px-4 py-2 me-2" id="saveChangesBtn" disabled>@_translationState.GetValue("Save Changes")</button>
                 </NotAuthorized>
             </AuthorizeView>
         </div>

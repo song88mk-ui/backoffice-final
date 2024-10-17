@@ -7,13 +7,13 @@
             <div class="d-flex justify-content-between m-4">
 
                 <div>
-                    <h4 class="page-title">@TranslationState.GetValue(_pageTitle)</h4>
+                    <h4 class="page-title">@_translationState.GetValue(_pageTitle)</h4>
                 </div>
 
                 <div>
                     <a class="btn btn-logs" href="javascript:void(0)" @onclick="HandleLogsClick">
                         <i class="fa fa-list"></i>
-                        <span>@TranslationState.GetValue("Logs")</span>
+                        <span>@_translationState.GetValue("Logs")</span>
                     </a>
                 </div>
             </div>
@@ -25,7 +25,7 @@
                     <div class="input-container d-flex">
                         <EditForm Model="_searchForm" OnValidSubmit="HandleSearchInput" Context="FormContext">
                             <div class="input-group">
-                                <InputText id="search" placeholder="@TranslationState.GetValue("Find")" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
+                                <InputText id="search" placeholder="@_translationState.GetValue("Find")" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
                                 <button class="input-group-text border-start-0">
                                     <i class="fa fa-search"></i>
                                 </button>
@@ -34,12 +34,12 @@
                     </div>
 
                     <select class="form-select" @onchange="HandleSportChange">
-                        <option value="-1" selected="@_selectedSportId == -1">@TranslationState.GetValue("All Sports")</option>
+                        <option value="-1" selected="@_selectedSportId == -1">@_translationState.GetValue("All Sports")</option>
                         @if (FilterModel.Sports.Any())
                         {
                             @foreach (var item in FilterModel.Sports)
                             {
-                                <option value="@item.Value" selected="@(item.Value == _selectedSportId.ToString())">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == _selectedSportId.ToString())">@_translationState.GetValue(item.Name)</option>
                             }
                         }
                         else
@@ -53,7 +53,7 @@
                         {
                             @foreach (var item in FilterModel.Scopes)
                             {
-                                <option value="@item.Value" selected="@(item.Value == _selectedScopeId.ToString())">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == _selectedScopeId.ToString())">@_translationState.GetValue(item.Name)</option>
                             }
                         }
                     </select>
@@ -63,7 +63,7 @@
                     <AuthorizeView Policy="sbc-config-canedit">
                         <Authorized Context="ActivateAll">
                             <button class="btn btn-create" @onclick="HandleNewTemplateClick">
-                                @TranslationState.GetValue("Create New")
+                                @_translationState.GetValue("Create New")
                             </button>
                         </Authorized>
                     </AuthorizeView>
@@ -76,12 +76,12 @@
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th class="px-4 w-25" scope="col">@TranslationState.GetValue("Template Name")</th>
-                            <th class="px-4 w-25" scope="col">@TranslationState.GetValue("Sports")</th>
-                            <th class="text-center" scope="col">@TranslationState.GetValue("Client Assigned")</th>
-                            <th class="text-center" scope="col">@TranslationState.GetValue("League Assigned")</th>
-                            <th class="text-center" scope="col">@TranslationState.GetValue("Date Created")</th>
-                            <th class="text-center" scope="col">@TranslationState.GetValue("Manage")</th>
+                            <th class="px-4 w-25" scope="col">@_translationState.GetValue("Template Name")</th>
+                            <th class="px-4 w-25" scope="col">@_translationState.GetValue("Sports")</th>
+                            <th class="text-center" scope="col">@_translationState.GetValue("Client Assigned")</th>
+                            <th class="text-center" scope="col">@_translationState.GetValue("League Assigned")</th>
+                            <th class="text-center" scope="col">@_translationState.GetValue("Date Created")</th>
+                            <th class="text-center" scope="col">@_translationState.GetValue("Manage")</th>
                         </tr>
                     </thead>
 
@@ -106,7 +106,7 @@
                             {
                                 <tr>
                                     <td colspan="7">
-                                        <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                        <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                     </td>
                                 </tr>
                             }

@@ -11,7 +11,7 @@
             <div class="form-group">
                 <EditForm class="f-right form-group" Model="SearchForm" OnValidSubmit="OnSubmitClickEvent" Context="FormContext">
                     <div class="right-icon-control">
-                        <InputText id="search" class="form-control search-text" placeholder="@($"{TranslationState.GetValue("Search Here")}...")" @bind-Value="SearchForm.SearchText" />
+                        <InputText id="search" class="form-control search-text" placeholder="@($"{_translationState.GetValue("Search Here")}...")" @bind-Value="SearchForm.SearchText" />
                         <div class="form-icon"> <i class="feather icon-search"></i> </div>
                     </div>
                 </EditForm>
@@ -29,14 +29,14 @@
                         <thead>
                             <tr>
                                 <th valign="middle" align="left"><strong>#</strong></th>
-                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("Date")</strong></th>
-                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("Client name")</strong></th>
-                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("Activity")</strong></th>
+                                <th valign="middle" align="left"><strong>@_translationState.GetValue("Date")</strong></th>
+                                <th valign="middle" align="left"><strong>@_translationState.GetValue("Client name")</strong></th>
+                                <th valign="middle" align="left"><strong>@_translationState.GetValue("Activity")</strong></th>
                                 @* <th valign="middle" align="left"><strong>Changed From</strong></th>
                                 <th valign="middle" align="left"><strong>Changed To</strong></th> *@
-                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("From")</strong></th>
-                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("To")</strong></th>
-                                <th valign="middle" align="left"><strong>@TranslationState.GetValue("Updated By")</strong></th>
+                                <th valign="middle" align="left"><strong>@_translationState.GetValue("From")</strong></th>
+                                <th valign="middle" align="left"><strong>@_translationState.GetValue("To")</strong></th>
+                                <th valign="middle" align="left"><strong>@_translationState.GetValue("Updated By")</strong></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -65,12 +65,12 @@
                 }
                 else
                 {
-                    <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                    <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                 }
             }
         </div>
     </div>
 </div>
 <div class="modal-footer notifications">
-    <button type="button" @onclick="OnCancelClickEvent" class="btn btn-danger waves-effect" data-dismiss="modal">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" @onclick="OnCancelClickEvent" class="btn btn-danger waves-effect" data-dismiss="modal">@_translationState.GetValue("Cancel")</button>
 </div>

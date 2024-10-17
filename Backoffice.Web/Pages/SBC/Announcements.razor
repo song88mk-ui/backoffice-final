@@ -29,14 +29,14 @@
                             <table class="table table-borderless">
                                 <thead class="table-head">
                                     <tr>
-                                        <th class="th-number">@TranslationState.GetValue("No.")</th>
-                                        <th class="th-title">@TranslationState.GetValue("Title")</th>
-                                        <th class="th-client">@TranslationState.GetValue("Clients")</th>
-                                        <th class="th-languages">@TranslationState.GetValue("Languages")</th>
-                                        <th class="th-description">@TranslationState.GetValue("Description")</th>
-                                        <th class="th-date">@TranslationState.GetValue("Start Date (UTC)")</th>
-                                        <th class="th-date">@TranslationState.GetValue("End Date (UTC)")</th>
-                                        <th class="th-status">@TranslationState.GetValue("Status")</th>
+                                        <th class="th-number">@_translationState.GetValue("No.")</th>
+                                        <th class="th-title">@_translationState.GetValue("Title")</th>
+                                        <th class="th-client">@_translationState.GetValue("Clients")</th>
+                                        <th class="th-languages">@_translationState.GetValue("Languages")</th>
+                                        <th class="th-description">@_translationState.GetValue("Description")</th>
+                                        <th class="th-date">@_translationState.GetValue("Start Date (UTC)")</th>
+                                        <th class="th-date">@_translationState.GetValue("End Date (UTC)")</th>
+                                        <th class="th-status">@_translationState.GetValue("Status")</th>
                                         <AuthorizeView Policy="sbc-announcements-canedit">
                                             <Authorized Context="ActivateAll">
                                                 <th class="th-action"></th>
@@ -112,7 +112,7 @@
                                         {
                                             <tr>
                                                 <td colspan=8>
-                                                    <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                                    <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                                 </td>
                                             </tr>
                                         }

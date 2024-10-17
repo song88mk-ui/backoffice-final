@@ -56,7 +56,7 @@ namespace Backoffice.Web.Components.Common
             _shouldRender = ValidateParameters();
 
             if (_shouldRender)
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
 
             _init = false;
             return base.OnParametersSetAsync();
@@ -103,7 +103,7 @@ namespace Backoffice.Web.Components.Common
 
         private bool ValidateParameters()
         {
-            return _init || _languageCode != TranslationState.ActiveLanguageCode;
+            return _init || _languageCode != _translationState.ActiveLanguageCode;
         }
 
         #endregion

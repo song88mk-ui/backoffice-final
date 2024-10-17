@@ -3,7 +3,7 @@
 <div class="permission-container">
     <div class="row">
         <div class="col-md-12 mb-1">
-            <h6 class="title fw-bold ps-2 py-1">@TranslationState.GetValue("Permissions")</h6>
+            <h6 class="title fw-bold ps-2 py-1">@_translationState.GetValue("Permissions")</h6>
         </div>
     </div>
     <div class="row">
@@ -17,7 +17,7 @@
                             <div class="header-title">
                                 <h6 class="fw-bold d-inline-block " @onclick="() => OnDropCategoryClickEvent(category)">
                                     <i class="fa fa-plus me-3"></i>
-                                    @TranslationState.GetValue(category.CategoryName)
+                                    @_translationState.GetValue(category.CategoryName)
                                 </h6>
                                 <div class="form-switch d-inline-block pull-right">
                                     @if (category.CategoryId == SelectedCategoryId && IsSubUser == false)
@@ -54,7 +54,7 @@
                                 }
                                 else if (category.CategoryId == (int)PermissionCategory.SBC)
                                 {
-                                    <label>@TranslationState.GetValue("Sportsbook Clients details")</label>
+                                    <label>@_translationState.GetValue("Sportsbook Clients details")</label>
                                 }
                             </div>
                         </div>
@@ -64,8 +64,8 @@
                                 <div class="sub-title mb-4">
                                     <div class="row">
                                         <div class="col-8">
-                                            <span class="d-block fw-bold">@TranslationState.GetValue("Permissions")</span>
-                                            <span class="sub-title-info">@TranslationState.GetValue("Require usergroup permission")</span>
+                                            <span class="d-block fw-bold">@_translationState.GetValue("Permissions")</span>
+                                            <span class="sub-title-info">@_translationState.GetValue("Require usergroup permission")</span>
                                         </div>
                                         @if (category.CategoryId == (int)PermissionCategory.SBC)
                                         {
@@ -74,7 +74,7 @@
                                                     @if (!IsSubUser)
                                                     {
                                                         <button class="btn clients-btn dropdown-toggle ps-4" type="button" id="clientDropdown" data-bs-toggle="dropdown" data-bs-auto-close="dropdown" aria-expanded="false" disabled=@(!category.IsEnabled)>
-                                                            @TranslationState.GetValue("Select Clients")
+                                                            @_translationState.GetValue("Select Clients")
                                                         </button>
                                                         @if (ClientModel.Clients.Any())
                                                         {
@@ -85,7 +85,7 @@
                                             </div>
                                         }
                                         <div class="col text-center">
-                                            <button type="button" class="btn btn-enable-all" @onclick="() => OnEnableClickEvent(category)" disabled=@(!category.IsEnabled)>@TranslationState.GetValue("Enable All")</button>
+                                            <button type="button" class="btn btn-enable-all" @onclick="() => OnEnableClickEvent(category)" disabled=@(!category.IsEnabled)>@_translationState.GetValue("Enable All")</button>
                                         </div>
                                     </div>
                                 </div>
@@ -102,7 +102,7 @@
                                                 if (category.SubCategories[rowCount].ColPosition != "RIGHT")
                                                 {
                                                     <div class="category mb-3">
-                                                        <div class="category-title fw-bold mb-1">@TranslationState.GetValue(category.SubCategories[rowCount].SubCategoryName)</div>
+                                                        <div class="category-title fw-bold mb-1">@_translationState.GetValue(category.SubCategories[rowCount].SubCategoryName)</div>
 
                                                         @if (!category.SubCategories[rowCount].Groups.Any())
                                                         {
@@ -144,7 +144,7 @@
                                                 if (category.SubCategories[rowCount].ColPosition != "LEFT")
                                                 {
                                                     <div class="category mb-3">
-                                                        <div class="category-title fw-bold mb-1">@TranslationState.GetValue(category.SubCategories[rowCount].SubCategoryName)</div>
+                                                        <div class="category-title fw-bold mb-1">@_translationState.GetValue(category.SubCategories[rowCount].SubCategoryName)</div>
 
                                                         @if (!category.SubCategories[rowCount].Groups.Any())
                                                         {

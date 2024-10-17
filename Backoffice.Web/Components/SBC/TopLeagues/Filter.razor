@@ -4,23 +4,23 @@
     <div class="d-flex flex-row justify-content-between">
         <div class="select-container d-flex">
             <div class="me-4 w-50">
-                <label class="form-label d-block">@TranslationState.GetValue("Client")</label>
+                <label class="form-label d-block">@_translationState.GetValue("Client")</label>
                 <div class="dropdown">
                     <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         @if (Clients.Any())
                         {
                             if (Clients.Count - 1 == SelectedClientCount)
                             {
-                                <span>@TranslationState.GetValue("All Clients") (@SelectedClientCount)</span>
+                                <span>@_translationState.GetValue("All Clients") (@SelectedClientCount)</span>
                             }
                             else
                             {
-                                <span>@(SelectedClientCount == 1 ? SelectedClientName : $"{TranslationState.GetValue("Clients")} ({SelectedClientCount})")</span>
+                                <span>@(SelectedClientCount == 1 ? SelectedClientName : $"{_translationState.GetValue("Clients")} ({SelectedClientCount})")</span>
                             }
                         }
                         else
                         {
-                            <span>@TranslationState.GetValue("No Clients Available")</span>
+                            <span>@_translationState.GetValue("No Clients Available")</span>
                         }
                     </button>
                     @if (Clients.Any())
@@ -30,11 +30,11 @@
                 </div>
             </div>
             <div class="me-4 w-50">
-                <label class="form-label d-block">@TranslationState.GetValue("Sports")</label>
+                <label class="form-label d-block">@_translationState.GetValue("Sports")</label>
                 <select class="form-select d-block" @onchange="OnSportsChangedEvent">
                     @foreach (var item in Sports)
                     {
-                        <option value="@item.Value" selected="@(item.Value == SelectedSportId)">@TranslationState.GetValue(item.Name)</option>
+                        <option value="@item.Value" selected="@(item.Value == SelectedSportId)">@_translationState.GetValue(item.Name)</option>
                     }
                 </select>
             </div>
@@ -43,7 +43,7 @@
             <div>
                 <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                     <div class="input-group">
-                        <InputText id="search" placeholder=@TranslationState.GetValue("Search") class="form-control search-text valid border-end-0" @bind-Value="SearchForm.SearchText" @oninput="() => SearchForm.IsReset = SearchForm.SearchText != string.Empty" />
+                        <InputText id="search" placeholder=@_translationState.GetValue("Search") class="form-control search-text valid border-end-0" @bind-Value="SearchForm.SearchText" @oninput="() => SearchForm.IsReset = SearchForm.SearchText != string.Empty" />
                         <span class="input-group-text border-start-0">
                             @if (!SearchForm.IsReset)
                             {

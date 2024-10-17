@@ -21,7 +21,7 @@
                     <select class="form-select d-block" @onchange="OnSportChangedEvent">
                         @foreach (var sport in Sports)
                         {
-                            <option value="@sport.Value" selected="@(sport.Value == _filterModel.SelectedSportId)">@TranslationState.GetValue(sport.Name)</option>
+                            <option value="@sport.Value" selected="@(sport.Value == _filterModel.SelectedSportId)">@_translationState.GetValue(sport.Name)</option>
                         }
                     </select>
                 </div>
@@ -29,7 +29,7 @@
                     <select class="form-select d-block" @onchange="OnFixtureStatusChangedEvent">
                         @foreach (var fixtureStatus in FixtureStatuses)
                         {
-                            <option value="@fixtureStatus.Value" selected="@(fixtureStatus.Value == _filterModel.SelectedSportId)">@TranslationState.GetValue(fixtureStatus.Name)</option>
+                            <option value="@fixtureStatus.Value" selected="@(fixtureStatus.Value == _filterModel.SelectedSportId)">@_translationState.GetValue(fixtureStatus.Name)</option>
                         }
                     </select>
                 </div>
@@ -40,7 +40,7 @@
                         <div class="me-2">
                             <a href="javascript:void(0)" class="btn btn-copy px-3 @(IsPreLoader ? "disabled" : "")" @onclick="OnCopyClickEvent">
                                 <i class="fa fa-copy"></i>
-                                @TranslationState.GetValue("Copy")
+                                @_translationState.GetValue("Copy")
                             </a>
                         </div>
                         @if (!IsUpdate)
@@ -48,7 +48,7 @@
                             <div class="me-2">
                                 <a href="javascript:void(0)" class="btn btn-edit px-3 @(IsPreLoader ? "disabled" : "")" @onclick="OnUpdateClickEvent">
                                     <i class="fa fa-edit"></i>
-                                    @TranslationState.GetValue("Update")
+                                    @_translationState.GetValue("Update")
                                 </a>
                             </div>
                         }
@@ -57,12 +57,12 @@
                             <div class="me-2">
                                 <a href="javascript:void(0)" class="btn btn-save px-3" @onclick="OnSaveClickEvent">
                                     <i class="fa fa-check"></i>
-                                    @TranslationState.GetValue("Save")
+                                    @_translationState.GetValue("Save")
                                 </a>
                             </div>
                             <div class="me-2">
                                 <a href="javascript:void(0)" class="btn btn-cancel px-3" @onclick="OnCancelClickEvent">
-                                    @TranslationState.GetValue("Cancel")
+                                    @_translationState.GetValue("Cancel")
                                 </a>
                             </div>
                         }
@@ -71,13 +71,13 @@
                         <div class="me-2">
                             <a href="javascript:void(0)" class="btn btn-copy px-3" disabled>
                                 <i class="fa fa-copy"></i>
-                                @TranslationState.GetValue("Copy")
+                                @_translationState.GetValue("Copy")
                             </a>
                         </div>
                         <div class="me-2">
                             <a href="javascript:void(0)" class="btn btn-edit px-3" disabled>
                                 <i class="fa fa-edit"></i>
-                                @TranslationState.GetValue("Update")
+                                @_translationState.GetValue("Update")
                             </a>
                         </div>
                     </NotAuthorized>

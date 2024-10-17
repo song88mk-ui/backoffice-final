@@ -55,7 +55,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (_shouldRender)
             {
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
                 _selectedSportId = -1;
                 _selectedScopeId = int.Parse(FilterModel.Scopes.FirstOrDefault()?.Value ?? "-1");
 
@@ -74,7 +74,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
 
-        private bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode || (!string.IsNullOrEmpty(QueryMessage) && _alertModel.Message != QueryMessage);
+        private bool ValidateParameters() => _init || _languageCode != _translationState.ActiveLanguageCode || (!string.IsNullOrEmpty(QueryMessage) && _alertModel.Message != QueryMessage);
 
         public void HandleLogsClick()
         {

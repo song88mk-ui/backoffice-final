@@ -2,14 +2,14 @@
 <div class="row">
     <div class="col-4">
         <button class="btn btn-filter" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse" disabled="@IsFilterButtonDisabled" @onclick="Initialize">
-            <i class="fa fa-filter"></i>&nbsp;@TranslationState.GetValue("Filters")
+            <i class="fa fa-filter"></i>&nbsp;@_translationState.GetValue("Filters")
         </button>
     </div>
     <div class="col-4"></div>
     <div class="col-4 position-relative">
         <EditForm class="f-right" Model="ConfigLogsFilterModel" OnValidSubmit="OnSubmitClickEvent">
             <div class="right-icon-control">
-                <InputText id="search" class="form-control search-text" placeholder="@($"{TranslationState.GetValue("Search Here")}...")" @bind-Value="ConfigLogsFilterModel.Filter" />
+                <InputText id="search" class="form-control search-text" placeholder="@($"{_translationState.GetValue("Search Here")}...")" @bind-Value="ConfigLogsFilterModel.Filter" />
                 <div class="form-icon"> <i class="feather icon-search"></i> </div>
             </div>
         </EditForm>
@@ -62,12 +62,12 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnSportsChangedEvent">
                         <optgroup label="Sports">
-                            <option value="0">@TranslationState.GetValue("Select Sports")</option>
+                            <option value="0">@_translationState.GetValue("Select Sports")</option>
                             @if (ConfigLogsFilterModel != null && ConfigLogsFilterModel.Sports != null && ConfigLogsFilterModel.Sports.Any())
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.Sports)
                                 {
-                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.SportId)">@TranslationState.GetValue(item.Name)</option>
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.SportId)">@_translationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -76,12 +76,12 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnSegmentChangedEvent">
                         <optgroup label="Segment">
-                            <option value="0">@TranslationState.GetValue("Select Segment")</option>
+                            <option value="0">@_translationState.GetValue("Select Segment")</option>
                             @if (ConfigLogsFilterModel != null && ConfigLogsFilterModel.Segments != null && ConfigLogsFilterModel.Segments.Any())
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.Segments)
                                 {
-                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.SegmentId)">@TranslationState.GetValue(item.Name)</option>
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.SegmentId)">@_translationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -90,12 +90,12 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnLeagueChangedEvent">
                         <optgroup label="League">
-                            <option value="0">@TranslationState.GetValue("Select League")</option>
+                            <option value="0">@_translationState.GetValue("Select League")</option>
                             @if (ConfigLogsFilterModel != null && ConfigLogsFilterModel.Leagues != null && ConfigLogsFilterModel.Leagues.Any())
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.Leagues)
                                 {
-                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.LeagueId)">@TranslationState.GetValue(item.Name)</option>
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.LeagueId)">@_translationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -104,12 +104,12 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnMarketGroupChangedEvent">
                         <optgroup label="Markets">
-                            <option value="0">@TranslationState.GetValue("Select Market Group")</option>
+                            <option value="0">@_translationState.GetValue("Select Market Group")</option>
                             @if (ConfigLogsFilterModel != null && ConfigLogsFilterModel.MarketTemplateGroups != null && ConfigLogsFilterModel.MarketTemplateGroups.Any())
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.MarketTemplateGroups)
                                 {
-                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.MarketTemplateGroupId)">@TranslationState.GetValue(item.Name)</option>
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.MarketTemplateGroupId)">@_translationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -126,7 +126,7 @@
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.Markets)
                                 {
-                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.MarketId)">@TranslationState.GetValue(item.Name)</option>
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.MarketId)">@_translationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>
@@ -140,7 +140,7 @@
                             {                                
                                 @foreach (var item in ConfigLogsFilterModel.Scopes)
                                 {
-                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.Scope)">@TranslationState.GetValue(item.Name)</option>
+                                    <option value="@item.Value" selected="@(item.Value == ConfigLogsFilterModel.Scope)">@_translationState.GetValue(item.Name)</option>
                                 }
                             }
                         </optgroup>

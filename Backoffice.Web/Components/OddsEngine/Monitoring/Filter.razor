@@ -8,16 +8,16 @@
                         {
                             if (_clientFilter.Count == _selectedClientCount)
                             {
-                                <span>@TranslationState.GetValue("All Clients") (@_selectedClientCount)</span>
+                                <span>@_translationState.GetValue("All Clients") (@_selectedClientCount)</span>
                             }
                             else
                             {
-                                <span>@(_selectedClientCount == 1 ? _selectedClientName : $"{TranslationState.GetValue("Clients")} ({_selectedClientCount})")</span>
+                                <span>@(_selectedClientCount == 1 ? _selectedClientName : $"{_translationState.GetValue("Clients")} ({_selectedClientCount})")</span>
                             }
                         }
                         else
                         {
-                            <span>@TranslationState.GetValue("No Clients Available")</span>
+                            <span>@_translationState.GetValue("No Clients Available")</span>
                         }
                     </button>
                     @if (_clientFilter.Any())
@@ -43,7 +43,7 @@
             {
                 <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                     <div class="input-group">
-                        <InputText id="search" placeholder=@TranslationState.GetValue("Search") class="form-control search-text valid border-end-0" @bind-Value="_searchForm.SearchText" />
+                        <InputText id="search" placeholder=@_translationState.GetValue("Search") class="form-control search-text valid border-end-0" @bind-Value="_searchForm.SearchText" />
                         <span class="input-group-text border-start-0">
                             <i class="fa fa-search"></i>
                         </span>

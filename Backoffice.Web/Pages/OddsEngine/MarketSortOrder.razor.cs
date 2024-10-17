@@ -343,7 +343,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _marketTemplates = new();
             if (!string.IsNullOrEmpty(_filterModel.SelectedClientCode) && _filterModel.SelectedClientCode != "NA" && _filterModel.SelectedSportId != 0)
             {
-                var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId, TranslationState.ActiveLanguageCode)).Result;
+                var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId, _translationState.ActiveLanguageCode)).Result;
 
                 var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
 

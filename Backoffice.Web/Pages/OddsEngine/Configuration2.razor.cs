@@ -81,9 +81,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (_shouldRender)
             {
-                if (_languageCode != TranslationState.ActiveLanguageCode)
+                if (_languageCode != _translationState.ActiveLanguageCode)
                 {
-                    _languageCode = TranslationState.ActiveLanguageCode;
+                    _languageCode = _translationState.ActiveLanguageCode;
                     _contentFilterModel.Sports = await LoadSports();
                 }
 
@@ -96,7 +96,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override bool ShouldRender() => _shouldRender;
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
-        private bool ValidateParameters() => _init || _languageCode != TranslationState.ActiveLanguageCode ||  _queryMessage != QueryMessage;
+        private bool ValidateParameters() => _init || _languageCode != _translationState.ActiveLanguageCode ||  _queryMessage != QueryMessage;
 
         public void HandleConfigNavMenuSelection(ConfigTemplateNavMenu configNavMenu)
         {

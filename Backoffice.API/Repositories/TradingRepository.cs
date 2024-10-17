@@ -3,6 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Shared.Utilities;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -21,11 +22,13 @@ namespace Backoffice.API.Repositories
     {
         private readonly IConfiguration _configuration;
         private readonly IBackofficeActivityLogRepository _activityLogRepository;
+        private readonly IMemCache _memCache;
 
-        public TradingRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository)
+        public TradingRepository(IConfiguration configuration, IBackofficeActivityLogRepository activityLogRepository, IMemCache memCache)
         {
             _configuration = configuration;
             _activityLogRepository = activityLogRepository;
+            _memCache = memCache;
         }
 
         #region SPORTS
@@ -33,23 +36,33 @@ namespace Backoffice.API.Repositories
         {
             try
             {
+                var key = $"sp-{langCode}-{fixtureTypeId}";
+
+                var cache = _memCache.GetCache<BaseResponse<SportsTreeResponse>>(key);
+
+                if (cache != null && cache.StatusCode == StatusCode.Success)
+                    return cache;
+
+                var result = new BaseResponse<SportsTreeResponse>();
+
                 var response = await GetHttpClient(region, langCode).GetAsync($"sports/tree/{fixtureTypeId}");
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    result = JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        result = JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
-                    {
-                        return new BaseResponse<SportsTreeResponse>
+                        result = new BaseResponse<SportsTreeResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
                         };
-                    }
                 }
+
+                _memCache.AddOrUpdateCache(key, result, 24);
+                return result;
             }
             catch (Exception ex)
             {

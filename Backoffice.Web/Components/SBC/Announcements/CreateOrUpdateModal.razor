@@ -14,9 +14,9 @@
         <EditForm EditContext="EditContext">
             <div class="announcement-container">
                 <div class="announcement-header-container">
-                    <span class="announcement-header-title">@TranslationState.GetValue("Announcements")</span>
+                    <span class="announcement-header-title">@_translationState.GetValue("Announcements")</span>
                     <div class="announcement-switch-container">
-                        <span class="announcement-switch-label" for="@_announcement.IsActive">@TranslationState.GetValue(_announcement.IsActive? "Active" : "Inactive")</span>
+                        <span class="announcement-switch-label" for="@_announcement.IsActive">@_translationState.GetValue(_announcement.IsActive? "Active" : "Inactive")</span>
                         <div class="form-switch">
                             @if (_announcement.IsActive)
                             {
@@ -124,6 +124,6 @@
             }
         </div>
     }
-    <button type="button" class="announcement-cancel-btn" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled=@_isPreload>@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="announcement-save-btn" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled=@_isPreload>@TranslationState.GetValue("Save Announcement")</button>
+    <button type="button" class="announcement-cancel-btn" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled=@_isPreload>@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="announcement-save-btn" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled=@_isPreload>@_translationState.GetValue("Save Announcement")</button>
 </div>

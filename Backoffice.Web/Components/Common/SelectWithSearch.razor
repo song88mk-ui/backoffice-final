@@ -2,7 +2,7 @@
     @if (Items != null && Items.Any())
     {
         <li>
-            <input class="w-100 border p-2 px-3 search-text" placeholder="@TranslationState.GetValue("Select Template")" @onchange="OnSearchTextChanged" />
+            <input class="w-100 border p-2 px-3 search-text" placeholder="@_translationState.GetValue("Select Template")" @onchange="OnSearchTextChanged" />
         </li>
         foreach (var item in Items.Where(x => x.Name.ToUpper().Contains(SearchText.ToUpper())))
         {
@@ -15,7 +15,7 @@
             <li class="p-1 border-top">
                 <a class="btn w-100 text-start" @onclick="OnRemoveTemplateClickedEvent">
                     <span class="template-remove">
-                        <i class="fa fa-times ico-font-size" aria-hidden="true"></i>@TranslationState.GetValue("Remove Current Template")
+                        <i class="fa fa-times ico-font-size" aria-hidden="true"></i>@_translationState.GetValue("Remove Current Template")
                     </span>
                 </a>
             </li>
@@ -25,7 +25,7 @@
             <li class="p-1 border-top">
                 <a class="btn w-100 text-start" @onclick="RemoveSelectedItem">
                     <span class="template-remove">
-                        <i class="fa fa-times ico-font-size" aria-hidden="true"></i>@TranslationState.GetValue("Remove Selected Template")
+                        <i class="fa fa-times ico-font-size" aria-hidden="true"></i>@_translationState.GetValue("Remove Selected Template")
                     </span>
                 </a>
             </li>

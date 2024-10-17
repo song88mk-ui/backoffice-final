@@ -7,7 +7,7 @@
                 <div class="d-flex justify-content-between">
                     <div class="select-container">
                         <div class="me-4">
-                            <label class="form-label my-1 mr-2">@TranslationState.GetValue("Clients")</label>
+                            <label class="form-label my-1 mr-2">@_translationState.GetValue("Clients")</label>
                             <div class="dropdown">
                                 <button class="btn btn-client dropdown-toggle" type="button" id="client-dropdown" data-bs-auto-close="outside" data- data-bs-toggle="dropdown" aria-expanded="false">
                                     @if (Clients.Any())
@@ -16,7 +16,7 @@
                                     }
                                     else
                                     {
-                                        <span>@TranslationState.GetValue("No Clients Available")</span>
+                                        <span>@_translationState.GetValue("No Clients Available")</span>
                                     }
                                 </button>
                                 @if (Clients.Any())
@@ -27,7 +27,7 @@
                                     <li class="dropdown-item">
                                         <div class="form-check">
                                             <InputCheckbox class="form-check-input" @bind-Value="@IsSelectAll" @onclick="_ => SelectAllToggleCheckbox(!IsSelectAll)" />
-                                <label class="form-check-label" for="ClientAll">@TranslationState.GetValue("Select All")</label>
+                                <label class="form-check-label" for="ClientAll">@_translationState.GetValue("Select All")</label>
                                         </div>
                                     </li>
 
@@ -75,7 +75,7 @@
         }
         <div class="row">
             <div class="col-md-12">
-                <label class="form-label my-1 mr-2">@TranslationState.GetValue("Leagues")</label>
+                <label class="form-label my-1 mr-2">@_translationState.GetValue("Leagues")</label>
                 <div class="d-flex flex-wrap p-3 league-container">
                     @foreach (var item in CopyTopLeaguesModel.CopyFromClientTopLeagues)
                     {
@@ -91,12 +91,12 @@
         {
             <br/>
             <div class="alert @AlertStatus" role="alert">
-                @TranslationState.GetValue(AlertMessage)
+                @_translationState.GetValue(AlertMessage)
             </div>
         }
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@TranslationState.GetValue("Cancel")</button>
-        <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">@TranslationState.GetValue("Save")</button>
+        <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">@_translationState.GetValue("Save")</button>
     </div>
 </EditForm>

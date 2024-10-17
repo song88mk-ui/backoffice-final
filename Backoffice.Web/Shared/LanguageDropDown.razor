@@ -1,13 +1,13 @@
 ﻿<div class="d-flex align-items-center">
     <div class="dropdown">
-        <button class="btn btn-secondary @(TranslationState.LanguageCodes.Any() ? "dropdown-toggle" : "") d-flex align-items-center @(DropDownButtonClassName)" type="button" id="dropdownLanguage" data-bs-toggle="dropdown" aria-expanded="false">
+        <button class="btn btn-secondary @(_translationState.LanguageCodes.Any() ? "dropdown-toggle" : "") d-flex align-items-center @(DropDownButtonClassName)" type="button" id="dropdownLanguage" data-bs-toggle="dropdown" aria-expanded="false">
             <span class="d-flex">
-                <i class="@($"ico-flag flag-{TranslationState.ActiveLanguageCode.ToString().ToLower()}") me-2" aria-hidden="true"></i>
-                <span>@TranslationState.ActiveLanguageCode.ToString()</span>
+                <i class="@($"ico-flag flag-{_translationState.ActiveLanguageCode.ToString().ToLower()}") me-2" aria-hidden="true"></i>
+                <span>@_translationState.ActiveLanguageCode.ToString()</span>
             </span>
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownLanguage">
-            @foreach (var langCode in TranslationState.LanguageCodes.Select(s => s.ToString()))
+            @foreach (var langCode in _translationState.LanguageCodes.Select(s => s.ToString()))
             {
                 <button class="w-100 dropdown-item position-relative d-flex align-items-center" @onclick="e => OnLanguageCodeChanged(langCode)">
                     <span class="d-flex">

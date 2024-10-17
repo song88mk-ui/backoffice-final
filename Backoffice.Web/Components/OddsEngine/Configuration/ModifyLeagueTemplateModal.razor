@@ -7,7 +7,7 @@
     {
         <div class="container px-3 pb-4 border-bottom">
             <div class="mb-2 d-flex justify-content-between">
-                <label class="text-secondary fw-bold">@TranslationState.GetValue("Leagues selected")</label>
+                <label class="text-secondary fw-bold">@_translationState.GetValue("Leagues selected")</label>
 
                 <a href="javascript:void(0)" @onclick="HandleShowAllClick">@(!IsShowAll ? "Show All" : "Show Less")</a>
             </div>
@@ -20,7 +20,7 @@
                         <div class="col-12 mb-2 p-0">
                             <div class="container border">
                                 <p class="fw-bold my-2">@item.SegmentName > @item.LeagueName</p>
-                                <p class="mb-2">@($"{item.ClientName} | {TranslationState.GetValue(item.SportName)}")</p>
+                                <p class="mb-2">@($"{item.ClientName} | {_translationState.GetValue(item.SportName)}")</p>
                             </div>
                         </div>
                     }
@@ -28,7 +28,7 @@
             </div>
         </div>
         <div class="d-flex my-3 ms-2">
-            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">@TranslationState.GetValue("Prematch")</label>
+            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">@_translationState.GetValue("Prematch")</label>
             <div class="col col-sm-10">
                 <div class="dropdown">
                     <button class="btn w-100 form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -38,7 +38,7 @@
                         }
                         else
                         {
-                            <span class="template-name-italic">@TranslationState.GetValue("Select Template")</span>
+                            <span class="template-name-italic">@_translationState.GetValue("Select Template")</span>
                         }
                     </button>
                     @if (PrematchTemplates != null && PrematchTemplates.Any())
@@ -49,7 +49,7 @@
             </div>            
         </div>
         <div class="d-flex my-3 ms-2">
-            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">@TranslationState.GetValue("Live")</label>
+            <label for="scopeSelect" class="col-8 col-sm-2 col-form-label">@_translationState.GetValue("Live")</label>
             <div class="col col-sm-10">
                 <div class="dropdown">
                     <button class="btn w-100 form-select dropdown-toggle" type="button" id="live-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -59,7 +59,7 @@
                         }
                         else
                         {
-                            <span class="template-name-italic">@TranslationState.GetValue("Select Template")</span>
+                            <span class="template-name-italic">@_translationState.GetValue("Select Template")</span>
                         }
                     </button>
                     @if (LiveTemplates != null && LiveTemplates.Any())
@@ -81,6 +81,6 @@
     }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" @onclick="HandleCancelClick" disabled="@IsPreLoader">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn btn-save" @onclick="HandleSaveClick" disabled="@(IsPreLoader || !_hasChanged)">@TranslationState.GetValue("Apply")</button>
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="HandleCancelClick" disabled="@IsPreLoader">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn btn-save" @onclick="HandleSaveClick" disabled="@(IsPreLoader || !_hasChanged)">@_translationState.GetValue("Apply")</button>
 </div>

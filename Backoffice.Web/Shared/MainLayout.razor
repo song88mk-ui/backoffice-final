@@ -6,8 +6,6 @@
         @if (!PreRenderService.IsPreRendering)
         {
             <CascadingValue Value="UserModel" Name="UserModel" IsFixed>
-                @* <CascadingValue Value="UserClaims" Name="UserClaims">
-            <CascadingValue Value="UserClientCodes" Name="UserClientCodes" IsFixed> *@
                 @if (NavigationManager.Uri.Contains("/admin"))
                 {
                     <PageTitle>Backoffice - Administration</PageTitle>
@@ -27,14 +25,7 @@
                 {
                     <div class="page">
                         <div class="sidebar">
-                            @if (NavigationManager.Uri.Contains("/admin"))
-                            {
-                                <NavMenu NavMenuAccess="PermissionCategory.Admin" NavMenus="NavMenus" />
-                            }
-                            else
-                            {
-                                <NavMenu NavMenuAccess="PermissionCategory.SBC" NavMenus="NavMenus" />
-                            }
+                            <NavMenu NavMenuParameter="NavMenuParameter" />
                         </div>
                         <main>
                             <article class="content px-4">

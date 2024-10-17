@@ -74,7 +74,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                         Clients.Add(new SelectListItemModel<string>
                         {
                             Value = "",
-                            Name = TranslationState.GetValue("No Clients Available")
+                            Name = _translationState.GetValue("No Clients Available")
                         });
                     }
 
@@ -83,7 +83,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     CopyToClientName = client.ClientName;
                     SelectedClientCode = Clients.FirstOrDefault().Value;
 
-                    var sports = (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString())).Result;
+                    var sports = (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
 
                     if (sports != null)
                     {

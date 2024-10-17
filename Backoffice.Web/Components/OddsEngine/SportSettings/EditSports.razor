@@ -2,11 +2,11 @@
     <div class="d-flex flex-column sportstree-container py-3 me-2">
         <div class="d-flex justify-content-between mx-3 mb-3">
             <div>
-                <span class="fw-bold sports-tree-title">@TranslationState.GetValue("Sports Tree")</span>
+                <span class="fw-bold sports-tree-title">@_translationState.GetValue("Sports Tree")</span>
             </div>
             <div class="d-flex justify-content-end">
-                <button class="bg-transparent px-2 border-0 clear-selection-btn" disabled="@(!selectedSportIds.Any())" @onclick="OnClearSportsSelectionClick">@TranslationState.GetValue("Clear Selection")</button>
-                <button class="bg-transparent px-2 border-0 remove-btn" disabled="@(!selectedSportIds.Any())" @onclick="OnRemoveClick">@TranslationState.GetValue("Remove")</button>
+                <button class="bg-transparent px-2 border-0 clear-selection-btn" disabled="@(!selectedSportIds.Any())" @onclick="OnClearSportsSelectionClick">@_translationState.GetValue("Clear Selection")</button>
+                <button class="bg-transparent px-2 border-0 remove-btn" disabled="@(!selectedSportIds.Any())" @onclick="OnRemoveClick">@_translationState.GetValue("Remove")</button>
             </div>
         </div>
         <div id="sportstreeEditable" class="d-flex flex-column mx-3 connect-list">
@@ -35,7 +35,7 @@
 <div class="col main-container d-flex flex-column">
     <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
         <div class="input-group mb-3">
-            <InputText id="search" placeholder="@TranslationState.GetValue("Find Sports")" class="form-control border-end-0" @bind-Value="_searchForm.SearchText" />
+            <InputText id="search" placeholder="@_translationState.GetValue("Find Sports")" class="form-control border-end-0" @bind-Value="_searchForm.SearchText" />
             <span class="input-group-text border-start-0">
                 <i class="fa fa-search" />
             </span>
@@ -44,14 +44,14 @@
     <div class="all-sports-container flex-column d-flex rounded justify-content-between py-3">
         <div class="d-flex justify-content-between mx-3 mb-3">
             <div class="d-flex flex-column justify-content-center">
-                <span class="fw-bold sports-tree-title">@TranslationState.GetValue("All Sports")</span>
+                <span class="fw-bold sports-tree-title">@_translationState.GetValue("All Sports")</span>
             </div>
             <div class="d-flex justify-content-end">
-                <button class="bg-transparent px-2 border-0 clear-selection-btn" disabled="@(!_hasChanges)" @onclick="OnClearSelectionClick">@TranslationState.GetValue("Clear Selection")</button>
-                <button class="bg-transparent px-2 border-0 select-all-btn" @onclick="OnSelectAllClick">@TranslationState.GetValue("Select All")</button>
+                <button class="bg-transparent px-2 border-0 clear-selection-btn" disabled="@(!_hasChanges)" @onclick="OnClearSelectionClick">@_translationState.GetValue("Clear Selection")</button>
+                <button class="bg-transparent px-2 border-0 select-all-btn" @onclick="OnSelectAllClick">@_translationState.GetValue("Select All")</button>
                 <button class="btn bg-white add-to-btn border rounded" disabled="@(!_hasChanges)" @onclick="OnAddToSportstreeClick">
                     <i class="fa fa-plus me-2" />
-                    @TranslationState.GetValue("Add To Sports Tree")
+                    @_translationState.GetValue("Add To Sports Tree")
                 </button>
             </div>
         </div>

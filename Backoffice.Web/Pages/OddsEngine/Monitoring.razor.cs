@@ -68,17 +68,18 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnParametersSetAsync()
         {
-            if (ValidateParameters())
+            _shouldRender = ValidateParameters();
+            if (_shouldRender)
             {
-                var isSportChanged = _sportId != SelectedSport.SportId || _leagueId != SelectedSport.LeagueId || _languageCode != TranslationState.ActiveLanguageCode;
+                var isSportChanged = _sportId != SelectedSport.SportId || _leagueId != SelectedSport.LeagueId || _languageCode != _translationState.ActiveLanguageCode;
                 _sportId = SelectedSport.SportId;
                 _segmentId = SelectedSport.SegmentId;
                 _leagueId = SelectedSport.LeagueId;
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
 
                 _pageHeaderModel = new PageHeaderModel()
                 {
-                    Title = $"{TranslationState.GetValue(SelectedSport.SportName)} - {SelectedSport.SegmentName} - {SelectedSport.LeagueName}",
+                    Title = $"{_translationState.GetValue(SelectedSport.SportName)} - {SelectedSport.SegmentName} - {SelectedSport.LeagueName}",
                     IconClass = $"iconfont iconfont-{SelectedSport.SportName.ToLower().Replace(" ", "-")}",
                     ShowLanguageDropDown = false
                 };
@@ -87,8 +88,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     await OnInitializeEvent(_monitoringCallbackModel);
                 }
-
-                _shouldRender = true;
             }
         }
 

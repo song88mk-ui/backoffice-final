@@ -1,4 +1,6 @@
 ﻿
+using Backoffice.Shared.Enums;
+using Backoffice.Web.Models.Shared;
 using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Shared
@@ -10,8 +12,12 @@ namespace Backoffice.Web.Shared
             if (PreRenderService.IsPreRendering)
                 return;
 
+            NavMenuParameter = new NavMenuParameter()
+            {
+                NavMenuAccess = NavigationManager.Uri.Contains("/admin") ? PermissionCategory.Admin : PermissionCategory.SBC
+            };
+
             base.InitializeState();
-            await Task.CompletedTask;
         }
     }
 }

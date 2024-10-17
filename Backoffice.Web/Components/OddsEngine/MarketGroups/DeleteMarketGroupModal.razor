@@ -29,12 +29,12 @@
 
     @if (IsPreLoader)
     {
-        <button type="button" class="btn modal-btn modal-cancel" disabled>@TranslationState.GetValue("Cancel")</button>
-        <button type="button" class="btn modal-btn modal-delete" disabled>@TranslationState.GetValue("Delete")</button>
+        <button type="button" class="btn modal-btn modal-cancel" disabled>@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="btn modal-btn modal-delete" disabled>@_translationState.GetValue("Delete")</button>
     }
     else
     {
-        <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">@TranslationState.GetValue("Cancel")</button>
-        <button type="button" class="btn modal-btn modal-delete" @onclick="OnDeleteModalClick">@TranslationState.GetValue("Delete")</button>
+        <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="btn modal-btn modal-delete" @onclick="OnDeleteModalClick">@_translationState.GetValue("Delete")</button>
     }
 </div>
