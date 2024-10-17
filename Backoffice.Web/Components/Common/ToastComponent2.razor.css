@@ -1,6 +1,5 @@
 ﻿.toast-container {
-    position: absolute;
-    right: 40px;
+    position: fixed;
     bottom: 40px;
     display: flex;
     flex-direction: row;
@@ -11,6 +10,8 @@
     border-radius: 8px;
     justify-content: flex-start;
     align-items: center;
+	right:0;
+	margin-right:20px;
 }
 .toast-item {
     margin-left: 16px;
