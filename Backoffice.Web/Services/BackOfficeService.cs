@@ -33,13 +33,13 @@ namespace Backoffice.Web.Services
                 {
                     _client.DefaultRequestHeaders.Remove("x-page");
                 }
-                if(_client.DefaultRequestHeaders.Contains("x-language-code"))
+                if (_client.DefaultRequestHeaders.Contains("x-language-code"))
                     _client.DefaultRequestHeaders.Remove("x-language-code");
 
                 if (!string.IsNullOrEmpty(Page))
                     _client.DefaultRequestHeaders.Add("x-page", Page);
 
-                    _client.DefaultRequestHeaders.Add("x-language-code", LanguageCode.ToString());
+                _client.DefaultRequestHeaders.Add("x-language-code", LanguageCode.ToString());
 
 
                 return _client;
@@ -771,13 +771,16 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Methods - Others
-        public async Task<BaseResponse<SportsTreeResponse>> GetSportsTreeAsync(int fixtureTypeId, LanguageCode langCode)
+        public async Task<BaseResponse<SportsTreeResponse>> GetSportsTreeAsync(int fixtureTypeId, LanguageCode langCode, CancellationToken cancellationToken = default)
         {
             try
             {
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsTreeResponse>>
                 (await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
-                                  .GetStreamAsync($"api/trading/sports/{fixtureTypeId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                                  .GetStreamAsync($"api/trading/sports/{fixtureTypeId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }, cancellationToken);
+
+                if (cancellationToken.IsCancellationRequested)
+                    return new BaseResponse<SportsTreeResponse>();
 
                 return result ?? new BaseResponse<SportsTreeResponse>
                 {

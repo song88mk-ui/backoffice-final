@@ -60,6 +60,7 @@ namespace Backoffice.Web.Shared
 
             if (_init || _navMenuAccess != NavMenuParameter?.NavMenuAccess || _languageCode != _translationState.ActiveLanguageCode)
             {
+                var cts = new CancellationTokenSource();
                 _init = false;
                 _languageCode = _translationState.ActiveLanguageCode;
                 _navMenuAccess = NavMenuParameter?.NavMenuAccess;
@@ -71,7 +72,11 @@ namespace Backoffice.Web.Shared
 
                 if (_navMenuAccess == PermissionCategory.OE)
                 {
-                    _menu.Sports = await GetSportsTreeMenu();
+                    _menu.Sports = await GetSportsTreeMenu(cts.Token);
+
+                    if (cts.Token.IsCancellationRequested)
+                        return;
+
                     var sport = _menu.Sports.FirstOrDefault();
 
                     if (sport != null)
@@ -241,11 +246,14 @@ namespace Backoffice.Web.Shared
 
         #region Utilities
 
-        private async Task<List<SportModel>> GetSportsTreeMenu()
+        private async Task<List<SportModel>> GetSportsTreeMenu(CancellationToken token)
         {
-            var response = await _backofficeService.GetSportsTreeAsync((int)FixtureType.Match, _languageCode);
+            var response = await _backofficeService.GetSportsTreeAsync((int)FixtureType.Match, _languageCode, token);
             var result = new List<SportModel>();
 
+            if (token.IsCancellationRequested)
+                return new();
+            ;
             if (response.StatusCode == StatusCode.Success)
             {
                 result = response.Result.Sports

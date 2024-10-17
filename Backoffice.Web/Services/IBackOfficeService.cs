@@ -31,7 +31,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<PlatformMessageModel>> PostTopLeaguesAsync(PostTopLeaguesRequest request);
         Task<BaseResponse<bool>> CopyTopLeaguesAsync(CopyTopLeaguesRequest request);
         Task<BaseResponse<SportsTreeModel>> GetSportstreeByClientId(int clientId);
-        Task<BaseResponse<SportsTreeResponse>> GetSportsTreeAsync(int fixtureTypeId, LanguageCode langCode);
+        Task<BaseResponse<SportsTreeResponse>> GetSportsTreeAsync(int fixtureTypeId, LanguageCode langCode, CancellationToken cancellationToken = default);
         Task<BaseResponse<SportsLookupModel>> GetSportsAsync();
         Task<BaseResponse<ClientParlayBonusModel>> GetClientParlayBonus(GetParlayBonusRequest request);
         Task<BaseResponse<StatusCode>> AddOrUpdateParlayBonus(ParlayBonusRequest request);
