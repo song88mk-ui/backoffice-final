@@ -1,20 +1,24 @@
-﻿<div class="toast-container">
-    <div class="toast-item">
-         <img class="toast-icon" src="icons/svg/icon-check.svg" />
-    </div>
-    <span class="toast-item toast-message">@Message</span>
+﻿
+@if(_toasterService.HasMessage)
+{
+    <div class="toast-container">
+        <div class="toast-item">
+            <img class="toast-icon" src="icons/svg/icon-check.svg" />
+        </div>
+        <span class="toast-item toast-message">@_toasterService.GetToast()</span>
 
-</div>
+    </div>
+}
 
 @code {
-
+    [Inject] private AlertToastService? _toasterService { get; set; }
     private string Message;
+
+    private void ToastChanged(object? sender, EventArgs e)
+                                => this.InvokeAsync(this.StateHasChanged);
 
     protected override void OnInitialized()
     {
-        Message = "Message";
+        this._toasterService.ToasterChanged += ToastChanged;
     }
-
-
-
 }

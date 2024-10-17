@@ -1,71 +1,86 @@
-﻿@* @page "/admin/v2/maintenance" *@
+﻿@page "/admin/v2/maintenance"
 @using Backoffice.Web.Components.Administration.MaintenanceV2
 
 <div class="row maintenance m-3">
-    <div class="page-title my-3">
-        <div class="d-flex justify-content-between">
-            <div class="d-flex align-items-center">
-                <h4 class="fw-bolder">
-                    @TranslationState.GetValue(_title)
-                </h4>
+    @if (_isPreloader)
+    {
+        <Preloader />
+    }
+    else
+    {
+        <div class="page-title my-3">
+            <div class="d-flex justify-content-between">
+                <div class="d-flex align-items-center">
+                    <h4 class="fw-bolder">
+                        @TranslationState.GetValue(_title)
+                    </h4>
+                </div>
             </div>
         </div>
-    </div>
-    <ClientState IsLive="true" IsCompleteClients="true" />
-    <ClientState IsLive="false" />
-    <div class="page-content m-3">
-        <div class="d-flex justify-content-between my-3">
-            <div class="ms-2">
-                <p class="fw-bolder">Enable Maintenance Mode</p>
-                <p>Enabling maintenance mode will activate global bet stop for odds feed clients and maintenance page on sportsbook clients</p>
+        <ClientState IsLive="true" IsCompleteClients="true" />
+        <ClientState IsCompleteClients="true" />
+        @if (_liveClients.Any())
+        {
+            <ClientState Clients="_liveClients" IsLive="true" IsCompleteClients="@(!_underMaintenanceClients.Any())" />
+        }
+        @if (_underMaintenanceClients.Any())
+        {
+            <ClientState Clients="_underMaintenanceClients" IsLive="false" IsCompleteClients="@(!_liveClients.Any())" />
+        }
+        <div class="page-content m-3">
+            <div class="d-flex justify-content-between my-3">
+                <div class="ms-2">
+                    <p class="fw-bolder">Enable Maintenance Mode</p>
+                    <p>Enabling maintenance mode will activate global bet stop for odds feed clients and maintenance page on sportsbook clients</p>
+                </div>
+                <div>
+                    <div class="form-switch d-flex justify-content-center">
+                        <input class="form-check-input me-3" type="checkbox" @bind="@_isMaintenance" id="maitenance-mode" @bind:after="HandleSetAlertToast">
+                    </div>
+                </div>
             </div>
             <div>
-                <div class="form-switch d-flex justify-content-center">
-                    <input class="form-check-input me-3" type="checkbox" @bind="@_isMaintenance" id="maitenance-mode" @bind:after="HandleModalDisplay">
-                </div>
+                <ul>
+                    <li>Users won't be able to log in or access their accounts during this period</li>
+                    <li>All live bets and gameplay will be suspended temporarily</li>
+                    <li>Active players will be redirected to a maintenance page</li>
+                </ul>
             </div>
-        </div>
-        <div>
-            <ul>
-                <li>Users won't be able to log in or access their accounts during this period</li>
-                <li>All live bets and gameplay will be suspended temporarily</li>
-                <li>Active players will be redirected to a maintenance page</li>
-            </ul>
-        </div>
-        <div class="mode-container m-2">
-            <div class="current-items">
-                <div class="maintenance-mode-container all-clients border border-2 px-3 mb-3 @_maintenanceModeAllClientsCss">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="wrapper-input">
-                            <input type="radio" name="one" id="radio1" checked="@_isAllClient" @onclick="_allClientsEvent" @onchange="OnChange">
-                            <label for="radio1"></label>
-                        </div>
-                        <div class="option-item">
-                            <p class="fw-bold">Activate Maintenance Mode for all Clients</p>
-                            <p>Choosing this will activate maintenance mode for all clients</p>
+            <div class="mode-container m-2">
+                <div class="current-items">
+                    <div class="maintenance-mode-container all-clients border border-2 px-3 mb-3 @_maintenanceModeAllClientsCss">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="wrapper-input">
+                                <input type="radio" name="one" id="radio1" checked="@_isAllClient" @onchange="_allClientsEvent">
+                                <label for="radio1"></label>
+                            </div>
+                            <div class="option-item">
+                                <p class="fw-bold">Activate Maintenance Mode for all Clients</p>
+                                <p>Choosing this will activate maintenance mode for all clients</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="maintenance-mode-container specific-clients border border-2 px-3 mb-3 @_maintenanceModeSpecificClientsCss">
-                    <div class="d-flex align-items-center gap-3 pb-3">
-                        <div class="wrapper-input">
-                            <input type="radio" name="one" id="radio2" checked="@(!_isAllClient)" @onclick="_specificClientsEvent" @onchange="OnChange">
-                            <label for="radio2"></label>
+                    <div class="maintenance-mode-container specific-clients border border-2 px-3 mb-3 @_maintenanceModeSpecificClientsCss">
+                        <div class="d-flex align-items-center gap-3 pb-3">
+                            <div class="wrapper-input">
+                                <input type="radio" name="one" id="radio2" checked="@(!_isAllClient)" @onchange="_specificClientsEvent">
+                                <label for="radio2"></label>
+                            </div>
+                            <div class="option-item">
+                                <p class="fw-bold">Activate Maintenance Mode for Specific Clients</p>
+                                <p>By choosing this, maintenance mode will only apply to selected clients</p>
+                            </div>
                         </div>
-                        <div class="option-item">
-                            <p class="fw-bold">Activate Maintenance Mode for Specific Clients</p>
-                            <p>By choosing this, maintenance mode will only apply to selected clients</p>
+                        <div class="maintenance-header row py-4 mx-1 mb-3 h-100 border-top">
+                            <div class="d-flex p-0">
+                                <p>Select which clients you want to apply maintenance mode to</p>
+                            </div>
+                            <ClientSelectionDropDown Clients="_clients" Disable="_isAllClient" OnHasChange="HandlePropertyChange"/>
                         </div>
-                    </div>
-                    <div class="maintenance-header row py-4 mx-1 mb-3 h-100 border-top">
-                        <div class="d-flex p-0">
-                            <p>Select which clients you want to apply maintenance mode to</p>
-                        </div>
-                        <ClientSelectionDropDown Clients="_clients" Disable="_isAllClient" />
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
 </div>
 <MinimalistModal />

@@ -14,13 +14,6 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
 
         private bool _isShowClient;
 
-        protected override void OnInitialized()
-        {
-            Clients = new List<string>()
-            {
-                "Alpha88", "EKings Thailand", "Khelraja", "WSGaming" , "W88"
-            };
-        }
         protected override void OnParametersSet()
         {
             _headerText = IsCompleteClients ? "All client sites are" : "The following client sites are";

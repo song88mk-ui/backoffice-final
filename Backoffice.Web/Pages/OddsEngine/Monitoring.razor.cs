@@ -12,17 +12,16 @@ using Backoffice.Web.States;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class Monitoring : IAsyncDisposable, IDisposable
+    public partial class Monitoring : IDisposable
     {
         #region Properties
 
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public ICommonService CommonService { get; set; }
-        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
-        
+
 
         [Parameter] public int SportId { get; set; }
         [Parameter] public int SegmentId { get; set; }
@@ -34,27 +33,24 @@ namespace Backoffice.Web.Pages.OddsEngine
         private int _segmentId;
         private int _leagueId;
         private PageHeaderModel _pageHeaderModel;
-        private MonitoringCallbackModel _monitoringCallbackModel;
-        private List<Client>? _clients;
         private List<FixtureMarketModel>? _fixtureMarkets;
         private List<BreadcrumbModel> _breadcrumbs;
         private List<string>? _slugs;
 
         private bool _isPreloader;
-        private AlertModel _alertModel;
         private LanguageCode _languageCode;
-        private bool _isInit;
+
+        private bool _init = true;
+        private bool _shouldRender = true;
+        private List<Client> _clients = new();
+        private AlertModel _alertModel = new();
+
+        private MonitoringCallbackModel _monitoringCallbackModel = new();
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            _isInit = false;
-            _isPreloader = true;
-            _clients = new();
-            _alertModel = new();
-            _fixtureMarkets = null;
-            _monitoringCallbackModel = new();
             _slugs = new List<string>();
             _breadcrumbs = new()
             {
@@ -72,7 +68,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnParametersSetAsync()
         {
-            if (_isInit || (SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2))
+            if (ValidateParameters())
             {
                 var isSportChanged = _sportId != SelectedSport.SportId || _leagueId != SelectedSport.LeagueId || _languageCode != TranslationState.ActiveLanguageCode;
                 _sportId = SelectedSport.SportId;
@@ -87,10 +83,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                     ShowLanguageDropDown = false
                 };
 
-                if (!_isInit && isSportChanged && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
+                if (!_init && isSportChanged && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
                 {
                     await OnInitializeEvent(_monitoringCallbackModel);
                 }
+
+                _init = false;
             }
         }
 
@@ -112,11 +110,16 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
 
             }
+
+            _shouldRender = false;
         }
+        protected override bool ShouldRender() => _shouldRender;
+        private bool ValidateParameters() => _init || (SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2);
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
         {
             _isPreloader = true;
+            _shouldRender = true;
 
             _fixtureMarkets = await GetFixtures(new MarketFixtureRequest
             {
@@ -129,6 +132,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             });
 
             _isPreloader = false;
+            _shouldRender = true;
             StateHasChanged();
         }
 
@@ -145,6 +149,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     Region = _region
                 }).ToList();
             }
+            _shouldRender = true;
         }
 
         private async Task OnSaveClickedEvent(object param)
@@ -173,10 +178,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                         Message = $"{model.FixtureName} is NOT closed successfully."
                     };
                 }
+
+                _shouldRender = true;
             }
         }
-
-        public async ValueTask DisposeAsync() => Dispose();
 
         public async void Dispose()
         {
@@ -234,7 +239,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async Task<List<FixtureMarketModel>> GetFixtures(MarketFixtureRequest request)
         {
-            var response = await BackofficeService.GetMarketFixtures(request, _languageCode);
+            var response = await _backofficeService.GetMarketFixtures(request, _languageCode);
             var marketFixtures = response.Result;
 
             if (marketFixtures.Fixtures.Count == 0)
@@ -398,6 +403,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     });
                 }
             }
+
+            _shouldRender = true;
             await InvokeAsync(StateHasChanged);
         }
 
@@ -412,6 +419,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     var fixtureMarkets = _fixtureMarkets?.Where(c => c.ProviderFixtureId == message.ProviderFixtureId).ToList() ?? new List<FixtureMarketModel>();
                     fixtureMarkets.ForEach(x => x.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>());
 
+                    _shouldRender = true;
                     await InvokeAsync(StateHasChanged);
                 }
             }
@@ -422,6 +430,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (_fixtureMarkets != null && _fixtureMarkets.Any())
             {
                 _fixtureMarkets.ForEach(c => c.IsBetStopGlobal = message.IsBetStop);
+
+                _shouldRender = true;
                 await InvokeAsync(StateHasChanged);
             }
         }
