@@ -37,7 +37,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private List<BreadcrumbModel> _breadcrumbs;
         private List<string>? _slugs;
 
-        private bool _isPreloader;
+        private bool _isPreloader = true;
         private LanguageCode _languageCode;
 
         private bool _init = true;
@@ -87,6 +87,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     await OnInitializeEvent(_monitoringCallbackModel);
                 }
+
+                _shouldRender = true;
             }
         }
 
