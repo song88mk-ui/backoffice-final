@@ -103,10 +103,10 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
-        [HttpGet("templates")]
-        public async Task<IActionResult> GetConfigTemplates([FromQuery] string searchText = "", [FromQuery] int sportId = -1, [FromQuery] int scopeId = -1)
+        [HttpPost("templates")]
+        public async Task<IActionResult> GetConfigTemplates([FromBody] MetaData metaData, [FromQuery] string searchText = "", [FromQuery] int sportId = -1, [FromQuery] int scopeId = -1)
         {
-            var result = await _backofficeRepository.GetConfigTemplates(searchText, sportId == -1 ? null : new List<int>() { sportId }, scopeId == -1 ? null : new List<int>() { scopeId });
+            var result = await _backofficeRepository.GetConfigTemplates(searchText, metaData, sportId == -1 ? null : new List<int>() { sportId }, scopeId == -1 ? null : new List<int>() { scopeId });
 
             switch (result.StatusCode)
             {

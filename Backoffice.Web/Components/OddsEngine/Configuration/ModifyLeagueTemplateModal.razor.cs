@@ -429,9 +429,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var response = await BackofficeService.GetConfigTemplate(string.Empty, sportId, scopeId);
 
             IsPreLoader = false;
-            if (response.StatusCode == StatusCode.Success && response.Result.Count > 0)
+            if (response.StatusCode == StatusCode.Success && response.Result.ConfigTemplates.Count > 0)
             {
-                return response.Result.Select(x => new SelectListItemModel<long>()
+                return response.Result.ConfigTemplates.Select(x => new SelectListItemModel<long>()
                 {
                     Value = x.Id,
                     Name = x.Name

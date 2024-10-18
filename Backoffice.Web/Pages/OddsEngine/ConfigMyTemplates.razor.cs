@@ -5,6 +5,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Config;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -30,16 +31,19 @@ namespace Backoffice.Web.Pages.OddsEngine
         private List<BreadcrumbModel> _breadcrumbs;
 
         private List<ConfigMyTemplateModel>? _configTemplates = null;
+        private MetaData _metaData;
 
         private CancellationTokenSource? _cts;
         private LanguageCode _languageCode;
         private bool _init = true;
         private bool _shouldRender = true;
+
         #endregion
 
         #region Methods
         protected override void OnInitialized()
-            => _breadcrumbs = new List<BreadcrumbModel>()
+        {
+            _breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
                 {
@@ -48,6 +52,15 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
+
+            _metaData = new MetaData()
+            {
+                PageSize = 20,
+                CurrentPage = 1,
+                TotalPages = 0,
+                TotalCount = 0
+            };
+        }
 
         protected override async Task OnParametersSetAsync()
         {
@@ -166,6 +179,12 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Utilities
 
+        private async Task SelectPage(int page)
+        {
+            _metaData.CurrentPage = page;
+
+            await LoadConfigTemplates();
+        }
         private async Task LoadConfigTemplates()
         {
             _cts?.Cancel();
@@ -186,12 +205,15 @@ namespace Backoffice.Web.Pages.OddsEngine
                     _searchForm.SearchText,
                     _selectedSportId,
                     _selectedScopeId,
+                    _metaData,
                     token);
 
                 if (token.IsCancellationRequested)
                     return;
 
-                _configTemplates = configTemplateResponse?.Result?.Select(config => new ConfigMyTemplateModel()
+                var configTemplates = configTemplateResponse?.Result?.ConfigTemplates;
+
+                _configTemplates = configTemplates?.Select(config => new ConfigMyTemplateModel()
                 {
                     Id = config.Id,
                     Name = config.Name,
@@ -200,10 +222,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                     LeagueAssigned = $"{config.LeaguesCount} League{(config.LeaguesCount > 1 ? "s" : "")}",
                     DateCreated = config.Timestamp.ToString("HH:mm dd/MM/yyyy", CultureInfo.InvariantCulture),
                     IsReadOnly = !(config.ClientsCount > 0 && config.LeaguesCount > 0)
-                }).ToList() ?? new List<ConfigMyTemplateModel>();
+                }).ToList() ?? new();
 
+                _metaData = configTemplateResponse?.Result?.MetaData ?? new();
                 _isPreloader = false;
                 _shouldRender = true;
+
                 StateHasChanged();
             }
             catch (TaskCanceledException)

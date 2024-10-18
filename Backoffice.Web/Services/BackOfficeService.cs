@@ -4,15 +4,13 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
+using Backoffice.Web.Extensions;
 using Backoffice.Web.Models;
 using Serilog;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Backoffice.Web.Extensions;
-using static Backoffice.Shared.Models.Response.SportsTreeResponse;
-using System.Drawing;
 
 namespace Backoffice.Web.Services
 {
@@ -1509,7 +1507,7 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, CancellationToken cancellationToken = default)
+        public async Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, MetaData metaData = null, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -1529,17 +1527,17 @@ namespace Backoffice.Web.Services
                 if (queries != null && queries.Any() && queries.Count > 0)
                     path += $"?{string.Join("&", queries)}";
 
-                var response = await _httpClient.GetAsync($"{path}", cancellationToken);
+                var response = await _httpClient.PostAsync($"{path}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"), cancellationToken);
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<ConfigTemplateModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<ConfigTemplateModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
                     {
-                        return new BaseResponse<List<ConfigTemplateModel>>
+                        return new BaseResponse<ConfigTemplateResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -1549,7 +1547,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<ConfigTemplateModel>>
+                return new BaseResponse<ConfigTemplateResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

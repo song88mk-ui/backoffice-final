@@ -53,7 +53,7 @@ namespace Backoffice.Web.Services
         #region ConfigTemplate
         Task<BaseResponse<TranslationResponse>> GetTranslation(LanguageCode langCode);
         Task<BaseResponse<ConfigTemplateModel>> GetConfigTemplateById(long configTemplateId);
-        Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, CancellationToken cancellationToken = default);
+        Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, MetaData metaData = null, CancellationToken cancellationToken = default);
         Task<BaseResponse<long>> AddOrUpdateConfigTemplate(ConfigTemplateModel request);
         Task<BaseResponse<bool>> SetLeagueState(ConfigState state, ConfigSetLeagueStateRequest payload);
         Task<BaseResponse<List<ConfigTemplateModel>>> DeleteConfigTemplate(long id);
