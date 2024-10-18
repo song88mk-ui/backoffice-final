@@ -22,6 +22,7 @@ namespace Backoffice.API.Controllers.Trading
 
         public TradingController(ITradingRepository tradingRepository)
         {
+            //
             _tradingRepository = tradingRepository;
         }
 
