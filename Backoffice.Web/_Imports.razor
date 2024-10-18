@@ -9,6 +9,7 @@
 @using Microsoft.JSInterop
 @using Backoffice.Shared.Enums
 @using Backoffice.Web
+@using Backoffice.Web.Pages.Base
 @using Backoffice.Web.Shared
 @using Backoffice.Web.Shared.OddsEngine
 @using BlazorDeferredRemove.Components
@@ -25,8 +26,11 @@
 @inject AlertToastService _alertToastService;
 @inject SaveOptionService _saveOptionService;
 
-@inject IModalService _modalService
+@inject IModalService _modalService;
 @inject ITradingService _tradingService;
 @inject IBackofficeService _backofficeService;
+@inject IAuthenticationService _authenticationService;
+@inject ITableauService _tableauService;
+@inject IJSRuntime _jsRuntime;
 
-@inject NavigationManager _navigationManager
+@inject NavigationManager _navigationManager;

@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Formats.Tar;
 using System.Runtime.CompilerServices;
 
-namespace Backoffice.Web.States
+namespace Backoffice.Web.States.Base
 {
     public abstract class BaseState<T> : INotifyPropertyChanged
     {
@@ -12,7 +12,7 @@ namespace Backoffice.Web.States
         protected T Model
         {
             get { return _model; }
-            set 
+            set
             {
                 _model = value;
                 OnPropertyChanged();

@@ -2,33 +2,31 @@
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Pages.SBC
 {
     public partial class Dashboard : IDisposable
     {
         #region Properties
-        [Inject] public IAuthenticationService AuthenticationService { get; set; }
-        [Inject] public ITableauService TableauService { get; set; }
-        [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        
-
-        public string IFrameSrc { get; set; }
 
         #endregion
 
-        private PageHeaderModel _pageHeaderModel;
+        #region Fields
+
+        public string _iFrameSrc;
+
+        #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            _pageHeaderModel = new()
+            PageState.Page = this;
+
+            PageHeaderModel = new PageHeaderModel()
             {
                 Title = "Dashboard",
                 IconClass = "ico ico-dashboard"
@@ -40,13 +38,13 @@ namespace Backoffice.Web.Pages.SBC
 
         private async Task Initialize()
         {
-            var reportRoles = (await AuthenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
+            var reportRoles = (await _authenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
             {
                 RoleId = UserModel.RoleId,
                 ClaimType = SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", ".")
             })).Result ?? new ReportRolesUrlResponse();
 
-            IFrameSrc = await TableauService.GetTableauUrl(reportRoles.Url);
+            _iFrameSrc = await _tableauService.GetTableauUrl(reportRoles.Url);
         }
 
         public void Dispose()

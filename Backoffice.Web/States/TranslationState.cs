@@ -1,36 +1,48 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Services;
+using Backoffice.Web.States.Base;
 using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.JSInterop;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Backoffice.Web.States
 {
     public class TranslationState : BaseState<Dictionary<string, string>>
     {
+        #region Fields
+
         private ITranslationService _translationService;
-        private readonly IJSRuntime _jsRuntime;
-        public readonly List<LanguageCode> LanguageCodes;
 
-        public LanguageCode ActiveLanguageCode;
+        #endregion
 
-        public TranslationState(ITranslationService translationService, IJSRuntime jsRuntime) : base(new Dictionary<string, string>())
+        #region Properties
+
+        public List<LanguageCode> LanguageCodes { get;set; }
+        public LanguageCode ActiveLanguageCode { get; set; }
+
+        #endregion
+
+        #region Ctor
+
+        public TranslationState(ITranslationService translationService) : base(new Dictionary<string, string>())
         {
             _translationService = translationService;
-            _jsRuntime = jsRuntime;
-            ActiveLanguageCode = LanguageCode.EN;
-            LanguageCodes = new List<LanguageCode> { LanguageCode.EN, LanguageCode.ZH, LanguageCode.KO };  //Enum.GetValues<LanguageCode>().Select(s => s).ToList();
+
+            LanguageCodes = new List<LanguageCode> { LanguageCode.EN, LanguageCode.ZH, LanguageCode.KO }; 
 
             if (!Model.Any())
-                ReloadModel();
+                SetLanguageCode(LanguageCode.EN);
         }
 
-        public void SetLanguageCode(LanguageCode langCode)
+        #endregion
+
+        #region Methods
+
+        public async Task SetLanguageCode(LanguageCode langCode)
         {
+            Model = await _translationService.GetTranslationsAsync(langCode);
             ActiveLanguageCode = langCode;
-            ReloadModel();
         }
+
         public string GetValue(string word)
         {
             if (string.IsNullOrEmpty(word))
@@ -46,7 +58,10 @@ namespace Backoffice.Web.States
             return translated.Replace("{", "").Replace("}", "");
         }
 
-        private async void ReloadModel() => Model = await _translationService.GetTranslationsAsync(ActiveLanguageCode);
+        #endregion
+
+        #region Utilities
+
         private string TransformPlaceHolder(string word, string placeholder, params object[] values)
         {
             var index = -1;
@@ -60,6 +75,7 @@ namespace Backoffice.Web.States
 
             return word;
         }
+
         private List<string> ExtractPlaceholders(ref string input)
         {
             List<string> result = new List<string>();
@@ -75,5 +91,7 @@ namespace Backoffice.Web.States
 
             return result;
         }
+
+        #endregion
     }
 }
