@@ -86,3 +86,33 @@ p {
     left: 2rem;
     top: 0.5rem;
 }
+.btn{
+	text-align: center;
+	font-size: 14px;
+	font-style: normal;
+	font-weight: 600;
+	line-height: 20px; 
+	border-radius: 4px;
+	width: 61px;
+	height: 36px;
+	padding: 8px;
+	align-items: center;
+	gap: 2px;
+	border: none;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+
+}
+.btn-cancel{
+	background: #E0E1E4;
+	color:#4F4F50;
+}
+.btn-save{
+	background: #FF6B00;
+	color:#ffff;
+}
+.btn-disabled{
+	background: #FF6B003e;
+}
+
