@@ -1,7 +1,6 @@
 ﻿
 using Backoffice.Shared.Enums;
 using Backoffice.Web.Models.Shared;
-using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Shared
 {

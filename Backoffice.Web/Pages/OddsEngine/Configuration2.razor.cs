@@ -47,6 +47,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             await PageState.AuthenticateAccessEvent.InvokeAsync();
 
             _scopes = new List<SelectListItemModel<string>>()
