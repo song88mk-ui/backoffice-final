@@ -315,7 +315,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         SelectionId = od.SelectionId
                     }).ToList()
                 }).ToList()
-            }).ToList();
+            }).OrderBy(o => string.IsNullOrEmpty(o.Line) ? 0 : Convert.ToDecimal(o.Line)).ToList();
         }
 
         private List<FixtureMarketModel> PrepareFixtureMarketTemplates(string marketTemplateId)
