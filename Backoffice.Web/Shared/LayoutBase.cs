@@ -16,21 +16,27 @@ namespace Backoffice.Web.Shared
 {
     public abstract class LayoutBase : LayoutComponentBase
     {
-        [Inject] public NavigationManager NavigationManager { get; set; } = default!;
-        [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; }
+        #region Properties
 
+        [Inject] public IBackofficeService BackofficeService { get; set; }
+        [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
+
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-        [Inject] IBackofficeService BackofficeService { get; set; }
-        [Inject] public TranslationState _translationState { get; set; }
-        [Inject] public PageState PageState { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+        [Inject] public TranslationState TranslationState { get; set; }
         [Inject] public ToastService ToasterService { get; set; }
+        [Inject] public PageState PageState { get; set; }
 
         public UserModel UserModel { get; set; } = new UserModel();
         public NavMenuModel NavMenus { get; set; } = new NavMenuModel();
+        public NavMenuParameter NavMenuParameter { get; set; }
         public bool IsPreloader { get; set; }
         public string InlineSpinnerCss { get; set; } = "width:10rem;height:10rem;";
-        public NavMenuParameter NavMenuParameter { get; set; }
+
+        #endregion
+
+        #region Fields
 
         private static readonly Dictionary<string, string> PermissionMap = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
         {
@@ -43,7 +49,11 @@ namespace Backoffice.Web.Shared
             { "SBC.OE.PriceBoost.Manage", "/manage-boost" },
             { "SBC.OE.PriceBoost.Settings", "/boosted-settings" }
         };
-        private HubConnection _hubConnection { get; set; }
+        private HubConnection _hubConnection;
+
+        #endregion
+
+        #region Methods
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -60,11 +70,11 @@ namespace Backoffice.Web.Shared
             }
         }
 
-        public async void InitializeState()
+        protected async void InitializeState()
         {
             try
             {
-                _translationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
+                TranslationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
 
                 if (HttpContextAccessor?.HttpContext?.Session.GetString("UserToken") == null)
                 {
@@ -245,6 +255,11 @@ namespace Backoffice.Web.Shared
                 NavigationManager.NavigateTo("login", true);
             }
         }
+
+        #endregion
+
+        #region Private Methods
+
         private async Task Subscribe()
         {
             try
@@ -314,5 +329,7 @@ namespace Backoffice.Web.Shared
                 Permissions = permissions,
             };
         }
+
+        #endregion
     }
 }
