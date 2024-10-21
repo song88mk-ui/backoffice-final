@@ -168,10 +168,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (response.StatusCode == StatusCode.Success)
                     _navMenuParamModel.MyTemplatesCount = response.Result;
 
-                var rand = new Random();
-
-                _navMenuParamModel.MyTemplatesCount = rand.Next(1, 1000);
-
                 StateHasChanged();
             }, token);
 
@@ -181,12 +177,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 if (response.StatusCode == StatusCode.Success)
                     _navMenuParamModel.AssignedLeaguesCount = response.Result;
-
-                //await Task.Delay(5000);
-
-                //var rand = new Random();
-
-                //_navMenuParamModel.AssignedLeaguesCount = rand.Next(1, 1000);
 
                 StateHasChanged();
             }, token);
@@ -203,13 +193,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                         _navMenuParamModel.UnAssignedLeaguesCount = response.Result;
                         break;
                     }
-
-                    //await Task.Delay(8000);
-
-                    //var rand = new Random();
-
-                    //_navMenuParamModel.UnAssignedLeaguesCount = rand.Next(1, 1000);
-                    //break;
 
                     attempt++;
                 }
