@@ -13,7 +13,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         [Parameter] public EventCallback<AnnouncementsFilterModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<AnnouncementsFilterModel> OnFilterCallback { get; set; }
@@ -56,7 +56,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
             if (clients != null && clients.Clients.Any())
             {
-                clients.Clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
+                clients.Clients = UserModel?.ClientCodes != null && UserModel.ClientCodes.Any() ? clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
 
                 _clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
                 {
