@@ -168,6 +168,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (response.StatusCode == StatusCode.Success)
                     _navMenuParamModel.MyTemplatesCount = response.Result;
 
+                _shouldRender = true;
                 StateHasChanged();
             }, token);
 
@@ -178,6 +179,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (response.StatusCode == StatusCode.Success)
                     _navMenuParamModel.AssignedLeaguesCount = response.Result;
 
+                _shouldRender = true;
                 StateHasChanged();
             }, token);
 
@@ -197,6 +199,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     attempt++;
                 }
 
+                _shouldRender = true;
                 StateHasChanged();
             }, token);
         }
