@@ -18,7 +18,7 @@ namespace Backoffice.Web.Pages
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
-        
+
 
         public List<Claim> UserClaims { get; set; }
 
@@ -44,12 +44,8 @@ namespace Backoffice.Web.Pages
         {
             if (firstRender)
             {
-                var cookieValue = await JSRuntime.InvokeAsync<string>("getCookie", "c-langCode");
-
-                if (Enum.TryParse(cookieValue, out LanguageCode langCode))
-                {
-                    _translationState.SetLanguageCode(langCode);
-                }
+                var cookieValue = await _jsRuntime.InvokeAsync<string>("getCookie", "c-langCode");
+                await UpdateLanguageCode(cookieValue);  
             }
         }
         public async Task OnLogoutClickEvent()
@@ -73,6 +69,19 @@ namespace Backoffice.Web.Pages
 
             // Suppress finalization.
             GC.SuppressFinalize(this);
+        }
+        private async Task UpdateLanguageCode(string value)
+        {
+            if (_translationState.ActiveLanguageCode.ToString() == value)
+                return;
+
+            if (Enum.TryParse(value, out LanguageCode langCode))
+            {
+                await _jsRuntime.InvokeVoidAsync("setCookie", "c-langCode", value, 30);
+                await _translationState.SetLanguageCode(langCode);
+
+                await PageState.Page.RefreshPage();
+            }
         }
 
         #endregion
