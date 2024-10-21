@@ -42,4 +42,54 @@ p, i {
     font-size: 14px;
     max-height: 380px;
     overflow-y: auto;
+    li{
+        color: #4D4D4D;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+
+        input[type="checkbox"] {
+            display: none; /* hide the default checkbox */
+          }
+          
+          input[type="checkbox"] + label {
+            position: relative;
+            padding-left: 30px; /* adjust padding for the label */
+            cursor: pointer;
+            display: inline-block;
+            font-size: 16px;
+          }
+          
+          input[type="checkbox"] + label:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #E0E1E4; /* outer box border */
+            border-radius: 3px;
+            background-color: #FFF;
+            transition: background-color 0.2s ease;
+          }
+          
+          input[type="checkbox"] + label:after {
+            content: '';
+            position: absolute;
+            left: 4px; /* adjust for inner box */
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border: 2px solid transparent; /* inner box border */
+            border-radius: 2px;
+            background-color: #FFF;
+            transition: background-color 0.2s ease;
+          }
+          
+          input[type="checkbox"]:checked + label:after {
+            background-color: #FF6B00; /* inner box background color on check */
+          }
+          
+    }
 }
