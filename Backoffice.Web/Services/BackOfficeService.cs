@@ -6,11 +6,13 @@ using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Extensions;
 using Backoffice.Web.Models;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Backoffice.Web.Services
 {
@@ -1507,7 +1509,7 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, MetaData metaData = null, CancellationToken cancellationToken = default)
+        public async Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -1527,7 +1529,7 @@ namespace Backoffice.Web.Services
                 if (queries != null && queries.Any() && queries.Count > 0)
                     path += $"?{string.Join("&", queries)}";
 
-                var response = await _httpClient.PostAsync($"{path}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"), cancellationToken);
+                var response = await _httpClient.GetAsync($"{path}", cancellationToken);
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

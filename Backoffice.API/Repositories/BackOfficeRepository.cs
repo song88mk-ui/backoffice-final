@@ -1388,7 +1388,7 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Config
-        private async Task<List<ConfigTemplateModel>> GetFilteredPaginatedConfigTemplates(int pageNumber, int pageSize, string searchText, List<int> sportIds, List<int> scopeIds)
+        private async Task<List<ConfigTemplateModel>> GetFilteredPaginatedConfigTemplates(string searchText, List<int> sportIds, List<int> scopeIds)
         {
             var sportIdsParam = new SqlParameter("@SportIds", SqlDbType.Structured)
             {
@@ -1399,14 +1399,12 @@ namespace Backoffice.API.Repositories
             var scopeIdsParam = new SqlParameter("@ScopeIds", SqlDbType.Structured)
             {
                 TypeName = "dbo.IntList",
-                Value = CreateDataTable(scopeIds) // Convert list to DataTable
+                Value = CreateDataTable(scopeIds)
             };
 
             var results = await _backofficeContext.ConfigTemplateModel
-                .FromSqlRaw("EXEC GetAssignedConfigTemplatesV2 @PageNumber, @PageSize, @SearchText, @SportIds, @ScopeIds",
-                    new SqlParameter("@PageNumber", pageNumber),
-                    new SqlParameter("@PageSize", pageSize),
-                    new SqlParameter("@SearchText", (object)searchText ?? DBNull.Value), // Handle null
+                .FromSqlRaw("EXEC GetAssignedConfigTemplates @SearchText, @SportIds, @ScopeIds",
+                    new SqlParameter("@SearchText", (object)searchText ?? DBNull.Value),
                     sportIdsParam,
                     scopeIdsParam)
                 .AsNoTracking()
@@ -1427,48 +1425,11 @@ namespace Backoffice.API.Repositories
 
             return table;
         }
-        public async Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplates(string searchText, MetaData metaData = null, List<int> sportIds = null, List<int> scopeIds = null)
+        public async Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplates(string searchText, List<int> sportIds = null, List<int> scopeIds = null)
         {
             try
             {
-                var timer = new Stopwatch();
-                timer.Start();
-
-                if (metaData != null)
-                {
-                    var query = _backofficeContext.ConfigTemplate.AsNoTracking();
-
-                    if (!string.IsNullOrEmpty(searchText))
-                        query = query.Where(x => EF.Functions.Like(x.Name, $"%{searchText}%"));
-
-                    if (sportIds?.Any() == true)
-                        query = query.Where(x => sportIds.Contains(x.SportId));
-
-                    if (scopeIds?.Any() == true)
-                        query = query.Where(x => scopeIds.Contains(x.FixtureStatusId));
-
-                    var configTemplates = await query.ToListAsync();
-
-                    metaData.TotalCount = configTemplates.Count();
-                    metaData.TotalPages = Convert.ToInt32(Math.Ceiling(Convert.ToDecimal(metaData.TotalCount) / Convert.ToDecimal(metaData.PageSize)));
-
-                    var skip = (metaData.CurrentPage - 1) * metaData.PageSize;
-                    metaData.PageSize = metaData.PageSize == -1 ? metaData.TotalCount : metaData.PageSize;
-                }
-                timer.Stop();
-
-                var elapse = timer.Elapsed.ToString(@"m\:ss\.fff");
-                Console.WriteLine($" =========== Retrieving config data: {elapse}");
-
-                timer = new Stopwatch();
-                timer.Start();
-
-                var result = await GetFilteredPaginatedConfigTemplates(metaData?.CurrentPage ?? 1, metaData?.PageSize ?? 999999999, searchText, sportIds, scopeIds);
-
-                timer.Stop();
-
-                elapse = timer.Elapsed.ToString(@"m\:ss\.fff");
-                Console.WriteLine($" =========== Retrieving config data: {elapse}");
+                var result = await GetFilteredPaginatedConfigTemplates(searchText, sportIds, scopeIds);
 
                 return new BaseResponse<ConfigTemplateResponse>()
                 {
@@ -1476,8 +1437,7 @@ namespace Backoffice.API.Repositories
                     Message = StatusCode.Success.ToString(),
                     Result = new ConfigTemplateResponse()
                     {
-                        ConfigTemplates = result,
-                        MetaData = metaData
+                        ConfigTemplates = result
                     }
                 };
             }

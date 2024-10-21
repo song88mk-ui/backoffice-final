@@ -31,7 +31,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         private List<BreadcrumbModel> _breadcrumbs;
 
         private List<ConfigMyTemplateModel>? _configTemplates = null;
-        private MetaData _metaData;
 
         private CancellationTokenSource? _cts;
         private LanguageCode _languageCode;
@@ -51,14 +50,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                     Url = "hk/odds-engine/config/my-templates",
                     IsCurrentPage = true
                 }
-            };
-
-            _metaData = new MetaData()
-            {
-                PageSize = 20,
-                CurrentPage = 1,
-                TotalPages = 0,
-                TotalCount = 0
             };
         }
 
@@ -179,12 +170,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Utilities
 
-        private async Task SelectPage(int page)
-        {
-            _metaData.CurrentPage = page;
-
-            await LoadConfigTemplates();
-        }
         private async Task LoadConfigTemplates()
         {
             _cts?.Cancel();
@@ -205,7 +190,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                     _searchForm.SearchText,
                     _selectedSportId,
                     _selectedScopeId,
-                    _metaData,
                     token);
 
                 if (token.IsCancellationRequested)
@@ -224,7 +208,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsReadOnly = !(config.ClientsCount > 0 && config.LeaguesCount > 0)
                 }).ToList() ?? new();
 
-                _metaData = configTemplateResponse?.Result?.MetaData ?? new();
                 _isPreloader = false;
                 _shouldRender = true;
 
