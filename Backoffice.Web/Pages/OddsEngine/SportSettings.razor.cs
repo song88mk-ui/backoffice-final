@@ -50,6 +50,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (PreRenderService.IsPreRendering)
                 return;
 
+            PageState.Page = this;
+
             _breadcrumbs.Add(new BreadcrumbModel
             {
                 Name = "Sports Settings",

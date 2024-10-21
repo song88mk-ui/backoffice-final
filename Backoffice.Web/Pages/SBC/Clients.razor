@@ -2,7 +2,10 @@
 @using Backoffice.Web.Components.Common
 @using Backoffice.Web.Components.SBC.Clients
 
+@inherits BasePage
+
 @page "/clients"
+
 <AuthorizeView Policy="sbc-clients">
     <Authorized>
         <div class="row">

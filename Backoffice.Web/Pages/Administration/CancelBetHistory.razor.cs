@@ -39,6 +39,8 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             CallbackModel = new CancelBetHistoryCallbackModel();
             CancelBets = new CancelBetHistoryModel();
 

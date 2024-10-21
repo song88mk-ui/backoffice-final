@@ -36,6 +36,8 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _pageHeaderModel = new()
             {
                 Title = "Manage User Group",

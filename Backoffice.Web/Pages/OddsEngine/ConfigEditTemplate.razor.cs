@@ -54,6 +54,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _isPreloader = true;
 
             _configTemplateMargin = new ConfigTemplateMarginModel();

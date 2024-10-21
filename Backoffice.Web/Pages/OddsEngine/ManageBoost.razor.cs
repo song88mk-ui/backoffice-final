@@ -42,6 +42,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _isPreLoader = true;
             _alertModel = new();
             _pageHeaderModel = new()

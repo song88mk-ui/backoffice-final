@@ -47,6 +47,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _pageHeaderModel = new()
             {
                 Title = "Market Sort Order",

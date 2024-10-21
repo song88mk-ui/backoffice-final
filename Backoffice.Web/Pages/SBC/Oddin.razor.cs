@@ -18,6 +18,8 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             Config = new OddinConfig();
         }
 

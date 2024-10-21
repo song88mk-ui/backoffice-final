@@ -39,7 +39,8 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
-            //IsPreLoader = true;
+            PageState.Page = this;
+
             AlertModel = new AlertModel();
             _pageHeaderModel = new()
             {

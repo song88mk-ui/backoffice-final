@@ -34,6 +34,8 @@ namespace Backoffice.Web.Pages.Administration
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             IsPreLoader = true;
             _pageHeaderModel = new()
             {

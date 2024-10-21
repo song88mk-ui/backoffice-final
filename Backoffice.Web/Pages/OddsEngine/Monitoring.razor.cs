@@ -51,6 +51,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _slugs = new List<string>();
             _breadcrumbs = new()
             {

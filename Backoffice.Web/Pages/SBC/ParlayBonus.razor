@@ -1,7 +1,10 @@
 ﻿@using Backoffice.Web.Components.Common
 @using Backoffice.Web.Components.SBC.ParlayBonus
 
+@inherits BasePage
+
 @page "/parlay-bonus"
+
 <AuthorizeView Policy="sbc-parlaybonus">
     <Authorized>
         <div class="row">

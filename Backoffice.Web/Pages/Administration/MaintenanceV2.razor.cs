@@ -37,6 +37,8 @@ namespace Backoffice.Web.Pages.Administration
         private List<SelectListItemWithCheckboxModel<string>> _clients { get; set; }
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _pageHeaderModel = new()
             {
                 Title = "Maintenance",

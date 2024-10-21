@@ -1,7 +1,9 @@
 ﻿@using Backoffice.Web.Components.Common
 @using Backoffice.Web.Components.SBC.Announcements
 
+@inherits BasePage
 @page "/announcements"
+
 <AuthorizeView Policy="sbc-announcements">
     <Authorized>
         <div class="row">

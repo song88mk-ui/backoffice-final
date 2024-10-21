@@ -28,6 +28,8 @@ namespace Backoffice.Web.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             UserClaims = new List<Claim>();
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
