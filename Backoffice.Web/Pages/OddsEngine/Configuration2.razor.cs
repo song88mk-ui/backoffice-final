@@ -74,8 +74,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
-
-            Init();
         }
         protected override async Task OnParametersSetAsync()
         {
@@ -87,6 +85,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     _languageCode = _translationState.ActiveLanguageCode;
                     _contentFilterModel.Sports = await LoadSports();
+                    Init();
                 }
 
                 _queryMessage = QueryMessage;
