@@ -12,19 +12,19 @@
                 </div>
             }
             <div class="col-md-10">
-                <h6 class="title fw-bold ps-2 py-1">@TranslationState.GetValue("Sub User Preference")</h6>
+                <h6 class="title fw-bold ps-2 py-1">@_translationState.GetValue("Sub User Preference")</h6>
             </div>
             <div class="col-md-2">
                 @if (!IsEdit)
                 {
-                    <button type="button" class="btn btn-dark pull-right" @onclick="OnResetClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Reset")</button>
+                    <button type="button" class="btn btn-dark pull-right" @onclick="OnResetClickEvent" disabled="@IsPreload">@_translationState.GetValue("Reset")</button>
                 }
             </div>
 
             <div class="col-md-12">
                 <form class="row g-3">
                     <div class="col-md-6">
-                        <label for="inputUserName" class="form-label">@TranslationState.GetValue("Username")</label>
+                        <label for="inputUserName" class="form-label">@_translationState.GetValue("Username")</label>
                         <div class="input-group">
                             <span class="input-group-text" id="inputGroupPrepend3">@SubUserClaims.MainUserName</span>
                             @if (IsEdit)
@@ -38,34 +38,34 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label for="inputName" class="form-label">@TranslationState.GetValue("Nickname")</label>
-                        <input type="text" class="form-control" id="inputName" placeholder="@TranslationState.GetValue("Enter Nickname")" @bind-value="SubUser.NickName">
+                        <label for="inputName" class="form-label">@_translationState.GetValue("Nickname")</label>
+                        <input type="text" class="form-control" id="inputName" placeholder="@_translationState.GetValue("Enter Nickname")" @bind-value="SubUser.NickName">
                     </div>
 
                     <div class="col-md-6">
-                        <label for="inputPassword" class="form-label">@TranslationState.GetValue("Password")</label>
+                        <label for="inputPassword" class="form-label">@_translationState.GetValue("Password")</label>
                         <div class="input-group">
                             @if (IsTogglePassword)
                             {
-                                <input type="text" class="form-control" id="inputPassword" placeholder="@TranslationState.GetValue("Enter your Password")" @bind-value="SubUser.Password">
+                                <input type="text" class="form-control" id="inputPassword" placeholder="@_translationState.GetValue("Enter your Password")" @bind-value="SubUser.Password">
                             }
                             else
                             {
-                                <input type="password" class="form-control" id="inputPassword" placeholder="@TranslationState.GetValue("Enter your Password")" @bind-value="SubUser.Password">
+                                <input type="password" class="form-control" id="inputPassword" placeholder="@_translationState.GetValue("Enter your Password")" @bind-value="SubUser.Password">
                             }
                             <span class="input-group-text" @onclick="OnTogglePasswordClickEvent">
                                 <i class="@(IsTogglePassword ? "fa fa-eye" : "fa fa-eye-slash")" id="togglePassword"></i>
                             </span>
                         </div>
                         @* <p class="fst-italic p-desc">Password must contain any character from A-Z or a-z with any digit from 0-9 and between 8 to 15 characters long</p> *@
-                        <p class="fst-italic p-desc">@TranslationState.GetValue("password_criteria")</p>
+                        <p class="fst-italic p-desc">@_translationState.GetValue("password_criteria")</p>
                     </div>
                     @if (IsEdit == true)
                     {
                         <div class="col-md-6">
                             <div class="d-flex flex-column">
                                 <div>
-                                    <label for="selectStatus" class="form-label">@TranslationState.GetValue("Status")</label>
+                                    <label for="selectStatus" class="form-label">@_translationState.GetValue("Status")</label>
                                 </div>
 
                                 <div class="btn-group border rounded" role="group" aria-label="Status Toggle Button Group">
@@ -99,7 +99,7 @@
                     <div class="col-md-12">
                         <div class="row">
                             <div class="col-md-12">
-                                <h6 class="title fw-bold ps-2 py-1">@TranslationState.GetValue("Sub User Preference")</h6>
+                                <h6 class="title fw-bold ps-2 py-1">@_translationState.GetValue("Sub User Preference")</h6>
                             </div>
                             <div class="col-md-12">
                                 &nbsp;
@@ -121,8 +121,8 @@
                             </div>
                         }
 
-                        <button type="button" class="btn modal-btn cancel-btn waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Cancel")</button>
-                        <button type="button" class="btn modal-btn save-btn waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Save")</button>
+                        <button type="button" class="btn modal-btn cancel-btn waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">@_translationState.GetValue("Cancel")</button>
+                        <button type="button" class="btn modal-btn save-btn waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">@_translationState.GetValue("Save")</button>
                     </div>
                 </form>
             </div>

@@ -11,63 +11,44 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class DeleteTemplateModal : IDisposable
     {
         #region Properties
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
-        public ConfigTemplateModel ConfigTemplateModel { get; set; }
-
         #endregion
         private bool _isPreloader;
-        private bool _isEmptyLeagues;
+        private bool _isReadOnly;
+        private string _templateName;
+        private long _templateId;
 
         #region Methods
 
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
-            _isPreloader = false;
-            ConfigTemplateModel = ModalParameters.TryGet<ConfigTemplateModel>("ConfigTemplateModel");
-            _isEmptyLeagues = !(ConfigTemplateModel.ClientsCount > 0 || ConfigTemplateModel.LeaguesCount > 0);
+            _backofficeService.Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", ".");
+            _templateId = ModalParameters.TryGet<long>("ConfigTemplateId");
+            _templateName = ModalParameters.TryGet<string>("ConfigTemplateName");
+            _isReadOnly = ModalParameters.TryGet<bool>("IsReadOnly");
         }
 
-        public async Task OnCancelClickEvent()
-        {
-            ModalService.Cancel();
-        }
+        public void OnCancelClickEvent() => _modalService.Cancel();
 
-        public async Task OnApplyClickEvent()
+        public async Task HandleApplyClick()
         {
             _isPreloader = true;
-            var response = await BackofficeService.DeleteConfigTemplate(ConfigTemplateModel.Id);
+            var response = await _backofficeService.DeleteConfigTemplate(_templateId);
 
             if (response.StatusCode == StatusCode.Success)
             {
-                await BackofficeService.AddActivityLog(new ActivityLogModel()
-                {
-                    Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                    Payload = $"{ConfigTemplateModel.SportId}.{ConfigTemplateModel.FixtureStatusId}.{ConfigTemplateModel.Name}.T".Replace(" ", "_"),
-                    From = JsonSerializer.Serialize(ConfigTemplateModel),
-                    To = "-",
-                    Activity = Activity.Delete.ToString(),
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName,
-                    TimeStamp = DateTime.UtcNow
-                });
-
-                await Modal.OnSaveClickCallback.InvokeAsync($"{ConfigTemplateModel.Name} has successfully been removed.");
+                await Modal.OnSaveClickCallback.InvokeAsync($"{_templateName} has successfully been removed.");
             }
 
             _isPreloader = false;
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
-        public async Task OnCloseClickEvent()
-        {
-            ModalService.Cancel();
-        }
+        public void OnCloseClickEvent() => _modalService.Cancel();
 
         public void Dispose()
         {

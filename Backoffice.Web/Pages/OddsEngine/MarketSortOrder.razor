@@ -1,5 +1,6 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
+@inherits BasePage
 @layout OEMonitoringLayout
 
 @page "/hk/odds-engine/market-sort-order"
@@ -7,7 +8,7 @@
 <AuthorizeView Policy="sbc-market-sortorder">
     <Authorized>
         <div class="col-md-12">
-            <Breadcrumb Breadcrumbs="_breadcrumbs" Region="@Region" />
+            <Breadcrumb Breadcrumbs="_breadcrumbs" />
         </div>
         <div class="col-md-12">
             <OEPageHeader PageHeaderModel="_pageHeaderModel" />
@@ -31,7 +32,7 @@
                                 {
                                     <div class="me-2">
                                         <a href="javascript:void(0)" class="btn btn-market-group @(_selectedMarketGroupId == model.Id ? "active" : "") px-3" id="mtg-@model.Id" @onclick="() => OnMarketGroupClickEvent(model.Id)">
-                                            @TranslationState.GetValue(model.Name)
+                                            @_translationState.GetValue(model.Name)
                                         </a>
                                     </div>
                                 }
@@ -55,8 +56,8 @@
                 <table class="table @(_isUpdate ? "table-hover": "") table-bordered market-sort-order-table">
                     <thead class="table-head">
                         <tr>
-                            <th class="th-market">@TranslationState.GetValue("Market")</th>
-                            <th class="th-market-group">@TranslationState.GetValue("Market Group")</th>
+                            <th class="th-market">@_translationState.GetValue("Market")</th>
+                            <th class="th-market-group">@_translationState.GetValue("Market Group")</th>
                             <th class="th-action"></th>
                         </tr>
                     </thead>
@@ -101,7 +102,7 @@
                             {
                                 <tr>
                                     <td colspan="3">
-                                        <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                        <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                     </td>
                                 </tr>
                             }

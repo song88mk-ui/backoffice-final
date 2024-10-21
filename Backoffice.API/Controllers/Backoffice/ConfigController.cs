@@ -1,4 +1,5 @@
 ﻿using Backoffice.API.ActionFilter;
+using Backoffice.API.Models;
 using Backoffice.API.Repositories;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
@@ -7,13 +8,15 @@ using Backoffice.Shared.Models.Response;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Azure;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using AllowAnonymousAttribute = Backoffice.API.ActionFilter.AllowAnonymousAttribute;
 using AuthorizeAttribute = Backoffice.API.ActionFilter.AuthorizeAttribute;
-using BoStatusCode = Backoffice.Shared.Enums.StatusCode;     
+using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.Backoffice
 {
@@ -26,7 +29,6 @@ namespace Backoffice.API.Controllers.Backoffice
         private readonly IMaintenanceRepository _maintenanceRepository;
         public ConfigController(IBackofficeRepository backofficeRepository, IMaintenanceRepository maintenanceRepository)
         {
-            //
             _backofficeRepository = backofficeRepository;
             _maintenanceRepository = maintenanceRepository;
         }
@@ -59,6 +61,35 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
+        [HttpGet("v2/maintenance")]
+        public async Task<IActionResult> GetMaintenanceV2([FromBody] SetMaintenanceRequest request)
+        {
+            var clients = request?.ClientIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToUpper()).ToList() ?? new List<string>();
+            
+            var result = await _maintenanceRepository.GetMaintenanceV2(clients);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+        [HttpPost("v2/maintenance")]
+        public async Task<IActionResult> SetMaintenanceV2([FromBody] SetMaintenanceRequest request)
+        {
+            var result = await _maintenanceRepository.SetMaintenanceV2(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
+
         [HttpGet("template/{id}")]
         public async Task<IActionResult> GetConfigTemplateById([FromRoute] long id)
         {
@@ -72,10 +103,10 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
-        [HttpGet("templates")]
-        public async Task<IActionResult> GetConfigTemplates([FromQuery] string searchText = "", [FromQuery] int sportId = -1, [FromQuery] int scopeId = -1)
+        [HttpPost("templates")]
+        public async Task<IActionResult> GetConfigTemplates([FromBody] MetaData metaData, [FromQuery] string searchText = "", [FromQuery] int sportId = -1, [FromQuery] int scopeId = -1)
         {
-            var result = await _backofficeRepository.GetConfigTemplates(searchText, sportId == -1 ? null : new List<int>() { sportId }, scopeId == -1 ? null : new List<int>() { scopeId });
+            var result = await _backofficeRepository.GetConfigTemplates(searchText, metaData, sportId == -1 ? null : new List<int>() { sportId }, scopeId == -1 ? null : new List<int>() { scopeId });
 
             switch (result.StatusCode)
             {
@@ -131,8 +162,16 @@ namespace Backoffice.API.Controllers.Backoffice
         public async Task<IActionResult> DeleteConfigTemplate([FromRoute] string id)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
+            var userName = HttpContext.Items["UserName"]?.ToString();
 
-            var result = await _backofficeRepository.DeleteConfigTemplate(id);
+            var requester = new RequesterInfo()
+            {
+                UserId = userId,
+                UserName = userName,
+                Page = HttpContext.Request.Headers["x-page"].FirstOrDefault()
+            };
+
+            var result = await _backofficeRepository.DeleteConfigTemplate(id, requester);
 
             switch (result.StatusCode)
             {
@@ -147,6 +186,7 @@ namespace Backoffice.API.Controllers.Backoffice
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
             var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
+            var languageCode = HttpContext.Items["x-language-code"]?.ToString();
 
             var result = new BaseResponse<ConfigTemplateLeagueResponse>()
             {

@@ -2,11 +2,11 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th scope="col">@TranslationState.GetValue("Date")</th>
-                <th scope="col">@TranslationState.GetValue("Activity")</th>
-                <th scope="col">@TranslationState.GetValue("From")</th>
-                <th scope="col">@TranslationState.GetValue("To")</th>
-                <th scope="col">@TranslationState.GetValue("Updated By")</th>
+                <th scope="col">@_translationState.GetValue("Date")</th>
+                <th scope="col">@_translationState.GetValue("Activity")</th>
+                <th scope="col">@_translationState.GetValue("From")</th>
+                <th scope="col">@_translationState.GetValue("To")</th>
+                <th scope="col">@_translationState.GetValue("Updated By")</th>
             </tr>
         </thead>
         <tbody>
@@ -14,7 +14,7 @@
             {
                 <tr>
                     <th scope="row">
-                        @log.TimeStamp.ToLocalTime().ToString("dd/MM/yy") @log.TimeStamp.ToLocalTime().ToString("HH:mm")
+                        @log.TimeStamp.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture) @log.TimeStamp.ToLocalTime().ToString("HH:mm")
                     </th>
                     <td>
                         @log.Activity
@@ -34,5 +34,5 @@
     </table>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelModalClick">@_translationState.GetValue("Cancel")</button>
 </div>

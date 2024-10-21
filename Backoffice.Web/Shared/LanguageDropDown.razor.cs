@@ -2,39 +2,49 @@
 using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Diagnostics;
 
 namespace Backoffice.Web.Shared
 {
     public partial class LanguageDropDown
     {
-        [Inject] public IJSRuntime JSRuntime { get; set; }
-        [Inject] public IHttpContextAccessor _httpContextAccessor { get; set; }
-        [Parameter] public string DropDownButtonClassName { get; set; }
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                var cookieValue = await JSRuntime.InvokeAsync<string>("getCookie", "c-langCode");
+        #region Properties
 
-                await OnLanguageCodeChanged(cookieValue);
-            }
+        [Parameter] public string DropDownButtonClassName { get; set; }
+        [Parameter] public EventCallback OnLanguageCodeChange { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        protected override async Task OnInitializedAsync()
+        {
+            var cookieValue = await _jsRuntime.InvokeAsync<string>("getCookie", "c-langCode");
+            await UpdateLanguageCode(cookieValue);
         }
 
-        private async Task OnLanguageCodeChanged(string value)
+        private async Task HandleLanguageCodeClick(string value)
         {
-            if (TranslationState.ActiveLanguageCode.ToString() == value)
+            await UpdateLanguageCode(value);
+        }
+
+        #endregion
+
+        #region Utilities
+
+        private async Task UpdateLanguageCode(string value)
+        {
+            if (_translationState.ActiveLanguageCode.ToString() == value)
                 return;
 
             if (Enum.TryParse(value, out LanguageCode langCode))
             {
+                await _jsRuntime.InvokeVoidAsync("setCookie", "c-langCode", value, 30);
+                await _translationState.SetLanguageCode(langCode);
 
-                TranslationState.ActiveLanguageCode = langCode;
-                await JSRuntime.InvokeVoidAsync("setCookie","c-langCode", value, 30);
-                //_httpContextAccessor.HttpContext?.Session.SetString("c-langCode", value);
-
-                StateHasChanged();
+                await PageState.Page.RefreshPage();
             }
         }
+
+        #endregion
     }
 }

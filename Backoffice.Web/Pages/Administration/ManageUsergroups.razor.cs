@@ -17,7 +17,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         public MetaData MetaData { get; set; }
         public UserGroupListResponse UserGroupListModel { get; set; }
@@ -36,6 +36,8 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _pageHeaderModel = new()
             {
                 Title = "Manage User Group",
@@ -56,7 +58,7 @@ namespace Backoffice.Web.Pages.Administration
                 TotalPages = 1,
             };
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
 
             var clients = (await BackofficeService.GetClients()).Result;
 
@@ -198,9 +200,6 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
-            BackofficeService.Dispose();
-            AuthenticationService.Dispose();
-
             GC.SuppressFinalize(this);
         }
 

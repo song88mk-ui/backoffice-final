@@ -4,7 +4,7 @@
     foreach (var sport in SportsTree)
     {
         <li>
-            <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" href="#Row@(RowCount)Collapse@(sport.SportId)">@TranslationState.GetValue(sport.SportName)</a>
+            <a class="dropdown-toggle dropdown-item" data-bs-toggle="collapse" role="button" href="#Row@(RowCount)Collapse@(sport.SportId)">@_translationState.GetValue(sport.SportName)</a>
             @if (sport.Segments != null && sport.Segments.Any())
             {
                 <div id="Row@(RowCount)Collapse@(sport.SportId)" class="collapse ms-2">

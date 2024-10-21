@@ -14,18 +14,18 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col"><strong>@TranslationState.GetValue("Date")</strong></th>
-                                <th scope="col"><strong>@TranslationState.GetValue("Activity")</strong></th>
-                                <th scope="col"><strong>@TranslationState.GetValue("From")</strong></th>
-                                <th scope="col"><strong>@TranslationState.GetValue("To")</strong></th>
-                                <th scope="col"><strong>@TranslationState.GetValue("Updated By")</strong></th>
+                                <th scope="col"><strong>@_translationState.GetValue("Date")</strong></th>
+                                <th scope="col"><strong>@_translationState.GetValue("Activity")</strong></th>
+                                <th scope="col"><strong>@_translationState.GetValue("From")</strong></th>
+                                <th scope="col"><strong>@_translationState.GetValue("To")</strong></th>
+                                <th scope="col"><strong>@_translationState.GetValue("Updated By")</strong></th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var logs in ActivityLogs)
                             {
                                 <tr>
-                                    <td>@logs.TimeStamp.ToLocalTime().ToString("dd/MM/yy") @logs.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
+                                    <td>@logs.TimeStamp.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture) @logs.TimeStamp.ToLocalTime().ToString("HH:mm")</td>
                                     <td>@logs.Activity</td>
                                     <td class="td-left">@((MarkupString)CommonService.GetActivity<AdminPermission>(logs.From, logs.To, AdminPermission.Admin_ManageUserGroups, logs.Activity, true))</td>
                                     <td class="td-left">@((MarkupString)CommonService.GetActivity<AdminPermission>(logs.From, logs.To, AdminPermission.Admin_ManageUserGroups, logs.Activity, false))</td>
@@ -38,12 +38,12 @@
                 }
                 else
                 {
-                    <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                    <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                 }
             }
         </div>
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent">@TranslationState.GetValue("Close")</button>
+    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent">@_translationState.GetValue("Close")</button>
 </div>

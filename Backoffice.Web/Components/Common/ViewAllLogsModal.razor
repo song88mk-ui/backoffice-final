@@ -16,12 +16,12 @@
                     <thead>
                         <tr>
                             <th valign="middle" align="left"><strong>#</strong></th>
-                            <th valign="middle" align="left"><strong>@TranslationState.GetValue("Date")</strong></th>
-                            <th valign="middle" align="left"><strong>@TranslationState.GetValue("Client name")</strong></th>
-                            <th valign="middle" align="left"><strong>@TranslationState.GetValue("Activity")</strong></th>
-                            <th valign="middle" align="left"><strong>@TranslationState.GetValue("From")</strong></th>
-                            <th valign="middle" align="left"><strong>@TranslationState.GetValue("To")</strong></th>
-                            <th valign="middle" align="left"><strong>@TranslationState.GetValue("Updated By")</strong></th>
+                            <th valign="middle" align="left"><strong>@_translationState.GetValue("Date")</strong></th>
+                            <th valign="middle" align="left"><strong>@_translationState.GetValue("Client name")</strong></th>
+                            <th valign="middle" align="left"><strong>@_translationState.GetValue("Activity")</strong></th>
+                            <th valign="middle" align="left"><strong>@_translationState.GetValue("From")</strong></th>
+                            <th valign="middle" align="left"><strong>@_translationState.GetValue("To")</strong></th>
+                            <th valign="middle" align="left"><strong>@_translationState.GetValue("Updated By")</strong></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -42,7 +42,7 @@
             }
             else
             {
-                <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
             }
         }
         @if (CurrentPage == SportsbookClientPermission.SBC_OE_PriceBoost_Manage)
@@ -55,14 +55,14 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">@TranslationState.GetValue("Date")</th>
-                                <th scope="col">@TranslationState.GetValue("Client name")</th>
-                                <th scope="col">@TranslationState.GetValue("Sports")</th>
-                                <th scope="col">@TranslationState.GetValue("Details")</th>
-                                <th scope="col">@TranslationState.GetValue("Activity")</th>
-                                <th scope="col">@TranslationState.GetValue("From")</th>
-                                <th scope="col">@TranslationState.GetValue("To")</th>
-                                <th scope="col">@TranslationState.GetValue("Updated By")</th>
+                                <th scope="col">@_translationState.GetValue("Date")</th>
+                                <th scope="col">@_translationState.GetValue("Client name")</th>
+                                <th scope="col">@_translationState.GetValue("Sports")</th>
+                                <th scope="col">@_translationState.GetValue("Details")</th>
+                                <th scope="col">@_translationState.GetValue("Activity")</th>
+                                <th scope="col">@_translationState.GetValue("From")</th>
+                                <th scope="col">@_translationState.GetValue("To")</th>
+                                <th scope="col">@_translationState.GetValue("Updated By")</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -85,16 +85,16 @@
                 }
                 else
                 {
-                    <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                    <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                 }
             }
             else
             {
-                <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
             }
         }
     }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">@TranslationState.GetValue("Close")</button>
+    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">@_translationState.GetValue("Close")</button>
 </div>

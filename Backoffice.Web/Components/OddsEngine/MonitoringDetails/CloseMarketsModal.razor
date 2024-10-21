@@ -17,7 +17,7 @@
                         <tr>
                             <td class="td-min-width">
                                 <span>
-                                    @Fixture.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")
+                                    @Fixture.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)
                                     <br>
                                     <strong>@Fixture.FixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
                                 </span>
@@ -57,7 +57,7 @@
                                 var isAllChecked = Markets.Any(m => m.MarketStatusId != 1) ? false : true;
                             }
                             <th class="th-width px-4 py-3"><input type="checkbox" checked="@isAllChecked" /></th>
-                            <th class="align-middle">@TranslationState.GetValue("Market Name")</th>
+                            <th class="align-middle">@_translationState.GetValue("Market Name")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,6 +82,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn modal-save waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Close Markets")</button>
+    <button type="button" class="btn modal-btn modal-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn modal-save waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@IsPreload">@_translationState.GetValue("Close Markets")</button>
 </div>

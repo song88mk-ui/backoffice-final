@@ -80,7 +80,7 @@
                     <table class="table table-bordered">
                         <thead class="table-head">
                             <tr>
-                                <th class="w-50 border-0">@TranslationState.GetValue("Other Sports")</th>
+                                <th class="w-50 border-0">@_translationState.GetValue("Other Sports")</th>
                                 <th class="w-50 border-0"></th>
                             </tr>
                         </thead>
@@ -169,5 +169,5 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@TranslationState.GetValue("Close")</button>
+    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@_translationState.GetValue("Close")</button>
 </div>

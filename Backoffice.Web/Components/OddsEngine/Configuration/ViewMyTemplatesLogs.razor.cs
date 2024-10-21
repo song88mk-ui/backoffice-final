@@ -93,14 +93,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             if (activityLog.Activity == Activity.Create.ToString())
             {
-                stringBuilder.Append($"<td class=\"px-4\">{TranslationState.GetValue("Added New Template")}</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{_translationState.GetValue("Added New Template")}</td>");
                 stringBuilder.Append($"<td class=\"px-4\">{activityLog.From}</td>");
                 var toPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.To);
                 stringBuilder.Append($"<td class=\"px-4\">{toPaylaod?.Name ?? "-"}</td>");
             }
             else if (activityLog.Activity == Activity.Delete.ToString())
             {
-                stringBuilder.Append($"<td class=\"px-4\">{TranslationState.GetValue("Deleted Template")}</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{_translationState.GetValue("Deleted Template")}</td>");
                 var fromPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.From);
                 stringBuilder.Append($"<td class=\"px-4\">{fromPaylaod?.Name ?? "-"}</td>");
                 stringBuilder.Append($"<td class=\"px-4\">{activityLog.To}</td>");
@@ -124,7 +124,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             }
 
                             stringBuilder.Append($"<td class=\"px-4\">");
-                            stringBuilder.Append($"<strong>{TranslationState.GetValue("Clients")}</strong>");
+                            stringBuilder.Append($"<strong>{_translationState.GetValue("Clients")}</strong>");
                             stringBuilder.Append($"<br>");
                             foreach (var client in tFromPayload.Payloads.Clients)
                             {
@@ -132,7 +132,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 stringBuilder.Append($"<br>");
                             }
                             stringBuilder.Append($"<br>");
-                            stringBuilder.Append($"<strong>{TranslationState.GetValue("Leagues")}</strong>");
+                            stringBuilder.Append($"<strong>{_translationState.GetValue("Leagues")}</strong>");
                             foreach (var league in tFromPayload.Payloads.Leagues)
                             {
                                 stringBuilder.Append($"<br>");

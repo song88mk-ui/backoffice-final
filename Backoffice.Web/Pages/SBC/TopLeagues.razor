@@ -2,6 +2,8 @@
 @using Backoffice.Web.Components.SBC.TopLeagues
 @using Backoffice.Shared.Enums
 
+@inherits BasePage
+
 @page "/top-leagues"
 
 <AuthorizeView Policy="sbc-topleagues">
@@ -20,10 +22,10 @@
                             <table class="table table-hover table-borderless mt-4">
                                 <thead class="table-head">
                                     <tr>
-                                        <th class="th-number py-2">@TranslationState.GetValue("No.")</th>
-                                        <th class="th-client py-2">@TranslationState.GetValue("Client")</th>
-                                        <th class="th-top-leagues py-2">@TranslationState.GetValue("Top Leagues")</th>
-                                        <th class="th-action py-2">@TranslationState.GetValue("Action")</th>
+                                        <th class="th-number py-2">@_translationState.GetValue("No.")</th>
+                                        <th class="th-client py-2">@_translationState.GetValue("Client")</th>
+                                        <th class="th-top-leagues py-2">@_translationState.GetValue("Top Leagues")</th>
+                                        <th class="th-action py-2">@_translationState.GetValue("Action")</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -95,7 +97,7 @@
                                         {
                                             <tr>
                                                 <td colspan=4>
-                                                    <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                                    <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                                 </td>
                                             </tr>
                                         }

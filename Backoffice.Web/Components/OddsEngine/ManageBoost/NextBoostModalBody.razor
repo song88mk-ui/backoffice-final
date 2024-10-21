@@ -6,28 +6,28 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th scope="col">@TranslationState.GetValue("Details")</th>
-                <th scope="col">@TranslationState.GetValue("Sports")</th>
-                <th scope="col">@TranslationState.GetValue("Client name")</th>
+                <th scope="col">@_translationState.GetValue("Details")</th>
+                <th scope="col">@_translationState.GetValue("Sports")</th>
+                <th scope="col">@_translationState.GetValue("Client name")</th>
                 <th scope="col">BR CTRL</th>
-                <th scope="col">@TranslationState.GetValue("Current Odds")</th>
-                <th scope="col">@TranslationState.GetValue("Boosted Odds")</th>
+                <th scope="col">@_translationState.GetValue("Current Odds")</th>
+                <th scope="col">@_translationState.GetValue("Boosted Odds")</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <th scope="row" rowspan="@(AddPriceBoostFilterModel.PriceBoostConfigList.Count+1)">
                     <div class="d-flex flex-column">
-                        <span><b>@TranslationState.GetValue(AddPriceBoostFilterModel.SelectionName)</b></span>
+                        <span><b>@_translationState.GetValue(AddPriceBoostFilterModel.SelectionName)</b></span>
                         <span>@AddPriceBoostFilterModel.MarketName</span>
                         <span>@AddPriceBoostFilterModel.SegmentName</span>
                         <span>@AddPriceBoostFilterModel.LeagueName</span>
                         <span>@AddPriceBoostFilterModel.FixtureName</span>
-                        <span>@(AddPriceBoostFilterModel.PriceBoostConfigList.FirstOrDefault()?.TimeStamp.ToString("dd/MM/yy"))</span>
+                        <span>@(AddPriceBoostFilterModel.PriceBoostConfigList.FirstOrDefault()?.TimeStamp.ToString("dd/MM/yy", CultureInfo.InvariantCulture))</span>
                         <span>@(AddPriceBoostFilterModel.PriceBoostConfigList.FirstOrDefault()?.TimeStamp.ToString("HH:mm"))</span>
                     </div>
                 </th>
-                <td rowspan="@(AddPriceBoostFilterModel.PriceBoostConfigList.Count+1)">@TranslationState.GetValue(AddPriceBoostFilterModel.SportName)</td>
+                <td rowspan="@(AddPriceBoostFilterModel.PriceBoostConfigList.Count+1)">@_translationState.GetValue(AddPriceBoostFilterModel.SportName)</td>
             </tr>
             @foreach (var config in AddPriceBoostFilterModel.PriceBoostConfigList)
             {
@@ -55,6 +55,6 @@
     </table>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn modal-save" @onclick="OnSaveModalClick" disabled="@IsSaveDisabled">@TranslationState.GetValue("Save")</button>
+    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn modal-save" @onclick="OnSaveModalClick" disabled="@IsSaveDisabled">@_translationState.GetValue("Save")</button>
 </div>

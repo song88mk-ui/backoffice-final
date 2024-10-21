@@ -19,7 +19,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         public CancelBetHistoryCallbackModel CallbackModel { get; set; }
         public CancelBetHistoryModel CancelBets { get; set; }
@@ -39,6 +39,8 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             CallbackModel = new CancelBetHistoryCallbackModel();
             CancelBets = new CancelBetHistoryModel();
 
@@ -50,7 +52,7 @@ namespace Backoffice.Web.Pages.Administration
                 TotalPages = 1,
             };
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
             _pageHeaderModel = new()
             {
                 Title = "Cancel Bet History",
@@ -98,8 +100,6 @@ namespace Backoffice.Web.Pages.Administration
         public void Dispose()
         {
             CancelBets = null;
-
-            BackofficeService.Dispose();
 
             GC.SuppressFinalize(this);
         }

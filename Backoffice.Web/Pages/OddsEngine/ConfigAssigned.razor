@@ -7,19 +7,19 @@
         <AlertMessage AlertClass="mx-3" AlertModel="@_alertModel"></AlertMessage>
         <div class="d-flex justify-content-between m-4">
             <div>
-                <h4 class="page-title">@TranslationState.GetValue(_pageTitle)</h4>
+                <h4 class="page-title">@_translationState.GetValue(_pageTitle)</h4>
             </div>
         </div>
         <div id="selectedLeagueWrapper" style="display: none">
             <div class="d-flex align-items-center justify-content-between mx-4 p-2 border">
                 <div class="col d-inline-flex align-items-center">
                     <div class="selection-logo"><i class="ico ico-top-leagues mx-4" aria-hidden="true"></i></div>
-                    <p class="lbl-selection m-0">@(TranslationState.GetValue((_selectedConfigClients?.Count ?? 0) >= 2 ? $"{_selectedConfigClients?.Count ?? 0} Leagues selected" : $"{_selectedConfigClients?.Count ?? 0} League selected"))</p>
+                    <p class="lbl-selection m-0">@(_translationState.GetValue((_selectedConfigClients?.Count ?? 0) >= 2 ? $"{_selectedConfigClients?.Count ?? 0} Leagues selected" : $"{_selectedConfigClients?.Count ?? 0} League selected"))</p>
                 </div>
                 <div class="d-flex h-75 justify-content-end">
-                    <button href="javascript:void(0)" @onclick="OnSelectAllClickedEvent" class="btn btn-selection-all px-4">@TranslationState.GetValue("Select All")</button>
-                    <button href="javascript:void(0)" @onclick="OnClearSelectionClickedEvent" class="btn btn-selection-clear px-4">@TranslationState.GetValue("Clear Selection")</button>
-                    <button href="javascript:void(0)" @onclick="OnEditTemplateClickedEvent" class="btn btn-selection-modify px-4">@(TranslationState.GetValue(_state == ConfigState.Assigned ? "Change template" : "Assign a template"))</button>
+                    <button href="javascript:void(0)" @onclick="HandleSelectAllClick" class="btn btn-selection-all px-4">@_translationState.GetValue("Select All")</button>
+                    <button href="javascript:void(0)" @onclick="HandleClearSelectionClick" class="btn btn-selection-clear px-4">@_translationState.GetValue("Clear Selection")</button>
+                    <button href="javascript:void(0)" @onclick="HandleEditTemplateClick" class="btn btn-selection-modify px-4">@(_translationState.GetValue(_state == ConfigState.Assigned ? "Change template" : "Assign a template"))</button>
                 </div>
             </div>
         </div>
@@ -31,11 +31,11 @@
         <div class="d-flex filter-div">
             <div class="dropdown">
                 <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    @if (_clients != null && _clients.Any())
+                    @if (FilterModel.Clients != null && FilterModel.Clients.Any())
                     {
-                        if (_clients.Count - 1 == _selectedClientCount)
+                        if (FilterModel.Clients.Count - 1 == _selectedClientCount)
                         {
-                            <span>@TranslationState.GetValue("All Clients") (@_selectedClientCount)</span>
+                            <span>@_translationState.GetValue("All Clients") (@_selectedClientCount)</span>
                         }
                         else
                         {
@@ -44,21 +44,21 @@
                     }
                     else
                     {
-                        <span>@TranslationState.GetValue("No Clients Available")</span>
+                        <span>@_translationState.GetValue("No Clients Available")</span>
                     }
                 </button>
-                @if (_clients != null && _clients.Any())
+                @if (FilterModel.Clients != null && FilterModel.Clients.Any())
                 {
-                    <SelectWithCheckbox Items="_clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="scope-dropdown" />
+                    <SelectWithCheckbox Items="FilterModel.Clients" OnCheckboxCallback="HandleClientCheckboxClick" AriaLabel="scope-dropdown" />
                 }
             </div>
 
-            @if (_sports != null && _sports.Any())
+            @if (FilterModel.Sports != null && FilterModel.Sports.Any())
             {
-                <select class="form-select" @onchange="OnSportCheckboxClickEvent">
-                    @foreach (var item in _sports)
+                <select class="form-select" @onchange="HandleSportCheckboxClick">
+                    @foreach (var item in FilterModel.Sports)
                     {
-                        <option value="@item.Value" selected="@(item.Value == _filterModel.SportId.ToString())">@TranslationState.GetValue(item.Name)</option>
+                        <option value="@item.Value" selected="@(item.Value == _stateFilterModel.SportId.ToString())">@_translationState.GetValue(item.Name)</option>
                     }
                 </select>
             }
@@ -67,9 +67,9 @@
 
         <div>
             <div class="input-container d-flex">
-                <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
+                <EditForm Model="_searchForm" OnValidSubmit="HandleSearchInput" Context="FormContext">
                     <div class="input-group">
-                        <InputText id="search" placeholder="@TranslationState.GetValue("Find Client")" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
+                        <InputText id="search" placeholder="@_translationState.GetValue("Find Client")" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
                         <button class="input-group-text border-start-0">
                             <i class="fa fa-search"></i>
                         </button>
@@ -92,20 +92,20 @@
                             <th class="index" scope="col" rowspan="2"></th>
                         </Authorized>
                     </AuthorizeView>
-                    <th class="index" scope="col" rowspan="2">@TranslationState.GetValue("No.")</th>
-                    <th class="filter" scope="col" rowspan="2">@TranslationState.GetValue("Client name")</th>
-                    <th class="filter" scope="col" rowspan="2">@TranslationState.GetValue("Sport")</th>
-                    <th class="template" scope="col" rowspan="2">@TranslationState.GetValue("League Name")</th>
-                    <th class="template" scope="col" colspan="2">@TranslationState.GetValue("Template")</th>
+                    <th class="index" scope="col" rowspan="2">@_translationState.GetValue("No.")</th>
+                    <th class="filter" scope="col" rowspan="2">@_translationState.GetValue("Client name")</th>
+                    <th class="filter" scope="col" rowspan="2">@_translationState.GetValue("Sport")</th>
+                    <th class="template" scope="col" rowspan="2">@_translationState.GetValue("League Name")</th>
+                    <th class="template" scope="col" colspan="2">@_translationState.GetValue("Template")</th>
                 </tr>
                 <tr>
-                    <th class="template" scope="col">@TranslationState.GetValue("Prematch")</th>
-                    <th class="template" scope="col">@TranslationState.GetValue("Live")</th>
+                    <th class="template" scope="col">@_translationState.GetValue("Prematch")</th>
+                    <th class="template" scope="col">@_translationState.GetValue("Live")</th>
                 </tr>
             </thead>
 
             <tbody>
-                @if (IsPreloader)
+                @if (_isPreloader)
                 {
                     <tr>
                         <AuthorizeView Policy="sbc-config-canedit">
@@ -124,13 +124,11 @@
                 }
                 else
                 {
-                    @if (ConfigClients != null && ConfigClients.Any())
+                    @if (_configClients != null && _configClients.Any())
                     {
-                        foreach (var config in ConfigClients)
-                        {
-                            var index = (ConfigClients.IndexOf(config) + 1) + ((MetaData.CurrentPage * MetaData.PageSize) - MetaData.PageSize);
-                            <ConfigStateRow State="_state" Index="@index" Config="config" ItemSelectionChangedEvent="@OnConfigSelectionChanged" />
-                        }
+                        <Virtualize Items="_configClients" Context="config" SpacerElement="tr">
+                            <ConfigStateRow State="_state" Config="config" ItemSelectionChangedEvent="@HandleConfigSelectionChange" />
+                        </Virtualize>
                     }
                     else
                     {
@@ -138,12 +136,12 @@
                             <AuthorizeView Policy="sbc-config-canedit">
                                 <Authorized Context="ActivateAll">
                                     <td colspan="7">
-                                        <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                        <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                     </td>
                                 </Authorized>
                                 <NotAuthorized>
                                     <td colspan="6">
-                                        <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                        <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                     </td>
                                 </NotAuthorized>
                             </AuthorizeView>
@@ -151,9 +149,9 @@
                     }
                 }
             </tbody>
-            <Pagination MetaData="MetaData" Spread="5" SelectPageEvent="SelectedPage" PaginationColspan="7" RowInfColSpan="5" />
+            <Pagination MetaData="_metaData" Spread="5" SelectPageEvent="HandledPageSelect" PaginationColspan="7" RowInfColSpan="5" />
         </table>
     </div>
 </div>
 
-<CustomModal OnSaveClickCallback="OnModalSaveEvent" />
+<CustomModal OnSaveClickCallback="HandleModalSave" />

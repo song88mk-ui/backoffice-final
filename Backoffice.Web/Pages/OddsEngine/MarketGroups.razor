@@ -1,5 +1,6 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.MarketGroups
 
+@inherits BasePage
 @layout OEMonitoringLayout
 
 @page "/hk/odds-engine/market-groups"
@@ -7,7 +8,7 @@
 <AuthorizeView Policy="sbc-market-group">
     <Authorized>
         <div class="col-md-12">
-            <Breadcrumb Breadcrumbs="Breadcrumbs" Region="@Region"/>
+            <Breadcrumb Breadcrumbs="Breadcrumbs" />
         </div>
         <div class="col-md-12">
             <OEPageHeader PageHeaderModel="_pageHeaderModel" />
@@ -39,9 +40,9 @@
                                     <th scope="col" class="th-checkbox">
                                         <Checkbox HasOnChange="MarketGroupModel.IsUpdate" Checked="IsSelectAll" OnChangeCallback="CheckboxSelectAllClickedEvent" />
                                     </th>
-                                    <th scope="col" class="text-start">@TranslationState.GetValue("Market Group Name")</th>
-                                    <th scope="col">@TranslationState.GetValue("Markets")</th>
-                                    <th scope="col">@TranslationState.GetValue("Manage")</th>
+                                    <th scope="col" class="text-start">@_translationState.GetValue("Market Group Name")</th>
+                                    <th scope="col">@_translationState.GetValue("Markets")</th>
+                                    <th scope="col">@_translationState.GetValue("Manage")</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -94,7 +95,7 @@
                     }
                     else
                     {
-                        <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                        <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                     }
                 }
             </div>

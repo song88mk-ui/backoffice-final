@@ -22,7 +22,7 @@
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <label class="form-label">@TranslationState.GetValue("Username")</label>
+                    <label class="form-label">@_translationState.GetValue("Username")</label>
                     <input type="text" class="form-control @(IsValidUsername ? "valid" : "invalid")" placeholder="Enter Username" @bind-value="UserRegister.UserName" disabled="@IsEdit" @oninput="@(() => RemoveError("username"))" />
                 </div>
                 <div class="col-md-4">
@@ -30,7 +30,7 @@
                     <input type="text" class="form-control @(IsValidEmail ? "valid" : "invalid")" placeholder="Enter Email Address" @bind-value="UserRegister.Email" @oninput="@(() => RemoveError("email"))" />
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">@TranslationState.GetValue("Password")</label>
+                    <label class="form-label">@_translationState.GetValue("Password")</label>
                     <div class="input-group">
                         <input id="password" type="password" class="form-control pe-5 @(IsValidPassword ? "valid" : "invalid")" placeholder="Enter your password" @bind-value="UserRegister.Password" @oninput="@(() => RemoveError("password"))" />
                         <button type="button" class="d-flex align-items-center position-absolute end-0 h-100 bg-transparent border-0 password-eye" onclick="password_show_hide();">
@@ -39,7 +39,7 @@
                         </button>
                     </div>
                     <div class="form-text fst-italic">
-                        @TranslationState.GetValue("password_criteria")
+                        @_translationState.GetValue("password_criteria")
                     </div>
                 </div>
             </div>
@@ -57,7 +57,7 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">@TranslationState.GetValue("Status")</label>
+                    <label class="form-label">@_translationState.GetValue("Status")</label>
                     <div class="btn-group border rounded px-2 d-flex" role="group">
                         <input id="radio-normal" name="btn-radio" type="radio" class="btn-check" checked="@(UserRegister.Status == "Normal" || UserRegister.Status == null)" @onclick="() => OnStatusClickedEvent(false)" />
                         <label class="btn btn-radio my-1 w-50 rounded" for="radio-normal">Normal</label>
@@ -72,7 +72,7 @@
     }
 </div>
 <div class="modal-footer mx-4">
-    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCloseClickEvent">@TranslationState.GetValue("Cancel")</button>
-    <button type="submit" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickedEvent" disabled="@IsPreLoader">@TranslationState.GetValue("Save")</button>
+    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCloseClickEvent">@_translationState.GetValue("Cancel")</button>
+    <button type="submit" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickedEvent" disabled="@IsPreLoader">@_translationState.GetValue("Save")</button>
 </div>
 

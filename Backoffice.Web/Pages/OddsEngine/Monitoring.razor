@@ -1,6 +1,7 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.Monitoring
 @using Backoffice.Web.Components.Common
 
+@inherits BasePage
 @layout OEMonitoringLayout
 
 @page "/hk/odds-engine"
@@ -11,7 +12,7 @@
 <AuthorizeView Policy="sbc-monitoring-match">
     <Authorized>
         <div class="col-md-12">
-            <Breadcrumb Breadcrumbs="_breadcrumbs" Region="@_region" />
+            <Breadcrumb Breadcrumbs="_breadcrumbs" />
         </div>
         <div class="col-md-12">
             <OEPageHeader PageHeaderModel="@_pageHeaderModel" />
@@ -60,12 +61,12 @@
                             @if (_fixtureMarkets != null && _fixtureMarkets.Any())
                             {
                                 <Virtualize Items="_fixtureMarkets" Context="market" OverscanCount="5">
-                                    <FixtureRow @key="@market.ProviderMarketId" Clients="@_clients" Market="market" Region="@_region" IsMonitoringPage=true />
+                                    <FixtureRow @key="@market" Clients="@_clients" Market="market" Region="@_region" IsMonitoringPage=true />
                                 </Virtualize>
                             }
                             else
                             {
-                                <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                             }
                         </tbody>
                     </table>

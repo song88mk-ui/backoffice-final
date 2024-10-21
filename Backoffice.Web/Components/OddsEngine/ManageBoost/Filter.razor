@@ -3,13 +3,13 @@
         <div class="content-filter mx-3 d-flex justify-content-between">
             <div class="select-container d-flex">
                 <div class="client-container me-4">
-                    <label class="form-label d-block">@TranslationState.GetValue("Clients")</label>
+                    <label class="form-label d-block">@_translationState.GetValue("Clients")</label>
                     <select class="form-select d-block" @onchange="OnClientChangedEvent">
                         @if (_clients.Any())
                         {
                             @foreach (var item in _clients)
                             {
-                                <option value="@item.Value" selected="@(item.Value == SelectedClientCode)">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == SelectedClientCode)">@_translationState.GetValue(item.Name)</option>
                             }
                         }
                         else
@@ -19,13 +19,13 @@
                     </select>
                 </div>
                 <div class="sport-container me-4">
-                    <label class="form-label d-block">@TranslationState.GetValue("Sports")</label>
+                    <label class="form-label d-block">@_translationState.GetValue("Sports")</label>
                     <select class="form-select d-block" @onchange="OnSportChangedEvent">
                         @if (_sports.Any())
                         {
                             @foreach (var item in _sports)
                             {
-                                <option value="@item.Value" selected="@(item.Value == SelectedSportId)">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == SelectedSportId)">@_translationState.GetValue(item.Name)</option>
                             }
                         }
                         else
@@ -35,13 +35,13 @@
                     </select>
                 </div>
                 <div class="segment-container me-4">
-                    <label class="form-label d-block">@TranslationState.GetValue("Segment")</label>
+                    <label class="form-label d-block">@_translationState.GetValue("Segment")</label>
                     <select class="form-select d-block" @onchange="OnSegmentChangedEvent">
                         @if (_segments.Any())
                         {
                             @foreach (var item in _segments)
                             {
-                                <option value="@item.Value" selected="@(item.Value == SelectedSegmentId)">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == SelectedSegmentId)">@_translationState.GetValue(item.Name)</option>
                             }
                         }
                         else
@@ -51,13 +51,13 @@
                     </select>
                 </div>
                 <div class="league-container me-4">
-                    <label class="form-label d-block">@TranslationState.GetValue("League")</label>
+                    <label class="form-label d-block">@_translationState.GetValue("League")</label>
                     <select class="form-select d-block" @onchange="OnLeagueChangedEvent">
                         @if (_leagues != null)
                         {
                             @foreach (var item in _leagues)
                             {
-                                <option value="@item.Value" selected=@(item.Value == SelectedLeagueId)>@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected=@(item.Value == SelectedLeagueId)>@_translationState.GetValue(item.Name)</option>
                             }
                         }
                         else
@@ -70,7 +70,7 @@
             <div class="input-container d-flex flex-row-reverse align-items-end">
                 <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                     <div class="input-group">
-                        <InputText id="search" placeholder=@TranslationState.GetValue("Search") class="form-control search-text valid border-end-0" @bind-Value="SearchForm.SearchText" />
+                        <InputText id="search" placeholder=@_translationState.GetValue("Search") class="form-control search-text valid border-end-0" @bind-Value="SearchForm.SearchText" />
                         <span class="input-group-text border-start-0">
                             <i class="fa fa-search"></i>
                         </span>
@@ -88,7 +88,7 @@
                     <Authorized Context="ActivateAll">
                         <a href="javascript:void(0)" class="btn btn-boosted-odds px-3" @onclick="OnAddBoostedOdds">
                             <i class="fa fa-rocket"></i>
-                            @TranslationState.GetValue("Add Boosted Odds")
+                            @_translationState.GetValue("Add Boosted Odds")
                         </a>
                     </Authorized>
                 </AuthorizeView>
@@ -96,7 +96,7 @@
             <div>
                 <a href="javascript:void(0)" class="btn btn-logs px-3" @onclick="OnViewAllLogs">
                     <i class="fa fa-list"></i>
-                    @TranslationState.GetValue("Logs")
+                    @_translationState.GetValue("Logs")
                 </a>
             </div>
         </div>

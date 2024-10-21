@@ -18,7 +18,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
-        [CascadingParameter(Name = "UserClientCodes")] public List<string> UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public List<ClientIdSelectedModel> ClientIdSelectedModel { get; set; }
         public ClientTopFixtureModel.OrderedClientTopFixture TopFixture { get; set; }
@@ -37,7 +37,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 var clients = (await BackofficeService.GetClients()).Result;
                 if (clients != null)
                 {
-                    clients.Clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != TopFixture.ClientIdRef).ToList() : new List<Client>();
+                    clients.Clients = UserModel.ClientCodes.Any() ? clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != TopFixture.ClientIdRef).ToList() : new List<Client>();
 
                     ClientIdSelectedModel = clients.Clients.Select(s => new ClientIdSelectedModel
                     {
@@ -52,7 +52,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                     {
                         IsSelected = false,
                         ClientId = string.Empty,
-                        ClientName = TranslationState.GetValue("No Clients Available")
+                        ClientName = _translationState.GetValue("No Clients Available")
                     });
             }
             catch (Exception ex)

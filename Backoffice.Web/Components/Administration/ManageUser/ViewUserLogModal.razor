@@ -2,7 +2,7 @@
     <div class="row mb-3">
         <EditForm Model="SearchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
             <div class="input-group">
-                <input id="search" type="text" placeholder=@TranslationState.GetValue("Search") class="form-control search-text valid border-end-0" @bind-value="SearchForm.SearchText" />
+                <input id="search" type="text" placeholder=@_translationState.GetValue("Search") class="form-control search-text valid border-end-0" @bind-value="SearchForm.SearchText" />
                 <span class="input-group-text border-start-0">
                     <i class="fa fa-search"></i>
                 </span>
@@ -53,7 +53,7 @@
                         {
                             <tr>
                                 <td colspan=4>
-                                    <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                    <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                 </td>
                             </tr>
                         }
@@ -65,5 +65,5 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-close" @onclick="OnCloseModalClickEvent">@TranslationState.GetValue("Close")</button>
+    <button type="button" class="btn modal-close" @onclick="OnCloseModalClickEvent">@_translationState.GetValue("Close")</button>
 </div>

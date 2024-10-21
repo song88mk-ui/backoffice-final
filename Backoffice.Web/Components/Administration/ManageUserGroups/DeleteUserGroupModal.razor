@@ -14,13 +14,13 @@
         </div>
         <div class="text-center">
             @* You are about to delete "<span class="fw-bold">@UserGroup.UserGroupName</span>". *@
-            @((MarkupString)TranslationState.GetValue(GetMarkupMessage()))
+            @((MarkupString)_translationState.GetValue(GetMarkupMessage()))
             <br />
-            @TranslationState.GetValue("Please be certain as this cannot be undone")
+            @_translationState.GetValue("Please be certain as this cannot be undone")
         </div>
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Close")</button>
-    <button type="button" class="btn modal-btn modal-apply" @onclick="OnDeleteClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Apply")</button>
+    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent" disabled="@IsPreload">@_translationState.GetValue("Close")</button>
+    <button type="button" class="btn modal-btn modal-apply" @onclick="OnDeleteClickEvent" disabled="@IsPreload">@_translationState.GetValue("Apply")</button>
 </div>

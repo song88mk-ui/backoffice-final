@@ -1,4 +1,6 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.BoostedSettings
+
+@inherits BasePage
 @layout OEMonitoringLayout
 
 @page "/{Region}/odds-engine/boosted-settings"
@@ -8,7 +10,7 @@
     <Authorized>
         <CascadingValue Name="Region" Value="@Region">
             <div class="col-md-12">
-                <Breadcrumb Breadcrumbs="_breadcrumbs" Region="@Region" />
+                <Breadcrumb Breadcrumbs="_breadcrumbs" />
             </div>
             <div class="col-md-12">
                 <OEPageHeader PageHeaderModel="_pageHeaderModel" />
@@ -29,9 +31,9 @@
                     <table class="table table-bordered mt-3">
                         <thead>
                             <tr>
-                                <th><strong>@TranslationState.GetValue("Client name")</strong></th>
-                                <th><strong>% @TranslationState.GetValue("Cap of Current Odds from Boosted Odds")</strong></th>
-                                <th><strong>@TranslationState.GetValue("Manage")</strong></th>
+                                <th><strong>@_translationState.GetValue("Client name")</strong></th>
+                                <th><strong>% @_translationState.GetValue("Cap of Current Odds from Boosted Odds")</strong></th>
+                                <th><strong>@_translationState.GetValue("Manage")</strong></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -57,7 +59,7 @@
                                 {
                                     <tr>
                                         <td colspan="3">
-                                            <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                            <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                         </td>
                                     </tr>
                                 }

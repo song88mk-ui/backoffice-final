@@ -41,6 +41,9 @@ namespace Backoffice.Web.Components.Common
         private string _clientCode;
         private string _clientCodeMargin;
         private List<SelectionModel> _selections;
+
+        private bool _init = true;
+        private bool _shouldRender = true;
         #endregion
 
         #region Methods
@@ -89,6 +92,7 @@ namespace Backoffice.Web.Components.Common
                 }
             }
         }
+        protected override bool ShouldRender() => _shouldRender;
 
         private void OnCloseMatchClickEvent()
         {

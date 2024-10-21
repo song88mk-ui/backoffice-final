@@ -7,13 +7,13 @@
     {
         <div class="row mb-2">
             <div class="col-2 text-center">
-                <span>@TranslationState.GetValue("From")</span>
+                <span>@_translationState.GetValue("From")</span>
             </div>
             <div class="col-10">
                 <select class="form-select" placeholder="Select Client" @onchange="OnClientChangedEvent">
                     @if (Clients != null)
                     {
-                        <option value="" selected>@TranslationState.GetValue("Select Client")</option>
+                        <option value="" selected>@_translationState.GetValue("Select Client")</option>
 
                         foreach (var client in Clients)
                         {
@@ -33,14 +33,14 @@
         <div class="row mb-2">
             <div class="col-2"></div>
             <div class="col-10">
-                <select class="form-select" placeholder="@TranslationState.GetValue("Select Sport")" @onchange="OnSportChangedEvent">
+                <select class="form-select" placeholder="@_translationState.GetValue("Select Sport")" @onchange="OnSportChangedEvent">
                     @if (Sports != null)
                     {
-                        <option value="0" selected>@TranslationState.GetValue("Select Sport")</option>
+                        <option value="0" selected>@_translationState.GetValue("Select Sport")</option>
 
                         foreach (var sport in Sports)
                         {
-                            <option value="@sport.Value" selected="@(sport.Value == SelectedSportId)">@TranslationState.GetValue(sport.Name)</option>
+                            <option value="@sport.Value" selected="@(sport.Value == SelectedSportId)">@_translationState.GetValue(sport.Name)</option>
                         }
                     }
                 </select>
@@ -52,11 +52,11 @@
                 <select class="form-select" placeholder="Select Scope" @onchange="OnFixtureStatusChangedEvent">
                     @if (FixtureStatuses != null)
                     {
-                        <option value="-1" selected>@TranslationState.GetValue("Select Scope")</option>
+                        <option value="-1" selected>@_translationState.GetValue("Select Scope")</option>
 
                         foreach (var fixtureStatus in FixtureStatuses)
                         {
-                            <option value="@fixtureStatus.Value" selected="@(fixtureStatus.Value == SelectedFixtureStatusId)">@TranslationState.GetValue(fixtureStatus.Name)</option>
+                            <option value="@fixtureStatus.Value" selected="@(fixtureStatus.Value == SelectedFixtureStatusId)">@_translationState.GetValue(fixtureStatus.Name)</option>
                         }
                     }
                 </select>
@@ -65,13 +65,13 @@
     }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnModalCancelEvent">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnModalCancelEvent">@_translationState.GetValue("Cancel")</button>
     @if (string.IsNullOrEmpty(SelectedClientCode) || SelectedSportId <= 0 || SelectedFixtureStatusId <= -1)
     {
-        <button type="button" class="btn modal-btn modal-save" disabled>@TranslationState.GetValue("Copy")</button>
+        <button type="button" class="btn modal-btn modal-save" disabled>@_translationState.GetValue("Copy")</button>
     }
     else
     {
-        <button type="button" class="btn modal-btn modal-save" @onclick="OnModalCopyEvent" disabled="@IsPreLoader">@TranslationState.GetValue("Copy")</button>
+        <button type="button" class="btn modal-btn modal-save" @onclick="OnModalCopyEvent" disabled="@IsPreLoader">@_translationState.GetValue("Copy")</button>
     }
 </div>

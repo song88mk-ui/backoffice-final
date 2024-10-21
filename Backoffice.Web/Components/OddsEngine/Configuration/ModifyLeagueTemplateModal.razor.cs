@@ -85,7 +85,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         }
 
-        public async Task OnPrematchTemplateSelectChanged(SelectListItemModel<long> e)
+        public async Task HandlePrematchTemplateSelectChange(SelectListItemModel<long> e)
         {
             _prematchSelectedItem = new SelectListItemModel<long>();
             _prematchSelectedItem = e;
@@ -100,7 +100,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             }
         }
 
-        public async Task OnLiveTemplateSelectChanged(SelectListItemModel<long> e)
+        public async Task HandleLiveTemplateSelectChange(SelectListItemModel<long> e)
         {
             _liveSelectedItem = new SelectListItemModel<long>();
             _liveSelectedItem = e;
@@ -115,12 +115,12 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             }
         }
 
-        public async Task OnCancelClickedEvent()
+        public async Task HandleCancelClick()
         {
             ModalService.Cancel();
         }
 
-        public async Task OnSaveClickedEvent()
+        public async Task HandleSaveClick()
         {
             IsPreLoader = true;
             StateHasChanged();
@@ -410,7 +410,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ModalService.Cancel();
         }
 
-        public async Task OnShowAllClickedEvent()
+        public async Task HandleShowAllClick()
         {
             IsShowAll = !IsShowAll;
         }
@@ -429,9 +429,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var response = await BackofficeService.GetConfigTemplate(string.Empty, sportId, scopeId);
 
             IsPreLoader = false;
-            if (response.StatusCode == StatusCode.Success && response.Result.Count > 0)
+            if (response.StatusCode == StatusCode.Success && response.Result.ConfigTemplates.Count > 0)
             {
-                return response.Result.Select(x => new SelectListItemModel<long>()
+                return response.Result.ConfigTemplates.Select(x => new SelectListItemModel<long>()
                 {
                     Value = x.Id,
                     Name = x.Name

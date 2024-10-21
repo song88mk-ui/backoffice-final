@@ -22,7 +22,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         [Parameter] public string Region { get; set; } = "hk";
 
@@ -48,6 +48,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Methods
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             TradingService.Region = Region.ToUpper();
             _pageHeaderModel = new()
             {
@@ -72,7 +74,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
         public async Task OnAddClickedEvent()
@@ -322,8 +324,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
-            TradingService.Dispose();
-            BackofficeService.Dispose();
         }
 
         #endregion

@@ -14,7 +14,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public ITableauService TableauService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public string IFrameSrc { get; set; }
@@ -26,12 +26,14 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _pageHeaderModel = new()
             {
                 Title = "Market Report",
                 IconClass = "ico ico-market-report"
             };
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
 
 
 

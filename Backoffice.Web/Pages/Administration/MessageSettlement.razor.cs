@@ -22,7 +22,7 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         public MarketSettlementFilterModel FilterModel { get; set; } = new MarketSettlementFilterModel();
         public List<MessageSettlementModel> MessageSettlementModel { get; set; }
@@ -43,6 +43,8 @@ namespace Backoffice.Web.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             IsPreLoader = true;
             _pageHeaderModel = new()
             {
@@ -58,7 +60,7 @@ namespace Backoffice.Web.Pages.Administration
                 TotalPages = 1,
             };
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
         public async Task OnAddClickedEvent()
@@ -93,8 +95,6 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
-            BackofficeService.Dispose();
-
             GC.SuppressFinalize(this);
         }
 

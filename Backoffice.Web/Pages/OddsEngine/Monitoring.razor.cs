@@ -8,20 +8,19 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using Serilog;
+using Backoffice.Web.States;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
-    public partial class Monitoring : IAsyncDisposable, IDisposable
+    public partial class Monitoring : IDisposable
     {
         #region Properties
 
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public ICommonService CommonService { get; set; }
-        [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
 
 
         [Parameter] public int SportId { get; set; }
@@ -34,25 +33,26 @@ namespace Backoffice.Web.Pages.OddsEngine
         private int _segmentId;
         private int _leagueId;
         private PageHeaderModel _pageHeaderModel;
-        private MonitoringCallbackModel _monitoringCallbackModel;
-        private List<Client>? _clients;
         private List<FixtureMarketModel>? _fixtureMarkets;
         private List<BreadcrumbModel> _breadcrumbs;
         private List<string>? _slugs;
 
-        private bool _isPreloader;
-        private AlertModel _alertModel;
+        private bool _isPreloader = true;
         private LanguageCode _languageCode;
+
+        private bool _init = true;
+        private bool _shouldRender = true;
+        private List<Client> _clients = new();
+        private AlertModel _alertModel = new();
+
+        private MonitoringCallbackModel _monitoringCallbackModel = new();
         #endregion
 
         #region Methods
         protected override async Task OnInitializedAsync()
         {
-            _isPreloader = true;
-            _clients = new();
-            _alertModel = new();
-            _fixtureMarkets = null;
-            _monitoringCallbackModel = new();
+            PageState.Page = this;
+
             _slugs = new List<string>();
             _breadcrumbs = new()
             {
@@ -65,27 +65,28 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
             _slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            if (SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2)
+            _shouldRender = ValidateParameters();
+            if (_shouldRender)
             {
-                var isSportChanged = _sportId != SelectedSport.SportId || _leagueId != SelectedSport.LeagueId || _languageCode != TranslationState.ActiveLanguageCode;
+                var isSportChanged = _sportId != SelectedSport.SportId || _leagueId != SelectedSport.LeagueId || _languageCode != _translationState.ActiveLanguageCode;
                 _sportId = SelectedSport.SportId;
                 _segmentId = SelectedSport.SegmentId;
                 _leagueId = SelectedSport.LeagueId;
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
 
                 _pageHeaderModel = new PageHeaderModel()
                 {
-                    Title = $"{TranslationState.GetValue(SelectedSport.SportName)} - {SelectedSport.SegmentName} - {SelectedSport.LeagueName}",
+                    Title = $"{_translationState.GetValue(SelectedSport.SportName)} - {SelectedSport.SegmentName} - {SelectedSport.LeagueName}",
                     IconClass = $"iconfont iconfont-{SelectedSport.SportName.ToLower().Replace(" ", "-")}",
                     ShowLanguageDropDown = false
                 };
 
-                if (isSportChanged && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
+                if (!_init && isSportChanged && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
                 {
                     await OnInitializeEvent(_monitoringCallbackModel);
                 }
@@ -110,11 +111,16 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
 
             }
+
+            _shouldRender = false;
         }
+        protected override bool ShouldRender() => _shouldRender;
+        private bool ValidateParameters() => (SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2);
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
         {
             _isPreloader = true;
+            _shouldRender = true;
 
             _fixtureMarkets = await GetFixtures(new MarketFixtureRequest
             {
@@ -127,13 +133,11 @@ namespace Backoffice.Web.Pages.OddsEngine
             });
 
             _isPreloader = false;
+            _shouldRender = true;
             StateHasChanged();
         }
 
-        private async Task MonitoringCallback(MonitoringCallbackModel model)
-        {
-            await OnInitializeEvent(_monitoringCallbackModel = model);
-        }
+        private async Task MonitoringCallback(MonitoringCallbackModel model) => await OnInitializeEvent(_monitoringCallbackModel = model);
 
         private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
         {
@@ -146,6 +150,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     Region = _region
                 }).ToList();
             }
+            _shouldRender = true;
         }
 
         private async Task OnSaveClickedEvent(object param)
@@ -174,10 +179,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                         Message = $"{model.FixtureName} is NOT closed successfully."
                     };
                 }
+
+                _shouldRender = true;
             }
         }
-
-        public async ValueTask DisposeAsync() => Dispose();
 
         public async void Dispose()
         {
@@ -235,7 +240,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async Task<List<FixtureMarketModel>> GetFixtures(MarketFixtureRequest request)
         {
-            var response = await BackofficeService.GetMarketFixtures(request, _languageCode);
+            var response = await _backofficeService.GetMarketFixtures(request, _languageCode);
             var marketFixtures = response.Result;
 
             if (marketFixtures.Fixtures.Count == 0)
@@ -399,6 +404,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     });
                 }
             }
+
+            _shouldRender = true;
             await InvokeAsync(StateHasChanged);
         }
 
@@ -413,6 +420,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     var fixtureMarkets = _fixtureMarkets?.Where(c => c.ProviderFixtureId == message.ProviderFixtureId).ToList() ?? new List<FixtureMarketModel>();
                     fixtureMarkets.ForEach(x => x.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>());
 
+                    _shouldRender = true;
                     await InvokeAsync(StateHasChanged);
                 }
             }
@@ -423,6 +431,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (_fixtureMarkets != null && _fixtureMarkets.Any())
             {
                 _fixtureMarkets.ForEach(c => c.IsBetStopGlobal = message.IsBetStop);
+
+                _shouldRender = true;
                 await InvokeAsync(StateHasChanged);
             }
         }

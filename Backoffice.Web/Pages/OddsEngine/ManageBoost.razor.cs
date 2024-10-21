@@ -18,8 +18,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [Parameter] public string Region { get; set; } = "hk";
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
         #endregion
 
         #region Fields
@@ -42,6 +42,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _isPreLoader = true;
             _alertModel = new();
             _pageHeaderModel = new()
@@ -50,7 +52,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 ShowLanguageDropDown = false
             };
             _breadcrumbs = new();
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
         protected override async Task OnParametersSetAsync()
@@ -300,7 +302,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
                 else
                 {
-                    var query = priceBoostConfigResponse.Result.AsQueryable().Where(c => UserClientCodes != null && UserClientCodes.Contains(c.ClientCode));
+                    var query = priceBoostConfigResponse.Result.AsQueryable().Where(c => UserModel.ClientCodes.Contains(c.ClientCode));
 
                     if (!string.IsNullOrEmpty(_search))
                     {

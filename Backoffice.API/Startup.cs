@@ -143,7 +143,7 @@ namespace Backoffice.API
             services.AddDbContext<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"]));
             services.AddHttpClient<IRabbitMqRepository, RabbitMqRepository>();
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
-            services.AddScoped<IMaintenanceRepository, MaintenanceRepository>();
+            services.AddHttpClient<IMaintenanceRepository, MaintenanceRepository>(client => client.BaseAddress = new Uri(Configuration["API:Maintenance:Uri"]));
             services.AddScoped<IPlatformRepository, PlatformRepository>();
             services.AddScoped<ITradingRepository, TradingRepository>();
             services.AddScoped<IBackofficeActivityLogRepository, BackofficeActivityLogRepository>();

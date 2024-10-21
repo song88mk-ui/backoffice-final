@@ -44,6 +44,8 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _pageHeaderModel = new()
             {
                 Title = "Announcements",
@@ -69,7 +71,7 @@ namespace Backoffice.Web.Pages.SBC
             _shouldRender = ValidateParameters();
 
             if (_shouldRender)
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
 
             _init = false;
             return base.OnParametersSetAsync();
@@ -244,7 +246,7 @@ namespace Backoffice.Web.Pages.SBC
 
         private bool ValidateParameters()
         {
-            return _init || _languageCode != TranslationState.ActiveLanguageCode;
+            return _init || _languageCode != _translationState.ActiveLanguageCode;
         }
 
         private async Task GetContent(AnnouncementsFilterModel model)
@@ -332,7 +334,7 @@ namespace Backoffice.Web.Pages.SBC
 
         private string GetStatusLabel(bool isActive)
         {
-            return isActive ? TranslationState.GetValue("Active").ToUpper() : TranslationState.GetValue("Inactive").ToUpper();
+            return isActive ? _translationState.GetValue("Active").ToUpper() : _translationState.GetValue("Inactive").ToUpper();
         }
 
         private string GetLanguagesConcat(List<AnnouncementMessage> langList)

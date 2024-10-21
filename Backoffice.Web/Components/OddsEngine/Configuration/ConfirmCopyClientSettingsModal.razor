@@ -1,23 +1,26 @@
 ﻿<div class="modal-body">
-    <div class="d-flex flex-column justify-content-center p-5">
+    @if (_isProcessing)
+    {
         <div class="text-center">
-            <img src="icons/svg/warning-icon.svg" />
+            <Preloader />
         </div>
-        <div class="text-center">
-            @((MarkupString)TranslationState.GetValue($"Are you sure you want to copy {{{$"<b>{SelectedFromClient.Value}</b>"}}} to {{{$"<b>{ToClient.ClientName}</b>"}}}?"))
-            <br />
-            @TranslationState.GetValue("You can't undo this action.")
-        </div>
-        @if(_isProcessing)
-        {
+    }
+    else
+    {
+        <div class="d-flex flex-column justify-content-center p-5">
             <div class="text-center">
-                <Preloader />
+                <img src="icons/svg/warning-icon.svg" />
             </div>
-        }
+            <div class="text-center">
+                @((MarkupString)_translationState.GetValue($"Are you sure you want to copy {{{$"<b>{SelectedFromClient.Value}</b>"}}} to {{{$"<b>{ToClient.ClientName}</b>"}}}?"))
+                <br />
+                @_translationState.GetValue("You can't undo this action.")
+            </div>
 
-    </div>
+        </div>
+    }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" disabled="@_isProcessing" data-bs-dismiss="modal" @onclick="OnCancelModalClickEvent">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn btn-apply" disabled="@_isProcessing" @onclick="OnApplyModalClickEvent">@TranslationState.GetValue("Apply")</button>
+    <button type="button" class="btn modal-btn btn-cancel" disabled="@_isProcessing" data-bs-dismiss="modal" @onclick="OnCancelModalClickEvent">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn btn-apply" disabled="@_isProcessing" @onclick="OnApplyModalClickEvent">@_translationState.GetValue("Apply")</button>
 </div>

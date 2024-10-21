@@ -18,7 +18,7 @@ namespace Backoffice.Web.Pages
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+
 
         public List<Claim> UserClaims { get; set; }
 
@@ -28,9 +28,11 @@ namespace Backoffice.Web.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             UserClaims = new List<Claim>();
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
 
             var validClaimValues = new string[] { "1", "2", "0" };
             var authState = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
@@ -42,12 +44,8 @@ namespace Backoffice.Web.Pages
         {
             if (firstRender)
             {
-                var cookieValue = await JSRuntime.InvokeAsync<string>("getCookie", "c-langCode");
-
-                if (Enum.TryParse(cookieValue, out LanguageCode langCode))
-                {
-                    TranslationState.ActiveLanguageCode = langCode;
-                }
+                var cookieValue = await _jsRuntime.InvokeAsync<string>("getCookie", "c-langCode");
+                await UpdateLanguageCode(cookieValue);  
             }
         }
         public async Task OnLogoutClickEvent()
@@ -71,6 +69,19 @@ namespace Backoffice.Web.Pages
 
             // Suppress finalization.
             GC.SuppressFinalize(this);
+        }
+        private async Task UpdateLanguageCode(string value)
+        {
+            if (_translationState.ActiveLanguageCode.ToString() == value)
+                return;
+
+            if (Enum.TryParse(value, out LanguageCode langCode))
+            {
+                await _jsRuntime.InvokeVoidAsync("setCookie", "c-langCode", value, 30);
+                await _translationState.SetLanguageCode(langCode);
+
+                await PageState.Page.RefreshPage();
+            }
         }
 
         #endregion

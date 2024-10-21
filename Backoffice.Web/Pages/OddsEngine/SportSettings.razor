@@ -1,5 +1,6 @@
 ﻿@using Backoffice.Web.Components.OddsEngine.SportSettings
 
+@inherits BasePage
 @layout OEMonitoringLayout
 
 @page "/hk/odds-engine/sport-settings"
@@ -8,7 +9,7 @@
     <Authorized>
         <div class="d-flex flex-column">
             <div>
-                <Breadcrumb Breadcrumbs="_breadcrumbs" Region="hk" />
+                <Breadcrumb Breadcrumbs="_breadcrumbs" />
             </div>
             <div>
                 <OEPageHeader PageHeaderModel="_pageHeaderModel" />
@@ -31,7 +32,7 @@
                         if (!_isUpdate)
                         {
                             <div class="mb-2">
-                                <h6 class="fw-bold">@TranslationState.GetValue("Sports")</h6>
+                                <h6 class="fw-bold">@_translationState.GetValue("Sports")</h6>
                             </div>
 
                             <Main SportSettings="_sportSettings" />
@@ -45,7 +46,7 @@
                             else if (_currentEditPage == EditSportSettingsPage.SegmentAndLeagues)
                             {
                                 <div class="mb-2">
-                                    <h6 class="fw-bold">@TranslationState.GetValue("Sports Tree")</h6>
+                                    <h6 class="fw-bold">@_translationState.GetValue("Sports Tree")</h6>
                                 </div>
 
                                 <EditSegmentLeagues @bind-SportSettings="_editedSportSettings" OnValueHadChanged="e => _hasChanges = e" />

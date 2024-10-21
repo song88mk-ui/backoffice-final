@@ -2,7 +2,6 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
-using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -23,8 +22,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private IExcelService ExcelService { get; set; }
         [Inject] private IMessageBroker MessageBroker { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel? UserModel { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
         public EventCallback OnExportMarginCallback { get; set; }
@@ -111,7 +109,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     var stream = new MemoryStream();
                     await e.File.OpenReadStream(long.MaxValue).CopyToAsync(stream);
 
-                    var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(stream, e.File.Name, UserModel?.Id ?? string.Empty, string.Join(",", SelectedClientsSet), MessageBroker);
+                    var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(stream, e.File.Name, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
 
 
                     IsUploading = false;
@@ -163,7 +161,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                         using (MemoryStream ms = new MemoryStream(fileStream.Value))
                         {
-                            var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(ms, fileStream.Key, UserModel?.Id ?? string.Empty, string.Join(",", SelectedClientsSet), MessageBroker);
+                            var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(ms, fileStream.Key, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
 
                             if (payload.StatusCode == StatusCode.Error)
                             {
@@ -226,7 +224,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             var payload = new OnExportConfigMarginMessage()
             {
-                UserId = UserModel?.Id ?? string.Empty,
+                UserId = UserModel.Id,
                 ClientCode = SelectedClient,
                 SportIds = string.Join(",", SelectedSportsSet)
             };
@@ -317,7 +315,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             if (clients != null)
             {
-                clients = UserClientCodes != null && UserClientCodes.Any() ? clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+                clients = UserModel.ClientCodes.Any() ? clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
             }
 
             return clients?.Select(x => new SelectListItemModel<string>()
@@ -329,7 +327,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private async Task<List<SelectListItemModel<int>>> LoadSports()
         {
-            var result = (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString())).Result;
+            var result = (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
 
             if (result == null)
                 return new List<SelectListItemModel<int>>();

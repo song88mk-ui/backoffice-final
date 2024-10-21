@@ -38,7 +38,7 @@ namespace Backoffice.Web.Shared
                         JSRuntime.InvokeVoidAsync("console.log", $"Redirection claim {subUserClaim.Type} - {subUserClaim.Value}");
                     }
 
-                    var menu = await MenuHelper.GetMenu(claim, FromPage ?? string.Empty);
+                    var menu = MenuHelper.GetMenu(claim, FromPage ?? string.Empty);
 
                     NavigationManager.NavigateTo(menu.Url, true);
                 }

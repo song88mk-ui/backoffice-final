@@ -2,12 +2,12 @@
     <div class="col-2">
         <select class="form-select" @onchange="OnSportChangedEvent">
             <optgroup label="Sports">
-                <option value="0">@TranslationState.GetValue("Select Sport")</option>
+                <option value="0">@_translationState.GetValue("Select Sport")</option>
                 @if (Sports != null && Sports.Any())
                 {
                     @foreach (var item in Sports)
                     {
-                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.SportId)">@TranslationState.GetValue(item.Name)</option>
+                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.SportId)">@_translationState.GetValue(item.Name)</option>
                     }
                 }
             </optgroup>
@@ -16,12 +16,12 @@
     <div class="col-2">
         <select class="form-select" @onchange="OnSegmentChangedEvent">
             <optgroup label="Segments">
-                <option value="0">@TranslationState.GetValue("Select Segment")</option>
+                <option value="0">@_translationState.GetValue("Select Segment")</option>
                 @if (Segments != null && Segments.Any())
                 {
                     @foreach (var item in Segments)
                     {
-                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.SegmentId)">@TranslationState.GetValue(item.Name)</option>
+                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.SegmentId)">@_translationState.GetValue(item.Name)</option>
                     }
 
                 }
@@ -31,12 +31,12 @@
     <div class="col-2">
         <select class="form-select" @onchange="OnLeagueChangedEvent">
             <optgroup label="Leagues">
-                <option value="0">@TranslationState.GetValue("Select League")</option>
+                <option value="0">@_translationState.GetValue("Select League")</option>
                 @if (Leagues != null && Leagues.Any())
                 {
                     @foreach (var item in Leagues)
                     {
-                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.LeagueId)">@TranslationState.GetValue(item.Name)</option>
+                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.LeagueId)">@_translationState.GetValue(item.Name)</option>
                     }
                 }
             </optgroup>
@@ -45,12 +45,12 @@
     <div class="col-2">
         <select class="form-select" @onchange="OnFixtureChangedEvent">
             <optgroup label="Fixtures">
-                <option value="0">@TranslationState.GetValue("Select Fixture")</option>
+                <option value="0">@_translationState.GetValue("Select Fixture")</option>
                 @if (Fixtures != null && Fixtures.Any())
                 {
                     @foreach (var item in Fixtures)
                     {
-                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.FixtureId)">@TranslationState.GetValue(item.Name)</option>
+                        <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.FixtureId)">@_translationState.GetValue(item.Name)</option>
                     }
                 }
             </optgroup>
@@ -66,7 +66,7 @@
                         {
                             @foreach (var item in Markets)
                             {
-                                <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.MarketId)">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == AddMarketSettlement.MarketId)">@_translationState.GetValue(item.Name)</option>
                             }
                         }
                     </optgroup>
@@ -78,7 +78,7 @@
             <div class="col">
                 <EditForm Model="AddMarketSettlement" OnValidSubmit="OnBetIdChangedEvent">
                     <div class="input-group">
-                        <input id="search" type="text" placeholder="@TranslationState.GetValue("Find using BetId")" class="form-control search-text valid border-end-0" @bind-value="AddMarketSettlement.BetId" />
+                        <input id="search" type="text" placeholder="@_translationState.GetValue("Find using BetId")" class="form-control search-text valid border-end-0" @bind-value="AddMarketSettlement.BetId" />
                         <button class="input-group-text border-start-0" type="submit">
                             <i class="fa fa-search"></i>
                         </button>

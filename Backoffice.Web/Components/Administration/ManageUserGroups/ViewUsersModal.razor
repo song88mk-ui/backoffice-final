@@ -16,8 +16,8 @@
                 <table class="table table-bordered">
                     <thead class="table-head">
                         <tr>
-                            <th class="w-50 border-0">@TranslationState.GetValue("No.")</th>
-                            <th class="w-50 border-0">@TranslationState.GetValue("Username")</th>
+                            <th class="w-50 border-0">@_translationState.GetValue("No.")</th>
+                            <th class="w-50 border-0">@_translationState.GetValue("Username")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -35,7 +35,7 @@
                             {
                                 <tr>
                                     <td colspan="2">
-                                        <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                        <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                     </td>
                                 </tr>
                             }
@@ -47,5 +47,5 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@TranslationState.GetValue("Close")</button>
+    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@_translationState.GetValue("Close")</button>
 </div

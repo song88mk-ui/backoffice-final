@@ -55,8 +55,8 @@
 
     <div class="form-group row">
         <div class="col-sm-12" align="center">
-            <button type="reset" class="btn btn-cancel-option btn-inline btn-default btn-sm m-b-0" @onclick="@(_ => CloseModal())">@TranslationState.GetValue("Cancel")</button>
-            <button type="submit" @onclick="@(_ => UpdateSetting())" class="btn btn-success btn-inline btn-sm m-b-0">@TranslationState.GetValue("Apply")</button>
+            <button type="reset" class="btn btn-cancel-option btn-inline btn-default btn-sm m-b-0" @onclick="@(_ => CloseModal())">@_translationState.GetValue("Cancel")</button>
+            <button type="submit" @onclick="@(_ => UpdateSetting())" class="btn btn-success btn-inline btn-sm m-b-0">@_translationState.GetValue("Apply")</button>
         </div>
     </div>
 </EditForm>

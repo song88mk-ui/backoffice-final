@@ -17,8 +17,7 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
-        [CascadingParameter(Name = "UserClientCodes")] List<string>? UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public MetaData MetaData { get; set; }
         public ClientParlayBonusModel ClientParlayBonusModel { get; set; }
@@ -47,6 +46,8 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _pageHeaderModel = new()
             {
                 Title = "Parlay Bonus",
@@ -67,7 +68,7 @@ namespace Backoffice.Web.Pages.SBC
 
             OnDisableSaveActionAsync = DisableSaveButton;
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
 
             await LoadClients();
         }
@@ -183,7 +184,7 @@ namespace Backoffice.Web.Pages.SBC
 
             if (result.StatusCode == Backoffice.Shared.Enums.StatusCode.Success)
             {
-                ToastMessage = TranslationState.GetValue("Parlay bonus updated!");
+                ToastMessage = _translationState.GetValue("Parlay bonus updated!");
             }
             else
             {
@@ -262,8 +263,6 @@ namespace Backoffice.Web.Pages.SBC
             TempConfig = null;
             Clients = null;
 
-            BackofficeService.Dispose();
-
             GC.SuppressFinalize(this);
         }
 
@@ -281,9 +280,9 @@ namespace Backoffice.Web.Pages.SBC
             var clients = (await BackofficeService.GetClients()).Result;
             if (clients != null)
             {
-                if (UserClientCodes != null && UserClientCodes.Any())
+                if (UserModel.ClientCodes.Any())
                 {
-                    clients.Clients = clients.Clients.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                 }
 
                 Clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemModel<Client>
@@ -298,7 +297,7 @@ namespace Backoffice.Web.Pages.SBC
                 Clients.Add(new SelectListItemModel<Client>
                 {
                     Value = new Client(),
-                    Name = TranslationState.GetValue("No Clients Available")
+                    Name = _translationState.GetValue("No Clients Available")
                 });
             else
                 Clients.Insert(0, new SelectListItemModel<Client> { Value = new Client(), Name = "Choose client" });

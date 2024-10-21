@@ -4,19 +4,21 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
+using Backoffice.Web.Extensions;
 using Backoffice.Web.Models;
 using Serilog;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Backoffice.Web.Extensions;
 
 namespace Backoffice.Web.Services
 {
     public class BackofficeService : IBackofficeService
     {
         #region Fields
+        public string Page { get; set; } = string.Empty;
+        public LanguageCode LanguageCode { get; set; } = LanguageCode.EN;
         private HttpClient _client;
         private HttpClient _httpClient
         {
@@ -25,12 +27,22 @@ namespace Backoffice.Web.Services
                 var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+                if (_client.DefaultRequestHeaders.Contains("x-page"))
+                {
+                    _client.DefaultRequestHeaders.Remove("x-page");
+                }
+                if (_client.DefaultRequestHeaders.Contains("x-language-code"))
+                    _client.DefaultRequestHeaders.Remove("x-language-code");
+
+                if (!string.IsNullOrEmpty(Page))
+                    _client.DefaultRequestHeaders.Add("x-page", Page);
+
+                _client.DefaultRequestHeaders.Add("x-language-code", LanguageCode.ToString());
+
+
                 return _client;
             }
-            set
-            {
-                _client = value;
-            }
+            set => _client = value;
         }
 
         private readonly IConfiguration _configuration;
@@ -757,13 +769,16 @@ namespace Backoffice.Web.Services
         #endregion
 
         #region Methods - Others
-        public async Task<BaseResponse<SportsTreeResponse>> GetSportsTreeAsync(int fixtureTypeId, LanguageCode langCode)
+        public async Task<BaseResponse<SportsTreeResponse>> GetSportsTreeAsync(int fixtureTypeId, LanguageCode langCode, CancellationToken cancellationToken = default)
         {
             try
             {
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsTreeResponse>>
                 (await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
-                                  .GetStreamAsync($"api/trading/sports/{fixtureTypeId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                                  .GetStreamAsync($"api/trading/sports/{fixtureTypeId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }, cancellationToken);
+
+                if (cancellationToken.IsCancellationRequested)
+                    return new BaseResponse<SportsTreeResponse>();
 
                 return result ?? new BaseResponse<SportsTreeResponse>
                 {
@@ -1492,7 +1507,7 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ConfigTemplateModel>>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1)
+        public async Task<BaseResponse<ConfigTemplateResponse>> GetConfigTemplate(string searchText, int sportId = -1, int scopeId = -1, MetaData metaData = null, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -1512,17 +1527,17 @@ namespace Backoffice.Web.Services
                 if (queries != null && queries.Any() && queries.Count > 0)
                     path += $"?{string.Join("&", queries)}";
 
-                var response = await _httpClient.GetAsync($"{path}");
+                var response = await _httpClient.PostAsync($"{path}", new StringContent(JsonSerializer.Serialize(metaData), Encoding.UTF8, "application/json"), cancellationToken);
 
                 if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<List<ConfigTemplateModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else
                 {
                     if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<List<ConfigTemplateModel>>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        return JsonSerializer.Deserialize<BaseResponse<ConfigTemplateResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
                     {
-                        return new BaseResponse<List<ConfigTemplateModel>>
+                        return new BaseResponse<ConfigTemplateResponse>
                         {
                             StatusCode = StatusCode.Error,
                             Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
@@ -1532,7 +1547,7 @@ namespace Backoffice.Web.Services
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<ConfigTemplateModel>>
+                return new BaseResponse<ConfigTemplateResponse>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
@@ -1643,12 +1658,12 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload, int templateId = -1)
+        public async Task<BaseResponse<ConfigTemplateLeagueResponse>> GetConfigClient(ConfigState state, ConfigTemplateLeagueRequest payload, long templateId = -1, CancellationToken token = default)
         {
             try
             {
                 var query = templateId != -1 ? $"?templateId={templateId}" : "";
-                var response = await _httpClient.PostAsync($"api/config/template/{state.ToString()}{query}", new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"api/config/template/{state.ToString()}{query}", new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"), token);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1815,7 +1830,7 @@ namespace Backoffice.Web.Services
             //_httpClient.Dispose();
             //_authenticationService.Dispose();
 
-            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+            ////Console.WriteLine("- {0} was disposed!", this.GetType().Name);
         }
 
     }

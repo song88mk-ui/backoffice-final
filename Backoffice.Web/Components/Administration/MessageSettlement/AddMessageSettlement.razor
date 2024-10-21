@@ -5,7 +5,7 @@
             <div class="me-4">
                 <EditForm Model="@AddMessageSettlementModel" OnValidSubmit="GetBetDetails">
                     <div class="input-group">
-                        <input id="search" type="text" placeholder=@TranslationState.GetValue("Search Bet ID") class="form-control search-text valid border-end-0" @bind-value="AddMessageSettlementModel.BetId" />
+                        <input id="search" type="text" placeholder=@_translationState.GetValue("Search Bet ID") class="form-control search-text valid border-end-0" @bind-value="AddMessageSettlementModel.BetId" />
                         <button class="input-group-text border-start-0" type="submit">
                             <i class="fa fa-search"></i>
                         </button>
@@ -40,7 +40,7 @@
                     {
                         <tr>
                             <td colspan=5>
-                                <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                             </td>
                         </tr>
                     }
@@ -54,7 +54,7 @@
             @if (AddMessageSettlementModel.BetSelections != null && AddMessageSettlementModel.BetSelections.Any())
             {
                 <div align="right">
-                    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCloseClickEvent">@TranslationState.GetValue("Cancel")</button>
+                    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCloseClickEvent">@_translationState.GetValue("Cancel")</button>
                     <button type="button" class="btn modal-btn btn-settle" @onclick="OnSettleClickEvent">Settle</button>
                 </div>
             }

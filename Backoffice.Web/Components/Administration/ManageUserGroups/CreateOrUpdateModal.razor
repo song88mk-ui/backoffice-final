@@ -36,6 +36,6 @@
     <Permission IsReadOnly="IsPreload" Permissions="Permissions.Permissions" ClientModel="ClientModel" IsClientEmptyCallback="IsEmptyClientCallback" />
 </div>
 <div class="modal-footer mx-4">
-    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@(IsPreload || IsClientEmpty)">@TranslationState.GetValue("Save")</button>
+    <button type="button" class="btn btn-cancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@IsPreload">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn btn-edit waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent" disabled="@(IsPreload || IsClientEmpty)">@_translationState.GetValue("Save")</button>
 </div>

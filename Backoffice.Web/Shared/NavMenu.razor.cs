@@ -1,9 +1,10 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
+using Backoffice.Web.Models.Shared;
 using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.Metrics;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Shared
@@ -12,68 +13,70 @@ namespace Backoffice.Web.Shared
     {
         #region Properties
 
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-        [Inject] public INavMenuModalService ModalService { get; set; }
-        [Inject] public NavigationManager NavigationManager { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel? UserModel { get; set; }
-        [CascadingParameter(Name = "UserClaims")] public List<Claim>? UserClaims { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
-
-        [Parameter] public PermissionCategory NavMenuAccess { get; set; }
-        [Parameter] public NavMenuModel? NavMenus { get; set; }
+        [Parameter] public NavMenuParameter NavMenuParameter { get; set; }
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
-        [Parameter] public string? Region { get; set; }
 
         #endregion
 
         #region Fields
 
-        private bool collapseNavMenu = true;
-        private PermissionCategory _navMenuAccess;
-        private SportsTreeModel _menu;
-        private SportClickCallbackModel _selectedSport;
-        private bool _showSwitchAccess;
-        private string _page;
-        private NavMenuModel _navMenus;
+        private List<Claim> _userClaims = new List<Claim>();
+
+        private PermissionCategory? _navMenuAccess;
         private LanguageCode _languageCode;
+
+        private SportsTreeModel _menu = new SportsTreeModel();
+        private SportClickCallbackModel _selectedSport = new SportClickCallbackModel();
+        private NavMenuModel _navMenus;
+
+        private string[] _permissionCategories = new string[] { nameof(PermissionCategory.Admin), nameof(PermissionCategory.SBC) };
+        private string[] _access = new string[] { ((int)Access.View).ToString(), ((int)Access.Edit).ToString() };
+
+        private string _page;
+
+        private bool _showSwitchAccess;
+        private bool collapseNavMenu = true;
+        private bool _init = true;
+
         #endregion
 
         #region Methods
 
-        protected override async void OnInitialized()
-        {
-            _menu = new SportsTreeModel();
-            _selectedSport = new SportClickCallbackModel();
-
-            _page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
-            var splitVal = _page.Split("/").FirstOrDefault();
-
-            if (splitVal != null && splitVal.Any() && Region != null)
-            {
-                var regions = new List<string>() { "HK", "SA" };
-                Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToUpper() : null;
-            }
-
-            var permissionCategories = new string[] { nameof(PermissionCategory.Admin), nameof(PermissionCategory.SBC) };
-            var access = new string[] { ((int)Access.View).ToString(), ((int)Access.Edit).ToString() };
-
-            var categories = UserClaims?.Where(c => access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
-            categories = categories?.Where(c => permissionCategories.Contains(c)).ToList();
-
-            if (categories != null && categories.Count > 1)
-                _showSwitchAccess = true;
-        }
         protected override async Task OnParametersSetAsync()
         {
-            await InvokeAsync(StateHasChanged);
+            _page = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "");
 
-            if (_navMenuAccess != NavMenuAccess || _languageCode != TranslationState.ActiveLanguageCode)
+            if (!_userClaims.SequenceEqual(UserModel.Claims))
             {
-                _languageCode = TranslationState.ActiveLanguageCode;
-                _navMenuAccess = NavMenuAccess;
+                _userClaims = new List<Claim>(UserModel.Claims);
+
+                var categories = UserModel.Claims?.Where(c => _access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
+                categories = categories?.Where(c => _permissionCategories.Contains(c)).ToList();
+
+                _showSwitchAccess = categories != null && categories.Count > 1;
+            }
+
+            if (_init || _navMenuAccess != NavMenuParameter?.NavMenuAccess || _languageCode != _translationState.ActiveLanguageCode)
+            {
+                var cts = new CancellationTokenSource();
+                _init = false;
+                _languageCode = _translationState.ActiveLanguageCode;
+                _navMenuAccess = NavMenuParameter?.NavMenuAccess;
+
+                var categories = _userClaims?.Where(c => _access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
+                categories = categories?.Where(c => _permissionCategories.Contains(c)).ToList();
+
+                _showSwitchAccess = categories != null && categories.Count > 1;
+
                 if (_navMenuAccess == PermissionCategory.OE)
                 {
-                    _menu.Sports = await GetSportsTreeMenu();
+                    _menu.Sports = await GetSportsTreeMenu(cts.Token);
+
+                    if (cts.Token.IsCancellationRequested)
+                        return;
+
                     var sport = _menu.Sports.FirstOrDefault();
 
                     if (sport != null)
@@ -114,7 +117,7 @@ namespace Backoffice.Web.Shared
             {
                 _navMenus = new NavMenuModel()
                 {
-                    Menus = NavMenus?.Menus?.Select(x => new MenuModel()
+                    Menus = NavMenuParameter?.NavMenus?.Menus?.Select(x => new MenuModel()
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -125,11 +128,11 @@ namespace Backoffice.Web.Shared
                 };
             }
 
-            if (!_navMenus.Equals(NavMenus))
+            if (!_navMenus.Equals(NavMenuParameter?.NavMenus))
             {
                 _navMenus = new NavMenuModel()
                 {
-                    Menus = NavMenus?.Menus?.Select(x => new MenuModel()
+                    Menus = NavMenuParameter?.NavMenus?.Menus?.Select(x => new MenuModel()
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -140,6 +143,7 @@ namespace Backoffice.Web.Shared
                 };
             }
         }
+
         private void OnSportClickEvent(int sportId)
         {
             if (_selectedSport.SportId != sportId)
@@ -198,11 +202,11 @@ namespace Backoffice.Web.Shared
                 _selectedSport.LeagueName = league.LeagueName;
 
                 // verify if you're in the monitoring page, if not then the user will be navigated.
-                var slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
+                var slugs = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "").Split("/").ToList();
 
                 if (slugs.Count != 1 && slugs[1].ToLower() != "monitoring")
                 {
-                    NavigationManager.NavigateTo($"/{Region}/odds-engine");
+                    _navigationManager.NavigateTo($"/hk/odds-engine");
                 }
 
                 await OnSportClickCallback.InvokeAsync(_selectedSport);
@@ -219,7 +223,7 @@ namespace Backoffice.Web.Shared
             parameters.Add("TitleClass", "w-100");
 
             var options = new ModalOptions();
-            ModalService.Open<ConfirmLogoutModal>("Logout", parameters, options);
+            _modalService.Open<ConfirmLogoutModal>("Logout", parameters, options);
         }
 
         private void OnChangePasswordClickEvent()
@@ -231,23 +235,25 @@ namespace Backoffice.Web.Shared
             parameters.Add("TitleClass", "w-100");
 
             var options = new ModalOptions();
-            ModalService.Open<ChangePasswordModal>("Change Password", parameters, options);
+            _modalService.Open<ChangePasswordModal>("Change Password", parameters, options);
         }
 
         public void Dispose()
         {
-            BackofficeService.Dispose();
         }
 
         #endregion
 
         #region Utilities
 
-        private async Task<List<SportModel>> GetSportsTreeMenu()
+        private async Task<List<SportModel>> GetSportsTreeMenu(CancellationToken token)
         {
-            var response = await BackofficeService.GetSportsTreeAsync((int)FixtureType.Match, _languageCode);
+            var response = await _backofficeService.GetSportsTreeAsync((int)FixtureType.Match, _languageCode, token);
             var result = new List<SportModel>();
 
+            if (token.IsCancellationRequested)
+                return new();
+            ;
             if (response.StatusCode == StatusCode.Success)
             {
                 result = response.Result.Sports

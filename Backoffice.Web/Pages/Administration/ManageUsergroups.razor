@@ -1,5 +1,7 @@
 ﻿@using Backoffice.Web.Components.Administration.ManageUserGroups
 
+@inherits BasePage
+
 @layout MainLayout
 
 @page "/admin/manage-usergroup"
@@ -29,9 +31,9 @@
                     <thead class="table-head">
                         <tr>
                             <th>#</th>
-                            <th>@TranslationState.GetValue("Market Group Name")</th>
-                            <th>@TranslationState.GetValue("Markets")</th>
-                            <th>@TranslationState.GetValue("Action")</th>
+                            <th>@_translationState.GetValue("Market Group Name")</th>
+                            <th>@_translationState.GetValue("Markets")</th>
+                            <th>@_translationState.GetValue("Action")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -51,7 +53,7 @@
                                 {
                                     <tr>
                                         <td colspan="4">
-                                            <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                            <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                         </td>
                                     </tr>
                                 }
@@ -94,7 +96,7 @@
                             {
                                 <tr>
                                     <td colspan="5">
-                                        <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                        <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                     </td>
                                 </tr>
                             }

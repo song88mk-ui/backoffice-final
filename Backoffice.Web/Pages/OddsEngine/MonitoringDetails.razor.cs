@@ -28,7 +28,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        
 
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public string Id { get; set; }
@@ -64,6 +64,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _isPreLoader = true;
             _clients = new();
             _pageHeaderModel = new();
@@ -76,7 +78,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarginMarket = new MarketModel();
             _isInit = true;
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -99,10 +101,10 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         protected override async Task OnParametersSetAsync()
         {
-            if (_isInit || _languageCode != TranslationState.ActiveLanguageCode || Id != _id)
+            if (_isInit || _languageCode != _translationState.ActiveLanguageCode || Id != _id)
             {
                 _id = Id;
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
 
                 await PrepareMonitoringDetails();
                 _isInit = false;
@@ -211,8 +213,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public void Dispose()
         {
-            TradingService.Dispose();
-            BackofficeService.Dispose();
         }
 
         #endregion
@@ -232,7 +232,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 SportId = Fixture.SportId;
                 _pageHeaderModel = new()
                 {
-                    Title = $"{TranslationState.GetValue(Fixture.SportName)} - {Fixture.SegmentName} - {Fixture.LeagueName}",
+                    Title = $"{_translationState.GetValue(Fixture.SportName)} - {Fixture.SegmentName} - {Fixture.LeagueName}",
                     IconClass = $"iconfont iconfont-{Fixture.SportName.ToLower().Replace(" ", "-")}",
                     ShowLanguageDropDown = false
                 };
@@ -317,7 +317,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         SelectionId = od.SelectionId
                     }).ToList()
                 }).ToList()
-            }).ToList();
+            }).OrderBy(o => string.IsNullOrEmpty(o.Line) ? 0 : Convert.ToDecimal(o.Line)).ToList();
         }
 
         private List<FixtureMarketModel> PrepareFixtureMarketTemplates(string marketTemplateId)

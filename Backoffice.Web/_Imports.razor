@@ -1,4 +1,5 @@
 ﻿@using System.Net.Http
+@using Backoffice.Web.Services
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
@@ -8,6 +9,7 @@
 @using Microsoft.JSInterop
 @using Backoffice.Shared.Enums
 @using Backoffice.Web
+@using Backoffice.Web.Pages.Base
 @using Backoffice.Web.Shared
 @using Backoffice.Web.Shared.OddsEngine
 @using BlazorDeferredRemove.Components
@@ -17,4 +19,18 @@
 
 @using Backoffice.Web.States
 
-@inject TranslationState TranslationState;
+@inject IPreRenderService PreRenderService;
+
+@inject TranslationState _translationState;
+@inject PageState PageState;
+@inject AlertToastService _alertToastService;
+@inject SaveOptionService _saveOptionService;
+
+@inject IModalService _modalService;
+@inject ITradingService _tradingService;
+@inject IBackofficeService _backofficeService;
+@inject IAuthenticationService _authenticationService;
+@inject ITableauService _tableauService;
+@inject IJSRuntime _jsRuntime;
+
+@inject NavigationManager _navigationManager;

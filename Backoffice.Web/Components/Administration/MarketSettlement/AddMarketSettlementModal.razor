@@ -21,7 +21,7 @@
                         }
                         <th scope="col">Event Details</th>
                         <th scope="col">Selection</th>
-                        <th scope="col">@TranslationState.GetValue("Status")</th>
+                        <th scope="col">@_translationState.GetValue("Status")</th>
                         <th scope="col">Reason</th>
                     </tr>
                 </thead>
@@ -54,7 +54,7 @@
                                         }
                                         else
                                         {
-                                            <span>&nbsp;&nbsp;</span> @TranslationState.GetValue(marketSelection.SportName)
+                                            <span>&nbsp;&nbsp;</span> @_translationState.GetValue(marketSelection.SportName)
 
                                             <br />
                                             <span>@marketSelection.SegmentName</span> <br>
@@ -65,7 +65,7 @@
 
                                             <br />
                                             <span>
-                                                @marketSelection.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy") <strong>@marketSelection.FixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
+                                                @marketSelection.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture) <strong>@marketSelection.FixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
                                             </span>
 
                                             <br />
@@ -85,7 +85,7 @@
                                 </td>
                                 <td valign="middle" align="left">
                                     <select class="form-select input-sm" name="Status" @onchange="(e) => OnAddStatusChange(e, marketSelection.RowCount)">
-                                        <option value="0">@TranslationState.GetValue("Select Status")</option>
+                                        <option value="0">@_translationState.GetValue("Select Status")</option>
                                         @foreach (var item in marketSelection.Statuses)
                                         {
                                             if (item.Value == marketSelection.ToStatus)
@@ -112,6 +112,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelModal" disabled="@IsPreLoader">@TranslationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn btn-cancel" @onclick="OnCancelModal" disabled="@IsPreLoader">@_translationState.GetValue("Cancel")</button>
     <button type="button" class="btn modal-btn btn-settle" @onclick="OnMarketSettlement" disabled="@IsPreLoader">Settle Market</button>
 </div>

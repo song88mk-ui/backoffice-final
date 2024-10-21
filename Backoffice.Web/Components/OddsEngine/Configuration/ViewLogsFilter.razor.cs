@@ -17,7 +17,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public EventCallback<ConfigLogsFilterModel> ConfigLogsFilterModelChanged { get; set; }
         [Parameter] public EventCallback GetContentCallback { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         private bool IsFilterButtonDisabled { get; set; }
         #endregion
         #region Methods
@@ -146,13 +146,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 new SelectListItemModel<int> {  Value = 1, Name = "Outrights" }
             };
 
-        private async Task<List<SelectListItemModel<Guid>>> GetClients() => (await TradingService.GetClientList()).Result.Where(x => UserClientCodes != null && UserClientCodes.Contains(x.ClientCode)).Select(c => new SelectListItemModel<Guid>()
+        private async Task<List<SelectListItemModel<Guid>>> GetClients() => (await TradingService.GetClientList()).Result.Where(x => UserModel.ClientCodes.Contains(x.ClientCode)).Select(c => new SelectListItemModel<Guid>()
         {
             Value = c.ClientId,
             Name = c.ClientName
         }).ToList();
 
-        private async Task<List<SelectListItemModel<int>>> GetSports() => (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString())).Result.SportLookup.Select(c => new SelectListItemModel<int>()
+        private async Task<List<SelectListItemModel<int>>> GetSports() => (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result.SportLookup.Select(c => new SelectListItemModel<int>()
         {
             Value = c.SportId,
             Name = c.SportName

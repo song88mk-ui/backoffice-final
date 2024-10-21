@@ -1,4 +1,6 @@
-﻿@page "/admin/dashboard"
+﻿@inherits BasePage
+
+@page "/admin/dashboard"
 <AuthorizeView Policy="admin-dashboard">
     <Authorized>
         <div class="row">

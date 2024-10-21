@@ -1,24 +1,31 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Models;
+using Backoffice.Web.Models.Shared;
+using Microsoft.AspNetCore.Components;
+using System.Drawing;
 
 namespace Backoffice.Web.Shared.OddsEngine
 {
-    public partial class OEMonitoringLayout : IDisposable
+    public partial class OEMonitoringLayout
     {
         #region Properties        
-        public string? Region { get; set; }                
+        public HeaderNavMenu HeaderNavMenuReference { get; set; }
+        public SportClickCallbackModel SelectedSport { get; set; }
+        private NavMenuParameter _navMenuParameter { get; set; } = new();
+
         #endregion
 
         #region Methods
         protected override void OnInitialized()
         {
-            var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
-            var splitVal = page.Split("/").FirstOrDefault();
+            _navMenuParameter.NavMenuAccess = PermissionCategory.OE;
+            base.InitializeState();
+        }
 
-            if (splitVal != null)
-            {
-                var regions = new List<string>() { "HK", "SA" };
-                Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToLower() : null;
-            }
+        public void OnSportClickEvent(SportClickCallbackModel model)
+        {
+            SelectedSport = model;
+            HeaderNavMenuReference.ActivateMenu("monitoring");
         }
         #endregion
     }

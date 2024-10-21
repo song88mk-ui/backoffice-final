@@ -2,15 +2,15 @@
     <div class="modal-body">
         <div class="row">
             <div class="col-2">
-                <label class="my-1 mr-2">@TranslationState.GetValue("Clients")</label>
+                <label class="my-1 mr-2">@_translationState.GetValue("Clients")</label>
                 <div class="dropdown">
-                    <button class="btn clientBtn dropdown-toggle" type="button" id="clientDropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">@TranslationState.GetValue("Clients") (@ClientIdSelectedModel?.Where(x => x.IsSelected).Count())</button>
+                    <button class="btn clientBtn dropdown-toggle" type="button" id="clientDropdown" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false">@_translationState.GetValue("Clients") (@ClientIdSelectedModel?.Where(x => x.IsSelected).Count())</button>
 
                     <ul class="dropdown-menu" aria-labelledby="clientDropdown">
                         <li class="dropdown-item">
                             <div class="form-check">
                                 <InputCheckbox class="form-check-input" @bind-Value="@IsSelectAll" @onclick="_ => SelectAllToggleCheckbox(!IsSelectAll)" />
-                                <label class="form-check-label" for="ClientAll">@TranslationState.GetValue("Select All")</label>
+                                <label class="form-check-label" for="ClientAll">@_translationState.GetValue("Select All")</label>
                             </div>
                         </li>
 
@@ -50,7 +50,7 @@
 
         <div class="row">
             <div class="col-12">
-                <label class="my-1 mr-2">@TranslationState.GetValue("Top Fixtures")</label>
+                <label class="my-1 mr-2">@_translationState.GetValue("Top Fixtures")</label>
                 <div class="d-flex flex-wrap p-3 leagueContainer">
                     @if(TopFixture != null)
                     {
@@ -66,7 +66,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn copyModalBtn copyModalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@TranslationState.GetValue("Cancel")</button>
-        <button type="button" class="btn copyModalBtn copyModalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">@TranslationState.GetValue("Save")</button>
+        <button type="button" class="btn copyModalBtn copyModalCancel waves-effect" data-bs-dismiss="modal" @onclick="OnCancelClickEvent">@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="btn copyModalBtn copyModalSave waves-effect" data-bs-dismiss="modal" @onclick="OnSaveClickEvent">@_translationState.GetValue("Save")</button>
     </div>
 </EditForm>

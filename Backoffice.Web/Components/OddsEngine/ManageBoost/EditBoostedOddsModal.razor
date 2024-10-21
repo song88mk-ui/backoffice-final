@@ -10,19 +10,19 @@ else
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th scope="col">@TranslationState.GetValue("Client name")</th>
-                    <th scope="col">@TranslationState.GetValue("Sports")</th>
-                    <th scope="col">@TranslationState.GetValue("Details")</th>
-                    <th scope="col">@TranslationState.GetValue("BR Ctrl")</th>
-                    <th scope="col">@TranslationState.GetValue("Current Odds")</th>
-                    <th scope="col">@TranslationState.GetValue("Update Selection")</th>
-                    <th scope="col">@TranslationState.GetValue("Boosted Odds")</th>
+                    <th scope="col">@_translationState.GetValue("Client name")</th>
+                    <th scope="col">@_translationState.GetValue("Sports")</th>
+                    <th scope="col">@_translationState.GetValue("Details")</th>
+                    <th scope="col">@_translationState.GetValue("BR Ctrl")</th>
+                    <th scope="col">@_translationState.GetValue("Current Odds")</th>
+                    <th scope="col">@_translationState.GetValue("Update Selection")</th>
+                    <th scope="col">@_translationState.GetValue("Boosted Odds")</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <th scope="row">@_priceBoostConfigModel.ClientName</th>
-                    <td>@TranslationState.GetValue(_priceBoostConfigModel.SportName)</td>
+                    <td>@_translationState.GetValue(_priceBoostConfigModel.SportName)</td>
                     <td class="d-flex flex-column">
                         <span><b>@_priceBoostConfigModel.SelectionName</b></span>
                         <span>@_priceBoostConfigModel.MarketName</span>
@@ -39,7 +39,7 @@ else
                         }
                         else
                         {
-                            <span>@_priceBoostConfigModel.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy")</span>
+                            <span>@_priceBoostConfigModel.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)</span>
                             <span>@_priceBoostConfigModel.FixtureStartDate.ToLocalTime().ToString("HH:mm")</span>
                         }
                     </td>
@@ -99,6 +99,6 @@ else
     </div>
 }
 <div class="modal-footer mx-4 pe-0">
-    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick" disabled="@_isPreloader">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn modal-save" @onclick="OnSaveModalClick" disabled="@_isPreloader">@TranslationState.GetValue("Save")</button>
+    <button type="button" class="btn modal-btn modal-cancel" @onclick="OnCancelModalClick" disabled="@_isPreloader">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn modal-save" @onclick="OnSaveModalClick" disabled="@_isPreloader">@_translationState.GetValue("Save")</button>
 </div>

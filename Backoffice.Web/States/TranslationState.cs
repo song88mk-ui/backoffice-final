@@ -1,44 +1,53 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Services;
+using Backoffice.Web.States.Base;
 using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.JSInterop;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Backoffice.Web.States
 {
     public class TranslationState : BaseState<Dictionary<string, string>>
     {
+        #region Fields
+
         private ITranslationService _translationService;
-        private readonly IJSRuntime _jsRuntime;
-        public readonly List<LanguageCode> LanguageCodes;
 
-        private LanguageCode _activeLangCode;
-        public LanguageCode ActiveLanguageCode
-        {
-            get { return _activeLangCode; }
-            set
-            {
-                if (value != _activeLangCode || !Model.Any())
-                {
-                    _activeLangCode = value;
-                    ReloadModel();
-                }
-            }
-        }
+        #endregion
 
-        public TranslationState(ITranslationService translationService, IJSRuntime jsRuntime) : base(new Dictionary<string, string>())
+        #region Properties
+
+        public List<LanguageCode> LanguageCodes { get;set; }
+        public LanguageCode ActiveLanguageCode { get; set; }
+
+        #endregion
+
+        #region Ctor
+
+        public TranslationState(ITranslationService translationService) : base(new Dictionary<string, string>())
         {
             _translationService = translationService;
-            _jsRuntime = jsRuntime;
-            LanguageCodes = new List<LanguageCode> { LanguageCode.EN, LanguageCode.ZH, LanguageCode.KO };  //Enum.GetValues<LanguageCode>().Select(s => s).ToList();
+
+            LanguageCodes = new List<LanguageCode> { LanguageCode.EN, LanguageCode.ZH, LanguageCode.KO }; 
 
             if (!Model.Any())
-                ReloadModel();
+                SetLanguageCode(LanguageCode.EN);
+        }
+
+        #endregion
+
+        #region Methods
+
+        public async Task SetLanguageCode(LanguageCode langCode)
+        {
+            Model = await _translationService.GetTranslationsAsync(langCode);
+            ActiveLanguageCode = langCode;
         }
 
         public string GetValue(string word)
         {
+            if (string.IsNullOrEmpty(word))
+                return word;
+
             var key = word.Replace(" ", "_").ToLower();
             var placeHolders = ExtractPlaceholders(ref key);
             var translated = Model.TryGetValue(key, out string? value) ? value : word;
@@ -49,18 +58,10 @@ namespace Backoffice.Web.States
             return translated.Replace("{", "").Replace("}", "");
         }
 
-        private async void ReloadModel()
-        {
-            var timer = new Stopwatch();
-            timer.Start();
-            Model = await _translationService.GetTranslationsAsync(_activeLangCode);
+        #endregion
 
-            timer.Stop();
+        #region Utilities
 
-            TimeSpan timeTaken = timer.Elapsed;
-            string foo = "(Translation Service) Time taken: " + timeTaken.ToString(@"m\:ss\.fff");
-            await _jsRuntime.InvokeVoidAsync("console.log", foo);
-        }
         private string TransformPlaceHolder(string word, string placeholder, params object[] values)
         {
             var index = -1;
@@ -74,6 +75,7 @@ namespace Backoffice.Web.States
 
             return word;
         }
+
         private List<string> ExtractPlaceholders(ref string input)
         {
             List<string> result = new List<string>();
@@ -89,5 +91,7 @@ namespace Backoffice.Web.States
 
             return result;
         }
+
+        #endregion
     }
 }

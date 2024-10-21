@@ -1,0 +1,28 @@
+﻿.toast-container {
+    position: fixed;
+    bottom: 40px;
+    display: flex;
+    flex-direction: row;
+    min-width: 520px;
+    background-color: white;
+    height: 80px;
+    box-shadow: 211px 358px 116px 0px rgba(148, 148, 148, 0.00), 135px 229px 106px 0px rgba(148, 148, 148, 0.01), 76px 129px 90px 0px rgba(148, 148, 148, 0.05), 34px 57px 66px 0px rgba(148, 148, 148, 0.09), 8px 14px 37px 0px rgba(148, 148, 148, 0.10);
+    border-radius: 8px;
+    justify-content: flex-start;
+    align-items: center;
+	right:0;
+	margin-right:20px;
+}
+.toast-item {
+    margin-left: 16px;
+}
+.toast-icon {
+    margin-top:12px;
+}
+.toast-message {
+    color: #101828;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 28px;
+}

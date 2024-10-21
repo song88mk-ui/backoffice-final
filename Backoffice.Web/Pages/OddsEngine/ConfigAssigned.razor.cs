@@ -3,7 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
+using Backoffice.Web.Models.OddsEngine.Config;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -12,59 +12,46 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class ConfigAssigned : IDisposable
     {
         #region Properties
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
-        [Parameter] public EventCallback OnStateHasChanged { get; set; }
-        [Parameter] public string Region { get; set; } = "hk";
-        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
-        [Parameter] public List<SelectListItemModel<string>> Sports { get; set; }
-        [Parameter] public List<SelectListItemModel<string>> Scopes { get; set; }
         [Parameter] public ConfigState State { get; set; }
-
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-
-        public List<BreadcrumbModel> Breadcrumbs { get; set; }
-        public List<ConfigClientViewModel> ConfigClients { get; set; } = new List<ConfigClientViewModel>();
-        private List<ConfigClientViewModel>? _selectedConfigClients { get; set; }
-        public MetaData MetaData { get; set; }
-        public string IconClass { get; set; }
-        public bool IsPreloader { get; set; } = true;
-        public bool IsEdit { get; set; } = false;
-        public bool IsSelectedLeagueShowing { get; set; } = false;
+        [Parameter] public ConfigContentFilterModel FilterModel { get; set; }
+        [Parameter] public EventCallback OnStateHasChange { get; set; }
 
         #endregion
+
+        #region Fields
+        private List<BreadcrumbModel> _breadcrumbs;
+        private List<ConfigClientViewModel> _configClients = new();
+        private List<ConfigClientViewModel>? _selectedConfigClients = new();
+
+        private bool _isSelectedLeagueShowing;
         private string _pageTitle;
-        private ConfigState? _state;
-        private List<SelectListItemModel<string>> _sports;
-        private ConfigStateFilterModel _filterModel;
-        private List<SelectListItemWithCheckboxModel<string>> _clients;
-        private SearchFormModel _searchForm;
+        private MetaData _metaData = new();
+        private string _iconClass = "";
+        private bool _isPreloader = true;
+        private bool _isEdit = false;
+        private bool _init = true;
+
+        private ConfigState? _state = null;
+        private ConfigStateFilterModel _stateFilterModel = new();
+        private SearchFormModel _searchForm = new();
+        private AlertModel _alertModel = new();
+        private bool _shouldRender = true;
+        private string _selectedClientName = string.Empty;
         private int _selectedClientCount;
-        private string _region;
-        private string _selectedClientName;
-        private AlertModel _alertModel;
+        private LanguageCode _languageCode;
+
+        private CancellationTokenSource? _cts;
+        #endregion
+
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            _state = null;
-            IsPreloader = true;
-            IsEdit = false;
-            IconClass = "";
-            _sports = new();
-            _clients = new();
-            _searchForm = new();
-            _alertModel = new();
-
-            _filterModel = new();
-            MetaData = new();
-            _filterModel = new();
             _pageTitle = State == ConfigState.Assigned ? "Assigned Leagues" : "Unassigned Leagues";
-            _selectedConfigClients = new();
 
-            Breadcrumbs = new List<BreadcrumbModel>()
+            _breadcrumbs = new List<BreadcrumbModel>()
             {
                 new BreadcrumbModel
                 {
@@ -77,51 +64,44 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnParametersSetAsync()
         {
-            if (_region != Region)
-                _region = Region;
+            _shouldRender = ValidateParameters();
 
-            if (_filterModel == null)
-                _filterModel = new();
-
-            if (!Clients.Equals(_clients))
+            if (_shouldRender)
             {
+                _languageCode = _translationState.ActiveLanguageCode;
                 _selectedClientName = string.Empty;
-                _clients = Clients;
-                _filterModel.ClientCodes = Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>();
-                _selectedClientCount = _filterModel.ClientCodes.Count();
-
-                if (_selectedClientCount == 1)
-                    _selectedClientName = Clients?.FirstOrDefault(x => x.IsChecked && x.Value.ToUpper() != "ALL")?.Name ?? string.Empty;
-            }
-
-            if (!Sports.Equals(_sports))
-            {
-                _sports = Sports;
-                _filterModel.SportId = int.Parse(_sports.FirstOrDefault()?.Value ?? "-1");
-                _filterModel.SportName = _sports.FirstOrDefault()?.Name ?? "-";
-            }
-
-            if (State != _state)
-            {
+                _languageCode = _translationState.ActiveLanguageCode;
+                _backofficeService.LanguageCode = _languageCode;
                 _state = State;
+
                 _searchForm.SearchText = "";
                 _pageTitle = State == ConfigState.Assigned ? "Assigned Leagues" : "Unassigned Leagues";
-                _filterModel = new()
+
+                var firstSport = FilterModel.Sports.FirstOrDefault();
+
+                _stateFilterModel = new()
                 {
-                    ClientCodes = Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
-                    SportId = int.Parse(_sports.FirstOrDefault()?.Value ?? "-1"),
-                    SportName = _sports.FirstOrDefault()?.Name ?? "-",
+                    ClientCodes = FilterModel.Clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
+                    SportId = int.Parse(firstSport?.Value ?? "-1"),
+                    SportName = firstSport?.Name ?? "-",
                     SearchText = _searchForm.SearchText
                 };
-                _selectedClientCount = _filterModel.ClientCodes.Count();
+
+                _selectedClientCount = _stateFilterModel.ClientCodes.Count();
 
                 if (_selectedClientCount == 1)
-                    _selectedClientName = Clients?.FirstOrDefault(x => x.IsChecked && x.Value.ToUpper() != "ALL")?.Name ?? string.Empty;
-                await LoadLeagues(_filterModel);
-            }
-        }
+                    _selectedClientName = FilterModel.Clients?.FirstOrDefault(x => x.IsChecked && x.Value.ToUpper() != "ALL")?.Name ?? string.Empty;
 
-        public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
+                await LoadLeagues();
+            }
+
+            _init = false;
+        }
+        protected override bool ShouldRender() => _shouldRender;
+        protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
+        private bool ValidateParameters() => _init || State != _state || _languageCode != _translationState.ActiveLanguageCode;
+
+        public async Task HandleClientCheckboxClick(Dictionary<string, string> items)
         {
             _selectedClientName = string.Empty;
             _selectedClientCount = items.Count;
@@ -131,98 +111,80 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _selectedClientName = items.FirstOrDefault().Value;
             }
 
-            _filterModel.ClientCodes = new List<string>();
+            _stateFilterModel.ClientCodes = new List<string>();
             if (items != null)
             {
-                _filterModel.ClientCodes = items.Keys.Where(x => x.ToUpper() != "ALL").ToList();
+                _stateFilterModel.ClientCodes = items.Keys.Where(x => x.ToUpper() != "ALL").ToList();
             }
 
-            if (IsSelectedLeagueShowing)
+            if (_isSelectedLeagueShowing)
             {
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
-                IsSelectedLeagueShowing = false;
+                _isSelectedLeagueShowing = false;
             }
 
             _selectedConfigClients = new();
 
-            await SelectedPage(1);
-            //var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
-
-            //SelectedClientCount = selectedClients.Count;
-            //SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+            await HandledPageSelect(1);
         }
 
-        public async Task OnSportCheckboxClickEvent(ChangeEventArgs e)
+        public async Task HandleSportCheckboxClick(ChangeEventArgs e)
         {
-            if (IsSelectedLeagueShowing)
+            if (_isSelectedLeagueShowing)
             {
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
-                IsSelectedLeagueShowing = false;
+                _isSelectedLeagueShowing = false;
             }
 
             _selectedConfigClients = new();
 
             if (e != null)
             {
-                _filterModel.SportId = int.Parse((e == null ? _sports.FirstOrDefault()?.Value : e.Value?.ToString()) ?? "-1");
-                _filterModel.SportName = (e == null ? _sports.FirstOrDefault()?.Name : _sports.FirstOrDefault(x => x.Value == e.Value.ToString())?.Name) ?? string.Empty;
+                var firstSport = FilterModel.Sports.FirstOrDefault(c => c.Value == e.Value.ToString());
+
+                _stateFilterModel.SportId = int.Parse(firstSport?.Value ?? "-1");
+                _stateFilterModel.SportName = firstSport?.Name ?? string.Empty;
             }
-            await SelectedPage(1);
+            await HandledPageSelect(1);
         }
 
-        public async Task OnModalSaveEvent(object e)
+        public async Task HandleModalSave(object e)
         {
             _selectedConfigClients = new();
             _alertModel = new();
-            await OnStateHasChanged.InvokeAsync();
-            await LoadLeagues(_filterModel);
+            await LoadLeagues();
 
             if (e is AlertModel)
             {
                 _alertModel = (AlertModel)e;
             }
 
-            await SelectedPage(1);
-            if(IsSelectedLeagueShowing)
+            await HandledPageSelect(1);
+            if (_isSelectedLeagueShowing)
             {
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
-                IsSelectedLeagueShowing = false;
+                _isSelectedLeagueShowing = false;
             }
         }
 
-        public async Task OnInputSearchEvent()
+        public async Task HandleSearchInput()
         {
-            _filterModel.SearchText = _searchForm.SearchText;
-            await LoadLeagues(_filterModel);
+            _stateFilterModel.SearchText = _searchForm.SearchText;
+            await LoadLeagues();
         }
 
-        public async Task SelectedPage(int selectedPage)
+        public async Task HandledPageSelect(int selectedPage)
         {
-            MetaData.CurrentPage = selectedPage;
-            await LoadLeagues(_filterModel);
+            _metaData.CurrentPage = selectedPage;
+            await LoadLeagues();
         }
 
-        public async Task OnResetClickEvent()
+        public async Task HandleConfigSelectionChange(ConfigClientViewModel config)
         {
-            MetaData = new MetaData();
-            _searchForm.SearchText = "";
-            _filterModel = new ConfigStateFilterModel()
-            {
-                ClientCodes = _clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>(),
-                SportId = int.Parse(_sports.FirstOrDefault().Value),
-                SportName = _sports.FirstOrDefault().Name,
-                SearchText = _searchForm.SearchText
-            };
-            _selectedClientCount = (_clients?.Where(x => x.IsChecked && x.Value.ToUpper() != "ALL").Select(x => x.Value).ToList() ?? new List<string>()).Count();
-
-            await LoadLeagues(_filterModel);
-        }
-        public async Task OnConfigSelectionChanged(ConfigClientViewModel config)
-        {
-            if (ConfigClients.Any(x => x.IsChecked))
-                IsEdit = true;
+            if (_configClients.Any(x => x.IsChecked))
+                _isEdit = true;
             else
-                IsEdit = false;
+                _isEdit = false;
 
             if (_selectedConfigClients == null)
                 _selectedConfigClients = new();
@@ -232,64 +194,68 @@ namespace Backoffice.Web.Pages.OddsEngine
             else
                 _selectedConfigClients.Remove(config);
 
-            if (_selectedConfigClients.Count > 0 && !IsSelectedLeagueShowing)
+            if (_selectedConfigClients.Count > 0 && !_isSelectedLeagueShowing)
             {
-                IsSelectedLeagueShowing = true;
+                _isSelectedLeagueShowing = true;
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
             }
 
             if (_selectedConfigClients.Count == 0)
             {
-                IsSelectedLeagueShowing = false;
+                _isSelectedLeagueShowing = false;
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
             }
         }
-        public async Task OnClearSelectionClickedEvent()
+        public async Task HandleClearSelectionClick()
         {
-            ConfigClients.ForEach(x => x.IsChecked = false);
-            IsEdit = false;
+            _configClients.ForEach(x => x.IsChecked = false);
+            _isEdit = false;
 
-            var configs = ConfigClients.Where(x => !x.IsChecked).ToList();
+            var configs = _configClients.Where(x => !x.IsChecked).ToList();
 
             if (_selectedConfigClients == null)
                 _selectedConfigClients = new();
 
             _selectedConfigClients.RemoveAll(x => configs.Any(cc => cc.ClientCode == x.ClientCode && cc.LeagueId == x.LeagueId && cc.SportId == x.SportId));
 
-            if (IsSelectedLeagueShowing && _selectedConfigClients.Count == 0)
+            if (_isSelectedLeagueShowing && _selectedConfigClients.Count == 0)
             {
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
-                IsSelectedLeagueShowing = false;
+                _isSelectedLeagueShowing = false;
             }
+
+            _shouldRender = true;
         }
-        public async Task OnSelectAllClickedEvent()
+        public void HandleSelectAllClick()
         {
-            ConfigClients.ForEach(x => x.IsChecked = true);
-            var configs = ConfigClients.Where(x => x.IsChecked).ToList();
+            _configClients.ForEach(x => x.IsChecked = true);
+            var configs = _configClients.Where(x => x.IsChecked).ToList();
 
             if (_selectedConfigClients == null)
                 _selectedConfigClients = new();
 
             _selectedConfigClients.RemoveAll(x => configs.Any(cc => cc.ClientCode == x.ClientCode && cc.LeagueId == x.LeagueId && cc.SportId == x.SportId));
             _selectedConfigClients.AddRange(configs);
+
+            _shouldRender = true;
         }
-        public async Task OnEditTemplateClickedEvent()
+        public void HandleEditTemplateClick()
         {
-            var leagues = _selectedConfigClients.Where(x => x.IsChecked).ToList();
+            var leagues = _selectedConfigClients?.Where(x => x.IsChecked).ToList();
 
             var parameters = new ModalParameters();
 
             parameters.Add("Leagues", leagues);
             parameters.Add("State", _state);
-            parameters.Add("SportId", _filterModel.SportId);
+            parameters.Add("SportId", _stateFilterModel.SportId);
 
-            var selectedPrematch = ConfigClients.Where(x => x.IsChecked && x.PrematchTemplateId > 0).Select(s => s.PrematchTemplateId).Distinct().ToList();
-            var selectedLive = ConfigClients.Where(x => x.IsChecked && x.LiveTemplateId > 0).Select(s => s.LiveTemplateId).Distinct().ToList(); ;
+            var selectedPrematch = _configClients.Where(x => x.IsChecked && x.PrematchTemplateId > 0).Select(s => s.PrematchTemplateId).Distinct().ToList();
+            var selectedLive = _configClients.Where(x => x.IsChecked && x.LiveTemplateId > 0).Select(s => s.LiveTemplateId).Distinct().ToList();
+            ;
 
             parameters.Add("CurrentPrematchId", selectedPrematch.Count() == 1 ? selectedPrematch.FirstOrDefault() : 0);
             parameters.Add("CurrentLiveId", selectedLive.Count() == 1 ? selectedLive.FirstOrDefault() : 0);
 
-            parameters.Add("Region", _region);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");
             var options = new ModalOptions();
@@ -297,12 +263,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             switch (_state)
             {
                 case ConfigState.Assigned:
-                    ModalService.Open<ModifyLeagueTemplateModal>($"Change Template", parameters, options);
+                    _modalService.Open<ModifyLeagueTemplateModal>($"Change Template", parameters, options);
                     break;
                 case ConfigState.UnAssigned:
-                    ModalService.Open<ModifyLeagueTemplateModal>($"Assign Template", parameters, options);
+                    _modalService.Open<ModifyLeagueTemplateModal>($"Assign Template", parameters, options);
                     break;
             }
+
+            _shouldRender = true;
         }
 
         public void Dispose()
@@ -315,44 +283,53 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-        private async Task LoadLeagues(ConfigStateFilterModel filter = null)
+        private async Task LoadLeagues()
         {
-            if (!IsPreloader)
+            _cts?.Cancel();
+
+            if (!_isPreloader)
             {
-                IsPreloader = true;
+                _isPreloader = true;
+                _shouldRender = true;
                 await InvokeAsync(StateHasChanged);
             }
 
             var payload = new ConfigTemplateLeagueRequest();
-            if (filter != null)
+            if (_stateFilterModel != null)
             {
-                payload.ClientCodes = filter.ClientCodes ?? new List<string>();
-                payload.SportId = filter.SportId;
-                payload.SearchText = filter.SearchText;
+                payload.ClientCodes = _stateFilterModel.ClientCodes ?? new List<string>();
+                payload.SportId = _stateFilterModel.SportId;
+                payload.SearchText = _stateFilterModel.SearchText;
             }
-            payload.MetaData = MetaData;
-            var response = await BackofficeService.GetConfigClient(_state ?? ConfigState.Assigned, payload);
+            payload.MetaData = _metaData;
+
+            _cts = new CancellationTokenSource();
+
+            var token = _cts.Token;
+            var response = await _backofficeService.GetConfigClient(_state ?? ConfigState.Assigned, payload, token: token);
+
+            if (token.IsCancellationRequested)
+                return;
 
             if (response.StatusCode == StatusCode.Success)
             {
-                ConfigClients = new List<ConfigClientViewModel>();
-                MetaData = new MetaData();
+                _configClients = new List<ConfigClientViewModel>();
+                _metaData = new MetaData();
 
                 if (response.Result != null)
                 {
                     if (response.Result.ClientConfigs != null && response.Result.ClientConfigs.Any())
-                        ConfigClients = ConfigClientViewModel.ConvertList(response.Result.ClientConfigs);
+                        _configClients = ConfigClientViewModel.ConvertList(response.Result.ClientConfigs);
 
                     if (response.Result.MetaData != null)
-                        MetaData = response.Result.MetaData;
+                        _metaData = response.Result.MetaData;
                 }
 
-                ConfigClients.ForEach(config =>
-                {
-                    config.IsChecked = _selectedConfigClients?.FirstOrDefault(x => x.ClientCode == config.ClientCode && x.LeagueId == config.LeagueId && x.SportId == config.SportId)?.IsChecked ?? config.IsChecked;
-                });
+                _configClients.ForEach(config => config.IsChecked = _selectedConfigClients?.FirstOrDefault(x => x.ClientCode == config.ClientCode && x.LeagueId == config.LeagueId && x.SportId == config.SportId)?.IsChecked ?? config.IsChecked);
             }
-            IsPreloader = false;
+
+            _isPreloader = false;
+            _shouldRender = true;
         }
 
         #endregion

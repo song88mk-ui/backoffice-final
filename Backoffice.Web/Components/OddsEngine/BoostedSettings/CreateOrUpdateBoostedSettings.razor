@@ -3,8 +3,8 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th class="col-md-3">@TranslationState.GetValue("Client name")</th>
-                    <th class="col"><center>% @TranslationState.GetValue("Cap of Current Odds from Boosted Odds")</center></th>
+                    <th class="col-md-3">@_translationState.GetValue("Client name")</th>
+                    <th class="col"><center>% @_translationState.GetValue("Cap of Current Odds from Boosted Odds")</center></th>
                 </tr>
             </thead>
             <tbody>
@@ -26,12 +26,12 @@
 <div class="modal-footer">
     @if (IsPreLoader)
     {
-        <button type="button" class="btn btn-cancel" disabled>@TranslationState.GetValue("Cancel")</button>
-        <button type="button" class="btn btn-save" data-type="inverse" data-from="top" data-align="right" @ref="SaveButton" disabled>@TranslationState.GetValue("Save")</button>
+        <button type="button" class="btn btn-cancel" disabled>@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="btn btn-save" data-type="inverse" data-from="top" data-align="right" @ref="SaveButton" disabled>@_translationState.GetValue("Save")</button>
     }
     else
     {
-        <button type="button" class="btn btn-cancel" @onclick="_ => OnCancelClickEvent()">@TranslationState.GetValue("Cancel")</button>
-        <button type="button" class="btn btn-save" data-type="inverse" data-from="top" data-align="right" @onclick="_ => OnSaveClickEvent()" @ref="SaveButton">@TranslationState.GetValue("Save")</button>
+        <button type="button" class="btn btn-cancel" @onclick="_ => OnCancelClickEvent()">@_translationState.GetValue("Cancel")</button>
+        <button type="button" class="btn btn-save" data-type="inverse" data-from="top" data-align="right" @onclick="_ => OnSaveClickEvent()" @ref="SaveButton">@_translationState.GetValue("Save")</button>
     }
 </div>

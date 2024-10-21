@@ -16,7 +16,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public EventCallback OnInitCallback { get; set; }
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
@@ -68,9 +68,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 _region = Region.ToUpper();
                 TradingService.Region = _region;
             }
-            if (_languageCode != TranslationState.ActiveLanguageCode)
+            if (_languageCode != _translationState.ActiveLanguageCode)
             {
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
 
                 _sports = await LoadSports();
                 SelectedSportId = 0;
@@ -177,7 +177,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 return new();
             }
 
-            clientList = UserClientCodes != null && UserClientCodes.Any() ? clientList.Where(c => UserClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+            clientList = UserModel.ClientCodes.Any() ? clientList.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
 
             var result = clientList?.Select(s => new SelectListItemModel<string>
             {

@@ -8,7 +8,7 @@
                         <select class="form-select" @onchange="OnSportClickEvent">
                             @foreach (var item in Sports)
                             {
-                                <option value="@item.Value" selected="@(item.Value == FilterModel.SelectedSportId.ToString())">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.SelectedSportId.ToString())">@_translationState.GetValue(item.Name)</option>
                             }
                         </select>
                     }
@@ -18,7 +18,7 @@
                         <select class="form-select" @onchange="OnScopeClickEvent">
                             @foreach (var item in Scopes)
                             {
-                                <option value="@item.Value" selected="@(item.Value == FilterModel.SelectedScopeId.ToString())">@TranslationState.GetValue(item.Name)</option>
+                                <option value="@item.Value" selected="@(item.Value == FilterModel.SelectedScopeId.ToString())">@_translationState.GetValue(item.Name)</option>
                             }
                         </select>
                     }
@@ -27,7 +27,7 @@
 
                 <EditForm Model="FilterModel" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                     <div class="input-group">
-                        <input id="search" placeholder="@($"{TranslationState.GetValue("Search")}")" class="form-control search-text valid border-end-0" @bind-value="FilterModel.SearchText" />
+                        <input id="search" placeholder="@($"{_translationState.GetValue("Search")}")" class="form-control search-text valid border-end-0" @bind-value="FilterModel.SearchText" />
                         <span class="input-group-text border-start-0">
                             <i class="fa fa-search"></i>
                         </span>
@@ -42,14 +42,14 @@
             <table class="table table-bordered table-striped table-logs">
                 <thead>
                     <tr>
-                        <th scope="col" class="date">@TranslationState.GetValue("Date")</th>
-                        <th scope="col">@TranslationState.GetValue("Sports")</th>
-                        <th scope="col">@TranslationState.GetValue("Scope")</th>
-                        <th scope="col">@TranslationState.GetValue("Template")</th>
-                        <th scope="col">@TranslationState.GetValue("Changes Made")</th>
-                        <th scope="col">@TranslationState.GetValue("From")</th>
-                        <th scope="col">@TranslationState.GetValue("To")</th>
-                        <th scope="col">@TranslationState.GetValue("Updated By")</th>
+                        <th scope="col" class="date">@_translationState.GetValue("Date")</th>
+                        <th scope="col">@_translationState.GetValue("Sports")</th>
+                        <th scope="col">@_translationState.GetValue("Scope")</th>
+                        <th scope="col">@_translationState.GetValue("Template")</th>
+                        <th scope="col">@_translationState.GetValue("Changes Made")</th>
+                        <th scope="col">@_translationState.GetValue("From")</th>
+                        <th scope="col">@_translationState.GetValue("To")</th>
+                        <th scope="col">@_translationState.GetValue("Updated By")</th>
                     </tr>
                 </thead>
 
@@ -76,7 +76,7 @@
                         {
                             <tr>
                                 <td colspan="8">
-                                    <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+                                    <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
                                 </td>
                             </tr>
                         }
@@ -88,5 +88,5 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn" @onclick="OnCloseClickEvent">@TranslationState.GetValue("Close")</button>
+    <button type="button" class="btn modal-btn" @onclick="OnCloseClickEvent">@_translationState.GetValue("Close")</button>
 </div>

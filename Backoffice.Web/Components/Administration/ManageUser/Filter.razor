@@ -1,10 +1,10 @@
 ﻿<div class="content-filter mx-3 d-flex justify-content-between">
     <div class="input-container d-flex">
         <div class="me-4">
-            <label class="form-label d-block">@TranslationState.GetValue("Username")</label>
+            <label class="form-label d-block">@_translationState.GetValue("Username")</label>
             <EditForm Model="FilterModel" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
                 <div class="input-group">
-                    <input id="search" placeholder=@TranslationState.GetValue("Search") class="form-control search-text valid border-end-0" @bind-value="FilterModel.SearchText" />
+                    <input id="search" placeholder=@_translationState.GetValue("Search") class="form-control search-text valid border-end-0" @bind-value="FilterModel.SearchText" />
                     <span class="input-group-text border-start-0">
                         <i class="fa fa-search"></i>
                     </span>

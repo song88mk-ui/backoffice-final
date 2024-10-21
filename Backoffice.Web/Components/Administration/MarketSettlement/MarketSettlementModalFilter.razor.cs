@@ -175,7 +175,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
         private async Task<List<SelectListItemModel<int>>> GetSports()
         {
-            var result = await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString().ToUpper());
+            var result = await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString().ToUpper());
 
             if (result.Result == null)
                 return new List<SelectListItemModel<int>>();

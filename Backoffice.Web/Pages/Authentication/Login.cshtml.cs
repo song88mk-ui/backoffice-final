@@ -52,7 +52,7 @@ namespace Backoffice.Web.Pages.Authentication
             _jsRuntime = jSRuntime;
             _translationService = translationService;
 
-            LanguageCodes = Enum.GetValues<LanguageCode>().Select(s => s).ToList();
+            LanguageCodes = new List<LanguageCode> { LanguageCode.EN, LanguageCode.ZH, LanguageCode.KO };
         }
 
         #endregion

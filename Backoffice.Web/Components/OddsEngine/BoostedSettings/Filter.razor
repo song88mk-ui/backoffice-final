@@ -2,7 +2,7 @@
     <div class="input-container d-flex">
         <EditForm Model="_searchForm" OnValidSubmit="OnInputSearchEvent" Context="FormContext">
             <div class="input-group">
-                <InputText id="search" placeholder="@TranslationState.GetValue("Find Client")" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
+                <InputText id="search" placeholder="@_translationState.GetValue("Find Client")" class="form-control search-text border-end-0" @bind-Value="_searchForm.SearchText" />
                 <button class="input-group-text border-start-0">
                     <i class="fa fa-search"></i>
                 </button>
@@ -13,7 +13,7 @@
         <div>
             <a href="javascript:void(0)" class="btn btn-logs px-3" @onclick="OnViewLogsClickEvent">
                 <i class="fa fa-list"></i>
-                @TranslationState.GetValue("Logs")
+                @_translationState.GetValue("Logs")
             </a>
         </div>
     </div>

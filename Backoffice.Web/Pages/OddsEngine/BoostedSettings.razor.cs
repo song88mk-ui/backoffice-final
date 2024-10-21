@@ -17,8 +17,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] IModalService ModalService { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
-        [CascadingParameter(Name = "UserClientCodes")] List<string>? UserClientCodes { get; set; }
-        [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
+
 
         //protected SearchFormModel SearchForm { get; set; } = new SearchFormModel();
         #endregion
@@ -35,6 +35,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
+            PageState.Page = this;
+
             _isPreLoader = true;
             _tHeadClass = "table-head";
             _pageHeaderModel = new()
@@ -63,7 +65,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
 
-            await AuthenticateAccess.InvokeAsync();
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
         public async Task OnSaveSettingClickEvent(object item)
@@ -90,7 +92,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 var result = await TradingService.GetBoostedSettings(new BoostedSettingsRequest()
                 {
-                    ClientCodes = UserClientCodes != null && UserClientCodes.Any() ? UserClientCodes.ToList() : new List<string>(),
+                    ClientCodes = UserModel.ClientCodes.Any() ? UserModel.ClientCodes.ToList() : new List<string>(),
                     Search = _searchText
                 });
                 _clientsView = result.Result;
@@ -148,7 +150,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         public void Dispose()
         {
-            TradingService.Dispose();
         }
 
         #endregion

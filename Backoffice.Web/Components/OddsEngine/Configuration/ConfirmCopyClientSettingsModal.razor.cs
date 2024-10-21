@@ -21,7 +21,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }        
 
         private EventCallback<AlertModel> OnCopyClientSettingsCallback { get; set; }
-        private string Region { get; set; }
         private ClientInformationModel ToClient { get; set; }
         private KeyValuePair<string, string> SelectedFromClient { get; set; }
         private bool _isProcessing;
@@ -30,7 +29,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         protected override async Task OnInitializedAsync()
         {
             SelectedFromClient = ModalParameters.TryGet<KeyValuePair<string, string>>("SelectedFromClient");
-            Region = ModalParameters.TryGet<string>("Region").ToUpper();
             ToClient = ModalParameters.TryGet<ClientInformationModel>("ToClient");
             OnCopyClientSettingsCallback = ModalParameters.TryGet<EventCallback<AlertModel>>("OnCopyClientSettingsCallback");
         }
@@ -42,7 +40,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);
             parameters.Add("FromClientCode", SelectedFromClient.Key);
             parameters.Add("ToClientCode", ToClient.ClientCode);
-            parameters.Add("Region", Region);
 
             var options = new ModalOptions();
             ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);

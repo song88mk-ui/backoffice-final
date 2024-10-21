@@ -8,15 +8,15 @@
             <table class="table table-bordered mt-3">
                 <thead>
                     <tr>
-                        <th scope="col">@TranslationState.GetValue("Date")</th>
-                        <th scope="col">@TranslationState.GetValue("Client")</th>
-                        <th scope="col">@TranslationState.GetValue("Sports")</th>
-                        <th scope="col">@TranslationState.GetValue("Segment")</th>
-                        <th scope="col">@TranslationState.GetValue("League")</th>
-                        <th scope="col">@TranslationState.GetValue("Changes Made")</th>
-                        <th scope="col">@TranslationState.GetValue("From")</th>
-                        <th scope="col">@TranslationState.GetValue("To")</th>
-                        <th scope="col">@TranslationState.GetValue("Updated By")</th>
+                        <th scope="col">@_translationState.GetValue("Date")</th>
+                        <th scope="col">@_translationState.GetValue("Client")</th>
+                        <th scope="col">@_translationState.GetValue("Sports")</th>
+                        <th scope="col">@_translationState.GetValue("Segment")</th>
+                        <th scope="col">@_translationState.GetValue("League")</th>
+                        <th scope="col">@_translationState.GetValue("Changes Made")</th>
+                        <th scope="col">@_translationState.GetValue("From")</th>
+                        <th scope="col">@_translationState.GetValue("To")</th>
+                        <th scope="col">@_translationState.GetValue("Updated By")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,9 +25,9 @@
                         <tr>
                             <td>@log.Date</td>
                             <td>@log.Client</td>
-                            <td>@TranslationState.GetValue(log.Sports)</td>
-                            <td>@TranslationState.GetValue(log.Segment)</td>
-                            <td>@TranslationState.GetValue(log.League)</td>
+                            <td>@_translationState.GetValue(log.Sports)</td>
+                            <td>@_translationState.GetValue(log.Segment)</td>
+                            <td>@_translationState.GetValue(log.League)</td>
                             <td>@log.ChangesMade</td>
                             <td>@((MarkupString)log.OldValue)</td>
                             <td>@((MarkupString)log.NewValue)</td>
@@ -40,14 +40,14 @@
         }
         else
         {
-            <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+            <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
         }
     }
     else
     {
-        <NoRecordFound Message="@TranslationState.GetValue("No Record Found")" />
+        <NoRecordFound Message="@_translationState.GetValue("No Record Found")" />
     }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent">@TranslationState.GetValue("Close")</button>
+    <button type="button" class="btn modal-btn modal-close" @onclick="OnCloseModalClickEvent">@_translationState.GetValue("Close")</button>
 </div>

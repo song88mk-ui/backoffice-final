@@ -6,7 +6,7 @@
         <div class="text-center">
             Are you sure you want to close the match <span class="fw-bold">"@_fixtureName"</span>
             <br />
-            @TranslationState.GetValue("Please be certain as this cannot be undone")
+            @_translationState.GetValue("Please be certain as this cannot be undone")
         </div>
         @if (_isPreload)
         {
@@ -15,6 +15,6 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn cancel-btn" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@_isPreload">@TranslationState.GetValue("Cancel")</button>
-    <button type="button" class="btn modal-btn confirm-btn" data-bs-dismiss="modal" @onclick="OnConfirmClickEvent" disabled="@_isPreload">@TranslationState.GetValue("Confirm")</button>
+    <button type="button" class="btn modal-btn cancel-btn" data-bs-dismiss="modal" @onclick="OnCancelClickEvent" disabled="@_isPreload">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn confirm-btn" data-bs-dismiss="modal" @onclick="OnConfirmClickEvent" disabled="@_isPreload">@_translationState.GetValue("Confirm")</button>
 </div>

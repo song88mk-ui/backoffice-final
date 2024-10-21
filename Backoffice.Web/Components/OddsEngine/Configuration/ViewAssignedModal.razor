@@ -15,7 +15,7 @@
             </div>
         }
         <div class="accordion" id="viewAssignedAccordion">
-            @foreach (var client in Leagues.Select(x => new
+            @foreach (var client in _leagues.Select(x => new
             {
                 ClientId = x.ClientId,
                 ClientCode = x.ClientCode,
@@ -24,7 +24,7 @@
             {
                 <div class="accordion-item mb-2">
                     <h2 class="accordion-header" id="header2">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@client.ClientId" aria-expanded="true" aria-controls="collapse-@client.ClientId">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@client.ClientId" aria-expanded="true" aria-controls="collapse-@client.ClientId">
                             @client.ClientName
                         </button>
                     </h2>
@@ -32,7 +32,7 @@
                     <div id="collapse-@client.ClientId" class="accordion-collapse collapse" aria-labelledby="header2">
                         <div class="accordion-body">
                             <ul class="list-group">
-                                @foreach (var item in Leagues.Where(x => x.ClientCode == client.ClientCode).ToList())
+                                @foreach (var item in _leagues.Where(x => x.ClientId == client.ClientId).ToList())
                                 {
                                     <li class="list-group-item">@item.LeagueName</li>
                                 }
@@ -45,5 +45,5 @@
     }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn modal-btn" @onclick="OnCloseClickEvent">@TranslationState.GetValue("Close")</button>
+    <button type="button" class="btn modal-btn" @onclick="HandleCloseClick">@_translationState.GetValue("Close")</button>
 </div>

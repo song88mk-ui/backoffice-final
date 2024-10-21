@@ -1,15 +1,18 @@
-﻿@page "/dashboard"
+﻿@inherits BasePage
+
+@page "/dashboard"
+
 <AuthorizeView Policy="sbc-dashboard">
     <Authorized>
         <div class="row">
             <div class="main-content col-md-12 mb-4 pb-3">
                 <div class="row">
                     <div class="col-md-12">
-                        <PageHeader PageHeaderModel="_pageHeaderModel" />
+                        <PageHeader PageHeaderModel="PageHeaderModel" />
                     </div>
-                    @if (!string.IsNullOrEmpty(IFrameSrc))
+                    @if (!string.IsNullOrEmpty(_iFrameSrc))
                     {
-                        <iframe class="tableau-iframe" src="@IFrameSrc"></iframe>
+                        <iframe class="tableau-iframe" src="@_iFrameSrc"></iframe>
                     }
                 </div>
             </div>

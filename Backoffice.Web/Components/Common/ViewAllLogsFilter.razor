@@ -4,14 +4,14 @@
 <div class="row">
     <div class="col-4">
         <button class="btn btn-filter" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
-            <i class="fa fa-filter"></i>&nbsp;@TranslationState.GetValue("Filters")
+            <i class="fa fa-filter"></i>&nbsp;@_translationState.GetValue("Filters")
         </button>
     </div>
     <div class="col-4"></div>
     <div class="col-4 position-relative">
         @*<EditForm class="f-right" Model="FilterModel" OnValidSubmit="OnSubmitClickEvent">
         <div class="right-icon-control">
-        <InputText id="search" class="form-control search-text" placeholder="@TranslationState.GetValue("Search Here")..." @bind-Value="FilterModel.SearchText" />
+        <InputText id="search" class="form-control search-text" placeholder="@_translationState.GetValue("Search Here")..." @bind-Value="FilterModel.SearchText" />
         <div class="form-icon"> <i class="feather icon-search"></i> </div>
         </div>
         </EditForm>*@
@@ -42,7 +42,7 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnClientChangedEvent">
                         <optgroup label="Clients">
-                            <option value="ALL">@TranslationState.GetValue("All Clients")</option>
+                            <option value="ALL">@_translationState.GetValue("All Clients")</option>
                             @if (FilterModel != null && FilterModel.Clients != null)
                             {
                                 @foreach (var client in FilterModel.Clients)
@@ -63,12 +63,12 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnSportChangedEvent">
                         <optgroup label="Sports">
-                            <option value="0">@TranslationState.GetValue("Select Sports")</option>
+                            <option value="0">@_translationState.GetValue("Select Sports")</option>
                             @if (FilterModel != null && FilterModel.Sports != null)
                             {
                                 @foreach (var sport in FilterModel.Sports.SportLookup)
                                 {
-                                    <option value="@sport.SportId" selected="@(sport.SportId == FilterModel.SportId)">@TranslationState.GetValue(sport.SportName)</option>
+                                    <option value="@sport.SportId" selected="@(sport.SportId == FilterModel.SportId)">@_translationState.GetValue(sport.SportName)</option>
                                 }
                             }
                         </optgroup>
@@ -77,12 +77,12 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnSegmentChangedEvent">
                         <optgroup label="Segment">
-                            <option value="0">@TranslationState.GetValue("Select Segment")</option>
+                            <option value="0">@_translationState.GetValue("Select Segment")</option>
                             @if (FilterModel != null && FilterModel.Segments != null)
                             {
                                 @foreach (var segment in FilterModel.Segments.SegmentLookup)
                                 {
-                                    <option value="@segment.SegmentId" selected="@(segment.SegmentId == FilterModel.SportId)">@TranslationState.GetValue(segment.SegmentName)</option>
+                                    <option value="@segment.SegmentId" selected="@(segment.SegmentId == FilterModel.SportId)">@_translationState.GetValue(segment.SegmentName)</option>
                                 }
                             }
                         </optgroup>
@@ -91,12 +91,12 @@
                 <div class="col-2">
                     <select class="form-select" @onchange="OnLeagueChangedEvent">
                         <optgroup label="League">
-                            <option value="0">@TranslationState.GetValue("Select League")</option>
+                            <option value="0">@_translationState.GetValue("Select League")</option>
                             @if (FilterModel != null && FilterModel.Leagues != null)
                             {
                                 @foreach (var league in FilterModel.Leagues.LeagueLookup)
                                 {
-                                    <option value="@league.LeagueId" selected="@(league.LeagueId == FilterModel.SportId)">@TranslationState.GetValue(league.LeagueName)</option>
+                                    <option value="@league.LeagueId" selected="@(league.LeagueId == FilterModel.SportId)">@_translationState.GetValue(league.LeagueName)</option>
                                 }
                             }
                         </optgroup>
@@ -113,7 +113,7 @@
                     <select class="form-select" @onchange="OnPageSelectionChangedEvent">
                         @foreach (var item in Pages)
                         {
-                            <option value="@item.Key" selected="@(SelectedPage == item.Key)">@TranslationState.GetValue(item.Value)</option>
+                            <option value="@item.Key" selected="@(SelectedPage == item.Key)">@_translationState.GetValue(item.Value)</option>
                         }
                     </select>
                 </div>

@@ -13,7 +13,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class SportSettings : IDisposable
     {
-        [Inject] public IPreRenderService PreRenderService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public IModalService ModalService { get; set; }
@@ -51,6 +50,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (PreRenderService.IsPreRendering)
                 return;
 
+            PageState.Page = this;
+
             _breadcrumbs.Add(new BreadcrumbModel
             {
                 Name = "Sports Settings",
@@ -74,9 +75,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         protected override async Task OnParametersSetAsync()
         {
-            if(_languageCode != TranslationState.ActiveLanguageCode)
+            if(_languageCode != _translationState.ActiveLanguageCode)
             {
-                _languageCode = TranslationState.ActiveLanguageCode;
+                _languageCode = _translationState.ActiveLanguageCode;
                 await GetSports();
             }
         }
@@ -132,7 +133,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isPreload = true;
             if (!_sportLookupSettings.Any())
             {
-                var sportLookupResponse = await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString());
+                var sportLookupResponse = await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
 
                 await Task.WhenAll(_leagueLookupTask, _segmentLookupTask);
                 var leagueLookupResponse = _leagueLookupTask.Result.Result;

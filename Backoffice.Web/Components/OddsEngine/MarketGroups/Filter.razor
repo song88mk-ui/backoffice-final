@@ -21,7 +21,7 @@
                     <select class="form-select d-block" @onchange="OnSportChangedEvent">
                         @foreach (var sport in Sports)
                         {
-                            <option value="@sport.Value" selected="@(sport.Value == SelectedSportId)">@TranslationState.GetValue(sport.Name)</option>
+                            <option value="@sport.Value" selected="@(sport.Value == SelectedSportId)">@_translationState.GetValue(sport.Name)</option>
                         }
                     </select>
                 </div>
@@ -29,7 +29,7 @@
                     <select class="form-select d-block" @onchange="OnFixtureStatusChangedEvent">
                         @foreach (var fixtureStatus in FixtureStatuses)
                         {
-                            <option value="@fixtureStatus.Value" selected="@(fixtureStatus.Value == SelectedFixtureStatusId)">@TranslationState.GetValue(fixtureStatus.Name)</option>
+                            <option value="@fixtureStatus.Value" selected="@(fixtureStatus.Value == SelectedFixtureStatusId)">@_translationState.GetValue(fixtureStatus.Name)</option>
                         }
                     </select>
                 </div>
@@ -38,13 +38,13 @@
                 <div class="me-2">
                     <a href="javascript:void(0)" class="btn btn-logs px-3" @onclick="OnViewLogsClickEvent">
                         <i class="fa fa-list"></i>
-                        @TranslationState.GetValue("Logs")
+                        @_translationState.GetValue("Logs")
                     </a>
                 </div>
                 <div class="me-2">
                     <a href="javascript:void(0)" class="btn btn-copy px-3" @onclick="OnCopyMarketGroupClickEvent">
                         <i class="fa fa-copy"></i>
-                        @TranslationState.GetValue("Copy")
+                        @_translationState.GetValue("Copy")
                     </a>
                 </div>
                 @if (MarketGroupModel.IsUpdate)
@@ -52,12 +52,12 @@
                     <div class="me-2">
                         <a href="javascript:void(0)" class="btn btn-save px-3" @onclick="OnSaveUpdateClickEvent">
                             <i class="fa fa-check"></i>
-                            @TranslationState.GetValue("Save")
+                            @_translationState.GetValue("Save")
                         </a>
                     </div>
                     <div class="me-2">
                         <a href="javascript:void(0)" class="btn btn-cancel px-3" @onclick="OnCancelClickEvent">
-                            @TranslationState.GetValue("Cancel")
+                            @_translationState.GetValue("Cancel")
                         </a>
                     </div>
                 }
@@ -66,7 +66,7 @@
                     <div class="me-2">
                         <a href="javascript:void(0)" class="btn btn-edit px-3" @onclick="OnUpdateClickEvent">
                             <i class="fa fa-edit"></i>
-                            @TranslationState.GetValue("Update")
+                            @_translationState.GetValue("Update")
                         </a>
                     </div>
                 }
@@ -80,7 +80,7 @@
             <div class="mx-3 mt-2">
                 <a href="javascript:void(0)" class="btn btn-market-group px-3" @onclick="OnAddMarketGroupClickEvent">
                     <i class="fa fa-plus"></i>
-                    @TranslationState.GetValue("Add Market Group")
+                    @_translationState.GetValue("Add Market Group")
                 </a>
             </div>
         </div>

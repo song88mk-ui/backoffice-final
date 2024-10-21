@@ -12,9 +12,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class EditConfigTemplateFilter : IDisposable
     {
         #region Properties
-        [Inject] private IBackofficeService BackofficeService { get; set; }
-        [Inject] private ITradingService TradingService { get; set; }
-
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [Parameter] public EventCallback<EditConfigTemplateFilterModel> EditConfigTemplateFilterCallback { get; set; }
         [Parameter] public long ConfigTemplateId { get; set; }
@@ -84,11 +81,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Utilities
         private async Task LoadConfigTemplateById()
         {
-            var response = await BackofficeService.GetConfigTemplateById(ConfigTemplateId);
+            var response = await _backofficeService.GetConfigTemplateById(ConfigTemplateId);
 
             if (response.StatusCode == StatusCode.Success && response.Result != null)
             {
-                var sportLookUp = await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString());
+                var sportLookUp = await _tradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
 
                 EditConfigTemplateFilterModel.ConfigTemplate = response.Result;                                                   
                 EditConfigTemplateFilterModel.SportName = sportLookUp.Result.SportLookup.FirstOrDefault(e => e.SportId == response.Result.SportId)?.SportName ?? string.Empty;
@@ -134,7 +131,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private async Task<List<MarketGroupNavigationModel>> GetMarketTemplateGroup(int scope, int sportId)
         {
             if (_marketTemplateGroupResponse == null)
-                _marketTemplateGroupResponse = (await TradingService.GetMarketTemplateGroups(scope)).Result;
+                _marketTemplateGroupResponse = (await _tradingService.GetMarketTemplateGroups(scope)).Result;
 
             if (_marketTemplateGroupResponse == null)
             {
@@ -161,7 +158,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var marketTemplateGroupNames = tempMarketTemplateGroup.Select(s => s.MarketTemplateGroupName).Distinct().ToList();
 
             var MarketTemplateGroups = new List<MarketGroupNavigationModel>();
-            EditConfigTemplateFilterModel.MarketLookup = (await TradingService.GetMarketLookup(new MarketLookupRequest { FixtureTypeId = (int)FixtureType.Match, SportId = sportId })).Result;
+            EditConfigTemplateFilterModel.MarketLookup = (await _tradingService.GetMarketLookup(new MarketLookupRequest { FixtureTypeId = (int)FixtureType.Match, SportId = sportId })).Result;
 
             if (EditConfigTemplateFilterModel.MarketLookup != null)
             {

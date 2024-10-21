@@ -1,4 +1,6 @@
-﻿@layout AccessLayout
+﻿@inherits BasePage
+
+@layout AccessLayout
 @page "/"
 @page "/choose-access"
 
@@ -24,7 +26,7 @@
                             </div>
                             <div class="bottom-row mx-2 mb-2">
                                 <a href="admin/dashboard" class="d-block py-2 rounded-2 text-decoration-none">
-                                    <span class="link-text">@TranslationState.GetValue("Go to admin page")</span>
+                                    <span class="link-text">@_translationState.GetValue("Go to admin page")</span>
                                     <i class="fa fa-chevron-right"></i>
                                 </a>
                             </div>
@@ -59,16 +61,16 @@
                                 <div class="access-item-logo">
                                     <i class="ico ico-sbc"></i>
                                 </div>
-                                <h4 class="text-center mt-3 fw-bold">@TranslationState.GetValue("Sportsbook Clients")</h4>
+                                <h4 class="text-center mt-3 fw-bold">@_translationState.GetValue("Sportsbook Clients")</h4>
                             </div>
                             <div class="middle-row mx-2 mt-3 mb-1">
                                 <p class="text-center mx-1">
-                                    @TranslationState.GetValue("Sportsbook Clients details")
+                                    @_translationState.GetValue("Sportsbook Clients details")
                                 </p>
                             </div>
                             <div class="bottom-row mx-2 mb-2">
                                 <a href="/dashboard" class="d-block py-2 rounded-2 text-decoration-none">
-                                    <span class="link-text">@TranslationState.GetValue("Go to Sportsbook Client Page")</span>
+                                    <span class="link-text">@_translationState.GetValue("Go to Sportsbook Client Page")</span>
                                     <i class="fa fa-chevron-right"></i>
                                 </a>
                             </div>
@@ -79,7 +81,7 @@
                     <div class="w-75 d-flex justify-content-end align-items-center">
                         <button type="button" @onclick="OnLogoutClickEvent" class="btn-logout m-2 py-2 px-3 text-decoration-none text-center">
                             <i class="me-2 fa fa-sign-out" aria-hidden="true"></i>
-                            @TranslationState.GetValue("Logout")
+                            @_translationState.GetValue("Logout")
                         </button>
                     </div>
                 </div>

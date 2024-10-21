@@ -15,8 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "UserClientCodes")] public List<string>? UserClientCodes { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel? UserModel { get; set; }
+        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
 
         public List<ClientInformationModel> ClientInformations { get; set; }
@@ -54,14 +53,14 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 try
                 {
                     CopyToClientCode = ModalParameters.TryGet<string>("ClientCode");
-                    if (UserClientCodes != null && UserClientCodes.Any())
+                    if (UserModel.ClientCodes.Any())
                     {
                         ClientInformations = (await TradingService.GetClientList()).Result;
 
-                        var roleName = UserModel?.RoleName;
+                        var roleName = UserModel.RoleName;
                         if (roleName != "Super Admin")
                         {
-                            var clientCodes = UserClientCodes;
+                            var clientCodes = UserModel.ClientCodes;
                             ClientInformations = ClientInformations.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
                         }
                         Clients = ClientInformations.Where(x => x.ClientCode != CopyToClientCode).Select(s => new SelectListItemModel<string>
@@ -75,7 +74,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                         Clients.Add(new SelectListItemModel<string>
                         {
                             Value = "",
-                            Name = TranslationState.GetValue("No Clients Available")
+                            Name = _translationState.GetValue("No Clients Available")
                         });
                     }
 
@@ -84,7 +83,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     CopyToClientName = client.ClientName;
                     SelectedClientCode = Clients.FirstOrDefault().Value;
 
-                    var sports = (await TradingService.GetSportLookup(TranslationState.ActiveLanguageCode.ToString())).Result;
+                    var sports = (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
 
                     if (sports != null)
                     {
