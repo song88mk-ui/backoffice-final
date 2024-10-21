@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Data.Backoffice;
+using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.OutgoingEngineMessages;
@@ -9,9 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
+using System.Transactions;
 
 namespace Backoffice.Utility.Repository
 {
@@ -125,6 +126,52 @@ namespace Backoffice.Utility.Repository
                 _logger.LogInformation($"{configTemplateId} Finished!");
             }
         }
+        public void DeleteConfigTemplate(ConfigTemplate config)
+        {
+            var fixtureStatusId = config.FixtureStatusId;
+            var assignedLiveTemplates = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(c => c.LiveConfigTemplateId == config.Id).ToList();
+
+            using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+            {
+                using (var context = _backofficeContext)
+                {
+                    if (assignedLiveTemplates.Any())
+                    {
+                        foreach (var assignedTemplate in assignedLiveTemplates)
+                        {
+                            if (assignedTemplate.PrematchConfigTemplateId > 0)
+                            {
+                                assignedTemplate.LiveConfigTemplateId = -1;
+                                context.ConfigTemplateAssigned.Update(assignedTemplate);
+                            }
+                            else
+                                context.ConfigTemplateAssigned.Remove(assignedTemplate);
+                        }
+                    }
+
+                    var assignedPrematchTemplates = _backofficeContext.ConfigTemplateAssigned.Where(c => c.PrematchConfigTemplateId == config.Id).ToList();
+                    if (assignedPrematchTemplates.Any())
+                    {
+                        foreach (var assignedTemplate in assignedPrematchTemplates)
+                        {
+                            if (assignedTemplate.LiveConfigTemplateId > 0)
+                            {
+                                assignedTemplate.PrematchConfigTemplateId = -1;
+                                context.ConfigTemplateAssigned.Update(assignedTemplate);
+                            }
+                            else
+                                context.ConfigTemplateAssigned.Remove(assignedTemplate);
+                        }
+                    }
+
+                    context.SaveChanges();
+                    scope.Complete();
+                }
+            }
+
+            // Margins, to follow
+        }
+
         private double ConvertToUnixTimestamp(DateTime date)
         {
             var diff = date.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);

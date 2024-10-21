@@ -40,9 +40,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             var response = await _backofficeService.DeleteConfigTemplate(_templateId);
 
             if (response.StatusCode == StatusCode.Success)
-            {
                 await Modal.OnSaveClickCallback.InvokeAsync($"{_templateName} has successfully been removed.");
-            }
+            else
+                await Modal.OnSaveClickCallback.InvokeAsync($"{_templateName} Error!");
 
             _isPreloader = false;
             _modalService.Cancel();

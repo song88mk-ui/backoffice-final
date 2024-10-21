@@ -1,3 +1,4 @@
+using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.Utilities;
 using Backoffice.Utility.Repository;
 using Microsoft.Extensions.Hosting;
@@ -52,8 +53,12 @@ namespace Backoffice.Config.Service
                 switch (messageType)
                 {
                     case "UpdateClientMargin":
-                        var config = JsonSerializer.Deserialize<long>(payload);
-                        _backofficeRepository.UpdateClientMargin(config, _messageBroker);
+                        var UpdateClientMarginPayload = JsonSerializer.Deserialize<long>(payload);
+                        _backofficeRepository.UpdateClientMargin(UpdateClientMarginPayload, _messageBroker);
+                        break;
+                    case "DeleteConfigTemplate":
+                         var DeleteConfigTemplatePayload = JsonSerializer.Deserialize<ConfigTemplate>(payload);
+                        _backofficeRepository.DeleteConfigTemplate(DeleteConfigTemplatePayload);
                         break;
                 }
             }

@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
@@ -1417,7 +1416,7 @@ namespace Backoffice.API.Repositories
             var table = new DataTable();
             table.Columns.Add("Value", typeof(int));
 
-            if (ids != null)
+            if (ids != null && ids.Any())
                 foreach (var id in ids)
                 {
                     table.Rows.Add(id);
@@ -1665,7 +1664,10 @@ namespace Backoffice.API.Repositories
                     TimeStamp = DateTime.UtcNow
                 };
 
-                var config = await _backofficeContext.ConfigTemplate.FindAsync(id);
+                if (!long.TryParse(id, out long configTemplateId))
+                    return new BaseResponse<List<ConfigTemplateModel>>() { StatusCode = StatusCode.Error, Message = "Invalid ID", Result = null };
+
+                var config = await _backofficeContext.ConfigTemplate.FindAsync(configTemplateId);
 
                 activity.Payload = $"{config.SportId}.{config.FixtureStatusId}.{config.Name}.T".Replace(" ", "_");
                 activity.From = JsonSerializer.Serialize(config);
@@ -1673,6 +1675,14 @@ namespace Backoffice.API.Repositories
                 if (config != null)
                 {
                     _backofficeContext.ConfigTemplate.Remove(config);
+
+                    await _rabbitMqRepository.Publish(new MessageRequest()
+                    {
+                        CorrelationId = Guid.NewGuid().ToString(),
+                        MessageType = "DeleteConfigTemplate",
+                        RoutingKey = $"r.bo.config.deleteconfigtemplate",
+                        Payload = JsonSerializer.Serialize(config)
+                    });
                 }
 
                 await _backofficeContext.SaveChangesAsync();
@@ -1720,7 +1730,7 @@ namespace Backoffice.API.Repositories
                     clientList = clientList.Where(x => payload.ClientCodes?.ToList()?.Contains(x.ClientCode) ?? false).ToList();
                 }
 
-                var query = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(x => clientList.Select(cl => cl.ClientCode).Contains(x.ClientCode.ToUpper()));
+                var query = _backofficeContext.ConfigTemplateAssigned.AsNoTracking().Where(x => clientList.Select(cl => cl.ClientCode).Contains(x.ClientCode, StringComparer.OrdinalIgnoreCase));
 
                 if (templateId != -1)
                     query = query.Where(x => x.PrematchConfigTemplateId == templateId || x.LiveConfigTemplateId == templateId);
@@ -1847,8 +1857,12 @@ namespace Backoffice.API.Repositories
                 var count = 0;
                 if (state.ToUpper() == ConfigState.Assigned.ToString().ToUpper())
                 {
-                    var assignedConfig = await GetConfigState(clientCodes, null, ConfigState.Assigned);
-                    count = assignedConfig.Result.ClientConfigs.Count();
+                    var query = _backofficeContext.ConfigTemplateAssigned.Select(s => s.ClientCode);
+
+                    if ((clientCodes.Count() == 1 && clientCodes.FirstOrDefault().ToUpper() == "ALL") == false)
+                        query.Where(c => clientCodes.Contains(c));
+
+                    count = query.Count();
                 }
                 else if (state.ToUpper() == ConfigState.UnAssigned.ToString().ToUpper())
                 {
@@ -2394,20 +2408,24 @@ namespace Backoffice.API.Repositories
         private async Task<int> GetUnAssignedCount(List<string> clientCodes)
         {
             var result = 0;
-            var assignedConfigTask = GetConfigState(clientCodes, null, ConfigState.Assigned);
+
+            var query = _backofficeContext.ConfigTemplateAssigned.Select(s => new { s.ClientCode, s.LeagueId}).Distinct();
+
+            if ((clientCodes.Count() == 1 && clientCodes.FirstOrDefault().ToUpper() == "ALL") == false)
+                query.Where(c => clientCodes.Contains(c.ClientCode));
+
+            var leagueCount = query.Count();    
             var leagueLookupResponseTask = _tradingRepository.GetAllLeagueLookup("");
 
-            await Task.WhenAll(leagueLookupResponseTask, assignedConfigTask);
+            await Task.WhenAll(leagueLookupResponseTask);
 
             var leagueLookupResponse = leagueLookupResponseTask.Result;
-            var assignedConfig = assignedConfigTask.Result;
 
             if (leagueLookupResponse.StatusCode == StatusCode.Success)
             {
-                var assignedLeagues = assignedConfig.Result.ClientConfigs.Count();
                 var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
 
-                result = (leagueLookup.Count * GetTradingClientInformation().Count) - assignedLeagues;
+                result = (leagueLookup.Count * GetTradingClientInformation().Count) - leagueCount;
             }
 
             return result;

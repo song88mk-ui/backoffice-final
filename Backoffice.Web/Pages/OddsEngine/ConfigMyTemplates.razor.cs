@@ -68,7 +68,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _alertModel.Status = AlertStatus.Success;
                 _alertModel.Opacity = 1.0m;
 
-                await LoadConfigTemplates();
+                if (_init)
+                    await LoadConfigTemplates();
             }
 
             _init = false;
@@ -170,7 +171,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Utilities
 
-        private async Task LoadConfigTemplates()
+        private async Task LoadConfigTemplates(bool isReload = true)
         {
             _cts?.Cancel();
 
@@ -185,28 +186,41 @@ namespace Backoffice.Web.Pages.OddsEngine
             try
             {
                 var token = _cts.Token;
+                var configTemplates = new List<ConfigTemplateModel>();
 
-                var configTemplateResponse = await _backofficeService.GetConfigTemplate(
-                    _searchForm.SearchText,
-                    _selectedSportId,
-                    _selectedScopeId,
-                    token);
+                if (isReload)
+                {
+                    var configTemplateResponse = await _backofficeService.GetConfigTemplate(
+                        _searchForm.SearchText,
+                        _selectedSportId,
+                        _selectedScopeId,
+                        token);
+
+                    configTemplates = configTemplateResponse?.Result?.ConfigTemplates;
+
+                    if (token.IsCancellationRequested)
+                        return;
+
+                    _configTemplates = configTemplates?.Select(config => new ConfigMyTemplateModel()
+                    {
+                        Id = config.Id,
+                        Name = config.Name,
+                        SportId = config.SportId,
+                        SportName = FilterModel.Sports.FirstOrDefault(e => e.Value == config.SportId.ToString())?.Name ?? "",
+                        ClientAssigned = $"{config.ClientsCount} Client{(config.ClientsCount > 1 ? "s" : "")}",
+                        LeagueAssigned = $"{config.LeaguesCount} League{(config.LeaguesCount > 1 ? "s" : "")}",
+                        DateCreated = config.Timestamp.ToString("HH:mm dd/MM/yyyy", CultureInfo.InvariantCulture),
+                        IsReadOnly = !(config.ClientsCount > 0 && config.LeaguesCount > 0)
+                    }).ToList() ?? new();
+                }
+                else
+                {
+                    configTemplates = new List<ConfigTemplateModel>();
+                    _configTemplates?.ForEach(config => config.SportName = FilterModel.Sports.FirstOrDefault(e => e.Value == config.SportId.ToString())?.Name ?? "");
+                }
 
                 if (token.IsCancellationRequested)
                     return;
-
-                var configTemplates = configTemplateResponse?.Result?.ConfigTemplates;
-
-                _configTemplates = configTemplates?.Select(config => new ConfigMyTemplateModel()
-                {
-                    Id = config.Id,
-                    Name = config.Name,
-                    SportName = FilterModel.Sports.FirstOrDefault(e => e.Value == config.SportId.ToString())?.Name ?? "",
-                    ClientAssigned = $"{config.ClientsCount} Client{(config.ClientsCount > 1 ? "s" : "")}",
-                    LeagueAssigned = $"{config.LeaguesCount} League{(config.LeaguesCount > 1 ? "s" : "")}",
-                    DateCreated = config.Timestamp.ToString("HH:mm dd/MM/yyyy", CultureInfo.InvariantCulture),
-                    IsReadOnly = !(config.ClientsCount > 0 && config.LeaguesCount > 0)
-                }).ToList() ?? new();
 
                 _isPreloader = false;
                 _shouldRender = true;
