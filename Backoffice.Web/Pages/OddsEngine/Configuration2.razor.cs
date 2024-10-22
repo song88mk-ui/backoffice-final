@@ -85,11 +85,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     _languageCode = _translationState.ActiveLanguageCode;
                     _contentFilterModel.Sports = await LoadSports();
+                    Init();
                 }
-                Init();
 
                 _queryMessage = QueryMessage;
-                _shouldRender = true;
             }
 
             _init = false;
