@@ -1978,36 +1978,72 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var existingConfig = _backofficeContext.ConfigTemplateMargin.Where(x => x.ConfigTemplateId == request.ConfigTemplateMargins.FirstOrDefault().ConfigTemplateId).AsNoTracking();
+                var configTemplateId = request.ConfigTemplateMargins.FirstOrDefault().ConfigTemplateId;
 
-                if (existingConfig != null)
+                // Create a DataTable to hold the values
+                var dataTable = new DataTable();
+                dataTable.Columns.Add("ConfigTemplateId", typeof(int));
+                dataTable.Columns.Add("FixtureTypeId", typeof(int));
+                dataTable.Columns.Add("FixtureStatusId", typeof(int));
+                dataTable.Columns.Add("MarketTemplateId", typeof(int));
+                dataTable.Columns.Add("SportId", typeof(int));
+                dataTable.Columns.Add("Config", typeof(string));
+                dataTable.Columns.Add("IsActive", typeof(bool));
+
+                // Populate the DataTable
+                foreach (var config in request.ConfigTemplateMargins)
                 {
-                    _backofficeContext.ConfigTemplateMargin.RemoveRange(existingConfig);
+                    dataTable.Rows.Add(config.ConfigTemplateId, config.FixtureTypeId, config.FixtureStatusId,
+                                        config.MarketTemplateId, config.SportId, config.Config, config.IsActive);
                 }
 
-                _backofficeContext.ConfigTemplateMargin.AddRange(request.ConfigTemplateMargins.Select(config => new Shared.Data.Backoffice.Entities.ConfigTemplateMargin()
+                var parameter = new SqlParameter
                 {
-                    ConfigTemplateId = config.ConfigTemplateId,
-                    FixtureTypeId = config.FixtureTypeId,
-                    FixtureStatusId = config.FixtureStatusId,
-                    MarketTemplateId = config.MarketTemplateId,
-                    SportId = config.SportId,
-                    Config = config.Config,
-                    IsActive = config.IsActive
-                }).ToArray());
+                    ParameterName = "@ConfigTemplateMargins",
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "ConfigTemplateMarginType",
+                    Value = dataTable
+                };
 
-                await _backofficeContext.SaveChangesAsync();
+                var configTemplateIdParam = new SqlParameter
+                {
+                    ParameterName = "@ConfigTemplateId",
+                    SqlDbType = SqlDbType.BigInt,
+                    Value = configTemplateId
+                };
+
+                await _backofficeContext.Database.ExecuteSqlRawAsync("EXEC AddOrUpdateConfigTemplateMargin @ConfigTemplateId @ConfigTemplateMargins", configTemplateIdParam, parameter);
+
+                //var existingConfig = _backofficeContext.ConfigTemplateMargin.Where(x => x.ConfigTemplateId == request.ConfigTemplateMargins.FirstOrDefault().ConfigTemplateId).AsNoTracking();
+
+                //if (existingConfig != null)
+                //{
+                //    _backofficeContext.ConfigTemplateMargin.RemoveRange(existingConfig);
+                //}
+
+                //_backofficeContext.ConfigTemplateMargin.AddRange(request.ConfigTemplateMargins.Select(config => new Shared.Data.Backoffice.Entities.ConfigTemplateMargin()
+                //{
+                //    ConfigTemplateId = config.ConfigTemplateId,
+                //    FixtureTypeId = config.FixtureTypeId,
+                //    FixtureStatusId = config.FixtureStatusId,
+                //    MarketTemplateId = config.MarketTemplateId,
+                //    SportId = config.SportId,
+                //    Config = config.Config,
+                //    IsActive = config.IsActive
+                //}).ToArray());
+
+                //await _backofficeContext.SaveChangesAsync();
 
                 var configTemplateIds = request.ConfigTemplateMargins.Select(s => s.ConfigTemplateId).Distinct().ToList();
 
-                foreach (var configTemplateId in configTemplateIds)
+                foreach (var id in configTemplateIds)
                 {
                     await _rabbitMqRepository.Publish(new MessageRequest()
                     {
                         CorrelationId = Guid.NewGuid().ToString(),
                         MessageType = "UpdateClientMargin",
                         RoutingKey = $"r.bo.config.updateclientmargin",
-                        Payload = JsonSerializer.Serialize(configTemplateId)
+                        Payload = JsonSerializer.Serialize(id)
                     });
                 }
 
