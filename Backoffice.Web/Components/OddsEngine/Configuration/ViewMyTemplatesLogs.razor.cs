@@ -249,8 +249,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                 Payload = BuildPayload(filterModel),
                 MetaData = MetaData,
-                DateFrom = filterModel.DateFrom.ToUniversalTime().Date.Add(new TimeSpan(0, 0, 0)),
-                DateTo = filterModel.DateTo.ToUniversalTime().Date.Add(new TimeSpan(23, 59, 59)),
+                DateFrom = filterModel.DateFrom.Date.Add(new TimeSpan(0, 0, 0)).ToUniversalTime(),
+                DateTo = filterModel.DateFrom.Date.Add(new TimeSpan(23, 59, 59)).ToUniversalTime(),
                 SearchText = filterModel.SearchText
             });
 

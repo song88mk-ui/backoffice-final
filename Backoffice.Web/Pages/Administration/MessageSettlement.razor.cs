@@ -111,8 +111,8 @@ namespace Backoffice.Web.Pages.Administration
                 Page = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
                 Payload = BuildPayload(),
                 MetaData = MetaData,
-                DateFrom = FilterModel.FromDate.Date.Add(new TimeSpan(0, 0, 0)),
-                DateTo = FilterModel.ToDate.Date.Add(new TimeSpan(23, 59, 59))
+                DateFrom = FilterModel.FromDate.Date.Add(new TimeSpan(0, 0, 0)).ToUniversalTime(),
+                DateTo = FilterModel.ToDate.Date.Add(new TimeSpan(23, 59, 59)).ToUniversalTime()
             };
 
             var logs = await BackofficeService.GetActivityLogs(request);

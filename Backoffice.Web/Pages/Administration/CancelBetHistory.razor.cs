@@ -115,8 +115,8 @@ namespace Backoffice.Web.Pages.Administration
             {
                 Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                 Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
-                DateFrom = model.DateFrom,
-                DateTo = model.DateTo,
+                DateFrom = model.DateFrom.Date.Add(new TimeSpan(0, 0, 0)).ToUniversalTime(),
+                DateTo = model.DateTo.Date.Add(new TimeSpan(23, 59, 59)).ToUniversalTime(),
                 MetaData = MetaData
             };
 

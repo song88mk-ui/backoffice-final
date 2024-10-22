@@ -5,8 +5,10 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Newtonsoft.Json;
 using System.Globalization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 {
@@ -85,13 +87,14 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             IsPreLoader = true;
 
             ActivityLogs = new List<ActivityLogModel>();
+
             var response = await BackofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace("_", "."),
                 Payload = $"{ClientCode}",
                 MetaData = MetaData,
-                DateFrom = Convert.ToDateTime(StartDate),
-                DateTo = Convert.ToDateTime(EndDate)
+                DateFrom = StartDate.Date.Add(new TimeSpan(0, 0, 0)).ToUniversalTime(),
+                DateTo = EndDate.Date.Add(new TimeSpan(23, 59, 59)).ToUniversalTime()
             });
 
             if (response.Result != null)

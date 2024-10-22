@@ -243,18 +243,9 @@ namespace Backoffice.API.Repositories
                 var metaData = request.MetaData;
 
                 if (request.DateFrom == DateTime.MinValue)
-                    request.DateFrom = DateTime.UtcNow.AddDays(-1).Date;
-                else
-                    request.DateFrom = request.DateFrom.ToUniversalTime();
+                    request.DateFrom = DateTime.Now.Date.Add(new TimeSpan(0, 0, 0)).ToUniversalTime();
                 if (request.DateTo == DateTime.MinValue)
-                    request.DateTo = DateTime.UtcNow.Date.AddTicks(-1);
-                else
-                    request.DateTo = request.DateTo.ToUniversalTime();
-
-                if (request.TimeStamp == DateTime.MinValue)
-                {
-                    request.TimeStamp = DateTime.UtcNow;
-                }
+                    request.DateTo = DateTime.Now.Date.Add(new TimeSpan(23, 59, 59)).ToUniversalTime();
 
                 var fromUTC = request.DateFrom.ToString("yyyy-MM-dd HH:mm:ss");
                 var toUTC = request.DateTo.ToString("yyyy-MM-dd HH:mm:ss");
