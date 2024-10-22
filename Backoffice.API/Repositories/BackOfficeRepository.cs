@@ -2018,26 +2018,6 @@ namespace Backoffice.API.Repositories
 
                     await _backofficeContext.Database.ExecuteSqlRawAsync("EXEC AddOrUpdateConfigTemplateMarginV2 @ConfigTemplateId, @ConfigTemplateMargins", configTemplateIdParam, parameter);
 
-                    //var existingConfig = _backofficeContext.ConfigTemplateMargin.Where(x => x.ConfigTemplateId == request.ConfigTemplateMargins.FirstOrDefault().ConfigTemplateId).AsNoTracking();
-
-                    //if (existingConfig != null)
-                    //{
-                    //    _backofficeContext.ConfigTemplateMargin.RemoveRange(existingConfig);
-                    //}
-
-                    //_backofficeContext.ConfigTemplateMargin.AddRange(request.ConfigTemplateMargins.Select(config => new Shared.Data.Backoffice.Entities.ConfigTemplateMargin()
-                    //{
-                    //    ConfigTemplateId = config.ConfigTemplateId,
-                    //    FixtureTypeId = config.FixtureTypeId,
-                    //    FixtureStatusId = config.FixtureStatusId,
-                    //    MarketTemplateId = config.MarketTemplateId,
-                    //    SportId = config.SportId,
-                    //    Config = config.Config,
-                    //    IsActive = config.IsActive
-                    //}).ToArray());
-
-                    //await _backofficeContext.SaveChangesAsync();
-
                     await _rabbitMqRepository.Publish(new MessageRequest()
                     {
                         CorrelationId = Guid.NewGuid().ToString(),

@@ -12,7 +12,6 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Backoffice.Web.Services
 {
@@ -1561,20 +1560,20 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var Model = await _httpClient.PostAsync($"api/config/template", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"api/config/template", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
-                if (Model.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<long>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<long>();
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<long>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<long>();
                 else
                 {
-                    if (Model.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<long>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<long>();
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        return JsonSerializer.Deserialize<BaseResponse<long>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<long>();
                     else
                     {
                         return new BaseResponse<long>
                         {
                             StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({Model.ReasonPhrase})"
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
                         };
                     }
                 }
@@ -1760,7 +1759,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var Model = await _httpClient.PostAsync($"api/config/template/margin", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+                var Model = await _httpClient.PostAsync($"api/config/template/margin", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (Model.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<bool>>(await Model.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? new BaseResponse<bool>();
