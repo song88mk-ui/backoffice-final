@@ -140,7 +140,7 @@ namespace Backoffice.API
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Add("x-api-key", Configuration["API:AuthenticationAPI:Security:APIKey"]);
             });
-            services.AddDbContext<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"], options =>
+            services.AddDbContextPool<BackofficeContext>(o => o.UseSqlServer(Configuration["ConnectionStrings:BackOffice"], options =>
                 options.CommandTimeout(180))); //180 seconds timeout
             services.AddHttpClient<IRabbitMqRepository, RabbitMqRepository>();
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
