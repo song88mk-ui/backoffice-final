@@ -5,6 +5,7 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Text.Json;
 using Activity = Backoffice.Shared.Enums.Activity;
 
@@ -13,6 +14,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class ConfigEditTemplate : IDisposable
     {
         #region Properties
+        [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -169,7 +171,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (_isProcessing || _hasChanges == false)
                 return;
 
-            _isPreloader =  true;
+            _isPreloader = true;
             _isProcessing = true;
             var isNavigate = false;
 
@@ -376,12 +378,16 @@ namespace Backoffice.Web.Pages.OddsEngine
                     isNavigate = true;
                 }
 
+                await JSRuntime.InvokeVoidAsync("console.log", $"[test] Margin error - [{result.StatusCode}] - {result.Message}");
+
                 if (isNavigate)
                     NavigationManager.NavigateTo($"hk/odds-engine/config-templates?message=Successfully updated");
             }
             catch (Exception ex)
             {
 
+
+                await JSRuntime.InvokeVoidAsync("console.log", $"[test] Margin ex - [{ex.Message}] - {ex.StackTrace}");
             }
             finally
             {
