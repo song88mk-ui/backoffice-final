@@ -38,7 +38,7 @@ namespace Backoffice.Web.Pages.SBC
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {
+        {//
             PageState.Page = this;
 
             _pageHeaderModel = new()
