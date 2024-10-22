@@ -86,6 +86,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             var parameters = new ModalParameters();
 
             parameters.Add("FilterModel", FilterModel);
+            parameters.Add("Sports", FilterModel.Sports);
+            parameters.Add("Scopes", FilterModel.Scopes);
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-lg modal-dialog-centered");
             parameters.Add("DialogStyle", "max-width:1500px");
