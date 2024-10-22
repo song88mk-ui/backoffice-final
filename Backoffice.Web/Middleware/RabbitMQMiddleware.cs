@@ -21,7 +21,7 @@ namespace Backoffice.Web.Middleware
             _messageBroker = messageBroker;
             _boHub = boHub;
 
-            //_messageBroker.Connect(config.GetSection($"MessageBroker:HK").Get<MessageBrokerCredentialModel>());
+            _messageBroker.Connect(config.GetSection($"MessageBroker:HK").Get<MessageBrokerCredentialModel>());
 
             _messageBroker.MessageReceived += async (sender, e) =>
             {
