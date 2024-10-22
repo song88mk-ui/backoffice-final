@@ -118,7 +118,6 @@ namespace Backoffice.Web.Extensions
                 client.BaseAddress = new Uri(builder?.Configuration["API:Backoffice:Uri"] ?? string.Empty);
                 client.DefaultRequestHeaders.Add("x-api-key", builder?.Configuration["API:Backoffice:Security:APIKey"]);
                 client.DefaultRequestHeaders.Add("x-region", builder?.Configuration["API:Region"]);
-                client.Timeout = TimeSpan.FromMinutes(5);
             });
             return builder;
         }
