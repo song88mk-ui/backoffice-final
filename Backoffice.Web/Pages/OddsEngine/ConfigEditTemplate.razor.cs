@@ -168,7 +168,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnSaveMarginTemplate()
         {
-            if (_isProcessing || _hasChanges == false)
+            if (_isProcessing)
                 return;
 
             _isPreloader = true;
@@ -216,137 +216,137 @@ namespace Backoffice.Web.Pages.OddsEngine
                     _isNameChanges = false;
                 }
 
-                ConfigTemplateMarginModel request = new ConfigTemplateMarginModel();
-
-                var activityLog = new List<ActivityLogModel>();
-                var oldConfigMarginsLogs = new List<ConfigMarginActivityLogModel>();
-                var newConfigMarginsLogs = new List<ConfigMarginActivityLogModel>();
-                var oldMarketState = new List<ConfigMarginActivityLogModel>();
-                var newMarketState = new List<ConfigMarginActivityLogModel>();
-
-                foreach (var market in _marketLookupNavigation)
+                if (_hasChanges)
                 {
-                    //validate Odds
-                    if (market.NewMarketLookup.IsActive)
+                    ConfigTemplateMarginModel request = new ConfigTemplateMarginModel();
+
+                    var activityLog = new List<ActivityLogModel>();
+                    var oldConfigMarginsLogs = new List<ConfigMarginActivityLogModel>();
+                    var newConfigMarginsLogs = new List<ConfigMarginActivityLogModel>();
+                    var oldMarketState = new List<ConfigMarginActivityLogModel>();
+                    var newMarketState = new List<ConfigMarginActivityLogModel>();
+
+                    foreach (var market in _marketLookupNavigation)
                     {
+                        //validate Odds
+                        if (market.NewMarketLookup.IsActive)
+                        {
+                            switch ((FixtureStatus)_editConfigTemplateFilterModel.ScopeId)
+                            {
+                                case FixtureStatus.Prematch:
+                                    if (market.NewPrematchSettings.Settings.Any(x => x.Key <= 101))
+                                    {
+                                        _alertModel = new AlertModel();
+                                        _alertModel.Message = "Please update margin for Active markets. 101 by default is not allowed.";
+                                        _alertModel.Status = AlertStatus.Error;
+                                        _alertModel.Opacity = 1.0m;
+
+                                        return;
+                                    }
+                                    break;
+                                case FixtureStatus.Live:
+                                    if (market.NewLiveSettings.Settings.Any(x => x.Key <= 101))
+                                    {
+                                        _alertModel = new AlertModel();
+                                        _alertModel.Message = "Please update margin for Active markets. 101 by default is not allowed.";
+                                        _alertModel.Status = AlertStatus.Error;
+                                        _alertModel.Opacity = 1.0m;
+
+                                        return;
+                                    }
+                                    break;
+                            }
+                        }
+
+                        var livematchSettings = new List<MarketMargin>();
+                        var liveSettings = market.NewLiveSettings.Settings.Where(a => a.Key != null);
+                        if (liveSettings != null)
+                            livematchSettings = liveSettings.Select(a => new MarketMargin { T = a.Time, M = (int)a.Key }).ToList();
+                        else
+                            livematchSettings = new List<MarketMargin>();
+
+                        var prematchSettings = new List<MarketMargin>();
+                        var preSettings = market.NewPrematchSettings.Settings.Where(a => a.Key != null);
+                        if (preSettings != null)
+                            prematchSettings = preSettings.Select(a => new MarketMargin { T = a.Time, M = (int)a.Key }).ToList();
+                        else
+                            prematchSettings = new List<MarketMargin>();
+
                         switch ((FixtureStatus)_editConfigTemplateFilterModel.ScopeId)
                         {
                             case FixtureStatus.Prematch:
-                                if (market.NewPrematchSettings.Settings.Any(x => x.Key <= 101))
+                                if (market.NewPrematchSettings.Settings.Any(x => market.PrematchSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)))
                                 {
-                                    _alertModel = new AlertModel();
-                                    _alertModel.Message = "Please update margin for Active markets. 101 by default is not allowed.";
-                                    _alertModel.Status = AlertStatus.Error;
-                                    _alertModel.Opacity = 1.0m;
+                                    if (_activity != Activity.Copy)
+                                        oldConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
+                                        {
+                                            MarketTemplateId = market.MarketLookup.MarketTemplateId,
+                                            MarketTemplateName = market.MarketLookup.MarketTemplateName,
+                                            Payload = market.PrematchSettings.Settings.Where(x => market.NewPrematchSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {(_activity == Activity.Copy ? "101" : x.Key)}").ToList()
+                                        });
 
-                                    return;
+                                    newConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
+                                    {
+                                        MarketTemplateId = market.MarketLookup.MarketTemplateId,
+                                        MarketTemplateName = market.MarketLookup.MarketTemplateName,
+                                        Payload = market.NewPrematchSettings.Settings.Where(x => market.PrematchSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {x.Key}").ToList()
+                                    });
                                 }
                                 break;
                             case FixtureStatus.Live:
-                                if (market.NewLiveSettings.Settings.Any(x => x.Key <= 101))
+                                if (market.NewLiveSettings.Settings.Any(x => market.LiveSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)))
                                 {
-                                    _alertModel = new AlertModel();
-                                    _alertModel.Message = "Please update margin for Active markets. 101 by default is not allowed.";
-                                    _alertModel.Status = AlertStatus.Error;
-                                    _alertModel.Opacity = 1.0m;
+                                    if (_activity != Activity.Copy)
+                                        oldConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
+                                        {
+                                            MarketTemplateId = market.MarketLookup.MarketTemplateId,
+                                            MarketTemplateName = market.MarketLookup.MarketTemplateName,
+                                            Payload = market.LiveSettings.Settings.Where(x => market.NewLiveSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {(_activity == Activity.Copy ? "101" : x.Key)}").ToList()
+                                        });
 
-                                    return;
+                                    newConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
+                                    {
+                                        MarketTemplateId = market.MarketLookup.MarketTemplateId,
+                                        MarketTemplateName = market.MarketLookup.MarketTemplateName,
+                                        Payload = market.NewLiveSettings.Settings.Where(x => market.LiveSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {x.Key}").ToList()
+                                    });
                                 }
                                 break;
                         }
-                    }
 
-                    var livematchSettings = new List<MarketMargin>();
-                    var liveSettings = market.NewLiveSettings.Settings.Where(a => a.Key != null);
-                    if (liveSettings != null)
-                        livematchSettings = liveSettings.Select(a => new MarketMargin { T = a.Time, M = (int)a.Key }).ToList();
-                    else
-                        livematchSettings = new List<MarketMargin>();
-
-                    var prematchSettings = new List<MarketMargin>();
-                    var preSettings = market.NewPrematchSettings.Settings.Where(a => a.Key != null);
-                    if (preSettings != null)
-                        prematchSettings = preSettings.Select(a => new MarketMargin { T = a.Time, M = (int)a.Key }).ToList();
-                    else
-                        prematchSettings = new List<MarketMargin>();
-
-                    switch ((FixtureStatus)_editConfigTemplateFilterModel.ScopeId)
-                    {
-                        case FixtureStatus.Prematch:
-                            if (market.NewPrematchSettings.Settings.Any(x => market.PrematchSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)))
-                            {
-                                if (_activity != Activity.Copy)
-                                    oldConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
-                                    {
-                                        MarketTemplateId = market.MarketLookup.MarketTemplateId,
-                                        MarketTemplateName = market.MarketLookup.MarketTemplateName,
-                                        Payload = market.PrematchSettings.Settings.Where(x => market.NewPrematchSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {(_activity == Activity.Copy ? "101" : x.Key)}").ToList()
-                                    });
-
-                                newConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
+                        if (market.MarketLookup.IsActive != market.NewMarketLookup.IsActive)
+                        {
+                            if (_activity != Activity.Copy)
+                                oldMarketState.Add(new ConfigMarginActivityLogModel()
                                 {
                                     MarketTemplateId = market.MarketLookup.MarketTemplateId,
                                     MarketTemplateName = market.MarketLookup.MarketTemplateName,
-                                    Payload = market.NewPrematchSettings.Settings.Where(x => market.PrematchSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {x.Key}").ToList()
+                                    Payload = new List<string>() { market.MarketLookup.IsActive ? "Active" : "Inactive" }
                                 });
-                            }
-                            break;
-                        case FixtureStatus.Live:
-                            if (market.NewLiveSettings.Settings.Any(x => market.LiveSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)))
-                            {
-                                if (_activity != Activity.Copy)
-                                    oldConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
-                                    {
-                                        MarketTemplateId = market.MarketLookup.MarketTemplateId,
-                                        MarketTemplateName = market.MarketLookup.MarketTemplateName,
-                                        Payload = market.LiveSettings.Settings.Where(x => market.NewLiveSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {(_activity == Activity.Copy ? "101" : x.Key)}").ToList()
-                                    });
 
-                                newConfigMarginsLogs.Add(new ConfigMarginActivityLogModel()
-                                {
-                                    MarketTemplateId = market.MarketLookup.MarketTemplateId,
-                                    MarketTemplateName = market.MarketLookup.MarketTemplateName,
-                                    Payload = market.NewLiveSettings.Settings.Where(x => market.LiveSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {x.Key}").ToList()
-                                });
-                            }
-                            break;
-                    }
-
-                    if (market.MarketLookup.IsActive != market.NewMarketLookup.IsActive)
-                    {
-                        if (_activity != Activity.Copy)
-                            oldMarketState.Add(new ConfigMarginActivityLogModel()
+                            newMarketState.Add(new ConfigMarginActivityLogModel()
                             {
                                 MarketTemplateId = market.MarketLookup.MarketTemplateId,
                                 MarketTemplateName = market.MarketLookup.MarketTemplateName,
-                                Payload = new List<string>() { market.MarketLookup.IsActive ? "Active" : "Inactive" }
+                                Payload = new List<string>() { market.NewMarketLookup.IsActive ? "Active" : "Inactive" }
                             });
+                        }
 
-                        newMarketState.Add(new ConfigMarginActivityLogModel()
+                        request.ConfigTemplateMargins.Add(new ConfigTemplateMargin
                         {
+                            ConfigTemplateId = referenceConfigTemplateId,
+                            SportId = _editConfigTemplateFilterModel.SportId,
                             MarketTemplateId = market.MarketLookup.MarketTemplateId,
-                            MarketTemplateName = market.MarketLookup.MarketTemplateName,
-                            Payload = new List<string>() { market.NewMarketLookup.IsActive ? "Active" : "Inactive" }
+                            FixtureTypeId = (int)FixtureType.Match,
+                            FixtureStatusId = _editConfigTemplateFilterModel.ScopeId,
+                            IsActive = market.NewMarketLookup.IsActive,
+                            Config = _editConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Prematch ? JsonSerializer.Serialize(prematchSettings) : JsonSerializer.Serialize(livematchSettings)
                         });
                     }
 
-                    request.ConfigTemplateMargins.Add(new ConfigTemplateMargin
-                    {
-                        ConfigTemplateId = referenceConfigTemplateId,
-                        SportId = _editConfigTemplateFilterModel.SportId,
-                        MarketTemplateId = market.MarketLookup.MarketTemplateId,
-                        FixtureTypeId = (int)FixtureType.Match,
-                        FixtureStatusId = _editConfigTemplateFilterModel.ScopeId,
-                        IsActive = market.NewMarketLookup.IsActive,
-                        Config = _editConfigTemplateFilterModel.ScopeId == (int)FixtureStatus.Prematch ? JsonSerializer.Serialize(prematchSettings) : JsonSerializer.Serialize(livematchSettings)
-                    });
-                }
+                    var result = await _backofficeService.AddOrUpdateConfigTemplateMargin(request);
 
-                var result = await _backofficeService.AddOrUpdateConfigTemplateMargin(request);
-
-                if (result.StatusCode == StatusCode.Success)
-                {
-                    if (new[] { oldConfigMarginsLogs, newConfigMarginsLogs }.All(x => x != null && x.Any()) && !oldConfigMarginsLogs.Equals(newConfigMarginsLogs))
+                    if (result.StatusCode == StatusCode.Success)
                     {
                         await _backofficeService.AddActivityLog(new ActivityLogModel()
                         {
@@ -359,9 +359,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             UserName = UserModel.UserName,
                             TimeStamp = DateTime.UtcNow
                         });
-                    }
-                    if (new[] { oldMarketState, newMarketState }.All(x => x != null && x.Any()) && !oldMarketState.Equals(newMarketState))
-                    {
+
                         await _backofficeService.AddActivityLog(new ActivityLogModel()
                         {
                             Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
@@ -373,22 +371,16 @@ namespace Backoffice.Web.Pages.OddsEngine
                             UserName = UserModel.UserName,
                             TimeStamp = DateTime.UtcNow
                         });
+
+                        isNavigate = true;
                     }
-
-                    isNavigate = true;
                 }
-
-                await JSRuntime.InvokeVoidAsync("console.log", $"[test] Margin error - [{result.StatusCode}] - {result.Message}");
 
                 if (isNavigate)
                     NavigationManager.NavigateTo($"hk/odds-engine/config-templates?message=Successfully updated");
             }
             catch (Exception ex)
-            {
-
-
-                await JSRuntime.InvokeVoidAsync("console.log", $"[test] Margin ex - [{ex.Message}] - {ex.StackTrace}");
-            }
+            { }
             finally
             {
                 _isPreloader = false;
