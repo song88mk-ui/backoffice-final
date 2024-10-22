@@ -9,6 +9,7 @@ using Backoffice.Shared.Utilities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -1010,14 +1011,15 @@ namespace Backoffice.API.Repositories
 
                     var clientBetSettings = _backofficeContext.ClientBetSetting.Where(b => b.ClientId == clientId).ToList();
 
-                    var clientBetSettingList = new List<ClientBetSetting>();
+                    var clientBetSettingList = new ConcurrentBag<ClientBetSetting>();
+                    var baseResponse = new List<BaseResponse<bool>>();
 
-                    foreach (var betSetting in request.BetSettings)
+                    Parallel.ForEach(request.BetSettings, (betSetting, state) =>
                     {
                         int[] categories = { (int)BetSettingCategory.Soccer, (int)BetSettingCategory.OtherSports, (int)BetSettingCategory.Parlay, (int)BetSettingCategory.Cricket, (int)BetSettingCategory.Priceboost, (int)BetSettingCategory.BetBuilder };
 
                         decimal suggestedMinimumBet = 0;
-                        suggestedMinimumBet = await GetSuggestedMinimumBet(betSetting.CurrencyCode);
+                        suggestedMinimumBet = GetSuggestedMinimumBet(betSetting.CurrencyCode).Result;
 
                         foreach (var i in categories)
                         {
@@ -1091,22 +1093,26 @@ namespace Backoffice.API.Repositories
 
                                 if (minStake < suggestedMinimumBet)
                                 {
-                                    return new BaseResponse<bool>
+                                    baseResponse.Add(new BaseResponse<bool>
                                     {
                                         StatusCode = StatusCode.Error,
                                         Message = $"Suggested minimum bet not met. ({betSetting.CurrencyCode})",
                                         Result = false
-                                    };
+                                    });
+
+                                    state.Stop();
                                 }
 
                                 if (minStake > maxStake)
                                 {
-                                    return new BaseResponse<bool>
+                                    baseResponse.Add(new BaseResponse<bool>
                                     {
                                         StatusCode = StatusCode.Error,
                                         Message = $"Max amount must be greater than minimum amount. ({betSetting.CurrencyCode})",
                                         Result = false
-                                    };
+                                    });
+
+                                    state.Stop();
                                 }
                             }
 
@@ -1114,12 +1120,14 @@ namespace Backoffice.API.Repositories
                             {
                                 if (maxWinnings < 0.02m)
                                 {
-                                    return new BaseResponse<bool>
+                                    baseResponse.Add(new BaseResponse<bool>
                                     {
                                         StatusCode = StatusCode.Error,
                                         Message = $"Max Winnings Bonus must be at least 0.02. ({betSetting.CurrencyCode})",
                                         Result = false
-                                    };
+                                    });
+
+                                    state.Stop();
                                 }
                             }
 
@@ -1127,16 +1135,16 @@ namespace Backoffice.API.Repositories
                             {
                                 if (maxStake > 99999999999 || decimalPlaces > 12)
                                 {
-                                    return new BaseResponse<bool>
+                                    baseResponse.Add(new BaseResponse<bool>
                                     {
                                         StatusCode = StatusCode.Error,
                                         Message = $"Maximum stake must be lower or equal 99999999999. ({betSetting.CurrencyCode})",
                                         Result = false
-                                    };
+                                    });
+
+                                    state.Stop();
                                 }
-
                             }
-
 
                             if (clientBetSetting != null)
                             {
@@ -1153,21 +1161,23 @@ namespace Backoffice.API.Repositories
                                 });
                             }
                         }
-                    }
+                    });
+
+                    if (baseResponse.Any())
+                        return baseResponse.FirstOrDefault();
 
                     if (clientBetSettings.Any())
                         _backofficeContext.ClientBetSetting.RemoveRange(clientBetSettings);
 
                     if (clientBetSettingList.Count > 0)
-                        _backofficeContext.ClientBetSetting.AddRange(clientBetSettingList);
+                        _backofficeContext.ClientBetSetting.AddRange(clientBetSettingList.ToList());
 
                     await _backofficeContext.SaveChangesAsync();
 
-
                     try
                     {
-                        var betConfig = new List<BetConfig>();
-                        foreach (var betSetting in request.BetSettings)
+                        var betConfig = new ConcurrentBag<BetConfig>();
+                        Parallel.ForEach(request.BetSettings, betSetting =>
                         {
                             betConfig.Add(new BetConfig
                             {
@@ -1208,7 +1218,7 @@ namespace Backoffice.API.Repositories
                                 },
                                 TaxConfig = request.TaxConfig
                             });
-                        }
+                        });
 
                         //Update client in NewPlatformDB
                         decimal companyRevenueShare = request.RevenueShare.SportsbookShare;
@@ -1239,7 +1249,7 @@ namespace Backoffice.API.Repositories
                             var betConfigRequest = new AddOrUpdateBetConfigRequest
                             {
                                 ClientId = newPlatformResponse.Result.ClientId,
-                                BetConfigPayload = betConfig
+                                BetConfigPayload = betConfig.ToList()
                             };
                             int retry = 0;
                             while (retry < 3)

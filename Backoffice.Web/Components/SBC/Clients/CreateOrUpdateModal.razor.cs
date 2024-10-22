@@ -122,7 +122,7 @@ namespace Backoffice.Web.Components.SBC.Clients
                 }
             }
 
-            var concealedCurrency = new[] { Currency.ALL, Currency.PHP };
+            var concealedCurrency = new[] { Currency.ALL }; //, Currency.PHP
 
             Currencies = Enum.GetValues<Currency>().Except(concealedCurrency).Select(x => x.ToString()).ToList();
 
