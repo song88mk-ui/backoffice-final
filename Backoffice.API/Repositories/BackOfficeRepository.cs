@@ -540,7 +540,9 @@ namespace Backoffice.API.Repositories
                 var userId = 0;
 
                 long clientId = 0;
-                if (GetClientInformation().Any(c => c.Brand == request.ClientCode && c.ClientId != request.ClientId))
+                var clientInformation = GetClientInformation();
+
+                if (clientInformation.Any(c => c.Brand == request.ClientCode && c.ClientId != request.ClientId))
                 {
                     return new BaseResponse<bool>
                     {
@@ -549,7 +551,7 @@ namespace Backoffice.API.Repositories
                         Result = false
                     };
                 }
-                if (GetClientInformation().Any(c => c.Name == request.Name && c.ClientId != request.ClientId))
+                if (clientInformation.Any(c => c.Name == request.Name && c.ClientId != request.ClientId))
                 {
                     return new BaseResponse<bool>
                     {
@@ -588,7 +590,7 @@ namespace Backoffice.API.Repositories
                         websites.Add(urlToValidate);
                     }
 
-                    if (GetClientInformation().Any(c => websites.Contains(c.Website) && c.ClientId != request.ClientId))
+                    if (clientInformation.Any(c => websites.Contains(c.Website) && c.ClientId != request.ClientId))
                     {
                         return new BaseResponse<bool>
                         {
@@ -912,7 +914,7 @@ namespace Backoffice.API.Repositories
                 }
 
 
-                if (GetClientInformation().Any(c => c.Brand == request.ClientCode && c.ClientId != request.ClientId))
+                if (clientInformation.Any(c => c.Brand == request.ClientCode && c.ClientId != request.ClientId))
                 {
                     return new BaseResponse<bool>
                     {
