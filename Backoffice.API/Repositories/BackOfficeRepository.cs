@@ -2016,7 +2016,7 @@ namespace Backoffice.API.Repositories
                         Value = configTemplateId
                     };
 
-                    await _backofficeContext.Database.ExecuteSqlRawAsync("EXEC AddOrUpdateConfigTemplateMargin @ConfigTemplateId @ConfigTemplateMargins", configTemplateIdParam, parameter);
+                    await _backofficeContext.Database.ExecuteSqlRawAsync("EXEC AddOrUpdateConfigTemplateMargin @ConfigTemplateId, @ConfigTemplateMargins",configTemplateIdParam, parameter);
 
                     //var existingConfig = _backofficeContext.ConfigTemplateMargin.Where(x => x.ConfigTemplateId == request.ConfigTemplateMargins.FirstOrDefault().ConfigTemplateId).AsNoTracking();
 
