@@ -112,10 +112,10 @@ namespace Backoffice.Utility.Repository
                 }
 
                 if (leaguePayload.Any())
-                    messageBroker.Publish(JsonSerializer.Serialize(JsonSerializer.Serialize(new OnUpdateClientLeagueConfigMessage()
+                    messageBroker.Publish(JsonSerializer.Serialize(new OnUpdateClientLeagueConfigMessage()
                     {
                         ConfigSettings = leaguePayload
-                    })), "OnUpdateClientLeagueConfig", "r.oe.web.config.OnUpdateClientLeagueConfig", ConvertToUnixTimestamp(DateTime.UtcNow).ToString());
+                    }), "OnUpdateClientLeagueConfig", "r.oe.web.config.OnUpdateClientLeagueConfig", ConvertToUnixTimestamp(DateTime.UtcNow).ToString());
             }
             catch (Exception ex)
             {
