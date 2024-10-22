@@ -2,10 +2,8 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
 using Activity = Backoffice.Shared.Enums.Activity;
@@ -168,9 +166,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnSaveMarginTemplate()
         {
-            if (_isProcessing)
+            if (_isProcessing || _hasChanges == false)
                 return;
 
+            _isPreloader =  true;
             _isProcessing = true;
             var isNavigate = false;
 
@@ -386,6 +385,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             finally
             {
+                _isPreloader = false;
                 _isProcessing = false;
             }
         }
@@ -554,13 +554,13 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
         }
 
-        private PrematchSettingsTemplateModel GetPrematchSettingsTemplate(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, string marketTemplateId, string marketTemplateName) => new PrematchSettingsTemplateModel()
+        private PrematchSettingsTemplateModel GetPrematchSettingsTemplate(ConfigTemplateMargin configTemplateMargin, string marketTemplateId, string marketTemplateName) => new PrematchSettingsTemplateModel()
         {
             SportId = _editConfigTemplateFilterModel.ConfigTemplate.SportId,
             FirstKey = GetFirstKey(configTemplateMargin),
             LastKey = GetLastKey(configTemplateMargin),
             MarketTemplateId = marketTemplateId,
-            Settings = MockData.PrematchSettings.Select(s => new Backoffice.Shared.Models.KeyTimeModel()
+            Settings = MockData.PrematchSettings.Select(s => new KeyTimeModel()
             {
                 Key = GetPrematchKey(s.TimeDisplay, configTemplateMargin),
                 Time = s.Time,
@@ -603,7 +603,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             return result;
         }
 
-        public LiveSettingsTemplateModel GetLiveSettingsTemplate(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin, string marketTemplateId)
+        public LiveSettingsTemplateModel GetLiveSettingsTemplate(ConfigTemplateMargin configTemplateMargin, string marketTemplateId)
         {
             var liveSettings = MockData.SportsLiveTimeline.Where(s => s.SportId == configTemplateMargin.SportId).FirstOrDefault();
 
@@ -633,7 +633,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
         }
 
-        private string GetFirstKey(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin)
+        private string GetFirstKey(ConfigTemplateMargin configTemplateMargin)
         {
 
             if (configTemplateMargin == null || string.IsNullOrEmpty(configTemplateMargin.Config))
@@ -651,7 +651,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             return (firstKey ?? 101).ToString();
         }
 
-        private string GetLastKey(Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin)
+        private string GetLastKey(ConfigTemplateMargin configTemplateMargin)
         {
             if (configTemplateMargin == null || string.IsNullOrEmpty(configTemplateMargin.Config))
                 return "101";
@@ -667,7 +667,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             return lastKey == null ? "" : lastKey.ToString();
         }
 
-        private int? GetPrematchKey(string Time, Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin)
+        private int? GetPrematchKey(string Time, ConfigTemplateMargin configTemplateMargin)
         {
 
             if (configTemplateMargin == null)
@@ -703,7 +703,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             return keyTime.M;
         }
 
-        private int? GetLiveKey(string Time, Backoffice.Shared.Models.ConfigTemplateMargin configTemplateMargin)
+        private int? GetLiveKey(string Time, ConfigTemplateMargin configTemplateMargin)
         {
             ////for testing only
             //if (config == null || string.IsNullOrEmpty(config.Live))
