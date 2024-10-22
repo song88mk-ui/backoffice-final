@@ -291,7 +291,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 _isPreloader = true;
                 _shouldRender = true;
-                await InvokeAsync(StateHasChanged);
             }
 
             var payload = new ConfigTemplateLeagueRequest();

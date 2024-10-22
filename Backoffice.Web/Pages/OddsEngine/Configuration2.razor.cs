@@ -85,8 +85,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     _languageCode = _translationState.ActiveLanguageCode;
                     _contentFilterModel.Sports = await LoadSports();
-                    Init();
                 }
+                Init();
 
                 _queryMessage = QueryMessage;
                 _shouldRender = true;
@@ -151,7 +151,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _isPreloader = false;
             _shouldRender = true;
-            await InvokeAsync(StateHasChanged);
         }
         private async void CalculateConfigCounts()
         {

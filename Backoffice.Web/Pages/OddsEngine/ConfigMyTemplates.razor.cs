@@ -70,8 +70,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 if (_init)
                     await LoadConfigTemplates();
-            }
 
+            }
             _init = false;
         }
 
@@ -225,7 +225,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _isPreloader = false;
                 _shouldRender = true;
 
-                StateHasChanged();
             }
             catch (TaskCanceledException)
             {

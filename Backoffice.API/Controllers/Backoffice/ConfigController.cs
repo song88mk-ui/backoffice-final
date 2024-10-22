@@ -200,7 +200,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
             else
             {
-                if (Enum.TryParse(state, out ConfigState confState))
+                if (Enum.TryParse(state, ignoreCase: true, out ConfigState confState))
                 {
                     result = await _backofficeRepository.GetConfigState(clientCodes, payload, confState);
                 }
