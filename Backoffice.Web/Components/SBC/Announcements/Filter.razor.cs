@@ -35,7 +35,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         #region Methods
 
         protected override async Task OnInitializedAsync()
-        {
+        {//
             _filterModel = new AnnouncementsFilterModel();
 
             _searchForm = new SearchFormModel()

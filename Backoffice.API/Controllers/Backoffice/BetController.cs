@@ -21,7 +21,7 @@ namespace Backoffice.API.Controllers.Backoffice
         private readonly bool _isStaging;
 
         public BetController(IPlatformRepository platformRepository, IConfiguration configuration)
-        {
+        {//
             _platformRepository = platformRepository;
             _isStaging = bool.Parse(configuration["IsStaging"]);
         }
