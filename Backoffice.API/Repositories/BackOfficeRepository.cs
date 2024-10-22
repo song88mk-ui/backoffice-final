@@ -2,10 +2,12 @@
 using Backoffice.Shared.Data.Backoffice;
 using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.Enums;
+using Backoffice.Shared.Extensions;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
+using Microsoft.ApplicationInsights;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -30,18 +32,22 @@ namespace Backoffice.API.Repositories
     {
         #region Fields
         private readonly BackofficeContext _backofficeContext;
+        private readonly TelemetryClient _telemetryClient;
+
         private readonly IPlatformRepository _platformRepository;
         private readonly ITradingRepository _tradingRepository;
         private readonly IRabbitMqRepository _rabbitMqRepository;
         private readonly IMemCache _memCache;
+
         private string[] cryptoCurrencies = new string[] { Currency.BTC.ToString(), Currency.ETH.ToString() };
 
         #endregion
 
         #region Ctor
 
-        public BackofficeRepository(BackofficeContext backofficeContext, IPlatformRepository platformRepository, ITradingRepository tradingRepository, IMemCache memCache, IRabbitMqRepository rabbitMqRepository)
+        public BackofficeRepository(BackofficeContext backofficeContext, TelemetryClient telemetryClient, IPlatformRepository platformRepository, ITradingRepository tradingRepository, IMemCache memCache, IRabbitMqRepository rabbitMqRepository)
         {
+            _telemetryClient = telemetryClient;
             _backofficeContext = backofficeContext;
             _platformRepository = platformRepository;
             _tradingRepository = tradingRepository;
@@ -537,6 +543,9 @@ namespace Backoffice.API.Repositories
         {
             try
             {
+                var events = new List<Event>();
+                var timestampStartedValidation = DateTime.UtcNow;
+
                 #region VALIDATION
                 var userId = 0;
 
@@ -946,8 +955,12 @@ namespace Backoffice.API.Repositories
                 }
                 #endregion
 
+                events.Add(GetEvent("VALIDATION", timestampStartedValidation, DateTime.UtcNow));
+
                 using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
                 {
+
+                    var timestampStartedUpdate = DateTime.UtcNow;
 
                     if (request.ClientId == 0)
                     {
@@ -1008,6 +1021,10 @@ namespace Backoffice.API.Repositories
 
                         clientId = UpdateClientRecord(client);
                     }
+
+                    events.Add(GetEvent("UPDATE CLIENT", timestampStartedUpdate, DateTime.UtcNow));
+
+                    timestampStartedUpdate = DateTime.UtcNow;
 
                     var clientBetSettings = _backofficeContext.ClientBetSetting.Where(b => b.ClientId == clientId).ToList();
 
@@ -1174,6 +1191,10 @@ namespace Backoffice.API.Repositories
 
                     await _backofficeContext.SaveChangesAsync();
 
+                    events.Add(GetEvent("UPDATE BET SETTINGS", timestampStartedUpdate, DateTime.UtcNow));
+
+                    timestampStartedUpdate = DateTime.UtcNow;
+
                     try
                     {
                         var betConfig = new ConcurrentBag<BetConfig>();
@@ -1263,12 +1284,24 @@ namespace Backoffice.API.Repositories
                             //new trading
                             //await _tradingClient.UpdateClientEmail(clientPlatform);
                         }
+
+                        events.Add(GetEvent("UPDATE PLATFORM", timestampStartedUpdate, DateTime.UtcNow));
+
                     }
                     catch (Exception ex)
                     {
                     }
 
                     scope.Complete();
+
+
+                    var properties = new Dictionary<string, string>
+                    {
+                        { "client-code", request.ClientCode },
+                        { "events", JsonSerializer.Serialize(events) }
+                    };
+
+                    _telemetryClient.TrackEvent($"e:backoffice.client={request.ClientCode}", properties);
 
                     //return response;
                     return new BaseResponse<bool>()
@@ -2434,6 +2467,20 @@ namespace Backoffice.API.Repositories
 
             return result;
         }
+
+        private Event GetEvent(string action, DateTime timestampStarted, DateTime timestampFinished)
+        {
+            var model = new Event
+            {
+                Action = action,
+                TimestampStarted = timestampStarted,
+                TimestampFinished = timestampFinished,
+                ProcessingTime = timestampFinished.ToEpochTimestamp() - timestampStarted.ToEpochTimestamp()
+            };
+
+            return model;
+        }
+
         #endregion
     }
 }
