@@ -27,7 +27,7 @@ namespace Backoffice.Web.States
         {
             _translationService = translationService;
 
-            LanguageCodes = new List<LanguageCode> { LanguageCode.EN, LanguageCode.ZH, LanguageCode.KO }; 
+            LanguageCodes = new List<LanguageCode> { LanguageCode.EN, LanguageCode.ZH, LanguageCode.KO };
 
             if (!Model.Any())
                 SetLanguageCode(LanguageCode.EN);
@@ -39,8 +39,8 @@ namespace Backoffice.Web.States
 
         public async Task SetLanguageCode(LanguageCode langCode)
         {
-            Model = await _translationService.GetTranslationsAsync(langCode);
             ActiveLanguageCode = langCode;
+            Model = await _translationService.GetTranslationsAsync(langCode);
         }
 
         public string GetValue(string word)

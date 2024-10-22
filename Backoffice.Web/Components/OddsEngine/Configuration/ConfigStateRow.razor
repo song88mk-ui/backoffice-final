@@ -10,7 +10,7 @@
     <td class="px-4">@Config.ClientName</td>
     <td class="px-4">@_translationState.GetValue(Config.SportName)</td>
     <td class="px-4">@Config.SegmentName > @Config.LeagueName</td>
-    <td class="@(State == ConfigState.UnAssigned ? "template-name-italic" : "") px-4">
+    <td class="@(Config.PrematchTemplateId == -1 ? "template-name-italic" : "") px-4">
         @if (Config.PrematchTemplateId == -1)
         {
             <label>No template assigned</label>
@@ -28,7 +28,7 @@
         }
 
     </td>
-    <td class="@(State == ConfigState.UnAssigned ? "template-name-italic" : "") px-4">
+    <td class="@(Config.LiveTemplateId == -1 ? "template-name-italic" : "") px-4">
         @if (Config.LiveTemplateId == -1)
         {
             <label>No template assigned</label>

@@ -32,6 +32,9 @@ namespace Backoffice.Web.Pages
 
             UserClaims = new List<Claim>();
 
+            var cookieValue = await _jsRuntime.InvokeAsync<string>("getCookie", "c-langCode");
+            await UpdateLanguageCode(cookieValue);
+
             await PageState.AuthenticateAccessEvent.InvokeAsync();
 
             var validClaimValues = new string[] { "1", "2", "0" };
@@ -40,14 +43,14 @@ namespace Backoffice.Web.Pages
 
             UserClaims.AddRange(authState.User.Claims.Where(c => validClaimValues.Contains(c.Value)).ToList());
         }
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                var cookieValue = await _jsRuntime.InvokeAsync<string>("getCookie", "c-langCode");
-                await UpdateLanguageCode(cookieValue);  
-            }
-        }
+        //protected override async Task OnAfterRenderAsync(bool firstRender)
+        //{
+        //    if (firstRender)
+        //    {
+        //        var cookieValue = await _jsRuntime.InvokeAsync<string>("getCookie", "c-langCode");
+        //        await UpdateLanguageCode(cookieValue);  
+        //    }
+        //}
         public async Task OnLogoutClickEvent()
         {
             var parameters = new ModalParameters();

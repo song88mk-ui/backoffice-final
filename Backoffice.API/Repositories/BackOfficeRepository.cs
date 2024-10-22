@@ -2407,26 +2407,18 @@ namespace Backoffice.API.Repositories
         }
         private async Task<int> GetUnAssignedCount(List<string> clientCodes)
         {
-            var result = 0;
+            var result = -1;
 
-            var query = _backofficeContext.ConfigTemplateAssigned.Select(s => new { s.ClientCode, s.LeagueId}).Distinct();
+            var query = _backofficeContext.ConfigTemplateAssigned.Select(s => new { s.ClientCode, s.LeagueId }).Distinct();
 
             if ((clientCodes.Count() == 1 && clientCodes.FirstOrDefault().ToUpper() == "ALL") == false)
                 query.Where(c => clientCodes.Contains(c.ClientCode));
 
-            var leagueCount = query.Count();    
-            var leagueLookupResponseTask = _tradingRepository.GetAllLeagueLookup("");
-
-            await Task.WhenAll(leagueLookupResponseTask);
-
-            var leagueLookupResponse = leagueLookupResponseTask.Result;
+            var leagueCount = query.Count();
+            var leagueLookupResponse = await _tradingRepository.GetAllLeagueLookup("");
 
             if (leagueLookupResponse.StatusCode == StatusCode.Success)
-            {
-                var leagueLookup = leagueLookupResponse.Result.LeagueLookup;
-
-                result = (leagueLookup.Count * GetTradingClientInformation().Count) - leagueCount;
-            }
+                result = (leagueLookupResponse.Result.LeagueLookup.Count * GetTradingClientInformation().Count) - leagueCount;
 
             return result;
         }

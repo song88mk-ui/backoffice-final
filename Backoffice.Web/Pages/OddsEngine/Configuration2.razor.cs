@@ -81,22 +81,24 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (_shouldRender)
             {
-                if (_languageCode != _translationState.ActiveLanguageCode)
+                if (_init || _languageCode != _translationState.ActiveLanguageCode)
                 {
+                    _init = false;
+                    var isLoadClients = _languageCode != _translationState.ActiveLanguageCode;
+
                     _languageCode = _translationState.ActiveLanguageCode;
                     _contentFilterModel.Sports = await LoadSports();
-                    Init();
+
+                    Init(isLoadClients);
                 }
 
                 _queryMessage = QueryMessage;
             }
-
-            _init = false;
         }
 
         protected override bool ShouldRender() => _shouldRender;
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
-        private bool ValidateParameters() => _init || _languageCode != _translationState.ActiveLanguageCode ||  _queryMessage != QueryMessage;
+        private bool ValidateParameters() => _init || _languageCode != _translationState.ActiveLanguageCode || _queryMessage != QueryMessage;
 
         public void HandleConfigNavMenuSelection(ConfigTemplateNavMenu configNavMenu)
         {
@@ -134,7 +136,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Utilities
 
-        private async void Init()
+        private async void Init(bool isLoadClient = true)
         {
             CalculateConfigCounts();
 
@@ -143,10 +145,15 @@ namespace Backoffice.Web.Pages.OddsEngine
             _contentFilterModel = new ConfigContentFilterModel();
             _contentFilterModel.Scopes = _scopes;
 
-            await Task.WhenAll(new[] {
-                Task.Run(async () => { _contentFilterModel.Clients = await LoadClients(); _shouldRender = true; }),
+            var tasks = new List<Task>()
+            {
                 Task.Run(async () => { _contentFilterModel.Sports = await LoadSports(); _shouldRender = true;})
-            });
+            };
+
+            if (isLoadClient || _contentFilterModel.Clients == null)
+                tasks.Add(Task.Run(async () => { _contentFilterModel.Clients = await LoadClients(); _shouldRender = true; }));
+
+            await Task.WhenAll(tasks.ToArray());
 
             _isPreloader = false;
             _shouldRender = true;
