@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Extensions;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
@@ -32,7 +33,7 @@ namespace Backoffice.API.Repositories
         }
 
         #region Client
-        public async Task<BaseResponse<PlatformClientResponse>> AddOrUpdateClient(ClientRequest request, string region)
+        public async Task<BaseResponse<PlatformClientResponse>> AddOrUpdateClient(ClientRequest request, string region, List<Event> events)
         {
             try
             {
@@ -41,6 +42,9 @@ namespace Backoffice.API.Repositories
                 if (response.IsSuccessStatusCode)
                 {
                     var result = JsonConvert.DeserializeObject<BaseResponse<PlatformClientResponse>>(await response.Content.ReadAsStringAsync());
+
+                    var timeStampPublishStart = DateTime.UtcNow;
+
                     await _rabbitMqRepository.Publish(new MessageRequest
                     {
                         Payload = JsonSerializer.Serialize(new OnDeleteCacheMessage
@@ -54,6 +58,15 @@ namespace Backoffice.API.Repositories
                         MessageType = "OnClientChange",
                         RoutingKey = $"r.oe.cachesync.onclientchange"
                     }, region);
+
+                    events.Add(new Event
+                    {
+                        Action = "PUBLISH OnClientChange",
+                        TimestampStarted = timeStampPublishStart,
+                        TimestampFinished = DateTime.UtcNow,
+                        ProcessingTime = DateTime.UtcNow.ToEpochTimestamp() - timeStampPublishStart.ToEpochTimestamp()
+                    });
+
                     return result;
                 }
                 else

@@ -1184,8 +1184,6 @@ namespace Backoffice.API.Repositories
 
                     events.Add(GetEvent("UPDATE BET SETTINGS", timestampStartedUpdate, DateTime.UtcNow));
 
-                    timestampStartedUpdate = DateTime.UtcNow;
-
                     try
                     {
                         var betConfig = new ConcurrentBag<BetConfig>();
@@ -1255,9 +1253,13 @@ namespace Backoffice.API.Repositories
                             EffectiveDate = DateTime.UtcNow,
                         };
 
-                        var newPlatformResponse = await _platformRepository.AddOrUpdateClient(clientPlatform, request.Region);
+                        timestampStartedUpdate = DateTime.UtcNow;
+
+                        var newPlatformResponse = await _platformRepository.AddOrUpdateClient(clientPlatform, request.Region, events);
                         if (newPlatformResponse.StatusCode == StatusCode.Success)
                         {
+                            events.Add(GetEvent("UPDATE PLATFORM CLIENT", timestampStartedUpdate, DateTime.UtcNow));
+
                             var betConfigRequest = new AddOrUpdateBetConfigRequest
                             {
                                 ClientId = newPlatformResponse.Result.ClientId,
@@ -1266,9 +1268,14 @@ namespace Backoffice.API.Repositories
                             int retry = 0;
                             while (retry < 3)
                             {
+                                timestampStartedUpdate = DateTime.UtcNow;
+
                                 var newPlatformBettingResponse = await _platformRepository.ProcessBackofficeClientBetConfig(betConfigRequest, request.Region);
                                 if (newPlatformBettingResponse.StatusCode == StatusCode.Success)
+                                {
+                                    events.Add(GetEvent("UPDATE PLATFORM BETCONFIG", timestampStartedUpdate, DateTime.UtcNow));
                                     break;
+                                }
                                 retry += 1;
                             }
 
@@ -1276,7 +1283,6 @@ namespace Backoffice.API.Repositories
                             //await _tradingClient.UpdateClientEmail(clientPlatform);
                         }
 
-                        events.Add(GetEvent("UPDATE PLATFORM", timestampStartedUpdate, DateTime.UtcNow));
 
                     }
                     catch (Exception ex)
