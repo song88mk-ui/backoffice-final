@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Transactions;
 
-namespace Backoffice.Utility.Repository
+namespace Backoffice.Config.Service.Repository
 {
     public class BackofficeRepository : IBackofficeRepository
     {

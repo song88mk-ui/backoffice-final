@@ -1,4 +1,5 @@
 ﻿using Azure;
+using Backoffice.Shared.Enums;
 using Backoffice.Web.Components.Administration.CancelBets;
 using Backoffice.Web.Components.Administration.MaintenanceV2;
 using Backoffice.Web.Models;
@@ -61,7 +62,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             _isPreloader = true;
             _shouldRender = true;
-            _clients = await LoadClientsTest();
+            _clients = await LoadClients();
 
             var isAllClient = true;
 
@@ -124,17 +125,21 @@ namespace Backoffice.Web.Pages.Administration
         }
         private async Task<List<SelectListItemWithCheckboxModel<string>>> LoadClients()
         {
-            var response = (await _tradingService.GetClientList()).Result;
+            var response = await _backofficeService.GetMaintenanceV2();
             var result = new List<SelectListItemWithCheckboxModel<string>>();
 
-            if (response != null && response.Any())
+            if (response.StatusCode != StatusCode.Success)
+                return result;
+
+            var clientConfigs = response?.Result?.ClientConfig;
+            if (clientConfigs != null && clientConfigs.Any())
             {
-                result = response.Select(e =>
+                result = clientConfigs.Select(e =>
                     new SelectListItemWithCheckboxModel<string>()
                     {
                         IsChecked = true,
                         Name = e.ClientName,
-                        Value = e.ClientCode.ToString()
+                        Value = e.ClientId.ToString()
                     }).ToList();
             }
 

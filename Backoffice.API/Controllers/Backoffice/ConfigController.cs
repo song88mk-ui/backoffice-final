@@ -62,11 +62,11 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpGet("v2/maintenance")]
-        public async Task<IActionResult> GetMaintenanceV2([FromBody] SetMaintenanceRequest request)
+        public async Task<IActionResult> GetMaintenanceV2()
         {
-            var clients = request?.ClientIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToUpper()).ToList() ?? new List<string>();
+            var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
 
-            var result = await _maintenanceRepository.GetMaintenanceV2(clients);
+            var result = await _maintenanceRepository.GetMaintenanceV2(clientCodes);
 
             switch (result.StatusCode)
             {

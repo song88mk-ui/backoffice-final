@@ -112,7 +112,7 @@ p {
 	background: #FF6B00;
 	color:#ffff;
 }
-.btn-disabled{
-	background: #FF6B003e;
+.btn-save:disabled {
+    background: #FF6B003e;
 }
 

@@ -30,10 +30,10 @@
             </li>
             @foreach (var item in Clients)
             {
-                <li id="@item">
-                    <div class="form-check ms-2">
+                <li id="@item.Value">
+                    <div class="form-check ms-2" @onclick="() => HandleCheckboxCheck(item)">
                         @* <input type="checkbox" class="form-check-input" @onclick="() => CheckboxClicked(item)" checked="@item.IsChecked" disabled="@IsReadOnly" /> *@
-                        <input type="checkbox" class="form-check-input" @onclick="() => HandleCheckboxCheck(item)" checked="@item.IsChecked" />
+                        <input type="checkbox" class="form-check-input" checked="@item.IsChecked" />
                         <label class="form-check-label fw-bold">@_translationState.GetValue(item.Name)</label>
                     </div>
                 </li>

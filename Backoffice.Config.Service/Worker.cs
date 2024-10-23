@@ -1,6 +1,6 @@
+using Backoffice.Config.Service.Repository;
 using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.Utilities;
-using Backoffice.Utility.Repository;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client.Events;

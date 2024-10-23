@@ -22,8 +22,8 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
         private bool _hasChange;
         private bool _isDisabled;
 
-        protected override void OnInitialized()
-        {
+        protected override async Task OnInitializedAsync() {
+            var clientConfigs = await _backofficeService.GetMaintenance();
         }
         protected override void OnParametersSet()
         {
@@ -64,8 +64,6 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
 
             _activeClients.Remove(activeClient);
             _shouldRender = true;
-
-            //ReOrderClients();
         }
         private async Task HandleCheckboxCheck(SelectListItemWithCheckboxModel<string> client)
         {

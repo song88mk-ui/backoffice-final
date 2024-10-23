@@ -1,7 +1,7 @@
 ﻿using Backoffice.Shared.Data.Backoffice.Entities;
 using Backoffice.Shared.Utilities;
 
-namespace Backoffice.Utility.Repository
+namespace Backoffice.Config.Service.Repository
 {
     public interface IBackofficeRepository
     {
