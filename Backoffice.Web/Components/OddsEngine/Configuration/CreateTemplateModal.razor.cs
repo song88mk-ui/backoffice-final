@@ -27,6 +27,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private int _selectedScopeId;
         private string _templateName;
         private bool _isConfigNameExisting;
+        private bool _isInvalidName;
         private bool _isPreloader;
 
         #endregion
@@ -70,8 +71,14 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             ModalService.Cancel();
         }
 
-        public async Task OnSaveClickEvent()
+        public async Task HandleSaveClick()
         {
+            if (string.IsNullOrEmpty(_templateName))
+            {
+                _isInvalidName = true;
+                return;
+            }
+
             _isPreloader = true;
             var isSuccess = false;
             _isConfigNameExisting = false;
@@ -110,6 +117,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             _isPreloader = false;
             if (isSuccess)
                 ModalService.Cancel();
+        }
+        public async Task HandleNameChange()
+        {
+            _isInvalidName = false;
+            _isConfigNameExisting = false;
         }
 
         public void Dispose()

@@ -98,12 +98,20 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 var toPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.To);
                 stringBuilder.Append($"<td class=\"px-4\">{toPaylaod?.Name ?? "-"}</td>");
             }
+            else if(activityLog.Activity == Activity.Copy.ToString())
+            {
+                stringBuilder.Append($"<td class=\"px-4\">{_translationState.GetValue("Copied Template")}</td>");
+                var fromPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.From);
+                var toPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.To);
+                stringBuilder.Append($"<td class=\"px-4\">{fromPaylaod?.Name ?? "-"}</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{toPaylaod?.Name ?? "-"}</td>");
+            }
             else if (activityLog.Activity == Activity.Delete.ToString())
             {
                 stringBuilder.Append($"<td class=\"px-4\">{_translationState.GetValue("Deleted Template")}</td>");
                 var fromPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.From);
-                stringBuilder.Append($"<td class=\"px-4\">{fromPaylaod?.Name ?? "-"}</td>");
                 stringBuilder.Append($"<td class=\"px-4\">{activityLog.To}</td>");
+                stringBuilder.Append($"<td class=\"px-4\">{fromPaylaod?.Name ?? "-"}</td>");
             }
             else
             {
@@ -161,7 +169,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 }
                                 stringBuilder.Append($"</td>");
                             }
-                            if (activityLog.To != "-")
+                            if (activityLog.To == "-")
                             {
                                 stringBuilder.Append($"<td class=\"px-4\">-</td>");
                             }
@@ -178,7 +186,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 }
                                 stringBuilder.Append($"</td>");
                             }
-
+                            break;
+                        case "N":
+                            stringBuilder.Append($"<td class=\"px-4\">{_translationState.GetValue("Changed Name")}</td>");
+                            var fromPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.From);
+                            var toPaylaod = JsonSerializer.Deserialize<ConfigTemplateModel>(activityLog.To);
+                            stringBuilder.Append($"<td class=\"px-4\">{fromPaylaod.Name}</td>");
+                            stringBuilder.Append($"<td class=\"px-4\">{toPaylaod?.Name ?? "-"}</td>");
                             break;
                         default:
                             stringBuilder.Append($"<td class=\"px-4\">-</td>");

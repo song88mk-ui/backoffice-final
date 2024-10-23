@@ -47,6 +47,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isProcessing;
         private bool _isEdttingName;
         private string _temporaryName;
+
         #endregion
 
 
@@ -98,6 +99,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _sportIcon = _editConfigTemplateFilterModel.SportName.Contains(" ") ? _editConfigTemplateFilterModel.SportName.Replace(" ", "-").ToLower() : _editConfigTemplateFilterModel.SportName.ToLower();
             _sportName = _editConfigTemplateFilterModel.SportName;
             _configTemplateName = $"{(_activity == Activity.Copy ? "Copy of " : "")}{_editConfigTemplateFilterModel.ConfigTemplate.Name}";
+
             _scope = ((FixtureStatus)_editConfigTemplateFilterModel.ScopeId).ToString();
 
             _breadcrumbs = new List<BreadcrumbModel>()
@@ -183,27 +185,60 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     var payload = new ConfigTemplateModel()
                     {
-                        Id = ConfigTemplateId,
                         SportId = _editConfigTemplateFilterModel.SportId,
-                        FixtureTypeId = (int)FixtureType.Match,
+                        FixtureTypeId = _editConfigTemplateFilterModel.ConfigTemplate.FixtureTypeId,
                         FixtureStatusId = _editConfigTemplateFilterModel.ScopeId,
                         Name = _configTemplateName,
                     };
 
+                    if (_isNameChanges)
+                    {
+                        if (string.IsNullOrEmpty(_configTemplateName))
+                        {
+                            _isExisitngName = true;
+                            return;
+                        }
+
+                        payload.Id = referenceConfigTemplateId;
+                    }
+
                     var response = await _backofficeService.AddOrUpdateConfigTemplate(payload);
                     if (response.StatusCode == StatusCode.Success)
                     {
-                        await _backofficeService.AddActivityLog(new ActivityLogModel()
+                        payload.Id = response.Result;
+                        var oldConfigTemplate = new ConfigTemplateModel()
+                        {
+                            Id = _editConfigTemplateFilterModel.ConfigTemplate.Id,
+                            SportId = _editConfigTemplateFilterModel.SportId,
+                            FixtureTypeId = _editConfigTemplateFilterModel.ConfigTemplate.FixtureTypeId,
+                            FixtureStatusId = _editConfigTemplateFilterModel.ScopeId,
+                            Name = _editConfigTemplateFilterModel.ConfigTemplate.Name
+                        };
+
+                        var activityLogPayload = new ActivityLogModel()
                         {
                             Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                            Payload = $"{_editConfigTemplateFilterModel.SportId}.{_editConfigTemplateFilterModel.ScopeId}.{payload.Name}.T".Replace(" ", "_"),
-                            From = "-",
+                            From = JsonSerializer.Serialize(oldConfigTemplate),
                             To = JsonSerializer.Serialize(payload),
-                            Activity = Activity.Create.ToString(),
                             UserId = UserModel.Id,
                             UserName = UserModel.UserName,
                             TimeStamp = DateTime.UtcNow
-                        });
+                        };
+
+                        if (_activity == Activity.Copy)
+                        {
+                            activityLogPayload.Payload = $"{_editConfigTemplateFilterModel.SportId}.{_editConfigTemplateFilterModel.ScopeId}.{payload.Name}.T".Replace(" ", "_");
+                            activityLogPayload.Activity = Activity.Copy.ToString();
+
+                            await _backofficeService.AddActivityLog(activityLogPayload);
+                        }
+                        else if (_isNameChanges)
+                        {
+                            activityLogPayload.Payload = $"{_editConfigTemplateFilterModel.SportId}.{_editConfigTemplateFilterModel.ScopeId}.{_editConfigTemplateFilterModel.ConfigTemplate.Name}.N".Replace(" ", "_");
+                            activityLogPayload.Activity = Activity.Update.ToString();
+
+                            await _backofficeService.AddActivityLog(activityLogPayload);
+                        }
 
                         referenceConfigTemplateId = response.Result;
                     }
@@ -225,6 +260,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                     var newConfigMarginsLogs = new List<ConfigMarginActivityLogModel>();
                     var oldMarketState = new List<ConfigMarginActivityLogModel>();
                     var newMarketState = new List<ConfigMarginActivityLogModel>();
+
+                    var marginHasChange = false;
+                    var statusHasChange = false;
 
                     foreach (var market in _marketLookupNavigation)
                     {
@@ -291,6 +329,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                                         MarketTemplateName = market.MarketLookup.MarketTemplateName,
                                         Payload = market.NewPrematchSettings.Settings.Where(x => market.PrematchSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {x.Key}").ToList()
                                     });
+
+                                    marginHasChange = true;
                                 }
                                 break;
                             case FixtureStatus.Live:
@@ -310,6 +350,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                                         MarketTemplateName = market.MarketLookup.MarketTemplateName,
                                         Payload = market.NewLiveSettings.Settings.Where(x => market.LiveSettings.Settings.Any(f => f.Time == x.Time && f.Key != x.Key)).Select(x => $"{x.TimeDisplay} {x.Key}").ToList()
                                     });
+
+                                    marginHasChange = true;
                                 }
                                 break;
                         }
@@ -330,6 +372,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 MarketTemplateName = market.MarketLookup.MarketTemplateName,
                                 Payload = new List<string>() { market.NewMarketLookup.IsActive ? "Active" : "Inactive" }
                             });
+
+                            statusHasChange = true;
                         }
 
                         request.ConfigTemplateMargins.Add(new ConfigTemplateMargin
@@ -348,29 +392,31 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                     if (result.StatusCode == StatusCode.Success)
                     {
-                        await _backofficeService.AddActivityLog(new ActivityLogModel()
-                        {
-                            Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                            Payload = $"{_editConfigTemplateFilterModel.SportId}.{_editConfigTemplateFilterModel.ScopeId}.{_editConfigTemplateFilterModel.ConfigTemplate.Name}.Modified_Margins.M".Replace(" ", "_"),
-                            From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldConfigMarginsLogs),
-                            To = JsonSerializer.Serialize(newConfigMarginsLogs),
-                            Activity = Activity.Update.ToString(),
-                            UserId = UserModel.Id,
-                            UserName = UserModel.UserName,
-                            TimeStamp = DateTime.UtcNow
-                        });
+                        if (marginHasChange)
+                            await _backofficeService.AddActivityLog(new ActivityLogModel()
+                            {
+                                Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
+                                Payload = $"{_editConfigTemplateFilterModel.SportId}.{_editConfigTemplateFilterModel.ScopeId}.{_configTemplateName}.Modified_Margins.M".Replace(" ", "_"),
+                                From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldConfigMarginsLogs),
+                                To = JsonSerializer.Serialize(newConfigMarginsLogs),
+                                Activity = Activity.Update.ToString(),
+                                UserId = UserModel.Id,
+                                UserName = UserModel.UserName,
+                                TimeStamp = DateTime.UtcNow
+                            });
 
-                        await _backofficeService.AddActivityLog(new ActivityLogModel()
-                        {
-                            Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
-                            Payload = $"{_editConfigTemplateFilterModel.SportId}.{_editConfigTemplateFilterModel.ScopeId}.{_editConfigTemplateFilterModel.ConfigTemplate.Name}.Changed_Market_State.M".Replace(" ", "_"),
-                            From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldMarketState),
-                            To = JsonSerializer.Serialize(newMarketState),
-                            Activity = Activity.Update.ToString(),
-                            UserId = UserModel.Id,
-                            UserName = UserModel.UserName,
-                            TimeStamp = DateTime.UtcNow
-                        });
+                        if (statusHasChange)
+                            await _backofficeService.AddActivityLog(new ActivityLogModel()
+                            {
+                                Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
+                                Payload = $"{_editConfigTemplateFilterModel.SportId}.{_editConfigTemplateFilterModel.ScopeId}.{_configTemplateName}.Changed_Market_State.M".Replace(" ", "_"),
+                                From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldMarketState),
+                                To = JsonSerializer.Serialize(newMarketState),
+                                Activity = Activity.Update.ToString(),
+                                UserId = UserModel.Id,
+                                UserName = UserModel.UserName,
+                                TimeStamp = DateTime.UtcNow
+                            });
 
                         isNavigate = true;
                     }
@@ -400,12 +446,19 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnSaveTemplateNameClicked()
         {
             _isEdttingName = false;
+            _isExisitngName = false;
+
+            if (string.IsNullOrEmpty(_temporaryName))
+                return;
+
             _configTemplateName = _temporaryName.Trim();
             _isExisitngName = false;
 
             if (_configTemplateName != _editConfigTemplateFilterModel.ConfigTemplate.Name)
             {
-                _isNameChanges = true;
+                if (_activity != Activity.Copy)
+                    _isNameChanges = true;
+
                 _breadcrumbs.Last().Name = _configTemplateName;
             }
         }
