@@ -136,7 +136,7 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<string> GetMaintenancePrivate()
+        public async Task<List<ExternalMaintenanceConfig>> GetMaintenancePrivate()
         {
             using var activity = this._activitySource.StartActivity("get.maintenance.private");
             var result = new List<ExternalMaintenanceConfig>();
@@ -152,17 +152,17 @@ namespace Backoffice.API.Repositories
                     {
                         var value = await response.Content.ReadAsStringAsync();
                         var config = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(value);
-                        activity.SetTag($"${app}.response.content", config == null);
+                        activity.SetTag($"${app}.response.content", value);
                         result.AddRange(config.Config);
 
                     }
                 }
-                return result.ToString();
+                return result;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                activity?.SetStatus(ActivityStatusCode.Error, e.Message);
-                return result.ToString();
+                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                return new List<ExternalMaintenanceConfig>();
             }
             finally
             {
@@ -197,7 +197,6 @@ namespace Backoffice.API.Repositories
 
                 var clientsConfig = new List<MaintenanceConfigModel>();
 
-                var count = 0;
                 foreach (var app in _maintenanceApps)
                 {
                     var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
@@ -234,6 +233,19 @@ namespace Backoffice.API.Repositories
                                 App = app
                             });
                         }
+                    }
+                    else
+                    {
+                        var random = new Random();
+                        clientsConfig.Add(new MaintenanceConfigModel()
+                        {
+                            ClientId = random.Next(1000000, 999999).ToString(),
+                            IsMaintenance = false,
+                            Site = "",
+                            ClientCode = "",
+                            ClientName = "",
+                            App = app
+                        });
                     }
                 }
 
