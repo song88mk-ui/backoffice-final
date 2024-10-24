@@ -6,8 +6,7 @@ namespace Backoffice.Shared.ExternalApis.Maintenance
 {
     public class ExternalMaintenanceResponse
     {
-        [JsonPropertyName("Config")]
-        public List<ExternalMaintenanceConfig> Configs { get; set; }
+        public List<ExternalMaintenanceConfig> Config { get; set; }
     }
     public class ExternalMaintenanceConfig
     {

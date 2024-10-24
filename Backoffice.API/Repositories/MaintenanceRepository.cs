@@ -139,7 +139,8 @@ namespace Backoffice.API.Repositories
         public async Task<string> GetMaintenancePrivate()
         {
             using var activity = this._activitySource.StartActivity("get.maintenance.private");
-            var result = new StringBuilder();
+            var result = new List<ExternalMaintenanceConfig>();
+
             try
             {
                 foreach (var app in _maintenanceApps)
@@ -150,8 +151,10 @@ namespace Backoffice.API.Repositories
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         var value = await response.Content.ReadAsStringAsync();
-                        activity.SetTag($"${app}.response.content", value);
-                        result.Append(value);
+                        var config = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(value);
+                        activity.SetTag($"${app}.response.content", config == null);
+                        result.AddRange(config.Config);
+
                     }
                 }
                 return result.ToString();
@@ -212,24 +215,22 @@ namespace Backoffice.API.Repositories
 
                     var content = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(test);
 
-                    if (content?.Configs != null)
+                    if (content?.Config != null)
                     {
-                        foreach (var config in content.Configs)
+                        foreach (var config in content.Config)
                         {
-                            //var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase));
+                            var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase));
 
-                            //if (reference == null)
-                            //    continue;
+                            if (reference == null)
+                                continue;
 
                             clientsConfig.Add(new MaintenanceConfigModel()
                             {
                                 ClientId = config.ClientId,
                                 IsMaintenance = config.IsMaintenance,
                                 Site = config.Site,
-                                //ClientCode = reference.ClientCode,
-                                //ClientName = reference.ClientName,
-                                ClientCode = $"test{count + 1}",
-                                ClientName = "test",
+                                ClientCode = reference.ClientCode,
+                                ClientName = reference.ClientName,
                                 App = app
                             });
                         }
