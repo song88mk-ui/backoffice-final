@@ -136,44 +136,10 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<List<ExternalMaintenanceConfig>> GetMaintenancePrivate()
-        {
-            using var activity = this._activitySource.StartActivity("get.maintenance.private");
-            var result = new List<ExternalMaintenanceConfig>();
-
-            try
-            {
-                foreach (var app in _maintenanceApps)
-                {
-                    var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
-                    activity.SetTag($"{app}.response.status.code", response.StatusCode);
-
-                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        var value = await response.Content.ReadAsStringAsync();
-                        var config = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(value, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                        activity.SetTag($"${app}.response.content", value);
-                        result.AddRange(config.Config);
-
-                    }
-                }
-                return result;
-            }
-            catch (Exception ex)
-            {
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                return new List<ExternalMaintenanceConfig>();
-            }
-            finally
-            {
-                activity?.Stop();
-            }
-        }
         public async Task<BaseResponse<MaintenanceResponse>> GetMaintenanceV2(List<string> clientCodes)
         {
             try
             {
-
                 var clientResponse = await _tradingRepository.GetClientList("");
 
                 if (clientResponse?.Result == null)
@@ -200,23 +166,22 @@ namespace Backoffice.API.Repositories
                 foreach (var app in _maintenanceApps)
                 {
                     var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
-
-                    var test = await response.Content.ReadAsStringAsync();
+                    var content = await response.Content.ReadAsStringAsync();
 
                     if (response.StatusCode != System.Net.HttpStatusCode.OK)
                     {
                         return new BaseResponse<MaintenanceResponse>()
                         {
                             StatusCode = StatusCode.Error,
-                            Message = $"Error: {response.StatusCode} - {response.Content.ToString()} - {test}"
+                            Message = $"Error: {content}"
                         };
                     }
 
-                    var content = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(test, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    var extexrnalConfigs = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-                    if (content?.Config != null)
+                    if (extexrnalConfigs?.Config != null)
                     {
-                        foreach (var config in content.Config)
+                        foreach (var config in extexrnalConfigs.Config)
                         {
                             var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase));
 
@@ -233,19 +198,6 @@ namespace Backoffice.API.Repositories
                                 App = app
                             });
                         }
-                    }
-                    else
-                    {
-                        var random = new Random();
-                        clientsConfig.Add(new MaintenanceConfigModel()
-                        {
-                            ClientId = random.Next(10000, 9999).ToString(),
-                            IsMaintenance = false,
-                            Site = "",
-                            ClientCode = "",
-                            ClientName = "",
-                            App = app
-                        });
                     }
                 }
 
