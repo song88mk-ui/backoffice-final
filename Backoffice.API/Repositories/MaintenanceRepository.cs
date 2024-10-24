@@ -48,7 +48,7 @@ namespace Backoffice.API.Repositories
             _internalClient = "71BBE7D8-FD04-459C-6D8B-08D9354E5B64";
             _tradingRepository = tradingRepository;
 
-            _maintenanceApps = configuration["Maintenance.Apps"]?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.Select(s => s.Trim().ToUpper()).ToList() ?? null;
+            _maintenanceApps = configuration["Maintenance:Apps"]?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.Select(s => s.Trim().ToUpper()).ToList() ?? null;
 
             _httpClient = httpClient;
         }
@@ -134,6 +134,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
+
                 var clientResponse = await _tradingRepository.GetClientList("");
 
                 if (clientResponse?.Result == null)
@@ -157,6 +158,12 @@ namespace Backoffice.API.Repositories
 
                 var clientsConfig = new List<MaintenanceConfigModel>();
 
+                if (_maintenanceApps == null)
+                    return new BaseResponse<MaintenanceResponse>()
+                    {
+                        StatusCode = clientResponse.StatusCode,
+                        Message = $"Empty client reference : {clientCodes?.Join(",") ?? "No Clients"}"
+                    };
                 foreach (var app in _maintenanceApps)
                 {
                     var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
