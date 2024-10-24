@@ -6,6 +6,7 @@ using Azure.ResourceManager.Cdn;
 using Azure.ResourceManager.Cdn.Models;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Backoffice.API.Telemetry;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.ExternalApis.Maintenance;
 using Backoffice.Shared.Models;
@@ -17,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -38,8 +40,10 @@ namespace Backoffice.API.Repositories
         private readonly bool _isStaging;
         private readonly string _internalClient;
         private readonly List<string>? _maintenanceApps;
+        private readonly ActivitySource _activitySource;
 
-        public MaintenanceRepository(IConfiguration configuration, HttpClient httpClient, ITradingRepository tradingRepository)
+
+        public MaintenanceRepository(IConfiguration configuration, HttpClient httpClient, ITradingRepository tradingRepository, Instrumentation instrumentation)
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(configuration["ConnectionStrings:AzureStorage"]);
             BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("assets");
@@ -52,6 +56,7 @@ namespace Backoffice.API.Repositories
             _maintenanceApps = configuration["Maintenance:Apps"]?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.Select(s => s.Trim().ToUpper()).ToList() ?? null;
 
             _httpClient = httpClient;
+            _activitySource = instrumentation.ActivitySource;
         }
 
         #region Methods
@@ -133,19 +138,33 @@ namespace Backoffice.API.Repositories
         }
         public async Task<string> GetMaintenancePrivate()
         {
+            using var activity = this._activitySource.StartActivity("get.maintenance.private");
             var result = new StringBuilder();
-            foreach (var app in _maintenanceApps)
+            try
             {
-                var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
-
-                if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                foreach (var app in _maintenanceApps)
                 {
-                    var value = await response.Content.ReadAsStringAsync();
-                    result.Append(value);
-                }
-            }
+                    var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
+                    activity.SetTag($"{app}.response.status.code", response.StatusCode);
 
-            return result.ToString();
+                    if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        var value = await response.Content.ReadAsStringAsync();
+                        activity.SetTag($"${app}.response.content", value);
+                        result.Append(value);
+                    }
+                }
+                return result.ToString();
+            }
+            catch (Exception e)
+            {
+                activity?.SetStatus(ActivityStatusCode.Error, e.Message);
+                return result.ToString();
+            }
+            finally
+            {
+                activity?.Stop();
+            }
         }
         public async Task<BaseResponse<MaintenanceResponse>> GetMaintenanceV2(List<string> clientCodes)
         {
