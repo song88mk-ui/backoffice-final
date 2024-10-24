@@ -1,13 +1,8 @@
-﻿using Azure;
-using Backoffice.Shared.Enums;
-using Backoffice.Web.Components.Administration.CancelBets;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Web.Components.Administration.MaintenanceV2;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages.SBC;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using RabbitMQ.Client.Framing.Impl;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -61,22 +56,31 @@ namespace Backoffice.Web.Pages.Administration
 
         private async void LoadPage()
         {
-            _isPreloader = true;
-            _shouldRender = true;
-            _clients = await LoadClients();
+            try
+            {
+                _isPreloader = true;
+                _shouldRender = true;
+                _clients = await LoadClients();
 
-            var isAllClient = true;
+                var isAllClient = true;
 
-            // Get Maintenance
+                // Get Maintenance
 
-            _liveClients = _clients.Where(c => !c.IsChecked).Select(s => s.Value).ToList();
-            _underMaintenanceClients = _clients.Where(c => c.IsChecked).Select(s => s.Value).ToList();
+                _liveClients = _clients.Where(c => !c.IsChecked).Select(s => s.Value).ToList();
+                _underMaintenanceClients = _clients.Where(c => c.IsChecked).Select(s => s.Value).ToList();
 
-            ChangeMode(isAllClient);
-            _initialStatusIsAllClient = isAllClient;
-            _initialMaintenanceIsOn = _isMaintenance;
-            _isPreloader = false;
-            _shouldRender = true;
+                ChangeMode(isAllClient);
+                _initialStatusIsAllClient = isAllClient;
+                _initialMaintenanceIsOn = _isMaintenance;
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                _isPreloader = false;
+                _shouldRender = true;
+            }
         }
         private void ChangeMode(bool isAllClient)
         {
@@ -124,6 +128,7 @@ namespace Backoffice.Web.Pages.Administration
             var options = new ModalOptions();
             _modalService.Open<MaintenanceModal>(parameters, options);
         }
+        private List<MaintenanceConfigModel> _maintenanceConfigModels = new List<MaintenanceConfigModel>();
         private async Task<List<SelectListItemWithCheckboxModel<string>>> LoadClients()
         {
             var response = await _backofficeService.GetMaintenanceV2();
@@ -132,13 +137,14 @@ namespace Backoffice.Web.Pages.Administration
             if (response.StatusCode != StatusCode.Success)
                 return result;
 
-            var clientConfigs = response?.Result?.ClientConfig;
-            if (clientConfigs != null && clientConfigs.Any())
+            _maintenanceConfigModels = response?.Result?.ClientConfig;
+
+            if (_maintenanceConfigModels != null && _maintenanceConfigModels.Any())
             {
-                result = clientConfigs.Select(e =>
+                result = _maintenanceConfigModels.Select(e =>
                     new SelectListItemWithCheckboxModel<string>()
                     {
-                        IsChecked = true,
+                        IsChecked = e.IsMaintenance,
                         Name = e.ClientName,
                         Value = e.ClientId.ToString()
                     }).ToList();

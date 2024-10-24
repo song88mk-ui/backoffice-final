@@ -261,7 +261,7 @@ namespace Backoffice.API.Repositories
                     {
                         hasError = true;
 
-                        errorMessages.Add($"{result.StatusCode} - {reference.App} - {result.Content.ReadAsStringAsync().Result}");
+                        errorMessages.Add($"{result.StatusCode} - {reference.App} - {await result.Content.ReadAsStringAsync()}");
                     }
                 }
 
