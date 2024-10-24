@@ -136,20 +136,23 @@ namespace Backoffice.API.Repositories
             {
                 var clientResponse = await _tradingRepository.GetClientList("");
 
-                if (clientResponse == null)
+                if (clientResponse?.Result == null)
                     return new BaseResponse<MaintenanceResponse>()
                     {
                         StatusCode = clientResponse.StatusCode,
                         Message = clientResponse.Message
                     };
 
-                var clientReference = clientResponse.Result.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+                var clientReference = clientResponse.Result;
 
-                if(clientReference == null)
+                if (clientCodes.Count > 1)
+                    clientReference = clientReference.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+
+                if (clientReference == null)
                     return new BaseResponse<MaintenanceResponse>()
                     {
                         StatusCode = clientResponse.StatusCode,
-                        Message = $"Empty client reference : {clientCodes.Join(",")}"
+                        Message = $"Empty client reference : {clientCodes?.Join(",") ?? "No Clients" }"
                     };
 
                 var clientsConfig = new List<MaintenanceConfigModel>();
