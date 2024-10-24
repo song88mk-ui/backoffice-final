@@ -145,6 +145,13 @@ namespace Backoffice.API.Repositories
 
                 var clientReference = clientResponse.Result.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
 
+                if(clientReference == null)
+                    return new BaseResponse<MaintenanceResponse>()
+                    {
+                        StatusCode = clientResponse.StatusCode,
+                        Message = $"Empty client reference : {clientCodes.Join(",")}"
+                    };
+
                 var clientsConfig = new List<MaintenanceConfigModel>();
 
                 foreach (var app in _maintenanceApps)
