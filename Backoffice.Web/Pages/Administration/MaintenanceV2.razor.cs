@@ -39,6 +39,7 @@ namespace Backoffice.Web.Pages.Administration
         protected override async Task OnInitializedAsync()
         {
             PageState.Page = this;
+            await PageState.AuthenticateAccessEvent.InvokeAsync();
 
             _pageHeaderModel = new()
             {

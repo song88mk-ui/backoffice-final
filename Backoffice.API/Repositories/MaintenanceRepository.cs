@@ -147,7 +147,7 @@ namespace Backoffice.API.Repositories
                     var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
                     activity.SetTag($"{app}.response.status.code", response.StatusCode);
 
-                    if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         var value = await response.Content.ReadAsStringAsync();
                         activity.SetTag($"${app}.response.content", value);
@@ -194,6 +194,7 @@ namespace Backoffice.API.Repositories
 
                 var clientsConfig = new List<MaintenanceConfigModel>();
 
+                var count = 0;
                 foreach (var app in _maintenanceApps)
                 {
                     var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
@@ -215,18 +216,20 @@ namespace Backoffice.API.Repositories
                     {
                         foreach (var config in content.Configs)
                         {
-                            var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase));
+                            //var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase));
 
-                            if (reference == null)
-                                continue;
+                            //if (reference == null)
+                            //    continue;
 
                             clientsConfig.Add(new MaintenanceConfigModel()
                             {
                                 ClientId = config.ClientId,
                                 IsMaintenance = config.IsMaintenance,
                                 Site = config.Site,
-                                ClientCode = reference.ClientCode,
-                                ClientName = reference.ClientName,
+                                //ClientCode = reference.ClientCode,
+                                //ClientName = reference.ClientName,
+                                ClientCode = $"test{count + 1}",
+                                ClientName = "test",
                                 App = app
                             });
                         }
