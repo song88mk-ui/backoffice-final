@@ -153,44 +153,46 @@ namespace Backoffice.API.Repositories
                     return new BaseResponse<MaintenanceResponse>()
                     {
                         StatusCode = clientResponse.StatusCode,
-                        Message = $"Empty client reference : {clientCodes?.Join(",") ?? "No Clients" }"
+                        Message = $"Empty client reference : {clientCodes?.Join(",") ?? "No Clients"}"
                     };
 
                 var clientsConfig = new List<MaintenanceConfigModel>();
 
-                if (_maintenanceApps == null)
-                    return new BaseResponse<MaintenanceResponse>()
-                    {
-                        StatusCode = clientResponse.StatusCode,
-                        Message = $"Empty client reference : {clientCodes?.Join(",") ?? "No Clients"}"
-                    };
                 foreach (var app in _maintenanceApps)
                 {
                     var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
 
-                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    if (response.StatusCode != System.Net.HttpStatusCode.OK)
                     {
-                        var content = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(response.Content.ReadAsStringAsync().Result);
+                        var test = response.Content.ReadAsStringAsync();
 
-                        if (content?.Configs != null)
+                        return new BaseResponse<MaintenanceResponse>()
                         {
-                            foreach (var config in content.Configs)
+                            StatusCode = StatusCode.Error,
+                            Message = $"Error: {response.StatusCode} - {response.Content.ToString()} - {test}"
+                        };
+                    }
+
+                    var content = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(response.Content.ReadAsStringAsync().Result);
+
+                    if (content?.Configs != null)
+                    {
+                        foreach (var config in content.Configs)
+                        {
+                            var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase));
+
+                            if (reference == null)
+                                continue;
+
+                            clientsConfig.Add(new MaintenanceConfigModel()
                             {
-                                var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase));
-
-                                if (reference == null)
-                                    continue;
-
-                                clientsConfig.Add(new MaintenanceConfigModel()
-                                {
-                                    ClientId = config.ClientId,
-                                    IsMaintenance = config.IsMaintenance,
-                                    Site = config.Site,
-                                    ClientCode = reference.ClientCode,
-                                    ClientName = reference.ClientName,
-                                    App = app
-                                });
-                            }
+                                ClientId = config.ClientId,
+                                IsMaintenance = config.IsMaintenance,
+                                Site = config.Site,
+                                ClientCode = reference.ClientCode,
+                                ClientName = reference.ClientName,
+                                App = app
+                            });
                         }
                     }
                 }
