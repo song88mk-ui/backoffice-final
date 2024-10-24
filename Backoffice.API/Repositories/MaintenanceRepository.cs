@@ -130,6 +130,21 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
+        public async Task<string> GetMaintenancePrivate()
+        {
+            var result = new StringBuilder();
+            foreach (var app in _maintenanceApps)
+            {
+                var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
+
+                if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    result.Append(response.Content.ReadAsStringAsync());
+                }
+            }
+
+            return result.ToString();
+        }
         public async Task<BaseResponse<MaintenanceResponse>> GetMaintenanceV2(List<string> clientCodes)
         {
             try

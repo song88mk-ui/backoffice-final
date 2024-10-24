@@ -61,6 +61,13 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
+        [HttpGet("private/maintenance")]
+        public async Task<IActionResult> GetMaintenancePrivate()
+        {
+            var result = await _maintenanceRepository.GetMaintenancePrivate();
+
+            return Ok(result);
+        }
         [HttpGet("v2/maintenance")]
         public async Task<IActionResult> GetMaintenanceV2()
         {

@@ -10,6 +10,7 @@ namespace Backoffice.API.Repositories
     {
         Task<BaseResponse<bool>> SetMaintenance(bool content);
         Task<BaseResponse<bool>> GetMaintenance();
+        Task<string> GetMaintenancePrivate();
         Task<BaseResponse<MaintenanceResponse>> GetMaintenanceV2(List<string> clientCodes);
         Task<BaseResponse<bool>> SetMaintenanceV2(SetMaintenanceRequest request);
     }
