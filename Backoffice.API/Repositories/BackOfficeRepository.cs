@@ -316,7 +316,7 @@ namespace Backoffice.API.Repositories
             try
             {
                 var clients = GetClientInformation()
-                    .Where(c => c.IsDeleted == false && c.StatusId == (int)ClientStatus.Normal)
+                    .Where(c => c.IsDeleted == false && c.StatusId == (int)ClientStatus.Normal && (c.ApplicationId == (int)Application2.SBC || c.ApplicationId == (int)Application.Sportsbook))
                     .Select(client => new ClientResponse.Client
                     {
                         ClientId = client.ClientId,
@@ -460,7 +460,7 @@ namespace Backoffice.API.Repositories
                 {
                     StatusCode = StatusCode.Error,
                     Message = StatusCode.Success.ToString(),
-                    Result = GetClientInformation().Where(s => s.ClientId == clientId).Select(s => s.Region).FirstOrDefault().ToString()
+                    Result = GetClientInformation().Where(s => s.IsDeleted == false && s.ClientId == clientId).Select(s => s.Region).FirstOrDefault().ToString()
                 };
             }
             catch (Exception ex)
@@ -481,7 +481,7 @@ namespace Backoffice.API.Repositories
                 {
                     StatusCode = StatusCode.Error,
                     Message = StatusCode.Success.ToString(),
-                    Result = GetClientInformation().Where(s => s.Brand == clientCode).Select(s => s.ClientId).FirstOrDefault().ToString()
+                    Result = GetClientInformation().Where(s => s.IsDeleted == false && s.Brand == clientCode).Select(s => s.ClientId).FirstOrDefault().ToString()
                 };
             }
             catch (Exception ex)
@@ -2288,7 +2288,6 @@ namespace Backoffice.API.Repositories
         }
         private List<ClientInformation> GetClientInformation()
         {
-            //return _memCache.GetCache("boci", () => _backofficeContext.ClientInformation.AsNoTracking().ToList(), 24) ?? new List<ClientInformation>();
             return _backofficeContext.ClientInformation.AsNoTracking().ToList() ?? new List<ClientInformation>();
         }
         private List<ClientInformationModel> GetTradingClientInformation()
