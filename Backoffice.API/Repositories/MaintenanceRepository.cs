@@ -151,7 +151,7 @@ namespace Backoffice.API.Repositories
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         var value = await response.Content.ReadAsStringAsync();
-                        var config = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(value);
+                        var config = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(value, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                         activity.SetTag($"${app}.response.content", value);
                         result.AddRange(config.Config);
 
@@ -212,7 +212,7 @@ namespace Backoffice.API.Repositories
                         };
                     }
 
-                    var content = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(test);
+                    var content = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(test, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                     if (content?.Config != null)
                     {
@@ -239,7 +239,7 @@ namespace Backoffice.API.Repositories
                         var random = new Random();
                         clientsConfig.Add(new MaintenanceConfigModel()
                         {
-                            ClientId = random.Next(1000000, 999999).ToString(),
+                            ClientId = random.Next(10000, 9999).ToString(),
                             IsMaintenance = false,
                             Site = "",
                             ClientCode = "",
