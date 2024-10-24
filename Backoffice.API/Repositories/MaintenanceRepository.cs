@@ -23,6 +23,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Backoffice.API.Repositories
 {
@@ -139,7 +140,8 @@ namespace Backoffice.API.Repositories
 
                 if (response.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    result.Append(response.Content.ReadAsStringAsync());
+                    var value = await response.Content.ReadAsStringAsync();
+                    result.Append(value);
                 }
             }
 
@@ -177,10 +179,10 @@ namespace Backoffice.API.Repositories
                 {
                     var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
 
+                    var test = await response.Content.ReadAsStringAsync();
+
                     if (response.StatusCode != System.Net.HttpStatusCode.OK)
                     {
-                        var test = response.Content.ReadAsStringAsync();
-
                         return new BaseResponse<MaintenanceResponse>()
                         {
                             StatusCode = StatusCode.Error,
@@ -188,7 +190,7 @@ namespace Backoffice.API.Repositories
                         };
                     }
 
-                    var content = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(response.Content.ReadAsStringAsync().Result);
+                    var content = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(test);
 
                     if (content?.Configs != null)
                     {
