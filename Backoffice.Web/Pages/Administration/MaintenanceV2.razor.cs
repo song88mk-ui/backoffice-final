@@ -66,8 +66,8 @@ namespace Backoffice.Web.Pages.Administration
                 _clients = await LoadClients();
 
                 var isAllClient = true;
-
-                // Get Maintenance
+                _liveClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == false).Select(c => c.ClientName).ToList();
+                _underMaintenanceClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == true).Select(c => c.ClientName).ToList();
 
                 _liveClients = _clients.Where(c => !c.IsChecked).Select(s => s.Value).ToList();
                 _underMaintenanceClients = _clients.Where(c => c.IsChecked).Select(s => s.Value).ToList();
@@ -133,7 +133,7 @@ namespace Backoffice.Web.Pages.Administration
             });
 
             _isProcessing = false;
-            _shouldRender = true;
+            LoadPage();
         }
         public void HandleCancelClick()
         {
@@ -176,9 +176,9 @@ namespace Backoffice.Web.Pages.Administration
                         Value = _maintenanceConfigModels.Count(c => c.ClientId == e.ClientId) > 1 ? $"{e.App}:{e.ClientId.ToString()}" : $"{e.ClientId.ToString()}"
                     }).ToList();
 
-                _liveClients = result.Where(c => c.IsChecked == false).Select(c => c.Name).ToList();
-                _underMaintenanceClients = result.Where(c => c.IsChecked == true).Select(c => c.Name).ToList();
             }
+            else
+                _maintenanceConfigModels = new List<MaintenanceConfigModel>();
 
             return result;
         }

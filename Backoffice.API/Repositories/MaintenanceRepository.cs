@@ -24,6 +24,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -182,7 +183,7 @@ namespace Backoffice.API.Repositories
                             { "events", content }
                         };
 
-                        _telemetryClient.TrackEvent($"e:backoffice-maintenance.client", properties);
+                        _telemetryClient.TrackEvent($"e:backoffice-maintenance.get.client", properties);
                         continue;
                     }
 
@@ -250,19 +251,39 @@ namespace Backoffice.API.Repositories
 
                 foreach (var item in clientIds)
                 {
-                    var reference = referenceClients.FirstOrDefault(c => string.Equals(c.ClientId, item, StringComparison.OrdinalIgnoreCase));
+                    var app = string.Empty;
+                    var clientId = item;
+
+                    if (clientId.Contains(":"))
+                    {
+                        var split = clientId.Split(':');
+                        app = split.FirstOrDefault().ToLower();
+                        clientId = split.LastOrDefault().ToString();
+                    }
+
+                    var reference = referenceClients.FirstOrDefault(c => string.Equals(c.ClientId, clientId, StringComparison.OrdinalIgnoreCase));
 
                     if (reference == null)
                     {
                         hasError = true;
 
-                        errorMessages.Add($"No reference - Unknown - {item}");
+                        errorMessages.Add($"No reference - Unknown - {clientId}");
+
+                        var properties = new Dictionary<string, string>
+                        {
+                            { "app", app },
+                            { "clientId", clientId }
+                        };
+
+                        _telemetryClient.TrackEvent($"e:backoffice-maintenance.set.client", properties);
                         continue;
                     }
 
-                    var result = await _httpClient.PostAsync($"/v1.0/invoke/{reference.App.ToLower()}/method/maintenance", new StringContent(JsonSerializer.Serialize(new
+                    app = string.IsNullOrEmpty(app) ? reference.App : app;
+
+                    var result = await _httpClient.PostAsync($"/v1.0/invoke/{app.ToLower()}/method/maintenance", new StringContent(JsonSerializer.Serialize(new
                     {
-                        ClientId = item,
+                        ClientId = clientId,
                         reference.IsMaintenance,
                     }), Encoding.UTF8, "application/json"));
 
@@ -270,7 +291,18 @@ namespace Backoffice.API.Repositories
                     {
                         hasError = true;
 
-                        errorMessages.Add($"{result.StatusCode} - {reference.App} - {await result.Content.ReadAsStringAsync()}");
+                        var content = await result.Content.ReadAsStringAsync();
+                        errorMessages.Add($"{result.StatusCode} - {app} - {content}");
+
+                        var properties = new Dictionary<string, string>
+                        {
+                            { "app", app },
+                            { "status" , result.StatusCode.ToString() },
+                            { "clientId", clientId },
+                            {"event" , content }
+                };
+
+                        _telemetryClient.TrackEvent($"e:backoffice-maintenance.set.client", properties);
                     }
                 }
 
