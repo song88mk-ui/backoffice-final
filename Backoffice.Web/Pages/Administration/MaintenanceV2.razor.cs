@@ -63,6 +63,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 _isPreloader = true;
                 _shouldRender = true;
+                _hasChange = false;
                 _clients = await LoadClients();
 
                 var isAllClient = true;
@@ -138,7 +139,7 @@ namespace Backoffice.Web.Pages.Administration
         public void HandleCancelClick()
         {
             _isMaintenance = _initialMaintenanceIsOn;
-            _hasChange = false;
+            LoadPage();
         }
         private void HandleMaintenanceSwitch() => HandlePropertyChange();
         private async void HandleSetAlertToast()
