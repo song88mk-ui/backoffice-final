@@ -249,43 +249,21 @@ namespace Backoffice.API.Repositories
                 var hasError = false;
                 var errorMessages = new List<string>();
 
-                foreach (var item in clientIds)
+                var apps = referenceClients.Select(s => s.App).Distinct().ToList();
+
+                foreach (var app in apps)
                 {
-                    var app = string.Empty;
-                    var clientId = item;
+                    var tempClientIds = clientIds.Where(c => c.Contains($"{app}:", StringComparison.OrdinalIgnoreCase) || c.Contains(":") == false).Select(c => c.Split(":").LastOrDefault());
 
-                    if (clientId.Contains(":"))
+                    var reference = referenceClients.Where(c => tempClientIds.Contains(c.ClientId, StringComparer.OrdinalIgnoreCase)).ToList();
+
+                    var stringPayload = JsonSerializer.Serialize(new
                     {
-                        var split = clientId.Split(':');
-                        app = split.FirstOrDefault().ToLower();
-                        clientId = split.LastOrDefault().ToString();
-                    }
+                        clientIds = string.Join(",", reference.Select(c => c.ClientId)),
+                        request.IsMaintenance,
+                    });
 
-                    var reference = referenceClients.FirstOrDefault(c => string.Equals(c.ClientId, clientId, StringComparison.OrdinalIgnoreCase));
-
-                    if (reference == null)
-                    {
-                        hasError = true;
-
-                        errorMessages.Add($"No reference - Unknown - {clientId}");
-
-                        var properties = new Dictionary<string, string>
-                        {
-                            { "app", app },
-                            { "clientId", clientId }
-                        };
-
-                        _telemetryClient.TrackEvent($"e:backoffice-maintenance.set.client", properties);
-                        continue;
-                    }
-
-                    app = string.IsNullOrEmpty(app) ? reference.App : app;
-
-                    var result = await _httpClient.PostAsync($"/v1.0/invoke/{app.ToLower()}/method/maintenance", new StringContent(JsonSerializer.Serialize(new
-                    {
-                        ClientId = clientId,
-                        reference.IsMaintenance,
-                    }), Encoding.UTF8, "application/json"));
+                    var result = await _httpClient.PostAsync($"/v1.0/invoke/{app.ToLower()}/method/maintenance", new StringContent(stringPayload, Encoding.UTF8, "application/json"));
 
                     if (result.StatusCode != System.Net.HttpStatusCode.OK)
                     {
@@ -298,9 +276,9 @@ namespace Backoffice.API.Repositories
                         {
                             { "app", app },
                             { "status" , result.StatusCode.ToString() },
-                            { "clientId", clientId },
-                            {"event" , content }
-                };
+                            { "payload", stringPayload },
+                            {  "event" , content }
+                        };
 
                         _telemetryClient.TrackEvent($"e:backoffice-maintenance.set.client", properties);
                     }
