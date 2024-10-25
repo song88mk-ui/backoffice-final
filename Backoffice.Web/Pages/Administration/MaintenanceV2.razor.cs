@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Administration.MaintenanceV2;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -123,9 +124,9 @@ namespace Backoffice.Web.Pages.Administration
 
             var clientIds = string.Empty;
             if (_isAllClient)
-                clientIds = string.Join(",", _maintenanceConfigModels.Select(c => c.ClientId).ToList());
+                clientIds = "All";
             else
-                clientIds = string.Join(",", _clients.Where(c => c.IsChecked).Select(c => c.Value.Split(":").LastOrDefault()).ToList());
+                clientIds = string.Join(",", _clients.Where(c => c.IsChecked).Select(c => c.Value).ToList());
 
             var result = await _backofficeService.SetMaintenanceV2(new SetMaintenanceRequest()
             {
@@ -176,7 +177,6 @@ namespace Backoffice.Web.Pages.Administration
                         Name = _maintenanceConfigModels.Count(c => c.ClientId == e.ClientId) > 1 ? $"{e.App}-{e.ClientName.ToString()}" : $"{e.ClientName.ToString()}",
                         Value = _maintenanceConfigModels.Count(c => c.ClientId == e.ClientId) > 1 ? $"{e.App}:{e.ClientId.ToString()}" : $"{e.ClientId.ToString()}"
                     }).ToList();
-
             }
             else
                 _maintenanceConfigModels = new List<MaintenanceConfigModel>();

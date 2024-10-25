@@ -249,21 +249,21 @@ namespace Backoffice.API.Repositories
                 var hasError = false;
                 var errorMessages = new List<string>();
 
-                var apps = referenceClients.Select(s => s.App).Distinct().ToList();
+                var appGroups = referenceClients.Where(c => (clientIds.Count() == 1 && clientIds.FirstOrDefault().ToUpper() == "ALL")
+                                                || (clientIds.Any(ci => (ci.Contains(":") && ci.Contains($"{c.App}:{c.ClientId}", StringComparison.OrdinalIgnoreCase)) || ci == c.ClientId)))
+                                                .GroupBy(c => c.App).ToList();
 
-                foreach (var app in apps)
+                foreach (var appGroup in appGroups)
                 {
-                    var tempClientIds = clientIds.Where(c => c.Contains($"{app}:", StringComparison.OrdinalIgnoreCase) || c.Contains(":") == false).Select(c => c.Split(":").LastOrDefault());
-
-                    var reference = referenceClients.Where(c => tempClientIds.Contains(c.ClientId, StringComparer.OrdinalIgnoreCase)).ToList();
+                    var app = appGroup.Key.ToLower();
 
                     var stringPayload = JsonSerializer.Serialize(new
                     {
-                        clientIds = string.Join(",", reference.Select(c => c.ClientId)),
-                        request.IsMaintenance,
+                        ClientIds = (clientIds.Count() == 1 && clientIds.FirstOrDefault().ToUpper() == "ALL") ? "All" : string.Join(",", appGroup.Select(c => c.ClientId)),
+                        request.IsMaintenance
                     });
 
-                    var result = await _httpClient.PostAsync($"/v1.0/invoke/{app.ToLower()}/method/maintenance", new StringContent(stringPayload, Encoding.UTF8, "application/json"));
+                    var result = await _httpClient.PostAsync($"/v1.0/invoke/{app}/method/maintenance", new StringContent(stringPayload, Encoding.UTF8, "application/json"));
 
                     if (result.StatusCode != System.Net.HttpStatusCode.OK)
                     {
