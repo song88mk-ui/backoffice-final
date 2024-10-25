@@ -189,7 +189,7 @@ namespace Backoffice.Shared.Utilities
                 if (messageBroker != null)
                 {
                     _isExclusive = messageBroker.IsExclusive;
-                    _isPriority = messageBroker.IsExclusive;
+                    _isPriority = messageBroker.IsPriority;
                     _hostName = messageBroker.Host;
                     _userName = messageBroker.Username;
                     _password = messageBroker.Password;
