@@ -35,7 +35,7 @@
                 </div>
                 <div>
                     <div class="form-switch d-flex justify-content-center">
-                        <input class="form-check-input me-3" type="checkbox" @bind="@_isMaintenance" id="maitenance-mode" @bind:after="HandleSetAlertToast">
+                        <input class="form-check-input me-3" type="checkbox" @bind="@_isMaintenance" id="maitenance-mode" @bind:after="HandleMaintenanceSwitch">
                     </div>
                 </div>
             </div>
@@ -75,17 +75,19 @@
                             <div class="d-flex p-0">
                                 <p>Select which clients you want to apply maintenance mode to</p>
                             </div>
-                            <ClientSelectionDropDown Clients="_clients" Disable="_isAllClient" OnHasChange="HandlePropertyChange"/>
+                            <ClientSelectionDropDown @bind-Clients="_clients" Disable="_isAllClient" OnHasChange="HandlePropertyChange" />
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     }
-	<div>
-		<button class="btn btn-save">Save</button>
-		<button class="btn btn-save" disabled>Save</button>
-		<button class="btn btn-cancel">Cancel</button>
-	</div>
+    @if (_hasChange)
+    {
+        <div>
+            <button class="btn btn-save" @onclick="HandleSaveClick" disabled="@_isProcessing">Save</button>
+            <button class="btn btn-cancel">Cancel</button>
+        </div>
+    }
 </div>
 <MinimalistModal />

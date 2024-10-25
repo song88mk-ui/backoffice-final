@@ -229,22 +229,22 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<bool>> SetMaintenanceV2(SetMaintenanceRequest request, List<string> clientCodes)
+        public async Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request, List<string> clientCodes)
         {
             try
             {
                 var clientIds = request?.ClientIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToUpper()).ToList() ?? new List<string>();
 
-                var clients = GetMaintenanceV2(clientCodes);
-                var referenceClients = clients?.Result?.Result?.ClientConfig;
+                var clients = await GetMaintenanceV2(clientCodes);
+                var referenceClients = clients?.Result?.ClientConfig;
 
                 if (referenceClients == null)
-                    return new BaseResponse<bool>()
+                    return new BaseResponse<MaintenanceResponse>()
                     {
                         StatusCode = StatusCode.Error,
-                        Message = StatusCode.Error.ToString(),
-                        Result = false
+                        Message = StatusCode.Error.ToString()
                     };
+
                 var hasError = false;
                 var errorMessages = new List<string>();
 
@@ -274,20 +274,21 @@ namespace Backoffice.API.Repositories
                     }
                 }
 
-                return new BaseResponse<bool>()
+                clients = await GetMaintenanceV2(clientCodes);
+
+                return new BaseResponse<MaintenanceResponse>()
                 {
-                    StatusCode = StatusCode.Success,
-                    Message = StatusCode.Success.ToString(),
-                    Result = true
+                    StatusCode = clients.StatusCode,
+                    Message = clients.Message,
+                    Result = clients.Result
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<bool>()
+                return new BaseResponse<MaintenanceResponse>()
                 {
                     StatusCode = StatusCode.Error,
-                    Message = ex.Message.ToString(),
-                    Result = false
+                    Message = ex.Message.ToString()
                 };
             }
         }

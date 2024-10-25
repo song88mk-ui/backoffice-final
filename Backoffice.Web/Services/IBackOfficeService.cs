@@ -13,6 +13,7 @@ namespace Backoffice.Web.Services
         LanguageCode LanguageCode { get; set; }
         Task<BaseResponse<bool>> GetMaintenance();
         Task<BaseResponse<MaintenanceResponse>> GetMaintenanceV2();
+        Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request);
         Task<BaseResponse<bool>> SetMaintenance(bool request);
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<MessageResponse>> AddActivityLog(ActivityLogModel request);

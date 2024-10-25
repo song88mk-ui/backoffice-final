@@ -1,5 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Administration.MaintenanceV2;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
@@ -20,6 +21,8 @@ namespace Backoffice.Web.Pages.Administration
         private bool _isMaintenance;
         private bool _isAllClient;
         private bool _isPreloader;
+        private bool _hasChange;
+        private bool _isProcessing;
 
         private Action<EventArgs> _allClientsEvent;
         private Action<EventArgs> _specificClientsEvent;
@@ -105,16 +108,39 @@ namespace Backoffice.Web.Pages.Administration
         {
             var hasChange = value || _isMaintenance != _initialMaintenanceIsOn || _isAllClient != _initialStatusIsAllClient;
 
-            if (hasChange)
-                _saveOptionService.Open();
-            else
-                _saveOptionService.Close();
+            if (hasChange != _hasChange)
+            {
+                _hasChange = hasChange;
+                _shouldRender = true;
+            }
         }
 
-        private void HandleMaintenanceSwitch()
+        public async void HandleSaveClick()
         {
-            HandlePropertyChange();
+            _isProcessing = true;
+            _shouldRender = true;
+
+            var clientIds = string.Empty;
+            if (_isAllClient)
+                clientIds = string.Join(",", _maintenanceConfigModels.Select(c => c.ClientId).ToList());
+            else
+                clientIds = string.Join(",", _clients.Where(c => c.IsChecked).Select(c => c.Value.Split(":").LastOrDefault()).ToList());
+
+            var result = await _backofficeService.SetMaintenanceV2(new SetMaintenanceRequest()
+            {
+                ClientIds = clientIds,
+                IsMaintenance = _isMaintenance
+            });
+
+            _isProcessing = false;
+            _shouldRender = true;
         }
+        public void HandleCancelClick()
+        {
+            _isMaintenance = _initialMaintenanceIsOn;
+            _hasChange = false;
+        }
+        private void HandleMaintenanceSwitch() => HandlePropertyChange();
         private async void HandleSetAlertToast()
         {
             _alertToastService.SetToast("Success");
@@ -147,7 +173,7 @@ namespace Backoffice.Web.Pages.Administration
                     {
                         IsChecked = e.IsMaintenance,
                         Name = _maintenanceConfigModels.Count(c => c.ClientId == e.ClientId) > 1 ? $"{e.App}-{e.ClientName.ToString()}" : $"{e.ClientName.ToString()}",
-                        Value =  _maintenanceConfigModels.Count(c => c.ClientId == e.ClientId) > 1 ? $"{e.App}-{e.ClientId.ToString()}" : $"{e.ClientId.ToString()}"
+                        Value = _maintenanceConfigModels.Count(c => c.ClientId == e.ClientId) > 1 ? $"{e.App}:{e.ClientId.ToString()}" : $"{e.ClientId.ToString()}"
                     }).ToList();
 
                 _liveClients = result.Where(c => c.IsChecked == false).Select(c => c.Name).ToList();
@@ -155,23 +181,6 @@ namespace Backoffice.Web.Pages.Administration
             }
 
             return result;
-        }
-        private async Task<List<SelectListItemWithCheckboxModel<string>>> LoadClientsTest()
-        {
-            var test = new[] { "TSO", "EKT", "MHB", "TSO2", "EKT2", "MHB2", "TSO3", "EKT3", "MHB3" };
-            var testAw = new List<string>()
-            {
-                "Alpha88", "EKings Thailand", "Khelraja", "WSGaming" , "W88"
-            };
-
-            var rand = new Random();
-            return test.Select(e =>
-                new SelectListItemWithCheckboxModel<string>()
-                {
-                    IsChecked = rand.Next(0, 10) % 2 == 0,
-                    Name = e,
-                    Value = e
-                }).ToList();
         }
         private void HandleOnSaveClick()
         {
