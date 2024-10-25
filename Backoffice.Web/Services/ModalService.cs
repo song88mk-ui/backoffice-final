@@ -52,6 +52,11 @@ namespace Backoffice.Web.Services
             OnClose?.Invoke(ModalResult.Cancel(_modalType));
         }
 
+        public void Close()
+        {
+            CloseModal?.Invoke();
+            OnClose?.Invoke(null);
+        }
         public void Close(ModalResult modalResult)
         {
             modalResult.ModalType = _modalType;

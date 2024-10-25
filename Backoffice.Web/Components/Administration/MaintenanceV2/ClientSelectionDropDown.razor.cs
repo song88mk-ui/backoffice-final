@@ -10,13 +10,13 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
     public partial class ClientSelectionDropDown
     {
         [Parameter] public bool Disable { get; set; }
-        [Parameter] public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
-        [Parameter] public EventCallback<List<SelectListItemWithCheckboxModel<string>>> ClientsChanged { get; set; }
+        [Parameter] public List<MaintenanceSelectListItemWithCheckboxModel> Clients { get; set; }
+        [Parameter] public EventCallback<List<MaintenanceSelectListItemWithCheckboxModel>> ClientsChanged { get; set; }
         [Parameter] public EventCallback<bool> OnHasChange { get; set; }
 
         private string _searchField = "";
         private string _selectionCss;
-        private List<SelectListItemWithCheckboxModel<string>> _activeClients = new();
+        private List<MaintenanceSelectListItemWithCheckboxModel> _activeClients = new();
         private bool _init = true;
         private bool _shouldRender = true;
         private List<string> _initialClients = new();
@@ -39,8 +39,11 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
                 _shouldRender = true;
 
                 if (_init)
-                    _initialClients = new(_activeClients.Select(s => s.Value));
+                    _initialClients = new(Clients.Where(c => c.IsMaintenanceEnabled).Select(s => s.Value));
             }
+
+            _init = false;
+
         }
         protected override bool ShouldRender() => _shouldRender;
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
@@ -55,6 +58,9 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
         }
         private async Task HandleRemoveClientClick(string clientId)
         {
+            if (Disable)
+                return;
+
             var client = Clients.FirstOrDefault(c => c.Value == clientId);
             if (client != null)
                 client.IsChecked = false;
@@ -66,11 +72,12 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
 
             _activeClients.Remove(activeClient);
 
+            HandleChangeValue();
             await ClientsChanged.InvokeAsync(Clients);
 
             _shouldRender = true;
         }
-        private async Task HandleCheckboxCheck(SelectListItemWithCheckboxModel<string> client)
+        private async Task HandleCheckboxCheck(MaintenanceSelectListItemWithCheckboxModel client)
         {
             client.IsChecked = !client.IsChecked;
 
@@ -78,23 +85,25 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
             {
                 if (!_activeClients.Any(c => c.Value == client.Value))
                 {
-                    _activeClients.Add(new SelectListItemWithCheckboxModel<string>()
+                    _activeClients.Add(new MaintenanceSelectListItemWithCheckboxModel()
                     {
                         Value = client.Value,
                         Name = client.Name,
-                        IsChecked = client.IsChecked
+                        IsChecked = client.IsChecked,
+                        IsMaintenanceEnabled = client.IsMaintenanceEnabled
                     });
 
                     await ClientsChanged.InvokeAsync(Clients);
                     _shouldRender = true;
                 }
+
+                HandleChangeValue();
             }
             else
             {
                 await HandleRemoveClientClick(client.Value);
             }
 
-            HandleChangeValue();
         }
         private void ReOrderClients()
         {

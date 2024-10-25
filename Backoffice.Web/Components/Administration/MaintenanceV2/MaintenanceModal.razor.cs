@@ -1,4 +1,6 @@
-﻿using Backoffice.Web.Services;
+﻿using Backoffice.Web.Components.Common;
+using Backoffice.Web.Models;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -8,19 +10,26 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
     public partial class MaintenanceModal
     {
         [Inject] private IModalService ModalService { get; set; }
-        protected override void OnInitialized()
-        {
-            ((ModalService)ModalService).OnOpenV2 += Open;
-            ((ModalService)ModalService).CloseModal += Close;
-        }
-        public void Open()
-        {
+        [CascadingParameter] public ModalParameters ModalParameters { get; set; }
+        [CascadingParameter] public MinimalistModal Modal { get; set; }
 
-        }
-        public void Close()
-        {
+        private bool _value;
+        private bool _isMaintenanceSwitch;
 
-            StateHasChanged();
+        protected override async Task OnInitializedAsync()
+        {
+            _isMaintenanceSwitch = ModalParameters.TryGet<bool>("IsMainteanceSwitch");
+            _value = ModalParameters.TryGet<bool>("Value");
+        }
+        public async Task HandleApplyClick()
+        {
+            ModalService.Cancel();
+
+            await Modal.OnSaveClickCallback.InvokeAsync(new Tuple<bool, bool>(_isMaintenanceSwitch, _value));
+        }
+        public async Task HandleCancelClick()
+        {
+            ModalService.Cancel();
         }
     }
 }

@@ -1,4 +1,25 @@
-﻿.modal-body {
-
-
+﻿.modal-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
 }
+
+    .modal-footer .modal-btn {
+        border-radius: 0.5rem;
+        color: #FFFFFF;
+        height: 3rem;
+        width: 9.5rem;
+    }
+
+    .modal-footer .modal-close {
+        border: 1px solid #dee2e6;
+        background: #FFFFFF;
+        color: #344054;
+    }
+
+    .modal-footer .modal-apply {
+        background: #FF6B00;
+        width: 134px;
+        height: 44px;
+    }

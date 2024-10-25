@@ -37,6 +37,10 @@ p, i {
     margin: 0;
 }
 
+.dropdown.disabled {
+    opacity: 0.6
+}
+
 .dropdown-menu {
     border-radius: 6px;
     font-size: 14px;

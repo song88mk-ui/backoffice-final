@@ -3,7 +3,7 @@
 @page "/admin/v2/maintenance"
 @using Backoffice.Web.Components.Administration.MaintenanceV2
 
-<div class="row maintenance m-3">
+<div class="row maintenance me-3">
     @if (_isPreloader)
     {
         <Preloader />
@@ -35,7 +35,7 @@
                 </div>
                 <div>
                     <div class="form-switch d-flex justify-content-center">
-                        <input class="form-check-input me-3" type="checkbox" @bind="@_isMaintenance" id="maitenance-mode" @bind:after="HandleMaintenanceSwitch">
+                        <input class="form-check-input me-3" type="checkbox" id="maitenance-mode" @bind="IsMaintenance">
                     </div>
                 </div>
             </div>
@@ -75,7 +75,7 @@
                             <div class="d-flex p-0">
                                 <p>Select which clients you want to apply maintenance mode to</p>
                             </div>
-                            <ClientSelectionDropDown @bind-Clients="_clients" Disable="_isAllClient" OnHasChange="HandlePropertyChange" />
+                            <ClientSelectionDropDown @bind-Clients="_clients" Disable="_isAllClient || _isDropDownDisabled" OnHasChange="HandlePropertyChange" />
                         </div>
                     </div>
                 </div>
@@ -86,8 +86,8 @@
     {
         <div>
             <button class="btn btn-save" @onclick="HandleSaveClick" disabled="@_isProcessing">Save</button>
-            <button class="btn btn-cancel">Cancel</button>
+            <button class="btn btn-cancel" @onclick="HandleCancel">Cancel</button>
         </div>
     }
 </div>
-<MinimalistModal />
+<MinimalistModal OnSaveClickCallback="HandleModalSaveClick"/>

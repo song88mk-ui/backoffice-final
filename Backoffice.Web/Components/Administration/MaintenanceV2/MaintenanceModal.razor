@@ -1,8 +1,12 @@
-﻿<div class="modal-body px-3 p-0">
+﻿<div class="modal-body p-0 mx-4">
     <div class="d-flex flex-column justify-content-center p-2">
         <div>
             <p class="title fw-bolder">Change Maintenance Mode</p>
             <p class="m-0">You are about to change the maintenance mode setting. Are you sure you want to proceed?</p>
         </div>
     </div>
+</div>
+<div class="modal-footer mt-3">
+    <button type="button" class="btn modal-btn modal-close" @onclick="HandleCancelClick">@_translationState.GetValue("Cancel")</button>
+    <button type="button" class="btn modal-btn modal-apply" @onclick="HandleApplyClick">@_translationState.GetValue("Confirm")</button>
 </div>

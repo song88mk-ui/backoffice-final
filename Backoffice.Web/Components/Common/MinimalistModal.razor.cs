@@ -8,6 +8,7 @@ namespace Backoffice.Web.Components.Common
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
+        [Parameter] public EventCallback<object> OnSaveClickCallback { get; set; }
         [Parameter] public EventCallback<object> OnCancelClickCallback { get; set; }
         private RenderFragment ModalContent { get; set; }
         private ModalParameters ModalParameters { get; set; }
@@ -81,6 +82,7 @@ namespace Backoffice.Web.Components.Common
 
             StateHasChanged();
         }
+
 
         public async Task OnBack()
         {

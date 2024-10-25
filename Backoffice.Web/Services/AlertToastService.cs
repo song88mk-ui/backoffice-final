@@ -8,6 +8,7 @@ namespace Backoffice.Web.Services
     public class AlertToastService : IDisposable
     {
         public event EventHandler? ToasterChanged;
+        public event EventHandler? LoadToastChanged;
         public bool HasMessage => _message != null;
 
         private string? _message;
@@ -31,6 +32,15 @@ namespace Backoffice.Web.Services
                 return;
 
             ClearToast();
+        }
+        public async Task SetLoadingToast(string message)
+        {
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            _message = message;
+
+            this.LoadToastChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void ClearToast()

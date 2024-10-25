@@ -14,6 +14,7 @@ namespace Backoffice.Web.Services
 
         void Open(Type contentComponent, string title, ModalParameters parameters, ModalOptions options);
 
+        void Close();
         void Close(ModalResult modalResult);
         void Cancel();
     }
