@@ -12,9 +12,11 @@ using Backoffice.Shared.ExternalApis.Maintenance;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -33,7 +35,8 @@ namespace Backoffice.API.Repositories
     {
         private readonly ITradingRepository _tradingRepository;
 
-        private HttpClient _httpClient { get; set; }
+        private readonly TelemetryClient _telemetryClient;
+        private HttpClient _httpClient;
         private string _fileName = Path.Join("web", "config.json");
         private BlobClient _blobClient = null;
         private List<MaintenanceModel> _clientsConfigs = new List<MaintenanceModel>();
@@ -43,7 +46,7 @@ namespace Backoffice.API.Repositories
         private readonly ActivitySource _activitySource;
 
 
-        public MaintenanceRepository(IConfiguration configuration, HttpClient httpClient, ITradingRepository tradingRepository, Instrumentation instrumentation)
+        public MaintenanceRepository(IConfiguration configuration, HttpClient httpClient, ITradingRepository tradingRepository, TelemetryClient telemetryClient)
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(configuration["ConnectionStrings:AzureStorage"]);
             BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("assets");
@@ -52,11 +55,11 @@ namespace Backoffice.API.Repositories
             _isStaging = bool.Parse(configuration["IsStaging"]);
             _internalClient = "71BBE7D8-FD04-459C-6D8B-08D9354E5B64";
             _tradingRepository = tradingRepository;
+            _telemetryClient = telemetryClient;
 
             _maintenanceApps = configuration["Maintenance:Apps"]?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.Select(s => s.Trim().ToUpper()).ToList() ?? null;
 
             _httpClient = httpClient;
-            _activitySource = instrumentation.ActivitySource;
         }
 
         #region Methods
@@ -155,11 +158,13 @@ namespace Backoffice.API.Repositories
                     clientReference = clientReference.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
 
                 if (clientReference == null)
+                {
                     return new BaseResponse<MaintenanceResponse>()
                     {
                         StatusCode = clientResponse.StatusCode,
                         Message = $"Empty client reference : {clientCodes?.Join(",") ?? "No Clients"}"
                     };
+                }
 
                 var clientsConfig = new List<MaintenanceConfigModel>();
 
@@ -170,11 +175,15 @@ namespace Backoffice.API.Repositories
 
                     if (response.StatusCode != System.Net.HttpStatusCode.OK)
                     {
-                        return new BaseResponse<MaintenanceResponse>()
+                        var properties = new Dictionary<string, string>
                         {
-                            StatusCode = StatusCode.Error,
-                            Message = $"Error: {content}"
+                            { "app", app },
+                            { "status", response.StatusCode.ToString() },
+                            { "events", content }
                         };
+
+                        _telemetryClient.TrackEvent($"e:backoffice-maintenance.client", properties);
+                        continue;
                     }
 
                     var extexrnalConfigs = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

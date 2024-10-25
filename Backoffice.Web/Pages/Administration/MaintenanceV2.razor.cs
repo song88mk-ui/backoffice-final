@@ -80,6 +80,7 @@ namespace Backoffice.Web.Pages.Administration
             {
                 _isPreloader = false;
                 _shouldRender = true;
+                StateHasChanged();
             }
         }
         private void ChangeMode(bool isAllClient)
@@ -148,6 +149,9 @@ namespace Backoffice.Web.Pages.Administration
                         Name = e.ClientName,
                         Value = e.ClientId.ToString()
                     }).ToList();
+
+                _liveClients = result.Where(c => c.IsChecked == false).Select(c => c.Name).ToList();
+                _underMaintenanceClients = result.Where(c => c.IsChecked == true).Select(c => c.Name).ToList();
             }
 
             return result;

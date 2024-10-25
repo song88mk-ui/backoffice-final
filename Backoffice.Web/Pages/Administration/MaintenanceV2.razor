@@ -19,8 +19,6 @@
                 </div>
             </div>
         </div>
-        <ClientState IsLive="true" IsCompleteClients="true" />
-        <ClientState IsCompleteClients="true" />
         @if (_liveClients.Any())
         {
             <ClientState Clients="_liveClients" IsLive="true" IsCompleteClients="@(!_underMaintenanceClients.Any())" />
