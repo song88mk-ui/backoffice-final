@@ -165,6 +165,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _isSelectedLeagueShowing = false;
             }
 
+            StateHasChanged();
             await OnStateHasChange.InvokeAsync();
         }
 
