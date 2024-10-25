@@ -152,7 +152,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             _selectedConfigClients = new();
             _alertModel = new();
-            await LoadLeagues();
 
             if (e is AlertModel)
             {
@@ -165,6 +164,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
                 _isSelectedLeagueShowing = false;
             }
+
+            await OnStateHasChange.InvokeAsync();
         }
 
         public async Task HandleSearchInput()

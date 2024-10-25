@@ -141,7 +141,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             CalculateConfigCounts();
 
             _isPreloader = true;
-            _shouldRender = true;
             _contentFilterModel = new ConfigContentFilterModel();
             _contentFilterModel.Scopes = _scopes;
 
@@ -160,6 +159,12 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         private async void CalculateConfigCounts()
         {
+            _navMenuParamModel.MyTemplatesCount = -1;
+            _navMenuParamModel.AssignedLeaguesCount = -1;
+            _navMenuParamModel.UnAssignedLeaguesCount = -1;
+            
+            _shouldRender = true;
+
             _cts?.Cancel();
 
             _cts = new CancellationTokenSource();
