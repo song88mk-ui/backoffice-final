@@ -79,7 +79,9 @@ namespace Backoffice.API.Controllers.Backoffice
         [HttpPost("v2/maintenance")]
         public async Task<IActionResult> SetMaintenanceV2([FromBody] SetMaintenanceRequest request)
         {
-            var result = await _maintenanceRepository.SetMaintenanceV2(request);
+            var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
+
+            var result = await _maintenanceRepository.SetMaintenanceV2(request, clientCodes);
 
             switch (result.StatusCode)
             {

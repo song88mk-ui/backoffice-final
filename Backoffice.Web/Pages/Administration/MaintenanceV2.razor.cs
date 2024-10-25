@@ -146,8 +146,8 @@ namespace Backoffice.Web.Pages.Administration
                     new SelectListItemWithCheckboxModel<string>()
                     {
                         IsChecked = e.IsMaintenance,
-                        Name = e.ClientName,
-                        Value = e.ClientId.ToString()
+                        Name = _maintenanceConfigModels.Count(c => c.ClientId == e.ClientId) > 1 ? $"{e.App}-{e.ClientName.ToString()}" : $"{e.ClientName.ToString()}",
+                        Value =  _maintenanceConfigModels.Count(c => c.ClientId == e.ClientId) > 1 ? $"{e.App}-{e.ClientId.ToString()}" : $"{e.ClientId.ToString()}"
                     }).ToList();
 
                 _liveClients = result.Where(c => c.IsChecked == false).Select(c => c.Name).ToList();

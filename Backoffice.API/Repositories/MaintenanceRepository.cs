@@ -170,7 +170,7 @@ namespace Backoffice.API.Repositories
 
                 foreach (var app in _maintenanceApps)
                 {
-                    var response = await _httpClient.GetAsync($"/v1.0/invoke/{app}/method/maintenance");
+                    var response = await _httpClient.GetAsync($"/v1.0/invoke/{app.ToLower()}/method/maintenance");
                     var content = await response.Content.ReadAsStringAsync();
 
                     if (response.StatusCode != System.Net.HttpStatusCode.OK)
@@ -229,13 +229,13 @@ namespace Backoffice.API.Repositories
                 };
             }
         }
-        public async Task<BaseResponse<bool>> SetMaintenanceV2(SetMaintenanceRequest request)
+        public async Task<BaseResponse<bool>> SetMaintenanceV2(SetMaintenanceRequest request, List<string> clientCodes)
         {
             try
             {
                 var clientIds = request?.ClientIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToUpper()).ToList() ?? new List<string>();
 
-                var clients = GetMaintenanceV2(clientIds);
+                var clients = GetMaintenanceV2(clientCodes);
                 var referenceClients = clients?.Result?.Result?.ClientConfig;
 
                 if (referenceClients == null)
@@ -260,7 +260,7 @@ namespace Backoffice.API.Repositories
                         continue;
                     }
 
-                    var result = await _httpClient.PostAsync($"/v1.0/invoke/{reference.App}/method/maintenance", new StringContent(JsonSerializer.Serialize(new
+                    var result = await _httpClient.PostAsync($"/v1.0/invoke/{reference.App.ToLower()}/method/maintenance", new StringContent(JsonSerializer.Serialize(new
                     {
                         ClientId = item,
                         reference.IsMaintenance,
