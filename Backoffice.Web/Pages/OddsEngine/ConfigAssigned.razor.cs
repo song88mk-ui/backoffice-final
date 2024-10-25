@@ -207,6 +207,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _isSelectedLeagueShowing = false;
                 await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
             }
+
+            _shouldRender = true;
         }
         public async Task HandleClearSelectionClick()
         {
