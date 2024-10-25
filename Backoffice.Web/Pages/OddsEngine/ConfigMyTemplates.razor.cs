@@ -159,7 +159,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             }
 
-            Task task = LoadConfigTemplates();
+            await LoadConfigTemplates();
         }
 
         public async Task HandleSearchInput() => await LoadConfigTemplates();
