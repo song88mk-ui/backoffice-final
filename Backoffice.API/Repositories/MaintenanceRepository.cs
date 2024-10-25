@@ -259,7 +259,7 @@ namespace Backoffice.API.Repositories
 
                     var stringPayload = JsonSerializer.Serialize(new
                     {
-                        ClientIds = (clientIds.Count() == 1 && clientIds.FirstOrDefault().ToUpper() == "ALL") ? "All" : string.Join(",", appGroup.Select(c => c.ClientId)),
+                        ClientIds = (clientIds.Count() == 1 && clientIds.FirstOrDefault().ToUpper() == "ALL") ? "ALL" : string.Join(",", appGroup.Select(c => c.ClientId)),
                         request.IsMaintenance
                     });
 

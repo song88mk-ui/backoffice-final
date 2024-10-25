@@ -20,7 +20,7 @@ namespace Backoffice.Web.Pages.Administration
         private bool _init = true;
         private bool _shouldRender = true;
         private bool _isMaintenance;
-        private bool _isAllClient;
+        private bool _isAllClient = true;
         private bool _isPreloader;
         private bool _hasChange;
         private bool _isProcessing;
@@ -67,15 +67,14 @@ namespace Backoffice.Web.Pages.Administration
                 _hasChange = false;
                 _clients = await LoadClients();
 
-                var isAllClient = true;
                 _liveClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == false).Select(c => c.ClientName).ToList();
                 _underMaintenanceClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == true).Select(c => c.ClientName).ToList();
 
                 _liveClients = _clients.Where(c => !c.IsChecked).Select(s => s.Value).ToList();
                 _underMaintenanceClients = _clients.Where(c => c.IsChecked).Select(s => s.Value).ToList();
 
-                ChangeMode(isAllClient);
-                _initialStatusIsAllClient = isAllClient;
+                ChangeMode(_isAllClient);
+                _initialStatusIsAllClient = _isAllClient;
                 _initialMaintenanceIsOn = _isMaintenance;
             }
             catch (Exception ex)
@@ -96,11 +95,15 @@ namespace Backoffice.Web.Pages.Administration
             {
                 _maintenanceModeAllClientsCss = "active";
                 _maintenanceModeSpecificClientsCss = "";
+
+                _isMaintenance = _maintenanceConfigModels.All(c => c.IsMaintenance);
             }
             else
             {
                 _maintenanceModeAllClientsCss = "";
                 _maintenanceModeSpecificClientsCss = "active";
+
+                _isMaintenance = _clients.Any(c => c.IsChecked);
             }
 
             _shouldRender = true;
