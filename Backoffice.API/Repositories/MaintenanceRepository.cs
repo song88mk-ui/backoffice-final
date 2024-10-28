@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -54,19 +55,34 @@ namespace Backoffice.API.Repositories
             _tradingRepository = tradingRepository;
             _telemetryClient = telemetryClient;
 
-            var blobServiceClientv2 = new BlobServiceClient(
-                    new Uri("https://prodstoragecdn.blob.core.windows.net"),
-                    new DefaultAzureCredential());
-            _containerClient = blobServiceClientv2.GetBlobContainerClient("assets");
-
-            var env = Environment.GetEnvironmentVariable("PLATFORM_WEB_ENV_NAME") ?? "dev";
             var configFilename = "configv2.json";
-
+            var env = Environment.GetEnvironmentVariable("PLATFORM_WEB_ENV_NAME") ?? "dev";
             _fileName = env.ToLower() switch
             {
                 "production" => Path.Join("web", "production", configFilename),
                 _ => Path.Join("web", "staging", configFilename)
             };
+
+            try
+            {
+                var blobServiceClientv2 = new BlobServiceClient(
+                        new Uri("https://prodstoragecdn.blob.core.windows.net"),
+                        new DefaultAzureCredential());
+                _containerClient = blobServiceClientv2.GetBlobContainerClient("assets");
+            }
+            catch (Exception ex)
+            {
+                var properties = new Dictionary<string, string>
+                            {
+                                { "env", env },
+                                { "filename", _fileName },
+                                { "message", ex.Message },
+                                { "events", ex.StackTrace }
+                            };
+
+                _telemetryClient.TrackEvent($"e:backoffice-maintenance.init", properties);
+            }
+
 
             _maintenanceApps = configuration["Maintenance:Apps"]?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.Select(s => s.Trim().ToUpper()).ToList() ?? null;
 
@@ -194,11 +210,11 @@ namespace Backoffice.API.Repositories
                         if (response.StatusCode != System.Net.HttpStatusCode.OK)
                         {
                             var properties = new Dictionary<string, string>
-                        {
-                            { "app", app },
-                            { "status", response.StatusCode.ToString() },
-                            { "events", content }
-                        };
+                            {
+                                { "app", app },
+                                { "status", response.StatusCode.ToString() },
+                                { "events", content }
+                            };
 
                             _telemetryClient.TrackEvent($"e:backoffice-maintenance.get.client", properties);
                             continue;
