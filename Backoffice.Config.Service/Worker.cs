@@ -14,6 +14,7 @@ namespace Backoffice.Config.Service
 {
     public class Worker : BackgroundService
     {
+        //
         private readonly ILogger<Worker> _logger;
         private readonly IMessageBroker _messageBroker;
         private readonly IBackofficeRepository _backofficeRepository;
