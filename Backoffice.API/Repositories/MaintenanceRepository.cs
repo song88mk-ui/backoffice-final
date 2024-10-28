@@ -385,19 +385,35 @@ namespace Backoffice.API.Repositories
         }
         private List<ExternalMaintenanceConfig> GetConfigV2()
         {
-            var bobClient = _containerClient.GetBlobClient(_fileName);
-
             var result = "";
-            if (bobClient.ExistsAsync().Result)
+            try
             {
-                var response = bobClient.DownloadAsync().Result;
-                using (var streamReader = new StreamReader(response.Value.Content))
+                var bobClient = _containerClient.GetBlobClient(_fileName);
+
+                if (bobClient.ExistsAsync().Result)
                 {
-                    while (!streamReader.EndOfStream)
+                    var response = bobClient.DownloadAsync().Result;
+                    using (var streamReader = new StreamReader(response.Value.Content))
                     {
-                        result += streamReader.ReadLineAsync().Result;
+                        while (!streamReader.EndOfStream)
+                        {
+                            result += streamReader.ReadLineAsync().Result;
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                var env = Environment.GetEnvironmentVariable("PLATFORM_WEB_ENV_NAME") ?? "dev";
+                var properties = new Dictionary<string, string>
+                            {
+                                { "env", env },
+                                { "filename", _fileName },
+                                { "message", ex.Message },
+                                { "events", ex.StackTrace }
+                            };
+
+                _telemetryClient.TrackEvent($"e:backoffice-maintenance.init", properties);
             }
 
             return string.IsNullOrEmpty(result) ? new List<ExternalMaintenanceConfig>() : JsonSerializer.Deserialize<List<ExternalMaintenanceConfig>>(result, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
