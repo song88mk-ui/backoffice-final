@@ -172,7 +172,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task HandleSearchInput()
         {
             _stateFilterModel.SearchText = _searchForm.SearchText;
-            await LoadLeagues();
+            await HandledPageSelect(1);
         }
 
         public async Task HandledPageSelect(int selectedPage)
