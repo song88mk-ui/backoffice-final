@@ -21,7 +21,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -333,12 +332,12 @@ namespace Backoffice.API.Repositories
                             errorMessages.Add($"{result.StatusCode} - {app} - {content}");
 
                             var properties = new Dictionary<string, string>
-                        {
-                            { "app", app },
-                            { "status" , result.StatusCode.ToString() },
-                            { "payload", stringPayload },
-                            {  "event" , content }
-                        };
+                            {
+                                { "app", app },
+                                { "status" , result.StatusCode.ToString() },
+                                { "payload", stringPayload },
+                                {  "event" , content }
+                            };
 
                             _telemetryClient.TrackEvent($"e:backoffice-maintenance.set.client", properties);
                         }
