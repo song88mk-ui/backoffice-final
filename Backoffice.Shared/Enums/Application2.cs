@@ -5,8 +5,10 @@ namespace Backoffice.Shared.Enums
     {
         Backoffice = 1001,
         Sportsbook = 1002,
-        AgentManagementSystem = 1003
+        AgentManagementSystem = 1003,
+        ClientChecklist = 1004
     }
+
     public enum Application2
     {
         None = 0,
