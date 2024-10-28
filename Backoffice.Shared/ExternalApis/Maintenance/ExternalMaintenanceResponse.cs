@@ -12,6 +12,7 @@ namespace Backoffice.Shared.ExternalApis.Maintenance
     {
         public string ClientId { get; set; }
         public bool IsMaintenance { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Site { get; set; }
     }
 }

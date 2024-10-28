@@ -6,7 +6,6 @@ using Azure.ResourceManager.Cdn;
 using Azure.ResourceManager.Cdn.Models;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Backoffice.API.Telemetry;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.ExternalApis.Maintenance;
 using Backoffice.Shared.Models;
@@ -14,9 +13,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -24,11 +21,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Backoffice.API.Repositories
 {
@@ -45,6 +40,7 @@ namespace Backoffice.API.Repositories
         private readonly string _internalClient;
         private readonly List<string>? _maintenanceApps;
         private readonly ActivitySource _activitySource;
+        private BlobContainerClient _containerClient;
 
 
         public MaintenanceRepository(IConfiguration configuration, HttpClient httpClient, ITradingRepository tradingRepository, TelemetryClient telemetryClient)
@@ -57,6 +53,20 @@ namespace Backoffice.API.Repositories
             _internalClient = "71BBE7D8-FD04-459C-6D8B-08D9354E5B64";
             _tradingRepository = tradingRepository;
             _telemetryClient = telemetryClient;
+
+            var blobServiceClientv2 = new BlobServiceClient(
+                    new Uri("https://prodstoragecdn.blob.core.windows.net"),
+                    new DefaultAzureCredential());
+            _containerClient = blobServiceClientv2.GetBlobContainerClient("assets");
+
+            var env = Environment.GetEnvironmentVariable("PLATFORM_WEB_ENV_NAME") ?? "dev";
+            var configFilename = "configv2.json";
+
+            _fileName = env.ToLower() switch
+            {
+                "production" => Path.Join("web", "production", configFilename),
+                _ => Path.Join("web", "staging", configFilename)
+            };
 
             _maintenanceApps = configuration["Maintenance:Apps"]?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.Select(s => s.Trim().ToUpper()).ToList() ?? null;
 
@@ -171,27 +181,36 @@ namespace Backoffice.API.Repositories
 
                 foreach (var app in _maintenanceApps)
                 {
-                    var response = await _httpClient.GetAsync($"/v1.0/invoke/{app.ToLower()}/method/maintenance");
-                    var content = await response.Content.ReadAsStringAsync();
-
-                    if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                    var configs = new List<ExternalMaintenanceConfig>();
+                    if (app.Equals("bl", StringComparison.OrdinalIgnoreCase))
                     {
-                        var properties = new Dictionary<string, string>
+                        configs = GetConfigV2();
+                    }
+                    else
+                    {
+                        var response = await _httpClient.GetAsync($"/v1.0/invoke/{app.ToLower()}/method/maintenance");
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                        {
+                            var properties = new Dictionary<string, string>
                         {
                             { "app", app },
                             { "status", response.StatusCode.ToString() },
                             { "events", content }
                         };
 
-                        _telemetryClient.TrackEvent($"e:backoffice-maintenance.get.client", properties);
-                        continue;
+                            _telemetryClient.TrackEvent($"e:backoffice-maintenance.get.client", properties);
+                            continue;
+                        }
+
+                        var extexrnalConfigs = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                        configs = extexrnalConfigs.Config;
                     }
 
-                    var extexrnalConfigs = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-
-                    if (extexrnalConfigs?.Config != null)
+                    if (configs != null && configs.Any())
                     {
-                        foreach (var config in extexrnalConfigs.Config)
+                        foreach (var config in configs)
                         {
                             var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase));
 
@@ -234,7 +253,7 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var clientIds = request?.ClientIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToUpper()).ToList() ?? new List<string>();
+                var requestClientIds = request?.ClientIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToUpper()).ToList() ?? new List<string>();
 
                 var clients = await GetMaintenanceV2(clientCodes);
                 var referenceClients = clients?.Result?.ClientConfig;
@@ -249,30 +268,55 @@ namespace Backoffice.API.Repositories
                 var hasError = false;
                 var errorMessages = new List<string>();
 
-                var appGroups = referenceClients.Where(c => (clientIds.Count() == 1 && clientIds.FirstOrDefault().ToUpper() == "ALL")
-                                                || (clientIds.Any(ci => (ci.Contains(":") && ci.Contains($"{c.App}:{c.ClientId}", StringComparison.OrdinalIgnoreCase)) || ci == c.ClientId)))
+                var appGroups = referenceClients.Where(c => (requestClientIds.Count() == 1 && requestClientIds.FirstOrDefault().ToUpper() == "ALL")
+                                                || (requestClientIds.Any(ci => (ci.Contains(":") && ci.Contains($"{c.App}:{c.ClientId}", StringComparison.OrdinalIgnoreCase)) || ci == c.ClientId)))
                                                 .GroupBy(c => c.App).ToList();
 
                 foreach (var appGroup in appGroups)
                 {
                     var app = appGroup.Key.ToLower();
+                    var clientIds = (requestClientIds.Count() == 1 && requestClientIds.FirstOrDefault().ToUpper() == "ALL") ? "all" : string.Join(",", appGroup.Select(c => c.ClientId));
 
-                    var stringPayload = JsonSerializer.Serialize(new
+                    if (app.Equals("bl", StringComparison.OrdinalIgnoreCase))
                     {
-                        ClientIds = (clientIds.Count() == 1 && clientIds.FirstOrDefault().ToUpper() == "ALL") ? "all" : string.Join(",", appGroup.Select(c => c.ClientId)),
-                        request.IsMaintenance
-                    });
+                        var configs = appGroup.Select(s => new ExternalMaintenanceConfig
+                        {
+                            ClientId = s.ClientId,
+                            IsMaintenance = s.IsMaintenance
+                        }).ToList();
 
-                    var result = await _httpClient.PostAsync($"/v1.0/invoke/{app}/method/maintenance", new StringContent(stringPayload, Encoding.UTF8, "application/json"));
+                        configs.ForEach(config =>
+                        {
+                            if (clientIds.Contains(config.ClientId, StringComparison.OrdinalIgnoreCase))
+                            {
+                                config.IsMaintenance = request.IsMaintenance;
+                            }
+                        });
 
-                    if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                        await UploadToAzureV2(configs.Select(s => new
+                        {
+                            s.ClientId,
+                            s.IsMaintenance
+                        }).ToList());
+                    }
+                    else
                     {
-                        hasError = true;
+                        var stringPayload = JsonSerializer.Serialize(new
+                        {
+                            ClientIds = clientIds,
+                            request.IsMaintenance
+                        });
 
-                        var content = await result.Content.ReadAsStringAsync();
-                        errorMessages.Add($"{result.StatusCode} - {app} - {content}");
+                        var result = await _httpClient.PostAsync($"/v1.0/invoke/{app}/method/maintenance", new StringContent(stringPayload, Encoding.UTF8, "application/json"));
 
-                        var properties = new Dictionary<string, string>
+                        if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                        {
+                            hasError = true;
+
+                            var content = await result.Content.ReadAsStringAsync();
+                            errorMessages.Add($"{result.StatusCode} - {app} - {content}");
+
+                            var properties = new Dictionary<string, string>
                         {
                             { "app", app },
                             { "status" , result.StatusCode.ToString() },
@@ -280,7 +324,8 @@ namespace Backoffice.API.Repositories
                             {  "event" , content }
                         };
 
-                        _telemetryClient.TrackEvent($"e:backoffice-maintenance.set.client", properties);
+                            _telemetryClient.TrackEvent($"e:backoffice-maintenance.set.client", properties);
+                        }
                     }
                 }
 
@@ -320,7 +365,26 @@ namespace Backoffice.API.Repositories
                 }
             }
 
-            return System.Text.Json.JsonSerializer.Deserialize<List<MaintenanceModel>>(result, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return JsonSerializer.Deserialize<List<MaintenanceModel>>(result, new JsonSerializerOptions { PropertyNameCaseInsensitive = true, });
+        }
+        private List<ExternalMaintenanceConfig> GetConfigV2()
+        {
+            var bobClient = _containerClient.GetBlobClient(_fileName);
+
+            var result = "";
+            if (bobClient.ExistsAsync().Result)
+            {
+                var response = bobClient.DownloadAsync().Result;
+                using (var streamReader = new StreamReader(response.Value.Content))
+                {
+                    while (!streamReader.EndOfStream)
+                    {
+                        result += streamReader.ReadLineAsync().Result;
+                    }
+                }
+            }
+
+            return string.IsNullOrEmpty(result) ? new List<ExternalMaintenanceConfig>() : JsonSerializer.Deserialize<List<ExternalMaintenanceConfig>>(result, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
         private async Task<bool> UploadToAzure(List<MaintenanceModel> content)
         {
@@ -341,6 +405,22 @@ namespace Backoffice.API.Repositories
                 CdnEndpointResource cdnEndpoint = client.GetCdnEndpointResource(cdnEndpointResourceId);
 
                 await cdnEndpoint.PurgeContentAsync(WaitUntil.Completed, new PurgeContent(new string[] { "/web/config.json" }));
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        private async Task<bool> UploadToAzureV2(object content)
+        {
+            try
+            {
+                BlobClient blobClient = _containerClient.GetBlobClient(_fileName);
+
+                var stream = new MemoryStream(Encoding.Default.GetBytes(JsonSerializer.Serialize(content, new JsonSerializerOptions { WriteIndented = true })));
+                await blobClient.UploadAsync(stream, true);
+                var test = await blobClient.UploadAsync(_fileName, true);
                 return true;
             }
             catch (Exception)
