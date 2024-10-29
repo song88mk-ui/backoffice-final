@@ -51,7 +51,7 @@
                     <div class="maintenance-mode-container all-clients border border-2 px-3 mb-3 @_maintenanceModeAllClientsCss">
                         <div class="d-flex align-items-center gap-3">
                             <div class="wrapper-input">
-                                <input type="radio" name="one" id="radio1" checked="@_isAllClient" @onchange="_allClientsEvent">
+                                <input type="radio" name="one" id="radio1" checked="@_isAllClientMode" @onchange="_allClientsEvent">
                                 <label for="radio1"></label>
                             </div>
                             <div class="option-item">
@@ -63,7 +63,7 @@
                     <div class="maintenance-mode-container specific-clients border border-2 px-3 mb-3 @_maintenanceModeSpecificClientsCss">
                         <div class="d-flex align-items-center gap-3 pb-3">
                             <div class="wrapper-input">
-                                <input type="radio" name="one" id="radio2" checked="@(!_isAllClient)" @onchange="_specificClientsEvent">
+                                <input type="radio" name="one" id="radio2" checked="@(!_isAllClientMode)" @onchange="_specificClientsEvent">
                                 <label for="radio2"></label>
                             </div>
                             <div class="option-item">
@@ -75,7 +75,7 @@
                             <div class="d-flex p-0">
                                 <p>Select which clients you want to apply maintenance mode to</p>
                             </div>
-                            <ClientSelectionDropDown @bind-Clients="_clients" Disable="_isAllClient || _isDropDownDisabled" OnHasChange="HandlePropertyChange" />
+                            <ClientSelectionDropDown @bind-Clients="_clients" Disable="_isAllClientMode || _isDropDownDisabled" OnHasChange="HandlePropertyChange" />
                         </div>
                     </div>
                 </div>

@@ -18,7 +18,8 @@ namespace Backoffice.Web.Pages.Administration
 
         private bool _init = true;
         private bool _shouldRender = true;
-        private bool _isAllClient = true;
+        private bool _isAllClientMode = true;
+        private bool _isAllClient = false;
         private bool _isMaintenance;
         private bool _isPreloader;
         private bool _hasChange;
@@ -38,28 +39,8 @@ namespace Backoffice.Web.Pages.Administration
             }
         }
 
-        //public bool IsAllClient
-        //{
-        //    get { return _isAllClient; }
-        //    set
-        //    {
-        //        ChangeMode(!value);
-        //        _shouldRender = true;
-        //    }
-        //}
-        //public bool IsSpecificClient
-        //{
-        //    get { return !_isAllClient; }
-        //    set
-        //    {
-        //        ChangeMode(value);
-        //        _shouldRender = true;
-        //    }
-        //}
-
         private Action<EventArgs> _allClientsEvent;
         private Action<EventArgs> _specificClientsEvent;
-        //private bool _hasChange;
 
         private bool _initialStatusIsAllClient;
         private bool _initialMaintenanceIsOn;
@@ -102,10 +83,12 @@ namespace Backoffice.Web.Pages.Administration
                 _liveClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == false).Select(c => c.ClientName).ToList();
                 _underMaintenanceClients = _maintenanceConfigModels.Where(c => c.IsMaintenance == true).Select(c => c.ClientName).ToList();
 
+
+                _isAllClient = (_underMaintenanceClients.Any() && !_liveClients.Any()) || (!_underMaintenanceClients.Any() && _liveClients.Any());
                 _isDropDownDisabled = _underMaintenanceClients.Any();
 
-                HandleChangeMode(_isAllClient);
-                _initialStatusIsAllClient = _isAllClient;
+                HandleChangeMode(_isAllClientMode);
+                _initialStatusIsAllClient = _isAllClientMode;
                 _initialMaintenanceIsOn = _isMaintenance;
             }
             catch (Exception ex)
@@ -128,7 +111,7 @@ namespace Backoffice.Web.Pages.Administration
         private void HandlePropertyChange(bool value)
         {
             var hasChange = _hasChange;
-            if (!_isAllClient)
+            if (!_isAllClientMode)
             {
                 if (value != _clienHasChange)
                     _clienHasChange = value;
@@ -166,9 +149,9 @@ namespace Backoffice.Web.Pages.Administration
         {
             _hasChange = false;
 
-            _isAllClient = isAllClient;
+            _isAllClientMode = isAllClient;
 
-            if (_isAllClient)
+            if (_isAllClientMode)
             {
                 _maintenanceModeAllClientsCss = "active";
                 _maintenanceModeSpecificClientsCss = "";
@@ -193,7 +176,7 @@ namespace Backoffice.Web.Pages.Administration
             _shouldRender = true;
 
             var clientIds = string.Empty;
-            if (_isAllClient)
+            if (_isAllClientMode)
                 clientIds = "All";
             else
                 clientIds = string.Join(",", _clients.Where(c => c.IsChecked).Select(c => c.Value).ToList());
