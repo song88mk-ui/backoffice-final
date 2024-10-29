@@ -12,6 +12,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Microsoft.ApplicationInsights;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -302,7 +303,7 @@ namespace Backoffice.API.Repositories
 
                         configs.ForEach(config =>
                         {
-                            if (clientIds.Contains(config.ClientId, StringComparison.OrdinalIgnoreCase))
+                            if (clientIds.Contains(config.ClientId, StringComparison.OrdinalIgnoreCase) || clientIds.Equals("all", StringComparison.OrdinalIgnoreCase))
                             {
                                 config.IsMaintenance = request.IsMaintenance;
                             }
@@ -454,9 +455,21 @@ namespace Backoffice.API.Repositories
                 var test = await blobClient.UploadAsync(_fileName, true);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                var env = Environment.GetEnvironmentVariable("PLATFORM_WEB_ENV_NAME") ?? "dev";
+                var properties = new Dictionary<string, string>
+                            {
+                                { "env", env },
+                                {"stream", JsonSerializer.Serialize(content, new JsonSerializerOptions { WriteIndented = true }) },
+                                { "filename", _fileName },
+                                { "message", ex.Message },
+                                { "events", ex.StackTrace }
+                            };
+
+                _telemetryClient.TrackEvent($"e:backoffice-maintenance.bl", properties);
+
+                return false;
             }
         }
         #endregion

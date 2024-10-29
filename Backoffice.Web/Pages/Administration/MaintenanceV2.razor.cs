@@ -209,7 +209,9 @@ namespace Backoffice.Web.Pages.Administration
             _isProcessing = false;
 
             if (result.StatusCode == StatusCode.Success)
-                _alertToastService.SetToast($"Maintenance Mode {(_isMaintenance ? "Enabled" : "Disabled")}");
+                await _alertToastService.SetToast($"Maintenance Mode {(_isMaintenance ? "Enabled" : "Disabled")}");
+            else
+                await _alertToastService.SetToast($"Maintenance Mode {(_isMaintenance ? "Enabled" : "Disabled")}");
 
             LoadPage();
 
