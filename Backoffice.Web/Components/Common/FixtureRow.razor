@@ -48,14 +48,16 @@
         <div class="d-flex justify-content-left">
             @if (Market != null && _selections.Any())
             {
+                var displayLine = true;
                 foreach (var selection in _selections)
                 {
                     var selectionKey = $"br-{selection.ProviderSelectionId}";
 
-                    <SelectionRow @key="selectionKey" Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop" CurrentMarketStatus="@_marketStatusId" HasClientConfig="true" Region="@Region"/>
+                    <SelectionRow @key="selectionKey" Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop" CurrentMarketStatus="@_marketStatusId" HasClientConfig="true" Region="@Region" />
 
-                    if (_hasLine)
+                    if (_hasLine && displayLine)
                     {
+                        displayLine = false;
                         <div>
                             <div class="margin-value me-2 py-1">
                                 <span class="d-block text-center">@_marketLine</span>
@@ -96,18 +98,20 @@
                 <div class="d-flex justify-content-left">
                     @if (Market != null && _selections.Any())
                     {
+                        var displayLine = true;
+                        var hasClientConfig = HasClientConfig(client.ClientCode, _clientCode, _clientCodeMargin);
                         foreach (var selection in _selections)
                         {
                             @*var selectionKey = $"{client.ClientCode.ToLower()}-{selection.ProviderSelectionId}";*@
-                            var hasClientConfig = HasClientConfig(client.ClientCode, _clientCode, _clientCodeMargin);
 
                             <SelectionRow @key="selection.ProviderSelectionId" CurrentClientCode="@client.ClientCode"
-                              Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop"
-                              CurrentMarketStatus="@GetMarketStatusId(client, _clientCode, _marketStatusId)"
-                              HasClientConfig="hasClientConfig" />
+                                          Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop"
+                                          CurrentMarketStatus="@GetMarketStatusId(client, _clientCode, _marketStatusId)"
+                                          HasClientConfig="hasClientConfig" />
 
-                            if (_hasLine)
+                            if (_hasLine && displayLine)
                             {
+                                displayLine = false;
                                 if (hasClientConfig)
                                 {
                                     <div>
@@ -132,7 +136,7 @@
                             if (HasClientConfig(client.ClientCode, _clientCode, _clientCodeMargin))
                             {
                                 <div class="py-1 px-1">
-                                    <span class ="text-nowrap">@GetClientMargin(client.ClientCode, _clientCodeMargin, _selections)</span>
+                                    <span class="text-nowrap">@GetClientMargin(client.ClientCode, _clientCodeMargin, _selections)</span>
                                 </div>
                             }
                             else
