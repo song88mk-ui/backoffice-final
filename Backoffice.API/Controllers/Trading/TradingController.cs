@@ -346,8 +346,8 @@ namespace Backoffice.API.Controllers.Trading
             switch (result.StatusCode)
             {
                 case Shared.Enums.StatusCode.Success:
-
-                    result.Result = result.Result.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+                    if (clientCodes.FirstOrDefault() != "ALL")
+                        result.Result = result.Result.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
 
                     return Ok(result);
                 default:
