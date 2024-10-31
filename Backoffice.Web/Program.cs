@@ -49,17 +49,18 @@ if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
           .AddHttpClientInstrumentation()
           .AddAspNetCoreInstrumentation((opts) => opts.Filter = httpContext =>
           {
-              return (
-                !httpContext.Request.Path.ToString().StartsWith("/js") ||
-                !httpContext.Request.Path.ToString().StartsWith("/css") ||
-                !httpContext.Request.Path.ToString().StartsWith("/_blazor") ||
-                !httpContext.Request.Path.ToString().StartsWith("/bohub") ||
-                !httpContext.Request.Path.ToString().StartsWith("/healthz")
-                );
+            var path = httpContext.Request.Path.ToString();
+            var toInclude = path.EndsWith(".js") ||
+                            path.EndsWith(".css") ||
+                            path.StartsWith("/_blazor") ||
+                            path.StartsWith("/_content") ||
+                            path.StartsWith("/bohub") ||
+                            path.StartsWith("/healthz");
+            return !toInclude;
           })
           .AddSqlClientInstrumentation();
 
-          builder.Services.Configure<AspNetCoreInstrumentationOptions>(builder.Configuration.GetSection("Telemetry:AspNetCoreInstrumentation"));
+          builder.Services.Configure<AspNetCoreTraceInstrumentationOptions>(builder.Configuration.GetSection("Telemetry:AspNetCoreInstrumentation"));
 
           tracing.AddOtlpExporter(otlpOptions =>
           {
