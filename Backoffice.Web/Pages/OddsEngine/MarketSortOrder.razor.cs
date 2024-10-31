@@ -35,7 +35,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isPreLoader;
         private bool _isMarketPreLoader;
         private PageHeaderModel _pageHeaderModel;
-        private MarketSortOrderFilterModel _filterModel;
+        private MarketSortOrderFilterModel _filterModel = new();
         private List<ClientMarketTemplate> _filteredMarketTemplatesRef;
         private static List<ClientMarketTemplate> _marketTemplates;
         public List<ClientMarketTemplateGroup> _clientMarketTemplateGroupsRef;
