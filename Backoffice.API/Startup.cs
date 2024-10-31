@@ -62,8 +62,9 @@ namespace Backoffice.API
                           (req) =>
                           {
                             var uriString = req.RequestUri.ToString();
-                            return uriString.Contains("monitor.azure.com") ||
-                                uriString.Contains("visualstudio.com");
+                            var isAzureReq = uriString.Contains("monitor.azure.com") ||
+                                             uriString.Contains("visualstudio.com");
+                            return !isAzureReq;
                           }
                       )
                       .AddAspNetCoreInstrumentation((aspCoreOpts) => aspCoreOpts.Filter = httpContext =>
