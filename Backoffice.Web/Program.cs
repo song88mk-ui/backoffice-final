@@ -50,13 +50,13 @@ if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
           .AddAspNetCoreInstrumentation((opts) => opts.Filter = httpContext =>
           {
             var path = httpContext.Request.Path.ToString();
-            var toInclude = path.EndsWith(".js") ||
+            var toExclude = path.EndsWith(".js") ||
                             path.EndsWith(".css") ||
                             path.StartsWith("/_blazor") ||
                             path.StartsWith("/_content") ||
                             path.StartsWith("/bohub") ||
                             path.StartsWith("/healthz");
-            return !toInclude;
+            return toExclude;
           })
           .AddSqlClientInstrumentation();
 
