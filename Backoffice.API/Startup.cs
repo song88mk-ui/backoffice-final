@@ -57,7 +57,15 @@ namespace Backoffice.API
                       tracing
                       .AddSource(Instrumentation.ActivitySourceName)
                       .SetSampler(new AlwaysOnSampler())
-                      .AddHttpClientInstrumentation()
+                      .AddHttpClientInstrumentation(
+                        (opts) => opts.FilterHttpRequestMessage =
+                          (req) =>
+                          {
+                            var uriString = req.RequestUri.ToString();
+                            return uriString.Contains("monitor.azure.com") ||
+                                uriString.Contains("visualstudio.com");
+                          }
+                      )
                       .AddAspNetCoreInstrumentation((aspCoreOpts) => aspCoreOpts.Filter = httpContext =>
                       {
                           return (
@@ -67,7 +75,7 @@ namespace Backoffice.API
                       })
                       .AddSqlClientInstrumentation();
 
-                      services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("Telemetry:AspNetCoreInstrumentation"));
+                      services.Configure<AspNetCoreTraceInstrumentationOptions>(Configuration.GetSection("Telemetry:AspNetCoreInstrumentation"));
 
                       tracing.AddOtlpExporter(exporterOpts =>
                     {
