@@ -5,7 +5,9 @@ using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Backoffice.API.Controllers.Trading
@@ -337,12 +339,16 @@ namespace Backoffice.API.Controllers.Trading
         public async Task<IActionResult> GetClientList()
         {
             var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
 
             var result = await _tradingRepository.GetClientList(region);
 
             switch (result.StatusCode)
             {
                 case Shared.Enums.StatusCode.Success:
+
+                    result.Result = result.Result.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+
                     return Ok(result);
                 default:
                     return BadRequest(result);

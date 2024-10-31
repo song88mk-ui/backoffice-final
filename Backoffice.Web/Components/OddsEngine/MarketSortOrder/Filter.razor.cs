@@ -13,8 +13,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         [Inject] public ITradingService TradingService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
         [Parameter] public EventCallback OnUpdateCallback { get; set; }
         [Parameter] public EventCallback OnCancelCallback { get; set; }
         [Parameter] public EventCallback OnSaveCallback { get; set; }
@@ -49,33 +47,22 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             TradingService.Region = Region.ToUpper();
             ClientsInformation = new();
 
-            if (UserModel.ClientCodes.Any())
+            var response = await TradingService.GetClientList();
+
+            ClientsInformation = response.Result;
+
+            Clients = ClientsInformation.Select(s => new SelectListItemModel<string>
             {
-                var response = await TradingService.GetClientList();
+                Name = s.ClientName,
+                Value = s.ClientCode
+            }).OrderBy(x => x.Name).ToList();
 
-                ClientsInformation = response.Result;
-                var roleName = UserModel.RoleName;
-
-                if (roleName != "Super Admin")
-                {
-                    var clientCodes = UserModel.ClientCodes;
-                    ClientsInformation = ClientsInformation.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
-                }
-
-                Clients = ClientsInformation.Select(s => new SelectListItemModel<string>
-                {
-                    Name = s.ClientName,
-                    Value = s.ClientCode
-                }).OrderBy(x => x.Name).ToList();
-            }
-            else
-            {
+            if (Clients == null || Clients.Count == 0)
                 Clients.Add(new SelectListItemModel<string>
                 {
                     Value = "",
                     Name = _translationState.GetValue("No Clients Available")
                 });
-            }
 
             var sports = (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
 
@@ -118,7 +105,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
             await Init();
         }
-
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
             IsPreLoader = true;
@@ -229,7 +215,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             {
                 var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
 
-                if(marketTemplateGroupResponse != null)
+                if (marketTemplateGroupResponse != null)
                 {
                     ClientMarketTemplateGroups = marketTemplateGroupResponse.ClientMarketTemplateGroups
                     .Select(s => new MarketSortOrderModel.ClientMarketTemplateGroup
