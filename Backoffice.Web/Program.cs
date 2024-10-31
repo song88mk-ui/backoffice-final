@@ -53,7 +53,8 @@ if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
                 !httpContext.Request.Path.ToString().StartsWith("/js") ||
                 !httpContext.Request.Path.ToString().StartsWith("/css") ||
                 !httpContext.Request.Path.ToString().StartsWith("/_blazor") ||
-                !httpContext.Request.Path.ToString().StartsWith("/bohub")
+                !httpContext.Request.Path.ToString().StartsWith("/bohub") ||
+                !httpContext.Request.Path.ToString().StartsWith("/healthz")
                 );
           })
           .AddSqlClientInstrumentation();
