@@ -103,9 +103,9 @@ namespace Backoffice.Web.Pages.Administration
         }
         private void ChangeMode(bool isAllClient)
         {
-            if (_hasChange)
-                HandleModalDisplay(false, isAllClient);
-            else
+            //if (_hasChange)
+            //    HandleModalDisplay(false, isAllClient);
+            //else
                 HandleChangeMode(isAllClient);
         }
         private void HandlePropertyChange(bool value)
