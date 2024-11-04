@@ -77,14 +77,17 @@ namespace Backoffice.Web.Pages.Authentication
             }
 
             IsSaveCookie = false;
-            if (Request.Cookies.ContainsKey("RememberMePreference"))
+
+            var cookieToken = RetrieveToken();
+
+            if (!string.IsNullOrEmpty(cookieToken))
             {
                 try
                 {
                     var policies = new List<string>();
                     TempData["HasError"] = false;
 
-                    var preference = JsonSerializer.Deserialize<TokenModel>(Request.Cookies["RememberMePreference"]?.ToString());
+                    var preference = JsonSerializer.Deserialize<TokenModel>(cookieToken);
 
                     if (preference?.AccessToken == null)
                     {
@@ -240,17 +243,48 @@ namespace Backoffice.Web.Pages.Authentication
 
         #region Utilities
 
-        private void SetRememberMePreference(bool value, TokenModel token = null)
+        public void StoreToken(string token)
         {
-            if (value && token != null)
+            var context = _httpContextAccessor.HttpContext;
+            if (context != null)
             {
-                var options = new CookieOptions
+                var cookieOptions = new CookieOptions
                 {
-                    Expires = DateTime.UtcNow.AddMonths(1), // Example: Cookie expires in 1 month
-                    SameSite = SameSiteMode.Lax,
-                    Secure = true
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddMonths(1),
                 };
-                Response.Cookies.Append("RememberMePreference", JsonSerializer.Serialize(token), options);
+
+                context.Response.Cookies.Append("BlUserToken", token, cookieOptions);
+            }
+        }
+        public string RetrieveToken()
+        {
+            var context = _httpContextAccessor.HttpContext;
+            if (context != null)
+            {
+                if (context.Request.Cookies.TryGetValue("BlUserToken", out var token))
+                    return token;
+            }
+
+            return string.Empty;
+        }
+        private void SetRememberMePreference(bool value, TokenModel tokenModel = null)
+        {
+            if (value && tokenModel != null)
+            {
+                var token = JsonSerializer.Serialize(tokenModel);
+
+                //var options = new CookieOptions
+                //{
+                //    Expires = DateTime.UtcNow.AddMonths(1),
+                //    SameSite = SameSiteMode.Lax,
+                //    Secure = true
+                //};
+
+                //Response.Cookies.Append("RememberMePreference", token, options);
+                StoreToken(token);
             }
             else
             {

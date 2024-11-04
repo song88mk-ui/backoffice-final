@@ -6,7 +6,7 @@ using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Extensions;
 using Backoffice.Web.Models;
-using Newtonsoft.Json.Linq;
+using Microsoft.JSInterop;
 using Serilog;
 using System.Net;
 using System.Net.Http.Headers;
@@ -25,21 +25,12 @@ namespace Backoffice.Web.Services
         {
             get
             {
-                var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
-                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                if (_client.DefaultRequestHeaders.Contains("x-page"))
+                if (_client == null)
                 {
-                    _client.DefaultRequestHeaders.Remove("x-page");
+                    _client = new HttpClient();
                 }
-                if (_client.DefaultRequestHeaders.Contains("x-language-code"))
-                    _client.DefaultRequestHeaders.Remove("x-language-code");
 
-                if (!string.IsNullOrEmpty(Page))
-                    _client.DefaultRequestHeaders.Add("x-page", Page);
-
-                _client.DefaultRequestHeaders.Add("x-language-code", LanguageCode.ToString());
-
+                ConfigureHttpClientHeaders();
 
                 return _client;
             }
@@ -50,21 +41,48 @@ namespace Backoffice.Web.Services
         private readonly IAuthenticationService _authenticationService;
         private readonly IMessageBroker _messageBroker;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IJSRuntime _jsRuntime;
         #endregion
 
         #region Ctor
 
-        public BackofficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IMessageBroker messageBroker, IHttpContextAccessor httpContextAccessor)
+        public BackofficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IMessageBroker messageBroker, IHttpContextAccessor httpContextAccessor, IJSRuntime jsRuntime)
         {
             _configuration = configuration;
             _authenticationService = authenticationService;
             _messageBroker = messageBroker;
             _httpContextAccessor = httpContextAccessor;
+            _jsRuntime = jsRuntime;
 
             _httpClient = httpClient;
         }
 
         #endregion
+
+
+        private void ConfigureHttpClientHeaders()
+        {
+            var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            RemoveHeader("x-page");
+            RemoveHeader("x-language-code");
+
+            if (!string.IsNullOrEmpty(Page))
+            {
+                _client.DefaultRequestHeaders.Add("x-page", Page);
+            }
+
+            _client.DefaultRequestHeaders.Add("x-language-code", LanguageCode.ToString());
+        }
+
+        private void RemoveHeader(string headerName)
+        {
+            if (_client.DefaultRequestHeaders.Contains(headerName))
+            {
+                _client.DefaultRequestHeaders.Remove(headerName);
+            }
+        }
 
         #region Method - Maintenance
 
