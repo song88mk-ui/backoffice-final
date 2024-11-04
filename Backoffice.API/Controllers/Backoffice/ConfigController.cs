@@ -1,6 +1,7 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Models;
 using Backoffice.API.Repositories;
+using Backoffice.API.Telemetry;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AllowAnonymousAttribute = Backoffice.API.ActionFilter.AllowAnonymousAttribute;
@@ -25,10 +27,12 @@ namespace Backoffice.API.Controllers.Backoffice
     {
         private readonly IBackofficeRepository _backofficeRepository;
         private readonly IMaintenanceRepository _maintenanceRepository;
-        public ConfigController(IBackofficeRepository backofficeRepository, IMaintenanceRepository maintenanceRepository)
+        private readonly ActivitySource _activitySource;
+        public ConfigController(IBackofficeRepository backofficeRepository, IMaintenanceRepository maintenanceRepository, Instrumentation instrumentation)
         {
             _backofficeRepository = backofficeRepository;
             _maintenanceRepository = maintenanceRepository;
+            _activitySource = instrumentation.ActivitySource;
         }
 
         [HttpPost("maintenance/{isMaintenance}")]
@@ -217,17 +221,23 @@ namespace Backoffice.API.Controllers.Backoffice
         [HttpGet("template/count")]
         public async Task<IActionResult> GetTemplateConfigCount([FromQuery] string state = "")
         {
-            var userId = HttpContext.Items["UserId"].ToString();
-            var clientCodes = HttpContext.Items["ClientCodes"].ToString().Split(',').ToList();
-
-            var result = await _backofficeRepository.GetTemplateConfigCount(clientCodes, state);
-
-            switch (result.StatusCode)
+            using (var activity = _activitySource.StartActivity("template/count"))
             {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
+                var userToken = HttpContext.Items["UserToken"].ToString();
+                activity?.SetTag("authorization", userToken);
+
+                var userId = HttpContext.Items["UserId"].ToString();
+                var clientCodes = HttpContext.Items["ClientCodes"].ToString().Split(',').ToList();
+
+                var result = await _backofficeRepository.GetTemplateConfigCount(clientCodes, state);
+
+                switch (result.StatusCode)
+                {
+                    case BoStatusCode.Success:
+                        return Ok(result);
+                    default:
+                        return BadRequest(result);
+                }
             }
         }
 
