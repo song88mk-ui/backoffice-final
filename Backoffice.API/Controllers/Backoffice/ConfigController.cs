@@ -22,7 +22,7 @@ namespace Backoffice.API.Controllers.Backoffice
     [Route("api/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class ConfigController : ControllerBase
-    {//
+    {
         private readonly IBackofficeRepository _backofficeRepository;
         private readonly IMaintenanceRepository _maintenanceRepository;
         public ConfigController(IBackofficeRepository backofficeRepository, IMaintenanceRepository maintenanceRepository)

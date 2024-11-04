@@ -61,10 +61,10 @@ namespace Backoffice.API
                         (opts) => opts.FilterHttpRequestMessage =
                           (req) =>
                           {
-                            var uriString = req.RequestUri.ToString();
-                            var isAzureReq = uriString.Contains("monitor.azure.com") ||
-                                             uriString.Contains("visualstudio.com");
-                            return !isAzureReq;
+                              var uriString = req.RequestUri.ToString();
+                              var isAzureReq = uriString.Contains("monitor.azure.com") ||
+                                               uriString.Contains("visualstudio.com");
+                              return !isAzureReq;
                           }
                       )
                       .AddAspNetCoreInstrumentation((aspCoreOpts) => aspCoreOpts.Filter = httpContext =>
@@ -153,7 +153,11 @@ namespace Backoffice.API
                 options.CommandTimeout(180))); //180 seconds timeout
             services.AddHttpClient<IRabbitMqRepository, RabbitMqRepository>();
             services.AddScoped<IBackofficeRepository, BackofficeRepository>();
-            services.AddHttpClient<IMaintenanceRepository, MaintenanceRepository>(client => client.BaseAddress = new Uri(Configuration["API:Maintenance:Uri"]));
+            services.AddHttpClient<IMaintenanceRepository, MaintenanceRepository>(client =>
+            {
+                client.BaseAddress = new Uri(Configuration["API:Maintenance:Uri"]);
+                client.DefaultRequestHeaders.Add("x-api-key", "API:Maintenance:Security:ApiKey");
+            });
             services.AddScoped<IPlatformRepository, PlatformRepository>();
             services.AddScoped<ITradingRepository, TradingRepository>();
             services.AddScoped<IBackofficeActivityLogRepository, BackofficeActivityLogRepository>();
