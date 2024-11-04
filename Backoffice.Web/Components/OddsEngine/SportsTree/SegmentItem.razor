@@ -1,0 +1,18 @@
+﻿<div class="nav-link" @onclick="Segment.MenuEvent">
+    <span class="fa fa-chevron-right me-2"></span>
+    <span class="nav-menu-text">@Segment.Name</span>
+    <span class="fa @_cssArrowIcon" />
+</div>
+@if (_isSelected)
+{
+    <div class="sub-menu-oddsengine ms-3">
+        <div class="flex-column">
+            <div class="nav-item">
+                @foreach (var league in Segment.Leagues.OrderBy(l => l.SortOrder))
+                {
+                    <LeagueItem League="league" />
+                }
+            </div>
+        </div>
+    </div>
+}

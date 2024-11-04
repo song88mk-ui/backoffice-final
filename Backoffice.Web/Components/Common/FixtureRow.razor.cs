@@ -17,7 +17,6 @@ namespace Backoffice.Web.Components.Common
 
         [Parameter] public List<Client> Clients { get; set; }
         [Parameter] public FixtureMarketModel Market { get; set; }
-        [Parameter] public string Region { get; set; }
         [Parameter] public bool IsMonitoringPage { get; set; }
 
         #endregion

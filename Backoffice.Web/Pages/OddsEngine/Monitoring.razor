@@ -7,7 +7,7 @@
 @page "/hk/odds-engine"
 @page "/hk/odds-engine/monitoring"
 @*@page "/{Region}/odds-engine/monitoring/{SportId}/{SegmentId}"*@
-@page "/hk/odds-engine/monitoring/{SportId}/{SegmentId}/{LeagueId}"
+@page "/hk/odds-engine/monitoring/{SportId:int}/{SegmentId:int}/{LeagueId:int}"
 
 <AuthorizeView Policy="sbc-monitoring-match">
     <Authorized>
@@ -61,7 +61,7 @@
                             @if (_fixtureMarkets != null && _fixtureMarkets.Any())
                             {
                                 <Virtualize Items="_fixtureMarkets" Context="market" OverscanCount="5">
-                                    <FixtureRow @key="@market" Clients="@_clients" Market="market" Region="@_region" IsMonitoringPage=true />
+                                    <FixtureRow @key="@market" Clients="@_clients" Market="market" IsMonitoringPage=true />
                                 </Virtualize>
                             }
                             else

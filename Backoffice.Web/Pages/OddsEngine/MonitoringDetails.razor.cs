@@ -226,7 +226,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var marketFixtureResponse = await BackofficeService.GetMarketFixtureDetails(Id, _languageCode);
 
-            if (marketFixtureResponse.StatusCode == StatusCode.Success)
+            if (marketFixtureResponse.StatusCode == StatusCode.Success && marketFixtureResponse.Result.Fixture != null)
             {
                 Fixture = marketFixtureResponse.Result.Fixture;
                 SportId = Fixture.SportId;

@@ -14,7 +14,6 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public string ColumnSize { get; set; }
         [Parameter] public bool IsBetStop { get; set; }
         [Parameter] public int CurrentMarketStatus { get; set; }
-        [Parameter] public string Region { get; set; }
 
         public string Color { get; set; }
         public Dictionary<string, object> SpanAttributes { get; set; }

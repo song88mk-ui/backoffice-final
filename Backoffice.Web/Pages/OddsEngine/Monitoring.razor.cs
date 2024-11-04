@@ -91,6 +91,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     await OnInitializeEvent(_monitoringCallbackModel);
                 }
             }
+
+            _init = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -115,7 +117,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = false;
         }
         protected override bool ShouldRender() => _shouldRender;
-        private bool ValidateParameters() => (SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2);
+        private bool ValidateParameters() => SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2;
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
         {

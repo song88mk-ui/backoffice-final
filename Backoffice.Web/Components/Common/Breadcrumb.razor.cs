@@ -10,8 +10,6 @@ namespace Backoffice.Web.Components.Common
 
         [Parameter] public List<BreadcrumbModel> Breadcrumbs { get; set; }
 
-        [CascadingParameter(Name = "HeaderNavMenuReference")] public HeaderNavMenu HeaderNavMenuReference { get; set; }
-
         #endregion
 
         public void Dispose()

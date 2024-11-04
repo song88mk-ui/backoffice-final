@@ -5,7 +5,7 @@
     <ChildContent>
         @if (!PreRenderService.IsPreRendering)
         {
-            <CascadingValue Value="UserModel" Name="UserModel" IsFixed>
+            <CascadingValue Value="UserModel" Name="UserModel">
                 @if (NavigationManager.Uri.Contains("/admin"))
                 {
                     <PageTitle>Backoffice - Administration</PageTitle>
