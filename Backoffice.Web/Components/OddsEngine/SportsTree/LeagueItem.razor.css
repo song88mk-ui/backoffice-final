@@ -1,0 +1,86 @@
+﻿.nav-menu-text {
+    flex: auto;
+}
+
+.nav-item {
+    font-size: 0.9rem;
+    padding-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+    .nav-item:first-of-type {
+        padding-top: 0.2rem;
+    }
+
+    .nav-item:last-of-type {
+        padding-bottom: 0.2rem;
+    }
+
+    .nav-item .nav-link {
+        color: #9AA0AB;
+        border-radius: 4px;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        line-height: 1rem;
+    }
+
+    .nav-item .nav-item-header {
+        color: #9AA0AB;
+    }
+
+    .nav-item ::deep .nav-link.account, .nav-item ::deep .nav-link.switch-access, .nav-item ::deep .nav-link.logout, .nav-item ::deep .nav-link.key {
+        color: #fff;
+    }
+
+    .nav-item.info {
+        border-bottom: solid 1px #4C5A71;
+    }
+
+    .nav-item ::deep .nav-link.switch-access {
+        border: solid 1px #fff;
+    }
+
+    .nav-item ::deep .nav-link.logout {
+        background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
+    }
+
+@media (min-width: 641px) {
+    .navbar-toggler {
+        display: none;
+    }
+
+    .collapse {
+        /* Never collapse the sidebar for wide screens */
+        display: block;
+    }
+}
+
+.nav-item ::deep a.active .ico, .nav-item ::deep a:hover .ico, .nav-item ::deep a.active .iconfont, .nav-item ::deep a:hover .iconfont {
+    color: #fff;
+}
+
+[data-bs-toggle="collapse"] .fa:before {
+    content: "\f078" !important;
+}
+
+[data-bs-toggle="collapse"].collapsed .fa:before {
+    content: "\f054" !important;
+}
+
+.sub-menu, .sub-menu-oddsengine {
+    border-radius: 5px;
+}
+
+.sub-menu {
+    background-color: #404E67;
+}
+
+span.ico, span.iconfont, span.all-sports {
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.collapse:not(.show) {
+    display: none !important;
+}

@@ -1,0 +1,22 @@
+﻿@using Backoffice.Web.Utilities
+
+<div class="nav-item px-3">
+    <div class="nav-link" @onclick="Sport.MenuEvent">
+        <span class="iconfont iconfont-@Utility.GetSportIcon(Sport.Id)" />
+        <span class="nav-menu-text">@Sport.Name</span>
+        <span class="fa @_cssArrowIcon" />
+    </div>
+    @if (_isSelected)
+    {
+        <div class="sub-menu-oddsengine ms-3">
+            <div class="flex-column">
+                <div class="nav-item">
+                    @foreach (var segment in Sport.Segments.OrderBy(s => s.SortOrder))
+                    {
+                        <SegmentItem Segment="segment" OnSegmentClickCallback="HandleSegmentClick" />
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

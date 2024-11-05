@@ -91,6 +91,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     await OnInitializeEvent(_monitoringCallbackModel);
                 }
             }
+
+            _init = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -115,13 +117,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = false;
         }
         protected override bool ShouldRender() => _shouldRender;
-        private bool ValidateParameters() => (SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2);
+        private bool ValidateParameters() => SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2;
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
         {
             _isPreloader = true;
             _shouldRender = true;
 
+            StateHasChanged();
             _fixtureMarkets = await GetFixtures(new MarketFixtureRequest
             {
                 FixtureTypeId = (int)FixtureType.Match,
@@ -134,10 +137,13 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _isPreloader = false;
             _shouldRender = true;
-            StateHasChanged();
         }
 
-        private async Task MonitoringCallback(MonitoringCallbackModel model) => await OnInitializeEvent(_monitoringCallbackModel = model);
+        private async Task MonitoringCallback(MonitoringCallbackModel model)
+        {
+            await OnInitializeEvent(_monitoringCallbackModel = model);
+            
+        }
 
         private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
         {

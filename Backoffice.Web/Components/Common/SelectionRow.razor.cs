@@ -1,5 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Microsoft.AspNetCore.Components;
+
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
 namespace Backoffice.Web.Components.Common
@@ -7,17 +8,27 @@ namespace Backoffice.Web.Components.Common
     public partial class SelectionRow : IDisposable
     {
         #region Properties
-
         [Parameter] public SelectionModel Selection { get; set; }
         [Parameter] public string CurrentClientCode { get; set; }
         [Parameter] public bool HasClientConfig { get; set; }
         [Parameter] public string ColumnSize { get; set; }
         [Parameter] public bool IsBetStop { get; set; }
         [Parameter] public int CurrentMarketStatus { get; set; }
-        [Parameter] public string Region { get; set; }
 
-        public string Color { get; set; }
         public Dictionary<string, object> SpanAttributes { get; set; }
+
+        #endregion
+
+        #region Fields
+
+        private string _color = "";
+
+        private bool _init = true;
+        private bool _shouldRender;
+        private bool _isBetStop;
+        private int _currentMarketStatus;
+
+        private CancellationTokenSource _cts;
 
         #endregion
 
@@ -26,43 +37,48 @@ namespace Backoffice.Web.Components.Common
         protected override async Task OnInitializedAsync()
         {
             SpanAttributes = new Dictionary<string, object>();
-
         }
+
         protected override async Task OnParametersSetAsync()
         {
-            Color = "odds-bg-default";
+            var color = GetColor();
 
-            SpanAttributes["data-title"] = string.Empty;
+            _shouldRender = ValidateParameters() || _color != color;
 
-            if (IsBetStop || CurrentMarketStatus != (int)MarketStatus.Active)
+            if (_shouldRender)
             {
-                if (CurrentMarketStatus == (int)MarketStatus.Inactive)
+                _isBetStop = IsBetStop;
+                _currentMarketStatus = CurrentMarketStatus;
+
+                if (_color != color)
                 {
-                    SpanAttributes["data-title"] = MarketStatus.Inactive.ToString();
-                    Color = "odds-bg-inactive";
-                }
-                else
-                {
-                    SpanAttributes["data-title"] = "Bet Stop";
-                    Color = "odds-bg-betstop";
+                    _cts?.Cancel();
+                    _cts = new CancellationTokenSource();
+
+                    if (!string.IsNullOrEmpty(_color) && !_color.Contains("inactive") && !_color.Contains("betstop"))
+                    {
+                        _color = color;
+                        await Task.Delay(4000, _cts.Token);
+
+                        _color = "odds-bg-default";
+                        Selection.OldDecimalOdds = string.Empty;
+                        Selection.ClientOdds.ForEach(c => { c.OldOdds = 0; });
+                    }
+                    else
+                        _color = color;
                 }
             }
-            else
-            {
-                if (!string.IsNullOrEmpty(Selection.OldDecimalOdds))
-                {
-                    if (Convert.ToDecimal(Selection.OldDecimalOdds) > Convert.ToDecimal(Selection.DecimalOdds))
-                    {
-                        Color = "odds-bg-danger-active";
-                    }
 
-                    if (Convert.ToDecimal(Selection.OldDecimalOdds) < Convert.ToDecimal(Selection.DecimalOdds))
-                    {
-                        Color = "odds-bg-success-active";
-                    }
-                }
-            }
+            _init = false;
         }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            _shouldRender = false;
+        }
+
+        protected override bool ShouldRender() => _shouldRender;
+
 
         public void Dispose()
         {
@@ -71,14 +87,15 @@ namespace Backoffice.Web.Components.Common
         #endregion
 
         #region Utilities
-        public void OnCompleted(string cssPropertyName)
+
+        private bool ValidateParameters()
         {
-            Color = "odds-bg-default";
-            Selection.OldDecimalOdds = string.Empty;
-            Selection.ClientOdds.ForEach(c => { c.OldOdds = 0; });
+            return _init
+                || _isBetStop != IsBetStop
+                || _currentMarketStatus != CurrentMarketStatus;
         }
 
-        public string GetClientOdds()
+        private string GetClientOdds()
         {
             if (Selection.ClientOdds != null && Selection.ClientOdds.Any(c => c.ClientCode == CurrentClientCode))
             {
@@ -88,9 +105,10 @@ namespace Backoffice.Web.Components.Common
             return Selection.DecimalOdds;
         }
 
-        public string GetClientColor()
+        private string GetColor()
         {
-            Color = "odds-bg-default";
+
+            var color = "odds-bg-default";
 
             SpanAttributes["data-title"] = string.Empty;
 
@@ -99,12 +117,12 @@ namespace Backoffice.Web.Components.Common
                 if (CurrentMarketStatus == (int)MarketStatus.Inactive)
                 {
                     SpanAttributes["data-title"] = MarketStatus.Inactive.ToString();
-                    Color = "odds-bg-inactive";
+                    color = "odds-bg-inactive";
                 }
                 else
                 {
                     SpanAttributes["data-title"] = "Bet Stop";
-                    Color = "odds-bg-betstop";
+                    color = "odds-bg-betstop";
                 }
             }
             else
@@ -115,39 +133,42 @@ namespace Backoffice.Web.Components.Common
                     {
                         if (Convert.ToDecimal(Selection.OldDecimalOdds) > Convert.ToDecimal(Selection.DecimalOdds))
                         {
-                            Color = "odds-bg-danger-active";
+                            color = "odds-bg-danger-active";
                         }
 
                         if (Convert.ToDecimal(Selection.OldDecimalOdds) < Convert.ToDecimal(Selection.DecimalOdds))
                         {
-                            Color = "odds-bg-success-active";
+                            color = "odds-bg-success-active";
                         }
                     }
                 }
                 else
                 {
-                    if (Selection.ClientOdds == null)
-                        return Color;
-                    var clientOdds = Selection.ClientOdds.Where(c => c.ClientCode == CurrentClientCode && c.SelectionTemplateId == Selection.SelectionTemplateId).FirstOrDefault();
-                    if (clientOdds != null)
+                    if (Selection.ClientOdds != null)
                     {
-                        if (clientOdds.OldOdds != 0)
+                        var clientOdds = Selection.ClientOdds.Where(c => c.ClientCode == CurrentClientCode && c.SelectionTemplateId == Selection.SelectionTemplateId).FirstOrDefault();
+                        if (clientOdds != null)
                         {
-                            if (clientOdds.OldOdds > clientOdds.Odds)
+                            if (clientOdds.OldOdds != 0)
                             {
-                                Color = "odds-bg-danger-active";
-                            }
+                                if (clientOdds.OldOdds > clientOdds.Odds)
+                                {
+                                    color = "odds-bg-danger-active";
+                                }
 
-                            if (clientOdds.OldOdds < clientOdds.Odds)
-                            {
-                                Color = "odds-bg-success-active";
+                                if (clientOdds.OldOdds < clientOdds.Odds)
+                                {
+                                    color = "odds-bg-success-active";
+                                }
                             }
                         }
                     }
                 }
             }
-            return Color;
+
+            return color;
         }
+
 
         #endregion
     }

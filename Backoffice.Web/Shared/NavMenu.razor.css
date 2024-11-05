@@ -60,7 +60,6 @@ nav-item ::deep .nav-link.header.active, .nav-item ::deep .nav-link.header:hover
     cursor: context-menu;
 }
 
-
 /*.nav-item ::deep a.active {
     background-image: linear-gradient(270deg, #EA6442, #E43F2C, #E12E22);
     color: white;

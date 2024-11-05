@@ -1,10 +1,11 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
+using Backoffice.Web.Models.OddsEngine.Monitoring;
 using Backoffice.Web.Models.Shared;
-using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
-using System.Diagnostics.Metrics;
+using RabbitMQ.Client.MessagePatterns;
+using System.Collections.Immutable;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Shared
@@ -30,6 +31,10 @@ namespace Backoffice.Web.Shared
         private SportsTreeModel _menu = new SportsTreeModel();
         private SportClickCallbackModel _selectedSport = new SportClickCallbackModel();
         private NavMenuModel _navMenus;
+
+        // New Sport Tree
+        private List<SportItemModel> _sports = new();
+        //private CurrentSportModel _currentSport = new();
 
         private string[] _permissionCategories = new string[] { nameof(PermissionCategory.Admin), nameof(PermissionCategory.SBC) };
         private string[] _access = new string[] { ((int)Access.View).ToString(), ((int)Access.Edit).ToString() };
@@ -73,33 +78,60 @@ namespace Backoffice.Web.Shared
                 if (_navMenuAccess == PermissionCategory.OE)
                 {
                     _menu.Sports = await GetSportsTreeMenu(cts.Token);
+                    _sports = await GetSportTreeMenus(cts.Token);
 
                     if (cts.Token.IsCancellationRequested)
                         return;
 
-                    var sport = _menu.Sports.FirstOrDefault();
+                    _selectedSport = new();
 
+                    var sport = _sports.FirstOrDefault();
                     if (sport != null)
                     {
-                        _selectedSport.SportId = sport.SportId;
-                        _selectedSport.SportName = sport.SportName;
+                        sport.IsSelected = true;
+                        _selectedSport.SportId = sport.Id;
+                        _selectedSport.SportName = sport.Name;
 
                         var segment = sport.Segments.FirstOrDefault();
-
                         if (segment != null)
                         {
-                            _selectedSport.SegmentId = segment.SegmentId;
-                            _selectedSport.SegmentName = segment.SegmentName;
+                            segment.IsSelected = true;
+                            _selectedSport.SegmentId = segment.Id;
+                            _selectedSport.SegmentName = segment.Name;
 
                             var league = segment.Leagues.FirstOrDefault();
-
                             if (league != null)
                             {
-                                _selectedSport.LeagueId = league.LeagueId;
-                                _selectedSport.LeagueName = league.LeagueName;
+                                league.IsSelected = true;
+                                _selectedSport.LeagueId = league.Id;
+                                _selectedSport.LeagueName = league.Name;
                             }
                         }
                     }
+
+                    //var sport = _menu.Sports.FirstOrDefault();
+
+                    //if (sport != null)
+                    //{
+                    //    _selectedsport.sportid = sport.sportid;
+                    //    _selectedsport.sportname = sport.sportname;
+
+                    //    var segment = sport.segments.firstordefault();
+
+                    //    if (segment != null)
+                    //    {
+                    //        _selectedsport.segmentid = segment.segmentid;
+                    //        _selectedsport.segmentname = segment.segmentname;
+
+                    //        var league = segment.leagues.firstordefault();
+
+                    //        if (league != null)
+                    //        {
+                    //            _selectedsport.leagueid = league.leagueid;
+                    //            _selectedsport.leaguename = league.leaguename;
+                    //        }
+                    //    }
+                    //}
 
                     switch (_page?.ToLower() ?? string.Empty)
                     {
@@ -190,6 +222,137 @@ namespace Backoffice.Web.Shared
             }
         }
 
+        private async Task HandleSportClick(SportClickCallbackModel selectedSport)
+        {
+
+            var sport = _sports.FirstOrDefault(c => c.Id == _selectedSport.SportId);
+            var segment = sport?.Segments.FirstOrDefault(c => c.Id == _selectedSport.SegmentId);
+            var league = segment?.Leagues.FirstOrDefault(c => c.Id == _selectedSport.SegmentId);
+
+            _selectedSport = new SportClickCallbackModel()
+            {
+                SportId = sport?.Id ?? -1,
+                SportName = sport?.Name,
+                SegmentId = segment?.Id ?? -1,
+                SegmentName = segment?.Name,
+                LeagueId = league?.Id ?? -1,
+                LeagueName = league?.Name
+            };
+        }
+        private async Task HandleSportMenuEvent(int sportId, string sportName)
+        {
+            var sports = _sports.Where(c => c.IsSelected || c.Id == sportId).ToList();
+
+            sports.ForEach(sport =>
+            {
+                sport.ShouldRender = false;
+                var isSelected = sport.Id == sportId;
+
+                if (sport.IsSelected != isSelected)
+                {
+                    sport.ShouldRender = true;
+                    sport.IsSelected = isSelected;
+                }
+
+                if (!isSelected)
+                {
+                    var segments = sport.Segments.Where(c => c.IsSelected).ToList();
+                    segments.ForEach(segment => segment.IsSelected = false);
+                }
+            });
+
+            _selectedSport = new SportClickCallbackModel()
+            {
+                SportId = sportId,
+                SportName = sportName
+            };
+        }
+        private async Task HandleSegmentMenuEvent(int sportId, string sportName, int segmentId, string segmentName)
+        {
+            var sports = _sports.Where(c => c.IsSelected || c.Id == sportId).ToList();
+
+            sports.ForEach(sport =>
+            {
+                sport.ShouldRender = false;
+                var isSelected = sport.Id == sportId;
+
+                if (!isSelected)
+                {
+                    var segments = sport.Segments.Where(c => c.IsSelected).ToList();
+                    segments.ForEach(segment => segment.IsSelected = false);
+                }
+                else
+                {
+                    var segments = sport.Segments.Where(c => c.IsSelected || c.Id == segmentId).ToList();
+                    segments.ForEach(segment =>
+                    {
+                        segment.ShouldRender = false;
+                        isSelected = segment.Id == segmentId;
+
+                        if (segment.IsSelected != isSelected)
+                        {
+                            segment.ShouldRender = true;
+                            segment.IsSelected = isSelected;
+                        }
+                    });
+                }
+            });
+
+            _sports.ForEach(sport =>
+            {
+                sport.ShouldRender = false;
+
+                var isSelected = sport.Id == sportId;
+
+                if (sport.IsSelected != isSelected)
+                {
+                    sport.ShouldRender = true;
+                    sport.IsSelected = isSelected;
+                }
+
+                var segments = sport.Segments.Where(c => c.IsSelected).ToList();
+                segments.ForEach(segment => segment.IsSelected = false);
+
+                if (sport.Id == sportId)
+                    sport.Segments.ForEach(segment =>
+                    {
+                        segment.ShouldRender = false;
+
+                        var isSelected = segment.Id == segmentId;
+
+                        if (segment.IsSelected != isSelected)
+                        {
+                            segment.ShouldRender = true;
+                            segment.IsSelected = isSelected;
+                        }
+                    });
+            });
+
+            _selectedSport = new SportClickCallbackModel()
+            {
+                SportId = sportId,
+                SportName = sportName,
+                SegmentId = segmentId,
+                SegmentName = segmentName
+            };
+        }
+        private async Task HandleLeagueMenuEvent(int sportId, string sportName, int segmentId, string segmentName, int leagueId, string leagueName)
+        {
+            if (_selectedSport.LeagueId != leagueId)
+            {
+                _selectedSport = new SportClickCallbackModel()
+                {
+                    SportId = sportId,
+                    SportName = sportName,
+                    SegmentId = segmentId,
+                    SegmentName = segmentName,
+                    LeagueId = leagueId,
+                    LeagueName = leagueName
+                };
+
+                await OnSportClickCallback.InvokeAsync(_selectedSport);
+            }
+        }
         private async Task OnLeagueClickEvent(int leagueId)
         {
             if (_selectedSport.LeagueId != leagueId)
@@ -208,8 +371,6 @@ namespace Backoffice.Web.Shared
                 {
                     _navigationManager.NavigateTo($"/hk/odds-engine");
                 }
-
-                await OnSportClickCallback.InvokeAsync(_selectedSport);
             }
         }
 
@@ -246,6 +407,44 @@ namespace Backoffice.Web.Shared
 
         #region Utilities
 
+        private async Task<List<SportItemModel>> GetSportTreeMenus(CancellationToken token)
+        {
+            var result = new List<SportItemModel>();
+
+            var response = await _backofficeService.GetSportsTreeAsync((int)FixtureType.Match, _languageCode, token);
+
+            if (token.IsCancellationRequested)
+                return new();
+
+            if (response.StatusCode == StatusCode.Success)
+            {
+                result = response.Result.Sports
+                    .Select(sp => new SportItemModel
+                    {
+                        Id = sp.SportId,
+                        Name = sp.SportName,
+                        SortOrder = sp.SortOrder ?? -1,
+                        MenuEvent = async e => await HandleSportMenuEvent(sp.SportId, sp.SportName),
+                        Segments = sp.Segments.Select(se => new SegmentItemModel
+                        {
+                            Id = se.SegmentId,
+                            Name = se.SegmentName,
+                            SortOrder = se.SortOrder,
+                            MenuEvent = async e => await HandleSegmentMenuEvent(sp.SportId, sp.SportName, se.SegmentId, se.SegmentName),
+                            Leagues = se.Leagues.Select(le => new LeagueItemModel
+                            {
+                                Id = le.LeagueId,
+                                Name = le.LeagueName,
+                                SortOrder = le.SortOrder,
+                                MenuEvent = async e => await HandleLeagueMenuEvent(sp.SportId, sp.SportName, se.SegmentId, se.SegmentName, le.LeagueId, le.LeagueName)
+                            }).ToList()
+                        }).ToList()
+                    }).ToList();
+            }
+
+
+            return result;
+        }
         private async Task<List<SportModel>> GetSportsTreeMenu(CancellationToken token)
         {
             var response = await _backofficeService.GetSportsTreeAsync((int)FixtureType.Match, _languageCode, token);

@@ -66,68 +66,32 @@ else if (_navMenuAccess == PermissionCategory.OE)
                         }
                     }
                 }
-                
+
                 @*<div class="nav-item px-3">
-                    <NavLink class="nav-link" href="oddin-poc">
-                        <span class="ico ico-oddin" aria-hidden="true"></span>
-                        <span class="nav-menu-text">Oddin POC</span>
-                    </NavLink>
-                </div>*@
+            <NavLink class="nav-link" href="oddin-poc">
+            <span class="ico ico-oddin" aria-hidden="true"></span>
+            <span class="nav-menu-text">Oddin POC</span>
+            </NavLink>
+            </div>*@
             </nav>
         }
         else if (_navMenuAccess == PermissionCategory.OE)
         {
-            <nav class="flex-column">
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link header" href="javascript:void(0);">
-                        <span class="fa fa-trophy all-sports" aria-hidden="true"></span>
-                        <span class="nav-menu-text">@_translationState.GetValue("All Sports")</span>
-                    </NavLink>
-                </div>
-                @if (_menu != null && _menu.Sports.Any())
-                {
-                    @foreach (var sport in _menu.Sports)
-                    {
-                        <div class="nav-item px-3">
-                            <NavLink class="nav-link" @onclick="_ => OnSportClickEvent(sport.SportId)">
-                                <span class="@($"iconfont iconfont-{Utility.GetSportIcon(sport.SportId)}")" aria-hidden="true"></span>
-                                <span class="nav-menu-text">@_translationState.GetValue(sport.SportName)</span>
-                                <span class="@(sport.SportId == _selectedSport.SportId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
-                            </NavLink>
-                            @if (sport.SportId == _selectedSport.SportId)
-                            {
-                                <div class="sub-menu-oddsengine ms-3 show">
-                                    <nav class="flex-column">
-                                        <div class="nav-item">
-                                            @foreach (var segment in sport.Segments)
-                                            {
-                                                <NavLink class="nav-link" @onclick="_ => OnSegmentClickEvent(segment.SegmentId)">
-                                                    <span class="fa fa-chevron-right me-2"></span>
-                                                    <span class="nav-menu-text">@segment.SegmentName</span>
-                                                    <span class="@(sport.SportId == _selectedSport.SportId && segment.SegmentId == _selectedSport.SegmentId ? "fa fa-chevron-down" : "fa fa-chevron-right")"></span>
-                                                </NavLink>
-                                                @if (sport.SportId == _selectedSport.SportId && segment.SegmentId == _selectedSport.SegmentId)
-                                                {
-                                                    <div class="sub-menu-oddsengine ms-3 show">
-                                                        @foreach (var league in segment.Leagues)
-                                                        {
-                                                            <NavLink class="nav-link" @onclick="_ => OnLeagueClickEvent(league.LeagueId)">
-                                                                <span class="fa fa-chevron-right me-2"></span>
-                                                                <span class="nav-menu-text">@league.LeagueName</span>
-                                                            </NavLink>
-                                                        }
-                                                    </div>
-                                                }
-                                            }
-                                        </div>
-                                    </nav>
-                                </div>
-                            }
+            if (_sports?.Any() ?? false)
+            {
+                <div class="flex-column">
+                    <div class="nav-item px-3">
+                        <div class="nav-link header" href="javascript:void(0);">
+                            <span class="fa fa-trophy all-sports" aria-hidden="true"></span>
+                            <span class="nav-menu-text">@_translationState.GetValue("All Sports")</span>
                         </div>
+                    </div>
+                    @foreach (var sport in _sports)
+                    {
+                        <Backoffice.Web.Components.OddsEngine.SportsTree.SportItem Sport="sport" SelectecSport="_selectedSport"/>
                     }
-                }
-
-            </nav>
+                </div>
+            }
         }
     </div>
     <div class="bottom-row">
