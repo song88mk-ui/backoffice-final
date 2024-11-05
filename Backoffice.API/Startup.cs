@@ -62,17 +62,16 @@ namespace Backoffice.API
                           (req) =>
                           {
                               var uriString = req.RequestUri.ToString();
-                              var isAzureReq = uriString.Contains("monitor.azure.com") ||
+                              var isAzureReq = uriString.Contains("azure.com") ||
                                                uriString.Contains("visualstudio.com");
                               return !isAzureReq;
                           }
                       )
                       .AddAspNetCoreInstrumentation((aspCoreOpts) => aspCoreOpts.Filter = httpContext =>
                       {
-                          return (
-                            httpContext.Request.Path.ToString().StartsWith("/api") ||
-                            httpContext.Request.Path.ToString().StartsWith("/sportsbook")
-                            );
+                        var path = httpContext.Request.Path.ToString();
+                        var toExclude = path.StartsWith("/api") || path.StartsWith("/sportsbook");
+                        return !toExclude;
                       })
                       .AddSqlClientInstrumentation();
 

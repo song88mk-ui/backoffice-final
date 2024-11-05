@@ -32,7 +32,7 @@ builder.Services.AddSingleton<Instrumentation>();
 
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()    
+    .Enrich.FromLogContext()
     .CreateLogger();
 
 Log.Logger = logger;
@@ -46,7 +46,16 @@ if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
           tracing
           .AddSource(Instrumentation.ActivitySourceName)
           .SetSampler(new AlwaysOnSampler())
-          .AddHttpClientInstrumentation()
+          .AddHttpClientInstrumentation(
+            (opts) => opts.FilterHttpRequestMessage =
+              (req) =>
+              {
+                  var uriString = req.RequestUri.ToString();
+                  var isAzureReq = uriString.Contains("azure.com") ||
+                                   uriString.Contains("visualstudio.com");
+                  return !isAzureReq;
+              }
+          )
           .AddAspNetCoreInstrumentation((opts) => opts.Filter = httpContext =>
           {
             var path = httpContext.Request.Path.ToString();
@@ -56,7 +65,7 @@ if (Convert.ToBoolean(builder.Configuration["Telemetry:Enabled"]))
                             path.StartsWith("/_content") ||
                             path.StartsWith("/bohub") ||
                             path.StartsWith("/healthz");
-            return toExclude;
+            return !toExclude;
           })
           .AddSqlClientInstrumentation();
 
