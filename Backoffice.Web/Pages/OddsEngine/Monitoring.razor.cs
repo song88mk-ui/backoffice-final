@@ -124,7 +124,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isPreloader = true;
             _shouldRender = true;
 
-            StateHasChanged();
             _fixtureMarkets = await GetFixtures(new MarketFixtureRequest
             {
                 FixtureTypeId = (int)FixtureType.Match,
