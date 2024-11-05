@@ -210,52 +210,53 @@ namespace Backoffice.API.Repositories
                                     Site = c.Site
                                 }).ToList();
                             }
-                            else
-                            {
-                                configs = referenceClients.Where(c => c.App.Equals("bl", StringComparison.OrdinalIgnoreCase)).Select(c => new ExternalMaintenanceConfig()
-                                {
-                                    ClientId = c.ClientId,
-                                    IsMaintenance = c.IsMaintenance,
-                                    Site = c.Site
-                                }).ToList();
-
-                                if (configs != null)
-                                {
-                                    configs.ForEach(config =>
-                                    {
-                                        if (clientIds.Contains(config.ClientId, StringComparison.OrdinalIgnoreCase))
-                                            config.IsMaintenance = request.IsMaintenance;
-                                    });
-                                }
-                            }
-
-                            if (configs != null && configs.Any())
-                            {
-                                using (StreamWriter writer = new StreamWriter(_maintenanceConfigJsonTest))
-                                {
-                                    var configText = JsonSerializer.Serialize(configs, new JsonSerializerOptions
-                                    {
-                                        WriteIndented = true
-                                    });
-                                    writer.Write(configText);
-                                }
-                            }
                         }
                         else
                         {
-                            var stringPayload = JsonSerializer.Serialize(new
+                            configs = referenceClients.Where(c => c.App.Equals("bl", StringComparison.OrdinalIgnoreCase)).Select(c => new ExternalMaintenanceConfig()
                             {
-                                ClientIds = clientIds,
-                                request.IsMaintenance
-                            });
+                                ClientId = c.ClientId,
+                                IsMaintenance = c.IsMaintenance,
+                                Site = c.Site
+                            }).ToList();
 
-                            var result = await _maintenanceHttpClient.PostAsync($"/v1.0/invoke/{app}/method/maintenance", new StringContent(stringPayload, Encoding.UTF8, "application/json"));
-
-                            if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                            if (configs != null)
                             {
-                                var content = await result.Content.ReadAsStringAsync();
+                                configs.ForEach(config =>
+                                {
+                                    if (clientIds.Contains(config.ClientId, StringComparison.OrdinalIgnoreCase))
+                                        config.IsMaintenance = request.IsMaintenance;
+                                });
+                            }
+                        }
 
-                                var properties = new Dictionary<string, string>
+                        if (configs != null && configs.Any())
+                        {
+                            using (StreamWriter writer = new StreamWriter(_maintenanceConfigJsonTest))
+                            {
+                                var configText = JsonSerializer.Serialize(configs, new JsonSerializerOptions
+                                {
+                                    WriteIndented = true
+                                });
+                                writer.Write(configText);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var stringPayload = JsonSerializer.Serialize(new
+                        {
+                            ClientIds = clientIds,
+                            request.IsMaintenance
+                        });
+
+                        var result = await _maintenanceHttpClient.PostAsync($"/v1.0/invoke/{app}/method/maintenance", new StringContent(stringPayload, Encoding.UTF8, "application/json"));
+
+                        if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                        {
+                            var content = await result.Content.ReadAsStringAsync();
+
+                            var properties = new Dictionary<string, string>
                             {
                                 { "app", app },
                                 { "status" , result.StatusCode.ToString() },
@@ -264,20 +265,20 @@ namespace Backoffice.API.Repositories
                                 {  "event" , content }
                             };
 
-                                _telemetryClient.TrackEvent($"e:backoffice-maintenance.set.client", properties);
-                            }
+                            _telemetryClient.TrackEvent($"e:backoffice-maintenance.set.client", properties);
                         }
                     }
-
-                    clients = await GetMaintenanceV2(clientCodes);
-
-                    return new BaseResponse<MaintenanceResponse>()
-                    {
-                        StatusCode = clients.StatusCode,
-                        Message = clients.Message,
-                        Result = clients.Result
-                    };
                 }
+
+                clients = await GetMaintenanceV2(clientCodes);
+
+                return new BaseResponse<MaintenanceResponse>()
+                {
+                    StatusCode = clients.StatusCode,
+                    Message = clients.Message,
+                    Result = clients.Result
+                };
+            }
             catch (Exception ex)
             {
                 return new BaseResponse<MaintenanceResponse>()
