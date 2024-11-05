@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Backoffice.API.Controllers.Trading
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class TradingController : ControllerBase

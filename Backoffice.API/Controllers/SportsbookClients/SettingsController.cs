@@ -8,7 +8,7 @@ using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.SportsbookClients
 {
-    [Authorize]
+    //[Authorize]
     [Route("sportsbook/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class SettingsController : ControllerBase

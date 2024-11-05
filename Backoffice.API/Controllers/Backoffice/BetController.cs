@@ -12,7 +12,7 @@ using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.Backoffice
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class BetController : ControllerBase
