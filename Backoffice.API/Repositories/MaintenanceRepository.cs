@@ -85,12 +85,12 @@ namespace Backoffice.API.Repositories
 
                     if (app.Equals("bl", StringComparison.OrdinalIgnoreCase))
                     {
-                        var tempConfigs = new List<MaintenanceConfigModel>();
+                        var tempConfigs = new List<ExternalMaintenanceConfig>();
                         using (StreamReader reader = new StreamReader(_maintenanceConfigJson))
                         {
                             string text = await reader.ReadToEndAsync();
 
-                            tempConfigs = JsonSerializer.Deserialize<List<MaintenanceConfigModel>>(text);
+                            tempConfigs = JsonSerializer.Deserialize<List<ExternalMaintenanceConfig>>(text);
                         }
 
                         if (tempConfigs != null && tempConfigs.Any())
@@ -205,11 +205,11 @@ namespace Backoffice.API.Repositories
                         else
                         {
                             configs = appGroup.Select(c => new ExternalMaintenanceConfig()
-                            {
-                                ClientId = c.ClientId,
-                                IsMaintenance = request.IsMaintenance,
-                                Site = c.Site
-                            })
+                                        {
+                                            ClientId = c.ClientId,
+                                            IsMaintenance = request.IsMaintenance,
+                                            Site = c.Site
+                                        })
                                         .GroupBy(c => c.ClientId)
                                         .Select(g => g.First())
                                         .ToList();
