@@ -90,7 +90,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/config/v2/maintenance");
+                var response = await _httpClient.GetAsync($"api/config/maintenance");
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<MaintenanceResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -123,10 +123,9 @@ namespace Backoffice.Web.Services
         }
         public async Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request)
         {
-
             try
             {
-                var response = await _httpClient.PostAsync($"api/config/v2/maintenance", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"api/config/maintenance", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<MaintenanceResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -151,84 +150,6 @@ namespace Backoffice.Web.Services
                     Log.Error(ex.StackTrace.ToString());
 
                 return new BaseResponse<MaintenanceResponse>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-        public async Task<BaseResponse<bool>> GetMaintenance()
-        {
-            try
-            {
-                var response = await _httpClient.GetAsync($"api/config/maintenance");
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
-
-                return new BaseResponse<bool>
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
-                };
-            }
-        }
-        public async Task<BaseResponse<bool>> SetMaintenance(bool request)
-        {
-            var httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(_configuration["API:Backoffice:Uri"]);
-            httpClient.DefaultRequestHeaders.Add("x-api-key", _configuration["API:Backoffice:Security:APIKey"]);
-            httpClient.DefaultRequestHeaders.Add("x-region", _configuration["API:Region"]);
-
-            try
-            {
-                httpClient.Timeout = TimeSpan.FromMinutes(3);
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext?.Session.GetString("UserToken"));
-
-                var response = await httpClient.PostAsync($"api/config/maintenance/{request}", null);
-
-                if (response.IsSuccessStatusCode)
-                    return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                else
-                {
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                        return JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    else
-                    {
-                        return new BaseResponse<bool>
-                        {
-                            StatusCode = StatusCode.Error,
-                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
-
-                return new BaseResponse<bool>
                 {
                     StatusCode = StatusCode.Error,
                     Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"

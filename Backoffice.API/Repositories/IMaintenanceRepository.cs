@@ -9,8 +9,6 @@ namespace Backoffice.API.Repositories
 {
     public interface IMaintenanceRepository
     {
-        Task<BaseResponse<bool>> SetMaintenance(bool content);
-        Task<BaseResponse<bool>> GetMaintenance();
         Task<BaseResponse<MaintenanceResponse>> GetMaintenanceV2(List<string> clientCodes);
         Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request, List<string> clientCodes);
     }

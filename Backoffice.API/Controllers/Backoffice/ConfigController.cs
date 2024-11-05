@@ -35,35 +35,7 @@ namespace Backoffice.API.Controllers.Backoffice
             _activitySource = instrumentation.ActivitySource;
         }
 
-        [HttpPost("maintenance/{isMaintenance}")]
-        public async Task<IActionResult> SetMaintenance([FromRoute] bool isMaintenance)
-        {
-            var result = await _maintenanceRepository.SetMaintenance(isMaintenance);
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-
         [HttpGet("maintenance")]
-        public async Task<IActionResult> GetMaintenance()
-        {
-            var result = await _maintenanceRepository.GetMaintenance();
-
-            switch (result.StatusCode)
-            {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
-            }
-        }
-
-        [HttpGet("v2/maintenance")]
         public async Task<IActionResult> GetMaintenanceV2()
         {
             var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
@@ -78,7 +50,7 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
-        [HttpPost("v2/maintenance")]
+        [HttpPost("maintenance")]
         public async Task<IActionResult> SetMaintenanceV2([FromBody] SetMaintenanceRequest request)
         {
             var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();

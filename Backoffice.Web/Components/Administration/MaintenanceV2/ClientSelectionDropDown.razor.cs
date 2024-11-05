@@ -1,9 +1,5 @@
 ﻿using Backoffice.Web.Models;
-using Backoffice.Web.Pages.SBC;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.Identity.Client;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Backoffice.Web.Components.Administration.MaintenanceV2
 {
@@ -25,7 +21,6 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
 
         protected override async Task OnInitializedAsync()
         {
-            var clientConfigs = await _backofficeService.GetMaintenance();
         }
         protected override void OnParametersSet()
         {
