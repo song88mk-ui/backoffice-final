@@ -101,7 +101,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 try
                 {
-                    //await Subscribe();
+                    await Subscribe();
                 }
                 catch (Exception ex)
                 {
@@ -124,6 +124,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isPreloader = true;
             _shouldRender = true;
 
+            StateHasChanged();
             _fixtureMarkets = await GetFixtures(new MarketFixtureRequest
             {
                 FixtureTypeId = (int)FixtureType.Match,
@@ -136,10 +137,13 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _isPreloader = false;
             _shouldRender = true;
-            StateHasChanged();
         }
 
-        private async Task MonitoringCallback(MonitoringCallbackModel model) => await OnInitializeEvent(_monitoringCallbackModel = model);
+        private async Task MonitoringCallback(MonitoringCallbackModel model)
+        {
+            await OnInitializeEvent(_monitoringCallbackModel = model);
+            
+        }
 
         private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
         {
