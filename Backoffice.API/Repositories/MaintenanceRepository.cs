@@ -246,7 +246,8 @@ namespace Backoffice.API.Repositories
 
                             if (configs != null && configs.Any())
                             {
-                                using (StreamWriter writer = new StreamWriter(_maintenanceConfigJsonTest))
+                                using (FileStream fs = new FileStream(_maintenanceConfigJson, FileMode.Create, FileAccess.Write, FileShare.None))
+                                using (StreamWriter writer = new StreamWriter(fs))
                                 {
                                     var configText = JsonSerializer.Serialize(configs, new JsonSerializerOptions
                                     {
