@@ -245,6 +245,7 @@ namespace Backoffice.Web.Shared
 
             sports.ForEach(sport =>
             {
+                sport.ShouldRender = false;
                 var isSelected = sport.Id == sportId;
 
                 if (sport.IsSelected != isSelected)
@@ -272,6 +273,7 @@ namespace Backoffice.Web.Shared
 
             sports.ForEach(sport =>
             {
+                sport.ShouldRender = false;
                 var isSelected = sport.Id == sportId;
 
                 if (!isSelected)
@@ -284,6 +286,7 @@ namespace Backoffice.Web.Shared
                     var segments = sport.Segments.Where(c => c.IsSelected || c.Id == segmentId).ToList();
                     segments.ForEach(segment =>
                     {
+                        segment.ShouldRender = false;
                         isSelected = segment.Id == segmentId;
 
                         if (segment.IsSelected != isSelected)
@@ -297,8 +300,7 @@ namespace Backoffice.Web.Shared
 
             _sports.ForEach(sport =>
             {
-                if (sport.ShouldRender)
-                    sport.ShouldRender = false;
+                sport.ShouldRender = false;
 
                 var isSelected = sport.Id == sportId;
 
@@ -314,8 +316,7 @@ namespace Backoffice.Web.Shared
                 if (sport.Id == sportId)
                     sport.Segments.ForEach(segment =>
                     {
-                        if (segment.ShouldRender)
-                            segment.ShouldRender = false;
+                        segment.ShouldRender = false;
 
                         var isSelected = segment.Id == segmentId;
 

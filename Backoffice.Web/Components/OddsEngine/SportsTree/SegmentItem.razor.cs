@@ -24,6 +24,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportsTree
 
                 _cssArrowIcon = _isSelected ? "fa-chevron-up" : "fa-chevron-down";
             }
+            _init = false;
 
             return Task.CompletedTask;
         }
