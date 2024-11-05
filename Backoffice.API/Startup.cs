@@ -70,7 +70,9 @@ namespace Backoffice.API
                       .AddAspNetCoreInstrumentation((aspCoreOpts) => aspCoreOpts.Filter = httpContext =>
                       {
                         var path = httpContext.Request.Path.ToString();
-                        var toExclude = path.StartsWith("/api") || path.StartsWith("/sportsbook");
+                        var toExclude = path.StartsWith("/api") ||
+                                        path.StartsWith("/sportsbook") ||
+                                        path.StartsWith("/healthz");
                         return !toExclude;
                       })
                       .AddSqlClientInstrumentation();
