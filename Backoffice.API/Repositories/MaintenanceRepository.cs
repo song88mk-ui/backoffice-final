@@ -1,12 +1,12 @@
-﻿using Azure.Storage.Blobs;
+﻿using Backoffice.API.Telemetry;
 using Backoffice.Shared.Enums;
 using Backoffice.Shared.ExternalApis.Maintenance;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,24 +24,25 @@ namespace Backoffice.API.Repositories
         private readonly ITradingRepository _tradingRepository;
 
         private HttpClient _maintenanceHttpClient;
-        private readonly TelemetryClient _telemetryClient;
         private readonly bool _isStaging;
         private readonly string _internalClient;
         private readonly ActivitySource _activitySource;
-        private BlobContainerClient _containerClient;
+        private readonly ILogger<MaintenanceRepository> _logger;
 
         private readonly List<string>? _maintenanceApps;
         private readonly string _maintenanceConfigJson;
         private readonly string _maintenanceConfigJsonTest;
 
 
-        public MaintenanceRepository(HttpClient httpClient, IConfiguration configuration, ITradingRepository tradingRepository, TelemetryClient telemetryClient)
+        public MaintenanceRepository(HttpClient httpClient, IConfiguration configuration, ITradingRepository tradingRepository,
+                Instrumentation instrumentation, ILogger<MaintenanceRepository> logger)
         {
             _isStaging = bool.Parse(configuration["IsStaging"]);
             _internalClient = "71BBE7D8-FD04-459C-6D8B-08D9354E5B64";
 
             _tradingRepository = tradingRepository;
-            _telemetryClient = telemetryClient;
+            _activitySource = instrumentation.ActivitySource;
+            _logger = logger;
 
             _maintenanceConfigJson = configuration["Custom:MaintenanceConfigFile"];
             _maintenanceConfigJsonTest = configuration["Custom:MaintenanceConfigFileTest"];
@@ -52,241 +53,251 @@ namespace Backoffice.API.Repositories
         #region Methods
         public async Task<BaseResponse<MaintenanceResponse>> GetMaintenanceV2(List<string> clientCodes)
         {
-            try
+            using (var activity = _activitySource.StartActivity("get.maintenance.v2"))
             {
-                var clientResponse = await _tradingRepository.GetClientList("");
-
-                if (clientResponse?.Result == null)
-                    return new BaseResponse<MaintenanceResponse>()
-                    {
-                        StatusCode = clientResponse.StatusCode,
-                        Message = clientResponse.Message
-                    };
-
-                var clientReference = clientResponse.Result;
-
-                if (clientCodes.Count > 1)
-                    clientReference = clientReference.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
-
-                if (clientReference == null)
+                activity?.SetTag("client.codes", clientCodes.Join(","));
+                try
                 {
-                    return new BaseResponse<MaintenanceResponse>()
+                    var clientResponse = await _tradingRepository.GetClientList("");
+
+                    if (clientResponse?.Result == null)
                     {
-                        StatusCode = clientResponse.StatusCode,
-                        Message = $"Empty client reference : {clientCodes?.Join(",") ?? "No Clients"}"
-                    };
-                }
-
-                var clientsConfig = new List<MaintenanceConfigModel>();
-
-                foreach (var app in _maintenanceApps)
-                {
-                    var configs = new List<ExternalMaintenanceConfig>();
-
-                    if (app.Equals("bl", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var tempConfigs = new List<ExternalMaintenanceConfig>();
-                        using (StreamReader reader = new StreamReader(_maintenanceConfigJson))
+                        activity?.SetStatus(ActivityStatusCode.Error, clientResponse.StatusCode.ToString());
+                        return new BaseResponse<MaintenanceResponse>()
                         {
-                            string text = await reader.ReadToEndAsync();
-
-                            tempConfigs = JsonSerializer.Deserialize<List<ExternalMaintenanceConfig>>(text);
-                        }
-
-                        if (tempConfigs != null && tempConfigs.Any())
-                            configs.AddRange(tempConfigs);
-                    }
-                    else
-                    {
-                        try
-                        {
-                            var response = await _maintenanceHttpClient.GetAsync($"/v1.0/invoke/{app.ToLower()}/method/maintenance");
-                            var content = await response.Content.ReadAsStringAsync();
-
-                            if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                            {
-                                var properties = new Dictionary<string, string>
-                            {
-                                { "app", app },
-                                { "status", response.StatusCode.ToString() },
-                                { "events", content }
-                            };
-
-                                _telemetryClient.TrackEvent($"e:backoffice-maintenance.get.client", properties);
-                                continue;
-                            }
-
-                            var externalContent = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-
-                            configs.AddRange(externalContent.Config);
-                        }
-                        catch (Exception)
-                        {
-
-                        }
+                            StatusCode = clientResponse.StatusCode,
+                            Message = clientResponse.Message
+                        };
                     }
 
-                    if (configs != null && configs.Any())
+                    var clientReference = clientResponse.Result;
+
+                    if (clientCodes.Count > 1)
+                        clientReference = clientReference.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+
+                    if (clientReference == null)
                     {
-                        foreach (var config in configs)
+
+                        activity?.SetStatus(ActivityStatusCode.Error, clientResponse.StatusCode.ToString());
+                        return new BaseResponse<MaintenanceResponse>()
                         {
-                            var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase));
-
-                            if (reference == null)
-                                continue;
-
-                            clientsConfig.Add(new MaintenanceConfigModel()
-                            {
-                                ClientId = config.ClientId,
-                                IsMaintenance = config.IsMaintenance,
-                                Site = config.Site,
-                                ClientCode = reference.ClientCode,
-                                ClientName = reference.ClientName,
-                                App = app
-                            });
-                        }
+                            StatusCode = clientResponse.StatusCode,
+                            Message = $"Empty client reference : {clientCodes?.Join(",") ?? "No Clients"}"
+                        };
                     }
-                }
 
-                return new BaseResponse<MaintenanceResponse>()
-                {
-                    StatusCode = StatusCode.Success,
-                    Message = StatusCode.Success.ToString(),
-                    Result = new MaintenanceResponse()
-                    {
-                        ClientConfig = clientsConfig
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<MaintenanceResponse>()
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = ex.Message.ToString()
-                };
-            }
-        }
-        public async Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request, List<string> clientCodes)
-        {
-            try
-            {
-                var requestClientIds = request?.ClientIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToUpper()).ToList() ?? new List<string>();
+                    var clientsConfig = new List<MaintenanceConfigModel>();
 
-                var clients = await GetMaintenanceV2(clientCodes);
-
-                if (clients.StatusCode != StatusCode.Success)
-                    return clients;
-
-                var referenceClients = clients?.Result?.ClientConfig;
-                if (referenceClients == null)
-                    return new BaseResponse<MaintenanceResponse>()
-                    {
-                        StatusCode = StatusCode.Error,
-                        Message = StatusCode.Error.ToString()
-                    };
-
-                var appGroups = referenceClients.Where(c => (requestClientIds.Count() == 1 && requestClientIds.FirstOrDefault().ToUpper() == "ALL")
-                                                || (requestClientIds.Any(ci => (ci.Contains(":") && ci.Contains($"{c.App}:{c.ClientId}", StringComparison.OrdinalIgnoreCase)) || ci == c.ClientId)))
-                                                .GroupBy(c => c.App).ToList();
-
-                foreach (var appGroup in appGroups)
-                {
-                    var app = appGroup.Key.ToLower();
-                    var clientIds = (requestClientIds.Count() == 1 && requestClientIds.FirstOrDefault().ToUpper() == "ALL") ? "all" : string.Join(",", appGroup.Select(c => c.ClientId));
-
-
-                    if (app.Equals("bl", StringComparison.OrdinalIgnoreCase))
+                    foreach (var app in _maintenanceApps)
                     {
                         var configs = new List<ExternalMaintenanceConfig>();
-                        if (clientIds.Equals("ALL", StringComparison.OrdinalIgnoreCase))
+
+                        if (app.Equals("bl", StringComparison.OrdinalIgnoreCase))
                         {
-                            if (appGroup != null)
+                            var tempConfigs = new List<ExternalMaintenanceConfig>();
+                            using (StreamReader reader = new StreamReader(_maintenanceConfigJson))
                             {
-                                configs = referenceClients.Where(c => c.App.Equals("bl", StringComparison.OrdinalIgnoreCase)).Select(c => new ExternalMaintenanceConfig()
-                                {
-                                    ClientId = c.ClientId,
-                                    IsMaintenance = request.IsMaintenance,
-                                    Site = c.Site
-                                }).ToList();
+                                string text = await reader.ReadToEndAsync();
+
+                                tempConfigs = JsonSerializer.Deserialize<List<ExternalMaintenanceConfig>>(text);
                             }
+
+                            if (tempConfigs != null && tempConfigs.Any())
+                                configs.AddRange(tempConfigs);
                         }
                         else
                         {
-                            configs = referenceClients.Where(c => c.App.Equals("bl", StringComparison.OrdinalIgnoreCase)).Select(c => new ExternalMaintenanceConfig()
+                            try
                             {
-                                ClientId = c.ClientId,
-                                IsMaintenance = c.IsMaintenance,
-                                Site = c.Site
-                            }).ToList();
+                                var response = await _maintenanceHttpClient.GetAsync($"/v1.0/invoke/{app.ToLower()}/method/maintenance");
+                                var content = await response.Content.ReadAsStringAsync();
 
-                            if (configs != null)
-                            {
-                                configs.ForEach(config =>
+                                if (response.StatusCode != System.Net.HttpStatusCode.OK)
                                 {
-                                    if (clientIds.Contains(config.ClientId, StringComparison.OrdinalIgnoreCase))
-                                        config.IsMaintenance = request.IsMaintenance;
-                                });
+                                    activity?.SetTag("app", app);
+                                    activity?.SetTag("status", response.StatusCode.ToString());
+                                    activity?.SetTag("events", content);
+                                    continue;
+                                }
+
+                                var externalContent = JsonSerializer.Deserialize<ExternalMaintenanceResponse>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                                configs.AddRange(externalContent.Config);
+                            }
+                            catch (Exception e)
+                            {
+                                _logger.LogError($"error on dapr invoke: {e.Message}");
                             }
                         }
 
                         if (configs != null && configs.Any())
                         {
-                            using (StreamWriter writer = new StreamWriter(_maintenanceConfigJsonTest))
+                            foreach (var config in configs)
                             {
-                                var configText = JsonSerializer.Serialize(configs, new JsonSerializerOptions
+                                var reference = clientReference.FirstOrDefault(c => c.ClientId.ToString().Equals(config.ClientId, StringComparison.OrdinalIgnoreCase));
+
+                                if (reference == null)
+                                    continue;
+
+                                clientsConfig.Add(new MaintenanceConfigModel()
                                 {
-                                    WriteIndented = true
+                                    ClientId = config.ClientId,
+                                    IsMaintenance = config.IsMaintenance,
+                                    Site = config.Site,
+                                    ClientCode = reference.ClientCode,
+                                    ClientName = reference.ClientName,
+                                    App = app
                                 });
-                                writer.Write(configText);
                             }
                         }
                     }
-                    else
+                    activity?.SetStatus(ActivityStatusCode.Ok);
+                    return new BaseResponse<MaintenanceResponse>()
                     {
-                        var stringPayload = JsonSerializer.Serialize(new
+                        StatusCode = StatusCode.Success,
+                        Message = StatusCode.Success.ToString(),
+                        Result = new MaintenanceResponse()
                         {
-                            ClientIds = clientIds,
-                            request.IsMaintenance
-                        });
+                            ClientConfig = clientsConfig
+                        }
+                    };
+                }
+                catch (Exception ex)
+                {
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    _logger.LogError($"error on method: {ex.Message}");
+                    return new BaseResponse<MaintenanceResponse>()
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = ex.Message.ToString()
+                    };
+                }
+            } // using
+        }
 
-                        var result = await _maintenanceHttpClient.PostAsync($"/v1.0/invoke/{app}/method/maintenance", new StringContent(stringPayload, Encoding.UTF8, "application/json"));
+        public async Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request, List<string> clientCodes)
+        {
+            using (var activity = _activitySource.StartActivity("set.maintenance.v2"))
+            {
+                activity?.SetTag("client.codes", clientCodes.Join(","));
+                try
+                {
+                    var requestClientIds = request?.ClientIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToUpper()).ToList() ?? new List<string>();
 
-                        if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                    var clients = await GetMaintenanceV2(clientCodes);
+
+                    if (clients.StatusCode != StatusCode.Success)
+                        return clients;
+
+                    var referenceClients = clients?.Result?.ClientConfig;
+                    if (referenceClients == null)
+                    {
+                        activity?.SetStatus(ActivityStatusCode.Error, "referenceClients=null");
+                        return new BaseResponse<MaintenanceResponse>()
                         {
-                            var content = await result.Content.ReadAsStringAsync();
+                            StatusCode = StatusCode.Error,
+                            Message = StatusCode.Error.ToString()
+                        };
+                    }
 
-                            var properties = new Dictionary<string, string>
+                    var appGroups = referenceClients.Where(c => (requestClientIds.Count() == 1 && requestClientIds.FirstOrDefault().ToUpper() == "ALL")
+                                                    || (requestClientIds.Any(ci => (ci.Contains(":") && ci.Contains($"{c.App}:{c.ClientId}", StringComparison.OrdinalIgnoreCase)) || ci == c.ClientId)))
+                                                    .GroupBy(c => c.App).ToList();
+
+                    foreach (var appGroup in appGroups)
+                    {
+                        var app = appGroup.Key.ToLower();
+                        var clientIds = (requestClientIds.Count() == 1 && requestClientIds.FirstOrDefault().ToUpper() == "ALL") ? "all" : string.Join(",", appGroup.Select(c => c.ClientId));
+
+
+                        if (app.Equals("bl", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var configs = new List<ExternalMaintenanceConfig>();
+                            if (clientIds.Equals("ALL", StringComparison.OrdinalIgnoreCase))
                             {
-                                { "app", app },
-                                { "status" , result.StatusCode.ToString() },
-                                { "payload", stringPayload },
-                                { "message", $"{result.StatusCode} - {app} - {content}"},
-                                {  "event" , content }
-                            };
+                                if (appGroup != null)
+                                {
+                                    configs = referenceClients.Where(c => c.App.Equals("bl", StringComparison.OrdinalIgnoreCase)).Select(c => new ExternalMaintenanceConfig()
+                                    {
+                                        ClientId = c.ClientId,
+                                        IsMaintenance = request.IsMaintenance,
+                                        Site = c.Site
+                                    }).ToList();
+                                }
+                            }
+                            else
+                            {
+                                configs = referenceClients.Where(c => c.App.Equals("bl", StringComparison.OrdinalIgnoreCase)).Select(c => new ExternalMaintenanceConfig()
+                                {
+                                    ClientId = c.ClientId,
+                                    IsMaintenance = c.IsMaintenance,
+                                    Site = c.Site
+                                }).ToList();
 
-                            _telemetryClient.TrackEvent($"e:backoffice-maintenance.set.client", properties);
+                                if (configs != null)
+                                {
+                                    configs.ForEach(config =>
+                                    {
+                                        if (clientIds.Contains(config.ClientId, StringComparison.OrdinalIgnoreCase))
+                                            config.IsMaintenance = request.IsMaintenance;
+                                    });
+                                }
+                            }
+
+                            if (configs != null && configs.Any())
+                            {
+                                using (StreamWriter writer = new StreamWriter(_maintenanceConfigJsonTest))
+                                {
+                                    var configText = JsonSerializer.Serialize(configs, new JsonSerializerOptions
+                                    {
+                                        WriteIndented = true
+                                    });
+                                    writer.Write(configText);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var stringPayload = JsonSerializer.Serialize(new
+                            {
+                                ClientIds = clientIds,
+                                request.IsMaintenance
+                            });
+
+                            var result = await _maintenanceHttpClient.PostAsync($"/v1.0/invoke/{app}/method/maintenance", new StringContent(stringPayload, Encoding.UTF8, "application/json"));
+
+                            if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                            {
+                                var content = await result.Content.ReadAsStringAsync();
+                                activity?.SetTag("app", app);
+                                activity?.SetTag("status", result.StatusCode.ToString());
+                                activity?.SetTag("payload", stringPayload);
+                                activity?.SetTag("content", content);
+                            }
                         }
                     }
+
+                    clients = await GetMaintenanceV2(clientCodes);
+
+                    activity?.SetStatus(ActivityStatusCode.Ok);
+                    return new BaseResponse<MaintenanceResponse>()
+                    {
+                        StatusCode = clients.StatusCode,
+                        Message = clients.Message,
+                        Result = clients.Result
+                    };
                 }
-
-                clients = await GetMaintenanceV2(clientCodes);
-
-                return new BaseResponse<MaintenanceResponse>()
+                catch (Exception ex)
                 {
-                    StatusCode = clients.StatusCode,
-                    Message = clients.Message,
-                    Result = clients.Result
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<MaintenanceResponse>()
-                {
-                    StatusCode = StatusCode.Error,
-                    Message = ex.Message.ToString()
-                };
-            }
+                    _logger.LogError($"error on method: {ex.Message}");
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    return new BaseResponse<MaintenanceResponse>()
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = ex.Message.ToString()
+                    };
+                }
+            } // using
         }
         #endregion
 
