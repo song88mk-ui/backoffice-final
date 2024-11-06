@@ -124,7 +124,8 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 
-builder.AddAuthorization()
+builder.AddStates()
+    .AddAuthorization()
     .AddHttpClients()
     .AddServices()
     .AddStates();

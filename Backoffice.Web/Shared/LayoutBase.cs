@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backoffice.Web.Shared
 {
@@ -27,6 +28,8 @@ namespace Backoffice.Web.Shared
         [Inject] public TranslationState TranslationState { get; set; }
         [Inject] public ToastService ToasterService { get; set; }
         [Inject] public PageState PageState { get; set; }
+        [Inject] public UserState UserState { get; set; }
+
 
         public UserModel UserModel { get; set; } = new UserModel();
         public NavMenuModel NavMenus { get; set; } = new NavMenuModel();
@@ -76,18 +79,18 @@ namespace Backoffice.Web.Shared
             {
                 TranslationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
 
-                if (HttpContextAccessor?.HttpContext?.Session.GetString("UserToken") == null)
+                if (!UserState.IsAuthenticated)
                 {
                     NavigationManager.NavigateTo("login", true);
                     return;
                 }
 
-                var authStateTask = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
+                //var authStateTask = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
                 var clientTask = await BackofficeService.GetClients();
 
-                var authState = authStateTask;
+                //var authState = authStateTask;
 
-                var userClaims = authState.User.Claims.ToList();
+                var userClaims = UserState.ClaimsPrincipal.Claims.ToList();
                 var clientResult = clientTask;
 
                 if (clientResult.StatusCode != StatusCode.Success)
