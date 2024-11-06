@@ -255,18 +255,18 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ClientInformationModel>>> GetClientList()
+        public async Task<BaseResponse<List<ClientInformationModel>>> GetClientList(CancellationToken cancellationToken = default)
         {
             try
             {
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<List<ClientInformationModel>>>
-                (await GetHttpClient().GetStreamAsync($"api/trading/client"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (await GetHttpClient().GetStreamAsync($"api/trading/client", cancellationToken), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result;
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message);
+                Log.Error($"Client List - {ex.Message}");
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
 
