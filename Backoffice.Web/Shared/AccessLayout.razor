@@ -1,7 +1,10 @@
 ﻿@inherits LayoutBase
 
 <div class="access-layout">
-    <div class="page">
-        @Body
-    </div>
+    @if (!PreRenderService.IsPreRendering)
+    {
+        <div class="page">
+            @Body
+        </div>
+    }
 </div>
