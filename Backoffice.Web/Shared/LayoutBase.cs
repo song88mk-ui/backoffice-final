@@ -20,6 +20,7 @@ namespace Backoffice.Web.Shared
         #region Properties
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
+        [Inject] public ITradingService TradingService { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
@@ -88,6 +89,7 @@ namespace Backoffice.Web.Shared
                 //var authStateTask = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
                 var clientTask = await BackofficeService.GetClients();
 
+                //await Task.WhenAll(clientTask, tradingClientTask);
                 //var authState = authStateTask;
 
                 var userClaims = UserState.ClaimsPrincipal.Claims.ToList();

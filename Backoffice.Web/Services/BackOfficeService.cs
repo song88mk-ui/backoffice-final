@@ -354,7 +354,6 @@ namespace Backoffice.Web.Services
                     return JsonSerializer.Deserialize<BaseResponse<ClientModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else
                 {
-                    var test = JsonSerializer.Deserialize<BaseResponse<ClientModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     return new BaseResponse<ClientModel>
                     {
                         StatusCode = StatusCode.Error,

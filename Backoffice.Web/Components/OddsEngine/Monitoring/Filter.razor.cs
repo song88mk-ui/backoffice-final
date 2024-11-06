@@ -2,8 +2,11 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
+using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Monitoring
 {
@@ -25,11 +28,14 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         private int _sportId;
         private SearchFormModel _searchForm;
         private List<MainMarketTemplateResponse> _topMarketTemplates;
-        private List<SelectListItemWithCheckboxModel<string>> _clientFilter;
+        private List<SelectListItemWithCheckboxModel<string>>? _clientFilter;
         private string _marketTemplateId = string.Empty;
         private int _selectedClientCount;
         private string _selectedClientName;
         private LanguageCode _languageCode;
+        private bool _init = true;
+
+        private List<ClientInformationModel> _clientListReference = new List<ClientInformationModel>();
         #endregion
 
         #region Methods
@@ -42,40 +48,49 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
             TradingService.Region = _region.ToUpper();
 
-            var clientsResponse = await TradingService.GetClientList();
-            var clients = clientsResponse.Result;
-
-            if (clients != null)
-            {
-                _clientFilter = UserModel.ClientCodes.Any() 
-                    ? clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList() 
-                    : new();
-
-                _clientFilter.Insert(0, new SelectListItemWithCheckboxModel<string>
-                {
-                    Value = "all",
-                    Name = "All Clients",
-                    IsChecked = true
-                });
-            }
-            else
-            {
-                _clientFilter.Add(new SelectListItemWithCheckboxModel<string>
-                {
-                    Value = "all",
-                    Name = "All Clients",
-                    IsChecked = true
-                });
-            }
-
-            _selectedClientCount = _clientFilter.Count;
-            _selectedClientName = _selectedClientCount > 0 ? string.Empty : _clientFilter.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
-
-            await OnFilterClientCallback.InvokeAsync(_clientFilter);
+            //var clientsResponse = await TradingService.GetClientList();
+            //_clientListReference = clientsResponse.Result;
+            _clientListReference = _userState.TradingClients;
         }
 
+        private string _clientReference;
         protected override async Task OnParametersSetAsync()
         {
+            var tempClientReference = string.Join(',', UserModel.ClientCodes.OrderBy(c => c).Select(s => s.Trim()).ToList());
+
+            if (_init || _clientReference != tempClientReference)
+            {
+                _clientFilter = null;
+
+                Log.Information($"UserModel - {string.Join(',', UserModel.ClientCodes)}");
+                _clientReference = tempClientReference;
+                if (_clientListReference != null)
+                {
+
+                    Log.Information($"ClientRef - {string.Join(',', _clientListReference.Select(s => s.ClientCode))}");
+                    _clientFilter = UserModel.ClientCodes.Any()
+                        ? _clientListReference.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList()
+                        : new();
+
+                    Log.Information($"ClientFilter - {string.Join(',', _clientFilter.Select(s => s.Value))}");
+                    if (_clientFilter.Any())
+                    {
+                        _clientFilter.Insert(0, new SelectListItemWithCheckboxModel<string>
+                        {
+                            Value = "all",
+                            Name = "All Clients",
+                            IsChecked = true
+                        });
+                    }
+                }
+
+                _selectedClientCount = _clientFilter?.Count ?? 0;
+                _selectedClientName = _selectedClientCount > 0 ? string.Empty : _clientFilter?.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Name ?? "";
+
+                await OnFilterClientCallback.InvokeAsync(_clientFilter);
+            }
+
+
             if (_sportId != SportId || _languageCode != _translationState.ActiveLanguageCode)
             {
                 _sportId = SportId;
@@ -94,6 +109,8 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                     });
                 }
             }
+
+            _init = false;
         }
 
         private async void OnMarketChangedEvent(ChangeEventArgs e)

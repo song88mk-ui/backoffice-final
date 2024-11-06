@@ -346,8 +346,6 @@ namespace Backoffice.API.Repositories
             {
                 var response = await GetHttpClient(region, langCode).GetAsync($"fixtures/market/{fixtureTypeId}/{sportId}/{segmentId}/{leagueId}/{marketTemplateId}");
 
-                var test = response.Content.ReadAsStringAsync();
-
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else

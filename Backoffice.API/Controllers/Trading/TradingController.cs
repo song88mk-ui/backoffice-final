@@ -1,5 +1,6 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
+using Backoffice.API.Telemetry;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Cors;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,13 +21,14 @@ namespace Backoffice.API.Controllers.Trading
     {
         // Include "x-region" in request Header
         private ITradingRepository _tradingRepository { get; set; }
+        private readonly ActivitySource _activitySource;
 
         #region Ctor
 
-        public TradingController(ITradingRepository tradingRepository)
+        public TradingController(ITradingRepository tradingRepository, Instrumentation instrumentation)
         {
-            //
             _tradingRepository = tradingRepository;
+            _activitySource = instrumentation.ActivitySource;
         }
 
         #endregion
@@ -338,20 +341,24 @@ namespace Backoffice.API.Controllers.Trading
         [HttpGet("client")]
         public async Task<IActionResult> GetClientList()
         {
-            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
-            var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
-
-            var result = await _tradingRepository.GetClientList(region);
-
-            switch (result.StatusCode)
+            using (var activity = _activitySource.StartActivity("api/trading/client"))
             {
-                case Shared.Enums.StatusCode.Success:
-                    if (clientCodes.FirstOrDefault() != "ALL")
-                        result.Result = result.Result.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+                activity?.SetTag("clientCodes", HttpContext.Items["ClientCodes"]?.ToString());
+                var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+                var clientCodes = HttpContext.Items["ClientCodes"]?.ToString().Split(',').ToList();
+                
+                var result = await _tradingRepository.GetClientList(region);
 
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
+                switch (result.StatusCode)
+                {
+                    case Shared.Enums.StatusCode.Success:
+                        if (clientCodes.FirstOrDefault() != "ALL")
+                            result.Result = result.Result.Where(c => clientCodes.Contains(c.ClientCode, StringComparer.OrdinalIgnoreCase)).ToList();
+
+                        return Ok(result);
+                    default:
+                        return BadRequest(result);
+                }
             }
         }
         [HttpPost("client/config/all")]

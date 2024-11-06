@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Monitoring;
 using Backoffice.Web.Models.Shared;
+using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing;
@@ -10,22 +11,34 @@ namespace Backoffice.Web.Shared.OddsEngine
 {
     public partial class OEMonitoringLayout
     {
-        #region Properties        
+        #region Properties
+        [Inject] public ITradingService TradingService { get; set; }
+
         private HeaderNavMenu _headerNavMenuReference;
         private SportClickCallbackModel _selectedSport;
         private NavMenuParameter _navMenuParameter = new();
 
         private List<SportItemModel> _sports = new();
         private LanguageCode _languageCode;
+        private CancellationTokenSource _cts;
 
         private bool _init = true;
         private bool _shouldRender = true;
         #endregion
 
         #region Methods
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
+            _cts?.Cancel();
+            _cts = new CancellationTokenSource();
             _navMenuParameter.NavMenuAccess = PermissionCategory.OE;
+
+            var ctsToken = _cts.Token;
+            var tradingClientTask = await TradingService.GetClientList(ctsToken);
+
+            if (!ctsToken.IsCancellationRequested)
+                UserState.SetTradingClients(tradingClientTask.Result);
+
             base.InitializeState();
         }
         protected override async Task OnParametersSetAsync()
