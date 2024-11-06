@@ -2,18 +2,13 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
-using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Components.OddsEngine.MonitoringDetails;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
-using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using Serilog;
-using RabbitMQ.Client.Apigen.Attributes;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
-using System.Drawing.Printing;
-using System.Drawing;
+using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -355,6 +350,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
             .Build();
 
+            Log.Information($"Hubconnection URI - {NavigationManager.BaseUri}");
 
             _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
             {
@@ -375,7 +371,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             });
 
             await _hubConnection.StartAsync();
-            await _hubConnection.InvokeAsync("AddToGroup", Region.ToUpper());
+            //await _hubConnection.InvokeAsync("AddToGroup", Region.ToUpper());
         }
 
         private async Task ProcessOddsChangeMonitoring(OnExternalOddsChangeMessage message)

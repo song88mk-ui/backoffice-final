@@ -10,7 +10,7 @@ using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.JSInterop;
+using Serilog;
 
 namespace Backoffice.Web.Shared
 {
@@ -270,6 +270,8 @@ namespace Backoffice.Web.Shared
                     .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
                 .Build();
 
+                Log.Information($"Hubconnection URI - {NavigationManager.BaseUri}");
+
                 _hubConnection.On<NotificationsModel>("Notification", async message =>
                 {
                     await ProcessNotification(message);
@@ -294,7 +296,7 @@ namespace Backoffice.Web.Shared
                     }
                 });
 
-                await _hubConnection.InvokeAsync("AddToGroup", "HK");
+                //await _hubConnection.InvokeAsync("AddToGroup", "HK");
             }
             catch (Exception ex)
             {

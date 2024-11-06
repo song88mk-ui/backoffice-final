@@ -4,11 +4,11 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
+using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
-using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using Serilog;
-using Backoffice.Web.States;
+using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -209,6 +209,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
             .Build();
+
+            Log.Information($"Hubconnection URI - {NavigationManager.BaseUri}");
 
             _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
             {

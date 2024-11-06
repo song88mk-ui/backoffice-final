@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json.Linq;
 using Serilog;
 using System.Net.Http.Headers;
 using System.Security.Claims;
