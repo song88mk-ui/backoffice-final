@@ -242,8 +242,8 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
 
-        //[HttpPost("template/copy/client")]
-        [Authorize("SBC.OE.Config", ((int)Access.View))]
+        [HttpPost("template/copy/client")]
+        //[Authorize("SBC.OE.Config", ((int)Access.View))]
         public async Task<IActionResult> CopyClientConfig([FromBody] CopyClientConfigRequest request)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
