@@ -344,7 +344,6 @@ namespace Backoffice.API.Repositories
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var test = await response.Content.ReadAsStringAsync();
                     var content = JsonSerializer.Deserialize<BaseResponse<PermissionResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })
                         ?? new BaseResponse<PermissionResponse>();
 

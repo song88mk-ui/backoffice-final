@@ -73,16 +73,21 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = ValidateParameters();
             if (_shouldRender)
             {
-                var isSportChanged = _sportId != SelectedSport.SportId || _leagueId != SelectedSport.LeagueId || _languageCode != _translationState.ActiveLanguageCode;
-                _sportId = SelectedSport.SportId;
-                _segmentId = SelectedSport.SegmentId;
-                _leagueId = SelectedSport.LeagueId;
-                _languageCode = _translationState.ActiveLanguageCode;
+                var isSportChanged = _sportId != (SelectedSport?.SportId ?? 0) || _leagueId != (SelectedSport?.LeagueId ?? 0) || _languageCode != _translationState.ActiveLanguageCode;
 
+                if (SelectedSport != null)
+                {
+                    _sportId = SelectedSport.SportId;
+                    _segmentId = SelectedSport.SegmentId;
+                    _leagueId = SelectedSport.LeagueId;
+                }
+
+                _languageCode = _translationState.ActiveLanguageCode;
+               
                 _pageHeaderModel = new PageHeaderModel()
                 {
-                    Title = $"{_translationState.GetValue(SelectedSport.SportName)} - {SelectedSport.SegmentName} - {SelectedSport.LeagueName}",
-                    IconClass = $"iconfont iconfont-{SelectedSport.SportName.ToLower().Replace(" ", "-")}",
+                    Title = $"{_translationState.GetValue(SelectedSport?.SportName ?? "")} - {SelectedSport?.SegmentName ?? ""} - {SelectedSport?.LeagueName ?? ""}",
+                    IconClass = $"iconfont iconfont-{SelectedSport?.SportName.ToLower().Replace(" ", "-") ?? ""}",
                     ShowLanguageDropDown = false
                 };
 
@@ -117,7 +122,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = false;
         }
         protected override bool ShouldRender() => _shouldRender;
-        private bool ValidateParameters() => SelectedSport != null && SelectedSport.SportId > 0 && _slugs != null && _slugs.Count >= 2;
+        private bool ValidateParameters() => _init || ((SelectedSport?.SportId ?? 0 )> 0 && _slugs != null && _slugs.Count >= 2);
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
         {
@@ -146,6 +151,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
         {
+            Log.Information($"Callback - {string.Join(',', clients.Select(c => c.Value).ToList())}");
             if (clients != null)
             {
                 _clients = clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => new Client

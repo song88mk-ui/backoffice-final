@@ -125,6 +125,7 @@ namespace Backoffice.Web.Extensions
         {
             builder.Services.AddScoped<TranslationState>();
             builder.Services.AddScoped<PageState>();
+            builder.Services.AddScoped<UserState>();
 
             return builder;
         }

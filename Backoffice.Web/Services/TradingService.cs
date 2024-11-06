@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Extensions;
 using Backoffice.Web.Models;
+using Backoffice.Web.States;
 using Serilog;
 using System.Net;
 using System.Net.Http.Headers;
@@ -40,19 +41,20 @@ namespace Backoffice.Web.Services
         private readonly IAuthenticationService _authenticationService;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserState _userState;
 
-        public TradingService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor)
+        public TradingService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor, UserState userState)
         {
             _client = httpClient;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _authenticationService = authenticationService;
+            _userState = userState;
         }
 
         private HttpClient GetHttpClient()
         {
-            var token = _httpContextAccessor.HttpContext?.Session?.GetString("UserToken") ?? string.Empty;
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.AccessToken);
 
             if (_client.DefaultRequestHeaders.Contains("x-region"))
             {
@@ -253,18 +255,18 @@ namespace Backoffice.Web.Services
             }
         }
 
-        public async Task<BaseResponse<List<ClientInformationModel>>> GetClientList()
+        public async Task<BaseResponse<List<ClientInformationModel>>> GetClientList(CancellationToken cancellationToken = default)
         {
             try
             {
                 var result = await JsonSerializer.DeserializeAsync<BaseResponse<List<ClientInformationModel>>>
-                (await GetHttpClient().GetStreamAsync($"api/trading/client"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                (await GetHttpClient().GetStreamAsync($"api/trading/client", cancellationToken), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return result;
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message);
+                Log.Error($"Client List - {ex.Message}");
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
 

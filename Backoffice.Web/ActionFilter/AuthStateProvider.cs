@@ -1,4 +1,6 @@
 ﻿using Backoffice.Shared.Utilities;
+using Backoffice.Web.Services;
+using Backoffice.Web.States;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -14,11 +16,14 @@ namespace Backoffice.Web.ActionFilter
         private readonly HttpClient _httpClient;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AuthenticationState _anonymous;
+        private readonly UserState _userState;
 
-        public AuthStateProvider(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
+        public AuthStateProvider(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, UserState userState)
         {
             _httpClient = httpClient;
             _httpContextAccessor = httpContextAccessor;
+            _userState = userState;
+
             _anonymous = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 
@@ -26,16 +31,15 @@ namespace Backoffice.Web.ActionFilter
         {
             try
             {
-                var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken");
-                if (string.IsNullOrWhiteSpace(token))
+                if(string.IsNullOrEmpty(_userState.AccessToken))
+                    _userState.SetAccessToken(_httpContextAccessor.HttpContext?.Session.GetString("UserToken"));
+
+                if (string.IsNullOrWhiteSpace(_userState.AccessToken))
                     return _anonymous;
 
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var parsedToken = JwtParser.ParseClaimsFromJwt(token);
-                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(parsedToken, "jwtAuthType"));
-                var claimsIdentity = new ClaimsIdentity(parsedToken, "jwtAuthType");
-
-                return new AuthenticationState(claimsPrincipal);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.AccessToken);
+                
+                return new AuthenticationState(_userState.ClaimsPrincipal);
             }
             catch (Exception ex)
             {

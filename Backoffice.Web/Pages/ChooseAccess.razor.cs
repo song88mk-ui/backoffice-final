@@ -3,8 +3,8 @@ using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
+using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using System.Security.Claims;
 
@@ -14,9 +14,9 @@ namespace Backoffice.Web.Pages
     {
         #region Properties
 
-        [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] public UserState UserState { get; set; }
 
 
 
@@ -38,10 +38,11 @@ namespace Backoffice.Web.Pages
             await PageState.AuthenticateAccessEvent.InvokeAsync();
 
             var validClaimValues = new string[] { "1", "2", "0" };
-            var authState = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
+            //var authState = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
             //var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
-            UserClaims.AddRange(authState.User.Claims.Where(c => validClaimValues.Contains(c.Value)).ToList());
+            if(UserState.ClaimsPrincipal != null)
+                UserClaims.AddRange(UserState.ClaimsPrincipal?.Claims.Where(c => validClaimValues.Contains(c.Value)).ToList());
         }
         //protected override async Task OnAfterRenderAsync(bool firstRender)
         //{

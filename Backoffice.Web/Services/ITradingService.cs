@@ -14,7 +14,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<SportsLookupResponse>> GetSportLookup(string langCode);
         Task<BaseResponse<SegmentLookupResponse>> GetSegmentLookup(int sportId, LanguageCode langCode = LanguageCode.EN);
         Task<BaseResponse<LeagueLookupResponse>> GetLeagueLookup(int sportId, int segmentId, LanguageCode langCode = LanguageCode.EN);
-        Task<BaseResponse<List<ClientInformationModel>>> GetClientList();
+        Task<BaseResponse<List<ClientInformationModel>>> GetClientList(CancellationToken cancellationToken = default);
         Task<BaseResponse<List<PriceBoostConfigModel>>> GetPriceBoostConfig(PriceBoostConfigRequest request);
         Task<BaseResponse<List<BoostedSettingsModel>>> GetBoostedSettings(BoostedSettingsRequest request);
         Task<BaseResponse<bool>> AddOrUpdateBoostedSetting(BoostedSettingsModel request, string userId);
