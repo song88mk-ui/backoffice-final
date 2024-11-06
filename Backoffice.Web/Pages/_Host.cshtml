@@ -1,8 +1,160 @@
 ﻿@page "/"
+
+@using Microsoft.AspNetCore.Components;
+@using Microsoft.AspNetCore.Components.Web;
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+@using System.Net;
+
 @namespace Backoffice.Web.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@inject IHttpContextAccessor _httpContextAccessor
+
 @{
-    Layout = "_Layout";
+    var host = $"{Request?.Scheme}://{Request?.Host.Value}" ?? string.Empty;
+
+    string GetCustomDomain()
+    {
+        var baseUri = host;
+
+        if (!baseUri.Contains("localhost"))
+            baseUri = baseUri.Replace("http:", "https:");
+
+        if (baseUri.EndsWith("/"))
+            baseUri = baseUri.TrimEnd('/');
+
+        return $"{baseUri}/_blazor";
+    }
 }
 
-<component type="typeof(App)" render-mode="Server" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <base href="~/" />
+
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/flags.css" rel="stylesheet" />
+    <link href="css/site.css" rel="stylesheet" />
+    <link href="css/sortable.css" rel="stylesheet" />
+    <link href="css/font-oe/css/iconsports.css" rel="stylesheet" />
+    <link href="css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="css/select2/select2.min.css" rel="stylesheet" />
+    <link href="_content/BlazorDateRangePicker/daterangepicker.min.css" rel="stylesheet" />
+
+    <link href="Backoffice.Web.styles.css" rel="stylesheet" />
+
+    <!-- script -->
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="_content/BlazorDateRangePicker/clickAndPositionHandler.js"></script>
+
+    <!-- preload svg, images -->
+    <link rel="preload" as="image" type="image/svg+xml" href="icons/svg/song-logo.svg" />
+
+    <!-- preload icons -->
+    <link rel="preload" as="font" type="font/woff" crossorigin="anonymous" href="css/font-bo/bo-icons.v3.woff" />
+    <link rel="preload" as="font" type="font/woff" crossorigin="anonymous" href="css/font-awesome/fonts/fontawesome-webfont.woff2" />
+
+    <!-- fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+
+    <script src="~/js/jquery-3.6.3.min.js"></script>
+    <script src="~/js/jquery-ui.js"></script>
+    <script src="~/js/jquery.multisortable.js"></script>
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+    <component type="typeof(App)" render-mode="Server" />
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js" autostart="false"></script>
+
+    <script src="~/js/select2.min.js"></script>
+    <script src="~/js/common-v1.js"></script>
+
+    <script src="~/js/oddin.js"></script>
+
+    <script>
+        let currentReconnectionProcess = null;
+        var signalRUrl = '@GetCustomDomain()';
+
+        Blazor.start({
+            reconnectionHandler: {
+                onConnectionDown: () => currentReconnectionProcess ??= startReconnectionProcess(),
+                onConnectionUp: () => {
+                    currentReconnectionProcess?.cancel();
+                    currentReconnectionProcess = null;
+                }
+            },
+            configureSignalR: builder => builder.withUrl(signalRUrl, { skipNegotiation: true, transport: 1 })
+        });
+    </script>
+    <script>
+        // Wait until a reload button appears
+        new MutationObserver((mutations, observer) => {
+            if (document.querySelector('#components-reconnect-modal h5 a')) {
+                // Now every 10 seconds, see if the server appears to be back, and if so, reload
+                async function attemptReload() {
+                    await fetch(''); // Check the server really is back
+                    location.reload();
+                }
+                observer.disconnect();
+                attemptReload();
+                setInterval(attemptReload, 2000);
+            }
+        }).observe(document.body, { childList: true, subtree: true });
+    </script>
+    <script type="text/javascript">
+        function getDimensions(element, maxwidth) {
+            var e = element.getBoundingClientRect();
+
+            var result = {
+                'bottom': e.bottom,
+                'height': e.height,
+                'left': e.left,
+                'right': e.right,
+                'top': e.top,
+                'width': e.width,
+                'x': e.x,
+                'y': e.y,
+                'position': positionString(element, maxwidth)
+            }
+
+            return JSON.stringify(result);
+        }
+
+        function positionString(element, maxwidth) {
+            var offset = $(element).offset();
+            var height = $(element).outerHeight();
+
+            var position = 'up';
+            if ((offset.top + height) > ($(window).height() + window.pageYOffset)) {
+                position = 'up';
+            }
+
+            if ((offset.left + maxwidth) > ($(window).width() + window.pageXOffset)) {
+                position = position + ' left';
+            }
+            else {
+                position = position + ' right';
+            }
+            return position;
+        }
+    </script>
+</body>
+</html>
