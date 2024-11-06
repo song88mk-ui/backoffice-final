@@ -6,6 +6,7 @@ using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Extensions;
 using Backoffice.Web.Models;
+using Backoffice.Web.States;
 using Microsoft.JSInterop;
 using Serilog;
 using System.Net;
@@ -42,17 +43,19 @@ namespace Backoffice.Web.Services
         private readonly IMessageBroker _messageBroker;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IJSRuntime _jsRuntime;
+        private readonly UserState _userState;
         #endregion
 
         #region Ctor
 
-        public BackofficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IMessageBroker messageBroker, IHttpContextAccessor httpContextAccessor, IJSRuntime jsRuntime)
+        public BackofficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IMessageBroker messageBroker, IHttpContextAccessor httpContextAccessor, IJSRuntime jsRuntime, UserState userState)
         {
             _configuration = configuration;
             _authenticationService = authenticationService;
             _messageBroker = messageBroker;
             _httpContextAccessor = httpContextAccessor;
             _jsRuntime = jsRuntime;
+            _userState = userState;
 
             _httpClient = httpClient;
         }
@@ -62,8 +65,7 @@ namespace Backoffice.Web.Services
 
         private void ConfigureHttpClientHeaders()
         {
-            var token = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.AccessToken);
 
             RemoveHeader("x-page");
             RemoveHeader("x-language-code");
