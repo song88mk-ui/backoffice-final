@@ -62,7 +62,7 @@ namespace Backoffice.Web.Services
 
         private void ConfigureHttpClientHeaders()
         {
-            var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+            var token = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             RemoveHeader("x-page");

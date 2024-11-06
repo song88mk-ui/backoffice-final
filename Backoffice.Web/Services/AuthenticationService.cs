@@ -115,7 +115,7 @@ namespace Backoffice.Web.Services
             var userToken = accesstoken;
             if(string.IsNullOrEmpty(accesstoken))
             {
-                userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
             }
 
             var key = $"as:t:{userToken}";
@@ -157,7 +157,7 @@ namespace Backoffice.Web.Services
         }
         public async Task<bool> Logout()
         {
-            var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+            var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
             var auth = _httpClient.GetAsync("api/authentication/logout").Result;
 
@@ -172,7 +172,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var response = await _httpClient.PostAsync($"api/authentication/register", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
@@ -213,7 +213,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var response = await _httpClient.PostAsync($"api/authentication/user/modify", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
@@ -255,7 +255,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var response = await _httpClient.PostAsync($"api/authentication/user/modify/{userId}", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
@@ -297,7 +297,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var query = $"?isShowSuperAdmin={isShowSuperAdmin}";
@@ -338,7 +338,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var query = !string.IsNullOrWhiteSpace(searchText) ? $"?search={searchText}" : "";
@@ -383,7 +383,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var response = await _httpClient.PostAsync($"api/authentication/subaccount/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
@@ -425,7 +425,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var response = await _httpClient.GetAsync($"api/authentication/permission/list?isSubUser={isSubUser}");
@@ -478,7 +478,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var response = await _httpClient.PostAsync($"api/authentication/usergroup/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
@@ -519,7 +519,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var response = await _httpClient.PostAsync($"api/authentication/usergroup/user/list", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
@@ -560,7 +560,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var response = await _httpClient.PostAsync($"api/authentication/usergroup/post", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
@@ -601,7 +601,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var response = await _httpClient.PostAsync($"api/authentication/usergroup/delete", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
@@ -645,7 +645,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+                var userToken = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
                 var response = await _httpClient.PostAsync($"api/authentication/report/roles/url", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));

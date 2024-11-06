@@ -26,7 +26,7 @@ namespace Backoffice.Web.ActionFilter
         {
             try
             {
-                var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken");
+                var token = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString();
                 if (string.IsNullOrWhiteSpace(token))
                     return _anonymous;
 
@@ -48,7 +48,7 @@ namespace Backoffice.Web.ActionFilter
 
         public void NotifyUserAuthentication(string email)
         {
-            var token = _httpContextAccessor.HttpContext?.Session.GetString("UserToken");
+            var token = _httpContextAccessor.HttpContext?.Items["UserToken"].ToString();
             var claims = new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(token), "jwtAuthType"));
             _ = claims.Claims.Append(new Claim(ClaimTypes.Name, email));
 

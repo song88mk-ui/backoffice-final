@@ -76,7 +76,7 @@ namespace Backoffice.Web.Shared
             {
                 TranslationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
 
-                if (HttpContextAccessor?.HttpContext?.Session.GetString("UserToken") == null)
+                if (HttpContextAccessor?.HttpContext?.Items["UserToken"].ToString() == null)
                 {
                     NavigationManager.NavigateTo("login", true);
                     return;

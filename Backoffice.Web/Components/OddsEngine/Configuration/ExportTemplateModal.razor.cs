@@ -42,7 +42,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 UserId = ModalParameters.TryGet<string>("UserId"),
                 ConfigTemplateId = ModalParameters.TryGet<long>("ConfigTemplateId").ToString(),
                 Filename = Path.GetFileNameWithoutExtension(_filename),
-                AccessToken = HttpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty
+                AccessToken = HttpContextAccessor.HttpContext?.Items["UserToken"].ToString() ?? string.Empty
             };
 
             await Task.Run(() => MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportOeConfigTemplate", $"r.bo.util.export", Guid.NewGuid().ToString()));
