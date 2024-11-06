@@ -346,28 +346,25 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task Subscribe()
         {
+            Log.Information($"Hubconnection URI - {NavigationManager.BaseUri}");
+
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
             .Build();
 
-            Log.Information($"Hubconnection URI - {NavigationManager.BaseUri}");
-
             _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
             {
                 await ProcessOddsChangeMonitoring(message);
-
             });
 
             _hubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async (message) =>
             {
                 await ProcessOnBetStopFixture(message);
-
             });
 
             _hubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async (message) =>
             {
                 await ProcessOnBetStopGlobal(message);
-
             });
 
             await _hubConnection.StartAsync();

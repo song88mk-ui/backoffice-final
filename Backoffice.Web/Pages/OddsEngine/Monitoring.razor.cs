@@ -203,47 +203,54 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Utilities
         private async Task Subscribe()
         {
-            var message = string.Empty;
-            var connectionId = string.Empty;
-
-            _hubConnection = new HubConnectionBuilder()
-                .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
-            .Build();
-
-            Log.Information($"Hubconnection URI - {NavigationManager.BaseUri}");
-
-            _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
+            try
             {
-                await ProcessOddsChange(message);
-            });
-            _hubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async (message) =>
-            {
-                await ProcessBetStopFixture(message);
-            });
-            _hubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async (message) =>
-            {
-                await ProcessBetStopGlobal(message);
-            });
+                var message = string.Empty;
+                var connectionId = string.Empty;
 
-            _hubConnection.Reconnecting += async (ex) =>
-            {
-                message = ex?.Message ?? "";
-            };
+                Log.Information($"Hubconnection URI - {NavigationManager.BaseUri}");
 
-            await _hubConnection.StartAsync().ContinueWith(task =>
-            {
-                if (task.IsFaulted)
+                _hubConnection = new HubConnectionBuilder()
+                    .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
+                .Build();
+
+                _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
                 {
-                    message = "Error Connecting to hub";
-                }
-                else if (task.IsCompletedSuccessfully)
+                    await ProcessOddsChange(message);
+                });
+                _hubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async (message) =>
                 {
-                    connectionId = _hubConnection.ConnectionId?.ToString();
-                }
-            });
+                    await ProcessBetStopFixture(message);
+                });
+                _hubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async (message) =>
+                {
+                    await ProcessBetStopGlobal(message);
+                });
 
-            await _hubConnection.InvokeAsync("AddToGroup", _region.ToUpper());
+                _hubConnection.Reconnecting += async (ex) =>
+                {
+                    message = ex?.Message ?? "";
+                };
 
+                await _hubConnection.StartAsync().ContinueWith(task =>
+                {
+                    if (task.IsFaulted)
+                    {
+                        message = "Error Connecting to hub";
+                    }
+                    else if (task.IsCompletedSuccessfully)
+                    {
+                        connectionId = _hubConnection.ConnectionId?.ToString();
+                    }
+                });
+
+                await _hubConnection.InvokeAsync("AddToGroup", _region.ToUpper());
+            }
+            catch (Exception ex) {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+            }
         }
         private async Task<List<FixtureMarketModel>> GetFixtures(MarketFixtureRequest request)
         {
