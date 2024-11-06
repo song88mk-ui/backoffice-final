@@ -16,7 +16,9 @@ namespace Backoffice.Web.Pages.SBC
 
         #region Fields
 
-        public string _iFrameSrc;
+        private string _iFrameSrc;
+        private string _roleId;
+        private bool _isPreLoader = true;
 
         #endregion
 
@@ -33,18 +35,34 @@ namespace Backoffice.Web.Pages.SBC
             };
             await PageState.AuthenticateAccessEvent.InvokeAsync();
 
-            await Initialize();
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            if (_roleId != UserModel.RoleId)
+            {
+                _roleId = UserModel.RoleId;
+                await Initialize();
+            }
         }
 
         private async Task Initialize()
         {
-            var reportRoles = (await _authenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
+            try
             {
-                RoleId = UserModel.RoleId,
-                ClaimType = SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", ".")
-            })).Result ?? new ReportRolesUrlResponse();
+                var reportRoles = (await _authenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
+                {
+                    RoleId = _roleId,
+                    ClaimType = SportsbookClientPermission.SBC_Dashboard.ToString().Replace("_", ".")
+                })).Result ?? new ReportRolesUrlResponse();
 
-            _iFrameSrc = await _tableauService.GetTableauUrl(reportRoles.Url);
+                _iFrameSrc = await _tableauService.GetTableauUrl(reportRoles.Url);
+            }
+            catch (Exception) { }
+            finally
+            {
+                _isPreLoader = false;
+            }
         }
 
         public void Dispose()
