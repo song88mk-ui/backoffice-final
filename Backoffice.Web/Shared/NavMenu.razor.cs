@@ -66,7 +66,6 @@ namespace Backoffice.Web.Shared
             if (_init || _navMenuAccess != NavMenuParameter?.NavMenuAccess || _languageCode != _translationState.ActiveLanguageCode)
             {
                 var cts = new CancellationTokenSource();
-                _init = false;
                 _languageCode = _translationState.ActiveLanguageCode;
                 _navMenuAccess = NavMenuParameter?.NavMenuAccess;
 
@@ -75,7 +74,7 @@ namespace Backoffice.Web.Shared
 
                 _showSwitchAccess = categories != null && categories.Count > 1;
 
-                if (_navMenuAccess == PermissionCategory.OE)
+                if (NavMenuParameter?.NavMenuAccess == PermissionCategory.OE)
                 {
                     _menu.Sports = await GetSportsTreeMenu(cts.Token);
                     _sports = await GetSportTreeMenus(cts.Token);
@@ -120,7 +119,11 @@ namespace Backoffice.Web.Shared
                         }
                     }
                 }
+
+                _navMenuAccess = NavMenuParameter?.NavMenuAccess;
             }
+
+            _init = false;
 
             if (_navMenus == null)
             {
