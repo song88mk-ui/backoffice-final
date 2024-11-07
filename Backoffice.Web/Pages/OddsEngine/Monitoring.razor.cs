@@ -44,6 +44,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _shouldRender = true;
         private List<Client> _clients = new();
         private AlertModel _alertModel = new();
+        private int _colCtr = 3;
 
         private MonitoringCallbackModel _monitoringCallbackModel = new();
         #endregion
@@ -83,7 +84,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
 
                 _languageCode = _translationState.ActiveLanguageCode;
-               
+
                 _pageHeaderModel = new PageHeaderModel()
                 {
                     Title = $"{_translationState.GetValue(SelectedSport?.SportName ?? "")} - {SelectedSport?.SegmentName ?? ""} - {SelectedSport?.LeagueName ?? ""}",
@@ -122,7 +123,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = false;
         }
         protected override bool ShouldRender() => _shouldRender;
-        private bool ValidateParameters() => _init || ((SelectedSport?.SportId ?? 0 )> 0 && _slugs != null && _slugs.Count >= 2);
+        private bool ValidateParameters() => _init || ((SelectedSport?.SportId ?? 0) > 0 && _slugs != null && _slugs.Count >= 2);
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
         {
@@ -146,7 +147,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private async Task MonitoringCallback(MonitoringCallbackModel model)
         {
             await OnInitializeEvent(_monitoringCallbackModel = model);
-            
+
         }
 
         private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
@@ -160,6 +161,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                     ClientName = s.Name,
                     Region = _region
                 }).ToList();
+                _colCtr = 3 + _clients.Count();
+
+                if (_userState.ClaimsPrincipal?.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_Monitoring_MatchType.ToString().Replace("_", ".")}" && x.Value == "1") ?? false)
+                    _colCtr++;
+
             }
             _shouldRender = true;
         }
@@ -252,7 +258,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 await _hubConnection.InvokeAsync("AddToGroup", _region.ToUpper());
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Log.Error(ex.Message);
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
