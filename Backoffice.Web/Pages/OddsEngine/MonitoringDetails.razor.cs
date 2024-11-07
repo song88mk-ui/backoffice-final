@@ -53,6 +53,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private LanguageCode _languageCode;
         private bool _isInit;
         private string _id;
+        private int _colCtr = 3;
         #endregion
 
         #region Methods
@@ -143,6 +144,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     ClientName = s.Name,
                     Region = _region
                 }).ToList();
+
+                _colCtr = 3 + _clients.Count();
             }
         }
 
