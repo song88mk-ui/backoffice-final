@@ -270,7 +270,6 @@ namespace Backoffice.Web.Shared
             try
             {
                 var request = HttpContextAccessor.HttpContext?.Request;
-                Log.Information($"Hubconnection URI - {NavigationManager.BaseUri}");
 
                 _hubConnection = new HubConnectionBuilder()
                     .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
@@ -304,6 +303,7 @@ namespace Backoffice.Web.Shared
             }
             catch (Exception ex)
             {
+                Log.Error($"Hubconnection URI - {NavigationManager.BaseUri}");
                 ToasterService.AddToast(Toast.NewToast
                         ("Error Connecting to hub", ex.Message));
                 Log.Error(ex.Message);

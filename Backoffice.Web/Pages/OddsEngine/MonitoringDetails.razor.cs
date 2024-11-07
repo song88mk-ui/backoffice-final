@@ -87,6 +87,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
                 catch (Exception ex)
                 {
+                    Log.Error($"Hubconnection URI - {NavigationManager.BaseUri}");
                     Console.WriteLine(ex.Message);
 
                     Log.Error(ex.Message);
@@ -349,7 +350,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task Subscribe()
         {
-            Log.Information($"Hubconnection URI - {NavigationManager.BaseUri}");
 
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))

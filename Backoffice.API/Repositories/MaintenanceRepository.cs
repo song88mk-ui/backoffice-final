@@ -263,7 +263,7 @@ namespace Backoffice.API.Repositories
                             {
                                 ClientIds = clientIds,
                                 request.IsMaintenance
-                            });
+                            }); 
 
                             var result = await _maintenanceHttpClient.PostAsync($"/v1.0/invoke/{app}/method/maintenance", new StringContent(stringPayload, Encoding.UTF8, "application/json"));
 

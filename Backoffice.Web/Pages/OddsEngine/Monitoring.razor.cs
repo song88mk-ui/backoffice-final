@@ -140,6 +140,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 SearchText = model.SearchText,
             });
 
+            Log.Information($"Monitoring: {_sportId} - {_segmentId} - {_leagueId}");
+
             _isPreloader = false;
             _shouldRender = true;
         }
@@ -152,7 +154,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
         {
-            Log.Information($"Callback - {string.Join(',', clients.Select(c => c.Value).ToList())}");
             if (clients != null)
             {
                 _clients = clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => new Client
@@ -220,8 +221,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var message = string.Empty;
                 var connectionId = string.Empty;
 
-                Log.Information($"Hubconnection URI - {NavigationManager.BaseUri}");
-
                 _hubConnection = new HubConnectionBuilder()
                     .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
                 .Build();
@@ -260,6 +259,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             catch (Exception ex)
             {
+                Log.Error($"Hubconnection URI - {NavigationManager.BaseUri}");
                 Log.Error(ex.Message);
                 if (ex.StackTrace != null)
                     Log.Error(ex.StackTrace.ToString());
