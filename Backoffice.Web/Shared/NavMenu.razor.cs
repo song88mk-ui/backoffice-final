@@ -246,7 +246,7 @@ namespace Backoffice.Web.Shared
             sports.ForEach(sport =>
             {
                 sport.ShouldRender = false;
-                var isSelected = sport.Id == sportId;
+                var isSelected = sport.Id == sportId && !sport.IsSelected;
 
                 if (sport.IsSelected != isSelected)
                 {
@@ -281,27 +281,11 @@ namespace Backoffice.Web.Shared
                     var segments = sport.Segments.Where(c => c.IsSelected).ToList();
                     segments.ForEach(segment => segment.IsSelected = false);
                 }
-                else
-                {
-                    var segments = sport.Segments.Where(c => c.IsSelected || c.Id == segmentId).ToList();
-                    segments.ForEach(segment =>
-                    {
-                        segment.ShouldRender = false;
-                        isSelected = segment.Id == segmentId;
-
-                        if (segment.IsSelected != isSelected)
-                        {
-                            segment.ShouldRender = true;
-                            segment.IsSelected = isSelected;
-                        }
-                    });
-                }
             });
 
             _sports.ForEach(sport =>
             {
                 sport.ShouldRender = false;
-
                 var isSelected = sport.Id == sportId;
 
                 if (sport.IsSelected != isSelected)
@@ -310,18 +294,16 @@ namespace Backoffice.Web.Shared
                     sport.IsSelected = isSelected;
                 }
 
-                var segments = sport.Segments.Where(c => c.IsSelected).ToList();
-                segments.ForEach(segment => segment.IsSelected = false);
-
                 if (sport.Id == sportId)
                     sport.Segments.ForEach(segment =>
                     {
                         segment.ShouldRender = false;
 
-                        var isSelected = segment.Id == segmentId;
+                        var isSelected = segment.Id == segmentId && !segment.IsSelected;
 
                         if (segment.IsSelected != isSelected)
                         {
+                            sport.ShouldRender = true;
                             segment.ShouldRender = true;
                             segment.IsSelected = isSelected;
                         }
