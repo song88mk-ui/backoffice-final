@@ -3,10 +3,10 @@
         <div class="select-container d-flex">
             <div class="me-2">
                 <div class="dropdown">
-                    <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        @if (_clientFilter != null && _clientFilter.Any())
-                        {
-                            if (_clientFilter.Count == _selectedClientCount)
+                    @if (_clientFilter != null && _clientFilter.Any())
+                    {
+                        <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            @if (_clientFilter.Count == _selectedClientCount)
                             {
                                 <span>@_translationState.GetValue("All Clients") (@_selectedClientCount)</span>
                             }
@@ -14,14 +14,7 @@
                             {
                                 <span>@(_selectedClientCount == 1 ? _selectedClientName : $"{_translationState.GetValue("Clients")} ({_selectedClientCount})")</span>
                             }
-                        }
-                        else
-                        {
-                            <span>@_translationState.GetValue("No Clients Available")</span>
-                        }
-                    </button>
-                    @if (_clientFilter != null && _clientFilter.Any())
-                    {
+                        </button>
                         <SelectWithCheckbox Items="_clientFilter" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="client-dropdown" />
                     }
                 </div>
