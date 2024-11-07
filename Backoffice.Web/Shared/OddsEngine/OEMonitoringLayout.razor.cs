@@ -19,11 +19,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         private NavMenuParameter _navMenuParameter = new();
 
         private List<SportItemModel> _sports = new();
-        private LanguageCode _languageCode;
         private CancellationTokenSource _cts;
-
-        private bool _init = true;
-        private bool _shouldRender = true;
         #endregion
 
         #region Methods
@@ -41,17 +37,6 @@ namespace Backoffice.Web.Shared.OddsEngine
 
             base.InitializeState();
         }
-        protected override async Task OnParametersSetAsync()
-        {
-            _shouldRender = ValidateParameters();
-            if (_shouldRender)
-            {
-                _languageCode = _translationState.ActiveLanguageCode;
-            }
-
-            await Task.CompletedTask;
-        }
-        private bool ValidateParameters() => _languageCode != _translationState.ActiveLanguageCode;
         private void HandleSportClick(SportClickCallbackModel model)
         {
             _selectedSport = model;
@@ -61,7 +46,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         {
             var result = new List<SportItemModel>();
 
-            var response = await _backofficeService.GetSportsTreeAsync((int)FixtureType.Match, _languageCode, token);
+            var response = await _backofficeService.GetSportsTreeAsync((int)FixtureType.Match, _translationState.ActiveLanguageCode, token);
 
             if (token.IsCancellationRequested)
                 return new();
