@@ -5,6 +5,7 @@ using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Backoffice.Web.States;
+using Backoffice.Web.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
@@ -88,7 +89,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _pageHeaderModel = new PageHeaderModel()
                 {
                     Title = $"{_translationState.GetValue(SelectedSport?.SportName ?? "")} - {SelectedSport?.SegmentName ?? ""} - {SelectedSport?.LeagueName ?? ""}",
-                    IconClass = $"iconfont iconfont-{SelectedSport?.SportName.ToLower().Replace(" ", "-") ?? ""}",
+                    IconClass = $"iconfont iconfont-{Utility.GetSportIcon(SelectedSport?.SportId ?? 0)}",
                     ShowLanguageDropDown = false
                 };
 

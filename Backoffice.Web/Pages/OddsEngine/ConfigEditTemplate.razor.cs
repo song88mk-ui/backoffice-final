@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
+using Backoffice.Web.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Text.Json;
@@ -96,8 +97,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _editConfigTemplateFilterModel = model;
 
-
-            _sportIcon = _editConfigTemplateFilterModel.SportName.Contains(" ") ? _editConfigTemplateFilterModel.SportName.Replace(" ", "-").ToLower() : _editConfigTemplateFilterModel.SportName.ToLower();
+            _sportIcon = Utility.GetSportIcon(_editConfigTemplateFilterModel.SportId);
             _sportName = _editConfigTemplateFilterModel.SportName;
             _configTemplateName = $"{(_activity == Activity.Copy ? "Copy of " : "")}{_editConfigTemplateFilterModel.ConfigTemplate.Name}";
 
