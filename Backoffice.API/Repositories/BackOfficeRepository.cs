@@ -2133,16 +2133,6 @@ namespace Backoffice.API.Repositories
             var englishTranslations = translations.Where(c => c.LanguageCode == "EN").ToList();
             var reqTranslations = translations.Where(c => c.LanguageCode == languageCode).ToList();
 
-            //result = englishTranslations.GroupJoin(refTranslations,
-            //    en => en.Name,
-            //    la => la.Name,
-            //    (english, language) => new { english, language })
-            //    .SelectMany(s => s.language.DefaultIfEmpty(),
-            //    (left, right) => new
-            //    {
-            //        Name = left.english.Name,
-            //        Value = right != null ? right.Value : left.english.Value
-            //    }).ToDictionary(s => s.Name, s => s.Value);
 
             var combinedResult = englishTranslations.Concat(reqTranslations)
                 .GroupBy(g => g.Name)
