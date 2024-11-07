@@ -109,35 +109,9 @@ namespace Backoffice.Web.Shared
                         }
                     }
 
-                    //var sport = _menu.Sports.FirstOrDefault();
-
-                    //if (sport != null)
-                    //{
-                    //    _selectedsport.sportid = sport.sportid;
-                    //    _selectedsport.sportname = sport.sportname;
-
-                    //    var segment = sport.segments.firstordefault();
-
-                    //    if (segment != null)
-                    //    {
-                    //        _selectedsport.segmentid = segment.segmentid;
-                    //        _selectedsport.segmentname = segment.segmentname;
-
-                    //        var league = segment.leagues.firstordefault();
-
-                    //        if (league != null)
-                    //        {
-                    //            _selectedsport.leagueid = league.leagueid;
-                    //            _selectedsport.leaguename = league.leaguename;
-                    //        }
-                    //    }
-                    //}
-
                     switch (_page?.ToLower() ?? string.Empty)
                     {
-                        //case "sa/odds-engine":
                         case "hk/odds-engine":
-                        //case "sa/odds-engine/monitoring":
                         case "hk/odds-engine/monitoring":
                             await OnSportClickCallback.InvokeAsync(_selectedSport);
                             break;
@@ -331,6 +305,12 @@ namespace Backoffice.Web.Shared
                     LeagueId = leagueId,
                     LeagueName = leagueName
                 };
+
+                var slugs = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "").Split("/").ToList();
+                if (slugs.Count != 1 && slugs[1].ToLower() != "monitoring")
+                {
+                    _navigationManager.NavigateTo($"/hk/odds-engine");
+                }
 
                 await OnSportClickCallback.InvokeAsync(_selectedSport);
             }
