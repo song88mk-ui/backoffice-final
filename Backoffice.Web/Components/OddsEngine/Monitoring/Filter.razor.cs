@@ -62,17 +62,13 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
             {
                 _clientFilter = null;
 
-                Log.Information($"UserModel - {string.Join(',', UserModel.ClientCodes)}");
                 _clientReference = tempClientReference;
                 if (_clientListReference != null)
                 {
-
-                    Log.Information($"ClientRef - {string.Join(',', _clientListReference.Select(s => s.ClientCode))}");
                     _clientFilter = UserModel.ClientCodes.Any()
                         ? _clientListReference.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList()
                         : new();
 
-                    Log.Information($"ClientFilter - {string.Join(',', _clientFilter.Select(s => s.Value))}");
                     if (_clientFilter.Any())
                     {
                         _clientFilter.Insert(0, new SelectListItemWithCheckboxModel<string>
