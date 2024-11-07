@@ -12,7 +12,7 @@ using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.Backoffice
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class BetController : ControllerBase
@@ -21,7 +21,7 @@ namespace Backoffice.API.Controllers.Backoffice
         private readonly bool _isStaging;
 
         public BetController(IPlatformRepository platformRepository, IConfiguration configuration)
-        {//
+        {
             _platformRepository = platformRepository;
             _isStaging = bool.Parse(configuration["IsStaging"]);
         }

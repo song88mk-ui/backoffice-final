@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Backoffice.API.Controllers.SportsbookClients
 {
-    [ActionFilter.Authorize]
+    [Authorize]
     [Route("sportsbook/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class ClientController : Controller

@@ -20,7 +20,7 @@ using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
 namespace Backoffice.API.Controllers.Backoffice
 {
-    //[Authorize("SBC.OE.Config", ((int)Access.View))]
+    [Authorize("SBC.OE.Config", ((int)Access.View))]
     [Route("api/[controller]")]
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class ConfigController : ControllerBase
@@ -93,7 +93,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         [HttpPost("template")]
-        //[Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> AddOrUpdateConfigTemplate([FromBody] ConfigTemplateModel request)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -110,7 +110,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpPost("template/set/{state}")]
-        //[Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> ConfigTemplateSetState([FromBody] ConfigSetLeagueStateRequest request, [FromRoute] string state)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -134,7 +134,7 @@ namespace Backoffice.API.Controllers.Backoffice
             }
         }
         [HttpPost("template/delete/{id}")]
-        //[Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> DeleteConfigTemplate([FromRoute] string id)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -228,7 +228,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpPost("template/margin")]
-        //[Authorize("SBC.OE.Config", ((int)Access.Edit))]
+        [Authorize("SBC.OE.Config", ((int)Access.Edit))]
         public async Task<IActionResult> AddOrUpdateConfigTemplateMargin([FromBody] ConfigTemplateMarginModel request)
         {
             var result = await _backofficeRepository.AddOrUpdateConfigTemplateMargin(request);
@@ -243,7 +243,7 @@ namespace Backoffice.API.Controllers.Backoffice
         }
 
         [HttpPost("template/copy/client")]
-        //[Authorize("SBC.OE.Config", ((int)Access.View))]
+        [Authorize("SBC.OE.Config", ((int)Access.View))]
         public async Task<IActionResult> CopyClientConfig([FromBody] CopyClientConfigRequest request)
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
@@ -317,14 +317,14 @@ namespace Backoffice.API.Controllers.Backoffice
 
         #region Translation
 
-        //[AllowAnonymous]
+        [AllowAnonymous]
         [HttpGet("translations")]
         public async Task<IActionResult> GetTranslations()
         {
             var userId = HttpContext.Items["UserId"]?.ToString();
 
             var langCode = LanguageCode.EN;
-            Enum.TryParse(HttpContext.Items["LanguageCode"]?.ToString(), out langCode);
+            Enum.TryParse(HttpContext.Request.Headers["x-language-code"].ToString(), out langCode);
 
             var result = await _backofficeRepository.GetTranslationsByLanguageCode(langCode);
 
