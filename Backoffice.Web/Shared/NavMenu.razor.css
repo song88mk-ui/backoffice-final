@@ -112,6 +112,7 @@ nav-item ::deep .nav-link.header.active, .nav-item ::deep .nav-link.header:hover
 span.ico, span.iconfont, span.all-sports {
     font-size: 18px;
     margin-right: 10px;
+    transform: translateY(-6px);
 }
 
 .collapse:not(.show) {
