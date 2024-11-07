@@ -6,7 +6,7 @@
                     @if (_clientFilter != null && _clientFilter.Any())
                     {
                         <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            @if (_clientFilter.Count == _selectedClientCount)
+                            @if (_clientFilter?.FirstOrDefault()?.IsChecked ?? false)
                             {
                                 <span>@_translationState.GetValue("All Clients") (@_selectedClientCount)</span>
                             }

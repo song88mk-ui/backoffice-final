@@ -2,20 +2,14 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Serilog;
-using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Monitoring
 {
     public partial class Filter : IDisposable
     {
         #region Properties
-
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public EventCallback<MonitoringCallbackModel> OnInitCallback { get; set; }
@@ -46,11 +40,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
             _searchForm = new SearchFormModel();
             _clientFilter = new List<SelectListItemWithCheckboxModel<string>>();
 
-            TradingService.Region = _region.ToUpper();
-
-            //var clientsResponse = await TradingService.GetClientList();
-            //_clientListReference = clientsResponse.Result;
-            _clientListReference = _userState.TradingClients;
+            _tradingService.Region = _region.ToUpper();
         }
 
         private string _clientReference;
@@ -58,11 +48,15 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         {
             var tempClientReference = string.Join(',', UserModel.ClientCodes.OrderBy(c => c).Select(s => s.Trim()).ToList());
 
+            if (_userState.TradingClients != null && !_clientListReference.Any())
+                _clientListReference = _userState.TradingClients;
+
             if (_init || _clientReference != tempClientReference)
             {
                 _clientFilter = null;
 
                 _clientReference = tempClientReference;
+                var minus = 0;
                 if (_clientListReference != null)
                 {
                     _clientFilter = UserModel.ClientCodes.Any()
@@ -77,10 +71,11 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                             Name = "All Clients",
                             IsChecked = true
                         });
+                        minus = 1;
                     }
                 }
 
-                _selectedClientCount = _clientFilter?.Count ?? 0;
+                _selectedClientCount = (_clientFilter?.Count ?? 0) - minus;
                 _selectedClientName = _selectedClientCount > 0 ? string.Empty : _clientFilter?.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Name ?? "";
 
                 await OnFilterClientCallback.InvokeAsync(_clientFilter);
@@ -92,7 +87,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                 _sportId = SportId;
                 _languageCode = _translationState.ActiveLanguageCode;
 
-                var topMarketsResponse = await BackofficeService.GetTopMarkets(_sportId, _languageCode);
+                var topMarketsResponse = await _backofficeService.GetTopMarkets(_sportId, _languageCode);
                 _topMarketTemplates = topMarketsResponse.Result;
                 _marketTemplateId = _topMarketTemplates?.FirstOrDefault()?.MainMarketTemplateId ?? string.Empty;
 
