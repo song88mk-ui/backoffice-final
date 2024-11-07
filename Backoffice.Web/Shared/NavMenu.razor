@@ -86,7 +86,7 @@ else if (_navMenuAccess == PermissionCategory.OE)
                             <span class="nav-menu-text">@_translationState.GetValue("All Sports")</span>
                         </div>
                     </div>
-                    @foreach (var sport in _sports)
+                    @foreach (var sport in _sports.OrderBy(c => c.SortOrder))
                     {
                         <Backoffice.Web.Components.OddsEngine.SportsTree.SportItem Sport="sport" SelectecSport="_selectedSport"/>
                     }
