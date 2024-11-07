@@ -35,7 +35,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         private LanguageCode _languageCode;
         private bool _init = true;
 
-        private string _clientReference;
+        private List<ClientInformationModel> _clientListReference = new List<ClientInformationModel>();
         #endregion
 
         #region Methods
@@ -44,31 +44,40 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         {
             _topMarketTemplates = new List<MainMarketTemplateResponse>();
             _searchForm = new SearchFormModel();
+            _clientFilter = new List<SelectListItemWithCheckboxModel<string>>();
 
             TradingService.Region = _region.ToUpper();
+
+            //var clientsResponse = await TradingService.GetClientList();
+            //_clientListReference = clientsResponse.Result;
+            _clientListReference = _userState.TradingClients;
         }
 
+        private string _clientReference;
         protected override async Task OnParametersSetAsync()
         {
-            var clientFilter = _clientFilter = UserModel.ClientCodes.Any()
-                        ? _userState.TradingClients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList()
+            var tempClientReference = string.Join(',', UserModel.ClientCodes.OrderBy(c => c).Select(s => s.Trim()).ToList());
+
+            if (_init || _clientReference != tempClientReference)
+            {
+                _clientFilter = null;
+
+                _clientReference = tempClientReference;
+                if (_clientListReference != null)
+                {
+                    _clientFilter = UserModel.ClientCodes.Any()
+                        ? _clientListReference.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList()
                         : new();
 
-            var tempClientReference = string.Join(',', clientFilter.Select(c => c.Value).OrderBy(c => c).Select(s => s.Trim()).ToList());
-
-            if (clientFilter != null && _clientReference != tempClientReference)
-            {
-                _clientFilter = clientFilter;
-                _clientReference = tempClientReference;
-
-                if (_clientFilter.Any())
-                {
-                    _clientFilter.Insert(0, new SelectListItemWithCheckboxModel<string>
+                    if (_clientFilter.Any())
                     {
-                        Value = "all",
-                        Name = "All Clients",
-                        IsChecked = true
-                    });
+                        _clientFilter.Insert(0, new SelectListItemWithCheckboxModel<string>
+                        {
+                            Value = "all",
+                            Name = "All Clients",
+                            IsChecked = true
+                        });
+                    }
                 }
 
                 _selectedClientCount = _clientFilter?.Count ?? 0;
@@ -76,6 +85,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
                 await OnFilterClientCallback.InvokeAsync(_clientFilter);
             }
+
 
             if (_sportId != SportId || _languageCode != _translationState.ActiveLanguageCode)
             {
