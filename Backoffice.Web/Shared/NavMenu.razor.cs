@@ -83,38 +83,41 @@ namespace Backoffice.Web.Shared
                     if (cts.Token.IsCancellationRequested)
                         return;
 
-                    _selectedSport = new();
-
-                    var sport = _sports.FirstOrDefault();
-                    if (sport != null)
+                    if (_init || _navMenuAccess != NavMenuParameter?.NavMenuAccess)
                     {
-                        sport.IsSelected = true;
-                        _selectedSport.SportId = sport.Id;
-                        _selectedSport.SportName = sport.Name;
+                        _selectedSport = new();
 
-                        var segment = sport.Segments.FirstOrDefault();
-                        if (segment != null)
+                        var sport = _sports.FirstOrDefault();
+                        if (sport != null)
                         {
-                            segment.IsSelected = true;
-                            _selectedSport.SegmentId = segment.Id;
-                            _selectedSport.SegmentName = segment.Name;
+                            sport.IsSelected = true;
+                            _selectedSport.SportId = sport.Id;
+                            _selectedSport.SportName = sport.Name;
 
-                            var league = segment.Leagues.FirstOrDefault();
-                            if (league != null)
+                            var segment = sport.Segments.FirstOrDefault();
+                            if (segment != null)
                             {
-                                league.IsSelected = true;
-                                _selectedSport.LeagueId = league.Id;
-                                _selectedSport.LeagueName = league.Name;
+                                segment.IsSelected = true;
+                                _selectedSport.SegmentId = segment.Id;
+                                _selectedSport.SegmentName = segment.Name;
+
+                                var league = segment.Leagues.FirstOrDefault();
+                                if (league != null)
+                                {
+                                    league.IsSelected = true;
+                                    _selectedSport.LeagueId = league.Id;
+                                    _selectedSport.LeagueName = league.Name;
+                                }
                             }
                         }
-                    }
 
-                    switch (_page?.ToLower() ?? string.Empty)
-                    {
-                        case "hk/odds-engine":
-                        case "hk/odds-engine/monitoring":
-                            await OnSportClickCallback.InvokeAsync(_selectedSport);
-                            break;
+                        switch (_page?.ToLower() ?? string.Empty)
+                        {
+                            case "hk/odds-engine":
+                            case "hk/odds-engine/monitoring":
+                                await OnSportClickCallback.InvokeAsync(_selectedSport);
+                                break;
+                        }
                     }
                 }
             }
