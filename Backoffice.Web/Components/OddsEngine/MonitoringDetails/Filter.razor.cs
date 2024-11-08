@@ -67,7 +67,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
             MarketTemplates = new List<SelectListItemModel<string>>();
 
-            _selectedClientCount = _clientFilter.Count;
+            _selectedClientCount = _clientFilter.Where(c => c.Value != "all").Count();
             _selectedClientName = _selectedClientCount > 0 ? string.Empty : _clientFilter.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
 
             await OnFilterClientCallback.InvokeAsync(_clientFilter);
@@ -114,6 +114,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
         {
             _selectedClientName = string.Empty;
+
             _selectedClientCount = items.Count;
 
             if (_selectedClientCount == 1)

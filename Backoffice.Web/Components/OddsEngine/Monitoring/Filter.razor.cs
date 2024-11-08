@@ -56,7 +56,6 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                 _clientFilter = null;
 
                 _clientReference = tempClientReference;
-                var minus = 0;
                 if (_clientListReference != null)
                 {
                     _clientFilter = UserModel.ClientCodes.Any()
@@ -71,11 +70,10 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                             Name = "All Clients",
                             IsChecked = true
                         });
-                        minus = 1;
                     }
                 }
 
-                _selectedClientCount = (_clientFilter?.Count ?? 0) - minus;
+                _selectedClientCount = _clientFilter.Where(c => c.Value != "all").Count();
                 _selectedClientName = _selectedClientCount > 0 ? string.Empty : _clientFilter?.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Name ?? "";
 
                 await OnFilterClientCallback.InvokeAsync(_clientFilter);
