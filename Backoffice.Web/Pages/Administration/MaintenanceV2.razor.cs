@@ -1,9 +1,11 @@
-﻿using Backoffice.Shared.Enums;
+﻿using Azure;
+using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Administration.MaintenanceV2;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 
 namespace Backoffice.Web.Pages.Administration
 {
@@ -34,8 +36,8 @@ namespace Backoffice.Web.Pages.Administration
                 if (value == _isMaintenance)
                     return;
 
-                HandleModalDisplay(true, value);
-                _shouldRender = true;
+                _isMaintenance = value;
+                HandlePropertyChange(_clienHasChange);
             }
         }
 
@@ -59,8 +61,8 @@ namespace Backoffice.Web.Pages.Administration
                 IconClass = "ico ico-maintenance"
             };
 
-            _allClientsEvent = _ => ChangeMode(true);
-            _specificClientsEvent = _ => ChangeMode(false);
+            _allClientsEvent = _ => HandleChangeMode(true);
+            _specificClientsEvent = _ => HandleChangeMode(false);
 
             LoadPage();
         }
@@ -101,13 +103,6 @@ namespace Backoffice.Web.Pages.Administration
                 StateHasChanged();
             }
         }
-        private void ChangeMode(bool isAllClient)
-        {
-            //if (_hasChange)
-            //    HandleModalDisplay(false, isAllClient);
-            //else
-                HandleChangeMode(isAllClient);
-        }
         private void HandlePropertyChange(bool value)
         {
             var hasChange = _hasChange;
@@ -127,22 +122,6 @@ namespace Backoffice.Web.Pages.Administration
             {
                 _hasChange = hasChange;
                 _shouldRender = true;
-            }
-        }
-        private void HandleModalSaveClick(object content)
-        {
-            var response = (Tuple<bool, bool>)content;
-
-            if (response.Item1)
-            {
-                _isMaintenance = response.Item2;
-                _shouldRender = true;
-
-                HandlePropertyChange(_clienHasChange);
-            }
-            else
-            {
-                HandleChangeMode(response.Item2);
             }
         }
         private void HandleChangeMode(bool isAllClient)
@@ -189,30 +168,16 @@ namespace Backoffice.Web.Pages.Administration
                 IsMaintenance = _isMaintenance
             });
 
+            LoadPage();
+
             _isProcessing = false;
 
             if (result.StatusCode == StatusCode.Success)
                 await _alertToastService.SetToast($"Maintenance Mode {(_isMaintenance ? "Enabled" : "Disabled")}");
             else
-                await _alertToastService.SetToast($"Maintenance Mode {(_isMaintenance ? "Enabled" : "Disabled")}");
-
-            LoadPage();
-
+                await _alertToastService.SetToast($"Error {(_isMaintenance ? "Enabling" : "Disabling")} Maintenance Mode");
         }
         private void HandleCancel() => LoadPage();
-
-        private void HandleModalDisplay(bool isMaintenanceSwitch, bool value)
-        {
-            var parameters = new ModalParameters();
-
-            parameters.Add("Value", value);
-            parameters.Add("IsMainteanceSwitch", isMaintenanceSwitch);
-            parameters.Add("ModalClass", "modal-center modal-show");
-            parameters.Add("ModalDialogClass", "modal-lg");
-
-            var options = new ModalOptions();
-            _modalService.Open<MaintenanceModal>(parameters, options);
-        }
 
         private List<MaintenanceConfigModel> _maintenanceConfigModels = new List<MaintenanceConfigModel>();
         private async Task<List<MaintenanceSelectListItemWithCheckboxModel>> LoadClients()

@@ -1,5 +1,5 @@
-﻿<div class="dropdown p-0@(Disable ? " disabled" : "")">
-    <div class="client-list-container d-flex gap-2 border border-2 p-2 align-items-center mt-3 btn w-100 @_selectionCss" type="button" id="client-dropdown" disabled="@Disable" data-bs-toggle="dropdown" aria-expanded="false" @onclick="HandleEditListClick">
+﻿<div class="dropdown p-0@(Disabled ? " disabled" : "")">
+    <div class="client-list-container d-flex gap-2 border border-2 p-2 align-items-center mt-3 btn w-100 @_selectionCss" type="button" id="client-dropdown" disabled="@Disabled" data-bs-toggle="dropdown" aria-expanded="false" @onclick="HandleEditListClick">
         @if (_activeClients?.Any() ?? false)
         {
             foreach (var client in _activeClients)
