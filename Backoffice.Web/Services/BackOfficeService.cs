@@ -127,7 +127,9 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var response = await _httpClient.PostAsync($"api/config/maintenance", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+                var endpoint = "api/config/maintenance";
+
+                var response = await _httpClient.PostAsync(endpoint, new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<MaintenanceResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -137,6 +139,8 @@ namespace Backoffice.Web.Services
                         return JsonSerializer.Deserialize<BaseResponse<MaintenanceResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                     else
                     {
+                        Log.Error($"{endpoint} - {response.StatusCode.ToString()} - {response.ReasonPhrase}");
+
                         return new BaseResponse<MaintenanceResponse>
                         {
                             StatusCode = StatusCode.Error,

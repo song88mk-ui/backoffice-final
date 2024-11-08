@@ -27,7 +27,7 @@
         {
             <ClientState Clients="_underMaintenanceClients" IsLive="false" IsCompleteClients="@(!_liveClients.Any())" />
         }
-        <div class="page-content m-3">
+        <div class="page-content m-3" >
             <div class="d-flex justify-content-between my-3">
                 <div class="ms-2">
                     <p class="fw-bolder">Enable Maintenance Mode</p>
@@ -35,7 +35,7 @@
                 </div>
                 <div>
                     <div class="form-switch d-flex justify-content-center">
-                        <input class="form-check-input me-3" type="checkbox" id="maitenance-mode" @bind="IsMaintenance">
+                        <input class="form-check-input me-3" type="checkbox" id="maitenance-mode" @bind="IsMaintenance" disabled="@_isProcessing">
                     </div>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                     <div class="maintenance-mode-container all-clients border border-2 px-3 mb-3 @_maintenanceModeAllClientsCss">
                         <div class="d-flex align-items-center gap-3">
                             <div class="wrapper-input">
-                                <input type="radio" name="one" id="radio1" checked="@_isAllClientMode" @onchange="_allClientsEvent">
+                                <input type="radio" name="one" id="radio1" checked="@_isAllClientMode" @onchange="_allClientsEvent" disabled="@_isProcessing">
                                 <label for="radio1"></label>
                             </div>
                             <div class="option-item">
@@ -63,7 +63,7 @@
                     <div class="maintenance-mode-container specific-clients border border-2 px-3 mb-3 @_maintenanceModeSpecificClientsCss">
                         <div class="d-flex align-items-center gap-3 pb-3">
                             <div class="wrapper-input">
-                                <input type="radio" name="one" id="radio2" checked="@(!_isAllClientMode)" @onchange="_specificClientsEvent">
+                                <input type="radio" name="one" id="radio2" checked="@(!_isAllClientMode)" @onchange="_specificClientsEvent" disabled="@_isProcessing">
                                 <label for="radio2"></label>
                             </div>
                             <div class="option-item">
@@ -75,7 +75,7 @@
                             <div class="d-flex p-0">
                                 <p>Select which clients you want to apply maintenance mode to</p>
                             </div>
-                            <ClientSelectionDropDown @bind-Clients="_clients" Disable="_isAllClientMode || _isDropDownDisabled" OnHasChange="HandlePropertyChange" />
+                            <ClientSelectionDropDown @bind-Clients="_clients" Disabled="_isAllClientMode || _isDropDownDisabled || _isProcessing" OnHasChange="HandlePropertyChange" />
                         </div>
                     </div>
                 </div>
@@ -90,4 +90,3 @@
         </div>
     }
 </div>
-<MinimalistModal OnSaveClickCallback="HandleModalSaveClick"/>

@@ -5,7 +5,7 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
 {
     public partial class ClientSelectionDropDown
     {
-        [Parameter] public bool Disable { get; set; }
+        [Parameter] public bool Disabled { get; set; }
         [Parameter] public List<MaintenanceSelectListItemWithCheckboxModel> Clients { get; set; }
         [Parameter] public EventCallback<List<MaintenanceSelectListItemWithCheckboxModel>> ClientsChanged { get; set; }
         [Parameter] public EventCallback<bool> OnHasChange { get; set; }
@@ -30,7 +30,7 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
                     .OrderByDescending(c => c.IsChecked).ToList();
 
                 _activeClients = Clients.Where(c => c.IsChecked).ToList();
-                _isDisabled = Disable;
+                _isDisabled = Disabled;
                 _shouldRender = true;
 
                 if (_init)
@@ -42,7 +42,7 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
         }
         protected override bool ShouldRender() => _shouldRender;
         protected override void OnAfterRender(bool firstRender) => _shouldRender = false;
-        private bool ParameterChanged() => Clients != null && !_activeClients.SequenceEqual(Clients.Where(c => c.IsChecked).ToList()) || _isDisabled != Disable;
+        private bool ParameterChanged() => Clients != null && !_activeClients.SequenceEqual(Clients.Where(c => c.IsChecked).ToList()) || _isDisabled != Disabled;
         private void HandleEditListClick()
         {
             //_selectionCss = " bg-white";
@@ -53,7 +53,7 @@ namespace Backoffice.Web.Components.Administration.MaintenanceV2
         }
         private async Task HandleRemoveClientClick(string clientId)
         {
-            if (Disable)
+            if (Disabled)
                 return;
 
             var client = Clients.FirstOrDefault(c => c.Value == clientId);
