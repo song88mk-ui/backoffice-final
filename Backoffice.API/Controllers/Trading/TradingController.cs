@@ -19,7 +19,6 @@ namespace Backoffice.API.Controllers.Trading
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class TradingController : ControllerBase
     {
-        // Include "x-region" in request Header
         private ITradingRepository _tradingRepository { get; set; }
         private readonly ActivitySource _activitySource;
 
