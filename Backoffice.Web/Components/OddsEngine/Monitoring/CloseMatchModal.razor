@@ -4,7 +4,7 @@
             <icon class="ico ico-warning"></icon>
         </div>
         <div class="text-center">
-            Are you sure you want to close the match <span class="fw-bold">"@_fixtureName"</span>
+            @((MarkupString)_translationState.GetValue($"Are you sure you want to close the match {{{$"<span class='fw-bold'>{_fixtureName}</span>"}}}"))
             <br />
             @_translationState.GetValue("Please be certain as this cannot be undone")
         </div>
