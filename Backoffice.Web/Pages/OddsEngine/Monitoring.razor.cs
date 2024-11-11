@@ -46,6 +46,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private List<Client> _clients = new();
         private AlertModel _alertModel = new();
         private int _colCtr = 3;
+        private bool _fixtureMarketPreLoader;
 
         private MonitoringCallbackModel _monitoringCallbackModel = new();
         #endregion
@@ -169,6 +170,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     _colCtr++;
 
             }
+
             _shouldRender = true;
         }
 
@@ -305,6 +307,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     MarketStatusId = market.MarketStatusId,
                     //MarketStatusName = market.MarketStatusName,
                     //MarketTemplateId = market.MarketTemplateId,
+                    CorrelationId = Guid.NewGuid().ToString(),
                     Selections = market.Selections
                 });
 
