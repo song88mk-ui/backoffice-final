@@ -277,7 +277,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             List<FixtureMarketModel> fixtureMarkets = new();
             foreach (var fixture in marketFixtures.Fixtures.Where(x => string.IsNullOrEmpty(request.SearchText) || (x.FixtureName.Contains(request.SearchText, StringComparison.OrdinalIgnoreCase))))
             {
-                fixtureMarkets.AddRange(fixture.Markets.Select(market => new FixtureMarketModel()
+                var market = GetNearestLineToTwo(fixture.Markets);
+
+                if (market == null)
+                    continue;
+
+                fixtureMarkets.Add(new FixtureMarketModel()
                 {
                     FixtureName = fixture.FixtureName,
                     MarketId = market.MarketId,
@@ -301,10 +306,91 @@ namespace Backoffice.Web.Pages.OddsEngine
                     //MarketStatusName = market.MarketStatusName,
                     //MarketTemplateId = market.MarketTemplateId,
                     Selections = market.Selections
-                }));
+                });
+
+                //fixtureMarkets.AddRange(fixture.Markets.Select(market => new FixtureMarketModel()
+                //{
+                //    FixtureName = fixture.FixtureName,
+                //    MarketId = market.MarketId,
+                //    ClientCode = market.ClientCode,
+                //    ClientCodeMargin = market.ClientCodeMargin,
+                //    MarketName = market.MarketName,
+                //    ProviderMarketId = market.ProviderMarketId,
+                //    ProviderFixtureId = market.ProviderFixtureId,
+                //    AwayName = fixture.AwayName,
+                //    BetStop = fixture.BetStop,
+                //    CurrentMinute = fixture.CurrentMinute,
+                //    CurrentPeriod = fixture.CurrentPeriod,
+                //    FixtureStartDate = fixture.FixtureStartDate,
+                //    FixtureStatusId = fixture.FixtureStatusId,
+                //    HomeName = fixture.HomeName,
+                //    IsBetStopGlobal = fixture.IsBetStopGlobal,
+                //    Score = fixture.Score,
+                //    Line = market.Line,
+                //    //MarketSpecifier = market.MarketSpecifier,
+                //    MarketStatusId = market.MarketStatusId,
+                //    //MarketStatusName = market.MarketStatusName,
+                //    //MarketTemplateId = market.MarketTemplateId,
+                //    Selections = market.Selections
+                //}));
             }
 
             return fixtureMarkets;
+        }
+        public MarketModel? GetNearestLineToTwo(List<MarketModel> markets)
+        {
+            if (!markets.Any())
+                return null;
+
+            if (markets.Count == 1)
+                return markets.FirstOrDefault();
+
+            var market = markets.FirstOrDefault(s => s.MarketStatusId <= (int)MarketStatus.Active);
+
+            if (market == null)
+                return null;
+
+            if (market.Selections.Count > 2)
+                return market;
+
+            var evenLine = 2m;
+
+            var selections = markets.SelectMany(s => s.Selections.Select(se => new
+            {
+                s.MarketId,
+                s.Line,
+                Odds = Convert.ToDecimal(se.DecimalOdds),
+                Diff = Math.Abs(evenLine - Convert.ToDecimal(se.DecimalOdds))
+            }))
+                            .OrderBy(o => o.Diff)
+                            .ThenBy(o => Convert.ToDecimal(o.Line))
+                            .Distinct()
+                            .ToList();
+
+            if (!selections.Any())
+                return null;
+
+            //var nearestSelection = selections.Aggregate((s1, s2) => Math.Abs(s1.Odds - evenLine) <= Math.Abs(s2.Odds - evenLine) ? s1 : s2);
+            var nearestSelections = selections.Where(x => x.Diff == selections.FirstOrDefault()?.Diff);
+
+            if (nearestSelections.Any() && nearestSelections.Count() > 1)
+            {
+                nearestSelections = nearestSelections
+                    .Select(s => new
+                    {
+                        s.MarketId,
+                        s.Line,
+                        s.Odds,
+                        Diff = Math.Abs(0.5m - (1 / s.Odds))
+                    })
+                    .OrderBy(o => o.Diff)
+                    .ThenBy(o => Convert.ToDecimal(o.Line))
+                    .Distinct();
+            }
+
+            var nearestSelection = nearestSelections.FirstOrDefault();
+
+            return markets.FirstOrDefault(c => c.MarketId == nearestSelection?.MarketId);
         }
 
         private async Task ProcessOddsChange(OnExternalOddsChangeMessage message)
