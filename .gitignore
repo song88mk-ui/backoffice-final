@@ -12,6 +12,8 @@ BackOffice.Shared/bin
 BackOffice.API/bin
 Backoffice.Web/bin
 Backoffice.Web/obj
+Backoffice.WebSocket.API/bin
+Backoffice.WebSocket.API/obj
 Backoffice.Utility/obj
 Backoffice.Utility/bin
 Backoffice.Hub/obj
