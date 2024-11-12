@@ -5,6 +5,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Drawing.Printing;
+using System.Runtime.CompilerServices;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 using static Backoffice.Web.Models.ClientModel;
 
@@ -43,13 +44,21 @@ namespace Backoffice.Web.Components.Common
 
         private bool _init = true;
         private bool _shouldRender = true;
+
+        private string _correlationId;
+        private string _clientReference;
         #endregion
 
         #region Methods
         protected override void OnParametersSet()
         {
-            if (Market != null)
+            var clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
+            _shouldRender = ValidateParameters() || _clientReference != clientReference;
+
+            if (_shouldRender)
             {
+                _clientReference = clientReference;
+                _correlationId = Market.CorrelationId;
                 _fixtureName = Market.FixtureName;
                 _fixtureStatusId = Market.FixtureStatusId;
                 _currentPeriod = Market.CurrentPeriod;
@@ -89,8 +98,11 @@ namespace Backoffice.Web.Components.Common
                 {
                     _isBetStop = Market.BetStop.Count > 0 && Market.BetStop.FirstOrDefault() == 1 ? true : false;
                 }
+
+                _init = false;
             }
         }
+        protected override async Task OnAfterRenderAsync(bool firstRender) => _shouldRender = false;
         protected override bool ShouldRender() => _shouldRender;
 
         private void OnCloseMatchClickEvent()
@@ -112,6 +124,7 @@ namespace Backoffice.Web.Components.Common
         #endregion
 
         #region Utilities
+        private bool ValidateParameters() => _init || Market != null && _correlationId != Market.CorrelationId;
         private string GetClientOdds(SelectionModel selection, string clientCode)
         {
             if (selection != null && selection.ClientOdds != null && selection.ClientOdds.Any(c => c.ClientCode == clientCode))
@@ -131,10 +144,10 @@ namespace Backoffice.Web.Components.Common
             {
                 var activeSelections = selections.Where(c => c.IsActive == true && Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
 
-				if (activeSelections.Count == 1)
-					activeSelections = selections.Where(c => Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
+                if (activeSelections.Count == 1)
+                    activeSelections = selections.Where(c => Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
 
-				var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(GetClientOdds(s, clientCode)))) - 100) / 100;
+                var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(GetClientOdds(s, clientCode)))) - 100) / 100;
 
                 return ((int)((margin * 100) + 100)).ToString();
             }
@@ -143,10 +156,10 @@ namespace Backoffice.Web.Components.Common
 
             var newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
 
-			if (newActiveSelections.Count == 1)
-				newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
+            if (newActiveSelections.Count == 1)
+                newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
 
-			var computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId)?.Odds ?? 1)) - 100) + 100}";
+            var computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId)?.Odds ?? 1)) - 100) + 100}";
 
             if (newMargin != computedMargin)
             {

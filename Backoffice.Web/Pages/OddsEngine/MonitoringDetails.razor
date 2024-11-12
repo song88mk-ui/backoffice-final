@@ -72,7 +72,7 @@
                     var filteredMarketTemplateNavigation = !string.IsNullOrEmpty(Search) ? MarketTemplateNavigation.Where(c => c.MarketName.Contains(Search, StringComparison.OrdinalIgnoreCase)).ToList() : MarketTemplateNavigation;
 
                     <div class="market-template-container">
-                        <MarketFilter MarketTemplates="filteredMarketTemplateNavigation" OnMarketTemplateClickCallback="OnMarketTemplateClickEvent" />
+                        <MarketFilter MarketTemplates="filteredMarketTemplateNavigation" OnMarketClickCallback="OnMarketClickEvent" />
                     </div>
                     <div class="market-template-fixture-container align-self-start">
                         @if (filteredMarketTemplateNavigation.Any() && FixtureMarketTemplates.Any())
@@ -120,12 +120,23 @@
                                     </tr>
                                     <!-- End Table Row Margin -->
                                     <!-- Table Row Odds-->
-                                    <Virtualize Items="FixtureMarketTemplates" Context="market" OverscanCount="20">
-                                        @foreach (var selection in market.Selections)
-                                        {
-                                            <MatchDetailSelectionRow Selection="selection" Market="@market" Clients="_clients" />
-                                        }
-                                    </Virtualize>
+                                    @if (_isMatchSelectionPreLoad)
+                                    {
+                                        <tr>
+                                            <td colspan="@_colCtr">
+                                                <Preloader />
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <Virtualize Items="FixtureMarketTemplates" Context="market" OverscanCount="20">
+                                            @foreach (var selection in market.Selections)
+                                            {
+                                                <MatchDetailSelectionRow Selection="selection" Market="@market" Clients="_clients" />
+                                            }
+                                        </Virtualize>
+                                    }
                                     <!-- End Table Row Odds -->
                                 </tbody>
                             </table>

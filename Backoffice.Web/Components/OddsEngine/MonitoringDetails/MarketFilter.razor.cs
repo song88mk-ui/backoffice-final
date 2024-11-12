@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Web.Models;
 using Microsoft.AspNetCore.Components;
 
@@ -9,7 +10,15 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         #region Properties
 
         [Parameter] public List<MarketNavigationModel2> MarketTemplates { get; set; }
-        [Parameter] public EventCallback<string> OnMarketTemplateClickCallback { get; set; }
+        [Parameter] public EventCallback<string> OnMarketClickCallback { get; set; }
+
+        #endregion
+
+        #region Fields
+
+        private bool _init = true;
+        private bool _shouldRender = true;
+        private LanguageCode _languageCode;
 
         #endregion
 
@@ -17,19 +26,27 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
         protected override async Task OnParametersSetAsync()
         {
-            if (MarketTemplates != null && MarketTemplates.Any())
+            _shouldRender = ValidateParameters();
+
+            if (_shouldRender)
             {
-                if (!MarketTemplates.Any(c => c.IsSelected))
+                if (MarketTemplates != null && MarketTemplates.Any())
                 {
-                    var model = MarketTemplates.FirstOrDefault();
+                    if (!MarketTemplates.Any(c => c.IsSelected))
+                    {
+                        var model = MarketTemplates.FirstOrDefault();
 
-                    model.IsSelected = true;
+                        model.IsSelected = true;
 
-                    await OnMarketTemplateClickCallback.InvokeAsync(model.MarketTemplateId);
+                        await OnMarketClickCallback.InvokeAsync(model.MarketId);
+                    }
                 }
             }
+            _init = false;
         }
-
+        protected override async Task OnAfterRenderAsync(bool firstRender) => _shouldRender = false;
+        protected override bool ShouldRender() => _shouldRender;
+        private bool ValidateParameters() => _init || _languageCode != _translationState.ActiveLanguageCode;
         public async Task OnMarketTemplateClickEvent(MarketNavigationModel2 model)
         {
             if (model.IsSelected)
@@ -42,7 +59,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
             model.IsSelected = true;
 
-            await OnMarketTemplateClickCallback.InvokeAsync(model.MarketTemplateId);
+            await OnMarketClickCallback.InvokeAsync(model.MarketId);
         }
 
         public void Dispose()

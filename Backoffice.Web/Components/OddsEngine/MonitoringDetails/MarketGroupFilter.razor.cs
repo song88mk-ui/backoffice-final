@@ -1,17 +1,14 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using SportMarketTemplateGroup = Backoffice.Shared.Models.Response.MarketTemplateGroupResponse.SportMarketTemplateGroup;
 
 namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 {
     public partial class MarketGroupFilter : IDisposable
     {
         #region Properties
-
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-
         [Parameter] public EventCallback<string> OnInputSearchCallback { get; set; }
         [Parameter] public EventCallback<MarketGroupNavigationModel> OnMarketTemplateGroupCallback { get; set; }
         [Parameter] public MarketFixtureResponse.FixtureModel Fixture { get; set; }
@@ -30,7 +27,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             MarketTemplateGroups = new List<MarketGroupNavigationModel>();
 
             // 99 = all fixture types
-            var marketTemplateGroupResponse = (await BackofficeService.GetMarketTemplateGroups(99));
+            var marketTemplateGroupResponse = await _backofficeService.GetMarketTemplateGroups(99);
 
             if (marketTemplateGroupResponse.StatusCode == StatusCode.Success)
             {
@@ -78,7 +75,6 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
                 await OnMarketTemplateGroupCallback.InvokeAsync(MarketTemplateGroups.FirstOrDefault(c => c.IsSelected));
             }
         }
-
         public async Task OnMarketTemplateGroupClickEvent(MarketGroupNavigationModel model)
         {
             if (model.IsSelected)

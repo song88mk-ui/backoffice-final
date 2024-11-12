@@ -24,7 +24,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
 
-        
+
 
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public string Id { get; set; }
@@ -48,6 +48,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Fields
         private bool _isPreLoader;
+        private bool _isMatchSelectionPreLoad;
         private PageHeaderModel _pageHeaderModel;
         private bool _isPlayerProps;
         private List<Client>? _clients;
@@ -55,6 +56,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isInit;
         private string _id;
         private int _colCtr = 3;
+        private MarketGroupNavigationModel _navigationModel;
         #endregion
 
         #region Methods
@@ -101,10 +103,13 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (_isInit || _languageCode != _translationState.ActiveLanguageCode || Id != _id)
             {
+                _isPreLoader = true;
                 _id = Id;
                 _languageCode = _translationState.ActiveLanguageCode;
 
                 await PrepareMonitoringDetails();
+
+                _isPreLoader = false;
                 _isInit = false;
             }
         }
@@ -112,16 +117,30 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnMarketChangedEvent(string marketTemplateId)
         {
             _isPreLoader = true;
-            await InvokeAsync(StateHasChanged);
+
+            if (_languageCode != _translationState.ActiveLanguageCode)
+            {
+                _isMatchSelectionPreLoad = true;
+                _id = Id;
+                _languageCode = _translationState.ActiveLanguageCode;
+
+                await PrepareMonitoringDetails();
+
+                FixtureMarketTemplates = await PrepareFixtureMarketTemplates(marketTemplateId);
+                _isMatchSelectionPreLoad = true;
+                await OnMarketTemplateGroupClickEvent(_navigationModel);
+            }
+
             MarketTemplateId = marketTemplateId;
 
             var markets = Fixture.Markets.Where(c => c.MarketTemplateId == MarketTemplateId).ToList();
+
+
             FixtureMarkets = await PrepareFixtureMarkets(markets);
 
             MarginMarket = markets.FirstOrDefault(f => f.MarketStatusId == (int)MarketStatus.Active) ?? markets.FirstOrDefault() ?? new();
             _isPreLoader = false;
         }
-
         public void OnCloseMarkeEvent()
         {
             var parameters = new ModalParameters();
@@ -135,6 +154,62 @@ namespace Backoffice.Web.Pages.OddsEngine
             var options = new ModalOptions();
             ModalService.Open<CloseMarketsModal>("Close Markets", parameters, options);
         }
+        private MarketModel? GetNearestLineToTwo(List<MarketModel> markets)
+        {
+            if (!markets.Any())
+                return null;
+
+            if (markets.Count == 1)
+                return markets.FirstOrDefault();
+
+            var market = markets.FirstOrDefault(s => s.MarketStatusId <= (int)MarketStatus.Active);
+
+            if (market == null)
+                return null;
+
+            if (market.Selections.Count > 2)
+                return market;
+
+            var evenLine = 2m;
+
+            var selections = markets.SelectMany(s => s.Selections.Select(se => new
+            {
+                s.MarketId,
+                s.Line,
+                Odds = Convert.ToDecimal(se.DecimalOdds),
+                Diff = Math.Abs(evenLine - Convert.ToDecimal(se.DecimalOdds))
+            }))
+                            .OrderBy(o => o.Diff)
+                            .ThenBy(o => Convert.ToDecimal(o.Line))
+                            .Distinct()
+                            .ToList();
+
+            if (!selections.Any())
+                return null;
+
+            //var nearestSelection = selections.Aggregate((s1, s2) => Math.Abs(s1.Odds - evenLine) <= Math.Abs(s2.Odds - evenLine) ? s1 : s2);
+            var nearestSelections = selections.Where(x => x.Diff == selections.FirstOrDefault()?.Diff);
+
+            if (nearestSelections.Any() && nearestSelections.Count() > 1)
+            {
+                nearestSelections = nearestSelections
+                    .Select(s => new
+                    {
+                        s.MarketId,
+                        s.Line,
+                        s.Odds,
+                        Diff = Math.Abs(0.5m - (1 / s.Odds))
+                    })
+                    .OrderBy(o => o.Diff)
+                    .ThenBy(o => Convert.ToDecimal(o.Line))
+                    .Distinct();
+            }
+
+            var nearestSelection = nearestSelections.FirstOrDefault();
+
+            return markets.FirstOrDefault(c => c.MarketId == nearestSelection?.MarketId);
+        }
+
 
         private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
         {
@@ -153,15 +228,20 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnInputSearchEvent(string search)
         {
+            _isMatchSelectionPreLoad = true;
             Search = search;
 
             var selectedNavigation = MarketTemplateNavigation.FirstOrDefault(c => c.IsSelected);
 
-            FixtureMarketTemplates = PrepareFixtureMarketTemplates(selectedNavigation.MarketTemplateId);
+            FixtureMarketTemplates = await PrepareFixtureMarketTemplates(selectedNavigation.MarketTemplateId);
+            _isMatchSelectionPreLoad = false;
         }
 
         public async Task OnMarketTemplateGroupClickEvent(MarketGroupNavigationModel model)
         {
+            _isMatchSelectionPreLoad = true;
+            _navigationModel = model;
+
             var marketTemplateIds = model.MarketTemplateGroup.MarketTemplateIds;
             var markets = Fixture.Markets.Where(c => marketTemplateIds.Contains(c.MarketTemplateId)).ToList();
 
@@ -170,19 +250,28 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 IsSelected = index == 0 ? true : false,
                 MarketTemplateId = s.MarketTemplateId,
+                MarketId = s.MarketId,
                 MarketName = s.MarketName,
             })
             .DistinctBy(d => new { d.MarketTemplateId, d.MarketName })
             .ToList();
 
-            var selectedNavigation = MarketTemplateNavigation.FirstOrDefault(c => c.IsSelected);
+            var selectedMarket = MarketTemplateNavigation.FirstOrDefault(c => c.IsSelected);
 
-            FixtureMarketTemplates = PrepareFixtureMarketTemplates(selectedNavigation.MarketTemplateId);
+            if (selectedMarket != null)
+                await OnMarketClickEvent(selectedMarket.MarketId);
+            else
+                _isMatchSelectionPreLoad = false;
         }
 
-        public async Task OnMarketTemplateClickEvent(string marketTemplateId)
+        public async Task OnMarketClickEvent(string marketId)
         {
-            FixtureMarketTemplates = PrepareFixtureMarketTemplates(marketTemplateId);
+            if (!_isMatchSelectionPreLoad)
+                _isMatchSelectionPreLoad = true;
+
+            var markets = Fixture.Markets.Where(c => c.MarketId == marketId).ToList();
+            FixtureMarketTemplates = await PrepareFixtureMarkets(markets);
+            _isMatchSelectionPreLoad = false;
         }
 
         public async Task OnSaveClickEvent(object item)
@@ -221,9 +310,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task PrepareMonitoringDetails()
         {
-            if (!_isPreLoader)
-                _isPreLoader = true;
-
             var marketFixtureResponse = await BackofficeService.GetMarketFixtureDetails(Id, _languageCode);
 
             if (marketFixtureResponse.StatusCode == StatusCode.Success && marketFixtureResponse.Result.Fixture != null)
@@ -267,60 +353,56 @@ namespace Backoffice.Web.Pages.OddsEngine
                     }
                 };
             }
-
-            _isPreLoader = false;
         }
 
-        private async Task<List<FixtureMarketModel>> PrepareFixtureMarkets(List<MarketModel> markets)
+        private async Task<List<FixtureMarketModel>> PrepareFixtureMarkets(List<MarketModel> markets) => markets.Select(s => new FixtureMarketModel
         {
-            return markets.Select(s => new FixtureMarketModel
+            FixtureName = Fixture.FixtureName,
+            MarketId = s.MarketId,
+            ClientCode = s.ClientCode,
+            ClientCodeMargin = s.ClientCodeMargin,
+            MarketName = s.MarketName,
+            ProviderMarketId = s.ProviderMarketId,
+            ProviderFixtureId = s.ProviderFixtureId,
+            AwayName = Fixture.AwayName,
+            BetStop = Fixture.BetStop,
+            CurrentMinute = Fixture.CurrentMinute,
+            CurrentPeriod = Fixture.CurrentPeriod,
+            FixtureStartDate = Fixture.FixtureStartDate,
+            FixtureStatusId = Fixture.FixtureStatusId,
+            HomeName = Fixture.HomeName,
+            IsBetStopGlobal = Fixture.IsBetStopGlobal,
+            Score = Fixture.Score,
+            Line = s.Line,
+            //MarketSpecifier = s.MarketSpecifier,
+            MarketStatusId = s.MarketStatusId,
+            //MarketStatusName = s.MarketStatusName,
+            CorrelationId = Guid.NewGuid().ToString(),
+            MarketTemplateId = s.MarketTemplateId,
+            Selections = s.Selections.Select(se => new SelectionModel
             {
-                FixtureName = Fixture.FixtureName,
-                MarketId = s.MarketId,
-                ClientCode = s.ClientCode,
-                ClientCodeMargin = s.ClientCodeMargin,
-                MarketName = s.MarketName,
-                ProviderMarketId = s.ProviderMarketId,
-                ProviderFixtureId = s.ProviderFixtureId,
-                AwayName = Fixture.AwayName,
-                BetStop = Fixture.BetStop,
-                CurrentMinute = Fixture.CurrentMinute,
-                CurrentPeriod = Fixture.CurrentPeriod,
-                FixtureStartDate = Fixture.FixtureStartDate,
-                FixtureStatusId = Fixture.FixtureStatusId,
-                HomeName = Fixture.HomeName,
-                IsBetStopGlobal = Fixture.IsBetStopGlobal,
-                Score = Fixture.Score,
-                Line = s.Line,
-                //MarketSpecifier = s.MarketSpecifier,
-                MarketStatusId = s.MarketStatusId,
-                //MarketStatusName = s.MarketStatusName,
-                MarketTemplateId = s.MarketTemplateId,
-                Selections = s.Selections.Select(se => new SelectionModel
+                ProviderSelectionId = se.ProviderSelectionId,
+                SelectionId = se.SelectionId,
+                SelectionTemplateId = se.SelectionTemplateId,
+                SelectionName = se.SelectionName,
+                SelectionSpecifier = se.SelectionSpecifier,
+                DecimalOdds = se.DecimalOdds,
+                IsActive = se.IsActive,
+                SortOrder = se.SortOrder,
+                CorrelationId = se.CorrelationId,
+                OldDecimalOdds = se.OldDecimalOdds,
+                ClientOdds = se.ClientOdds.Select(od => new ClientOddsModel
                 {
-                    ProviderSelectionId = se.ProviderSelectionId,
-                    SelectionId = se.SelectionId,
-                    SelectionTemplateId = se.SelectionTemplateId,
-                    SelectionName = se.SelectionName,
-                    SelectionSpecifier = se.SelectionSpecifier,
-                    DecimalOdds = se.DecimalOdds,
-                    IsActive = se.IsActive,
-                    SortOrder = se.SortOrder,
-                    CorrelationId = se.CorrelationId,
-                    OldDecimalOdds = se.OldDecimalOdds,
-                    ClientOdds = se.ClientOdds.Select(od => new ClientOddsModel
-                    {
-                        ClientCode = od.ClientCode,
-                        Odds = od.Odds,
-                        OldOdds = od.OldOdds,
-                        SelectionTemplateId = od.SelectionTemplateId,
-                        SelectionId = od.SelectionId
-                    }).ToList()
+                    ClientCode = od.ClientCode,
+                    Odds = od.Odds,
+                    OldOdds = od.OldOdds,
+                    SelectionTemplateId = od.SelectionTemplateId,
+                    SelectionId = od.SelectionId
                 }).ToList()
-            }).OrderBy(o => string.IsNullOrEmpty(o.Line) ? 0 : Convert.ToDecimal(o.Line)).ToList();
-        }
+            }).ToList()
+        }).OrderBy(o => string.IsNullOrEmpty(o.Line) ? 0 : Convert.ToDecimal(o.Line)).ToList();
 
-        private List<FixtureMarketModel> PrepareFixtureMarketTemplates(string marketTemplateId)
+        private async Task<List<FixtureMarketModel>> PrepareFixtureMarketTemplates(string marketTemplateId)
         {
             var filteredMarkets = Fixture.Markets.Where(c => c.MarketTemplateId == marketTemplateId);
 
@@ -346,7 +428,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             MarginMarket = filteredMarkets.FirstOrDefault(f => f.MarketStatusId == (int)MarketStatus.Active) ?? filteredMarkets.FirstOrDefault() ?? new();
 
-            return PrepareFixtureMarkets(filteredMarkets.ToList()).Result;
+            return await PrepareFixtureMarkets(filteredMarkets.ToList());
         }
 
         private async Task Subscribe()
@@ -576,7 +658,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 if (newMarketTemplateIds.Contains(selectedNavigation.MarketTemplateId))
                 {
-                    FixtureMarketTemplates = PrepareFixtureMarketTemplates(selectedNavigation.MarketTemplateId);
+                    FixtureMarketTemplates = await PrepareFixtureMarketTemplates(selectedNavigation.MarketTemplateId);
                 }
 
                 await InvokeAsync(StateHasChanged);

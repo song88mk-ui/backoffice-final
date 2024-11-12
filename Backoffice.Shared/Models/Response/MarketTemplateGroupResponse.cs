@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
+﻿using System.Collections.Generic;
 
 namespace Backoffice.Shared.Models.Response
 {

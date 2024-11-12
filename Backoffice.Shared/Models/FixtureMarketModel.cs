@@ -31,6 +31,7 @@ namespace Backoffice.Shared.Models
         //public string MarketSpecifier { get; set; }
         public string ClientCode { get; set; }
         public string ClientCodeMargin { get; set; }
+        public string CorrelationId { get; set; }
         public List<SelectionModel> Selections { get; set; }
     }
 
