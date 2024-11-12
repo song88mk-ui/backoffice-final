@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Backoffice.WebSocket.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+70b5c686556e7c93edd37bcfc93e5659fed2249b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0aedb7da5ac3dd33da15a2f107519a783f7c6ee7")]
 [assembly: System.Reflection.AssemblyProductAttribute("Backoffice.WebSocket.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Backoffice.WebSocket.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
