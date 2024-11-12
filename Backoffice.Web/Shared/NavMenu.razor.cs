@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using RabbitMQ.Client.MessagePatterns;
 using System.Collections.Immutable;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Backoffice.Web.Shared
 {
@@ -62,8 +63,11 @@ namespace Backoffice.Web.Shared
 
                 _showSwitchAccess = categories != null && categories.Count > 1;
             }
+            var init = _init;
+            var languageCode = _languageCode;
+            var navMenuAccess = _navMenuAccess;
 
-            if (_init || _navMenuAccess != NavMenuParameter?.NavMenuAccess || _languageCode != _translationState.ActiveLanguageCode)
+            if (init || _navMenuAccess != NavMenuParameter?.NavMenuAccess || languageCode != _translationState.ActiveLanguageCode)
             {
                 var cts = new CancellationTokenSource();
                 _languageCode = _translationState.ActiveLanguageCode;
@@ -76,13 +80,12 @@ namespace Backoffice.Web.Shared
 
                 if (NavMenuParameter?.NavMenuAccess == PermissionCategory.OE)
                 {
-                    _menu.Sports = await GetSportsTreeMenu(cts.Token);
-                    _sports = await GetSportTreeMenus(cts.Token);
+                    _sports = await GetSportTreeMenus(_translationState.ActiveLanguageCode, cts.Token);
 
                     if (cts.Token.IsCancellationRequested)
                         return;
 
-                    if (_init || _navMenuAccess != NavMenuParameter?.NavMenuAccess)
+                    if (init || navMenuAccess != NavMenuParameter?.NavMenuAccess)
                     {
                         _selectedSport = new();
 
@@ -118,9 +121,27 @@ namespace Backoffice.Web.Shared
                                 break;
                         }
                     }
+                    else if (languageCode != _translationState.ActiveLanguageCode)
+                    {
+                        var sport = _sports.FirstOrDefault(c => c.Id == _selectedSport.SportId);
+                        var segment = sport?.Segments.FirstOrDefault(c => c.Id == _selectedSport.SegmentId);
+                        var league = segment?.Leagues.FirstOrDefault(c => c.Id == _selectedSport.LeagueId);
+
+                        _selectedSport = new SportClickCallbackModel()
+                        {
+                            SportId = _selectedSport.SportId,
+                            SportName = sport?.Name ?? "-",
+                            SegmentId = _selectedSport.SegmentId,
+                            SegmentName = segment?.Name ?? "-",
+                            LeagueId = _selectedSport.LeagueId,
+                            LeagueName = league?.Name ?? "-",
+
+                        };
+
+                        await OnSportClickCallback.InvokeAsync(_selectedSport);
+                    }
                 }
 
-                _navMenuAccess = NavMenuParameter?.NavMenuAccess;
             }
 
             _init = false;
@@ -153,52 +174,6 @@ namespace Backoffice.Web.Shared
                         SubMenus = x.SubMenus
                     }).ToList() ?? new List<MenuModel>()
                 };
-            }
-        }
-
-        private void OnSportClickEvent(int sportId)
-        {
-            if (_selectedSport.SportId != sportId)
-            {
-                var sport = _menu.Sports.FirstOrDefault(c => c.SportId == sportId);
-
-                if (sport != null)
-                {
-                    _selectedSport.SportId = sport.SportId;
-                    _selectedSport.SportName = sport.SportName;
-                }
-            }
-            else
-            {
-                _selectedSport.SportId = 0;
-                _selectedSport.SportName = string.Empty;
-            }
-
-            // reset selected segment and league if new sport has been selected. 
-            _selectedSport.SegmentId = 0;
-            _selectedSport.SegmentName = string.Empty;
-
-            _selectedSport.LeagueId = 0;
-            _selectedSport.LeagueName = string.Empty;
-        }
-
-        private async Task OnSegmentClickEvent(int segmentId)
-        {
-            if (_selectedSport.SegmentId != segmentId)
-            {
-                var sport = _menu.Sports.FirstOrDefault(c => c.SportId == _selectedSport.SportId);
-                var segment = sport?.Segments.FirstOrDefault(c => c.SegmentId == segmentId);
-
-                if (segment != null)
-                {
-                    _selectedSport.SegmentId = segment.SegmentId;
-                    _selectedSport.SegmentName = segment.SegmentName;
-                }
-            }
-            else
-            {
-                _selectedSport.SegmentId = 0;
-                _selectedSport.SegmentName = string.Empty;
             }
         }
 
@@ -321,26 +296,6 @@ namespace Backoffice.Web.Shared
                 await OnSportClickCallback.InvokeAsync(_selectedSport);
             }
         }
-        private async Task OnLeagueClickEvent(int leagueId)
-        {
-            if (_selectedSport.LeagueId != leagueId)
-            {
-                var sport = _menu.Sports.FirstOrDefault(c => c.SportId == _selectedSport.SportId);
-                var segment = sport?.Segments.FirstOrDefault(c => c.SegmentId == _selectedSport.SegmentId);
-                var league = segment?.Leagues.FirstOrDefault(c => c.LeagueId == leagueId);
-
-                _selectedSport.LeagueId = league.LeagueId;
-                _selectedSport.LeagueName = league.LeagueName;
-
-                // verify if you're in the monitoring page, if not then the user will be navigated.
-                var slugs = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "").Split("/").ToList();
-
-                if (slugs.Count != 1 && slugs[1].ToLower() != "monitoring")
-                {
-                    _navigationManager.NavigateTo($"/hk/odds-engine");
-                }
-            }
-        }
 
         private void OnLogoutClickEvent()
         {
@@ -375,11 +330,11 @@ namespace Backoffice.Web.Shared
 
         #region Utilities
 
-        private async Task<List<SportItemModel>> GetSportTreeMenus(CancellationToken token)
+        private async Task<List<SportItemModel>> GetSportTreeMenus(LanguageCode languageCode, CancellationToken token)
         {
             var result = new List<SportItemModel>();
 
-            var response = await _backofficeService.GetSportsTreeAsync((int)FixtureType.Match, _languageCode, token);
+            var response = await _backofficeService.GetSportsTreeAsync((int)FixtureType.Match, languageCode, token);
 
             if (token.IsCancellationRequested)
                 return new();
@@ -413,9 +368,9 @@ namespace Backoffice.Web.Shared
 
             return result;
         }
-        private async Task<List<SportModel>> GetSportsTreeMenu(CancellationToken token)
+        private async Task<List<SportModel>> GetSportsTreeMenu(LanguageCode language, CancellationToken token)
         {
-            var response = await _backofficeService.GetSportsTreeAsync((int)FixtureType.Match, _languageCode, token);
+            var response = await _backofficeService.GetSportsTreeAsync((int)FixtureType.Match, language, token);
             var result = new List<SportModel>();
 
             if (token.IsCancellationRequested)
