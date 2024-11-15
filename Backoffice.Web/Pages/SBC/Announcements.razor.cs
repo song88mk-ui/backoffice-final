@@ -6,7 +6,6 @@ using Backoffice.Web.Components.SBC.Announcements;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Linq;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -304,12 +303,11 @@ namespace Backoffice.Web.Pages.SBC
 
         private void SetItemAction()
         {
-            var isInternalUser = UserModel.Claims.Any(c => c.Type.Contains("Admin.") && c.Value != "0") && UserModel.Claims.Any(c => c.Type.Contains("SBC.") && c.Value != "0");
             foreach (var item in _model.Announcements)
             {
                 item.EditAction = _ => OnEditClickEvent(item);
                 item.DeleteAction = _ => OnDeleteClickEvent(item);
-                item.DisabledClass = isInternalUser == false && !item.Clients.Any(c => UserModel.ClientCodes.Contains(c.ClientCode)) ? "disabled-action" : "";
+                item.DisabledClass = item.UserRoleId != UserModel.RoleId ? "disabled-action" : "";
             }
         }
 
