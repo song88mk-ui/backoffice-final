@@ -274,7 +274,7 @@ namespace Backoffice.Web.Shared
                 var request = HttpContextAccessor.HttpContext?.Request;
 
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(new Uri(Configuration["API:HubAPI"]), "bohub"))
+                    .WithUrl(new Uri(Configuration["API:HubAPI"]))
                 .Build();
 
                 _hubConnection.On<NotificationsModel>("Notification", async message =>

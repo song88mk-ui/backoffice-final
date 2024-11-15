@@ -225,7 +225,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var connectionId = string.Empty;
 
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(new Uri(Configuration["API:HubAPI"]), "bohub"))
+                    .WithUrl(new Uri(Configuration["API:HubAPI"]))
                 .Build();
 
 
