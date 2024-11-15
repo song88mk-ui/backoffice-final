@@ -32,7 +32,7 @@ namespace Backoffice.Web.Shared
         [Inject] public ToastService ToasterService { get; set; }
         [Inject] public PageState PageState { get; set; }
         [Inject] public UserState UserState { get; set; }
-
+        [Inject] public HubService HubService { get; set; }
 
         public UserModel UserModel { get; set; } = new UserModel();
         public NavMenuModel NavMenus { get; set; } = new NavMenuModel();
@@ -67,7 +67,12 @@ namespace Backoffice.Web.Shared
             {
                 try
                 {
-                    await Subscribe();
+                    //await Subscribe();
+
+                    await HubService.OnNotificationReceived(async (NotificationsModel message) =>
+                    {
+                        await ProcessNotification(message);
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -135,6 +140,7 @@ namespace Backoffice.Web.Shared
                     UserModel.ClientCodes = userClientCodes;
                     UserModel.RoleId = roleId;
                     UserModel.RoleName = role;
+                    UserModel.ConnectionId = HubService.ConnectionId;
                 }
 
                 NavMenus = new NavMenuModel();
@@ -274,7 +280,8 @@ namespace Backoffice.Web.Shared
                 var request = HttpContextAccessor.HttpContext?.Request;
 
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(Configuration["API:HubAPI"]))
+                    //.WithUrl(new Uri(Configuration["API:HubAPI"]))
+                    .WithUrl("/bohub")
                 .Build();
 
                 _hubConnection.On<NotificationsModel>("Notification", async message =>

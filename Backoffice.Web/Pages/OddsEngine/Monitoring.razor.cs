@@ -109,7 +109,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 try
                 {
-                    await Subscribe();
+                    //await Subscribe();
+                    await _hubService.InitializeOeMessageHandlers(
+                        ProcessOddsChange,
+                        ProcessBetStopFixture,
+                        ProcessBetStopGlobal
+                    );
                 }
                 catch (Exception ex)
                 {
@@ -228,7 +233,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _hubConnection = new HubConnectionBuilder()
                     .WithUrl(new Uri(Configuration["API:HubAPI"]))
                 .Build();
-
 
                 _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
                 {
@@ -443,7 +447,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             //currentMarket.MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString();
                             currentMarket.ClientCode = newMarket.ClientCodes;
                             currentMarket.ClientCodeMargin = newMarket.ClientCodeMargin;
-                            currentMarket.CorrelationId = message.CorrelationId;
+                            currentMarket.CorrelationId = Guid.NewGuid().ToString();
 
                             foreach (var newSelection in newMarket.Selections)
                             {
@@ -457,6 +461,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                                         currentSelection.OldDecimalOdds = currentSelection.DecimalOdds;
                                         currentSelection.DecimalOdds = CommonService.GetFinalOdds(newSelection.Odds).ToString("0.00");
                                         currentSelection.IsActive = newSelection.IsActive;
+                                        currentSelection.CorrelationId = Guid.NewGuid().ToString();
                                         currentSelection.ClientOdds = newSelection.ClientOdds != null ? newSelection.ClientOdds.Select(s =>
                                             new ClientOddsModel
                                             {
@@ -506,6 +511,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             MarketId = m.MarketId.ToString(),
                             ClientCode = m.ClientCodes,
                             ClientCodeMargin = m.ClientCodeMargin,
+                            CorrelationId = Guid.NewGuid().ToString(),
                             Selections = m.Selections.Select(ss => new SelectionModel()
                             {
                                 DecimalOdds = ss.Odds.ToString(),
@@ -514,6 +520,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 SelectionTemplateId = ss.SelectionTemplateId,
                                 ProviderSelectionId = $"{message.ProviderFixtureId}:{m.MarketTemplateId}:{ss.SelectionTemplateId}:{m.MarketSpecifier}",
                                 OldDecimalOdds = ss.Odds.ToString(),
+                                CorrelationId = Guid.NewGuid().ToString(),
                                 ClientOdds = ss.ClientOdds.Select(s =>
                                     new ClientOddsModel
                                     {
@@ -542,7 +549,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (currentFixture != null)
                 {
                     var fixtureMarkets = _fixtureMarkets?.Where(c => c.ProviderFixtureId == message.ProviderFixtureId).ToList() ?? new List<FixtureMarketModel>();
-                    fixtureMarkets.ForEach(x => x.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>());
+                    fixtureMarkets.ForEach(c =>
+                    {
+                        c.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>();
+                        c.CorrelationId = Guid.NewGuid().ToString();
+                    });
 
                     _shouldRender = true;
                     await InvokeAsync(StateHasChanged);
@@ -554,7 +565,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (_fixtureMarkets != null && _fixtureMarkets.Any())
             {
-                _fixtureMarkets.ForEach(c => c.IsBetStopGlobal = message.IsBetStop);
+                _fixtureMarkets.ForEach(c =>
+                {
+                    c.IsBetStopGlobal = message.IsBetStop;
+                    c.CorrelationId = Guid.NewGuid().ToString();
+                });
 
                 _shouldRender = true;
                 await InvokeAsync(StateHasChanged);

@@ -86,7 +86,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 try
                 {
-                    await Subscribe();
+                    //await Subscribe();
+                    await _hubService.InitializeOeMessageHandlers(
+                        ProcessOddsChangeMonitoring,
+                        ProcessOnBetStopFixture,
+                        ProcessOnBetStopGlobal
+                    );
                 }
                 catch (Exception ex)
                 {

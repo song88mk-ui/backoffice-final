@@ -94,6 +94,7 @@ namespace Backoffice.Web.Extensions
 
             builder.Services.AddScoped<ToastService>();
             builder.Services.AddScoped<AlertToastService>();
+            builder.Services.AddScoped<HubService>();
 
             return builder;
         }
