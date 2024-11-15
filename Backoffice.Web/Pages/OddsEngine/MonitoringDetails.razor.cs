@@ -433,10 +433,10 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task Subscribe()
         {
-
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
-            .Build();
+                    .WithUrl(new Uri(new Uri(Configuration["API:HubAPI"]), "bohub"))
+                .Build();
+
 
             _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
             {

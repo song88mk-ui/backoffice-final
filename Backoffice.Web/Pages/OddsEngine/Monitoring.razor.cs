@@ -225,8 +225,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var connectionId = string.Empty;
 
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
+                    .WithUrl(new Uri(new Uri(Configuration["API:HubAPI"]), "bohub"))
                 .Build();
+
 
                 _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
                 {

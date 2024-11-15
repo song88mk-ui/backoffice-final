@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
+using System.Security.Policy;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backoffice.Web.Shared
@@ -21,6 +22,7 @@ namespace Backoffice.Web.Shared
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
+        [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
@@ -272,7 +274,7 @@ namespace Backoffice.Web.Shared
                 var request = HttpContextAccessor.HttpContext?.Request;
 
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(Path.Combine(NavigationManager.BaseUri, "bohub")))
+                    .WithUrl(new Uri(new Uri(Configuration["API:HubAPI"]), "bohub"))
                 .Build();
 
                 _hubConnection.On<NotificationsModel>("Notification", async message =>
