@@ -125,6 +125,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = false;
         }
         protected override bool ShouldRender() => _shouldRender;
+
         private bool ValidateParameters() => _init || ((SelectedSport?.SportId ?? 0) > 0 && _slugs != null && _slugs.Count >= 2);
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
@@ -442,6 +443,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             //currentMarket.MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString();
                             currentMarket.ClientCode = newMarket.ClientCodes;
                             currentMarket.ClientCodeMargin = newMarket.ClientCodeMargin;
+                            currentMarket.CorrelationId = message.CorrelationId;
 
                             foreach (var newSelection in newMarket.Selections)
                             {
@@ -470,6 +472,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                         }
                     }
                 }
+
+                _shouldRender = true;
+                await InvokeAsync(StateHasChanged);
             }
             else if (message.FixtureStatusId < (int)FixtureStatus.Suspended)
             {
@@ -521,10 +526,11 @@ namespace Backoffice.Web.Pages.OddsEngine
                         });
                     });
                 }
+
+                _shouldRender = true;
+                await InvokeAsync(StateHasChanged);
             }
 
-            _shouldRender = true;
-            await InvokeAsync(StateHasChanged);
         }
 
         private async Task ProcessBetStopFixture(OnExternalBetStopFixtureMessage message)

@@ -4,10 +4,7 @@ using Backoffice.Web.Components.OddsEngine.Monitoring;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Drawing.Printing;
-using System.Runtime.CompilerServices;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
-using static Backoffice.Web.Models.ClientModel;
 
 namespace Backoffice.Web.Components.Common
 {
@@ -23,6 +20,7 @@ namespace Backoffice.Web.Components.Common
         #endregion
 
         #region Fields
+
         private string _mainMarketName = string.Empty;
         private bool _isBetStop = false;
         private bool _hasLine;
@@ -47,17 +45,18 @@ namespace Backoffice.Web.Components.Common
 
         private string _correlationId;
         private string _clientReference;
+
         #endregion
 
         #region Methods
+
         protected override void OnParametersSet()
         {
-            var clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
-            _shouldRender = ValidateParameters() || _clientReference != clientReference;
+            _shouldRender = ValidateParameters();
 
             if (_shouldRender)
             {
-                _clientReference = clientReference;
+                _clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
                 _correlationId = Market.CorrelationId;
                 _fixtureName = Market.FixtureName;
                 _fixtureStatusId = Market.FixtureStatusId;
@@ -102,38 +101,10 @@ namespace Backoffice.Web.Components.Common
                 _init = false;
             }
         }
+
         protected override async Task OnAfterRenderAsync(bool firstRender) => _shouldRender = false;
+
         protected override bool ShouldRender() => _shouldRender;
-
-        private void OnCloseMatchClickEvent()
-        {
-            ModalParameters parameters = new ModalParameters();
-            parameters.Add("ModalDialogClass", "modal-dialog-centered modal-lg");
-            parameters.Add("FixtureName", _fixtureName);
-            parameters.Add("ProviderFixtureId", _providerFixtureId);
-
-            ModalOptions options = new ModalOptions();
-
-            ModalService.Open<CloseMatchModal>("Close Match", parameters, options);
-        }
-
-        public void Dispose()
-        {
-        }
-
-        #endregion
-
-        #region Utilities
-        private bool ValidateParameters() => _init || Market != null && _correlationId != Market.CorrelationId;
-        private string GetClientOdds(SelectionModel selection, string clientCode)
-        {
-            if (selection != null && selection.ClientOdds != null && selection.ClientOdds.Any(c => c.ClientCode == clientCode))
-            {
-                return selection.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == selection.SelectionTemplateId)?.Odds.ToString() ?? string.Empty;
-            }
-
-            return selection?.DecimalOdds ?? string.Empty;
-        }
 
         public string GetClientMargin(string clientCode, string clientCodeMargin, List<SelectionModel> selections)
         {
@@ -169,6 +140,70 @@ namespace Backoffice.Web.Components.Common
             return newMargin;
         }
 
+        public bool HasClientConfig(string clientCode, string marketClientCode, string marketClientMargin)
+        {
+            if (marketClientCode.Split("|").Contains(clientCode) || marketClientMargin.Contains(clientCode))
+                return true;
+
+            return false;
+        }
+
+        public int GetMarketStatusId(Client client, string marketClientCodes, int marketStatusId)
+        {
+            var result = marketStatusId;
+
+            if (string.IsNullOrEmpty(marketClientCodes))
+            {
+                marketClientCodes = string.Empty;
+            }
+
+            var inactiveMarketClients = marketClientCodes.Split("|");
+
+            if (!inactiveMarketClients.Contains(client.ClientCode))
+            {
+                result = (int)MarketStatus.Inactive;
+            }
+
+            return result;
+        }
+
+        public void HandleCloseMatchClick()
+        {
+            ModalParameters parameters = new ModalParameters();
+            parameters.Add("ModalDialogClass", "modal-dialog-centered modal-lg");
+            parameters.Add("FixtureName", _fixtureName);
+            parameters.Add("ProviderFixtureId", _providerFixtureId);
+
+            ModalOptions options = new ModalOptions();
+
+            ModalService.Open<CloseMatchModal>("Close Match", parameters, options);
+        }
+
+        public void Dispose()
+        {
+        }
+
+        #endregion
+
+        #region Utilities
+
+        private bool ValidateParameters()
+        {
+            var clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
+
+            return _init || Market != null && _correlationId != Market.CorrelationId || _clientReference != clientReference;
+        }
+
+        private string GetClientOdds(SelectionModel selection, string clientCode)
+        {
+            if (selection != null && selection.ClientOdds != null && selection.ClientOdds.Any(c => c.ClientCode == clientCode))
+            {
+                return selection.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == selection.SelectionTemplateId)?.Odds.ToString() ?? string.Empty;
+            }
+
+            return selection?.DecimalOdds ?? string.Empty;
+        }
+
         private string GetMarketLine(string marketName, string marketLine)
         {
             var result = string.Empty;
@@ -189,31 +224,7 @@ namespace Backoffice.Web.Components.Common
             }
             return result;
         }
-        public bool HasClientConfig(string clientCode, string marketClientCode, string marketClientMargin)
-        {
-            if (marketClientCode.Split("|").Contains(clientCode) || marketClientMargin.Contains(clientCode))
-                return true;
 
-            return false;
-        }
-        public int GetMarketStatusId(Client client, string marketClientCodes, int marketStatusId)
-        {
-            var result = marketStatusId;
-
-            if (string.IsNullOrEmpty(marketClientCodes))
-            {
-                marketClientCodes = string.Empty;
-            }
-
-            var inactiveMarketClients = marketClientCodes.Split("|");
-
-            if (!inactiveMarketClients.Contains(client.ClientCode))
-            {
-                result = (int)MarketStatus.Inactive;
-            }
-
-            return result;
-        }
         #endregion
     }
 }
