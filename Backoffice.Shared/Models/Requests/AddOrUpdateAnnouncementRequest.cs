@@ -6,6 +6,10 @@ namespace Backoffice.Shared.Models.Requests
 {
     public class AddOrUpdateAnnouncementRequest
     {
+        public AddOrUpdateAnnouncementRequest()
+        {
+            ToRemoveClientCodes = new List<string>();
+        }
         public int Id { get; set; }
         public List<string> ClientCodes { get; set; }
         public List<string> ToRemoveClientCodes { get; set; }

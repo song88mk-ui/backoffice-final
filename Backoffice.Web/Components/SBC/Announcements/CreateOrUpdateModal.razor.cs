@@ -230,7 +230,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     });
                 }
 
-                if (!_selectedClientCodes.Any())
+                if (!_selectedClientCodes.Any() && !_isEdit)
                 {
                     _alerts.Add(new AnnouncementsAlertModel
                     {
@@ -268,6 +268,17 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
                 if(_isEdit)
                 {
+                    var isInternalUser = UserModel.Claims.Any(c => c.Type.Contains("Admin.") && c.Value != "0") && UserModel.Claims.Any(c => c.Type.Contains("SBC.") && c.Value != "0");
+
+                    if (isInternalUser == false && _announcement.UserRoleId != UserModel.RoleId)
+                    {
+                        var toRemoveClientCodes = _announcement.Clients.Select(s => s.ClientCode).ToList();
+                        if (toRemoveClientCodes != null && toRemoveClientCodes.Any())
+                        {
+                            request.ToRemoveClientCodes.AddRange(toRemoveClientCodes);
+                        }
+                    }
+
                     _announcement.Message = _announcementMessages[_announcement.LanguageCode].ToString();
                     _announcement.Clients = _selectedClientCodes.Select(s => new AnnouncementResponse.ClientInfo { ClientCode = s }).ToList();
                     _announcement.Languages = request.AnnouncementMessages;
