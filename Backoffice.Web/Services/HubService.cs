@@ -51,11 +51,6 @@ namespace Backoffice.Web.Services
                 await processOnBetStopFixture(message);
             });
 
-            _hubConnection.On<string>("onoddschange", async message =>
-            {
-                var test = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(message);
-            });
-
             _hubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async message =>
             {
                 await processOnBetStopGlobal(message);
