@@ -34,6 +34,4 @@ namespace Backoffice.Shared.Models
         public string CorrelationId { get; set; }
         public List<SelectionModel> Selections { get; set; }
     }
-
-
 }

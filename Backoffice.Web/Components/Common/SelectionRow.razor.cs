@@ -27,6 +27,7 @@ namespace Backoffice.Web.Components.Common
         private bool _shouldRender;
         private bool _isBetStop;
         private int _currentMarketStatus;
+        private string _correlationId;
 
         private CancellationTokenSource _cts;
 
@@ -88,12 +89,10 @@ namespace Backoffice.Web.Components.Common
 
         #region Utilities
 
-        private bool ValidateParameters()
-        {
-            return _init
+        private bool ValidateParameters() => _init
                 || _isBetStop != IsBetStop
-                || _currentMarketStatus != CurrentMarketStatus;
-        }
+                || _currentMarketStatus != CurrentMarketStatus
+                || _correlationId != Selection.CorrelationId;
 
         private string GetClientOdds()
         {
