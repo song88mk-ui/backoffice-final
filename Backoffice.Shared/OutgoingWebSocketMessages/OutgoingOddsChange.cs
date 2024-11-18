@@ -9,6 +9,6 @@ namespace Backoffice.Shared.OutgoingWebSocketMessages
     public class OutgoingOddsChange
     {
         public List<string> Gr { get; set; } = new List<string>();
-        public OnExternalOddsChangeMessage Pa { get; set; }
+        public OddsChangeFixture Pa { get; set; }
     }
 }

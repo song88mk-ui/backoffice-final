@@ -1,4 +1,7 @@
+using Backoffice.Shared.Enums;
+using Backoffice.Shared.IncomingSbEngineMessages;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.HubMessages;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.WebSocket.Service.Services;
@@ -9,10 +12,14 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
 namespace Backoffice.WebSocket.Service
 {
@@ -27,8 +34,8 @@ namespace Backoffice.WebSocket.Service
         private Thread _threadOnMonitoringDetailsOddsChange;
         private Thread _threadNotification;
 
-        private readonly BlockingCollection<OnExternalOddsChangeMessage> _messagesOnMonitoringOddsChange = new BlockingCollection<OnExternalOddsChangeMessage>();
-        private readonly BlockingCollection<OnExternalOddsChangeMessage> _messagesOnMonitoringDetailsOddsChange = new BlockingCollection<OnExternalOddsChangeMessage>();
+        private readonly BlockingCollection<IncomingOddsChangeMessage> _messagesOnMonitoringOddsChange = new BlockingCollection<IncomingOddsChangeMessage>();
+        private readonly BlockingCollection<IncomingOddsChangeMessage> _messagesOnMonitoringDetailsOddsChange = new BlockingCollection<IncomingOddsChangeMessage>();
         private readonly BlockingCollection<NotificationsDetailsModel> _messagesNotification = new BlockingCollection<NotificationsDetailsModel>();
 
         public Worker(ILogger<Worker> logger, IConfiguration configuration, IMessageBroker messageBroker, ISportsbookService sportsbookService)
@@ -58,6 +65,21 @@ namespace Backoffice.WebSocket.Service
             _threadOnMonitoringDetailsOddsChange.Start();
             _threadNotification.Start();
 
+            _hubConnection.Closed += async (error) =>
+            {
+                _logger.LogError($"Connection closed. Trying to reconnect... - {error.Message}- {error.InnerException}");
+            };
+            _hubConnection.Reconnecting += (error) =>
+            {
+                _logger.LogWarning($"Reconnecting... {error.Message}- {error.InnerException}");
+                return Task.CompletedTask;
+            };
+            _hubConnection.Reconnected += (connectionId) =>
+            {
+                _logger.LogInformation($"Reconnected with connectionId: {connectionId}");
+                return Task.CompletedTask;
+            };
+
             await _hubConnection.StartAsync();
 
             _messageBroker.Connect();
@@ -69,13 +91,12 @@ namespace Backoffice.WebSocket.Service
             var messageType = e.BasicProperties.Type;
             var correlationId = e.BasicProperties.CorrelationId;
 
-
             try
             {
                 switch (messageType)
                 {
                     case "OnOddsChange":
-                        var onOddsChange = JsonSerializer.Deserialize<OnExternalOddsChangeMessage>(payload);
+                        var onOddsChange = JsonSerializer.Deserialize<IncomingOddsChangeMessage>(payload);
 
                         if (onOddsChange != null)
                         {
@@ -99,7 +120,6 @@ namespace Backoffice.WebSocket.Service
                 _logger.LogError($"{ex.Message} - {ex.StackTrace}");
             }
         }
-
 
         private async void ThreadMonitoringOnOddsChange()
         {

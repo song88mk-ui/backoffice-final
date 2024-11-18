@@ -5,6 +5,6 @@ namespace Backoffice.WebSocket.API.Events
 {
     public interface IBackofficeEvent
     {
-        Task OnOddsChange(OnExternalOddsChangeMessage message);
+        Task OnOddsChange(OddsChangeFixture message);
     }
 }

@@ -21,6 +21,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         private int _marketStatusId;
         private string _clientCode;
         private string _clientCodeMargin;
+        private string _odds;
 
         #region Methods
         protected override async Task OnParametersSetAsync()
@@ -83,18 +84,20 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             {
                 if (ClientCode == null)
                 {
-                    if (!string.IsNullOrEmpty(Selection.OldDecimalOdds))
+                    if (!string.IsNullOrEmpty(_odds))
                     {
-                        if (Convert.ToDecimal(Selection.OldDecimalOdds) > Convert.ToDecimal(Selection.DecimalOdds))
+                        if (Convert.ToDecimal(_odds) > Convert.ToDecimal(Selection.DecimalOdds))
                         {
                             color = "odds-bg-danger-active";
                         }
 
-                        if (Convert.ToDecimal(Selection.OldDecimalOdds) < Convert.ToDecimal(Selection.DecimalOdds))
+                        if (Convert.ToDecimal(_odds) < Convert.ToDecimal(Selection.DecimalOdds))
                         {
                             color = "odds-bg-success-active";
                         }
                     }
+
+                    _odds = Selection.DecimalOdds;
                 }
                 else
                 {
@@ -102,17 +105,16 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
                         return color;
 
                     var clientOdds = Selection.ClientOdds.FirstOrDefault(c => c.ClientCode == ClientCode && c.SelectionTemplateId == Selection.SelectionTemplateId);
-
                     if (clientOdds != null)
                     {
-                        if (clientOdds.OldOdds != 0)
+                        if (!string.IsNullOrEmpty(_odds))
                         {
-                            if (clientOdds.OldOdds > clientOdds.Odds)
+                            if (Convert.ToDecimal(_odds) > clientOdds.Odds)
                             {
                                 color = "odds-bg-danger-active";
                             }
 
-                            if (clientOdds.OldOdds < clientOdds.Odds)
+                            if (Convert.ToDecimal(_odds) < clientOdds.Odds)
                             {
                                 color = "odds-bg-success-active";
                             }

@@ -125,7 +125,6 @@ builder.AddStates()
 builder.Services.AddScoped<ICommonService, CommonService>();
 //builder.Services.AddScoped<IExcelService, ExcelService>();
 
-//builder.Services.AddSignalR();
 builder.Services.AddResponseCompression(opts => opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
         new[] { "application/octet-stream" }));
 
@@ -142,7 +141,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseSession();
-//app.UseMiddleware<RabbitMQMiddleware>();
 
 //app.UseHttpsRedirection();
 app.MapHealthChecks("/healthz");
@@ -153,6 +151,5 @@ app.UseRouting();
 
 app.MapBlazorHub(o => { o.Transports = HttpTransportType.WebSockets; });
 app.MapFallbackToPage("/_Host");
-//app.MapHub<BoHub>("/bohub");
 
 app.Run();

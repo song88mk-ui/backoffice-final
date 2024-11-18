@@ -1,5 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.HubMessages;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Components.OddsEngine.MonitoringDetails;
@@ -395,12 +396,10 @@ namespace Backoffice.Web.Pages.OddsEngine
                 IsActive = se.IsActive,
                 SortOrder = se.SortOrder,
                 CorrelationId = se.CorrelationId,
-                OldDecimalOdds = se.OldDecimalOdds,
                 ClientOdds = se.ClientOdds.Select(od => new ClientOddsModel
                 {
                     ClientCode = od.ClientCode,
                     Odds = od.Odds,
-                    OldOdds = od.OldOdds,
                     SelectionTemplateId = od.SelectionTemplateId,
                     SelectionId = od.SelectionId
                 }).ToList()
@@ -436,33 +435,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             return await PrepareFixtureMarkets(filteredMarkets.ToList());
         }
 
-        private async Task Subscribe()
-        {
-            _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(Configuration["API:HubAPI"]))
-                .Build();
-
-
-            _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
-            {
-                await ProcessOddsChangeMonitoring(message);
-            });
-
-            _hubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async (message) =>
-            {
-                await ProcessOnBetStopFixture(message);
-            });
-
-            _hubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async (message) =>
-            {
-                await ProcessOnBetStopGlobal(message);
-            });
-
-            await _hubConnection.StartAsync();
-            //await _hubConnection.InvokeAsync("AddToGroup", Region.ToUpper());
-        }
-
-        private async Task ProcessOddsChangeMonitoring(OnExternalOddsChangeMessage message)
+        private async Task ProcessOddsChangeMonitoring(OddsChangeFixture message)
         {
             if (Fixture == null || Fixture.FixtureTypeId != message.FixtureTypeId || Id != message.ProviderFixtureId)
                 return;
@@ -480,6 +453,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Fixture.CurrentMinute = message.CurrentMinute.ToString();
                 Fixture.Score = message.Score;
                 Fixture.FixtureStatusId = message.FixtureStatusId;
+                Fixture.UnixTime = message.UnixTime;
 
                 foreach (var newMarket in message.Markets.Where(c => c.MarketTemplateId == marketFixture.MarketTemplateId && c.MarketName == marketFixture.MarketName && c.MarketSpecifier == marketFixture.MarketSpecifier))
                 {
@@ -492,8 +466,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                     {
                         currentMarket.MarketStatusId = newMarket.MarketStatusId;
                         currentMarket.MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString();
-                        currentMarket.ClientCode = newMarket.ClientCodes;
+                        currentMarket.ClientCode = newMarket.ClientCode;
                         currentMarket.ClientCodeMargin = newMarket.ClientCodeMargin;
+                        currentMarket.UnixTime = newMarket.UnixTime;
 
                         foreach (var newSelection in newMarket.Selections)
                         {
@@ -502,26 +477,71 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                             if (currentSelection != null)
                             {
+                                var clientOdds = new List<ClientOddsModel>();
+                                foreach (var client in newMarket.ClientSelections)
+                                {
+                                    var clientSelection = client.Selections.FirstOrDefault(c => c.SelectionId == newSelection.SelectionId);
+                                    clientOdds.Add(new ClientOddsModel()
+                                    {
+                                        ClientCode = client.ClientCode,
+                                        Odds = clientSelection?.DecimalOdds ?? -99,
+                                        SelectionTemplateId = newSelection.SelectionTemplateId,
+                                        SelectionId = newSelection.SelectionId
+                                    });
+                                }
+
                                 if (newSelection.IsActive)
                                 {
-                                    currentSelection.OldDecimalOdds = currentSelection.DecimalOdds;
-                                    currentSelection.DecimalOdds = CommonService.GetFinalOdds(newSelection.Odds).ToString("0.00");
+                                    currentSelection.DecimalOdds = CommonService.GetFinalOdds(newSelection.DecimalOdds).ToString("0.00");
                                     currentSelection.IsActive = newSelection.IsActive;
-                                    currentSelection.ClientOdds = newSelection.ClientOdds.Select(s =>
-                                        new ClientOddsModel
-                                        {
-                                            ClientCode = s.ClientCode,
-                                            SelectionTemplateId = s.SelectionTemplateId,
-                                            Odds = s.DecimalOdds,
-                                            OldOdds = currentSelection.ClientOdds != null && currentSelection.ClientOdds.Any(c => c.ClientCode == s.ClientCode) ?
-                                                        currentSelection.ClientOdds.Where(c => c.ClientCode == s.ClientCode).FirstOrDefault().Odds : s.DecimalOdds
-                                        }).ToList();
+                                    currentSelection.UnixTime = newSelection.UnixTime;
+                                    currentSelection.ClientOdds = clientOdds;
+                                    //currentSelection.ClientOdds = newSelection.ClientOdds.Select(s =>
+                                    //    new ClientOddsModel
+                                    //    {
+                                    //        ClientCode = s.ClientCode,
+                                    //        SelectionTemplateId = s.SelectionTemplateId,
+                                    //        Odds = s.DecimalOdds,
+                                    //        OldOdds = currentSelection.ClientOdds != null && currentSelection.ClientOdds.Any(c => c.ClientCode == s.ClientCode) ?
+                                    //                    currentSelection.ClientOdds.Where(c => c.ClientCode == s.ClientCode).FirstOrDefault().Odds : s.DecimalOdds
+                                    //    }).ToList();
                                 }
                             }
                         }
                     }
                     else
                     {
+                        var selections = new List<SelectionModel>();
+
+                        foreach(var newSelection in newMarket.Selections)
+                        {
+                            var clientOdds = new List<ClientOddsModel>();
+                            foreach (var client in newMarket.ClientSelections)
+                            {
+                                var clientSelection = client.Selections.FirstOrDefault(c => c.SelectionId == newSelection.SelectionId);
+                                clientOdds.Add(new ClientOddsModel()
+                                {
+                                    ClientCode = client.ClientCode,
+                                    Odds = clientSelection?.DecimalOdds ?? -99,
+                                    SelectionTemplateId = newSelection.SelectionTemplateId,
+                                    SelectionId = newSelection.SelectionId
+                                });
+                            }
+
+                            selections.Add(new SelectionModel()
+                            {
+                                SelectionId = newSelection.SelectionId.ToString(),
+                                ProviderSelectionId = $"{Fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newSelection.SelectionTemplateId}:{newMarket.MarketSpecifier}",
+                                //OldDecimalOdds = CommonService.GetFinalOdds(s.DecimalOdds).ToString("0.00"),
+                                DecimalOdds = CommonService.GetFinalOdds(newSelection.DecimalOdds).ToString("0.00"),
+                                IsActive = newSelection.IsActive,
+                                SelectionName = newSelection.SelectionName,
+                                SelectionTemplateId = newSelection.SelectionTemplateId,
+                                SortOrder = newSelection.SortOrder,
+                                UnixTime = newSelection.UnixTime,
+                                ClientOdds = clientOdds
+                            });
+                        }
                         // add market
                         var market = new MarketModel()
                         {
@@ -529,32 +549,14 @@ namespace Backoffice.Web.Pages.OddsEngine
                             ProviderMarketId = providerMarketId,
                             ProviderFixtureId = message.ProviderFixtureId,
                             Line = newMarket.Line,
-                            ClientCode = newMarket.ClientCodes,
+                            ClientCode = newMarket.ClientCode,
                             ClientCodeMargin = newMarket.ClientCodeMargin,
                             MarketStatusId = newMarket.MarketStatusId,
                             MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString(),
                             MarketName = newMarket.MarketName,
                             MarketTemplateId = newMarket.MarketTemplateId,
-                            Selections = newMarket.Selections.Select(s => new SelectionModel
-                            {
-                                SelectionId = s.SelectionId.ToString(),
-                                ProviderSelectionId = $"{Fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{s.SelectionTemplateId}:{newMarket.MarketSpecifier}",
-                                OldDecimalOdds = CommonService.GetFinalOdds(s.Odds).ToString("0.00"),
-                                DecimalOdds = CommonService.GetFinalOdds(s.Odds).ToString("0.00"),
-                                IsActive = s.IsActive,
-                                SelectionName = s.SelectionName,
-                                SelectionTemplateId = s.SelectionTemplateId,
-                                SortOrder = s.SortOrder,
-                                ClientOdds = s.ClientOdds.Select(ss =>
-                                        new ClientOddsModel
-                                        {
-                                            ClientCode = ss.ClientCode,
-                                            SelectionTemplateId = ss.SelectionTemplateId,
-                                            Odds = ss.DecimalOdds,
-                                            OldOdds = s.ClientOdds != null && s.ClientOdds.Any(c => c.ClientCode == ss.ClientCode) ?
-                                                        s.ClientOdds.Where(c => c.ClientCode == ss.ClientCode).FirstOrDefault().DecimalOdds : ss.DecimalOdds
-                                        }).ToList()
-                            }).ToList()
+                            UnixTime = newMarket.UnixTime,
+                            Selections = selections
                         };
 
                         Fixture.Markets.Add(market);
@@ -804,7 +806,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 ClientCode = client.Item1,
                 Odds = clientUnderOdds,
-                OldOdds = clientUnderOdds,
+                //OldOdds = clientUnderOdds,
             };
         }
 

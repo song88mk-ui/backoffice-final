@@ -1,4 +1,5 @@
 using Backoffice.Shared.Utilities;
+using Backoffice.WebSocket.Service.Repositories;
 using Backoffice.WebSocket.Service.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,8 +24,10 @@ namespace Backoffice.WebSocket.Service
                 {
                     var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
 
+                    services.AddSingleton<IMemCache, MemCache>();
                     services.AddSingleton<IMessageBroker, MessageBroker>();
                     services.AddSingleton<ISportsbookService, SportsbookService>();
+                    services.AddSingleton<ISportsbookRepository, SportsbookRepository>();
                     services.AddHostedService<Worker>();
                 }).UseWindowsService();
     }
