@@ -1,9 +1,10 @@
-﻿using Backoffice.WebSocket.API.Models.Messages;
+﻿using Backoffice.Shared.Models.HubMessages;
+using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 
 namespace Backoffice.WebSocket.API.Events
 {
     public interface IBackofficeEvent
     {
-        Task OnOddsChange(OddsChangeFixture message);
+        Task OnOddsChange(OnExternalOddsChangeMessage message);
     }
 }
