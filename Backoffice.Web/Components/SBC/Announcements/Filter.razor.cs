@@ -29,6 +29,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         private AnnouncementsFilterModel _filterModel;
         private List<SelectListItemWithCheckboxModel<string>> _clients;
         private List<SelectListItemWithCheckboxModel<string>> _languageCodes;
+        private List<Client> _clientListReference;
 
         #endregion
 
@@ -51,32 +52,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                 IsChecked = true
             }).ToList();
             _filterModel.LanguageCode = _languageCodes.FirstOrDefault()?.Value ?? string.Empty;
-
-            var clients = (await BackofficeService.GetClients()).Result;
-
-            if (clients != null && clients.Clients.Any())
-            {
-                clients.Clients = UserModel?.ClientCodes != null && UserModel.ClientCodes.Any() ? clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
-
-                _clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
-                {
-                    Value = s.ClientCode,
-                    Name = s.ClientName,
-                    IsChecked = true
-                }).ToList();
-
-                var selectedClients = _clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
-
-                _filterModel.Clients = _clients;
-                _filterModel.ClientCodes = string.Join(",", selectedClients);
-            }
-            else
-            {
-                _clients = new List<SelectListItemWithCheckboxModel<string>>();
-            }
-
             _filterModel.Search = string.Empty;
-            await OnInitCallback.InvokeAsync(_filterModel);
 
         }
 
@@ -85,6 +61,35 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _shouldRender = ValidateParameters();
 
             _init = false;
+
+            if (_shouldRender)
+            {
+                if (_userState.SportsbookClients != null && _clientListReference != _userState.SportsbookClients)
+                    _clientListReference = _userState.SportsbookClients;
+
+                if (_clientListReference != null && _clientListReference.Any())
+                {
+                    _clients = _clientListReference.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
+                    {
+                        Value = s.ClientCode,
+                        Name = s.ClientName,
+                        IsChecked = true
+                    }).ToList();
+
+                    var selectedClients = _clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
+
+                    _filterModel.Clients = _clients;
+                    _filterModel.ClientCodes = string.Join(",", selectedClients);
+                }
+                else
+                {
+                    _clients = new List<SelectListItemWithCheckboxModel<string>>();
+                    _filterModel.ClientCodes = null;
+                }
+
+                await OnInitCallback.InvokeAsync(_filterModel);
+
+            }
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -124,7 +129,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         private bool ValidateParameters()
         {
-            return _init || _clients != null;
+            return _init || _clientListReference != _userState.SportsbookClients;
         }
 
         public void Dispose()

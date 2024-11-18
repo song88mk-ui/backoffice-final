@@ -1,6 +1,5 @@
 ﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
-using Backoffice.Web.Services;
 using System.Security.Claims;
 
 namespace Backoffice.Web.States
@@ -12,6 +11,7 @@ namespace Backoffice.Web.States
         public string AccessToken => _accessToken;
         public ClaimsPrincipal? ClaimsPrincipal => _principal;
         public List<ClientInformationModel> TradingClients => _tradingClients;
+        public List<Models.Client> SportsbookClients => _sportsbookClients;
         public bool IsAuthenticated => !string.IsNullOrEmpty(AccessToken);
 
         #endregion
@@ -21,6 +21,7 @@ namespace Backoffice.Web.States
         private string _accessToken;
         private ClaimsPrincipal? _principal;
         private List<ClientInformationModel> _tradingClients;
+        private List<Models.Client> _sportsbookClients;
 
         #endregion
 
@@ -38,6 +39,13 @@ namespace Backoffice.Web.States
         public void SetTradingClients(List<ClientInformationModel> clients)
         {
             _tradingClients = clients;
+        }
+        public void SetSportsbookClients(List<Models.Client> clients)
+        {
+            if(_sportsbookClients == null)
+            {
+                _sportsbookClients = clients;
+            }
         }
         #endregion
     }

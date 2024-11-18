@@ -32,23 +32,7 @@ namespace Backoffice.Web.Components.Common
         #region Method
         protected override async Task OnInitializedAsync()
         {
-            _items = Items;
-
-            _selectedCount = _items?.Count(c => c.Value != "all" && c.IsChecked) ?? 0;
-            _selectedName = _selectedCount == 0 ? string.Empty : _items?.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Name ?? string.Empty;
-            _selectedValue = _selectedCount == 0 ? string.Empty : _items?.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Value ?? string.Empty;
-
-            if (Multiple)
-            {
-                if(!_items?.Any(i => i.Value == "all") ?? false)
-                    _items.Insert(0, new SelectListItemWithCheckboxModel<string>
-                    {
-                        Value = "all",
-                        Name = $"All {DropdownName}",
-                        IsChecked = true
-                    });
-            }
-
+            InitializeItems();
         }
 
         protected override Task OnParametersSetAsync()
@@ -56,7 +40,12 @@ namespace Backoffice.Web.Components.Common
             _shouldRender = ValidateParameters();
 
             if (_shouldRender)
+            {
                 _languageCode = _translationState.ActiveLanguageCode;
+
+                if (_items != Items)
+                    InitializeItems();
+            }
 
             _init = false;
             return base.OnParametersSetAsync();
@@ -103,9 +92,28 @@ namespace Backoffice.Web.Components.Common
 
         private bool ValidateParameters()
         {
-            return _init || _languageCode != _translationState.ActiveLanguageCode;
+            return _init || _items != Items || _languageCode != _translationState.ActiveLanguageCode;
         }
 
+        private void InitializeItems()
+        {
+            _items = Items;
+
+            _selectedCount = _items?.Count(c => c.Value != "all" && c.IsChecked) ?? 0;
+            _selectedName = _selectedCount == 0 ? string.Empty : _items?.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Name ?? string.Empty;
+            _selectedValue = _selectedCount == 0 ? string.Empty : _items?.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Value ?? string.Empty;
+
+            if (Multiple)
+            {
+                if(!_items?.Any(i => i.Value == "all") ?? false)
+                    _items.Insert(0, new SelectListItemWithCheckboxModel<string>
+                    {
+                        Value = "all",
+                        Name = $"All {DropdownName}",
+                        IsChecked = true
+                    });
+            }
+        }
         #endregion
     }
 }

@@ -379,6 +379,39 @@ namespace Backoffice.Web.Services
                 };
             }
         }
+
+        public async Task<BaseResponse<ClientModel>> GetClientsV2(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"sportsbook/client/list", cancellationToken);
+
+                if (response.IsSuccessStatusCode)
+                    return JsonSerializer.Deserialize<BaseResponse<ClientModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
+                {
+                    return new BaseResponse<ClientModel>
+                    {
+                        StatusCode = StatusCode.Error,
+                        Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})",
+                        Result = new ClientModel()
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<ClientModel>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+
         public async Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request)
         {
             try

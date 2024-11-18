@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Models;
+using System.Threading;
 
 namespace Backoffice.Web.Services
 {
@@ -19,6 +20,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request, string region);
         Task<BaseResponse<ActivityLogResponse>> GetManualBetSettlementActivityLogs(ManualBetSettlementActivityLogRequest request);
         Task<BaseResponse<ClientModel>> GetClients();
+        Task<BaseResponse<ClientModel>> GetClientsV2(CancellationToken cancellationToken);
         Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);

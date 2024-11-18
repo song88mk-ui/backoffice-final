@@ -56,6 +56,7 @@ namespace Backoffice.Web.Shared
             { "SBC.OE.PriceBoost.Settings", "/boosted-settings" }
         };
         private HubConnection _hubConnection;
+        private CancellationTokenSource _cts;
 
         #endregion
 
@@ -85,6 +86,10 @@ namespace Backoffice.Web.Shared
         {
             try
             {
+
+                _cts?.Cancel();
+                _cts = new CancellationTokenSource();
+
                 TranslationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
 
                 if (!UserState.IsAuthenticated)
@@ -93,16 +98,10 @@ namespace Backoffice.Web.Shared
                     return;
                 }
 
-                //var authStateTask = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
-                var clientTask = await BackofficeService.GetClients();
+                var ctsToken = _cts.Token;
+                var clientResult = await BackofficeService.GetClientsV2(ctsToken);
 
-                //await Task.WhenAll(clientTask, tradingClientTask);
-                //var authState = authStateTask;
-
-                var userClaims = UserState.ClaimsPrincipal.Claims.ToList();
-                var clientResult = clientTask;
-
-                if (clientResult.StatusCode != StatusCode.Success)
+                if (ctsToken.IsCancellationRequested || clientResult.StatusCode != StatusCode.Success)
                 {
                     ToasterService.AddToast(Toast.NewToast
                             ("Get Clients",
@@ -110,6 +109,8 @@ namespace Backoffice.Web.Shared
 
                     return;
                 }
+
+                var userClaims = UserState.ClaimsPrincipal.Claims.ToList();
 
                 var clients = clientResult.Result.Clients;
                 var userClientCodes = new List<string>();
@@ -132,6 +133,7 @@ namespace Backoffice.Web.Shared
                             clients = clients.Where(c => userClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                         }
                     }
+                    UserState.SetSportsbookClients(clients);
 
                     UserModel.Id = userClaims.Where(x => x.Type.ToUpper() == "USERID").FirstOrDefault()?.Value ?? "";
                     UserModel.UserName = userClaims.Where(x => x.Type.ToUpper() == "TOKENNAME").FirstOrDefault()?.Value ?? "";

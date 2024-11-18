@@ -255,6 +255,9 @@ namespace Backoffice.Web.Pages.SBC
             _cts?.Cancel();
             _cts = new CancellationTokenSource();
 
+            if (model.ClientCodes == null)
+                return;
+
             if (!_isPreLoader)
             {
                 _isPreLoader = true;
