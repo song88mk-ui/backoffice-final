@@ -43,7 +43,7 @@ namespace Backoffice.Web.Components.Common
         private bool _init = true;
         private bool _shouldRender = true;
 
-        private string _correlationId;
+        private long _unixTime;
         private string _clientReference;
 
         #endregion
@@ -57,7 +57,7 @@ namespace Backoffice.Web.Components.Common
             if (_shouldRender)
             {
                 _clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
-                _correlationId = Market.CorrelationId;
+                _unixTime = Market.UnixTime;
                 _fixtureName = Market.FixtureName;
                 _fixtureStatusId = Market.FixtureStatusId;
                 _currentPeriod = Market.CurrentPeriod;
@@ -130,8 +130,15 @@ namespace Backoffice.Web.Components.Common
             if (newActiveSelections.Count == 1)
                 newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
 
-            var computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId)?.Odds ?? 1)) - 100) + 100}";
+            var computedMargin = "";
+            try
+            {
+                computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId)?.Odds ?? 1)) - 100) + 100}";
+            }
+            catch (Exception ex)
+            {
 
+            }
             if (newMargin != computedMargin)
             {
                 newMargin = $"{newMargin} ({computedMargin})";
@@ -191,7 +198,7 @@ namespace Backoffice.Web.Components.Common
         {
             var clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
 
-            return _init || Market != null && _correlationId != Market.CorrelationId || _clientReference != clientReference;
+            return _init || Market != null && _unixTime != Market.UnixTime || _clientReference != clientReference;
         }
 
         private string GetClientOdds(SelectionModel selection, string clientCode)

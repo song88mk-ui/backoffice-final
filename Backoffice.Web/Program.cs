@@ -1,8 +1,6 @@
 using Azure.Identity;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Extensions;
-using Backoffice.Web.Hubs;
-using Backoffice.Web.Middleware;
 using Backoffice.Web.Services;
 using Backoffice.Web.Telemetry;
 using Blazored.LocalStorage;
@@ -102,12 +100,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor().AddCircuitOptions(o =>
 {
     o.DetailedErrors = true;
-}).AddHubOptions(o =>
-{
-    //o.MaximumReceiveMessageSize = 64 * 1024;
-    o.MaximumReceiveMessageSize = 5000000;
-    o.KeepAliveInterval = TimeSpan.FromSeconds(15);
-    o.EnableDetailedErrors = true;
 });
 
 if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CONTAINER_APP_ENV_DNS_SUFFIX")))
@@ -133,7 +125,6 @@ builder.AddStates()
 builder.Services.AddScoped<ICommonService, CommonService>();
 //builder.Services.AddScoped<IExcelService, ExcelService>();
 
-builder.Services.AddSignalR();
 builder.Services.AddResponseCompression(opts => opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
         new[] { "application/octet-stream" }));
 
@@ -150,7 +141,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseSession();
-app.UseMiddleware<RabbitMQMiddleware>();
 
 //app.UseHttpsRedirection();
 app.MapHealthChecks("/healthz");
@@ -161,6 +151,5 @@ app.UseRouting();
 
 app.MapBlazorHub(o => { o.Transports = HttpTransportType.WebSockets; });
 app.MapFallbackToPage("/_Host");
-app.MapHub<BoHub>("/bohub");
 
 app.Run();

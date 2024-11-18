@@ -1,5 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.HubMessages;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Models;
@@ -9,7 +10,10 @@ using Backoffice.Web.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
+using System.Diagnostics;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -49,6 +53,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _fixtureMarketPreLoader;
 
         private MonitoringCallbackModel _monitoringCallbackModel = new();
+
+        private List<string> _channels = new List<string>();
         #endregion
 
         #region Methods
@@ -67,6 +73,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
             _slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
+
+            await _hubService.InitializeOeMessageHandlers(
+                ProcessOddsChange,
+                ProcessBetStopFixture,
+                ProcessBetStopGlobal
+            );
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
@@ -110,11 +122,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 try
                 {
                     //await Subscribe();
-                    await _hubService.InitializeOeMessageHandlers(
-                        ProcessOddsChange,
-                        ProcessBetStopFixture,
-                        ProcessBetStopGlobal
-                    );
+
                 }
                 catch (Exception ex)
                 {
@@ -148,19 +156,15 @@ namespace Backoffice.Web.Pages.OddsEngine
                 SearchText = model.SearchText,
             });
 
-            Log.Information($"Monitoring: {_sportId} - {_segmentId} - {_leagueId}");
+            await SubscribeToChannel($"leagues:{_leagueId}:fixtures");
 
             _isPreloader = false;
             _shouldRender = true;
         }
 
-        private async Task MonitoringCallback(MonitoringCallbackModel model)
-        {
-            await OnInitializeEvent(_monitoringCallbackModel = model);
+        private async Task MonitoringCallback(MonitoringCallbackModel model) => await OnInitializeEvent(_monitoringCallbackModel = model);
 
-        }
-
-        private async Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
+        private Task FilterClientCallback(List<SelectListItemWithCheckboxModel<string>> clients)
         {
             if (clients != null)
             {
@@ -178,6 +182,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             _shouldRender = true;
+            return Task.CompletedTask;
         }
 
         private async Task OnSaveClickedEvent(object param)
@@ -223,56 +228,18 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
-        private async Task Subscribe()
+        private async Task SubscribeToChannel(string key)
         {
-            try
+            foreach (var channel in _channels)
             {
-                var message = string.Empty;
-                var connectionId = string.Empty;
-
-                _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(Configuration["API:HubAPI"]))
-                .Build();
-
-                _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
-                {
-                    await ProcessOddsChange(message);
-                });
-                _hubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async (message) =>
-                {
-                    await ProcessBetStopFixture(message);
-                });
-                _hubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async (message) =>
-                {
-                    await ProcessBetStopGlobal(message);
-                });
-
-                _hubConnection.Reconnecting += async (ex) =>
-                {
-                    message = ex?.Message ?? "";
-                };
-
-                await _hubConnection.StartAsync().ContinueWith(task =>
-                {
-                    if (task.IsFaulted)
-                    {
-                        message = "Error Connecting to hub";
-                    }
-                    else if (task.IsCompletedSuccessfully)
-                    {
-                        connectionId = _hubConnection.ConnectionId?.ToString();
-                    }
-                });
-
-                await _hubConnection.InvokeAsync("AddToGroup", _region.ToUpper());
+                await _hubService.UnSubscribeToChannel(channel);
+                Console.WriteLine($"UnSubscribed: {_leagueId} - {SelectedSport?.LeagueName}");
             }
-            catch (Exception ex)
-            {
-                Log.Error($"Hubconnection URI - {NavigationManager.BaseUri}");
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
-            }
+
+            _channels.Clear();
+            Console.WriteLine($"Subscribe: {_leagueId} - {SelectedSport?.LeagueName}");
+            await _hubService.SubscribeToChannel(key);
+            _channels.Add(key);
         }
         private async Task<List<FixtureMarketModel>> GetFixtures(MarketFixtureRequest request)
         {
@@ -402,8 +369,10 @@ namespace Backoffice.Web.Pages.OddsEngine
             return markets.FirstOrDefault(c => c.MarketId == nearestSelection?.MarketId);
         }
 
-        private async Task ProcessOddsChange(OnExternalOddsChangeMessage message)
+        private async Task ProcessOddsChange(OddsChangeFixture message)
         {
+            Debug.WriteLine($" ==> Message Received: {message.FixtureId} - {message.FixtureName}");
+
             if (_fixtureMarkets == null)
                 return;
 
@@ -427,6 +396,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 currentFixture.CurrentMinute = message.CurrentMinute.ToString();
                 currentFixture.Score = message.Score;
                 currentFixture.FixtureStatusId = message.FixtureStatusId;
+                currentFixture.UnixTime = message.UnixTime;
 
                 if (currentFixture.FixtureStatusId >= (int)FixtureStatus.Suspended)
                 {
@@ -445,32 +415,49 @@ namespace Backoffice.Web.Pages.OddsEngine
                         {
                             currentMarket.MarketStatusId = newMarket.MarketStatusId;
                             //currentMarket.MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString();
-                            currentMarket.ClientCode = newMarket.ClientCodes;
+                            currentMarket.ClientCode = newMarket.ClientCode;
                             currentMarket.ClientCodeMargin = newMarket.ClientCodeMargin;
-                            currentMarket.CorrelationId = Guid.NewGuid().ToString();
+                            currentMarket.UnixTime = newMarket.UnixTime;
 
                             foreach (var newSelection in newMarket.Selections)
                             {
                                 var providerSelectionId = $"{currentFixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newSelection.SelectionTemplateId}:{newMarket.MarketSpecifier}";
                                 var currentSelection = currentMarket.Selections.FirstOrDefault(c => c.ProviderSelectionId == providerSelectionId);
+                                    
+                                var clientOdds = new List<ClientOddsModel>();
+                                foreach (var client in newMarket.ClientSelections)
+                                {
+                                    var clientSelection = client.Selections.FirstOrDefault(c => c.SelectionId == newSelection.SelectionId);
+                                    clientOdds.Add(new ClientOddsModel()
+                                    {
+                                        ClientCode = client.ClientCode,
+                                        Odds = clientSelection?.DecimalOdds ?? -99,
+                                        SelectionTemplateId = newSelection.SelectionTemplateId,
+                                        SelectionId = newSelection.SelectionId
+                                    });
+                                }
 
                                 if (currentSelection != null)
                                 {
+                                    if (newMarket.ClientCodeMargins == null)
+                                        return;
+
                                     if (newSelection.IsActive)
                                     {
-                                        currentSelection.OldDecimalOdds = currentSelection.DecimalOdds;
-                                        currentSelection.DecimalOdds = CommonService.GetFinalOdds(newSelection.Odds).ToString("0.00");
+                                        currentSelection.DecimalOdds = CommonService.GetFinalOdds(newSelection.DecimalOdds).ToString("0.00");
                                         currentSelection.IsActive = newSelection.IsActive;
                                         currentSelection.CorrelationId = Guid.NewGuid().ToString();
-                                        currentSelection.ClientOdds = newSelection.ClientOdds != null ? newSelection.ClientOdds.Select(s =>
-                                            new ClientOddsModel
-                                            {
-                                                ClientCode = s.ClientCode,
-                                                SelectionTemplateId = s.SelectionTemplateId,
-                                                Odds = s.DecimalOdds,
-                                                OldOdds = currentSelection.ClientOdds != null && currentSelection.ClientOdds.Any(c => c.ClientCode == s.ClientCode) ?
-                                                            currentSelection.ClientOdds?.FirstOrDefault(c => c.ClientCode == s.ClientCode)?.Odds ?? s.DecimalOdds : s.DecimalOdds
-                                            }).ToList() : new List<ClientOddsModel>();
+                                        currentSelection.ClientOdds = clientOdds;
+                                        currentSelection.UnixTime = newSelection.UnixTime;
+                                        //currentSelection.ClientOdds = currentMarket.ClientCode != null ? currentMarket.ClientCode.Split.Select(s =>
+                                        //    new ClientOddsModel
+                                        //    {
+                                        //        ClientCode = s.ClientCode,
+                                        //        SelectionTemplateId = s.SelectionTemplateId,
+                                        //        Odds = s.DecimalOdds,
+                                        //        OldOdds = currentSelection.ClientOdds != null && currentSelection.ClientOdds.Any(c => c.ClientCode == s.ClientCode) ?
+                                        //                    currentSelection.ClientOdds?.FirstOrDefault(c => c.ClientCode == s.ClientCode)?.Odds ?? s.DecimalOdds : s.DecimalOdds
+                                        //    }).ToList() : new List<ClientOddsModel>();
                                     }
                                 }
                             }
@@ -487,9 +474,41 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 if (markets != null && markets.Any() && markets.Count > 0)
                 {
-                    Parallel.ForEach(markets, m =>
+                    Parallel.ForEach(markets, market =>
                     {
-                        _fixtureMarkets.Add(new FixtureMarketModel()
+                        var selections = new List<SelectionModel>();
+
+                        foreach (var newSelection in market.Selections)
+                        {
+                            var clientOdds = new List<ClientOddsModel>();
+                            foreach (var client in market.ClientSelections)
+                            {
+                                var clientSelection = client.Selections.FirstOrDefault(c => c.SelectionId == newSelection.SelectionId);
+                                clientOdds.Add(new ClientOddsModel()
+                                {
+                                    ClientCode = client.ClientCode,
+                                    Odds = clientSelection?.DecimalOdds ?? -99,
+                                    SelectionTemplateId = newSelection.SelectionTemplateId,
+                                    SelectionId = newSelection.SelectionId
+                                });
+                            }
+
+                            selections.Add(new SelectionModel()
+                            {
+                                SelectionId = newSelection.SelectionId.ToString(),
+                                ProviderSelectionId = $"{message.ProviderFixtureId}:{market.MarketTemplateId}:{newSelection.SelectionTemplateId}:{market.MarketSpecifier}",
+                                //OldDecimalOdds = CommonService.GetFinalOdds(s.DecimalOdds).ToString("0.00"),
+                                DecimalOdds = CommonService.GetFinalOdds(newSelection.DecimalOdds).ToString("0.00"),
+                                IsActive = newSelection.IsActive,
+                                SelectionName = newSelection.SelectionName,
+                                SelectionTemplateId = newSelection.SelectionTemplateId,
+                                SortOrder = newSelection.SortOrder,
+                                UnixTime = newSelection.UnixTime,
+                                ClientOdds = clientOdds
+                            });
+                        }
+
+                        var fixture = new FixtureMarketModel()
                         {
                             ProviderFixtureId = message.ProviderFixtureId,
                             FixtureName = message.FixtureName,
@@ -501,36 +520,40 @@ namespace Backoffice.Web.Pages.OddsEngine
                             FixtureStartDate = message.FixtureStartDate,
                             BetStop = new List<int>(),
                             Score = message.Score,
-                            Line = m.Line,
-                            MarketName = m.MarketName,
-                            MarketTemplateId = m.MarketTemplateId,
-                            ProviderMarketId = $"{message.ProviderFixtureId}:{m.MarketTemplateId}:{m.MarketSpecifier}",
+                            Line = market.Line,
+                            MarketName = market.MarketName,
+                            MarketTemplateId = market.MarketTemplateId,
+                            ProviderMarketId = $"{message.ProviderFixtureId}:{market.MarketTemplateId}:{market.MarketSpecifier}",
                             //MarketSpecifier = m.MarketSpecifier,
-                            MarketStatusId = m.MarketStatusId,
+                            MarketStatusId = market.MarketStatusId,
                             //MarketStatusName = ((MarketStatus)m.MarketStatusId).ToString(),
-                            MarketId = m.MarketId.ToString(),
-                            ClientCode = m.ClientCodes,
-                            ClientCodeMargin = m.ClientCodeMargin,
+                            MarketId = market.MarketId.ToString(),
+                            ClientCode = market.ClientCode,
+                            ClientCodeMargin = market.ClientCodeMargin,
                             CorrelationId = Guid.NewGuid().ToString(),
-                            Selections = m.Selections.Select(ss => new SelectionModel()
-                            {
-                                DecimalOdds = ss.Odds.ToString(),
-                                IsActive = ss.IsActive,
-                                SelectionName = ss.SelectionName,
-                                SelectionTemplateId = ss.SelectionTemplateId,
-                                ProviderSelectionId = $"{message.ProviderFixtureId}:{m.MarketTemplateId}:{ss.SelectionTemplateId}:{m.MarketSpecifier}",
-                                OldDecimalOdds = ss.Odds.ToString(),
-                                CorrelationId = Guid.NewGuid().ToString(),
-                                ClientOdds = ss.ClientOdds.Select(s =>
-                                    new ClientOddsModel
-                                    {
-                                        ClientCode = s.ClientCode,
-                                        SelectionTemplateId = s.SelectionTemplateId,
-                                        Odds = s.DecimalOdds,
-                                        OldOdds = 0m
-                                    }).ToList()
-                            }).ToList()
-                        });
+                            UnixTime = market.UnixTime,
+                            Selections = selections
+                            //Selections = market.Selections.Select(ss => new SelectionModel()
+                            //{
+                            //    DecimalOdds = ss.DecimalOdds.ToString(),
+                            //    IsActive = ss.IsActive,
+                            //    SelectionName = ss.SelectionName,
+                            //    SelectionTemplateId = ss.SelectionTemplateId,
+                            //    ProviderSelectionId = $"{message.ProviderFixtureId}:{market.MarketTemplateId}:{ss.SelectionTemplateId}:{market.MarketSpecifier}",
+                            //    //OldDecimalOdds = ss.DecimalOdds.ToString(),
+                            //    UnixTime = ss.UnixTime,
+                            //    //ClientOdds = ss.ClientOdds.Select(s =>
+                            //    //    new ClientOddsModel
+                            //    //    {
+                            //    //        ClientCode = s.ClientCode,
+                            //    //        SelectionTemplateId = s.SelectionTemplateId,
+                            //    //        Odds = s.DecimalOdds,
+                            //    //        OldOdds = 0m
+                            //    //    }).ToList()
+                            //}).ToList()
+                        };
+
+                        _fixtureMarkets.Add(fixture);
                     });
                 }
 

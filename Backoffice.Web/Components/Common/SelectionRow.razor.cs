@@ -21,12 +21,14 @@ namespace Backoffice.Web.Components.Common
 
         #region Fields
 
-        private string _color = "";
+        private string _color = "odds-bg-default";
 
         private bool _init = true;
         private bool _shouldRender;
         private bool _isBetStop;
         private int _currentMarketStatus;
+        private string _odds;
+        private long _unixTime;
 
         private CancellationTokenSource _cts;
 
@@ -47,6 +49,7 @@ namespace Backoffice.Web.Components.Common
 
             if (_shouldRender)
             {
+                _unixTime = Selection.UnixTime;
                 _isBetStop = IsBetStop;
                 _currentMarketStatus = CurrentMarketStatus;
 
@@ -54,28 +57,18 @@ namespace Backoffice.Web.Components.Common
                 {
                     _cts?.Cancel();
                     _cts = new CancellationTokenSource();
+                    _color = color;
+                    await Task.Delay(4000, _cts.Token);
 
-                    if (!string.IsNullOrEmpty(_color) && !_color.Contains("inactive") && !_color.Contains("betstop"))
-                    {
-                        _color = color;
-                        await Task.Delay(4000, _cts.Token);
-
-                        _color = "odds-bg-default";
-                        Selection.OldDecimalOdds = string.Empty;
-                        Selection.ClientOdds.ForEach(c => { c.OldOdds = 0; });
-                    }
-                    else
-                        _color = color;
+                    _color = "odds-bg-default";
+                    _shouldRender = true;
                 }
             }
 
             _init = false;
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            _shouldRender = false;
-        }
+        protected override async Task OnAfterRenderAsync(bool firstRender) => _shouldRender = false;
 
         protected override bool ShouldRender() => _shouldRender;
 
@@ -88,12 +81,10 @@ namespace Backoffice.Web.Components.Common
 
         #region Utilities
 
-        private bool ValidateParameters()
-        {
-            return _init
+        private bool ValidateParameters() => _init
                 || _isBetStop != IsBetStop
-                || _currentMarketStatus != CurrentMarketStatus;
-        }
+                || _currentMarketStatus != CurrentMarketStatus
+                || _unixTime != Selection.UnixTime;
 
         private string GetClientOdds()
         {
@@ -107,7 +98,6 @@ namespace Backoffice.Web.Components.Common
 
         private string GetColor()
         {
-
             var color = "odds-bg-default";
 
             SpanAttributes["data-title"] = string.Empty;
@@ -129,18 +119,20 @@ namespace Backoffice.Web.Components.Common
             {
                 if (CurrentClientCode == null)
                 {
-                    if (!string.IsNullOrEmpty(Selection.OldDecimalOdds))
+                    if (!string.IsNullOrEmpty(_odds))
                     {
-                        if (Convert.ToDecimal(Selection.OldDecimalOdds) > Convert.ToDecimal(Selection.DecimalOdds))
+                        if (Convert.ToDecimal(_odds) > Convert.ToDecimal(Selection.DecimalOdds))
                         {
                             color = "odds-bg-danger-active";
                         }
 
-                        if (Convert.ToDecimal(Selection.OldDecimalOdds) < Convert.ToDecimal(Selection.DecimalOdds))
+                        if (Convert.ToDecimal(_odds) < Convert.ToDecimal(Selection.DecimalOdds))
                         {
                             color = "odds-bg-success-active";
                         }
                     }
+
+                    //_odds = Selection.DecimalOdds;
                 }
                 else
                 {
@@ -149,23 +141,26 @@ namespace Backoffice.Web.Components.Common
                         var clientOdds = Selection.ClientOdds.Where(c => c.ClientCode == CurrentClientCode && c.SelectionTemplateId == Selection.SelectionTemplateId).FirstOrDefault();
                         if (clientOdds != null)
                         {
-                            if (clientOdds.OldOdds != 0)
+                            if(!string.IsNullOrEmpty(_odds))
                             {
-                                if (clientOdds.OldOdds > clientOdds.Odds)
+                                if (Convert.ToDecimal(_odds) > clientOdds.Odds)
                                 {
                                     color = "odds-bg-danger-active";
                                 }
 
-                                if (clientOdds.OldOdds < clientOdds.Odds)
+                                if (Convert.ToDecimal(_odds) < clientOdds.Odds)
                                 {
                                     color = "odds-bg-success-active";
                                 }
                             }
                         }
+
+                        //_odds = clientOdds?.Odds.ToString("0.00") ?? "-.-";
                     }
                 }
             }
 
+            _odds = GetClientOdds();
             return color;
         }
 

@@ -47,6 +47,7 @@ namespace Backoffice.Shared.Models.Response
             public bool IsBetStopGlobal { get; set; }
             public int SortOrder { get; set; }
             public int FixtureTypeId { get; set; }
+            public long UnixTime { get; set; }
             public SportMarketTemplateGroup MarketTemplateGroups { get; set; }
             public List<MarketModel> Markets { get; set; }
         }
@@ -82,6 +83,7 @@ namespace Backoffice.Shared.Models.Response
             public string ClientCode { get; set; }
             public string ClientCodeMargin { get; set; }
             public bool IsBoosted { get; set; }
+            public long UnixTime { get; set; }
             public List<SelectionModel> Selections { get; set; }
         }
 
@@ -96,7 +98,7 @@ namespace Backoffice.Shared.Models.Response
             public bool IsActive { get; set; }
             public int SortOrder { get; set; }
             public string CorrelationId { get; set; }
-            public string OldDecimalOdds { get; set; }
+            public long UnixTime { get; set; }
             public List<ClientOddsModel> ClientOdds { get; set; }
         }
 
@@ -104,7 +106,6 @@ namespace Backoffice.Shared.Models.Response
         {
             public string ClientCode { get; set; }
             public decimal Odds { get; set; }
-            public decimal OldOdds { get; set; }
             public string SelectionTemplateId { get; set; }
             public long SelectionId { get; set; }
         }

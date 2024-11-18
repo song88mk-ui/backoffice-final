@@ -94,10 +94,14 @@
 
         Blazor.start({
             reconnectionHandler: {
-                onConnectionDown: () => currentReconnectionProcess ??= startReconnectionProcess(),
+                onConnectionDown: (options, reason) => {
+                    currentReconnectionProcess ??= startReconnectionProcess();
+                    console.warn('Connection lost:', reason);
+                },
                 onConnectionUp: () => {
                     currentReconnectionProcess?.cancel();
                     currentReconnectionProcess = null;
+                    console.log('Reconnected!');
                 }
             },
             configureSignalR: builder => builder.withUrl(signalRUrl, { skipNegotiation: true, transport: 1 })

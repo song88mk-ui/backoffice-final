@@ -32,8 +32,7 @@ namespace Backoffice.Shared.Models
         public string ClientCode { get; set; }
         public string ClientCodeMargin { get; set; }
         public string CorrelationId { get; set; }
+        public long UnixTime { get; set; }
         public List<SelectionModel> Selections { get; set; }
     }
-
-
 }

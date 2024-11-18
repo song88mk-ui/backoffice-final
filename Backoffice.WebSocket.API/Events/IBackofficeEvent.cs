@@ -1,4 +1,5 @@
-﻿using Backoffice.WebSocket.API.Models.Messages;
+﻿using Backoffice.Shared.Models.HubMessages;
+using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 
 namespace Backoffice.WebSocket.API.Events
 {

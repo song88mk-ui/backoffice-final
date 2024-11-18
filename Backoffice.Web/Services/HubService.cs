@@ -1,17 +1,22 @@
 ﻿
 using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.HubMessages;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Models;
+using Grpc.Net.Client.Configuration;
 using Microsoft.AspNetCore.SignalR.Client;
+using Serilog;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backoffice.Web.Services
 {
     public class HubService : IAsyncDisposable
     {
         private HubConnection _hubConnection { get; set; }
-        public string ConnectionId {  get; private set; }
+        public string ConnectionId { get; private set; }
 
         public HubService(IConfiguration configuration)
         {
@@ -20,41 +25,75 @@ namespace Backoffice.Web.Services
                 .WithAutomaticReconnect()
             .Build();
 
+            _hubConnection.Closed += async (error) =>
+            {
+                Log.Error($"HubConnection Closed: {error?.Message} - {error?.StackTrace}");
+            };
+
+            _hubConnection.Reconnecting += (error) =>
+            {
+                Log.Warning($"HubConnection Reconnecting: {error?.Message} - {error?.StackTrace}");
+                return Task.CompletedTask;
+            };
+
+            _hubConnection.Reconnected += async (connectionId) =>
+            {
+                var tempChannel = new List<string>(_channels);
+                _channels.Clear();
+
+                foreach (var channel in tempChannel)
+                {
+                    await SubscribeToChannel(channel);
+                }
+
+                Log.Information($"HubConnection Reconnected with Connection ID: {connectionId}");
+            };
+
             _hubConnection.StartAsync().ContinueWith(task =>
             {
-                ConnectionId = string.Empty;
                 if (task.IsFaulted)
                 {
-                    //_logger.LogError("Error Connecting to hub\", \"Fault in connecting.");
+                    Log.Error($"HubConnection Closed: {task?.Exception?.Message} - {task?.Exception?.StackTrace}");
+                    Console.WriteLine($"Error Connecting to hub");
                 }
                 else if (task.IsCompletedSuccessfully)
                 {
-                    ConnectionId = _hubConnection?.ConnectionId?.ToString() ?? string.Empty;
+                    var connectionId = _hubConnection.ConnectionId?.ToString();
+                    Log.Information($"HubConnection Connected with Connection ID: {connectionId}");
                 }
             });
         }
         public async Task OnNotificationReceived(Func<NotificationsModel, Task> processNotification)
             => _hubConnection.On("Notification", async (NotificationsModel message) => await processNotification(message));
 
+        private List<string> _channels = new List<string>();
+        public async Task SubscribeToChannel(string key)
+        {
+            await _hubConnection.InvokeAsync(
+                "SubscribeToChannel",
+                key
+            );
+            _channels.Add(key);
+        }
+        public async Task UnSubscribeToChannel(string key) =>
+            await _hubConnection.InvokeAsync(
+                "UnSubscribeToChannel",
+                key
+            );
+
         public async Task InitializeOeMessageHandlers(
-            Func<OnExternalOddsChangeMessage, Task> processOddsChangeMonitoring,
+            Func<OddsChangeFixture, Task> processOddsChangeMonitoring,
             Func<OnExternalBetStopFixtureMessage, Task> processOnBetStopFixture,
             Func<OnExternalBetStopGlobalMessage, Task> processOnBetStopGlobal)
         {
-            _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async message =>
-            {
-                await processOddsChangeMonitoring(message);
-            });
+            _hubConnection.On<OddsChangeFixture>("OnOddsChange", async message
+                => await processOddsChangeMonitoring(message));
 
-            _hubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async message =>
-            {
-                await processOnBetStopFixture(message);
-            });
+            _hubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async message
+                => await processOnBetStopFixture(message));
 
-            _hubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async message =>
-            {
-                await processOnBetStopGlobal(message);
-            });
+            _hubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async message
+                => await processOnBetStopGlobal(message));
         }
         public async ValueTask DisposeAsync()
         {

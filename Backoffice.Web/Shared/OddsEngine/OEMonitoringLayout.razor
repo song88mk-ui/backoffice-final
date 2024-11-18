@@ -42,12 +42,10 @@
             <ToastComponent />
         }
     </ChildContent>
-    <ErrorContent Context="errorException">
+    <ErrorContent Context="ex">
         <div id="blazor-error-ui">
             <div class="blazor-error-body">
-                @{
-                    LogError(errorException);
-                }
+                consoe.log(@($"{ex.Message}\n{ex.StackTrace}"));
             </div>
         </div>
     </ErrorContent>
@@ -55,16 +53,10 @@
 
 
 @code {
-    [Inject] public IJSRuntime JsRuntime { get; set; }
     private ErrorBoundary? _errorBoundary;
 
     protected override void OnParametersSet()
     {
         _errorBoundary?.Recover();
-    }
-
-    private async void LogError(Exception ex)
-    {
-        await JsRuntime.InvokeAsync<string>("console.log", $"{ex.Message}\n{ex.StackTrace}");
     }
 }
