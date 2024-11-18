@@ -2,7 +2,9 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Models;
+using Grpc.Net.Client.Configuration;
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -11,7 +13,7 @@ namespace Backoffice.Web.Services
     public class HubService : IAsyncDisposable
     {
         private HubConnection _hubConnection { get; set; }
-        public string ConnectionId {  get; private set; }
+        public string ConnectionId { get; private set; }
 
         public HubService(IConfiguration configuration)
         {
@@ -20,29 +22,58 @@ namespace Backoffice.Web.Services
                 .WithAutomaticReconnect()
             .Build();
 
+            _hubConnection.Closed += async (error) =>
+            {
+                Console.WriteLine("Connection closed. Trying to reconnect...");
+            };
+
+            _hubConnection.Reconnecting += (error) =>
+            {
+                Console.WriteLine("Reconnecting...");
+                return Task.CompletedTask;
+            };
+
+            _hubConnection.Reconnected += (connectionId) =>
+            {
+                Console.WriteLine($"Reconnected with connectionId: {connectionId}");
+                return Task.CompletedTask;
+            };
+
             _hubConnection.StartAsync().ContinueWith(task =>
             {
-                ConnectionId = string.Empty;
                 if (task.IsFaulted)
                 {
-                    //_logger.LogError("Error Connecting to hub\", \"Fault in connecting.");
+                    Console.WriteLine($"Error Connecting to hub");
                 }
                 else if (task.IsCompletedSuccessfully)
                 {
-                    ConnectionId = _hubConnection?.ConnectionId?.ToString() ?? string.Empty;
+                    var connectionId = _hubConnection.ConnectionId?.ToString();
+                    Console.WriteLine($"Connected with connectionId: {connectionId}");
                 }
             });
         }
         public async Task OnNotificationReceived(Func<NotificationsModel, Task> processNotification)
             => _hubConnection.On("Notification", async (NotificationsModel message) => await processNotification(message));
 
+        public async Task SubscribeToChannel(string key) =>
+            await _hubConnection.InvokeAsync(
+                "SubscribeToChannel",
+                key
+            );
+        public async Task UnSubscribeToChannel(string key) =>
+            await _hubConnection.InvokeAsync(
+                "UnSubscribeToChannel",
+                key
+            );
+
         public async Task InitializeOeMessageHandlers(
             Func<OnExternalOddsChangeMessage, Task> processOddsChangeMonitoring,
             Func<OnExternalBetStopFixtureMessage, Task> processOnBetStopFixture,
             Func<OnExternalBetStopGlobalMessage, Task> processOnBetStopGlobal)
         {
-            _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async message =>
+            _hubConnection.On<OnExternalOddsChangeMessage>("OnOddsChange", async message =>
             {
+                Console.WriteLine($"OddsChange - {message.SportName,-20} - {message.LeagueId,-10} - {message.LeagueName,-60} - {message.CorrelationId}");
                 await processOddsChangeMonitoring(message);
             });
 

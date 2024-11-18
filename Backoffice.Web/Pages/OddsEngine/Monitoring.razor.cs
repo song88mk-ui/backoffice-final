@@ -9,6 +9,7 @@ using Backoffice.Web.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
+using System.Diagnostics;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -49,6 +50,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _fixtureMarketPreLoader;
 
         private MonitoringCallbackModel _monitoringCallbackModel = new();
+
+        private List<string> _channels = new List<string>();
         #endregion
 
         #region Methods
@@ -67,6 +70,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
             _slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
+
+            await _hubService.InitializeOeMessageHandlers(
+                ProcessOddsChange,
+                ProcessBetStopFixture,
+                ProcessBetStopGlobal
+            );
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
@@ -110,11 +119,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 try
                 {
                     //await Subscribe();
-                    await _hubService.InitializeOeMessageHandlers(
-                        ProcessOddsChange,
-                        ProcessBetStopFixture,
-                        ProcessBetStopGlobal
-                    );
+
                 }
                 catch (Exception ex)
                 {
@@ -148,7 +153,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 SearchText = model.SearchText,
             });
 
-            Log.Information($"Monitoring: {_sportId} - {_segmentId} - {_leagueId}");
+            await SubscribeToChannel($"leagues:{_leagueId}:fixtures");
 
             _isPreloader = false;
             _shouldRender = true;
@@ -223,15 +228,34 @@ namespace Backoffice.Web.Pages.OddsEngine
         #endregion
 
         #region Utilities
+        private async Task SubscribeToChannel(string key)
+        {
+            foreach (var channel in _channels)
+            {
+                await _hubService.UnSubscribeToChannel(channel);
+                Console.WriteLine($"UnSubscribed: {_leagueId} - {SelectedSport?.LeagueName}");
+            }
+
+            _channels.Clear();
+            Console.WriteLine($"Subscribe: {_leagueId} - {SelectedSport?.LeagueName}");
+            await _hubService.SubscribeToChannel(key);
+            _channels.Add(key);
+        }
         private async Task Subscribe()
         {
             try
             {
                 var message = string.Empty;
-                var connectionId = string.Empty;
 
                 _hubConnection = new HubConnectionBuilder()
                     .WithUrl(new Uri(Configuration["API:HubAPI"]))
+                    .WithAutomaticReconnect(new[]
+                    {
+                        TimeSpan.Zero,            // First retry immediately
+                        TimeSpan.FromSeconds(2),  // Second retry after 2 seconds
+                        TimeSpan.FromSeconds(5),  // Third retry after 5 seconds
+                        TimeSpan.FromSeconds(10)  // Subsequent retries every 10 seconds
+                    })
                 .Build();
 
                 _hubConnection.On<OnExternalOddsChangeMessage>("onoddschange", async (message) =>
@@ -247,20 +271,33 @@ namespace Backoffice.Web.Pages.OddsEngine
                     await ProcessBetStopGlobal(message);
                 });
 
-                _hubConnection.Reconnecting += async (ex) =>
+                _hubConnection.Closed += async (error) =>
                 {
-                    message = ex?.Message ?? "";
+                    Console.WriteLine("Connection closed. Trying to reconnect...");
+                };
+
+                _hubConnection.Reconnecting += (error) =>
+                {
+                    Console.WriteLine("Reconnecting...");
+                    return Task.CompletedTask;
+                };
+
+                _hubConnection.Reconnected += (connectionId) =>
+                {
+                    Console.WriteLine($"Reconnected with connectionId: {connectionId}");
+                    return Task.CompletedTask;
                 };
 
                 await _hubConnection.StartAsync().ContinueWith(task =>
                 {
                     if (task.IsFaulted)
                     {
-                        message = "Error Connecting to hub";
+                        Console.WriteLine($"Error Connecting to hub");
                     }
                     else if (task.IsCompletedSuccessfully)
                     {
-                        connectionId = _hubConnection.ConnectionId?.ToString();
+                        var connectionId = _hubConnection.ConnectionId?.ToString();
+                        Console.WriteLine($"Connected with connectionId: {connectionId}");
                     }
                 });
 
@@ -404,6 +441,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task ProcessOddsChange(OnExternalOddsChangeMessage message)
         {
+            Debug.WriteLine($" ==> Message Received: {message.FixtureId} - {message.FixtureName}");
+
             if (_fixtureMarkets == null)
                 return;
 
