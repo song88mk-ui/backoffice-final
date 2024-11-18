@@ -2,14 +2,8 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.HubMessages;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
-using Backoffice.Web.Models;
-using Grpc.Net.Client.Configuration;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
-using System.Diagnostics;
-using System.Text.Json;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backoffice.Web.Services
 {
@@ -69,17 +63,25 @@ namespace Backoffice.Web.Services
         private List<string> _channels = new List<string>();
         public async Task SubscribeToChannel(string key)
         {
+            if (_hubConnection.State != HubConnectionState.Connected)
+                return;
+
             await _hubConnection.InvokeAsync(
                 "SubscribeToChannel",
                 key
             );
             _channels.Add(key);
         }
-        public async Task UnSubscribeToChannel(string key) =>
+        public async Task UnSubscribeToChannel(string key)
+        {
+            if (_hubConnection.State != HubConnectionState.Connected)
+                return;
+
             await _hubConnection.InvokeAsync(
                 "UnSubscribeToChannel",
                 key
             );
+        }
 
         public async Task InitializeOeMessageHandlers(
             Func<OddsChangeFixture, Task> processOddsChangeMonitoring,
