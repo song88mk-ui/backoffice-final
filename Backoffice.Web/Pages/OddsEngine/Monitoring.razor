@@ -71,7 +71,6 @@
                                 if (_fixtureMarkets != null && _fixtureMarkets.Any())
                                 {
                                     <Virtualize Items="_fixtureMarkets" Context="market" OverscanCount="5">
-                                        @*<FixtureRow @key="@market" Clients="@_clients" Market="market" IsMonitoringPage=true />*@
                                         <FixtureRow Clients="_clients" Market="market" IsMonitoringPage=true />
                                     </Virtualize>
                                 }

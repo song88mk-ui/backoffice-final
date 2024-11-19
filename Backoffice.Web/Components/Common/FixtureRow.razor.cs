@@ -198,7 +198,7 @@ namespace Backoffice.Web.Components.Common
         {
             var clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
 
-            return _init || Market != null && _unixTime != Market.UnixTime || _clientReference != clientReference;
+            return (_init || _unixTime != Market.UnixTime || _clientReference != clientReference) && Market != null;
         }
 
         private string GetClientOdds(SelectionModel selection, string clientCode)

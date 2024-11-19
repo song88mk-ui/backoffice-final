@@ -534,7 +534,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     {
                         var selections = new List<SelectionModel>();
 
-                        foreach(var newSelection in newMarket.Selections)
+                        foreach (var newSelection in newMarket.Selections)
                         {
                             var clientOdds = new List<ClientOddsModel>();
                             foreach (var client in newMarket.ClientSelections)
@@ -676,7 +676,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var selectedNavigation = MarketTemplateNavigation.FirstOrDefault(c => c.IsSelected);
 
-            if (newMarketTemplateIds.Contains(MarketTemplateId) || newMarketTemplateIds.Contains(selectedNavigation.MarketTemplateId))
+            if (newMarketTemplateIds.Contains(MarketTemplateId) || (selectedNavigation != null && newMarketTemplateIds.Contains(selectedNavigation.MarketTemplateId)))
             {
                 if (newMarketTemplateIds.Contains(MarketTemplateId))
                 {

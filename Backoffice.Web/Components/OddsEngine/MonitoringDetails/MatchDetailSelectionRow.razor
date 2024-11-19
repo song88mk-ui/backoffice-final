@@ -1,32 +1,15 @@
 ﻿<tr>
     <td class="td-selection">
-        <span class="selection-name-container fw-bold">@Selection.SelectionName</span>
+        <span class="selection-name-container fw-bold">@_selectionName</span>
     </td>
-    <td class="td-master">
-        <div class="d-flex justify-content-left">
-            <div class="odds-container @GetClientColor() py-1">
-                <span class="d-block text-center">@GetClientOdds(null)</span>
-            </div>
-        </div>
-    </td>
+    <MatchDetailsClientSelectionComponent Selection="Selection" MarketStatusId="Market.MarketStatusId" IsBetStopGlobal="Market.IsBetStopGlobal" HasConfig="true" />
     @if (_clients != null && _clients.Any())
     {
         foreach (var client in _clients)
         {
-            <td class="td-client">
-                <div class="d-flex justify-content-left">
-                    <div class="odds-container @GetClientColor(client.ClientCode) py-1">
-                        @if (HasClientConfig(client.ClientCode, _clientCode, _clientCodeMargin))
-                        {
-                            <span class="d-block text-center">@GetClientOdds(client.ClientCode)</span>
-                        }
-                        else
-                        {
-                            <span class="d-block text-center">-.-</span>
-                        }
-                    </div>
-                </div>
-            </td>
+            var hasConfig = HasClientConfig(client.ClientCode, _clientCode, _clientCodeMargin);
+
+            <MatchDetailsClientSelectionComponent Selection="Selection" CurrentClientCode="@client.ClientCode" MarketStatusId="Market.MarketStatusId" IsBetStopGlobal="Market.IsBetStopGlobal" HasConfig="hasConfig" />
         }
     }
 </tr>

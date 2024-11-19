@@ -17,37 +17,41 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         #endregion
 
         private List<Client>? _clients;
-        private bool _isBetStopGlobal;
-        private int _marketStatusId;
         private string _clientCode;
         private string _clientCodeMargin;
-        private string _odds;
+        private string _selectionName;
+
+        private bool _shouldRender = true;
+        private bool _init = true;
+        private long _unixTimeMarket;
+        private long _unixTimeSelection;
+        private string _clientReference;
 
         #region Methods
         protected override async Task OnParametersSetAsync()
         {
-            if (Clients != null && !(_clients?.Equals(Clients) ?? false))
-            {
-                _clients = new List<Client>(Clients);
-            }
+            _shouldRender = ValidateParameters();
 
-            if(Market != null)
+            if (_shouldRender)
             {
-                _isBetStopGlobal = Market.IsBetStopGlobal;
-                _marketStatusId = Market.MarketStatusId;
+                _clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
+
+                if (Clients != null && !(_clients?.Equals(Clients) ?? false))
+                {
+                    _clients = new List<Client>(Clients);
+                }
+
+                _selectionName = Selection.SelectionName;
+                _unixTimeMarket = Market.UnixTime;
+                _unixTimeSelection = Selection.UnixTime;
                 _clientCode = Market.ClientCode;
                 _clientCodeMargin = Market.ClientCodeMargin;
             }
-        }
-        public string GetClientOdds(string clientCode)
-        {
-            if (Selection.ClientOdds != null && Selection.ClientOdds.Any(c => c.ClientCode == clientCode))
-            {
-                return Selection.ClientOdds.Where(c => c.ClientCode == clientCode && c.SelectionTemplateId == Selection.SelectionTemplateId).FirstOrDefault().Odds.ToString("0.00");
-            }
 
-            return Selection.DecimalOdds;
+            _init = false;
         }
+        protected override async Task OnAfterRenderAsync(bool firstRender) => _shouldRender = false;
+        protected override bool ShouldRender() => _shouldRender;
 
         public bool HasClientConfig(string clientCode, string marketClientCode, string marketClientMargin)
         {
@@ -64,72 +68,20 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             return false;
         }
 
-        public string GetClientColor(string ClientCode = null)
-        {
-            var color = "odds-bg-default";
-
-
-            if (_isBetStopGlobal || _marketStatusId != (int)MarketStatus.Active)
-            {
-                if (_marketStatusId == (int)MarketStatus.Inactive)
-                {
-                    color = "odds-bg-inactive";
-                }
-                else
-                {
-                    color = "odds-bg-betstop";
-                }
-            }
-            else
-            {
-                if (ClientCode == null)
-                {
-                    if (!string.IsNullOrEmpty(_odds))
-                    {
-                        if (Convert.ToDecimal(_odds) > Convert.ToDecimal(Selection.DecimalOdds))
-                        {
-                            color = "odds-bg-danger-active";
-                        }
-
-                        if (Convert.ToDecimal(_odds) < Convert.ToDecimal(Selection.DecimalOdds))
-                        {
-                            color = "odds-bg-success-active";
-                        }
-                    }
-
-                    _odds = Selection.DecimalOdds;
-                }
-                else
-                {
-                    if (Selection.ClientOdds == null)
-                        return color;
-
-                    var clientOdds = Selection.ClientOdds.FirstOrDefault(c => c.ClientCode == ClientCode && c.SelectionTemplateId == Selection.SelectionTemplateId);
-                    if (clientOdds != null)
-                    {
-                        if (!string.IsNullOrEmpty(_odds))
-                        {
-                            if (Convert.ToDecimal(_odds) > clientOdds.Odds)
-                            {
-                                color = "odds-bg-danger-active";
-                            }
-
-                            if (Convert.ToDecimal(_odds) < clientOdds.Odds)
-                            {
-                                color = "odds-bg-success-active";
-                            }
-                        }
-                    }
-                }
-            }
-
-            return color;
-        }
-
         public void Dispose()
         {
         }
 
+        #endregion
+
+        #region Utilities
+
+        private bool ValidateParameters()
+        {
+            var clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
+
+            return (_init || _unixTimeMarket != Market.UnixTime || _unixTimeSelection != Selection.UnixTime || _clientReference != clientReference) && Market != null;
+        }
         #endregion
     }
 }

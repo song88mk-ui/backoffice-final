@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.Common
         [Parameter] public bool IsBetStop { get; set; }
         [Parameter] public int CurrentMarketStatus { get; set; }
 
-        public Dictionary<string, object> SpanAttributes { get; set; }
+        public Dictionary<string, object> SpanAttributes { get; set; } = new Dictionary<string, object>();
 
         #endregion
 
@@ -35,11 +35,6 @@ namespace Backoffice.Web.Components.Common
         #endregion
 
         #region Methods
-
-        protected override async Task OnInitializedAsync()
-        {
-            SpanAttributes = new Dictionary<string, object>();
-        }
 
         protected override async Task OnParametersSetAsync()
         {

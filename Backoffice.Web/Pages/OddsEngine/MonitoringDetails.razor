@@ -52,7 +52,7 @@
                         else
                         {
                             <Virtualize Items="FixtureMarkets" Context="market" OverscanCount="5">
-                                <FixtureRow @key="@market.ProviderMarketId" Clients="_clients" Market="market" IsMonitoringPage=false />
+                                <FixtureRow Clients="_clients" Market="market" IsMonitoringPage=false />
                             </Virtualize>
                         }
                     </tbody>
