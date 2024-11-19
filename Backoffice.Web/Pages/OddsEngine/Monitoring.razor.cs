@@ -285,32 +285,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                     CorrelationId = Guid.NewGuid().ToString(),
                     Selections = market.Selections
                 });
-
-                //fixtureMarkets.AddRange(fixture.Markets.Select(market => new FixtureMarketModel()
-                //{
-                //    FixtureName = fixture.FixtureName,
-                //    MarketId = market.MarketId,
-                //    ClientCode = market.ClientCode,
-                //    ClientCodeMargin = market.ClientCodeMargin,
-                //    MarketName = market.MarketName,
-                //    ProviderMarketId = market.ProviderMarketId,
-                //    ProviderFixtureId = market.ProviderFixtureId,
-                //    AwayName = fixture.AwayName,
-                //    BetStop = fixture.BetStop,
-                //    CurrentMinute = fixture.CurrentMinute,
-                //    CurrentPeriod = fixture.CurrentPeriod,
-                //    FixtureStartDate = fixture.FixtureStartDate,
-                //    FixtureStatusId = fixture.FixtureStatusId,
-                //    HomeName = fixture.HomeName,
-                //    IsBetStopGlobal = fixture.IsBetStopGlobal,
-                //    Score = fixture.Score,
-                //    Line = market.Line,
-                //    //MarketSpecifier = market.MarketSpecifier,
-                //    MarketStatusId = market.MarketStatusId,
-                //    //MarketStatusName = market.MarketStatusName,
-                //    //MarketTemplateId = market.MarketTemplateId,
-                //    Selections = market.Selections
-                //}));
             }
 
             return fixtureMarkets;
@@ -367,6 +341,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             var nearestSelection = nearestSelections.FirstOrDefault();
+
+            var result = markets.FirstOrDefault(c => c.MarketId == nearestSelection?.MarketId);
+
+            result.UnixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            result.Selections.ForEach(selection => selection.UnixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
 
             return markets.FirstOrDefault(c => c.MarketId == nearestSelection?.MarketId);
         }

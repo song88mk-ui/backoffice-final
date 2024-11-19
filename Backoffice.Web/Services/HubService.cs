@@ -4,6 +4,7 @@ using Backoffice.Shared.Models.HubMessages;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
+using System.Threading.Tasks;
 
 namespace Backoffice.Web.Services
 {
@@ -43,22 +44,34 @@ namespace Backoffice.Web.Services
                 Log.Information($"HubConnection Reconnected with Connection ID: {connectionId}");
             };
 
-            _hubConnection.StartAsync().ContinueWith(task =>
+            try
             {
-                if (task.IsFaulted)
+
+                _hubConnection.StartAsync().ContinueWith(task =>
                 {
-                    Log.Error($"HubConnection Closed: {task?.Exception?.Message} - {task?.Exception?.StackTrace}");
-                    Console.WriteLine($"Error Connecting to hub");
-                }
-                else if (task.IsCompletedSuccessfully)
-                {
-                    var connectionId = _hubConnection.ConnectionId?.ToString();
-                    Log.Information($"HubConnection Connected with Connection ID: {connectionId}");
-                }
-            });
+                    if (task.IsFaulted)
+                    {
+                        Log.Error($"HubConnection failed to connect: {task?.Exception?.Message} - {task?.Exception?.StackTrace}");
+                    }
+                    else if (task.IsCompletedSuccessfully)
+                    {
+                        var connectionId = _hubConnection.ConnectionId?.ToString();
+                        Log.Information($"HubConnection Connected with Connection ID: {connectionId}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"{ex.Message} - {ex.StackTrace}");
+            }
         }
         public async Task OnNotificationReceived(Func<NotificationsModel, Task> processNotification)
-            => _hubConnection.On("Notification", async (NotificationsModel message) => await processNotification(message));
+        {
+            if (_hubConnection.State != HubConnectionState.Connected)
+                return;
+
+            _hubConnection.On("Notification", async (NotificationsModel message) => await processNotification(message));
+        }
 
         private List<string> _channels = new List<string>();
         public async Task SubscribeToChannel(string key)
@@ -96,6 +109,9 @@ namespace Backoffice.Web.Services
             Func<BetStopFixtureMessage, Task> processOnBetStopFixture,
             Func<BetStopGlobalMessage, Task> processOnBetStopGlobal)
         {
+            if (_hubConnection.State != HubConnectionState.Connected)
+                return;
+
             _hubConnection.On<OddsChangeFixtureMessage>("OnOddsChange", async message
                 => await processOddsChangeMonitoring(message));
 

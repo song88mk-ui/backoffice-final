@@ -1,6 +1,6 @@
 ﻿<tr>
     <td class="td-selection">
-        <span class="selection-name-container fw-bold">@_selectionName</span>
+        <span class="selection-name-container fw-bold">@Selection.SelectionName</span>
     </td>
     <MatchDetailsClientSelectionComponent Selection="Selection" MarketStatusId="Market.MarketStatusId" IsBetStopGlobal="Market.IsBetStopGlobal" HasConfig="true" />
     @if (_clients != null && _clients.Any())
