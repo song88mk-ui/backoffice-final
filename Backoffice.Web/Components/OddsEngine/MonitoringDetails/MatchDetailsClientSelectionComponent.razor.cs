@@ -19,6 +19,8 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         private bool _shouldRender = true;
         private bool _init = true;
 
+        private CancellationTokenSource _cts;
+
         protected override async Task OnParametersSetAsync()
         {
             var color = GetClientColor();
@@ -28,7 +30,19 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             if (_shouldRender)
             {
                 _unixTime = Selection.UnixTime;
-                _color = color;
+
+                if (_color != color)
+                {
+                    _shouldRender = true;
+
+                    _cts?.Cancel();
+                    _cts = new CancellationTokenSource();
+                    _color = color;
+                    await Task.Delay(4000, _cts.Token);
+
+                    _color = "odds-bg-default";
+                    _shouldRender = true;
+                }
             }
 
             _init = false;
@@ -40,7 +54,6 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         private string GetClientColor()
         {
             var color = "odds-bg-default";
-
 
             if (IsBetStopGlobal || MarketStatusId != (int)MarketStatus.Active)
             {

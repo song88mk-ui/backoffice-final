@@ -50,6 +50,8 @@ namespace Backoffice.Web.Components.Common
 
                 if (_color != color)
                 {
+                    _shouldRender = true;
+
                     _cts?.Cancel();
                     _cts = new CancellationTokenSource();
                     _color = color;

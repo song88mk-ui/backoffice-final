@@ -364,8 +364,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (message.FixtureTypeId != (int)FixtureType.Match)
                 return;
 
-            //var emptyContentModels = new List<MarketContentModel>();
-
             if (!message.Markets.Any(s => s.MarketTemplateId == _monitoringCallbackModel.SelectedMarketTemplateId))
                 return;
 
@@ -380,7 +378,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 currentFixture.FixtureStatusId = message.FixtureStatusId;
                 currentFixture.UnixTime = message.UnixTime;
 
-                if (currentFixture.FixtureStatusId >= (int)FixtureStatus.Suspended)
+                if (currentFixture.FixtureStatusId > (int)FixtureStatus.Live)
                 {
                     _fixtureMarkets.Remove(currentFixture);
                 }
@@ -405,7 +403,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             {
                                 var providerSelectionId = $"{currentFixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newSelection.SelectionTemplateId}:{newMarket.MarketSpecifier}";
                                 var currentSelection = currentMarket.Selections.FirstOrDefault(c => c.ProviderSelectionId == providerSelectionId);
-                                    
+
                                 var clientOdds = new List<ClientOddsModel>();
                                 foreach (var client in newMarket.ClientSelections)
                                 {
@@ -515,24 +513,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                             CorrelationId = Guid.NewGuid().ToString(),
                             UnixTime = market.UnixTime,
                             Selections = selections
-                            //Selections = market.Selections.Select(ss => new SelectionModel()
-                            //{
-                            //    DecimalOdds = ss.DecimalOdds.ToString(),
-                            //    IsActive = ss.IsActive,
-                            //    SelectionName = ss.SelectionName,
-                            //    SelectionTemplateId = ss.SelectionTemplateId,
-                            //    ProviderSelectionId = $"{message.ProviderFixtureId}:{market.MarketTemplateId}:{ss.SelectionTemplateId}:{market.MarketSpecifier}",
-                            //    //OldDecimalOdds = ss.DecimalOdds.ToString(),
-                            //    UnixTime = ss.UnixTime,
-                            //    //ClientOdds = ss.ClientOdds.Select(s =>
-                            //    //    new ClientOddsModel
-                            //    //    {
-                            //    //        ClientCode = s.ClientCode,
-                            //    //        SelectionTemplateId = s.SelectionTemplateId,
-                            //    //        Odds = s.DecimalOdds,
-                            //    //        OldOdds = 0m
-                            //    //    }).ToList()
-                            //}).ToList()
                         };
 
                         _fixtureMarkets.Add(fixture);
