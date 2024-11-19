@@ -822,19 +822,36 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<SportsTreeResponse>>
-                (await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
-                                  .GetStreamAsync($"api/trading/sports/{fixtureTypeId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }, cancellationToken);
+                var response = await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } }).GetAsync($"api/trading/sports/{fixtureTypeId}", cancellationToken);
 
-                if (cancellationToken.IsCancellationRequested)
-                    return new BaseResponse<SportsTreeResponse>();
-
-                return result ?? new BaseResponse<SportsTreeResponse>
+                if (response.IsSuccessStatusCode)
                 {
-                    StatusCode = StatusCode.Success,
-                    Message = $"{StatusCode.Success}",
-                    Result = new SportsTreeResponse()
-                };
+                    return JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>(
+                        await response.Content.ReadAsStringAsync(),
+                        new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<SportsTreeResponse>();
+                }
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+                        return JsonSerializer.Deserialize<BaseResponse<SportsTreeResponse>>
+                        (
+                            await response.Content.ReadAsStringAsync(),
+                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<SportsTreeResponse>();
+                    }
+                    else
+                    {
+                        Log.Error($"[api/trading/sports/{fixtureTypeId}] - {response.ReasonPhrase}");
+
+                        return new BaseResponse<SportsTreeResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
             }
             catch (Exception ex)
             {

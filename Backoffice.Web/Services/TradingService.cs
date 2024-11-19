@@ -9,7 +9,6 @@ using Serilog;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using static Backoffice.Shared.Models.Response.SportsTreeResponse;
 
 namespace Backoffice.Web.Services
 {
@@ -259,10 +258,36 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<List<ClientInformationModel>>>
-                (await GetHttpClient().GetStreamAsync($"api/trading/client", cancellationToken), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                var response = await GetHttpClient().GetAsync($"api/trading/client", cancellationToken);
 
-                return result;
+                if (response.IsSuccessStatusCode)
+                {
+                    return JsonSerializer.Deserialize<BaseResponse<List<ClientInformationModel>>>(
+                        await response.Content.ReadAsStringAsync(),
+                        new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<List<ClientInformationModel>>();
+                }
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+                        return JsonSerializer.Deserialize<BaseResponse<List<ClientInformationModel>>>
+                        (
+                            await response.Content.ReadAsStringAsync(),
+                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<List<ClientInformationModel>>();
+                    }
+                    else
+                    {
+                        Log.Error($"[api/trading/client] - {response.ReasonPhrase}");
+
+                        return new BaseResponse<List<ClientInformationModel>>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -385,7 +410,7 @@ namespace Backoffice.Web.Services
                 };
             }
         }
-        
+
         public async Task<BaseResponse<PriceBoostConfigResponse>> AddOrUpdatePriceBoost(Models.AddPriceBoostFilterModel request)
         {
             try
@@ -1356,7 +1381,7 @@ namespace Backoffice.Web.Services
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>>
                         (
-                            await response.Content.ReadAsStringAsync(), 
+                            await response.Content.ReadAsStringAsync(),
                             new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
                         ) ?? new BaseResponse<Tuple<List<ConfigLogsResponse>, MetaData>>();
                 else
@@ -1402,7 +1427,7 @@ namespace Backoffice.Web.Services
             }
         }
         #endregion
-        
+
         public async Task<BaseResponse<MessageResponse>> Publish(MessageRequest request)
         {
             try
