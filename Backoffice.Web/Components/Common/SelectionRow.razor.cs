@@ -29,6 +29,7 @@ namespace Backoffice.Web.Components.Common
         private int _currentMarketStatus;
         private string _odds;
         private long _unixTime;
+        private bool _fading = true;
 
         private CancellationTokenSource _cts;
 
@@ -50,15 +51,18 @@ namespace Backoffice.Web.Components.Common
 
                 if (_color != color)
                 {
+                    _color = color;
                     _shouldRender = true;
 
                     _cts?.Cancel();
-                    _cts = new CancellationTokenSource();
-                    _color = color;
-                    await Task.Delay(4000, _cts.Token);
+                    if (_fading)
+                    {
+                        _cts = new CancellationTokenSource();
+                        await Task.Delay(4000, _cts.Token);
 
-                    _color = "odds-bg-default";
-                    _shouldRender = true;
+                        _color = "odds-bg-default";
+                        _shouldRender = true;
+                    }
                 }
             }
 
@@ -95,12 +99,14 @@ namespace Backoffice.Web.Components.Common
 
         private string GetColor()
         {
+            _fading = true;
             var color = "odds-bg-default";
 
             SpanAttributes["data-title"] = string.Empty;
 
             if (IsBetStop || CurrentMarketStatus != (int)MarketStatus.Active)
             {
+                _fading = false;
                 if (CurrentMarketStatus == (int)MarketStatus.Inactive)
                 {
                     SpanAttributes["data-title"] = MarketStatus.Inactive.ToString();

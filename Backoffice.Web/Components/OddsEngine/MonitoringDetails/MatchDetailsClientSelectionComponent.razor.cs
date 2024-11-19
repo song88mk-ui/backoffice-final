@@ -7,7 +7,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
     public partial class MatchDetailsClientSelectionComponent
     {
         [Parameter] public SelectionModel Selection { get; set; }
-        [Parameter] public string CurrentClientCode {  get; set; }
+        [Parameter] public string CurrentClientCode { get; set; }
         [Parameter] public int MarketStatusId { get; set; }
         [Parameter] public bool IsBetStopGlobal { get; set; }
         [Parameter] public bool HasConfig { get; set; }
@@ -18,6 +18,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
         private bool _shouldRender = true;
         private bool _init = true;
+        private bool _fading = true;
 
         private CancellationTokenSource _cts;
 
@@ -33,15 +34,18 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
                 if (_color != color)
                 {
+                    _color = color;
                     _shouldRender = true;
 
                     _cts?.Cancel();
-                    _cts = new CancellationTokenSource();
-                    _color = color;
-                    await Task.Delay(4000, _cts.Token);
+                    if (_fading)
+                    {
+                        _cts = new CancellationTokenSource();
+                        await Task.Delay(4000, _cts.Token);
 
-                    _color = "odds-bg-default";
-                    _shouldRender = true;
+                        _color = "odds-bg-default";
+                        _shouldRender = true;
+                    }
                 }
             }
 
@@ -53,10 +57,12 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         private bool ValidateParameters() => _init || _unixTime != Selection.UnixTime;
         private string GetClientColor()
         {
+            _fading = true;
             var color = "odds-bg-default";
 
             if (IsBetStopGlobal || MarketStatusId != (int)MarketStatus.Active)
             {
+                _fading = false;
                 if (MarketStatusId == (int)MarketStatus.Inactive)
                 {
                     color = "odds-bg-inactive";
