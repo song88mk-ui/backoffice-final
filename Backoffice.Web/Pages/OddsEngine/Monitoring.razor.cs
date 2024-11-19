@@ -518,7 +518,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                         _fixtureMarkets.Add(fixture);
                     });
 
-                    _fixtureMarkets.OrderByDescending(o => o.FixtureStatusId).ThenBy(o => o.FixtureStartDate).ThenBy(o => o.FixtureName);
+                    _fixtureMarkets = _fixtureMarkets.OrderByDescending(o => o.FixtureStatusId).ThenBy(o => o.FixtureStartDate).ThenBy(o => o.FixtureName).ToList();
                 }
 
                 _shouldRender = true;

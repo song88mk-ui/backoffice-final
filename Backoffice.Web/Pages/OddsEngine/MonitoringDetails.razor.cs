@@ -279,7 +279,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         public async Task OnMarketClickEvent(string marketId)
         {
             if (!_isMatchSelectionPreLoad)
+            {
                 _isMatchSelectionPreLoad = true;
+            }
 
             var markets = Fixture.Markets.Where(c => c.MarketId == marketId).ToList();
             FixtureMarketTemplates = await PrepareFixtureMarkets(markets);

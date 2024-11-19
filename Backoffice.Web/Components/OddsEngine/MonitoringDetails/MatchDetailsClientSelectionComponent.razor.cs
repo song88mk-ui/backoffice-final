@@ -19,14 +19,20 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         private bool _shouldRender = true;
         private bool _init = true;
         private bool _fading = true;
+        private string _selectionId;
 
         private CancellationTokenSource _cts;
 
         protected override async Task OnParametersSetAsync()
         {
-            var color = GetClientColor();
+            var color = GetColor();
 
             _shouldRender = ValidateParameters() || color != _color;
+
+            if (_selectionId != Selection.SelectionId)
+            {
+                _selectionId = Selection.SelectionId;
+            }
 
             if (_shouldRender)
             {
@@ -35,7 +41,6 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
                 if (_color != color)
                 {
                     _color = color;
-                    _shouldRender = true;
 
                     _cts?.Cancel();
                     if (_fading)
@@ -55,7 +60,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         protected override bool ShouldRender() => _shouldRender;
 
         private bool ValidateParameters() => _init || _unixTime != Selection.UnixTime;
-        private string GetClientColor()
+        private string GetColor()
         {
             _fading = true;
             var color = "odds-bg-default";
@@ -74,6 +79,13 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             }
             else
             {
+                if (_selectionId != Selection.SelectionId)
+                {
+                    _selectionId = Selection.SelectionId;
+                    _odds = GetClientOdds();
+                    return color;
+                }
+
                 if (CurrentClientCode == null)
                 {
                     if (!string.IsNullOrEmpty(_odds))

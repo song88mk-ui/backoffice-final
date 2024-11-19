@@ -52,7 +52,6 @@ namespace Backoffice.Web.Components.Common
                 if (_color != color)
                 {
                     _color = color;
-                    _shouldRender = true;
 
                     _cts?.Cancel();
                     if (_fading)
