@@ -255,6 +255,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var marketTemplateIds = model.MarketTemplateGroup.MarketTemplateIds;
             var markets = Fixture.Markets.Where(c => marketTemplateIds.Contains(c.MarketTemplateId)).ToList();
+            //var markets = Fixture.Markets.Where(c => c.MarketId == model.MarketTemplateGroup.marke).ToList();
 
             // display list of markets available on the selected group
             MarketTemplateNavigation = markets.Select((s, index) => new MarketNavigationModel2
