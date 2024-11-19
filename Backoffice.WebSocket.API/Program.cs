@@ -13,7 +13,11 @@ builder.Services.AddSignalR(options => options.MaximumReceiveMessageSize = 50000
 builder.Services.AddResponseCompression(opts => opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
         new[] { "application/octet-stream" }));
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
+
+app.MapHealthChecks("/healthz");
 
 app.MapHub<BackofficeHub>("/bohub", options => {
     options.ApplicationMaxBufferSize = 5000000;
