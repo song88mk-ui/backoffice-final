@@ -230,14 +230,16 @@ namespace Backoffice.Web.Pages.OddsEngine
         #region Utilities
         private async Task SubscribeToChannel(string key)
         {
+            if (_channels.Contains(key))
+                return;
+
             foreach (var channel in _channels)
             {
                 await _hubService.UnSubscribeToChannel(channel);
-                Console.WriteLine($"UnSubscribed: {_leagueId} - {SelectedSport?.LeagueName}");
             }
 
             _channels.Clear();
-            Console.WriteLine($"Subscribe: {_leagueId} - {SelectedSport?.LeagueName}");
+
             await _hubService.SubscribeToChannel(key);
             _channels.Add(key);
         }
@@ -369,7 +371,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             return markets.FirstOrDefault(c => c.MarketId == nearestSelection?.MarketId);
         }
 
-        private async Task ProcessOddsChange(OddsChangeFixture message)
+        private async Task ProcessOddsChange(OddsChangeFixtureMessage message)
         {
             Debug.WriteLine($" ==> Message Received: {message.FixtureId} - {message.FixtureName}");
 
@@ -563,7 +565,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         }
 
-        private async Task ProcessBetStopFixture(OnExternalBetStopFixtureMessage message)
+        private async Task ProcessBetStopFixture(BetStopFixtureMessage message)
         {
             if (_fixtureMarkets != null && _fixtureMarkets.Any())
             {
@@ -584,7 +586,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
-        private async Task ProcessBetStopGlobal(OnExternalBetStopGlobalMessage message)
+        private async Task ProcessBetStopGlobal(BetStopGlobalMessage message)
         {
             if (_fixtureMarkets != null && _fixtureMarkets.Any())
             {

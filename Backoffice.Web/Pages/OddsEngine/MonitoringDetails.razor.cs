@@ -10,6 +10,7 @@ using Backoffice.Web.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
+using System.Threading.Channels;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -58,6 +59,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string _id;
         private int _colCtr = 3;
         private MarketGroupNavigationModel _navigationModel;
+
+        private List<string> _channels = new List<string>();
+
         #endregion
 
         #region Methods
@@ -78,6 +82,12 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarginMarket = new MarketModel();
             _isInit = true;
 
+            await _hubService.InitializeOeMessageHandlers(
+                ProcessOddsChangeMonitoring,
+                ProcessOnBetStopFixture,
+                ProcessOnBetStopGlobal
+            );
+
             await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
@@ -88,11 +98,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 try
                 {
                     //await Subscribe();
-                    await _hubService.InitializeOeMessageHandlers(
-                        ProcessOddsChangeMonitoring,
-                        ProcessOnBetStopFixture,
-                        ProcessOnBetStopGlobal
-                    );
                 }
                 catch (Exception ex)
                 {
@@ -321,6 +326,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (marketFixtureResponse.StatusCode == StatusCode.Success && marketFixtureResponse.Result.Fixture != null)
             {
                 Fixture = marketFixtureResponse.Result.Fixture;
+                await SubscribeToChannel($"fixturedetails:{Fixture.FixtureId}");
                 SportId = Fixture.SportId;
                 _pageHeaderModel = new()
                 {
@@ -359,6 +365,21 @@ namespace Backoffice.Web.Pages.OddsEngine
                     }
                 };
             }
+        }
+        private async Task SubscribeToChannel(string key)
+        {
+            if (_channels.Contains(key))
+                return;
+
+            foreach (var channel in _channels)
+            {
+                await _hubService.UnSubscribeToChannel(channel);
+            }
+
+            _channels.Clear();
+
+            await _hubService.SubscribeToChannel(key);
+            _channels.Add(key);
         }
 
         private async Task<List<FixtureMarketModel>> PrepareFixtureMarkets(List<MarketModel> markets) => markets.Select(s => new FixtureMarketModel
@@ -435,7 +456,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             return await PrepareFixtureMarkets(filteredMarkets.ToList());
         }
 
-        private async Task ProcessOddsChangeMonitoring(OddsChangeFixture message)
+        private async Task ProcessOddsChangeMonitoring(OddsChangeFixtureMessage message)
         {
             if (Fixture == null || Fixture.FixtureTypeId != message.FixtureTypeId || Id != message.ProviderFixtureId)
                 return;
@@ -672,7 +693,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
-        private async Task ProcessOnBetStopFixture(OnExternalBetStopFixtureMessage message)
+        private async Task ProcessOnBetStopFixture(BetStopFixtureMessage message)
         {
             if (Fixture == null || Id != message.ProviderFixtureId)
                 return;
@@ -687,7 +708,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             await InvokeAsync(StateHasChanged);
         }
 
-        private async Task ProcessOnBetStopGlobal(OnExternalBetStopGlobalMessage message)
+        private async Task ProcessOnBetStopGlobal(BetStopGlobalMessage message)
         {
             //if (MarketTemplates == null)
             //    return;

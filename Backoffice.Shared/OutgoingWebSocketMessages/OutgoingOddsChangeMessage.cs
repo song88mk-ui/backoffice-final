@@ -6,9 +6,8 @@ using System.Text;
 
 namespace Backoffice.Shared.OutgoingWebSocketMessages
 {
-    public class OutgoingOddsChange
+    public class OutgoingOddsChangeMessage : OutgoingBaseMessage
     {
-        public List<string> Gr { get; set; } = new List<string>();
-        public OddsChangeFixture Pa { get; set; }
+        public OddsChangeFixtureMessage Pa { get; set; }
     }
 }

@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
 namespace Backoffice.WebSocket.Service.Services
 {
@@ -46,7 +47,7 @@ namespace Backoffice.WebSocket.Service.Services
                 if (fixture == null)
                     return;
 
-                var payload = new OutgoingOddsChange
+                var payload = new OutgoingOddsChangeMessage
                 {
                     Gr = GetGroupForMonitoringMarkets(fixture),
                     Pa = fixture
@@ -68,13 +69,62 @@ namespace Backoffice.WebSocket.Service.Services
                 if (fixture == null)
                     return;
 
-                var payload = new OutgoingOddsChange
+                var payload = new OutgoingOddsChangeMessage
                 {
                     Gr = GetGroupForMonitoringDetailsMarkets(fixture),
                     Pa = fixture
                 };
 
                 await PublishToWebSocket(HubPublishOddsChange, hubConnection, payload);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+            }
+        }
+        public async Task ProcessOnBetStopFixture(IncomingBetStopFixtureMessage message, HubConnection hubConnection)
+        {
+            try
+            {
+                var fixture = new BetStopFixtureMessage()
+                {
+                    SportId = message.SportId,
+                    FixtureId = message.FixtureId,
+                    ProviderFixtureId = message.ProviderFixtureId,
+                    IsBetStop = message.IsBetStop,
+                    MarketTemplateGroups = message.MarketTemplateGroups,
+                    CorrelationId = message.CorrelationId,
+                };
+
+                var payload = new OutgoingBetStopFixtureMessage
+                {
+                    Gr = GetGroupForBetStopFixture(message),
+                    Pa = fixture
+                };
+
+                await PublishToWebSocket("PublishBetStopFixture", hubConnection, payload);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+            }
+        }
+        public async Task ProcessOnBetStopGlobal(IncomingBetStopGlobalMessage message, HubConnection hubConnection)
+        {
+            try
+            {
+                var fixture = new BetStopGlobalMessage()
+                {
+                    IsBetStop = message.IsBetStop,
+                    CorrelationId = message.CorrelationId
+                };
+
+                var payload = new OutgoingBetStopGlobalMessage
+                {
+                    Pa = fixture
+                };
+
+                await PublishToWebSocket("PublishBetStopFixture", hubConnection, payload);
             }
             catch (Exception ex)
             {
@@ -103,7 +153,7 @@ namespace Backoffice.WebSocket.Service.Services
             await PublishToWebSocket("Notification", hubConnection, payload);
         }
 
-        private async Task<OddsChangeFixture> ConvertToOddsChangeFixture(IncomingOddsChangeMessage message)
+        private async Task<OddsChangeFixtureMessage> ConvertToOddsChangeFixture(IncomingOddsChangeMessage message)
         {
             try
             {
@@ -188,7 +238,7 @@ namespace Backoffice.WebSocket.Service.Services
                     }
                 }
 
-                return new OddsChangeFixture()
+                return new OddsChangeFixtureMessage()
                 {
                     SportId = message.SportId,
                     SportName = message.SportName,
@@ -441,7 +491,7 @@ namespace Backoffice.WebSocket.Service.Services
             }
         }
 
-        private List<string> GetGroupForMonitoringMarkets(OddsChangeFixture message)
+        private List<string> GetGroupForMonitoringMarkets(OddsChangeFixtureMessage message)
         {
             var result = new List<string>();
 
@@ -449,11 +499,19 @@ namespace Backoffice.WebSocket.Service.Services
 
             return result;
         }
-
-        private List<string> GetGroupForMonitoringDetailsMarkets(OddsChangeFixture message)
+        private List<string> GetGroupForMonitoringDetailsMarkets(OddsChangeFixtureMessage message)
         {
             var result = new List<string>();
 
+            result.Add($"fixturedetails:{message.FixtureId}");
+
+            return result;
+        }
+        private List<string> GetGroupForBetStopFixture(IncomingBetStopFixtureMessage message)
+        {
+            var result = new List<string>();
+
+            result.Add($"leagues:{message.LeagueId}:fixtures");
             result.Add($"fixturedetails:{message.FixtureId}");
 
             return result;

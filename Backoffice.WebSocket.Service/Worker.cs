@@ -32,10 +32,14 @@ namespace Backoffice.WebSocket.Service
 
         private Thread _threadOnMonitoringOddsChange;
         private Thread _threadOnMonitoringDetailsOddsChange;
+        private Thread _threadOnBetStopFixture;
+        private Thread _threadOnBetStopGlobal;
         private Thread _threadNotification;
 
         private readonly BlockingCollection<IncomingOddsChangeMessage> _messagesOnMonitoringOddsChange = new BlockingCollection<IncomingOddsChangeMessage>();
         private readonly BlockingCollection<IncomingOddsChangeMessage> _messagesOnMonitoringDetailsOddsChange = new BlockingCollection<IncomingOddsChangeMessage>();
+        private readonly BlockingCollection<IncomingBetStopFixtureMessage> _messagesOnBetStopFixture = new BlockingCollection<IncomingBetStopFixtureMessage>();
+        private readonly BlockingCollection<IncomingBetStopGlobalMessage> _messagesOnBetStopGlobal = new BlockingCollection<IncomingBetStopGlobalMessage>();
         private readonly BlockingCollection<NotificationsDetailsModel> _messagesNotification = new BlockingCollection<NotificationsDetailsModel>();
 
         public Worker(ILogger<Worker> logger, IConfiguration configuration, IMessageBroker messageBroker, ISportsbookService sportsbookService)
@@ -105,10 +109,10 @@ namespace Backoffice.WebSocket.Service
                         }
                         break;
                     case "OnBetStopFixture":
-                        var onBetStop = JsonSerializer.Deserialize<OnExternalBetStopFixtureMessage>(payload);
+                        var onBetStop = JsonSerializer.Deserialize<IncomingBetStopFixtureMessage>(payload);
                         break;
                     case "OnBetStopGlobal":
-                        var onBetStopGlobal = JsonSerializer.Deserialize<OnExternalBetStopGlobalMessage>(payload);
+                        var onBetStopGlobal = JsonSerializer.Deserialize<IncomingBetStopGlobalMessage>(payload);
                         break;
                     case "OnNewNotification":
                         var notificationsModel = JsonSerializer.Deserialize<NotificationsDetailsModel>(payload);
@@ -135,6 +139,22 @@ namespace Backoffice.WebSocket.Service
             {
                 var message = _messagesOnMonitoringDetailsOddsChange.Take();
                 await _sportsbookService.ProcessOnMonitoringDetailsOddsChange(message, _hubConnection);
+            }
+        }
+        private async void ThreadBetStopFixture()
+        {
+            while (true)
+            {
+                var message = _messagesOnBetStopFixture.Take();
+                await _sportsbookService.ProcessOnBetStopFixture(message, _hubConnection);
+            }
+        }
+        private async void ThreadBetStopGlobal()
+        {
+            while (true)
+            {
+                var message = _messagesOnBetStopGlobal.Take();
+                await _sportsbookService.ProcessOnBetStopGlobal(message, _hubConnection);
             }
         }
         private async void ThreadNotification()

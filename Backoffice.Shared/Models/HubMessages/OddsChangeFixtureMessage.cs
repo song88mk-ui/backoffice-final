@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Backoffice.Shared.Models.HubMessages
 {
-    public class OddsChangeFixture
+    public class OddsChangeFixtureMessage
     {
         public int SportId { get; set; }
         public string SportName { get; set; }

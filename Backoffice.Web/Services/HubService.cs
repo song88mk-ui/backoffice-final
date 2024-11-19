@@ -66,6 +66,9 @@ namespace Backoffice.Web.Services
             if (_hubConnection.State != HubConnectionState.Connected)
                 return;
 
+            if (_channels.Contains(key))
+                return;
+
             await _hubConnection.InvokeAsync(
                 "SubscribeToChannel",
                 key
@@ -77,25 +80,32 @@ namespace Backoffice.Web.Services
             if (_hubConnection.State != HubConnectionState.Connected)
                 return;
 
+            if (!_channels.Contains(key))
+                return;
+
             await _hubConnection.InvokeAsync(
                 "UnSubscribeToChannel",
                 key
             );
+
+            _channels.Remove(key);
         }
 
         public async Task InitializeOeMessageHandlers(
-            Func<OddsChangeFixture, Task> processOddsChangeMonitoring,
-            Func<OnExternalBetStopFixtureMessage, Task> processOnBetStopFixture,
-            Func<OnExternalBetStopGlobalMessage, Task> processOnBetStopGlobal)
+            Func<OddsChangeFixtureMessage, Task> processOddsChangeMonitoring,
+            Func<BetStopFixtureMessage, Task> processOnBetStopFixture,
+            Func<BetStopGlobalMessage, Task> processOnBetStopGlobal)
         {
-            _hubConnection.On<OddsChangeFixture>("OnOddsChange", async message
+            _hubConnection.On<OddsChangeFixtureMessage>("OnOddsChange", async message
                 => await processOddsChangeMonitoring(message));
 
-            _hubConnection.On<OnExternalBetStopFixtureMessage>("onbetstopfixture", async message
+            _hubConnection.On<BetStopFixtureMessage>("OnBetStopFixture", async message
                 => await processOnBetStopFixture(message));
 
-            _hubConnection.On<OnExternalBetStopGlobalMessage>("onbetstopglobal", async message
+            _hubConnection.On<BetStopGlobalMessage>("OnBetStopGlobal", async message
                 => await processOnBetStopGlobal(message));
+
+            await SubscribeToChannel("onbetstopglobal");
         }
         public async ValueTask DisposeAsync()
         {
