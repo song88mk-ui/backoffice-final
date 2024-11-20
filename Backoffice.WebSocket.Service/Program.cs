@@ -1,4 +1,5 @@
 using Backoffice.Shared.Utilities;
+using Backoffice.WebSocket.Service.Extensions;
 using Backoffice.WebSocket.Service.Repositories;
 using Backoffice.WebSocket.Service.Services;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,8 @@ namespace Backoffice.WebSocket.Service
                 .ConfigureServices((hostContext, services) =>
                 {
                     var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
+
+                    services.AddTelemetry(configuration);
 
                     services.AddSingleton<IMemCache, MemCache>();
                     services.AddSingleton<IMessageBroker, MessageBroker>();
