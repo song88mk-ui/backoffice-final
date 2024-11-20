@@ -2,13 +2,21 @@ using Backoffice.Shared.IncomingSbEngineMessages;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Backoffice.WebSocket.Service.Services;
+using Backoffice.WebSocket.Service.Telemetry;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry;
+using OpenTelemetry.Context.Propagation;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -23,6 +31,10 @@ namespace Backoffice.WebSocket.Service
         private readonly ISportsbookService _sportsbookService;
         private readonly HubConnection _hubConnection;
 
+        private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
+        private readonly ActivitySource _activitySource;
+        private readonly Counter<long> _receivedMessagesCounter;
+
         private Thread _threadOnMonitoringOddsChange;
         private Thread _threadOnMonitoringDetailsOddsChange;
         private Thread _threadOnBetStopFixture;
@@ -35,7 +47,7 @@ namespace Backoffice.WebSocket.Service
         private readonly BlockingCollection<IncomingBetStopGlobalMessage> _messagesOnBetStopGlobal = new BlockingCollection<IncomingBetStopGlobalMessage>();
         private readonly BlockingCollection<NotificationsDetailsModel> _messagesNotification = new BlockingCollection<NotificationsDetailsModel>();
 
-        public Worker(ILogger<Worker> logger, IConfiguration configuration, IMessageBroker messageBroker, ISportsbookService sportsbookService)
+        public Worker(ILogger<Worker> logger, IConfiguration configuration, IMessageBroker messageBroker, ISportsbookService sportsbookService, Instrumentation instrumentation)
         {
             _logger = logger;
             _sportsbookService = sportsbookService;
@@ -45,6 +57,8 @@ namespace Backoffice.WebSocket.Service
                                 .WithAutomaticReconnect()
                                 .Build();
             _messageBroker = messageBroker;
+            _activitySource = instrumentation.ActivitySource;
+            _receivedMessagesCounter = instrumentation.ReceivedMessagesCounter;
         }
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
@@ -82,39 +96,51 @@ namespace Backoffice.WebSocket.Service
             _messageBroker.Connect();
             _messageBroker.MessageReceived += MessageReceivedEvent;
         }
+
         private async void MessageReceivedEvent(object sender, BasicDeliverEventArgs e)
         {
-            var payload = Encoding.UTF8.GetString(e.Body);
-            var messageType = e.BasicProperties.Type;
-            var correlationId = e.BasicProperties.CorrelationId;
+            var parentContext = Propagator.Extract(default, e.BasicProperties, this.ExtractTraceFromBasicProperties);
+            Baggage.Current = parentContext.Baggage;
 
-            try
+            using (var activity = _activitySource.StartActivity($"{e.RoutingKey} receive", ActivityKind.Consumer, parentContext.ActivityContext))
             {
-                switch (messageType)
+                var payload = Encoding.UTF8.GetString(e.Body);
+                var messageType = e.BasicProperties.Type;
+                var correlationId = e.BasicProperties.CorrelationId;
+
+                activity.SetTag("message.type", messageType);
+                if (_receivedMessagesCounter.Enabled)
+                    _receivedMessagesCounter.Add(1);
+
+                try
                 {
-                    case "OnOddsChange":
-                        var onOddsChange = JsonSerializer.Deserialize<IncomingOddsChangeMessage>(payload);
+                    switch (messageType)
+                    {
+                        case "OnOddsChange":
+                            var onOddsChange = JsonSerializer.Deserialize<IncomingOddsChangeMessage>(payload);
 
-                        if (onOddsChange != null)
-                        {
-                            _messagesOnMonitoringOddsChange.Add(onOddsChange);
-                            _messagesOnMonitoringDetailsOddsChange.Add(onOddsChange);
-                        }
-                        break;
-                    case "OnBetStopFixture":
-                        var onBetStop = JsonSerializer.Deserialize<IncomingBetStopFixtureMessage>(payload);
-                        break;
-                    case "OnBetStopGlobal":
-                        var onBetStopGlobal = JsonSerializer.Deserialize<IncomingBetStopGlobalMessage>(payload);
-                        break;
-                    case "OnNewNotification":
-                        var notificationsModel = JsonSerializer.Deserialize<NotificationsDetailsModel>(payload);
-                        break;
+                            if (onOddsChange != null)
+                            {
+                                _messagesOnMonitoringOddsChange.Add(onOddsChange);
+                                _messagesOnMonitoringDetailsOddsChange.Add(onOddsChange);
+                            }
+                            break;
+                        case "OnBetStopFixture":
+                            var onBetStop = JsonSerializer.Deserialize<IncomingBetStopFixtureMessage>(payload);
+                            break;
+                        case "OnBetStopGlobal":
+                            var onBetStopGlobal = JsonSerializer.Deserialize<IncomingBetStopGlobalMessage>(payload);
+                            break;
+                        case "OnNewNotification":
+                            var notificationsModel = JsonSerializer.Deserialize<NotificationsDetailsModel>(payload);
+                            break;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+                catch (Exception ex)
+                {
+                    _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+                    activity.SetStatus(ActivityStatusCode.Error, ex.Message);
+                }
             }
         }
 
@@ -157,6 +183,20 @@ namespace Backoffice.WebSocket.Service
                 var message = _messagesNotification.Take();
                 await _sportsbookService.ProcessNotification(message, _hubConnection);
             }
+        }
+
+        private IEnumerable<string> ExtractTraceFromBasicProperties(IBasicProperties props, string key)
+        {
+            try
+            {
+                if (props.Headers.TryGetValue(key, out var value))
+                {
+                    var bytes = value as byte[];
+                    return new[] { Encoding.UTF8.GetString(bytes) };
+                }
+            }
+            catch (Exception) {}
+            return Enumerable.Empty<string>();
         }
     }
 }

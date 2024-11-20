@@ -19,9 +19,11 @@ namespace Backoffice.WebSocket.Service.Telemetry
       string? version = "latest";
       this.ActivitySource = new ActivitySource(ActivitySourceName, version);
       this.meter = new Meter(MeterName, version);
+      ReceivedMessagesCounter = meter.CreateCounter<long>("received.messages", "count", "Number of processed messages");
     }
 
     public ActivitySource ActivitySource { get; }
+    public Counter<long> ReceivedMessagesCounter { get; }
 
     public void Dispose()
     {
