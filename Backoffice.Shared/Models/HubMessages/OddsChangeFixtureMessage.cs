@@ -28,6 +28,8 @@ namespace Backoffice.Shared.Models.HubMessages
         public int CurrentMinute { get; set; }
         public int SortOrder { get; set; }
         public int FixtureTypeId { get; set; }
+        public List<int> BetStop {  get; set; }
+        public bool IsBetStopGlobal { get; set; }
         public long UnixTime { get; set; }
         public List<OddsChangeMarket> Markets { get; set; } = new List<OddsChangeMarket>();
     }
@@ -58,6 +60,7 @@ namespace Backoffice.Shared.Models.HubMessages
     }
     public class OddsChangeSelection
     {
+        public string ProviderSelectionId { get; set; }
         public long SelectionId { get; set; }
         public string SelectionTemplateId { get; set; }
         public string SelectionName { get; set; }
@@ -73,6 +76,7 @@ namespace Backoffice.Shared.Models.HubMessages
         public string ClientMargin { get; set; }
         public decimal Odds { get; set; }
         public string SelectionTemplateId { get; set; }
+        public string SelectionSpecifier { get; set; }
         public string SelectionName { get; set; }
         public long SelectionId { get; set; }
         public bool IsActive { get; set; }

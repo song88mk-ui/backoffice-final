@@ -172,7 +172,7 @@ namespace Backoffice.API.Repositories
                         Message = ex.Message.ToString()
                     };
                 }
-            } // using
+            }
         }
 
         public async Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request, List<string> clientCodes)

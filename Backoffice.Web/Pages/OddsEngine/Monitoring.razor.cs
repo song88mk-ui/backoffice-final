@@ -2,7 +2,6 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.HubMessages;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Backoffice.Web.States;
@@ -11,9 +10,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
 using System.Diagnostics;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -353,8 +350,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task ProcessOddsChange(OddsChangeFixtureMessage message)
         {
-            Debug.WriteLine($" ==> Message Received: {message.FixtureId} - {message.FixtureName}");
-
             if (_fixtureMarkets == null)
                 return;
 
@@ -364,104 +359,29 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (message.FixtureTypeId != (int)FixtureType.Match)
                 return;
 
-            if (!message.Markets.Any(s => s.MarketTemplateId == _monitoringCallbackModel.SelectedMarketTemplateId))
-                return;
-
-            var currentFixture = _fixtureMarkets.FirstOrDefault(c => c.ProviderFixtureId == message.ProviderFixtureId);
-
-            if (currentFixture != null)
+            if (message.FixtureStatusId > (int)FixtureStatus.Live)
             {
-                currentFixture.BetStop = new List<int>();
-                currentFixture.CurrentPeriod = message.CurrentPeriod;
-                currentFixture.CurrentMinute = message.CurrentMinute.ToString();
-                currentFixture.Score = message.Score;
-                currentFixture.FixtureStatusId = message.FixtureStatusId;
-                currentFixture.UnixTime = message.UnixTime;
+                var fixture = _fixtureMarkets.FirstOrDefault(c => c.ProviderFixtureId == message.ProviderFixtureId);
 
-                if (currentFixture.FixtureStatusId > (int)FixtureStatus.Live)
-                {
-                    _fixtureMarkets.Remove(currentFixture);
-                }
-                else
-                {
-                    foreach (var newMarket in message.Markets.Where(c => c.MarketTemplateId == _monitoringCallbackModel.SelectedMarketTemplateId))
-                    {
-                        var selectionIds = newMarket.Selections.Select(s => s.SelectionTemplateId).Distinct().ToList();
-
-                        var providerMarketId = $"{currentFixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newMarket.MarketSpecifier}";
-                        var currentMarket = _fixtureMarkets.FirstOrDefault(c => c.ProviderFixtureId == message.ProviderFixtureId && c.ProviderMarketId == providerMarketId);
-
-                        if (currentMarket != null)
-                        {
-                            currentMarket.MarketStatusId = newMarket.MarketStatusId;
-                            //currentMarket.MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString();
-                            currentMarket.ClientCode = newMarket.ClientCode;
-                            currentMarket.ClientCodeMargin = newMarket.ClientCodeMargin;
-                            currentMarket.UnixTime = newMarket.UnixTime;
-
-                            foreach (var newSelection in newMarket.Selections)
-                            {
-                                var providerSelectionId = $"{currentFixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newSelection.SelectionTemplateId}:{newMarket.MarketSpecifier}";
-                                var currentSelection = currentMarket.Selections.FirstOrDefault(c => c.ProviderSelectionId == providerSelectionId);
-
-                                var clientOdds = new List<ClientOddsModel>();
-                                foreach (var client in newMarket.ClientSelections)
-                                {
-                                    var clientSelection = client.Selections.FirstOrDefault(c => c.SelectionId == newSelection.SelectionId);
-                                    clientOdds.Add(new ClientOddsModel()
-                                    {
-                                        ClientCode = client.ClientCode,
-                                        Odds = clientSelection?.DecimalOdds ?? -99,
-                                        SelectionTemplateId = newSelection.SelectionTemplateId,
-                                        SelectionId = newSelection.SelectionId
-                                    });
-                                }
-
-                                if (currentSelection != null)
-                                {
-                                    if (newMarket.ClientCodeMargins == null)
-                                        return;
-
-                                    if (newSelection.IsActive)
-                                    {
-                                        currentSelection.DecimalOdds = CommonService.GetFinalOdds(newSelection.DecimalOdds).ToString("0.00");
-                                        currentSelection.IsActive = newSelection.IsActive;
-                                        currentSelection.CorrelationId = Guid.NewGuid().ToString();
-                                        currentSelection.ClientOdds = clientOdds;
-                                        currentSelection.UnixTime = newSelection.UnixTime;
-                                        //currentSelection.ClientOdds = currentMarket.ClientCode != null ? currentMarket.ClientCode.Split.Select(s =>
-                                        //    new ClientOddsModel
-                                        //    {
-                                        //        ClientCode = s.ClientCode,
-                                        //        SelectionTemplateId = s.SelectionTemplateId,
-                                        //        Odds = s.DecimalOdds,
-                                        //        OldOdds = currentSelection.ClientOdds != null && currentSelection.ClientOdds.Any(c => c.ClientCode == s.ClientCode) ?
-                                        //                    currentSelection.ClientOdds?.FirstOrDefault(c => c.ClientCode == s.ClientCode)?.Odds ?? s.DecimalOdds : s.DecimalOdds
-                                        //    }).ToList() : new List<ClientOddsModel>();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                _shouldRender = true;
-                await InvokeAsync(StateHasChanged);
+                if (fixture != null)
+                    _fixtureMarkets.Remove(fixture);
             }
-            else if (message.FixtureStatusId < (int)FixtureStatus.Suspended)
+            else
             {
-                var markets = message.Markets.Where(c => c.MarketTemplateId == _monitoringCallbackModel.SelectedMarketTemplateId).ToList();
+                var isReOrder = false;
+                var monitoringFixture = _fixtureMarkets.FirstOrDefault(c => c.ProviderFixtureId == message.ProviderFixtureId);
 
-                if (markets != null && markets.Any() && markets.Count > 0)
+                if (monitoringFixture == null)
                 {
-                    Parallel.ForEach(markets, market =>
+                    isReOrder = true;
+                    foreach (var newMarket in message.Markets.Where(c => c.MarketTemplateId == _monitoringCallbackModel.SelectedMarketTemplateId))
                     {
                         var selections = new List<SelectionModel>();
 
-                        foreach (var newSelection in market.Selections)
+                        foreach (var newSelection in newMarket.Selections)
                         {
                             var clientOdds = new List<ClientOddsModel>();
-                            foreach (var client in market.ClientSelections)
+                            foreach (var client in newMarket.ClientSelections)
                             {
                                 var clientSelection = client.Selections.FirstOrDefault(c => c.SelectionId == newSelection.SelectionId);
                                 clientOdds.Add(new ClientOddsModel()
@@ -476,8 +396,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                             selections.Add(new SelectionModel()
                             {
                                 SelectionId = newSelection.SelectionId.ToString(),
-                                ProviderSelectionId = $"{message.ProviderFixtureId}:{market.MarketTemplateId}:{newSelection.SelectionTemplateId}:{market.MarketSpecifier}",
-                                //OldDecimalOdds = CommonService.GetFinalOdds(s.DecimalOdds).ToString("0.00"),
+                                ProviderSelectionId = $"{message.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newSelection.SelectionTemplateId}:{newMarket.MarketSpecifier}",
                                 DecimalOdds = CommonService.GetFinalOdds(newSelection.DecimalOdds).ToString("0.00"),
                                 IsActive = newSelection.IsActive,
                                 SelectionName = newSelection.SelectionName,
@@ -488,43 +407,158 @@ namespace Backoffice.Web.Pages.OddsEngine
                             });
                         }
 
-                        var fixture = new FixtureMarketModel()
+                        _fixtureMarkets.Add(new FixtureMarketModel()
                         {
-                            ProviderFixtureId = message.ProviderFixtureId,
                             FixtureName = message.FixtureName,
-                            HomeName = CommonService.GetHomeName(message.FixtureName, (FixtureType)message.FixtureTypeId),
-                            AwayName = CommonService.GetAwayName(message.FixtureName, (FixtureType)message.FixtureTypeId),
-                            CurrentPeriod = message.CurrentPeriod,
+                            MarketId = newMarket.MarketId,
+                            ClientCode = newMarket.ClientCode,
+                            ClientCodeMargin = newMarket.ClientCodeMargin,
+                            MarketName = newMarket.MarketName,
+                            ProviderMarketId = newMarket.ProviderMarketId,
+                            ProviderFixtureId = message.ProviderFixtureId,
+                            AwayName = message.AwayName,
+                            BetStop = message.BetStop ?? new List<int>(),
                             CurrentMinute = message.CurrentMinute.ToString(),
-                            FixtureStatusId = message.FixtureStatusId,
+                            CurrentPeriod = message.CurrentPeriod,
                             FixtureStartDate = message.FixtureStartDate,
-                            BetStop = new List<int>(),
+                            FixtureStatusId = message.FixtureStatusId,
+                            HomeName = message.HomeName,
+                            IsBetStopGlobal = message.IsBetStopGlobal,
                             Score = message.Score,
-                            Line = market.Line,
-                            MarketName = market.MarketName,
-                            MarketTemplateId = market.MarketTemplateId,
-                            ProviderMarketId = $"{message.ProviderFixtureId}:{market.MarketTemplateId}:{market.MarketSpecifier}",
-                            //MarketSpecifier = m.MarketSpecifier,
-                            MarketStatusId = market.MarketStatusId,
-                            //MarketStatusName = ((MarketStatus)m.MarketStatusId).ToString(),
-                            MarketId = market.MarketId.ToString(),
-                            ClientCode = market.ClientCode,
-                            ClientCodeMargin = market.ClientCodeMargin,
+                            Line = newMarket.Line,
+                            MarketStatusId = newMarket.MarketStatusId,
                             CorrelationId = Guid.NewGuid().ToString(),
-                            UnixTime = market.UnixTime,
+                            UnixTime = newMarket.UnixTime,
                             Selections = selections
-                        };
+                        });
+                    }
+                }
+                else
+                {
+                    isReOrder = monitoringFixture.FixtureStatusId != message.FixtureStatusId && message.FixtureStatusId == (int)FixtureStatus.Live;
 
-                        _fixtureMarkets.Add(fixture);
-                    });
+                    monitoringFixture.BetStop = new List<int>();
+                    monitoringFixture.CurrentPeriod = message.CurrentPeriod;
+                    monitoringFixture.CurrentMinute = message.CurrentMinute.ToString();
+                    monitoringFixture.Score = message.Score;
+                    monitoringFixture.FixtureStatusId = message.FixtureStatusId;
+                    monitoringFixture.UnixTime = message.UnixTime;
 
-                    _fixtureMarkets = _fixtureMarkets.OrderByDescending(o => o.FixtureStatusId).ThenBy(o => o.FixtureStartDate).ThenBy(o => o.FixtureName).ToList();
+                    foreach (var newMarket in message.Markets.Where(c => c.MarketTemplateId == _monitoringCallbackModel.SelectedMarketTemplateId))
+                    {
+                        var selectionIds = newMarket.Selections.Select(s => s.SelectionTemplateId).Distinct().ToList();
+
+                        var providerMarketId = $"{monitoringFixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newMarket.MarketSpecifier}";
+                        var monitoringMarket = _fixtureMarkets.FirstOrDefault(c => c.ProviderFixtureId == message.ProviderFixtureId && c.ProviderMarketId == providerMarketId);
+
+                        if (monitoringMarket == null)
+                        {
+                            var selections = new List<SelectionModel>();
+
+                            foreach (var newSelection in newMarket.Selections)
+                            {
+                                var clientOdds = new List<ClientOddsModel>();
+                                foreach (var client in newMarket.ClientSelections)
+                                {
+                                    var clientSelection = client.Selections.FirstOrDefault(c => c.SelectionId == newSelection.SelectionId);
+                                    clientOdds.Add(new ClientOddsModel()
+                                    {
+                                        ClientCode = client.ClientCode,
+                                        Odds = clientSelection?.DecimalOdds ?? -99,
+                                        SelectionTemplateId = newSelection.SelectionTemplateId,
+                                        SelectionId = newSelection.SelectionId
+                                    });
+                                }
+
+                                selections.Add(new SelectionModel()
+                                {
+                                    SelectionId = newSelection.SelectionId.ToString(),
+                                    ProviderSelectionId = $"{message.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newSelection.SelectionTemplateId}:{newMarket.MarketSpecifier}",
+                                    DecimalOdds = CommonService.GetFinalOdds(newSelection.DecimalOdds).ToString("0.00"),
+                                    IsActive = newSelection.IsActive,
+                                    SelectionName = newSelection.SelectionName,
+                                    SelectionTemplateId = newSelection.SelectionTemplateId,
+                                    SortOrder = newSelection.SortOrder,
+                                    UnixTime = newSelection.UnixTime,
+                                    ClientOdds = clientOdds
+                                });
+                            }
+
+                            _fixtureMarkets.Add(new FixtureMarketModel()
+                            {
+                                FixtureName = message.FixtureName,
+                                MarketId = newMarket.MarketId,
+                                ClientCode = newMarket.ClientCode,
+                                ClientCodeMargin = newMarket.ClientCodeMargin,
+                                MarketName = newMarket.MarketName,
+                                ProviderMarketId = newMarket.ProviderMarketId,
+                                ProviderFixtureId = message.ProviderFixtureId,
+                                AwayName = message.AwayName,
+                                BetStop = message.BetStop ?? new List<int>(),
+                                CurrentMinute = message.CurrentMinute.ToString(),
+                                CurrentPeriod = message.CurrentPeriod,
+                                FixtureStartDate = message.FixtureStartDate,
+                                FixtureStatusId = message.FixtureStatusId,
+                                HomeName = message.HomeName,
+                                IsBetStopGlobal = message.IsBetStopGlobal,
+                                Score = message.Score,
+                                Line = newMarket.Line,
+                                MarketStatusId = newMarket.MarketStatusId,
+                                CorrelationId = Guid.NewGuid().ToString(),
+                                UnixTime = newMarket.UnixTime,
+                                Selections = selections
+                            });
+                        }
+                        if (monitoringMarket != null)
+                        {
+                            monitoringMarket.MarketStatusId = newMarket.MarketStatusId;
+                            monitoringMarket.ClientCode = newMarket.ClientCode;
+                            monitoringMarket.ClientCodeMargin = newMarket.ClientCodeMargin;
+                            monitoringMarket.UnixTime = newMarket.UnixTime;
+
+                            foreach (var newSelection in newMarket.Selections)
+                            {
+                                var providerSelectionId = $"{monitoringFixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newSelection.SelectionTemplateId}:{newMarket.MarketSpecifier}";
+                                var selection = monitoringMarket.Selections.FirstOrDefault(c => c.ProviderSelectionId == providerSelectionId);
+
+                                var clientOdds = new List<ClientOddsModel>();
+                                foreach (var client in newMarket.ClientSelections)
+                                {
+                                    var clientSelection = client.Selections.FirstOrDefault(c => c.SelectionId == newSelection.SelectionId);
+                                    clientOdds.Add(new ClientOddsModel()
+                                    {
+                                        ClientCode = client.ClientCode,
+                                        Odds = clientSelection?.DecimalOdds ?? -99,
+                                        SelectionTemplateId = newSelection.SelectionTemplateId,
+                                        SelectionId = newSelection.SelectionId
+                                    });
+                                }
+
+                                if (selection != null)
+                                {
+                                    if (newMarket.ClientCodeMargins == null)
+                                        return;
+
+                                    if (newSelection.IsActive)
+                                    {
+                                        selection.DecimalOdds = CommonService.GetFinalOdds(newSelection.DecimalOdds).ToString("0.00");
+                                        selection.IsActive = newSelection.IsActive;
+                                        selection.CorrelationId = Guid.NewGuid().ToString();
+                                        selection.ClientOdds = clientOdds;
+                                        selection.UnixTime = newSelection.UnixTime;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
-                _shouldRender = true;
-                await InvokeAsync(StateHasChanged);
+                if (isReOrder)
+                    _fixtureMarkets = _fixtureMarkets.OrderByDescending(o => o.FixtureStatusId).ThenBy(o => o.FixtureStartDate).ThenBy(o => o.FixtureName).ToList();
             }
 
+            _shouldRender = true;
+            await InvokeAsync(StateHasChanged);
         }
 
         private async Task ProcessBetStopFixture(BetStopFixtureMessage message)
