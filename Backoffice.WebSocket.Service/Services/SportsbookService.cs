@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
 namespace Backoffice.WebSocket.Service.Services
 {

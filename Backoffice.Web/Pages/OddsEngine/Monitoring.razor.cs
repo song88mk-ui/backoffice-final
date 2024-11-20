@@ -437,7 +437,6 @@ namespace Backoffice.Web.Pages.OddsEngine
                 {
                     isReOrder = monitoringFixture.FixtureStatusId != message.FixtureStatusId && message.FixtureStatusId == (int)FixtureStatus.Live;
 
-                    monitoringFixture.BetStop = new List<int>();
                     monitoringFixture.CurrentPeriod = message.CurrentPeriod;
                     monitoringFixture.CurrentMinute = message.CurrentMinute.ToString();
                     monitoringFixture.Score = message.Score;
@@ -509,7 +508,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 Selections = selections
                             });
                         }
-                        if (monitoringMarket != null)
+                        else if (monitoringMarket != null)
                         {
                             monitoringMarket.MarketStatusId = newMarket.MarketStatusId;
                             monitoringMarket.ClientCode = newMarket.ClientCode;
@@ -565,12 +564,11 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (_fixtureMarkets != null && _fixtureMarkets.Any())
             {
-                var currentFixture = _fixtureMarkets?.FirstOrDefault(c => c.ProviderFixtureId == message.ProviderFixtureId && c.MarketTemplateId == _monitoringCallbackModel.SelectedMarketTemplateId);
+                var currentFixture = _fixtureMarkets.Where(c => c.ProviderFixtureId == message.ProviderFixtureId).ToList();
 
                 if (currentFixture != null)
                 {
-                    var fixtureMarkets = _fixtureMarkets?.Where(c => c.ProviderFixtureId == message.ProviderFixtureId).ToList() ?? new List<FixtureMarketModel>();
-                    fixtureMarkets.ForEach(c =>
+                    currentFixture.ForEach(c =>
                     {
                         c.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>();
                         c.CorrelationId = Guid.NewGuid().ToString();

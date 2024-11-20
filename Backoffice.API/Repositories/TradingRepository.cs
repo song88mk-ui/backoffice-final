@@ -410,6 +410,10 @@ namespace Backoffice.API.Repositories
             {
                 var response = await GetHttpClient(region, langCode).GetAsync($"fixtures2/market/details/{providerFixtureId}");
 
+                // Get the response size in bytes
+                //var content = await response.Content.ReadAsStringAsync();
+                //var responseSize = Encoding.UTF8.GetByteCount(content) / (1024.0 * 1024.0);
+                //Console.WriteLine($"Response Size: {responseSize} bytes");
                 if (response.IsSuccessStatusCode)
                     return JsonSerializer.Deserialize<BaseResponse<MarketFixtureDetailResponse>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 else

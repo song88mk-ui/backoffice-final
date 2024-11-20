@@ -2,7 +2,6 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.HubMessages;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using Backoffice.Web.Components.OddsEngine.MonitoringDetails;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -10,7 +9,6 @@ using Backoffice.Web.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
-using System.Threading.Channels;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -55,12 +53,14 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool _isPlayerProps;
         private List<Client>? _clients;
         private LanguageCode _languageCode;
-        private bool _isInit;
         private string _id;
         private int _colCtr = 3;
         private MarketGroupNavigationModel _navigationModel;
 
         private List<string> _channels = new List<string>();
+
+        private bool _shouldRender = true;
+        private bool _init = true;
 
         #endregion
 
@@ -80,7 +80,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             FixtureMarketTemplates = new List<FixtureMarketModel>();
             MarketTemplateNavigation = new List<MarketNavigationModel2>();
             MarginMarket = new MarketModel();
-            _isInit = true;
 
             await _hubService.InitializeOeMessageHandlers(
                 ProcessOddsChangeMonitoring,
@@ -93,6 +92,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            _shouldRender = false;
+
             if (firstRender)
             {
                 try
@@ -112,22 +113,24 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         protected override async Task OnParametersSetAsync()
         {
-            if (_isInit || _languageCode != _translationState.ActiveLanguageCode || Id != _id)
+            _shouldRender = ValidateParameters();
+            if (_shouldRender)
             {
                 _isPreLoader = true;
                 _id = Id;
+                if (_languageCode != _translationState.ActiveLanguageCode)
+                    await PrepareMonitoringDetails();
+
                 _languageCode = _translationState.ActiveLanguageCode;
 
-                await PrepareMonitoringDetails();
-
                 _isPreLoader = false;
-                _isInit = false;
+                _init = false;
             }
         }
-
         public async Task OnMarketChangedEvent(string marketTemplateId)
         {
             _isPreLoader = true;
+            _shouldRender = true;
 
             if (_languageCode != _translationState.ActiveLanguageCode)
             {
@@ -150,6 +153,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             FixtureMarkets = await PrepareFixtureMarkets(markets);
 
             MarginMarket = markets.FirstOrDefault(f => f.MarketStatusId == (int)MarketStatus.Active) ?? markets.FirstOrDefault() ?? new();
+            _shouldRender = true;
             _isPreLoader = false;
         }
         public void OnCloseMarkeEvent()
@@ -235,22 +239,28 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                 _colCtr = 3 + _clients.Count();
             }
+
+            _shouldRender = true;
         }
 
         public async Task OnInputSearchEvent(string search)
         {
             _isMatchSelectionPreLoad = true;
+            _shouldRender = true;
             Search = search;
 
             var selectedNavigation = MarketTemplateNavigation.FirstOrDefault(c => c.IsSelected);
 
             FixtureMarketTemplates = await PrepareFixtureMarketTemplates(selectedNavigation.MarketTemplateId);
+
+            _shouldRender = true;
             _isMatchSelectionPreLoad = false;
         }
 
         public async Task OnMarketTemplateGroupClickEvent(MarketGroupNavigationModel model)
         {
             _isMatchSelectionPreLoad = true;
+            _shouldRender = true;
             _navigationModel = model;
 
             var marketTemplateIds = model.MarketTemplateGroup.MarketTemplateIds;
@@ -272,8 +282,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (selectedMarket != null)
                 await OnMarketClickEvent(selectedMarket.MarketId);
-            else
-                _isMatchSelectionPreLoad = false;
+
+            _shouldRender = true;
+            _isMatchSelectionPreLoad = false;
         }
 
         public async Task OnMarketClickEvent(string marketId)
@@ -300,6 +311,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Opacity = Opacity
             });
 
+            _shouldRender = true;
         }
 
         public async ValueTask DisposeAsync()
@@ -322,6 +334,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         #region Utilities
 
+        private bool ValidateParameters() => _init || _languageCode != _translationState.ActiveLanguageCode || Id != _id;
         private async Task PrepareMonitoringDetails()
         {
             var marketFixtureResponse = await BackofficeService.GetMarketFixtureDetails(Id, _languageCode);
@@ -605,6 +618,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                     FixtureMarketTemplates = await PrepareFixtureMarketTemplates(selectedNavigation.MarketTemplateId);
                 }
 
+
+                _shouldRender = true;
                 await InvokeAsync(StateHasChanged);
             }
         }
@@ -621,6 +636,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 m.BetStop = message.IsBetStop ? new List<int>() { 1 } : new List<int>();
             });
 
+            _shouldRender = true;
             await InvokeAsync(StateHasChanged);
         }
 
@@ -636,6 +652,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 m.IsBetStopGlobal = message.IsBetStop;
             });
 
+            _shouldRender = true;
             await InvokeAsync(StateHasChanged);
         }
 

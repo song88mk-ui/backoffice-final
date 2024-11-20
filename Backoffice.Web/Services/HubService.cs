@@ -79,7 +79,10 @@ namespace Backoffice.Web.Services
         public async Task SubscribeToChannel(string key)
         {
             if (_hubConnection.State != HubConnectionState.Connected)
+            {
+                _channels.Add(key);
                 return;
+            }
 
             if (_channels.Contains(key))
                 return;
@@ -93,7 +96,10 @@ namespace Backoffice.Web.Services
         public async Task UnSubscribeToChannel(string key)
         {
             if (_hubConnection.State != HubConnectionState.Connected)
+            {
+                _channels.Remove(key);
                 return;
+            }
 
             if (!_channels.Contains(key))
                 return;
