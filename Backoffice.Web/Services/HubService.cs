@@ -41,13 +41,13 @@ namespace Backoffice.Web.Services
                     await SubscribeToChannel(channel);
                 }
 
+                await SubscribeToChannel("onbetstopglobal");
                 Log.Information($"HubConnection Reconnected with Connection ID: {connectionId}");
             };
 
             try
             {
-
-                _hubConnection.StartAsync().ContinueWith(task =>
+                _hubConnection.StartAsync().ContinueWith(async task =>
                 {
                     if (task.IsFaulted)
                     {
@@ -57,6 +57,8 @@ namespace Backoffice.Web.Services
                     {
                         var connectionId = _hubConnection.ConnectionId?.ToString();
                         Log.Information($"HubConnection Connected with Connection ID: {connectionId}");
+
+                        await SubscribeToChannel("onbetstopglobal");
                     }
                 });
             }
@@ -109,9 +111,6 @@ namespace Backoffice.Web.Services
             Func<BetStopFixtureMessage, Task> processOnBetStopFixture,
             Func<BetStopGlobalMessage, Task> processOnBetStopGlobal)
         {
-            if (_hubConnection.State != HubConnectionState.Connected)
-                return;
-
             _hubConnection.On<OddsChangeFixtureMessage>("OnOddsChange", async message
                 => await processOddsChangeMonitoring(message));
 
@@ -120,8 +119,6 @@ namespace Backoffice.Web.Services
 
             _hubConnection.On<BetStopGlobalMessage>("OnBetStopGlobal", async message
                 => await processOnBetStopGlobal(message));
-
-            await SubscribeToChannel("onbetstopglobal");
         }
         public async ValueTask DisposeAsync()
         {
