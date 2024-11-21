@@ -2,9 +2,12 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.HubMessages;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
+using MessagePack.Resolvers;
+using MessagePack;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Connections;
 
 namespace Backoffice.Web.Services
 {
@@ -19,11 +22,23 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                // Default message pack
                 _hubConnection = new HubConnectionBuilder()
-                .WithUrl(new Uri(configuration["API:HubAPI"]))
-                .WithAutomaticReconnect()
-                .Build();
+                                .WithUrl(configuration["API:HubAPI"], options =>
+                                {
+                                    options.SkipNegotiation = true;
+                                    options.Transports = HttpTransportType.WebSockets;
+                                })
+                                .AddMessagePackProtocol(options =>
+                                {
+                                    StaticCompositeResolver.Instance.Register(
+                                        ContractlessStandardResolver.Instance
+                                    );
+                                    options.SerializerOptions = MessagePackSerializerOptions.Standard
+                                        .WithResolver(ContractlessStandardResolver.Instance)
+                                        .WithSecurity(MessagePackSecurity.UntrustedData);
+                                })
+                                .WithAutomaticReconnect()
+                                .Build();
 
                 _hubConnection.Closed += async (error) =>
                 {

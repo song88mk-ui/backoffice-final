@@ -3,8 +3,12 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Backoffice.WebSocket.Service.Services;
 using Backoffice.WebSocket.Service.Telemetry;
+using MessagePack;
+using MessagePack.Resolvers;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry;
@@ -52,9 +56,21 @@ namespace Backoffice.WebSocket.Service
             _logger = logger;
             _sportsbookService = sportsbookService;
 
-            // Default message pack
             _hubConnection = new HubConnectionBuilder()
-                                .WithUrl(configuration["Custom:WebSocketAPI"])
+                                .WithUrl(configuration["Custom:WebSocketAPI"], options =>
+                                {
+                                    options.SkipNegotiation = true;
+                                    options.Transports = HttpTransportType.WebSockets;
+                                })
+                                .AddMessagePackProtocol(options =>
+                                {
+                                    StaticCompositeResolver.Instance.Register(
+                                        ContractlessStandardResolver.Instance
+                                    );
+                                    options.SerializerOptions = MessagePackSerializerOptions.Standard
+                                        .WithResolver(ContractlessStandardResolver.Instance)
+                                        .WithSecurity(MessagePackSecurity.UntrustedData);
+                                })
                                 .WithAutomaticReconnect()
                                 .Build();
             _messageBroker = messageBroker;
@@ -109,7 +125,7 @@ namespace Backoffice.WebSocket.Service
                 var messageType = e.BasicProperties.Type;
                 var correlationId = e.BasicProperties.CorrelationId;
 
-                activity.SetTag("message.type", messageType);
+                activity?.SetTag("message.type", messageType);
                 if (_receivedMessagesCounter.Enabled)
                     _receivedMessagesCounter.Add(1);
 
@@ -142,7 +158,7 @@ namespace Backoffice.WebSocket.Service
                 catch (Exception ex)
                 {
                     _logger.LogError($"{ex.Message} - {ex.StackTrace}");
-                    activity.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 }
             }
         }
