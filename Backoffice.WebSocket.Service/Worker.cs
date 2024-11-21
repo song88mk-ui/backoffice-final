@@ -128,9 +128,11 @@ namespace Backoffice.WebSocket.Service
                             break;
                         case "OnBetStopFixture":
                             var onBetStop = JsonSerializer.Deserialize<IncomingBetStopFixtureMessage>(payload);
+                            _messagesOnBetStopFixture.Add(onBetStop);
                             break;
                         case "OnBetStopGlobal":
                             var onBetStopGlobal = JsonSerializer.Deserialize<IncomingBetStopGlobalMessage>(payload);
+                            _messagesOnBetStopGlobal.Add(onBetStopGlobal);
                             break;
                         case "OnNewNotification":
                             var notificationsModel = JsonSerializer.Deserialize<NotificationsDetailsModel>(payload);
