@@ -59,7 +59,6 @@ namespace Backoffice.WebSocket.Service
             _hubConnection = new HubConnectionBuilder()
                                 .WithUrl(configuration["Custom:WebSocketAPI"], options =>
                                 {
-                                    options.SkipNegotiation = true;
                                     options.Transports = HttpTransportType.WebSockets;
                                 })
                                 .AddMessagePackProtocol(options =>

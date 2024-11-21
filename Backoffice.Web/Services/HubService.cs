@@ -25,8 +25,7 @@ namespace Backoffice.Web.Services
                 _hubConnection = new HubConnectionBuilder()
                                 .WithUrl(configuration["API:HubAPI"], options =>
                                 {
-                                    options.SkipNegotiation = true;
-                                    options.Transports = HttpTransportType.WebSockets;
+                                    options.Transports = HttpTransportType.WebSockets | HttpTransportType.LongPolling;
                                 })
                                 .AddMessagePackProtocol(options =>
                                 {

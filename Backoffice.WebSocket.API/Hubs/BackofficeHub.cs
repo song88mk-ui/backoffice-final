@@ -10,7 +10,6 @@ namespace Backoffice.WebSocket.API.Hubs
     {
         public async Task SubscribeToChannel(string request) => await Groups.AddToGroupAsync(Context.ConnectionId, request.ToLower());
         public async Task UnSubscribeToChannel(string request) => await Groups.RemoveFromGroupAsync(Context.ConnectionId, request.ToLower());
-        //public async Task PublishOddsChange(OutgoingOddsChangeMessage payload) => await Clients.Groups(payload.Gr).OnOddsChange(payload.Pa);
         public async Task PublishOddsChange(OutgoingOddsChangeMessage payload) => await Clients.Groups(payload.Gr).OnOddsChange(payload.Pa);
         public async Task PublishBetStopFixture(OutgoingBetStopFixtureMessage payload) => await Clients.Groups(payload.Gr).OnBetStopFixture(payload.Pa);
         public async Task PublishBetStopGlobal(OutgoingBetStopGlobalMessage payload) => await Clients.Groups($"onbetstopglobal").OnBetStopGlobal(payload.Pa);

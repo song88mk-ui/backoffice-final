@@ -281,20 +281,20 @@ namespace Backoffice.Web.Pages.OddsEngine
             var selectedMarket = MarketTemplateNavigation.FirstOrDefault(c => c.IsSelected);
 
             if (selectedMarket != null)
-                await OnMarketClickEvent(selectedMarket.MarketId);
+                await OnMarketClickEvent(new MonitoringDetailsMarketTemplateSelectionModel() { MarketId = selectedMarket.MarketTemplateId, MarketName = selectedMarket.MarketName });
 
             _shouldRender = true;
             _isMatchSelectionPreLoad = false;
         }
 
-        public async Task OnMarketClickEvent(string marketId)
+        public async Task OnMarketClickEvent(MonitoringDetailsMarketTemplateSelectionModel filter)
         {
             if (!_isMatchSelectionPreLoad)
             {
                 _isMatchSelectionPreLoad = true;
             }
 
-            var markets = Fixture.Markets.Where(c => c.MarketId == marketId).ToList();
+            var markets = Fixture.Markets.Where(c => c.MarketTemplateId == filter.MarketId && c.MarketName == filter.MarketName).ToList();
             FixtureMarketTemplates = await PrepareFixtureMarkets(markets);
             _isMatchSelectionPreLoad = false;
         }

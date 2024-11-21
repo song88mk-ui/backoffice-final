@@ -10,7 +10,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         #region Properties
 
         [Parameter] public List<MarketNavigationModel2> MarketTemplates { get; set; }
-        [Parameter] public EventCallback<string> OnMarketClickCallback { get; set; }
+        [Parameter] public EventCallback<MonitoringDetailsMarketTemplateSelectionModel> OnMarketClickCallback { get; set; }
 
         #endregion
 
@@ -38,7 +38,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
                         model.IsSelected = true;
 
-                        await OnMarketClickCallback.InvokeAsync(model.MarketId);
+                        await OnMarketClickCallback.InvokeAsync(new MonitoringDetailsMarketTemplateSelectionModel() { MarketId = model.MarketTemplateId, MarketName = model.MarketName });
                     }
                 }
             }
@@ -59,7 +59,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
             model.IsSelected = true;
 
-            await OnMarketClickCallback.InvokeAsync(model.MarketId);
+            await OnMarketClickCallback.InvokeAsync(new MonitoringDetailsMarketTemplateSelectionModel() { MarketId = model.MarketTemplateId, MarketName = model.MarketName });
         }
 
         public void Dispose()
