@@ -59,6 +59,7 @@ namespace Backoffice.WebSocket.Service.Services
                 _logger.LogError($"{ex.Message} - {ex.StackTrace}");
             }
         }
+
         public async Task ProcessOnMonitoringDetailsOddsChange(IncomingOddsChangeMessage message, HubConnection hubConnection)
         {
             try
@@ -81,6 +82,7 @@ namespace Backoffice.WebSocket.Service.Services
                 _logger.LogError($"{ex.Message} - {ex.StackTrace}");
             }
         }
+
         public async Task ProcessOnBetStopFixture(IncomingBetStopFixtureMessage message, HubConnection hubConnection)
         {
             try
@@ -108,6 +110,7 @@ namespace Backoffice.WebSocket.Service.Services
                 _logger.LogError($"{ex.Message} - {ex.StackTrace}");
             }
         }
+
         public async Task ProcessOnBetStopGlobal(IncomingBetStopGlobalMessage message, HubConnection hubConnection)
         {
             try
@@ -130,6 +133,7 @@ namespace Backoffice.WebSocket.Service.Services
                 _logger.LogError($"{ex.Message} - {ex.StackTrace}");
             }
         }
+
         public async Task ProcessNotification(NotificationsDetailsModel message, HubConnection hubConnection)
         {
 
@@ -164,9 +168,6 @@ namespace Backoffice.WebSocket.Service.Services
 
                     foreach (var market in message.Markets)
                     {
-                        //if (string.IsNullOrEmpty(market.ClientCodes) || string.IsNullOrEmpty(market.ClientCodes))
-                        //    continue;
-
                         var selections = new List<OddsChangeSelection>();
                         var clientOdds = new Dictionary<string, List<OddsChangeClientOdds>>();
                         var margin = 0m;
@@ -207,7 +208,6 @@ namespace Backoffice.WebSocket.Service.Services
                                     SelectionId = selection.SelectionId,
                                     SelectionTemplateId = selection.SelectionTemplateId,
                                     SelectionName = selection.SelectionName,
-                                    //SelectionSpecifier = selection.SelectionSpecifier,
                                     DecimalOdds = selection.Odds,
                                     IsActive = selection.IsActive,
                                     SortOrder = selection.SortOrder,
@@ -222,7 +222,6 @@ namespace Backoffice.WebSocket.Service.Services
                                         SelectionId = oddsValue.SelectionId,
                                         SelectionTemplateId = oddsValue.SelectionTemplateId,
                                         SelectionName = oddsValue.SelectionName,
-                                        //SelectionSpecifier = oddsValue.SelectionSpecifier,
                                         DecimalOdds = oddsValue.Odds,
                                         IsActive = oddsValue.IsActive,
                                         SortOrder = oddsValue.SortOrder,
@@ -467,7 +466,12 @@ namespace Backoffice.WebSocket.Service.Services
 
             return result;
         }
-        private List<MarketTemplatePlayerPropsResponse> GetMarketTemplatePlayerProps() => _memCache.GetCache($"mtpp", async () => (await _sportsbookRepository.GetMarketTemplatePlayerProps()).Result.ToList(), (int)(DateTimeOffset.UtcNow - DateTimeOffset.UtcNow.AddYears(1)).TotalHours).Result;
+
+        private List<MarketTemplatePlayerPropsResponse> GetMarketTemplatePlayerProps()
+        {
+            return _memCache.GetCache($"mtpp", async () => (await _sportsbookRepository.GetMarketTemplatePlayerProps()).Result.ToList(), (int)(DateTimeOffset.UtcNow - DateTimeOffset.UtcNow.AddYears(1)).TotalHours).Result;
+        }
+
         private static decimal GetMasterOddsWithAddedMargin(decimal odds)
         {
             if (Math.Round(odds, 2) <= 1.01m)
@@ -475,8 +479,11 @@ namespace Backoffice.WebSocket.Service.Services
 
             return Math.Round(100 / ((100 / odds) + 2m), 2);
         }
+
         private static string GetHomeName(string name, FixtureType fixtureType) => fixtureType == FixtureType.Match ? name.Split(" vs. ").First().Trim() : string.Empty;
+
         private static string GetAwayName(string name, FixtureType fixtureType) => fixtureType == FixtureType.Match ? name.Split(" vs. ").Last().Trim() : string.Empty;
+
         private async Task PublishToWebSocket<T>(string method, HubConnection hubConnection, T payload)
         {
             try
@@ -498,6 +505,7 @@ namespace Backoffice.WebSocket.Service.Services
 
             return result;
         }
+
         private List<string> GetGroupForMonitoringDetailsMarkets(OddsChangeFixtureMessage message)
         {
             var result = new List<string>();
@@ -506,6 +514,7 @@ namespace Backoffice.WebSocket.Service.Services
 
             return result;
         }
+
         private List<string> GetGroupForBetStopFixture(IncomingBetStopFixtureMessage message)
         {
             var result = new List<string>();

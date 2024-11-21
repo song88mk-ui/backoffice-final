@@ -71,7 +71,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
             _slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
 
-            await _hubService.InitializeOeMessageHandlers(
+            await _hubService.RegisterMessageHandlers(
                 ProcessOddsChange,
                 ProcessBetStopFixture,
                 ProcessBetStopGlobal

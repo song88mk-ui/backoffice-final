@@ -1,10 +1,7 @@
-using Backoffice.WebSocket.API.Hubs;
 using Backoffice.WebSocket.API.Extensions;
+using Backoffice.WebSocket.API.Hubs;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +27,6 @@ app.MapHealthChecks("/healthz");
 app.MapHub<BackofficeHub>("/bohub", options => {
     options.ApplicationMaxBufferSize = 5000000;
     options.TransportMaxBufferSize = 5000000;
-    options.Transports = HttpTransportType.WebSockets;
+    options.Transports = HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling;
 });
 app.Run();

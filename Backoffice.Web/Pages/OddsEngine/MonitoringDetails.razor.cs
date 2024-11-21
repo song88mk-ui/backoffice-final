@@ -81,7 +81,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarketTemplateNavigation = new List<MarketNavigationModel2>();
             MarginMarket = new MarketModel();
 
-            await _hubService.InitializeOeMessageHandlers(
+            await _hubService.RegisterMessageHandlers(
                 ProcessOddsChangeMonitoring,
                 ProcessOnBetStopFixture,
                 ProcessOnBetStopGlobal

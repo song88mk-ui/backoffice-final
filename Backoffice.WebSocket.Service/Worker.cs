@@ -52,6 +52,7 @@ namespace Backoffice.WebSocket.Service
             _logger = logger;
             _sportsbookService = sportsbookService;
 
+            // Default message pack
             _hubConnection = new HubConnectionBuilder()
                                 .WithUrl(configuration["Custom:WebSocketAPI"])
                                 .WithAutomaticReconnect()

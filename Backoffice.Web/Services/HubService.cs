@@ -10,43 +10,46 @@ namespace Backoffice.Web.Services
 {
     public class HubService : IAsyncDisposable
     {
-        private HubConnection _hubConnection { get; set; }
         public string ConnectionId { get; private set; }
+
+        private HubConnection _hubConnection;
+        private List<string> _channels = new List<string>();
 
         public HubService(IConfiguration configuration)
         {
-            _hubConnection = new HubConnectionBuilder()
-                .WithUrl(new Uri(configuration["API:HubAPI"]))
-                .WithAutomaticReconnect()
-            .Build();
-
-            _hubConnection.Closed += async (error) =>
-            {
-                Log.Error($"HubConnection Closed: {error?.Message} - {error?.StackTrace}");
-            };
-
-            _hubConnection.Reconnecting += (error) =>
-            {
-                Log.Warning($"HubConnection Reconnecting: {error?.Message} - {error?.StackTrace}");
-                return Task.CompletedTask;
-            };
-
-            _hubConnection.Reconnected += async (connectionId) =>
-            {
-                var tempChannel = new List<string>(_channels);
-                _channels.Clear();
-
-                foreach (var channel in tempChannel)
-                {
-                    await SubscribeToChannel(channel);
-                }
-
-                await SubscribeToChannel("onbetstopglobal");
-                Log.Information($"HubConnection Reconnected with Connection ID: {connectionId}");
-            };
-
             try
             {
+                // Default message pack
+                _hubConnection = new HubConnectionBuilder()
+                .WithUrl(new Uri(configuration["API:HubAPI"]))
+                .WithAutomaticReconnect()
+                .Build();
+
+                _hubConnection.Closed += async (error) =>
+                {
+                    Log.Error($"HubConnection Closed: {error?.Message} - {error?.StackTrace}");
+                };
+
+                _hubConnection.Reconnecting += (error) =>
+                {
+                    Log.Warning($"HubConnection Reconnecting: {error?.Message} - {error?.StackTrace}");
+                    return Task.CompletedTask;
+                };
+
+                _hubConnection.Reconnected += async (connectionId) =>
+                {
+                    var tempChannel = new List<string>(_channels);
+                    _channels.Clear();
+
+                    foreach (var channel in tempChannel)
+                    {
+                        await SubscribeToChannel(channel);
+                    }
+
+                    await SubscribeToChannel("onbetstopglobal");
+                    Log.Information($"HubConnection Reconnected with Connection ID: {connectionId}");
+                };
+
                 _hubConnection.StartAsync().ContinueWith(async task =>
                 {
                     if (task.IsFaulted)
@@ -67,6 +70,7 @@ namespace Backoffice.Web.Services
                 Log.Error($"{ex.Message} - {ex.StackTrace}");
             }
         }
+
         public async Task OnNotificationReceived(Func<NotificationsModel, Task> processNotification)
         {
             if (_hubConnection.State != HubConnectionState.Connected)
@@ -75,7 +79,6 @@ namespace Backoffice.Web.Services
             _hubConnection.On("Notification", async (NotificationsModel message) => await processNotification(message));
         }
 
-        private List<string> _channels = new List<string>();
         public async Task SubscribeToChannel(string key)
         {
             if (_hubConnection.State != HubConnectionState.Connected)
@@ -93,6 +96,7 @@ namespace Backoffice.Web.Services
             );
             _channels.Add(key);
         }
+
         public async Task UnSubscribeToChannel(string key)
         {
             if (_hubConnection.State != HubConnectionState.Connected)
@@ -112,7 +116,7 @@ namespace Backoffice.Web.Services
             _channels.Remove(key);
         }
 
-        public async Task InitializeOeMessageHandlers(
+        public async Task RegisterMessageHandlers(
             Func<OddsChangeFixtureMessage, Task> processOddsChangeMonitoring,
             Func<BetStopFixtureMessage, Task> processOnBetStopFixture,
             Func<BetStopGlobalMessage, Task> processOnBetStopGlobal)
@@ -126,6 +130,7 @@ namespace Backoffice.Web.Services
             _hubConnection.On<BetStopGlobalMessage>("OnBetStopGlobal", async message
                 => await processOnBetStopGlobal(message));
         }
+
         public async ValueTask DisposeAsync()
         {
             await _hubConnection.StopAsync();
