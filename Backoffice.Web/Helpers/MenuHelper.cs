@@ -45,7 +45,7 @@ namespace Backoffice.Web.Helpers
             return new MenuModel
             {
                 Id = $"menu.{claim.Type.ToLower()}",
-                Name = claim.Value == "2" ? $"{name} (Readonly)" : $"{name}",
+                Name = claim.Value == "2" ? $"{name} (Read Only)" : $"{name}",
                 IconName = iconName,
                 Url = url
             };

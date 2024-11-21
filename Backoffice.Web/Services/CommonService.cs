@@ -721,7 +721,7 @@ namespace Backoffice.Web.Services
                             if (claim.ClaimValue == "1")
                                 result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}\" disabled checked></div>";
                             else if (claim.ClaimValue == "2")
-                                result = result + $"{claim.ClaimType.Replace(".", " ")} ReadOnly<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
+                                result = result + $"{claim.ClaimType.Replace(".", " ")} Read Only<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
                             else
                                 result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled></div>";
                         }
@@ -744,7 +744,7 @@ namespace Backoffice.Web.Services
                                 if (claim.ClaimValue == "1")
                                     result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
                                 else if (claim.ClaimValue == "2")
-                                    result = result + $"{claim.ClaimType.Replace(".", " ")} ReadOnly<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
+                                    result = result + $"{claim.ClaimType.Replace(".", " ")} Read Only<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
                                 else
                                     result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled></div>";
                             }
@@ -765,7 +765,7 @@ namespace Backoffice.Web.Services
                         if (claim.ClaimValue == "1")
                             result = result + $"{claim.ClaimType.Replace(".", " ")}<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}\" disabled checked></div>";
                         else if (claim.ClaimValue == "2")
-                            result = result + $"{claim.ClaimType.Replace(".", " ")} ReadOnly<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
+                            result = result + $"{claim.ClaimType.Replace(".", " ")} Read Only<div class=\"form-switch mb-2\"><input class=\"form-check-input me-4\" type=\"checkbox\" value=\"\" id=\"{claim.ClaimType}readonly\" disabled checked></div>";
                         else if (claim.ClaimType == SportsbookClientPermission.SBC_Clients_Access.ToString().Replace("_", "."))
                         {
                             var clients = claim.ClaimValue.Split(',');

@@ -479,9 +479,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (Fixture == null || Fixture.FixtureTypeId != message.FixtureTypeId || Id != message.ProviderFixtureId)
                 return;
 
-            //if (MarketGroupCallback == null || MarketGroupCallback.MarketTemplateGroups == null || !MarketGroupCallback.MarketTemplateGroups.Any())
-            //    return;
-
             var newMarketTemplateIds = message.Markets.Select(s => s.MarketTemplateId).ToList();
             var marketFixtures = Fixture.Markets.Where(c => newMarketTemplateIds.Contains(c.MarketTemplateId)).ToList();
 
@@ -494,12 +491,12 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Fixture.FixtureStatusId = message.FixtureStatusId;
                 Fixture.UnixTime = message.UnixTime;
 
-                foreach (var newMarket in message.Markets.Where(c => c.MarketTemplateId == marketFixture.MarketTemplateId && c.MarketName == marketFixture.MarketName && c.MarketSpecifier == marketFixture.MarketSpecifier))
+                foreach (var newMarket in message.Markets.Where(c => c.MarketTemplateId == marketFixture.MarketTemplateId && c.MarketSpecifier == marketFixture.MarketSpecifier))
                 {
                     var selectionIds = newMarket.Selections.Select(s => s.SelectionTemplateId).Distinct().ToList();
 
                     var providerMarketId = $"{Fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newMarket.MarketSpecifier}";
-                    var currentMarket = Fixture.Markets.FirstOrDefault(c => c.ProviderMarketId == providerMarketId && c.MarketName == newMarket.MarketName);
+                    var currentMarket = Fixture.Markets.FirstOrDefault(c => c.ProviderMarketId == providerMarketId);
 
                     if (currentMarket != null)
                     {
