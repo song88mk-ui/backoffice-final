@@ -17,26 +17,6 @@ namespace Backoffice.Web.Services
         public string Region { get; set; } = "HK";
 
         private HttpClient _client;
-        //private HttpClient _httpClient
-        //{
-        //    get
-        //    {
-        //        var token = _httpContextAccessor.HttpContext?.Session?.GetString("UserToken") ?? string.Empty;
-        //        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-        //        if (_client.DefaultRequestHeaders.Contains("x-region"))
-        //        {
-        //            _client.DefaultRequestHeaders.Remove("x-region");
-        //        }
-        //        _client.DefaultRequestHeaders.Add("x-region", Region);
-        //        return _client;
-        //    }
-        //    set
-        //    {
-        //        _client = value;
-        //    }
-        //}
-
         private readonly IAuthenticationService _authenticationService;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -53,8 +33,7 @@ namespace Backoffice.Web.Services
 
         private HttpClient GetHttpClient()
         {
-            var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.AccessToken);
 
             if (_client.DefaultRequestHeaders.Contains("x-region"))
             {

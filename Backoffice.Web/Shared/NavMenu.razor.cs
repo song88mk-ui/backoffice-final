@@ -52,7 +52,7 @@ namespace Backoffice.Web.Shared
 
         protected override async Task OnParametersSetAsync()
         {
-            _page = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "");
+            var page = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "");
 
             if (!_userClaims.SequenceEqual(UserModel.Claims))
             {
@@ -63,13 +63,14 @@ namespace Backoffice.Web.Shared
 
                 _showSwitchAccess = categories != null && categories.Count > 1;
             }
-            var init = _init;
+            var init = _init || _page != page;
             var languageCode = _languageCode;
             var navMenuAccess = _navMenuAccess;
 
             if (init || _navMenuAccess != NavMenuParameter?.NavMenuAccess || languageCode != _translationState.ActiveLanguageCode)
             {
                 var cts = new CancellationTokenSource();
+                _page = page;
                 _languageCode = _translationState.ActiveLanguageCode;
                 _navMenuAccess = NavMenuParameter?.NavMenuAccess;
 

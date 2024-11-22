@@ -65,8 +65,7 @@ namespace Backoffice.Web.Services
 
         private void ConfigureHttpClientHeaders()
         {
-            var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.AccessToken);
 
             RemoveHeader("x-page");
             RemoveHeader("x-language-code");
@@ -1020,16 +1019,40 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<List<MainMarketTemplateResponse>>>
-                (await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
-                                  .GetStreamAsync($"api/trading/sports/topmarkets/{sportId}"), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                var response = await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
+                                  .GetAsync($"api/trading/sports/topmarkets/{sportId}");
 
-                return result ?? new BaseResponse<List<MainMarketTemplateResponse>>
+                if (response.IsSuccessStatusCode)
                 {
-                    StatusCode = StatusCode.Success,
-                    Message = $"{StatusCode.Success}",
-                    Result = new List<MainMarketTemplateResponse>()
-                };
+                    return JsonSerializer.Deserialize<BaseResponse<List<MainMarketTemplateResponse>>>(
+                        await response.Content.ReadAsStringAsync(),
+                        new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<List<MainMarketTemplateResponse>>();
+                }
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+
+                        var content = await response.Content.ReadAsStringAsync();
+                        Log.Error($"[api/trading/client] - {_userState.AccessToken} - {response.ReasonPhrase}");
+                        return JsonSerializer.Deserialize<BaseResponse<List<MainMarketTemplateResponse>>>
+                        (
+                            content,
+                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<List<MainMarketTemplateResponse>>();
+                    }
+                    else
+                    {
+                        Log.Error($"[api/trading/client] - {_userState.AccessToken} - {response.ReasonPhrase}");
+
+                        return new BaseResponse<List<MainMarketTemplateResponse>>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
             }
             catch (Exception ex)
             {

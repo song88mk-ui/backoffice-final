@@ -24,7 +24,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
 
-
         [Parameter] public int SportId { get; set; }
         [Parameter] public int SegmentId { get; set; }
         [Parameter] public int LeagueId { get; set; }

@@ -25,7 +25,7 @@ namespace Backoffice.Web.Services
                 _hubConnection = new HubConnectionBuilder()
                                 .WithUrl(configuration["API:HubAPI"], options =>
                                 {
-                                    options.Transports = HttpTransportType.WebSockets | HttpTransportType.LongPolling;
+                                    options.Transports = HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling;
                                 })
                                 .AddMessagePackProtocol(options =>
                                 {
@@ -39,6 +39,8 @@ namespace Backoffice.Web.Services
                                 .WithAutomaticReconnect()
                                 .Build();
 
+                _hubConnection.ServerTimeout = TimeSpan.FromSeconds(30);
+                _hubConnection.KeepAliveInterval = TimeSpan.FromSeconds(10);
                 _hubConnection.Closed += async (error) =>
                 {
                     Log.Error($"HubConnection Closed: {error?.Message} - {error?.StackTrace}");
@@ -149,6 +151,8 @@ namespace Backoffice.Web.Services
         {
             await _hubConnection.StopAsync();
             await _hubConnection.DisposeAsync();
+
+            Log.Warning("HubConnection Disposed");
         }
     }
 }
