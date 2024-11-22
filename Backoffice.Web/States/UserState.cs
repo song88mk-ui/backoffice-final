@@ -27,7 +27,7 @@ namespace Backoffice.Web.States
 
         #region Methods
 
-        public async void SetAccessToken(string accessToken)
+        public void SetAccessToken(string accessToken)
         {
             _accessToken = accessToken;
 

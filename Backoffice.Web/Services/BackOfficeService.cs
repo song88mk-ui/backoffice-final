@@ -65,7 +65,8 @@ namespace Backoffice.Web.Services
 
         private void ConfigureHttpClientHeaders()
         {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.AccessToken);
+            var userToken = _httpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty;
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
 
             RemoveHeader("x-page");
             RemoveHeader("x-language-code");
@@ -843,7 +844,7 @@ namespace Backoffice.Web.Services
                     }
                     else
                     {
-                        Log.Error($"[api/trading/sports/{fixtureTypeId}] - {response.ReasonPhrase}");
+                        Log.Error($"[api/trading/sports/{fixtureTypeId}] - {_userState.AccessToken} - {response.ReasonPhrase}");
 
                         return new BaseResponse<SportsTreeResponse>
                         {
