@@ -1,8 +1,11 @@
 ﻿using Backoffice.API.ActionFilter;
 using Backoffice.API.Repositories;
+using Backoffice.API.Telemetry;
 using Backoffice.Shared.Models.Requests;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using System.Text.Json;
 using System.Threading.Tasks;
 using BoStatusCode = Backoffice.Shared.Enums.StatusCode;
 
@@ -15,10 +18,13 @@ namespace Backoffice.API.Controllers.SportsbookClients
     {
         private readonly IBackofficeRepository _backofficeRepository;
         private readonly IPlatformRepository _platformRepository;
-        public SettingsController(IBackofficeRepository backofficeRepository, IPlatformRepository platformRepository)
+        private readonly ActivitySource _activitySource;
+
+        public SettingsController(IBackofficeRepository backofficeRepository, IPlatformRepository platformRepository, Instrumentation instrumentation)
         {
             _backofficeRepository = backofficeRepository;
             _platformRepository = platformRepository;
+            _activitySource = instrumentation.ActivitySource;
         }
 
         #region Top Fixture
@@ -209,14 +215,19 @@ namespace Backoffice.API.Controllers.SportsbookClients
         [HttpPost("announcements/post")]
         public async Task<IActionResult> AddOrUpdateAnnouncements([FromBody] AddOrUpdateAnnouncementRequest request)
         {//
-            var result = await _platformRepository.AddOrUpdateAnnouncements(request);
-
-            switch (result.StatusCode)
+            using (var activity = _activitySource.StartActivity("announcements/post"))
             {
-                case BoStatusCode.Success:
-                    return Ok(result);
-                default:
-                    return BadRequest(result);
+                activity?.SetTag("request", JsonSerializer.Serialize(request));
+
+                var result = await _platformRepository.AddOrUpdateAnnouncements(request);
+
+                switch (result.StatusCode)
+                {
+                    case BoStatusCode.Success:
+                        return Ok(result);
+                    default:
+                        return BadRequest(result);
+                }
             }
         }
 
