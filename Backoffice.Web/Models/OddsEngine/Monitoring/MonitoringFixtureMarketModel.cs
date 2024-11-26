@@ -37,7 +37,7 @@ namespace Backoffice.Web.Models.OddsEngine.Monitoring
     {
         public string ClientCode { get; set; }
         public long UnixTime { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        public MonitoringFixtureMarketModel Market { get; set; } = new MonitoringFixtureMarketModel();
+        public MonitoringFixtureMarketModel? Market { get; set; }
     }
     public class MonitoringFixtureMarketModel
     {
@@ -55,6 +55,7 @@ namespace Backoffice.Web.Models.OddsEngine.Monitoring
         public bool IsBoosted { get; set; }
         public long UnixTime { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         public List<MonitoringFixtureSelectionModel> Selections { get; set; } = new List<MonitoringFixtureSelectionModel>();
+        public bool IsBetStop { get; set; }
     }
     public class MonitoringFixtureSelectionModel
     {

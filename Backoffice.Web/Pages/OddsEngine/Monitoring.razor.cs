@@ -133,6 +133,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             _isPreloader = true;
             _shouldRender = true;
+            _fixtureMarkets = new List<MonitoringFixtureModel>();
 
             _fixtureMarkets = await GetFixtures(new MarketFixtureRequest
             {
@@ -236,7 +237,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var response = await _backofficeService.GetMostEvenLineMarketFixtures(request, _languageCode);
             var marketFixtures = response.Result;
 
-            if (marketFixtures.Fixtures.Count == 0)
+            if (marketFixtures == null || marketFixtures.Fixtures.Count == 0)
                 return new();
 
             var result = new List<MonitoringFixtureModel>();
@@ -244,6 +245,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 result.Add(new MonitoringFixtureModel
                 {
+                    FixtureId = fixture.FixtureId,
                     FixtureName = fixture.FixtureName,
                     ProviderFixtureId = fixture.ProviderFixtureId,
                     AwayName = fixture.AwayName,
@@ -252,10 +254,18 @@ namespace Backoffice.Web.Pages.OddsEngine
                     CurrentPeriod = fixture.CurrentPeriod,
                     FixtureStartDate = fixture.FixtureStartDate,
                     FixtureStatusId = fixture.FixtureStatusId,
+                    FixtureStatusName = fixture.FixtureStatusName,
+                    SportId = fixture.SportId,
+                    SportName = fixture.SportName,
+                    LeagueId = fixture.LeagueId,
+                    LeagueName = fixture.LeagueName,
+                    SegmentId = fixture.SegmentId,
+                    SegmentName = fixture.SegmentName,
                     HomeName = fixture.HomeName,
                     IsBetStopGlobal = fixture.IsBetStopGlobal,
                     Score = fixture.Score,
                     MarketTemplateGroups = fixture.MarketTemplateGroups,
+                    SortOrder = fixture.SortOrder,
                     ClientMarkets = fixture.ClientMarkets.Select(clientMarket => new MonitoringFixtureClient()
                     {
                         ClientCode = clientMarket.ClientCode,
@@ -283,7 +293,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 DecimalOdds = selection.DecimalOdds,
                                 IsActive = selection.IsActive,
                                 SortOrder = selection.SortOrder
-                            }).ToList()
+                            }).ToList(),
+                            IsBetStop = fixture.IsBetStopGlobal || (fixture.BetStop.Count > 0 && fixture.BetStop.FirstOrDefault() == 1)
                         }
                     }).ToList()
                 });

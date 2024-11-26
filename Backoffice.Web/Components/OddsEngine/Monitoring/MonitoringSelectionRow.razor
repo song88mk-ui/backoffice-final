@@ -1,12 +1,3 @@
-﻿@if (HasClientConfig)
-{
-    <div @attributes="SpanAttributes" class="odds-container @_color me-2 py-1">
-        <span class="d-block text-center">@_odds</span>
-    </div>
-}
-else
-{
-    <div @attributes="SpanAttributes" class="odds-container me-2 py-1">
-        <span class="d-block text-center">-.-</span>
-    </div>
-}
+﻿<div @attributes="SpanAttributes" class="odds-container @_color me-2 py-1">
+    <span class="d-block text-center">@_odds</span>
+</div>

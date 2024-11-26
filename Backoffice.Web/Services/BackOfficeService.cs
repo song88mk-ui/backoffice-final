@@ -1124,7 +1124,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var stringUri = $"fixtures/{request.FixtureTypeId}/sports/{request.SportId}/segments/{request.SegmentId}/leagues/{request.LeagueId}/markets/{request.MarketTemplateId}/most-even-line";
+                var stringUri = $"api/trading/fixtures/{request.FixtureTypeId}/sports/{request.SportId}/segments/{request.SegmentId}/leagues/{request.LeagueId}/markets/{request.MarketTemplateId}/most-even-line";
 
                 var response = await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
                                   .GetAsync(stringUri);

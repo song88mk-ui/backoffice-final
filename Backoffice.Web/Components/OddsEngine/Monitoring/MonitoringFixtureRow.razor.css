@@ -1,6 +1,9 @@
-﻿.fixture-details {
-    color: #212529;
-    white-space: nowrap;
+﻿.margin-value {
+    width: 50px;
+}
+
+.td-master {
+    flex: 1
 }
 
 .score-info {
@@ -8,11 +11,8 @@
     white-space: nowrap;
 }
 
-.margin-value {
-    width: 50px;
-}
-
-.close-match-btn {
+﻿.fixture-details {
+    color: #212529;
     white-space: nowrap;
 }
 
@@ -30,6 +30,6 @@
     width: 150px;
 }
 
-.td-master {
-    flex: 1
+.close-match-btn {
+    white-space: nowrap;
 }

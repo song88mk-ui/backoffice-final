@@ -1,73 +1,119 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
+using Backoffice.Web.Models.OddsEngine.Monitoring;
 using Microsoft.AspNetCore.Components;
-using System.Runtime.Intrinsics.X86;
-using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
+using Microsoft.Extensions.Azure;
 
 namespace Backoffice.Web.Components.OddsEngine.Monitoring
 {
     public partial class MonitoringFixtureSelectionComponent : IDisposable
     {
-        [Parameter] public ClientMarket ClientMarket {  get; set; }
-        [Parameter] public MarketModelV2 BaseMarket { get; set; }
+        [Parameter] public MonitoringFixtureMarketModel Market { get; set; }
+        [Parameter] public bool IsBetStop { get; set; }
 
+        private string _ctrlCode = "CTRL";
         private bool _hasLine;
         private int _marketStatusId;
+        private string _clientMargin = "-.-";
+        private bool _isBetStop;
+        private string _marketLine = "-.-";
 
-        protected override Task OnParametersSetAsync(){
+        private List<MonitoringFixtureSelectionModel> _selections;
 
-            _hasLine = BaseMarket.MarketName.Contains("HANDICAP", StringComparison.OrdinalIgnoreCase) || BaseMarket.MarketName.Contains("TOTAL", StringComparison.OrdinalIgnoreCase);
+        protected override Task OnParametersSetAsync()
+        {
 
+            _hasLine = Market.MarketName.Contains("HANDICAP", StringComparison.OrdinalIgnoreCase) || Market.MarketName.Contains("TOTAL", StringComparison.OrdinalIgnoreCase);
+
+            var hasClientConfig = true;
+            if (Market.ClientCode != _ctrlCode)
+                hasClientConfig = Market.ClientCodeMargin > 0;
+
+            _isBetStop = IsBetStop;
+            _selections = Market.Selections;
             _marketStatusId = GetMarketStatusId();
+
+            if (hasClientConfig)
+            {
+                _marketLine = GetMarketLine();
+                _clientMargin = GetClientMargin(Market.ClientCodeMargin);
+            }
+            else
+            {
+                _selections.ForEach(selection => selection.DecimalOdds = "-.-");
+            }
 
             return Task.CompletedTask;
         }
 
-        public void Dispose() => throw new NotImplementedException();
+        public void Dispose()
+        {
+        }
         private int GetMarketStatusId()
         {
-            if (ClientMarket == null || ClientMarket.Market.ClientCodeMargin <= 0)
+            if (Market.ClientCode != _ctrlCode && Market.ClientCodeMargin <= 0)
                 return (int)MarketStatus.Inactive;
 
-            return ClientMarket.Market.MarketStatusId;
+            return Market.MarketStatusId;
         }
-        private string GetClientMargin(decimal clientCodeMargin, List<SelectionModel> selections)
+        private string GetClientMargin(decimal clientCodeMargin)
         {
-
-            if (ClientMarket.Market == null)
+            if (clientCodeMargin > 0)
             {
-                var activeSelections = selections.Where(c => c.IsActive == true && Convert.ToDecimal(c.DecimalOdds) > 0m).ToList();
+                var newMargin = ((int)((Market.ClientCodeMargin * 100) + 100)).ToString();
 
-                if (activeSelections.Count == 1)
-                    activeSelections = selections.Where(c => Convert.ToDecimal(Convert.ToDecimal(c.DecimalOdds)) > 0m).ToList();
+                var newActiveSelections = _selections.Where(c => c.IsActive == true).ToList();
 
-                var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(s.DecimalOdds))) - 100) / 100;
+                if (newActiveSelections.Count == 1)
+                    newActiveSelections = _selections.Where(c => c.IsActive == true).ToList();
 
-                return ((int)((margin * 100) + 100)).ToString();
+                var computedMargin = "";
+                try
+                {
+                    computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / Convert.ToDecimal(s.DecimalOdds))) - 100) + 100}";
+                }
+                catch (Exception ex)
+                {
+
+                }
+                if (newMargin != computedMargin)
+                {
+                    newMargin = $"{newMargin} ({computedMargin})";
+                }
+
+                return newMargin;
             }
 
-            var newMargin = ((int)((ClientMarket.Market.ClientCodeMargin * 100) + 100)).ToString();
+            var activeSelections = _selections.Where(c => c.IsActive == true && Convert.ToDecimal(c.DecimalOdds) > 0m).ToList();
 
-            var newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
+            if (activeSelections.Count == 1)
+                activeSelections = _selections.Where(c => Convert.ToDecimal(Convert.ToDecimal(c.DecimalOdds)) > 0m).ToList();
 
-            if (newActiveSelections.Count == 1)
-                newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
+            var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(s.DecimalOdds))) - 100) / 100;
 
-            var computedMargin = "";
-            try
+            return ((int)((margin * 100) + 100)).ToString();
+        }
+        private string GetMarketLine()
+        {
+            var marketName = Market.MarketName;
+            var marketLine = Market.Line;
+
+            var result = string.Empty;
+            if (!string.IsNullOrEmpty(marketName))
             {
-                computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId)?.Odds ?? 1)) - 100) + 100}";
-            }
-            catch (Exception ex)
-            {
+                if (marketLine == null)
+                {
+                    result = "-.-";
+                }
+                else
+                {
+                    if (marketName.ToUpper().Contains("TOTAL"))
+                        result = $"o {decimal.Parse(marketLine ?? string.Empty)} u";
 
+                    if (marketName.ToUpper().Contains("HANDICAP"))
+                        result = $"h {decimal.Parse(marketLine ?? string.Empty)} a";
+                }
             }
-            if (newMargin != computedMargin)
-            {
-                newMargin = $"{newMargin} ({computedMargin})";
-            }
-
-            return newMargin;
+            return result;
         }
     }
 }

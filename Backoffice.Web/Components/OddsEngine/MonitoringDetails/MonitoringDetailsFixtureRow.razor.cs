@@ -5,7 +5,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
-namespace Backoffice.Web.Components.OddsEngine.Monitoring
+namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 {
     public partial class MonitoringDetailsFixtureRow : IDisposable
     {
@@ -14,7 +14,6 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         [Parameter] public List<Client> Clients { get; set; }
         [Parameter] public FixtureMarketModel Market { get; set; }
-        [Parameter] public bool IsMonitoringPage { get; set; }
 
         #endregion
 
@@ -81,6 +80,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                     columns += !_hasLine ? 0 : 1;
                     columns += Market != null ? Market.Selections.Count : 0;
 
+                    // divide number of column size by 12 (max size of col in bootstrap)
                     _columnSize = $"col-xs-{12 / columns}";
 
                     if (_hasLine)
@@ -170,18 +170,6 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
             }
 
             return result;
-        }
-
-        public void HandleCloseMatchClick()
-        {
-            ModalParameters parameters = new ModalParameters();
-            parameters.Add("ModalDialogClass", "modal-dialog-centered modal-lg");
-            parameters.Add("FixtureName", _fixtureName);
-            parameters.Add("ProviderFixtureId", _providerFixtureId);
-
-            ModalOptions options = new ModalOptions();
-
-            ModalService.Open<CloseMatchModal>("Close Match", parameters, options);
         }
 
         public void Dispose()
