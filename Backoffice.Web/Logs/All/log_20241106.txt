@@ -1,0 +1,23 @@
+2024-11-06 10:34:33.256 +08:00 [ERR] Exception of type 'Microsoft.AspNetCore.Components.NavigationException' was thrown.
+2024-11-06 10:34:33.333 +08:00 [ERR]    at Microsoft.AspNetCore.Components.Server.Circuits.RemoteNavigationManager.NavigateToCore(String uri, NavigationOptions options)
+   at Microsoft.AspNetCore.Components.NavigationManager.NavigateToCore(String uri, Boolean forceLoad)
+   at Backoffice.Web.Shared.LoginRedirect.OnInitialized() in E:\projects\ASP Net\repos\backoffice-final\Backoffice.Web\Shared\LoginRedirect.razor:line 13
+2024-11-06 10:34:34.657 +08:00 [INF] Hubconnection URI - https://localhost:44343/
+2024-11-06 18:11:59.356 +08:00 [INF] Hubconnection URI - https://localhost:44343/
+2024-11-06 18:12:23.862 +08:00 [INF] Hubconnection URI - https://localhost:44343/
+2024-11-06 18:12:24.904 +08:00 [INF] Hubconnection URI - https://localhost:44343/
+2024-11-06 18:12:26.440 +08:00 [INF] UserModel - 
+2024-11-06 18:12:26.872 +08:00 [INF] UserModel - 
+2024-11-06 18:12:26.872 +08:00 [INF] ClientRef - A88,APL,B88,BDV,BE8,BEC,BNS,CH2,CP1,CUB,EKB,EKT,GSA,GSC,GSP,ID8,IDN,KRJ,MAB,OB2,OB3,OBS,OGS,OTT,RKP,S88,TP2,TSO,TTN,V88,W88,WSG
+2024-11-06 18:12:26.872 +08:00 [INF] ClientFilter - 
+2024-11-06 18:12:26.873 +08:00 [INF] Callback - 
+2024-11-06 18:12:26.878 +08:00 [INF] UserModel - 
+2024-11-06 18:12:26.878 +08:00 [INF] ClientRef - A88,APL,B88,BDV,BE8,BEC,BNS,CH2,CP1,CUB,EKB,EKT,GSA,GSC,GSP,ID8,IDN,KRJ,MAB,OB2,OB3,OBS,OGS,OTT,RKP,S88,TP2,TSO,TTN,V88,W88,WSG
+2024-11-06 18:12:26.878 +08:00 [INF] ClientFilter - 
+2024-11-06 18:12:26.878 +08:00 [INF] Callback - 
+2024-11-06 18:12:26.894 +08:00 [INF] Hubconnection URI - https://localhost:44343/
+2024-11-06 18:12:26.904 +08:00 [INF] Hubconnection URI - https://localhost:44343/
+2024-11-06 18:12:27.089 +08:00 [INF] UserModel - TSO,BEC,W88,KRJ,APL,GSP,EKT,A88,B88,BE8,ID8,V88,WSG,EKB,GSC,BDV,TTN,CUB,OGS,OBS,GSA,OB2,OB3
+2024-11-06 18:12:27.089 +08:00 [INF] ClientRef - A88,APL,B88,BDV,BE8,BEC,BNS,CH2,CP1,CUB,EKB,EKT,GSA,GSC,GSP,ID8,IDN,KRJ,MAB,OB2,OB3,OBS,OGS,OTT,RKP,S88,TP2,TSO,TTN,V88,W88,WSG
+2024-11-06 18:12:27.090 +08:00 [INF] ClientFilter - A88,APL,B88,BDV,BE8,BEC,CUB,EKB,EKT,GSA,GSC,GSP,ID8,KRJ,OB2,OB3,OBS,OGS,TSO,TTN,V88,W88,WSG
+2024-11-06 18:12:27.090 +08:00 [INF] Callback - all,A88,APL,B88,BDV,BE8,BEC,CUB,EKB,EKT,GSA,GSC,GSP,ID8,KRJ,OB2,OB3,OBS,OGS,TSO,TTN,V88,W88,WSG

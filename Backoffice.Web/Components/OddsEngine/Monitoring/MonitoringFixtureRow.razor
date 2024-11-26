@@ -1,0 +1,59 @@
+﻿<tr>
+    @FixtureHeaderContent
+
+    <!-- BR CTRL -->
+    <td class="td-master">
+        <div class="d-flex justify-content-left">
+            @if (_ctrlMarket != null && _selections.Any())
+            {
+                var displayLine = true;
+                foreach (var selection in _ctrlMarket.Market.Selections)
+                {
+                    var selectionKey = $"br-{selection.ProviderSelectionId}";
+
+                    <MonitoringSelectionRow @key="selectionKey" Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop" CurrentMarketStatus="@_marketStatusId" HasClientConfig="true" />
+
+                    if (_hasLine && displayLine)
+                    {
+                        displayLine = false;
+                        <div>
+                            <div class="margin-value me-2 py-1">
+                                <span class="d-block text-center">@_marketLine</span>
+                            </div>
+                        </div>
+                    }
+                }
+
+                if (Markets != null && _selections.Any())
+                {
+                    <div class="py-1 px-1 ">
+                        <span class="text-nowrap">@GetClientMargin(string.Empty, string.Empty, _selections)</span>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="odds-container me-2 py-1 px-3">
+                    <span>-.-</span>
+                </div>
+                <div class="odds-container me-2 py-1 px-3">
+                    <span>-.-</span>
+                </div>
+                <div class="py-1 px-2">
+                    <span>-.-</span>
+                </div>
+            }
+
+        </div>
+    </td>
+
+    <!-- Client Odds -->
+    @if (Clients != null)
+    {   
+        foreach (var client in Clients)
+        {
+            <MonitoringFixtureSelectionComponent />
+        }
+    }
+
+</tr>

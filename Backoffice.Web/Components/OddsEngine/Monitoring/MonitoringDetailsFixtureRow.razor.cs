@@ -1,14 +1,13 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
-using Backoffice.Web.Components.OddsEngine.Monitoring;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
-namespace Backoffice.Web.Components.Common
+namespace Backoffice.Web.Components.OddsEngine.Monitoring
 {
-    public partial class FixtureRow : IDisposable
+    public partial class MonitoringDetailsFixtureRow : IDisposable
     {
         #region Properties
         [Inject] public IModalService ModalService { get; set; }
@@ -82,7 +81,6 @@ namespace Backoffice.Web.Components.Common
                     columns += !_hasLine ? 0 : 1;
                     columns += Market != null ? Market.Selections.Count : 0;
 
-                    // divide number of column size by 12 (max size of col in bootstrap)
                     _columnSize = $"col-xs-{12 / columns}";
 
                     if (_hasLine)

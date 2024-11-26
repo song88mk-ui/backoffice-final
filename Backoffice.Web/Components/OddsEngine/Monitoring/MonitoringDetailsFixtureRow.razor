@@ -53,7 +53,7 @@
                 {
                     var selectionKey = $"br-{selection.ProviderSelectionId}";
 
-                    <SelectionRow @key="selectionKey" Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop" CurrentMarketStatus="@_marketStatusId" HasClientConfig="true" />
+                    <MonitoringSelectionRow @key="selectionKey" Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop" CurrentMarketStatus="@_marketStatusId" HasClientConfig="true" />
 
                     if (_hasLine && displayLine)
                     {
@@ -102,12 +102,10 @@
                         var hasClientConfig = HasClientConfig(client.ClientCode, _clientCode, _clientCodeMargin);
                         foreach (var selection in _selections)
                         {
-                            @*var selectionKey = $"{client.ClientCode.ToLower()}-{selection.ProviderSelectionId}";*@
-
-                            <SelectionRow @key="selection.ProviderSelectionId" CurrentClientCode="@client.ClientCode"
-                                          Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop"
-                                          CurrentMarketStatus="@GetMarketStatusId(client, _clientCode, _marketStatusId)"
-                                          HasClientConfig="hasClientConfig" />
+                            <MonitoringSelectionRow @key="selection" CurrentClientCode="@client.ClientCode"
+                                                    Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop"
+                                                    CurrentMarketStatus="@GetMarketStatusId(client, _clientCode, _marketStatusId)"
+                                                    HasClientConfig="hasClientConfig" />
 
                             if (_hasLine && displayLine)
                             {

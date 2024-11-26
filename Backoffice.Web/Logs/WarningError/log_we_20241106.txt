@@ -1,0 +1,4 @@
+2024-11-06 10:34:33.256 +08:00 [ERR] Exception of type 'Microsoft.AspNetCore.Components.NavigationException' was thrown.
+2024-11-06 10:34:33.333 +08:00 [ERR]    at Microsoft.AspNetCore.Components.Server.Circuits.RemoteNavigationManager.NavigateToCore(String uri, NavigationOptions options)
+   at Microsoft.AspNetCore.Components.NavigationManager.NavigateToCore(String uri, Boolean forceLoad)
+   at Backoffice.Web.Shared.LoginRedirect.OnInitialized() in E:\projects\ASP Net\repos\backoffice-final\Backoffice.Web\Shared\LoginRedirect.razor:line 13

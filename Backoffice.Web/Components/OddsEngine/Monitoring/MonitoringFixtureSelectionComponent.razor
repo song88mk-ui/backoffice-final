@@ -1,0 +1,79 @@
+﻿
+<td class="td-master">
+    <div class="d-flex justify-content-left">
+        @if (ClientMarket != null && ClientMarket.Market.Selections.Any())
+        {
+            var displayLine = true;
+            var hasClientConfig = ClientMarket.Market.ClientCodeMargin > 0;
+            foreach (var selection in _selections)
+            {
+                <MonitoringSelectionRow @key="selection" CurrentClientCode="@client.ClientCode"
+                                        Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop"
+                                        CurrentMarketStatus="@_marketStatusId"
+                                        HasClientConfig="hasClientConfig" />
+
+                if (_hasLine && displayLine)
+                {
+                    displayLine = false;
+                    if (hasClientConfig)
+                    {
+                        <div>
+                            <div class="margin-value me-2 py-1">
+                                <span class="d-block text-center">@ClientMarket.Market.Line</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            <div class="margin-value me-2 py-1">
+                                <span class="d-block text-center">-.-</span>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+
+            if (hasClientConfig)
+            {
+                <div class="py-1 px-1">
+                    <span class="text-nowrap">@GetClientMargin(client.ClientCode, _clientCodeMargin, _selections)</span>
+                </div>
+            }
+            else
+            {
+                <div class="py-1 px-2">
+                    <span>-.-</span>
+                </div>
+            }
+        }
+        else if (BaseMarket != null && BaseMarket.Selections.Any())
+        {
+            var hasClientConfig = BaseMarket.ClientCodeMargin > 0;
+            var displayLine = true;
+            foreach (var selection in BaseMarket.Selections)
+            {
+                if (_hasLine && displayLine)
+                {
+                    displayLine = false;
+                    if (hasClientConfig)
+                    {
+                        <div>
+                            <div class="margin-value me-2 py-1">
+                                <span class="d-block text-center">@BaseMarket.Line</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            <div class="margin-value me-2 py-1">
+                                <span class="d-block text-center">-.-</span>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        }
+    </div>
+</td>

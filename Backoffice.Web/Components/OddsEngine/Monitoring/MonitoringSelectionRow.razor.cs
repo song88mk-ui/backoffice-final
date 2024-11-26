@@ -1,14 +1,13 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Models.OddsEngine.Monitoring;
 using Microsoft.AspNetCore.Components;
 
-using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
-
-namespace Backoffice.Web.Components.Common
+namespace Backoffice.Web.Components.OddsEngine.Monitoring
 {
-    public partial class SelectionRow : IDisposable
+    public partial class MonitoringSelectionRow : IDisposable
     {
         #region Properties
-        [Parameter] public SelectionModel Selection { get; set; }
+        [Parameter] public MonitoringFixtureSelectionModel Selection { get; set; }
         [Parameter] public string CurrentClientCode { get; set; }
         [Parameter] public bool HasClientConfig { get; set; }
         [Parameter] public string ColumnSize { get; set; }
@@ -143,7 +142,7 @@ namespace Backoffice.Web.Components.Common
                         var clientOdds = Selection.ClientOdds.Where(c => c.ClientCode == CurrentClientCode && c.SelectionTemplateId == Selection.SelectionTemplateId).FirstOrDefault();
                         if (clientOdds != null)
                         {
-                            if(!string.IsNullOrEmpty(_odds))
+                            if (!string.IsNullOrEmpty(_odds))
                             {
                                 if (Convert.ToDecimal(_odds) > clientOdds.Odds)
                                 {

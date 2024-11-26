@@ -1,0 +1,35 @@
+﻿.fixture-details {
+    color: #212529;
+    white-space: nowrap;
+}
+
+.score-info {
+    color: #eb3422;
+    white-space: nowrap;
+}
+
+.margin-value {
+    width: 50px;
+}
+
+.close-match-btn {
+    white-space: nowrap;
+}
+
+
+.td-start-date {
+    width: 100px;
+}
+
+.td-fixture-name {
+    width: 320px;
+    min-width: 250px;
+}
+
+.td-close-match {
+    width: 150px;
+}
+
+.td-master {
+    flex: 1
+}

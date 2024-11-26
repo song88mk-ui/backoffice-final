@@ -1,0 +1,230 @@
+﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
+using Backoffice.Web.Models;
+using Backoffice.Web.Models.OddsEngine.Monitoring;
+using Backoffice.Web.Services;
+using Microsoft.AspNetCore.Components;
+using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
+
+namespace Backoffice.Web.Components.OddsEngine.Monitoring
+{
+    public partial class MonitoringFixtureRow : IDisposable
+    {
+        #region Properties
+        [Inject] public IModalService ModalService { get; set; }
+        [Parameter] public RenderFragment? FixtureHeaderContent { get; set; }
+        [Parameter] public RenderFragment? MarketHeaderContent { get; set; }
+        [Parameter] public long UnixTime { get; set; }
+        [Parameter] public List<Client> Clients { get; set; }
+        [Parameter] public List<MonitoringFixtureClient> Markets { get; set; }
+
+        #endregion
+
+        #region Fields
+
+        private string _mainMarketName = string.Empty;
+        private bool _isBetStop = false;
+        private bool _hasLine;
+        private string _marketLine;
+        private string _columnSize;
+        private string _fixtureName;
+        private int _fixtureStatusId;
+        private string _currentPeriod;
+        private string _currentMinute;
+        private string _homeName;
+        private string _awayName;
+        private string _score;
+        private DateTime _fixtureStartDate;
+        private string _providerFixtureId;
+        private int _marketStatusId;
+        private string _clientCode;
+        private string _clientCodeMargin;
+        private List<SelectionModel> _selections;
+
+        private bool _init = true;
+        private bool _shouldRender = true;
+
+        private long _unixTime;
+        private string _clientReference;
+
+        private MonitoringFixtureClient _ctrlMarket { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        protected override void OnParametersSet()
+        {
+            _shouldRender = ValidateParameters();
+
+            if (_shouldRender)
+            {
+                _clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
+                _unixTime = UnixTime;
+                _ctrlMarket = Markets.FirstOrDefault(c => c.ClientCode.Equals("CTRL", StringComparison.OrdinalIgnoreCase)) ?? new MonitoringFixtureClient();
+
+
+                //_fixtureName = Market.FixtureName;
+                //_fixtureStatusId = Market.FixtureStatusId;
+                //_currentPeriod = Market.CurrentPeriod;
+                //_currentMinute = Market.CurrentMinute;
+                //_homeName = Market.HomeName;
+                //_awayName = Market.AwayName;
+                //_score = Market.Score;
+                //_fixtureStartDate = Market.FixtureStartDate;
+                //_providerFixtureId = Market.ProviderFixtureId;
+                //_marketStatusId = Market.MarketStatusId;
+                //_clientCode = Market.ClientCode;
+                //_clientCodeMargin = Market.ClientCodeMargin;
+                //_selections = Market.Selections;
+
+                //if (_mainMarketName != Market.MarketName)
+                //{
+                //    _mainMarketName = Market.MarketName;
+
+                //    _hasLine = _mainMarketName.ToUpper().Contains("HANDICAP") || _mainMarketName.ToUpper().Contains("TOTAL");
+
+                //    var columns = 1;
+                //    columns += !_hasLine ? 0 : 1;
+                //    columns += Market != null ? Market.Selections.Count : 0;
+
+                //    _columnSize = $"col-xs-{12 / columns}";
+
+                //    if (_hasLine)
+                //        _marketLine = GetMarketLine(_mainMarketName, Market.Line);
+                //}
+
+                //if (Market.IsBetStopGlobal)
+                //{
+                //    _isBetStop = true;
+                //}
+                //else if (Market.BetStop != null)
+                //{
+                //    _isBetStop = Market.BetStop.Count > 0 && Market.BetStop.FirstOrDefault() == 1 ? true : false;
+                //}
+
+                _init = false;
+            }
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender) => _shouldRender = false;
+
+        protected override bool ShouldRender() => _shouldRender;
+
+        public string GetClientMargin(string clientCode, string clientCodeMargin, List<SelectionModel> selections)
+        {
+            var clients = string.IsNullOrEmpty(clientCodeMargin) ? new List<Tuple<string, decimal>>() : clientCodeMargin.Split('|').Select(s => new Tuple<string, decimal>(s.Split(':').First(), Convert.ToDecimal(s.Split(':').Last()))).ToList();
+            var client = clients.FirstOrDefault(c => c.Item1 == clientCode);
+
+            if (client == null)
+            {
+                var activeSelections = selections.Where(c => c.IsActive == true && Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
+
+                if (activeSelections.Count == 1)
+                    activeSelections = selections.Where(c => Convert.ToDecimal(GetClientOdds(c, clientCode)) > 0m).ToList();
+
+                var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(GetClientOdds(s, clientCode)))) - 100) / 100;
+
+                return ((int)((margin * 100) + 100)).ToString();
+            }
+
+            var newMargin = ((int)((client.Item2 * 100) + 100)).ToString();
+
+            var newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
+
+            if (newActiveSelections.Count == 1)
+                newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
+
+            var computedMargin = "";
+            try
+            {
+                computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / s.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == s.SelectionTemplateId)?.Odds ?? 1)) - 100) + 100}";
+            }
+            catch (Exception ex)
+            {
+
+            }
+            if (newMargin != computedMargin)
+            {
+                newMargin = $"{newMargin} ({computedMargin})";
+            }
+
+            return newMargin;
+        }
+
+        public bool HasClientConfig(string clientCode, string marketClientCode, string marketClientMargin)
+        {
+            if (marketClientCode.Split("|").Contains(clientCode) || marketClientMargin.Contains(clientCode))
+                return true;
+
+            return false;
+        }
+
+        public int GetMarketStatusId(Client client, string marketClientCodes, int marketStatusId)
+        {
+            var result = marketStatusId;
+
+            if (string.IsNullOrEmpty(marketClientCodes))
+            {
+                marketClientCodes = string.Empty;
+            }
+
+            var inactiveMarketClients = marketClientCodes.Split("|");
+
+            if (!inactiveMarketClients.Contains(client.ClientCode))
+            {
+                result = (int)MarketStatus.Inactive;
+            }
+
+            return result;
+        }
+
+        public void Dispose()
+        {
+        }
+
+        #endregion
+
+        #region Utilities
+
+        private bool ValidateParameters()
+        {
+            var clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
+
+            return (_init || _unixTime != UnixTime || _clientReference != clientReference) && Markets != null;
+        }
+
+        private string GetClientOdds(SelectionModel selection, string clientCode)
+        {
+            if (selection != null && selection.ClientOdds != null && selection.ClientOdds.Any(c => c.ClientCode == clientCode))
+            {
+                return selection.ClientOdds.FirstOrDefault(c => c.ClientCode == clientCode && c.SelectionTemplateId == selection.SelectionTemplateId)?.Odds.ToString() ?? string.Empty;
+            }
+
+            return selection?.DecimalOdds ?? string.Empty;
+        }
+
+        private string GetMarketLine(string marketName, string marketLine)
+        {
+            var result = string.Empty;
+            if (!string.IsNullOrEmpty(marketName))
+            {
+                if (marketLine == null)
+                {
+                    result = "-.-";
+                }
+                else
+                {
+                    if (marketName.ToUpper().Contains("TOTAL"))
+                        result = $"o {decimal.Parse(marketLine ?? string.Empty)} u";
+
+                    if (marketName.ToUpper().Contains("HANDICAP"))
+                        result = $"h {decimal.Parse(marketLine ?? string.Empty)} a";
+                }
+            }
+            return result;
+        }
+
+        #endregion
+    }
+}
