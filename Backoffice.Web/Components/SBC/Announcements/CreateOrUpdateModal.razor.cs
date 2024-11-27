@@ -276,6 +276,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
                         if (toRemoveClientCodes != null && toRemoveClientCodes.Any())
                         {
                             request.ToRemoveClientCodes.AddRange(toRemoveClientCodes);
+                            _announcement.UserRoleId = userRoleId;
                         }
                     }
 
