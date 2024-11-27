@@ -132,13 +132,13 @@ namespace Backoffice.Web.Services
             _channels.Remove(key);
         }
 
-        public async Task RegisterMessageHandlers(
-            Func<OddsChangeFixtureMessage, Task> processOddsChangeMonitoring,
-            Func<BetStopFixtureMessage, Task> processOnBetStopFixture,
-            Func<BetStopGlobalMessage, Task> processOnBetStopGlobal)
+        public async Task RegisterMessageHandlers(Func<BetStopFixtureMessage, Task> processOnBetStopFixture, Func<BetStopGlobalMessage, Task> processOnBetStopGlobal, Func<OddsChangeMonitoringMessage, Task> processOddsChangeMonitoring = null, Func<OddsChangeFixtureDetailsMessage, Task> processOddsChange = null)
         {
-            _hubConnection.On<OddsChangeFixtureMessage>("OnOddsChange", async message
-                => await processOddsChangeMonitoring(message));
+            if (processOddsChangeMonitoring != null)
+                _hubConnection.On<OddsChangeMonitoringMessage>("OnMonitoringOddsChange", async message => await processOddsChangeMonitoring(message));
+
+            if (processOddsChange != null)
+                _hubConnection.On<OddsChangeFixtureDetailsMessage>("OnOddsChange", async message => await processOddsChange(message));
 
             _hubConnection.On<BetStopFixtureMessage>("OnBetStopFixture", async message
                 => await processOnBetStopFixture(message));
@@ -146,7 +146,6 @@ namespace Backoffice.Web.Services
             _hubConnection.On<BetStopGlobalMessage>("OnBetStopGlobal", async message
                 => await processOnBetStopGlobal(message));
         }
-
         public async ValueTask DisposeAsync()
         {
             await _hubConnection.StopAsync();

@@ -97,6 +97,7 @@ namespace Backoffice.Shared.IncomingSbEngineMessages
         public string SelectionTemplateId { get; set; }
         public string MarketSpecifier { get; set; }
         public long SelectionId { get; set; }
+        public string ProviderSelectionId { get; set; }
         public decimal Odds { get; set; }
         public double Probability { get; set; }
         public double WonProbability { get; set; }

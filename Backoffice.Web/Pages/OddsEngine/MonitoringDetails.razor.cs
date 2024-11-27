@@ -82,9 +82,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             MarginMarket = new MarketModel();
 
             await _hubService.RegisterMessageHandlers(
-                ProcessOddsChangeMonitoring,
                 ProcessOnBetStopFixture,
-                ProcessOnBetStopGlobal
+                ProcessOnBetStopGlobal,
+                processOddsChange: ProcessOddsChangeMonitoring
             );
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
@@ -474,7 +474,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             return await PrepareFixtureMarkets(filteredMarkets.ToList());
         }
 
-        private async Task ProcessOddsChangeMonitoring(OddsChangeFixtureMessage message)
+        private async Task ProcessOddsChangeMonitoring(OddsChangeFixtureDetailsMessage message)
         {
             if (Fixture == null || Fixture.FixtureTypeId != message.FixtureTypeId || Id != message.ProviderFixtureId)
                 return;

@@ -30,7 +30,6 @@ namespace Backoffice.Web.Models.OddsEngine.Monitoring
         public int SortOrder { get; set; }
         public int FixtureTypeId { get; set; }
         public long UnixTime { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        public SportMarketTemplateGroup MarketTemplateGroups { get; set; } = new SportMarketTemplateGroup();
         public List<MonitoringFixtureClient> ClientMarkets { get; set; } = new List<MonitoringFixtureClient>();
     }
     public class MonitoringFixtureClient
@@ -68,6 +67,5 @@ namespace Backoffice.Web.Models.OddsEngine.Monitoring
         public bool IsActive { get; set; }
         public int SortOrder { get; set; }
         public long UnixTime { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        public string CorrelationId { get; set; }
     }
 }

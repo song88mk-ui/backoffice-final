@@ -32,7 +32,6 @@ namespace Backoffice.Shared.Models
         public bool IsBetStopGlobal { get; set; }
         public int SortOrder { get; set; }
         public int FixtureTypeId { get; set; }
-        public SportMarketTemplateGroup MarketTemplateGroups { get; set; } = new SportMarketTemplateGroup();
         public List<ClientMarket> ClientMarkets { get; set; } = new List<ClientMarket>();
     }
     public class MarketModelV2
@@ -66,6 +65,5 @@ namespace Backoffice.Shared.Models
         public string DecimalOdds { get; set; }
         public bool IsActive { get; set; }
         public int SortOrder { get; set; }
-        public string CorrelationId { get; set; }
     }
 }

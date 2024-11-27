@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Policy;
-using System.Text;
 
 namespace Backoffice.Shared.Models.HubMessages
 {
-    public class OddsChangeFixtureMessage
+    public class OddsChangeFixtureDetailsMessage
     {
         public int SportId { get; set; }
         public string SportName { get; set; }
@@ -31,9 +29,9 @@ namespace Backoffice.Shared.Models.HubMessages
         public List<int> BetStop {  get; set; }
         public bool IsBetStopGlobal { get; set; }
         public long UnixTime { get; set; }
-        public List<OddsChangeMarket> Markets { get; set; } = new List<OddsChangeMarket>();
+        public List<OddsChangeFixtureDetailsMarket> Markets { get; set; } = new List<OddsChangeFixtureDetailsMarket>();
     }
-    public class OddsChangeMarket
+    public class OddsChangeFixtureDetailsMarket
     {
         public string MarketTemplateId { get; set; }
         public string MarketId { get; set; }
@@ -48,29 +46,28 @@ namespace Backoffice.Shared.Models.HubMessages
         public Dictionary<string, decimal> ClientCodeMargins { get; set; }
         public int SortOrder { get; set; }
         public long UnixTime { get; set; }
-        public List<OddsChangeClientSelections> ClientSelections { get; set; } = new List<OddsChangeClientSelections>();
-        public List<OddsChangeSelection> Selections { get; set; } = new List<OddsChangeSelection>();
+        public List<OddsChangeFixtureDetailsClientSelections> ClientSelections { get; set; } = new List<OddsChangeFixtureDetailsClientSelections>();
+        public List<OddsChangeFixtureDetailsSelection> Selections { get; set; } = new List<OddsChangeFixtureDetailsSelection>();
     }
-    public class OddsChangeClientSelections
+    public class OddsChangeFixtureDetailsClientSelections
     {
         public string ClientCode { get; set; }
         public string ClientMargin { get; set; }
 
-        public List<OddsChangeSelection> Selections { get; set; } = new List<OddsChangeSelection>();
+        public List<OddsChangeFixtureDetailsSelection> Selections { get; set; } = new List<OddsChangeFixtureDetailsSelection>();
     }
-    public class OddsChangeSelection
+    public class OddsChangeFixtureDetailsSelection
     {
         public string ProviderSelectionId { get; set; }
         public long SelectionId { get; set; }
         public string SelectionTemplateId { get; set; }
         public string SelectionName { get; set; }
-        //public string SelectionSpecifier { get; set; }
         public decimal DecimalOdds { get; set; }
         public bool IsActive { get; set; }
         public int SortOrder { get; set; }
         public long UnixTime { get; set; }
     }
-    public class OddsChangeClientOdds
+    public class OddsChangeFixtureDetailsClientOdds
     {
         public string ClientCode { get; set; }
         public string ClientMargin { get; set; }
