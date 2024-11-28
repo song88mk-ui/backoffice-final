@@ -110,7 +110,7 @@
                                                         <td class="td-close-match">
                                                             <button type="button"
                                                                     class="btn btn-dark close-match-btn mx-4"
-                                                                    @onclick="() => HandleCloseMatchClick(fixture.FixtureName, fixture.ProviderFixtureId)">
+                                                                    @onclick="fixture.CloseMatchClick">
                                                                 @_translationState.GetValue("Close Match")
                                                             </button>
                                                         </td>

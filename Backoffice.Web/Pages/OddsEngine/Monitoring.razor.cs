@@ -295,7 +295,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                             }).ToList(),
                             IsBetStop = fixture.IsBetStopGlobal || (fixture.BetStop.Count > 0 && fixture.BetStop.FirstOrDefault() == 1)
                         }
-                    }).ToList()
+                    }).ToList(),
+                    CloseMatchClick = e => HandleCloseMatchClick(fixture.FixtureName, fixture.ProviderFixtureId)
                 });
             }
 
@@ -388,6 +389,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 }).ToList()
                             }
                         }).ToList(),
+                        CloseMatchClick = e => HandleCloseMatchClick(message.FixtureName, message.ProviderFixtureId)
                     });
                 }
                 else
