@@ -31,7 +31,7 @@
                 </div>
                 <div class="announcement-title-container">
                     <div class="announcement-title-label">Title</div>
-                    <div class="announcement-title-sub-label">The title of your announcement.</div>
+                    <div class="announcement-title-sub-label">@_translationState.GetValue("The title of your announcement").</div>
                     <input type="text" class="form-control @(ShowNoTitleAlert() ? "has-error" : "")" id="titleField" placeholder="Enter title" @bind-value="_announcement.Title" @onblur="HandleBlur" />
                     @if (ShowNoTitleAlert())
                     {
@@ -88,8 +88,8 @@
                     }
                 </div>
                 <div class="announcement-language-container">
-                    <span class="announcement-language-label">Language</span>
-                    <span class="announcement-language-sub-label">Select the language to display this announcement to all selected clients.</span>
+                    <span class="announcement-language-label">@_translationState.GetValue("Language")</span>
+                    <span class="announcement-language-sub-label">@_translationState.GetValue("Select the language to display this announcement to all selected clients.")</span>
                     <div class="announcement-language-list">
                         @foreach (var language in _languages.Languages)
                         {
@@ -101,9 +101,9 @@
                     </div>
                 </div>
                 <div class="announcement-message-container">
-                    <span class="announcement-message-label">Message</span>
-                    <span class="announcement-message-sub-label">Enter the message of your announcement.</span>
-                    <textarea class="announcement-message-input @(ShowNoMessageAlert() ? "has-error" : "")" maxlength="500" placeholder="Enter the message of your announcement" @bind="_announcementMessages[_selectedLanguage]" rows="4" @onblur="HandleBlur" />
+                    <span class="announcement-message-label">@_translationState.GetValue("Message")</span>
+                    <span class="announcement-message-sub-label">@_translationState.GetValue("Enter the message of your announcement").</span>
+                    <textarea class="announcement-message-input @(ShowNoMessageAlert() ? "has-error" : "")" maxlength="500" placeholder="@_translationState.GetValue("Enter the message of your announcement")" @bind="_announcementMessages[_selectedLanguage]" rows="4" @onblur="HandleBlur" />
                     @if (ShowNoMessageAlert())
                     {
                         <span class="announcement-error-message">@(NO_MSG_ERR_MSG)</span>

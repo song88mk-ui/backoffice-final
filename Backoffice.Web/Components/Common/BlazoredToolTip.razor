@@ -5,7 +5,7 @@
       @onpointerleave:preventDefault="true" @onpointerleave:stopPropagation="true">
     @if (Content != null)
     {
-        <h3 class="popover-header">@Title</h3>
+        <h3 class="popover-header">@_translationState.GetValue(Title)</h3>
         <div class="popover-body">
             <CascadingValue Value="this">
                 <CascadingValue Value="@Parameters">

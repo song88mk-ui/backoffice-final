@@ -24,7 +24,7 @@
         <div class="button-container d-flex flex-row-reverse align-items-end">
             <AuthorizeView Policy="sbc-announcements-canedit">
                 <Authorized Context="ActivateAll">
-                    <a href="javascript:void(0)" class="btn btn-create px-4" @onclick="OnCreateAnnouncementClickEvent">Add</a>
+                    <a href="javascript:void(0)" class="btn btn-create px-4" @onclick="OnCreateAnnouncementClickEvent">@_translationState.GetValue("Add")</a>
                 </Authorized>
             </AuthorizeView>
         </div>
