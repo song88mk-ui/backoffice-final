@@ -273,6 +273,19 @@ namespace Backoffice.API.Controllers.Backoffice
                     return BadRequest(result);
             }
         }
+        [HttpPost("set/activitylog/list")]
+        public async Task<IActionResult> SetActivityLogList([FromBody] ActivityLogListRequest request)
+        {
+            var result = await _backofficeRepository.AddActivityLogList(request);
+
+            switch (result.StatusCode)
+            {
+                case BoStatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         [HttpPost("activitylog/list")]
         public async Task<IActionResult> GetActivityLogs([FromBody] ActivityLogRequest request)
         {
