@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <div class="announcement-title-container">
-                    <div class="announcement-title-label">Title</div>
+                    <div class="announcement-title-label">@_translationState.GetValue("Title")</div>
                     <div class="announcement-title-sub-label">@_translationState.GetValue("The title of your announcement").</div>
                     <input type="text" class="form-control @(ShowNoTitleAlert() ? "has-error" : "")" id="titleField" placeholder="Enter title" @bind-value="_announcement.Title" @onblur="HandleBlur" />
                     @if (ShowNoTitleAlert())
@@ -40,7 +40,7 @@
                 </div>
                 <div class="announcement-dates-container">
                     <div class="announcement-start-date-container">
-                        <span class="announcement-start-date-title">Start Date / Time (UTC)</span>
+                        <span class="announcement-start-date-title">@($"{_translationState.GetValue("Start Date")} / {_translationState.GetValue("Time (UTC)")}")</span>
                         <div class="announcement-date-input-wrapper @GetDateRangeClass()">
                             <DateRangePicker class="form-control"
                                 StartDate="_announcement.StartDate"
@@ -58,7 +58,7 @@
                         }
                     </div>
                     <div class="announcement-end-date-container">
-                        <span class="announcement-end-date-title">End Date / Time (UTC)</span>
+                        <span class="announcement-end-date-title">@($"{_translationState.GetValue("End Date")} / {_translationState.GetValue("Time (UTC)")}")</span>
                         <div class="announcement-date-input-wrapper">
                             <DateRangePicker class="form-control"
                                 MinDate="_announcement.StartDate"
@@ -74,8 +74,8 @@
                     </div>
                 </div>
                 <div class="announcement-clients-container">
-                    <span class="announcement-clients-label">Clients</span>
-                    <span class="announcement-clients-sub-label">Select the clients who will see this announcement.</span>
+                    <span class="announcement-clients-label">@_translationState.GetValue("Clients")</span>
+                    <span class="announcement-clients-sub-label">@_translationState.GetValue("Select the clients who will see this announcement").</span>
                     @if (_clients != null)
                     {
                         <div class="announcement-clients-input-wrapper @(ShowNoClientAlert() ? "has-error" : "")" @onblur="HandleBlur">

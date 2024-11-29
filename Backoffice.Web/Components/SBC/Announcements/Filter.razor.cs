@@ -25,6 +25,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
         private bool _init = true;
         private bool _shouldRender;
 
+        private LanguageCode _languageCode;
         private SearchFormModel _searchForm;
         private AnnouncementsFilterModel _filterModel;
         private List<SelectListItemWithCheckboxModel<string>> _clients;
@@ -64,6 +65,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
             if (_shouldRender)
             {
+                _languageCode = _translationState.ActiveLanguageCode;
+
                 if (_userState.SportsbookClients != null && _clientListReference != _userState.SportsbookClients)
                     _clientListReference = _userState.SportsbookClients;
 
@@ -129,7 +132,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         private bool ValidateParameters()
         {
-            return _init || _clientListReference != _userState.SportsbookClients;
+            return _init || _clientListReference != _userState.SportsbookClients || _languageCode != _translationState.ActiveLanguageCode;
         }
 
         public void Dispose()
