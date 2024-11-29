@@ -18,7 +18,6 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
 
-//
 // Telemetry
 Action<ResourceBuilder> configureResource = r => r.AddService(
     serviceName: "Backoffice.Web",

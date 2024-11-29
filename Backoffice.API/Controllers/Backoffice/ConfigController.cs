@@ -25,6 +25,7 @@ namespace Backoffice.API.Controllers.Backoffice
     [ApiController, EnableCors("AllowAllOrigins"), ServiceFilter(typeof(ApiKeyFilter))]
     public class ConfigController : ControllerBase
     {
+        //
         private readonly IBackofficeRepository _backofficeRepository;
         private readonly IMaintenanceRepository _maintenanceRepository;
         private readonly ActivitySource _activitySource;
