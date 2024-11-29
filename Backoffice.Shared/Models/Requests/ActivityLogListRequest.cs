@@ -4,6 +4,6 @@ namespace Backoffice.Shared.Models.Requests
 {
     public class ActivityLogListRequest
     {
-        public List<ActivityLogModel> ActivityLogs { get; set; }
+        public List<ActivityLogModel> ActivityLogs { get; set; } = new List<ActivityLogModel>();
     }
 }
