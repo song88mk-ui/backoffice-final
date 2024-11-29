@@ -214,7 +214,7 @@ namespace Backoffice.API.Controllers.SportsbookClients
 
         [HttpPost("announcements/post")]
         public async Task<IActionResult> AddOrUpdateAnnouncements([FromBody] AddOrUpdateAnnouncementRequest request)
-        {//
+        {
             using (var activity = _activitySource.StartActivity("announcements/post"))
             {
                 activity?.SetTag("request", JsonSerializer.Serialize(request));
