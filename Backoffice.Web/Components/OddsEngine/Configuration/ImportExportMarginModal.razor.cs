@@ -1,7 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.OutgoingEngineMessages;
-using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -9,7 +8,6 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using Serilog;
 using System.IO.Compression;
-using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -20,7 +18,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
         [Inject] private IExcelService ExcelService { get; set; }
-        [Inject] private IMessageBroker MessageBroker { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
@@ -101,6 +98,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         {
             try
             {
+                // Task - Migrate to API call
+                return;
+
                 IsUploading = true;
                 StateHasChanged();
 
@@ -109,15 +109,16 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     var stream = new MemoryStream();
                     await e.File.OpenReadStream(long.MaxValue).CopyToAsync(stream);
 
-                    var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(stream, e.File.Name, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
+                    // Task - Migrate to api call
+                    //var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(stream, e.File.Name, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
 
 
                     IsUploading = false;
-                    if (payload.StatusCode == StatusCode.Error)
-                    {
-                        await OnImportMarginCallback.InvokeAsync(payload.Message);
-                        return;
-                    }
+                    //if (payload.StatusCode == StatusCode.Error)
+                    //{
+                    //    await OnImportMarginCallback.InvokeAsync(payload.Message);
+                    //    return;
+                    //}
                 }
                 else if (e.File.Name.Contains(".zip"))
                 {
@@ -159,18 +160,19 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                         StateHasChanged();
 
-                        using (MemoryStream ms = new MemoryStream(fileStream.Value))
-                        {
-                            var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(ms, fileStream.Key, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
+                        //using (MemoryStream ms = new MemoryStream(fileStream.Value))
+                        //{
+                        //    // Task - Migrate to api call
+                        //    var payload = await ExcelService.ConvertExceltoBulkUpdateConfigMessage(ms, fileStream.Key, UserModel.Id, string.Join(",", SelectedClientsSet), MessageBroker);
 
-                            if (payload.StatusCode == StatusCode.Error)
-                            {
-                                IsUploading = false;
+                        //    if (payload.StatusCode == StatusCode.Error)
+                        //    {
+                        //        IsUploading = false;
 
 
-                                return;
-                            }
-                        }
+                        //        return;
+                        //    }
+                        //}
                     }
 
                     IsUploading = false;
@@ -229,7 +231,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 SportIds = string.Join(",", SelectedSportsSet)
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet2", "r.oe.web.config.ongetmarginspreadsheet2", Guid.NewGuid().ToString());
+            // Task - Migrate to api call
+            //MessageBroker.Publish(JsonSerializer.Serialize(payload), "OnGetMarginSpreadsheet2", "r.oe.web.config.ongetmarginspreadsheet2", Guid.NewGuid().ToString());
 
             IsUploading = false;
 

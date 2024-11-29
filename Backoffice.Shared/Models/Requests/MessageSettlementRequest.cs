@@ -1,14 +1,12 @@
 ﻿using Backoffice.Shared.OutgoingEngineMessages;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Backoffice.Shared.Models.Requests
 {
     public class MessageSettlementRequest
     {
         public MessageSettlementIodocsRequest MessageSettlementIodocsRequest { get; set; }
-        public OnActivityLogMessage OnActivityLogMessage { get; set; }
+        public ActivityLogModel OnActivityLogMessage { get; set; }
     }
 
     public class MessageSettlementIodocsRequest

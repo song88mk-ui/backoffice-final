@@ -389,10 +389,10 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
             IsPreLoader = true;
             await InvokeAsync(StateHasChanged);
 
-            OnActivityLogListMessage ActivityLogs = new OnActivityLogListMessage();
+            var ActivityLogs = new ActivityLogListRequest();
             foreach (var item in request)
             {
-                OnActivityLogMessage ActivityLog = new OnActivityLogMessage()
+                var ActivityLog = new ActivityLogModel()
                 {
                     Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace('_', '.'),
                     Activity = Activity.ManualSettlement.ToString(),
@@ -445,7 +445,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                     TimeStamp = DateTime.Now
                 };
 
-                ActivityLogs.OnActivityLogMessages.Add(ActivityLog);
+                ActivityLogs.ActivityLogs.Add(ActivityLog);
             }
 
             var response = (await TradingService.AddOrUpdateManualMarketSettlement(request, UserModel.Id)).Result;

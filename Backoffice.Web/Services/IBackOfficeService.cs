@@ -2,9 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Models;
-using System.Threading;
 
 namespace Backoffice.Web.Services
 {
@@ -16,7 +14,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<MaintenanceResponse>> SetMaintenanceV2(SetMaintenanceRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);
         Task<BaseResponse<MessageResponse>> AddActivityLog(ActivityLogModel request);
-        Task<BaseResponse<MessageResponse>> AddActivityLogList(OnActivityLogListMessage request);
+        Task<BaseResponse<MessageResponse>> AddActivityLogList(ActivityLogListRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request, string region);
         Task<BaseResponse<ActivityLogResponse>> GetManualBetSettlementActivityLogs(ManualBetSettlementActivityLogRequest request);
         Task<BaseResponse<ClientModel>> GetClients();

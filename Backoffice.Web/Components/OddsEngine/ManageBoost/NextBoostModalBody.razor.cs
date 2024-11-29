@@ -111,7 +111,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             if (result.StatusCode == StatusCode.Success)
             {
-                //remove existing from mongodb
                 if (result.Result.ExistingPriceBoostConfigs != null)
                 {
                     foreach (var existing in result.Result.ExistingPriceBoostConfigs)
@@ -161,7 +160,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     }
                 }
 
-                var activityLogList = new OnActivityLogListMessage();
+                var activityLogList = new ActivityLogListRequest();
 
                 foreach (var priceboost in AddPriceBoostFilterModel.PriceBoostConfigList)
                 {
@@ -227,7 +226,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                             Translations = priceboost.BoostedSelectionTranslations
                         };
 
-                        OnActivityLogMessage onActivityLogMessage = new OnActivityLogMessage()
+                        var onActivityLogMessage = new ActivityLogModel()
                         {
                             Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace('_', '.'),
                             Payload = $"{priceboost.ClientCode}.{priceboost.SportId}.{priceboost.SegmentId}.{priceboost.LeagueId}",
@@ -239,7 +238,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                             TimeStamp = DateTime.UtcNow
                         };
 
-                        activityLogList.OnActivityLogMessages.Add(onActivityLogMessage);
+                        activityLogList.ActivityLogs.Add(onActivityLogMessage);
                     }
                 }                
 

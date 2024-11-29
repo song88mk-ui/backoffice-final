@@ -14,7 +14,6 @@ namespace Backoffice.Web.Pages.Administration
     {
         #region Properties
 
-        [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
@@ -82,7 +81,8 @@ namespace Backoffice.Web.Pages.Administration
                 MetaData = MetaData
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(request), "ExportCancelBetHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+            // Task - Migrate to api call
+            //MessageBroker.Publish(JsonSerializer.Serialize(request), "ExportCancelBetHistory", "r.bo.util.export", Guid.NewGuid().ToString());
 
 
             _toasterService.AddToast(Toast.NewToast

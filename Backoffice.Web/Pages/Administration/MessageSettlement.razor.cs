@@ -1,7 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.Utilities;
 using Backoffice.Web.Components.Administration.MessageSettlement;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -16,7 +15,6 @@ namespace Backoffice.Web.Pages.Administration
         #region Properties
 
         [Inject] public IJSRuntime JSRuntime { get; set; }
-        [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }

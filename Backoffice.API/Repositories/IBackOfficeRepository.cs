@@ -10,7 +10,8 @@ namespace Backoffice.API.Repositories
 {
     public interface IBackofficeRepository
     {
-        Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request);
+        Task<BaseResponse<bool>> AddActivityLog(ActivityLogModel request); 
+        Task<BaseResponse<bool>> AddActivityLogList(ActivityLogListRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetManualBetSettlementHistoryLogs(ManualBetSettlementActivityLogRequest request);
         Task<BaseResponse<ActivityLogResponse>> GetActivityLogs(ActivityLogRequest request);

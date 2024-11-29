@@ -1,5 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Administration.CancelBets;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -147,7 +147,7 @@ namespace Backoffice.Web.Pages.Administration
                 if (response.StatusCode == StatusCode.Success)
                 {
                     //activity log
-                    OnActivityLogListMessage message = new();
+                    ActivityLogListRequest message = new();
                     foreach (var data in response.Result.Data)
                     {
                         var betData = betDetails.Bets.FirstOrDefault(b => b.BetId == Guid.Parse(data.BetId));
@@ -161,7 +161,7 @@ namespace Backoffice.Web.Pages.Administration
                             {
                                 foreach (var selection in betData.Selections)
                                 {
-                                    message.OnActivityLogMessages.Add(new()
+                                    message.ActivityLogs.Add(new()
                                     {
                                         Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                                         Payload = $"{UserModel.UserName}.{data.BetId}.{selection.BetSelectionId}.{betData.UserId}.{betData.ClientName}",

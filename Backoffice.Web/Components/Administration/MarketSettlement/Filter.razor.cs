@@ -18,7 +18,6 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         #region Properties        
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IMessageBroker MessageBroker { get; set; }
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
@@ -221,7 +220,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 ConnectionId = UserModel.ConnectionId
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMarketSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+            // Task - Migrate to api call
+            //MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMarketSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
             await OnExportCallback.InvokeAsync();
         }
 

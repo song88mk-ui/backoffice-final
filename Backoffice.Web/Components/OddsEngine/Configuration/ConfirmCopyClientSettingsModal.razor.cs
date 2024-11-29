@@ -2,11 +2,9 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineMessages;
-using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -14,7 +12,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
         [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IMessageBroker MessageBroker { get; set; }
         [Inject] private IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -79,7 +76,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     ).ToList()
                 };
 
-                MessageBroker.Publish(JsonSerializer.Serialize(message), "OnCopyClientSettings2", "r.oe.web.config.oncopyclientsettings2", Guid.NewGuid().ToString());
+                // Task - Migrate to api call
+                //MessageBroker.Publish(JsonSerializer.Serialize(message), "OnCopyClientSettings2", "r.oe.web.config.oncopyclientsettings2", Guid.NewGuid().ToString());
 
                 alert = new AlertModel()
                 {

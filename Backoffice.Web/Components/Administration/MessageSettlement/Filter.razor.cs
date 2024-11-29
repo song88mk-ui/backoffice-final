@@ -2,13 +2,11 @@
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
-using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
 using Serilog;
-using System.Text.Json;
 using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.FixtureModel;
 
 namespace Backoffice.Web.Components.Administration.MessageSettlement
@@ -17,7 +15,6 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
     {
         #region Properties
 
-        [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
 
         [Parameter] public EventCallback OnInitializeCallback { get; set; }
@@ -229,7 +226,8 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
                 SettledBy = FilterModel.SettledBy
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMessageSettlementHistory", $"r.bo.util.export", Guid.NewGuid().ToString());
+            // Task - Migrate to api call
+            //MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportMessageSettlementHistory", $"r.bo.util.export", Guid.NewGuid().ToString());
 
             await OnExportCallback.InvokeAsync();
         }

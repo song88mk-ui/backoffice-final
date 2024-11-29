@@ -1524,7 +1524,18 @@ namespace Backoffice.API.Repositories
                 if (response.IsSuccessStatusCode)
                 {
                     var activityLogList = new OnActivityLogListMessage();
-                    activityLogList.OnActivityLogMessages.AddRange(request.Select(x => x.OnActivityLogMessage).ToList());
+                    activityLogList.OnActivityLogMessages.AddRange(request.Select(c => new OnActivityLogMessage()
+                    {
+                        Id = c.OnActivityLogMessage.Id,
+                        Page = c.OnActivityLogMessage.Page,
+                        Payload = c.OnActivityLogMessage.Payload,
+                        Activity = c.OnActivityLogMessage.Activity,
+                        From = c.OnActivityLogMessage.From,
+                        To = c.OnActivityLogMessage.To,
+                        UserId = c.OnActivityLogMessage.UserId,
+                        UserName = c.OnActivityLogMessage.UserName,
+                        TimeStamp = c.OnActivityLogMessage.TimeStamp
+                    }).ToList());
                     await _activityLogRepository.ProcessActivityLog(activityLogList);
 
                     return JsonSerializer.Deserialize<BaseResponse<string>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

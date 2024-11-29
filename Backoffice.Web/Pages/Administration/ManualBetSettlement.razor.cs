@@ -3,12 +3,10 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
-using Backoffice.Shared.Utilities;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Text;
-using System.Text.Json;
 using static Backoffice.Shared.Models.ManualBetDetailsModel;
 
 namespace Backoffice.Web.Pages.Administration
@@ -18,7 +16,6 @@ namespace Backoffice.Web.Pages.Administration
         #region Properties
 
         [Inject] private IBackofficeService BackofficeService { get; set; }
-        [Inject] private IMessageBroker MessageBroker { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
         [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
@@ -120,7 +117,8 @@ namespace Backoffice.Web.Pages.Administration
                 ConnectionId = UserModel.ConnectionId
             };
 
-            MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportManualBetSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
+            // Task - Migrate to api call
+            //MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportManualBetSettlementHistory", "r.bo.util.export", Guid.NewGuid().ToString());
 
             _toasterService.AddToast(Toast.NewToast
                     ("Manual Bet Settlement",

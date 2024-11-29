@@ -1,22 +1,12 @@
-﻿using Backoffice.Shared.Models;
-using Backoffice.Shared.OutgoingEngineMessages;
-using Backoffice.Shared.Utilities;
+﻿using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.JSInterop;
-using RabbitMQ.Client;
-using System.Security.Permissions;
-using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
     public partial class ExportTemplateModal : IDisposable
     {
         #region Properties
-        [Inject] public IMessageBroker MessageBroker { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         #endregion
@@ -45,7 +35,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 AccessToken = HttpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty
             };
 
-            await Task.Run(() => MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportOeConfigTemplate", $"r.bo.util.export", Guid.NewGuid().ToString()));
+            // Task - Migrate to api call
+            //await Task.Run(() => MessageBroker.Publish(JsonSerializer.Serialize(payload), "ExportOeConfigTemplate", $"r.bo.util.export", Guid.NewGuid().ToString()));
 
             _modalService.Cancel();
         }

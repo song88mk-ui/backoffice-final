@@ -1,6 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -108,7 +108,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
                     if ((betselectionCount == 1 && !string.IsNullOrWhiteSpace(item.Reason)) || (item.IsChecked && !string.IsNullOrWhiteSpace(item.Reason)))
                     {
                         int requestId = 318;
-                        var activityLog = new OnActivityLogMessage()
+                        var activityLog = new ActivityLogModel()
                         {
                             Page = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
                             Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
@@ -160,7 +160,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
                                 RequestId = requestId,
                             };
 
-                            var activityLog2 = new OnActivityLogMessage()
+                            var activityLog2 = new ActivityLogModel()
                             {
                                 Page = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
                                 Payload = $"{item.SportId}.{item.SegmentId}.{item.LeagueId}.{item.FixtureId}",
@@ -201,14 +201,14 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
                 {
                     var response = await TradingService.AddManualMessageSettlement(messageSettlementRequest);
 
-                    OnActivityLogListMessage onActivityLogListMessage = new OnActivityLogListMessage();
+                    var onActivityLogListMessage = new ActivityLogListRequest();
 
                     foreach (var item in messageSettlementRequest)
                     {
-                        onActivityLogListMessage.OnActivityLogMessages.Add(item.OnActivityLogMessage);
+                        onActivityLogListMessage.ActivityLogs.Add(item.OnActivityLogMessage);
                     }
 
-                    if (onActivityLogListMessage.OnActivityLogMessages.Any())
+                    if (onActivityLogListMessage.ActivityLogs.Any())
                     {
                         var activityLogResponse = await BackofficeService.AddActivityLogList(onActivityLogListMessage);
                     }

@@ -40,7 +40,6 @@ namespace Backoffice.Web.Services
 
         private readonly IConfiguration _configuration;
         private readonly IAuthenticationService _authenticationService;
-        private readonly IMessageBroker _messageBroker;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IJSRuntime _jsRuntime;
         private readonly UserState _userState;
@@ -48,11 +47,10 @@ namespace Backoffice.Web.Services
 
         #region Ctor
 
-        public BackofficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IMessageBroker messageBroker, IHttpContextAccessor httpContextAccessor, IJSRuntime jsRuntime, UserState userState)
+        public BackofficeService(HttpClient httpClient, IConfiguration configuration, IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor, IJSRuntime jsRuntime, UserState userState)
         {
             _configuration = configuration;
             _authenticationService = authenticationService;
-            _messageBroker = messageBroker;
             _httpContextAccessor = httpContextAccessor;
             _jsRuntime = jsRuntime;
             _userState = userState;
@@ -209,15 +207,32 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                _messageBroker.Publish(JsonSerializer.Serialize(request), "LogActivity", "r.bo.util.logs", Guid.NewGuid().ToString());
+                var result = new BaseResponse<bool>();
+                var response = await _httpClient.PostAsync($"api/config/activitylog", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                return new BaseResponse<MessageResponse>
+                if (response.IsSuccessStatusCode)
+                    result = JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
                 {
-                    StatusCode = StatusCode.Success,
-                    Message = $"{StatusCode.Success}",
-                    Result = new MessageResponse
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        result = JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
                     {
-                        IsSuccess = true
+                        result = new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+
+                return new BaseResponse<MessageResponse>()
+                {
+                    StatusCode = result.StatusCode,
+                    Message = result.Message,
+                    Result = new MessageResponse()
+                    {
+                        IsSuccess = result.Result
                     }
                 };
             }
@@ -230,23 +245,44 @@ namespace Backoffice.Web.Services
                 return new BaseResponse<MessageResponse>
                 {
                     StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = new MessageResponse()
+                    {
+                        IsSuccess = false
+                    }
                 };
             }
         }
-        public async Task<BaseResponse<MessageResponse>> AddActivityLogList(OnActivityLogListMessage request)
+        public async Task<BaseResponse<MessageResponse>> AddActivityLogList(ActivityLogListRequest request)
         {
             try
             {
-                _messageBroker.Publish(JsonSerializer.Serialize(request), "LogActivityList", "r.bo.util.logs", Guid.NewGuid().ToString());
+                var result = new BaseResponse<bool>();
+                var response = await _httpClient.PostAsync($"api/config/set/activitylog/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
-                return new BaseResponse<MessageResponse>
+                if (response.IsSuccessStatusCode)
+                    result = JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                else
                 {
-                    StatusCode = StatusCode.Success,
-                    Message = $"{StatusCode.Success}",
-                    Result = new MessageResponse
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                        result = JsonSerializer.Deserialize<BaseResponse<bool>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                    else
                     {
-                        IsSuccess = true
+                        result = new BaseResponse<bool>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+
+                return new BaseResponse<MessageResponse>()
+                {
+                    StatusCode = result.StatusCode,
+                    Message = result.Message,
+                    Result = new MessageResponse()
+                    {
+                        IsSuccess = result.Result
                     }
                 };
             }
@@ -259,7 +295,11 @@ namespace Backoffice.Web.Services
                 return new BaseResponse<MessageResponse>
                 {
                     StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
+                    Result = new MessageResponse()
+                    {
+                        IsSuccess = false
+                    }
                 };
             }
         }
