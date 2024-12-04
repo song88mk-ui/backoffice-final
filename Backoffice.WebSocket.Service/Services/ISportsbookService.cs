@@ -8,6 +8,7 @@ namespace Backoffice.WebSocket.Service.Services
 {
     public interface ISportsbookService
     {
+        Task ProcessMarketTemplatePlayerProps();
         Task ProcessOnMonitoringOddsChange(IncomingOddsChangeMessage message, HubConnection hubConnection);
         Task ProcessOnMonitoringDetailsOddsChange(IncomingOddsChangeMessage message, HubConnection hubConnection);
         Task ProcessOnBetStopFixture(IncomingBetStopFixtureMessage message, HubConnection hubConnection);

@@ -38,7 +38,20 @@ namespace Backoffice.WebSocket.Service.Services
 
             _asianClientCodes = configuration["Custom:AsianClientCodes"].ToString().Split(',').ToList();
         }
+        public async Task ProcessMarketTemplatePlayerProps()
+        {
+            try
+            {
+                var result = await _sportsbookRepository.GetMarketTemplatePlayerProps();
 
+                var key = $"mtpp";
+
+                _memCache.AddOrUpdateCache(key, result.Result, DateTimeOffset.UtcNow.AddYears(1));
+            }
+            catch (Exception)
+            {
+            }
+        }
         public async Task ProcessOnMonitoringOddsChange(IncomingOddsChangeMessage message, HubConnection hubConnection)
         {
             try
@@ -483,10 +496,7 @@ namespace Backoffice.WebSocket.Service.Services
             return result;
         }
 
-        private List<MarketTemplatePlayerPropsResponse> GetMarketTemplatePlayerProps()
-        {
-            return _memCache.GetCache($"mtpp", async () => (await _sportsbookRepository.GetMarketTemplatePlayerProps()).Result.ToList(), (int)(DateTimeOffset.UtcNow - DateTimeOffset.UtcNow.AddYears(1)).TotalHours).Result;
-        }
+        private List<MarketTemplatePlayerPropsResponse> GetMarketTemplatePlayerProps() => _memCache.GetCache<List<MarketTemplatePlayerPropsResponse>>($"mtpp") ?? new List<MarketTemplatePlayerPropsResponse>();
 
         private static decimal GetMasterOddsWithAddedMargin(decimal odds)
         {

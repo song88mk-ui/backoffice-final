@@ -84,6 +84,8 @@ namespace Backoffice.WebSocket.Service
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            await _sportsbookService.ProcessMarketTemplatePlayerProps();
+
             _threadOnMonitoringOddsChange = new Thread(ThreadMonitoringOnOddsChange);
             _threadOnMonitoringDetailsOddsChange = new Thread(ThreadMonitoringDetailsOnOddsChange);
             _threadNotification = new Thread(ThreadNotification);
@@ -91,21 +93,6 @@ namespace Backoffice.WebSocket.Service
             _threadOnMonitoringOddsChange.Start();
             _threadOnMonitoringDetailsOddsChange.Start();
             _threadNotification.Start();
-
-            _hubConnection.Closed += async (error) =>
-            {
-                _logger.LogError($"Connection closed. Trying to reconnect... - {error.Message}- {error.InnerException}");
-            };
-            _hubConnection.Reconnecting += (error) =>
-            {
-                _logger.LogWarning($"Reconnecting... {error.Message}- {error.StackTrace}");
-                return Task.CompletedTask;
-            };
-            _hubConnection.Reconnected += (connectionId) =>
-            {
-                _logger.LogInformation($"Reconnected with connectionId: {connectionId}");
-                return Task.CompletedTask;
-            };
 
             await _hubConnection.StartAsync();
 
