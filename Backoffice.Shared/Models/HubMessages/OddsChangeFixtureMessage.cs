@@ -7,79 +7,76 @@ namespace Backoffice.Shared.Models.HubMessages
 {
     public class OddsChangeFixtureMessage
     {
-        public int SportId { get; set; }
-        public string SportName { get; set; }
-        public int SegmentId { get; set; }
-        public string SegmentName { get; set; }
-        public int LeagueId { get; set; }
-        public string LeagueName { get; set; }
-        public string ProviderFixtureId { get; set; }
-        public string FixtureId { get; set; }
-        public string FixtureName { get; set; }
-        public string HomeName { get; set; }
-        public string AwayName { get; set; }
-        public DateTime FixtureStartDate { get; set; }
-        public bool IsLive { get; set; }
-        public bool IsSuspended { get; set; }
-        public int FixtureStatusId { get; set; }
-        public string FixtureStatusName { get; set; }
-        public string Score { get; set; }
-        public string CurrentPeriod { get; set; }
-        public int CurrentMinute { get; set; }
-        public int SortOrder { get; set; }
-        public int FixtureTypeId { get; set; }
-        public List<int> BetStop {  get; set; }
-        public bool IsBetStopGlobal { get; set; }
-        public long UnixTime { get; set; }
-        public List<OddsChangeMarket> Markets { get; set; } = new List<OddsChangeMarket>();
+        public int SpId { get; set; }
+        public string SpNa { get; set; }
+        public int SegId { get; set; }
+        public string SegNa { get; set; }
+        public int LeId { get; set; }
+        public string LeNa { get; set; }
+        public string PrFiId { get; set; }
+        public string FiId { get; set; }
+        public string FiNa { get; set; }
+        public string HoNa { get; set; }
+        public string AwNa { get; set; }
+        public DateTime FiStDa { get; set; }
+        public bool IsLi { get; set; }
+        public int FiSId { get; set; }
+        public string FiStNa { get; set; }
+        public string Sc { get; set; }
+        public string CuPe { get; set; }
+        public int CuMi { get; set; }
+        public int SoOr { get; set; }
+        public int FiTyId { get; set; }
+        public long UnTi { get; set; }
+        public List<OddsChangeMarket> Ma { get; set; } = new List<OddsChangeMarket>();
     }
     public class OddsChangeMarket
     {
-        public string MarketTemplateId { get; set; }
-        public string MarketId { get; set; }
-        public string ProviderMarketId { get; set; }
-        public string MarketName { get; set; }
-        public string Line { get; set; }
-        public int MarketStatusId { get; set; }
-        public string MarketStatusName { get; set; }
-        public string MarketSpecifier { get; set; }
-        public string ClientCode { get; set; } // To Be Remove
-        public string ClientCodeMargin { get; set; } // To Be Remove
-        public Dictionary<string, decimal> ClientCodeMargins { get; set; }
-        public int SortOrder { get; set; }
-        public long UnixTime { get; set; }
-        public List<OddsChangeClientSelections> ClientSelections { get; set; } = new List<OddsChangeClientSelections>();
-        public List<OddsChangeSelection> Selections { get; set; } = new List<OddsChangeSelection>();
+        public string MaTeId { get; set; }
+        public string MaId { get; set; }
+        public string PrMaId { get; set; }
+        public string MaNa { get; set; }
+        public string Li { get; set; }
+        public int MaStId { get; set; }
+        public string MaStNa { get; set; }
+        public string MaSp { get; set; }
+        public string ClCo { get; set; } // To Be Remove
+        public string ClCoMa { get; set; } // To Be Remove
+        public Dictionary<string, decimal> ClCoMaLi { get; set; }
+        public int SoOr { get; set; }
+        public long UnTi { get; set; }
+        public List<OddsChangeClientSelections> ClSe { get; set; } = new List<OddsChangeClientSelections>();
+        public List<OddsChangeSelection> Se { get; set; } = new List<OddsChangeSelection>();
     }
     public class OddsChangeClientSelections
     {
-        public string ClientCode { get; set; }
-        public string ClientMargin { get; set; }
+        public string ClCo { get; set; }
+        public string ClMa { get; set; }
 
-        public List<OddsChangeSelection> Selections { get; set; } = new List<OddsChangeSelection>();
+        public List<OddsChangeSelection> Se { get; set; } = new List<OddsChangeSelection>();
     }
     public class OddsChangeSelection
     {
-        public string ProviderSelectionId { get; set; }
-        public long SelectionId { get; set; }
-        public string SelectionTemplateId { get; set; }
-        public string SelectionName { get; set; }
+        public string PrSeId { get; set; }
+        public long SeId { get; set; }
+        public string SeTeId { get; set; }
+        public string SeNa { get; set; }
         //public string SelectionSpecifier { get; set; }
-        public decimal DecimalOdds { get; set; }
-        public bool IsActive { get; set; }
-        public int SortOrder { get; set; }
-        public long UnixTime { get; set; }
+        public decimal DecOd { get; set; }
+        public bool IsAc { get; set; }
+        public int SoOr { get; set; }
+        public long UnTi { get; set; }
     }
     public class OddsChangeClientOdds
     {
-        public string ClientCode { get; set; }
-        public string ClientMargin { get; set; }
-        public decimal Odds { get; set; }
-        public string SelectionTemplateId { get; set; }
-        public string SelectionSpecifier { get; set; }
-        public string SelectionName { get; set; }
-        public long SelectionId { get; set; }
-        public bool IsActive { get; set; }
-        public int SortOrder { get; set; }
+        public string ClCo { get; set; }
+        public string ClCoMa { get; set; }
+        public decimal Od { get; set; }
+        public string SeTeId { get; set; }
+        public string SeSp { get; set; }
+        public string SeNa { get; set; }
+        public long SeId { get; set; }
+        public bool IsAc { get; set; }
+        public int SoOr { get; set; }
     }
 }

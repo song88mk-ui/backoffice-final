@@ -476,61 +476,61 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task ProcessOddsChangeMonitoring(OddsChangeFixtureMessage message)
         {
-            if (Fixture == null || Fixture.FixtureTypeId != message.FixtureTypeId || Id != message.ProviderFixtureId)
+            if (Fixture == null || Fixture.FixtureTypeId != message.FiTyId || Id != message.PrFiId)
                 return;
 
-            var newMarketTemplateIds = message.Markets.Select(s => s.MarketTemplateId).ToList();
+            var newMarketTemplateIds = message.Ma.Select(s => s.MaTeId).ToList();
             var marketFixtures = Fixture.Markets.Where(c => newMarketTemplateIds.Contains(c.MarketTemplateId)).ToList();
 
             foreach (var marketFixture in marketFixtures)
             {
                 Fixture.BetStop = new List<int>();
-                Fixture.CurrentPeriod = message.CurrentPeriod;
-                Fixture.CurrentMinute = message.CurrentMinute.ToString();
-                Fixture.Score = message.Score;
-                Fixture.FixtureStatusId = message.FixtureStatusId;
-                Fixture.UnixTime = message.UnixTime;
+                Fixture.CurrentPeriod = message.CuPe;
+                Fixture.CurrentMinute = message.CuMi.ToString();
+                Fixture.Score = message.Sc;
+                Fixture.FixtureStatusId = message.FiSId;
+                Fixture.UnixTime = message.UnTi;
 
-                foreach (var newMarket in message.Markets.Where(c => c.MarketTemplateId == marketFixture.MarketTemplateId && c.MarketSpecifier == marketFixture.MarketSpecifier))
+                foreach (var newMarket in message.Ma.Where(c => c.MaTeId == marketFixture.MarketTemplateId && c.MaSp == marketFixture.MarketSpecifier))
                 {
-                    var selectionIds = newMarket.Selections.Select(s => s.SelectionTemplateId).Distinct().ToList();
+                    var selectionIds = newMarket.Se.Select(s => s.SeTeId).Distinct().ToList();
 
-                    var providerMarketId = $"{Fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newMarket.MarketSpecifier}";
+                    var providerMarketId = $"{Fixture.ProviderFixtureId}:{newMarket.MaTeId}:{newMarket.MaSp}";
                     var currentMarket = Fixture.Markets.FirstOrDefault(c => c.ProviderMarketId == providerMarketId);
 
                     if (currentMarket != null)
                     {
-                        currentMarket.MarketStatusId = newMarket.MarketStatusId;
-                        currentMarket.MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString();
-                        currentMarket.ClientCode = newMarket.ClientCode;
-                        currentMarket.ClientCodeMargin = newMarket.ClientCodeMargin;
-                        currentMarket.UnixTime = newMarket.UnixTime;
+                        currentMarket.MarketStatusId = newMarket.MaStId;
+                        currentMarket.MarketStatusName = ((MarketStatus)newMarket.MaStId).ToString();
+                        currentMarket.ClientCode = newMarket.ClCo;
+                        currentMarket.ClientCodeMargin = newMarket.ClCoMa;
+                        currentMarket.UnixTime = newMarket.UnTi;
 
-                        foreach (var newSelection in newMarket.Selections)
+                        foreach (var newSelection in newMarket.Se)
                         {
-                            var providerSelectionId = $"{Fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newSelection.SelectionTemplateId}:{newMarket.MarketSpecifier}";
+                            var providerSelectionId = $"{Fixture.ProviderFixtureId}:{newMarket.MaTeId}:{newSelection.SeTeId}:{newMarket.MaSp}";
                             var currentSelection = currentMarket.Selections.FirstOrDefault(c => c.ProviderSelectionId == providerSelectionId);
 
                             if (currentSelection != null)
                             {
                                 var clientOdds = new List<ClientOddsModel>();
-                                foreach (var client in newMarket.ClientSelections)
+                                foreach (var client in newMarket.ClSe)
                                 {
-                                    var clientSelection = client.Selections.FirstOrDefault(c => c.SelectionId == newSelection.SelectionId);
+                                    var clientSelection = client.Se.FirstOrDefault(c => c.SeId == newSelection.SeId);
                                     clientOdds.Add(new ClientOddsModel()
                                     {
-                                        ClientCode = client.ClientCode,
-                                        Odds = clientSelection?.DecimalOdds ?? -99,
-                                        SelectionTemplateId = newSelection.SelectionTemplateId,
-                                        SelectionId = newSelection.SelectionId
+                                        ClientCode = client.ClCo,
+                                        Odds = clientSelection?.DecOd ?? -99,
+                                        SelectionTemplateId = newSelection.SeTeId,
+                                        SelectionId = newSelection.SeId
                                     });
                                 }
 
-                                if (newSelection.IsActive)
+                                if (newSelection.IsAc)
                                 {
-                                    currentSelection.DecimalOdds = CommonService.GetFinalOdds(newSelection.DecimalOdds).ToString("0.00");
-                                    currentSelection.IsActive = newSelection.IsActive;
-                                    currentSelection.UnixTime = newSelection.UnixTime;
+                                    currentSelection.DecimalOdds = CommonService.GetFinalOdds(newSelection.DecOd).ToString("0.00");
+                                    currentSelection.IsActive = newSelection.IsAc;
+                                    currentSelection.UnixTime = newSelection.UnTi;
                                     currentSelection.ClientOdds = clientOdds;
                                     //currentSelection.ClientOdds = newSelection.ClientOdds.Select(s =>
                                     //    new ClientOddsModel
@@ -549,49 +549,49 @@ namespace Backoffice.Web.Pages.OddsEngine
                     {
                         var selections = new List<SelectionModel>();
 
-                        foreach (var newSelection in newMarket.Selections)
+                        foreach (var newSelection in newMarket.Se)
                         {
                             var clientOdds = new List<ClientOddsModel>();
-                            foreach (var client in newMarket.ClientSelections)
+                            foreach (var client in newMarket.ClSe)
                             {
-                                var clientSelection = client.Selections.FirstOrDefault(c => c.SelectionId == newSelection.SelectionId);
+                                var clientSelection = client.Se.FirstOrDefault(c => c.SeId == newSelection.SeId);
                                 clientOdds.Add(new ClientOddsModel()
                                 {
-                                    ClientCode = client.ClientCode,
-                                    Odds = clientSelection?.DecimalOdds ?? -99,
-                                    SelectionTemplateId = newSelection.SelectionTemplateId,
-                                    SelectionId = newSelection.SelectionId
+                                    ClientCode = client.ClCo,
+                                    Odds = clientSelection?.DecOd ?? -99,
+                                    SelectionTemplateId = newSelection.SeTeId,
+                                    SelectionId = newSelection.SeId
                                 });
                             }
 
                             selections.Add(new SelectionModel()
                             {
-                                SelectionId = newSelection.SelectionId.ToString(),
-                                ProviderSelectionId = $"{Fixture.ProviderFixtureId}:{newMarket.MarketTemplateId}:{newSelection.SelectionTemplateId}:{newMarket.MarketSpecifier}",
+                                SelectionId = newSelection.SeId.ToString(),
+                                ProviderSelectionId = $"{Fixture.ProviderFixtureId}:{newMarket.MaTeId}:{newSelection.SeTeId}:{newMarket.MaSp}",
                                 //OldDecimalOdds = CommonService.GetFinalOdds(s.DecimalOdds).ToString("0.00"),
-                                DecimalOdds = CommonService.GetFinalOdds(newSelection.DecimalOdds).ToString("0.00"),
-                                IsActive = newSelection.IsActive,
-                                SelectionName = newSelection.SelectionName,
-                                SelectionTemplateId = newSelection.SelectionTemplateId,
-                                SortOrder = newSelection.SortOrder,
-                                UnixTime = newSelection.UnixTime,
+                                DecimalOdds = CommonService.GetFinalOdds(newSelection.DecOd).ToString("0.00"),
+                                IsActive = newSelection.IsAc,
+                                SelectionName = newSelection.SeNa,
+                                SelectionTemplateId = newSelection.SeTeId,
+                                SortOrder = newSelection.SoOr,
+                                UnixTime = newSelection.UnTi,
                                 ClientOdds = clientOdds
                             });
                         }
                         // add market
                         var market = new MarketModel()
                         {
-                            MarketId = newMarket.MarketId.ToString(),
+                            MarketId = newMarket.MaId.ToString(),
                             ProviderMarketId = providerMarketId,
-                            ProviderFixtureId = message.ProviderFixtureId,
-                            Line = newMarket.Line,
-                            ClientCode = newMarket.ClientCode,
-                            ClientCodeMargin = newMarket.ClientCodeMargin,
-                            MarketStatusId = newMarket.MarketStatusId,
-                            MarketStatusName = ((MarketStatus)newMarket.MarketStatusId).ToString(),
-                            MarketName = newMarket.MarketName,
-                            MarketTemplateId = newMarket.MarketTemplateId,
-                            UnixTime = newMarket.UnixTime,
+                            ProviderFixtureId = message.PrFiId,
+                            Line = newMarket.Li,
+                            ClientCode = newMarket.ClCo,
+                            ClientCodeMargin = newMarket.ClCoMa,
+                            MarketStatusId = newMarket.MaStId,
+                            MarketStatusName = ((MarketStatus)newMarket.MaStId).ToString(),
+                            MarketName = newMarket.MaNa,
+                            MarketTemplateId = newMarket.MaTeId,
+                            UnixTime = newMarket.UnTi,
                             Selections = selections
                         };
 

@@ -198,49 +198,49 @@ namespace Backoffice.WebSocket.Service.Services
 
                             var odds = GetClientOdds(message.SportId, activeSelections.Count, margin, market.Selections, market.ClientCodeMargin, market.MarketTemplateId, marketTemplateGroup.Where(c => c.SportId == message.SportId).ToList());
 
-                            clientOdds = odds.GroupBy(c => c.ClientCode).ToDictionary(s => s.Key, s => s.ToList());
+                            clientOdds = odds.GroupBy(c => c.ClCo).ToDictionary(s => s.Key, s => s.ToList());
                         }
 
                         try
                         {
                             markets.Add(new OddsChangeMarket()
                             {
-                                MarketTemplateId = market.MarketTemplateId,
-                                MarketId = market.MarketId.ToString(),
-                                ProviderMarketId = market.ProviderMarketId,
-                                MarketName = market.MarketName,
-                                Line = market.Line,
-                                MarketStatusId = (int)market.MarketStatus,
-                                MarketStatusName = market.MarketStatus.ToString(),
-                                MarketSpecifier = market.MarketSpecifier,
-                                ClientCode = market.ClientCodes,
-                                ClientCodeMargin = market.ClientCodeMargin,
-                                ClientCodeMargins = !string.IsNullOrEmpty(market.ClientCodeMargin) ? market.ClientCodeMargin.Split("|").ToDictionary(s => s.Split(":").FirstOrDefault(), s => Convert.ToDecimal(s.Split(":").LastOrDefault())) : new Dictionary<string, decimal>(),
-                                SortOrder = market.SortOrder,
-                                UnixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                                Selections = market.Selections.Select(selection => new OddsChangeSelection()
+                                MaTeId = market.MarketTemplateId,
+                                MaId = market.MarketId.ToString(),
+                                PrMaId = market.ProviderMarketId,
+                                MaNa = market.MarketName,
+                                Li = market.Line,
+                                MaStId = (int)market.MarketStatus,
+                                MaStNa = market.MarketStatus.ToString(),
+                                MaSp = market.MarketSpecifier,
+                                ClCo = market.ClientCodes,
+                                ClCoMa = market.ClientCodeMargin,
+                                ClCoMaLi = !string.IsNullOrEmpty(market.ClientCodeMargin) ? market.ClientCodeMargin.Split("|").ToDictionary(s => s.Split(":").FirstOrDefault(), s => Convert.ToDecimal(s.Split(":").LastOrDefault())) : new Dictionary<string, decimal>(),
+                                SoOr = market.SortOrder,
+                                UnTi = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                                Se = market.Selections.Select(selection => new OddsChangeSelection()
                                 {
-                                    SelectionId = selection.SelectionId,
-                                    SelectionTemplateId = selection.SelectionTemplateId,
-                                    SelectionName = selection.SelectionName,
-                                    DecimalOdds = selection.Odds,
-                                    IsActive = selection.IsActive,
-                                    SortOrder = selection.SortOrder,
-                                    UnixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+                                    SeId = selection.SelectionId,
+                                    SeTeId = selection.SelectionTemplateId,
+                                    SeNa = selection.SelectionName,
+                                    DecOd = selection.Odds,
+                                    IsAc = selection.IsActive,
+                                    SoOr = selection.SortOrder,
+                                    UnTi = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
                                 }).ToList(),
-                                ClientSelections = clientOdds.Select(odds => new OddsChangeClientSelections()
+                                ClSe = clientOdds.Select(odds => new OddsChangeClientSelections()
                                 {
-                                    ClientCode = odds.Key,
-                                    ClientMargin = odds.Value.FirstOrDefault().ClientMargin,
-                                    Selections = odds.Value.Select(oddsValue => new OddsChangeSelection()
+                                    ClCo = odds.Key,
+                                    ClMa = odds.Value.FirstOrDefault().ClCoMa,
+                                    Se = odds.Value.Select(oddsValue => new OddsChangeSelection()
                                     {
-                                        SelectionId = oddsValue.SelectionId,
-                                        SelectionTemplateId = oddsValue.SelectionTemplateId,
-                                        SelectionName = oddsValue.SelectionName,
-                                        DecimalOdds = oddsValue.Odds,
-                                        IsActive = oddsValue.IsActive,
-                                        SortOrder = oddsValue.SortOrder,
-                                        UnixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+                                        SeId = oddsValue.SeId,
+                                        SeTeId = oddsValue.SeTeId,
+                                        SeNa = oddsValue.SeNa,
+                                        DecOd = oddsValue.Od,
+                                        IsAc = oddsValue.IsAc,
+                                        SoOr = oddsValue.SoOr,
+                                        UnTi = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
                                     }).ToList()
                                 }).ToList()
                             });
@@ -253,28 +253,27 @@ namespace Backoffice.WebSocket.Service.Services
 
                 return new OddsChangeFixtureMessage()
                 {
-                    SportId = message.SportId,
-                    SportName = message.SportName,
-                    SegmentId = message.SegmentId,
-                    SegmentName = message.SegmentName,
-                    LeagueId = message.LeagueId,
-                    LeagueName = message.LeagueName,
-                    ProviderFixtureId = message.ProviderFixtureId,
-                    FixtureId = message.FixtureId.ToString(),
-                    FixtureName = message.FixtureName,
-                    HomeName = GetHomeName(message.FixtureName, (FixtureType)message.FixtureTypeId),
-                    AwayName = GetAwayName(message.FixtureName, (FixtureType)message.FixtureTypeId),
-                    FixtureStartDate = message.FixtureStartDate,
-                    IsSuspended = message.IsSuspended,
-                    FixtureStatusId = message.FixtureStatusId,
-                    FixtureStatusName = message.FixtureStatusName,
-                    Score = message.Score,
-                    CurrentPeriod = message.CurrentPeriod,
-                    CurrentMinute = message.CurrentMinute,
-                    SortOrder = message.SortOrder,
-                    FixtureTypeId = message.FixtureTypeId,
-                    UnixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                    Markets = markets
+                    SpId = message.SportId,
+                    SpNa = message.SportName,
+                    SegId = message.SegmentId,
+                    SegNa = message.SegmentName,
+                    LeId = message.LeagueId,
+                    LeNa = message.LeagueName,
+                    PrFiId = message.ProviderFixtureId,
+                    FiId = message.FixtureId.ToString(),
+                    FiNa = message.FixtureName,
+                    HoNa = GetHomeName(message.FixtureName, (FixtureType)message.FixtureTypeId),
+                    AwNa = GetAwayName(message.FixtureName, (FixtureType)message.FixtureTypeId),
+                    FiStDa = message.FixtureStartDate,
+                    FiSId = message.FixtureStatusId,
+                    FiStNa = message.FixtureStatusName,
+                    Sc = message.Score,
+                    CuPe = message.CurrentPeriod,
+                    CuMi = message.CurrentMinute,
+                    SoOr = message.SortOrder,
+                    FiTyId = message.FixtureTypeId,
+                    UnTi = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    Ma = markets
                 };
             }
             catch (Exception ex)
@@ -304,14 +303,14 @@ namespace Backoffice.WebSocket.Service.Services
                     {
                         result.Add(new OddsChangeClientOdds()
                         {
-                            ClientCode = client.Item1,
-                            Odds = selection.Odds,
-                            SelectionTemplateId = selection.SelectionTemplateId,
-                            SelectionId = selection.SelectionId,
-                            IsActive = selection.IsActive,
-                            SelectionName = selection.SelectionName,
-                            SortOrder = selection.SortOrder,
-                            ClientMargin = client.ToString()
+                            ClCo = client.Item1,
+                            Od = selection.Odds,
+                            SeTeId = selection.SelectionTemplateId,
+                            SeId = selection.SelectionId,
+                            IsAc = selection.IsActive,
+                            SeNa = selection.SelectionName,
+                            SoOr = selection.SortOrder,
+                            ClCoMa = client.ToString()
                         });
 
                         continue;
@@ -332,14 +331,14 @@ namespace Backoffice.WebSocket.Service.Services
 
                                 result.Add(new OddsChangeClientOdds
                                 {
-                                    ClientCode = client.Item1,
-                                    Odds = tempOdds,
-                                    SelectionTemplateId = selection.SelectionTemplateId,
-                                    SelectionId = selection.SelectionId,
-                                    IsActive = selection.IsActive,
-                                    SelectionName = selection.SelectionName,
-                                    SortOrder = selection.SortOrder,
-                                    ClientMargin = client.ToString()
+                                    ClCo = client.Item1,
+                                    Od = tempOdds,
+                                    SeTeId = selection.SelectionTemplateId,
+                                    SeId = selection.SelectionId,
+                                    IsAc = selection.IsActive,
+                                    SeNa = selection.SelectionName,
+                                    SoOr = selection.SortOrder,
+                                    ClCoMa = client.ToString()
                                 });
 
                                 continue;
@@ -350,14 +349,14 @@ namespace Backoffice.WebSocket.Service.Services
                         {
                             result.Add(new OddsChangeClientOdds
                             {
-                                ClientCode = client.Item1,
-                                Odds = selection.Odds,
-                                SelectionTemplateId = selection.SelectionTemplateId,
-                                SelectionId = selection.SelectionId,
-                                IsActive = selection.IsActive,
-                                SelectionName = selection.SelectionName,
-                                SortOrder = selection.SortOrder,
-                                ClientMargin = client.ToString()
+                                ClCo = client.Item1,
+                                Od = selection.Odds,
+                                SeTeId = selection.SelectionTemplateId,
+                                SeId = selection.SelectionId,
+                                IsAc = selection.IsActive,
+                                SeNa = selection.SelectionName,
+                                SoOr = selection.SortOrder,
+                                ClCoMa = client.ToString()
                             });
 
                             continue;
@@ -371,14 +370,14 @@ namespace Backoffice.WebSocket.Service.Services
 
                             result.Add(new OddsChangeClientOdds
                             {
-                                ClientCode = client.Item1,
-                                Odds = tempOdds,
-                                SelectionTemplateId = selection.SelectionTemplateId,
-                                SelectionId = selection.SelectionId,
-                                IsActive = selection.IsActive,
-                                SelectionName = selection.SelectionName,
-                                SortOrder = selection.SortOrder,
-                                ClientMargin = client.ToString()
+                                ClCo = client.Item1,
+                                Od = tempOdds,
+                                SeTeId = selection.SelectionTemplateId,
+                                SeId = selection.SelectionId,
+                                IsAc = selection.IsActive,
+                                SeNa = selection.SelectionName,
+                                SoOr = selection.SortOrder,
+                                ClCoMa = client.ToString()
                             });
 
                             continue;
@@ -392,14 +391,14 @@ namespace Backoffice.WebSocket.Service.Services
 
                             result.Add(new OddsChangeClientOdds
                             {
-                                ClientCode = client.Item1,
-                                Odds = tempOdds,
-                                SelectionTemplateId = selection.SelectionTemplateId,
-                                SelectionId = selection.SelectionId,
-                                IsActive = selection.IsActive,
-                                SelectionName = selection.SelectionName,
-                                SortOrder = selection.SortOrder,
-                                ClientMargin = client.ToString()
+                                ClCo = client.Item1,
+                                Od = tempOdds,
+                                SeTeId = selection.SelectionTemplateId,
+                                SeId = selection.SelectionId,
+                                IsAc = selection.IsActive,
+                                SeNa = selection.SelectionName,
+                                SoOr = selection.SortOrder,
+                                ClCoMa = client.ToString()
                             });
 
                             continue;
@@ -413,14 +412,14 @@ namespace Backoffice.WebSocket.Service.Services
 
                             result.Add(new OddsChangeClientOdds
                             {
-                                ClientCode = client.Item1,
-                                Odds = tempOdds,
-                                SelectionTemplateId = selection.SelectionTemplateId,
-                                SelectionId = selection.SelectionId,
-                                IsActive = selection.IsActive,
-                                SelectionName = selection.SelectionName,
-                                SortOrder = selection.SortOrder,
-                                ClientMargin = client.ToString()
+                                ClCo = client.Item1,
+                                Od = tempOdds,
+                                SeTeId = selection.SelectionTemplateId,
+                                SeId = selection.SelectionId,
+                                IsAc = selection.IsActive,
+                                SeNa = selection.SelectionName,
+                                SoOr = selection.SortOrder,
+                                ClCoMa = client.ToString()
                             });
 
                             continue;
@@ -434,14 +433,14 @@ namespace Backoffice.WebSocket.Service.Services
 
                             result.Add(new OddsChangeClientOdds
                             {
-                                ClientCode = client.Item1,
-                                Odds = tempOdds,
-                                SelectionTemplateId = selection.SelectionTemplateId,
-                                SelectionId = selection.SelectionId,
-                                IsActive = selection.IsActive,
-                                SelectionName = selection.SelectionName,
-                                SortOrder = selection.SortOrder,
-                                ClientMargin = client.ToString()
+                                ClCo = client.Item1,
+                                Od = tempOdds,
+                                SeTeId = selection.SelectionTemplateId,
+                                SeId = selection.SelectionId,
+                                IsAc = selection.IsActive,
+                                SeNa = selection.SelectionName,
+                                SoOr = selection.SortOrder,
+                                ClCoMa = client.ToString()
                             });
 
                             continue;
@@ -452,28 +451,28 @@ namespace Backoffice.WebSocket.Service.Services
 
                         result.Add(new OddsChangeClientOdds
                         {
-                            ClientCode = client.Item1,
-                            Odds = odds,
-                            SelectionTemplateId = selection.SelectionTemplateId,
-                            SelectionId = selection.SelectionId,
-                            IsActive = selection.IsActive,
-                            SelectionName = selection.SelectionName,
-                            SortOrder = selection.SortOrder,
-                            ClientMargin = client.ToString()
+                            ClCo = client.Item1,
+                            Od = odds,
+                            SeTeId = selection.SelectionTemplateId,
+                            SeId = selection.SelectionId,
+                            IsAc = selection.IsActive,
+                            SeNa = selection.SelectionName,
+                            SoOr = selection.SortOrder,
+                            ClCoMa = client.ToString()
                         });
                     }
                     else
                     {
                         result.Add(new OddsChangeClientOdds
                         {
-                            ClientCode = client.Item1,
-                            Odds = selection.Odds,
-                            SelectionTemplateId = selection.SelectionTemplateId,
-                            SelectionId = selection.SelectionId,
-                            IsActive = selection.IsActive,
-                            SelectionName = selection.SelectionName,
-                            SortOrder = selection.SortOrder,
-                            ClientMargin = client.ToString()
+                            ClCo = client.Item1,
+                            Od = selection.Odds,
+                            SeTeId = selection.SelectionTemplateId,
+                            SeId = selection.SelectionId,
+                            IsAc = selection.IsActive,
+                            SeNa = selection.SelectionName,
+                            SoOr = selection.SortOrder,
+                            ClCoMa = client.ToString()
                         });
                     }
                 }
@@ -518,7 +517,7 @@ namespace Backoffice.WebSocket.Service.Services
         {
             var result = new List<string>
             {
-                $"leagues:{message.LeagueId}:fixtures"
+                $"leagues:{message.LeId}:fixtures"
             };
 
             return result;
@@ -528,7 +527,7 @@ namespace Backoffice.WebSocket.Service.Services
         {
             var result = new List<string>
             {
-                $"fixturedetails:{message.FixtureId}"
+                $"fixturedetails:{message.FiId}"
             };
 
             return result;

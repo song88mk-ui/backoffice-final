@@ -20,6 +20,7 @@ builder.Services.AddSignalR(options => options.MaximumReceiveMessageSize = 50000
                         .WithResolver(ContractlessStandardResolver.Instance)
                         .WithSecurity(MessagePackSecurity.UntrustedData);
                 });
+
 builder.Services.AddResponseCompression(opts => opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
         new[] { "application/octet-stream" }));
 

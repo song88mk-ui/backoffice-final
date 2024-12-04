@@ -84,20 +84,27 @@ namespace Backoffice.WebSocket.Service
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await _sportsbookService.ProcessMarketTemplatePlayerProps();
+            try
+            {
+                await _sportsbookService.ProcessMarketTemplatePlayerProps();
 
-            _threadOnMonitoringOddsChange = new Thread(ThreadMonitoringOnOddsChange);
-            _threadOnMonitoringDetailsOddsChange = new Thread(ThreadMonitoringDetailsOnOddsChange);
-            _threadNotification = new Thread(ThreadNotification);
+                _threadOnMonitoringOddsChange = new Thread(ThreadMonitoringOnOddsChange);
+                _threadOnMonitoringDetailsOddsChange = new Thread(ThreadMonitoringDetailsOnOddsChange);
+                _threadNotification = new Thread(ThreadNotification);
 
-            _threadOnMonitoringOddsChange.Start();
-            _threadOnMonitoringDetailsOddsChange.Start();
-            _threadNotification.Start();
+                _threadOnMonitoringOddsChange.Start();
+                _threadOnMonitoringDetailsOddsChange.Start();
+                _threadNotification.Start();
 
-            await _hubConnection.StartAsync();
+                await _hubConnection.StartAsync();
 
-            _messageBroker.Connect();
-            _messageBroker.MessageReceived += MessageReceivedEvent;
+                _messageBroker.Connect();
+                _messageBroker.MessageReceived += MessageReceivedEvent;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+            }
         }
 
         private async void MessageReceivedEvent(object sender, BasicDeliverEventArgs e)
