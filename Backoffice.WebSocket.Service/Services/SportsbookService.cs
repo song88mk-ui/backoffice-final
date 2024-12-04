@@ -67,14 +67,7 @@ namespace Backoffice.WebSocket.Service.Services
                     Pa = fixture
                 };
 
-                var stopwatch = new Stopwatch();
-
-                stopwatch.Start();
-
                 await PublishToWebSocket(HUB_PUBLISH_ODDSCHANGE, hubConnection, payload);
-
-                Console.WriteLine($"ProcessOnMonitoringOddsChange: {stopwatch.Elapsed:hh\\:mm\\:ss\\.fff}");
-                stopwatch.Stop();
             }
             catch (Exception ex)
             {
@@ -97,14 +90,7 @@ namespace Backoffice.WebSocket.Service.Services
                     Pa = fixture
                 };
 
-                var stopwatch = new Stopwatch();
-
-                stopwatch.Start();
-
                 await PublishToWebSocket(HUB_PUBLISH_ODDSCHANGE, hubConnection, payload);
-
-                Console.WriteLine($"ProcessOnMonitoringDetailsOddsChange: {stopwatch.Elapsed:hh\\:mm\\:ss\\.fff}");
-                stopwatch.Stop();
             }
             catch (Exception ex)
             {
@@ -514,6 +500,11 @@ namespace Backoffice.WebSocket.Service.Services
         {
             try
             {
+                if (hubConnection.State != HubConnectionState.Connected)
+                {
+                    await hubConnection.StartAsync();
+                }
+
                 await hubConnection.SendAsync(method, payload);
             }
             catch (Exception ex)

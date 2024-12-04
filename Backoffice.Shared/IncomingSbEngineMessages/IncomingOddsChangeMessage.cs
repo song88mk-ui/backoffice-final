@@ -3,7 +3,6 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Backoffice.Shared.IncomingSbEngineMessages
 {
@@ -12,9 +11,9 @@ namespace Backoffice.Shared.IncomingSbEngineMessages
         public IncomingOddsChangeMessage()
         {
             Markets = new List<IncomingMarketMessage>();
-            SportTranslations = new List<SportTranslation>();
-            SegmentTranslations = new List<SegmentTranslation>();
-            LeagueTranslations = new List<LeagueTranslation>();
+            //SportTranslations = new List<SportTranslation>();
+            //SegmentTranslations = new List<SegmentTranslation>();
+            //LeagueTranslations = new List<LeagueTranslation>();
             FixtureTranslations = new List<FixtureTranslation>();
             PeriodScores = new List<IncomingPeriodScore>();
         }
@@ -47,9 +46,9 @@ namespace Backoffice.Shared.IncomingSbEngineMessages
         public string CorrelationId { get; set; }
         public bool IsSuspended { get; set; }
         public bool? IsBoosted { get; set; }
-        public List<SportTranslation> SportTranslations { get; set; }
-        public List<SegmentTranslation> SegmentTranslations { get; set; }
-        public List<LeagueTranslation> LeagueTranslations { get; set; }
+        //public List<SportTranslation> SportTranslations { get; set; }
+        //public List<SegmentTranslation> SegmentTranslations { get; set; }
+        //public List<LeagueTranslation> LeagueTranslations { get; set; }
         public List<FixtureTranslation> FixtureTranslations { get; set; }
         public List<IncomingMarketMessage> Markets { get; set; }
         public string HomeId { get; set; }
@@ -67,7 +66,7 @@ namespace Backoffice.Shared.IncomingSbEngineMessages
         public IncomingMarketMessage()
         {
             Selections = new List<IncomingSelectionMessage>();
-            MarketTranslations = new List<MarketTranslation>();
+            //MarketTranslations = new List<MarketTranslation>();
         }
         public string ProviderFixtureId { get; set; }
         public long MarketId { get; set; }
@@ -82,7 +81,7 @@ namespace Backoffice.Shared.IncomingSbEngineMessages
         public bool IsInsert { get; set; }
         public string ClientCodes { get; set; }
         public string ClientCodeMargin { get; set; }
-        public List<MarketTranslation> MarketTranslations { get; set; }
+        //public List<MarketTranslation> MarketTranslations { get; set; }
         public List<IncomingSelectionMessage> Selections { get; set; }
     }
 
@@ -90,7 +89,7 @@ namespace Backoffice.Shared.IncomingSbEngineMessages
     {
         public IncomingSelectionMessage()
         {
-            SelectionTranslations = new List<SelectionTranslation>();
+            //SelectionTranslations = new List<SelectionTranslation>();
         }
         public string ProviderFixtureId { get; set; }
         public string MarketTemplateId { get; set; }
@@ -110,7 +109,7 @@ namespace Backoffice.Shared.IncomingSbEngineMessages
         public int SortOrder { get; set; }
         public bool IsInsert { get; set; }
         public List<ClientOdds> ClientOdds { get; set; }
-        public List<SelectionTranslation> SelectionTranslations { get; set; }
+        //public List<SelectionTranslation> SelectionTranslations { get; set; }
     }
 
     public class IncomingPeriodScore
