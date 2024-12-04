@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,9 +24,11 @@ namespace Backoffice.WebSocket.Service.Services
         private readonly ISportsbookRepository _sportsbookRepository;
         private readonly IMemCache _memCache;
 
-        private readonly string HubPublishOddsChange;
         private readonly List<string> _asianClientCodes = new List<string>();
         private readonly List<string> _marketTemplateIds = new List<string> { "16", "18", "66", "68" };
+
+        private const string HUB_PUBLISH_ODDSCHANGE = "PublishOddsChange";
+        private const string HUB_PUBLISH_BETSTOPFIXTURE = "PublishBetStopFixture";
 
         public SportsbookService(ILogger<SportsbookService> logger, IConfiguration configuration, IMemCache memCache, ISportsbookRepository sportsbookRepository)
         {
@@ -33,7 +36,6 @@ namespace Backoffice.WebSocket.Service.Services
             _sportsbookRepository = sportsbookRepository;
             _memCache = memCache;
 
-            HubPublishOddsChange = "PublishOddsChange";
             _asianClientCodes = configuration["Custom:AsianClientCodes"].ToString().Split(',').ToList();
         }
 
@@ -52,7 +54,14 @@ namespace Backoffice.WebSocket.Service.Services
                     Pa = fixture
                 };
 
-                await PublishToWebSocket(HubPublishOddsChange, hubConnection, payload);
+                var stopwatch = new Stopwatch();
+
+                stopwatch.Start();
+
+                await PublishToWebSocket(HUB_PUBLISH_ODDSCHANGE, hubConnection, payload);
+
+                Console.WriteLine($"ProcessOnMonitoringOddsChange: {stopwatch.Elapsed:hh\\:mm\\:ss\\.fff}");
+                stopwatch.Stop();
             }
             catch (Exception ex)
             {
@@ -75,7 +84,14 @@ namespace Backoffice.WebSocket.Service.Services
                     Pa = fixture
                 };
 
-                await PublishToWebSocket(HubPublishOddsChange, hubConnection, payload);
+                var stopwatch = new Stopwatch();
+
+                stopwatch.Start();
+
+                await PublishToWebSocket(HUB_PUBLISH_ODDSCHANGE, hubConnection, payload);
+
+                Console.WriteLine($"ProcessOnMonitoringDetailsOddsChange: {stopwatch.Elapsed:hh\\:mm\\:ss\\.fff}");
+                stopwatch.Stop();
             }
             catch (Exception ex)
             {
@@ -103,7 +119,7 @@ namespace Backoffice.WebSocket.Service.Services
                     Pa = fixture
                 };
 
-                await PublishToWebSocket("PublishBetStopFixture", hubConnection, payload);
+                await PublishToWebSocket(HUB_PUBLISH_BETSTOPFIXTURE, hubConnection, payload);
             }
             catch (Exception ex)
             {
@@ -126,7 +142,7 @@ namespace Backoffice.WebSocket.Service.Services
                     Pa = fixture
                 };
 
-                await PublishToWebSocket("PublishBetStopFixture", hubConnection, payload);
+                await PublishToWebSocket(HUB_PUBLISH_BETSTOPFIXTURE, hubConnection, payload);
             }
             catch (Exception ex)
             {
@@ -499,18 +515,20 @@ namespace Backoffice.WebSocket.Service.Services
 
         private List<string> GetGroupForMonitoringMarkets(OddsChangeFixtureMessage message)
         {
-            var result = new List<string>();
-
-            result.Add($"leagues:{message.LeagueId}:fixtures");
+            var result = new List<string>
+            {
+                $"leagues:{message.LeagueId}:fixtures"
+            };
 
             return result;
         }
 
         private List<string> GetGroupForMonitoringDetailsMarkets(OddsChangeFixtureMessage message)
         {
-            var result = new List<string>();
-
-            result.Add($"fixturedetails:{message.FixtureId}");
+            var result = new List<string>
+            {
+                $"fixturedetails:{message.FixtureId}"
+            };
 
             return result;
         }
