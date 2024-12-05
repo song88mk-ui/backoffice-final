@@ -6,6 +6,7 @@ using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
 using Backoffice.Web.Extensions;
 using Backoffice.Web.Models;
+using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.States;
 using Microsoft.JSInterop;
 using Serilog;
@@ -13,6 +14,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
 
 namespace Backoffice.Web.Services
 {
@@ -1116,16 +1118,34 @@ namespace Backoffice.Web.Services
                     $"api/trading/fixtures/market/{request.FixtureTypeId}/{request.SportId}/{request.SegmentId}/{request.LeagueId}" :
                     $"api/trading/fixtures/market/{request.FixtureTypeId}/{request.SportId}/{request.SegmentId}/{request.LeagueId}/{request.MarketTemplateId}";
 
-                var result = await JsonSerializer.DeserializeAsync<BaseResponse<MarketFixtureResponse>>
-                (await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
-                                  .GetStreamAsync(stringUri), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                var response = await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
+                                  .GetAsync(stringUri);
 
-                return result ?? new BaseResponse<MarketFixtureResponse>
+                if (response.IsSuccessStatusCode)
                 {
-                    StatusCode = StatusCode.Success,
-                    Message = $"{StatusCode.Success}",
-                    Result = new MarketFixtureResponse()
-                };
+                    return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(
+                        await response.Content.ReadAsStringAsync(),
+                        new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<MarketFixtureResponse>();
+                }
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+                        return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponse>>(
+                            await response.Content.ReadAsStringAsync(),
+                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                            ) ?? new BaseResponse<MarketFixtureResponse>();
+                    }
+                    else
+                    {
+                        return new BaseResponse<MarketFixtureResponse>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -1136,8 +1156,55 @@ namespace Backoffice.Web.Services
                 return new BaseResponse<MarketFixtureResponse>
                 {
                     StatusCode = StatusCode.Error,
-                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})",
-                    Result = new MarketFixtureResponse()
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
+                };
+            }
+        }
+        public async Task<BaseResponse<MarketFixtureResponseV2>> GetMostEvenLineMarketFixtures(MarketFixtureRequest request, LanguageCode langCode)
+        {
+            try
+            {
+                var stringUri = $"api/trading/fixtures/{request.FixtureTypeId}/sports/{request.SportId}/segments/{request.SegmentId}/leagues/{request.LeagueId}/markets/{request.MarketTemplateId}/most-even-line";
+
+                var response = await _httpClient.WithRequestHeader(new Dictionary<string, string>() { { "x-language-code", langCode.ToString() } })
+                                  .GetAsync(stringUri);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponseV2>>(
+                        await response.Content.ReadAsStringAsync(),
+                        new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                        ) ?? new BaseResponse<MarketFixtureResponseV2>();
+                }
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+                        return JsonSerializer.Deserialize<BaseResponse<MarketFixtureResponseV2>>(
+                            await response.Content.ReadAsStringAsync(),
+                            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+                            ) ?? new BaseResponse<MarketFixtureResponseV2>();
+                    }
+                    else
+                    {
+                        return new BaseResponse<MarketFixtureResponseV2>
+                        {
+                            StatusCode = StatusCode.Error,
+                            Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({response.ReasonPhrase})"
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                if (ex.StackTrace != null)
+                    Log.Error(ex.StackTrace.ToString());
+
+                return new BaseResponse<MarketFixtureResponseV2>
+                {
+                    StatusCode = StatusCode.Error,
+                    Message = $"{StatusCode.Error.ToString().Replace('_', ' ')} ({ex.Message})"
                 };
             }
         }

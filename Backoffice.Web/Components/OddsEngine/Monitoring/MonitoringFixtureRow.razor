@@ -1,0 +1,105 @@
+﻿<tr>
+    @FixtureHeaderContent
+
+    <!-- BR CTRL -->
+    <td class="td-master">
+        <div class="d-flex justify-content-left">
+            @if (_ctrlMarket?.Market != null)
+            {
+        <td class="td-master">
+            <div class="d-flex justify-content-left">
+                        @if (_ctrlMarket.Market.Selections.Any())
+                        {
+                            var displayLine = true;
+                            foreach (var selection in _ctrlMarket.Market.Selections)
+                            {
+                        <MonitoringSelectionRow Selection="selection" IsBetStop="_isBetStop"
+                                                CurrentMarketStatus="@_ctrlMarket.Market.MarketStatusId" />
+
+                                if (_ctrlMarket.Market.HasLine && displayLine)
+                                {
+                                    displayLine = false;
+                            <div class="market-line">
+                                <div class="margin-value me-2 py-1">
+                                    <span class="d-block text-center">@_ctrlMarket.Market.Line</span>
+                                </div>
+                            </div>
+                                }
+                            }
+                    <div class="py-1 px-1">
+                        <span class="text-nowrap">@GetClientMargin(_ctrlMarket.Market.ClientCodeMargin, _ctrlMarket.Market.Selections)</span>
+                    </div>
+                        }
+            </div>
+        </td>
+            }
+            else
+            {
+        <div class="odds-container me-2 py-1 px-3">
+            <span>-.-</span>
+        </div>
+        <div class="odds-container me-2 py-1 px-3">
+            <span>-.-</span>
+        </div>
+        <div class="py-1 px-2">
+            <span>-.-</span>
+        </div>
+            }
+
+    </div>
+    </td>
+
+    <!-- Client Odds -->
+    @if (_clientList != null)
+    {
+        foreach (var client in _clientList)
+        {
+            <td class="td-master">
+                <div class="d-flex justify-content-left">
+                    @if (client.Market != null)
+                    {
+                <td class="td-master">
+                    <div class="d-flex justify-content-left">
+                                @if (client.Market.Selections.Any())
+                                {
+                                    var displayLine = true;
+                                    foreach (var selection in client.Market.Selections)
+                                    {
+                                <MonitoringSelectionRow Selection="selection" IsBetStop="_isBetStop"
+                                                        CurrentMarketStatus="@client.Market.MarketStatusId" />
+
+                                        if (client.Market.HasLine && displayLine)
+                                        {
+                                            displayLine = false;
+                                    <div class="market-line">
+                                        <div class="margin-value me-2 py-1">
+                                            <span class="d-block text-center">@client.Market.Line</span>
+                                        </div>
+                                    </div>
+                                        }
+                                    }
+
+                            <div class="py-1 px-1">
+                                <span class="text-nowrap">@GetClientMargin(client.Market.ClientCodeMargin, client.Market.Selections)</span>
+                            </div>
+                                }
+                    </div>
+                </td>
+                    }
+                    else
+                    {
+                <div class="odds-container me-2 py-1 px-3">
+                    <span>-.-</span>
+                </div>
+                <div class="odds-container me-2 py-1 px-3">
+                    <span>-.-</span>
+                </div>
+                <div class="py-1 px-2">
+                    <span>-.-</span>
+                </div>
+                    }
+            </div>
+            </td>
+        }
+    }
+</tr>

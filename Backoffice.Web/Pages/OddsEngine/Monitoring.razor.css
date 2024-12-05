@@ -47,5 +47,34 @@ table thead th:last-child {
 
 .th-master, .th-client {
     flex: 1;
-    text-align: left;
+    /*text-align: left;*/
+    text-align: center;
+}
+
+.score-info {
+    color: #eb3422;
+    white-space: nowrap;
+}
+
+﻿.fixture-details {
+    color: #212529;
+    white-space: nowrap;
+}
+
+
+.td-start-date {
+    width: 100px;
+}
+
+.td-fixture-name {
+    width: 320px;
+    min-width: 250px;
+}
+
+.td-close-match {
+    width: 150px;
+}
+
+.close-match-btn {
+    white-space: nowrap;
 }

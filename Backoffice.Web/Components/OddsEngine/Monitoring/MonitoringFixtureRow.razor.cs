@@ -1,21 +1,22 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
-using Backoffice.Web.Components.OddsEngine.Monitoring;
 using Backoffice.Web.Models;
+using Backoffice.Web.Models.OddsEngine.Monitoring;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
 
-namespace Backoffice.Web.Components.Common
+namespace Backoffice.Web.Components.OddsEngine.Monitoring
 {
-    public partial class FixtureRow : IDisposable
+    public partial class MonitoringFixtureRow : IDisposable
     {
         #region Properties
-        [Inject] public IModalService ModalService { get; set; }
-
+        [Parameter] public RenderFragment? FixtureHeaderContent { get; set; }
+        [Parameter] public long UnixTime { get; set; }
+        [Parameter] public bool IsBetStop {  get; set; }
         [Parameter] public List<Client> Clients { get; set; }
-        [Parameter] public FixtureMarketModel Market { get; set; }
-        [Parameter] public bool IsMonitoringPage { get; set; }
+        [Parameter] public List<MonitoringFixtureClient> Markets { get; set; }
 
         #endregion
 
@@ -24,27 +25,16 @@ namespace Backoffice.Web.Components.Common
         private string _mainMarketName = string.Empty;
         private bool _isBetStop = false;
         private bool _hasLine;
-        private string _marketLine;
-        private string _columnSize;
-        private string _fixtureName;
-        private int _fixtureStatusId;
-        private string _currentPeriod;
-        private string _currentMinute;
-        private string _homeName;
-        private string _awayName;
-        private string _score;
-        private DateTime _fixtureStartDate;
-        private string _providerFixtureId;
-        private int _marketStatusId;
-        private string _clientCode;
-        private string _clientCodeMargin;
-        private List<SelectionModel> _selections;
+
 
         private bool _init = true;
         private bool _shouldRender = true;
 
         private long _unixTime;
         private string _clientReference;
+
+        private MonitoringFixtureClient _ctrlMarket { get; set; }
+        private List<MonitoringFixtureClient> _clientList = new List<MonitoringFixtureClient>();
 
         #endregion
 
@@ -56,47 +46,45 @@ namespace Backoffice.Web.Components.Common
 
             if (_shouldRender)
             {
+                _isBetStop = IsBetStop;
                 _clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
-                _unixTime = Market.UnixTime;
-                _fixtureName = Market.FixtureName;
-                _fixtureStatusId = Market.FixtureStatusId;
-                _currentPeriod = Market.CurrentPeriod;
-                _currentMinute = Market.CurrentMinute;
-                _homeName = Market.HomeName;
-                _awayName = Market.AwayName;
-                _score = Market.Score;
-                _fixtureStartDate = Market.FixtureStartDate;
-                _providerFixtureId = Market.ProviderFixtureId;
-                _marketStatusId = Market.MarketStatusId;
-                _clientCode = Market.ClientCode;
-                _clientCodeMargin = Market.ClientCodeMargin;
-                _selections = Market.Selections;
+                _unixTime = UnixTime;
+                _ctrlMarket = Markets.FirstOrDefault(c => c.ClientCode.Equals("CTRL", StringComparison.OrdinalIgnoreCase)) ?? new MonitoringFixtureClient();
 
-                if (_mainMarketName != Market.MarketName)
-                {
-                    _mainMarketName = Market.MarketName;
+                _clientList = Clients
+                    .GroupJoin(
+                        Markets,
+                        client => client.ClientCode,
+                        market => market.ClientCode,
+                        (client, markets) => new { Client = client, Markets = markets.DefaultIfEmpty() }
+                    )
+                    .SelectMany(
+                        group => group.Markets.Select(market => new MonitoringFixtureClient
+                        {
+                            ClientCode = group.Client.ClientCode,
+                            UnixTime = market?.UnixTime ?? 0,
+                            Market = market?.Market
+                        })
+                    )
+                    .OrderBy(c => Clients.FindIndex(client => client.ClientCode == c.ClientCode))
+                    .ToList();
 
-                    _hasLine = _mainMarketName.ToUpper().Contains("HANDICAP") || _mainMarketName.ToUpper().Contains("TOTAL");
 
-                    var columns = 1;
-                    columns += !_hasLine ? 0 : 1;
-                    columns += Market != null ? Market.Selections.Count : 0;
+                //if (_mainMarketName != Market.MarketName)
+                //{
+                //    _mainMarketName = Market.MarketName;
 
-                    // divide number of column size by 12 (max size of col in bootstrap)
-                    _columnSize = $"col-xs-{12 / columns}";
+                //    _hasLine = _mainMarketName.ToUpper().Contains("HANDICAP") || _mainMarketName.ToUpper().Contains("TOTAL");
 
-                    if (_hasLine)
-                        _marketLine = GetMarketLine(_mainMarketName, Market.Line);
-                }
+                //    var columns = 1;
+                //    columns += !_hasLine ? 0 : 1;
+                //    columns += Market != null ? Market.Selections.Count : 0;
 
-                if (Market.IsBetStopGlobal)
-                {
-                    _isBetStop = true;
-                }
-                else if (Market.BetStop != null)
-                {
-                    _isBetStop = Market.BetStop.Count > 0 && Market.BetStop.FirstOrDefault() == 1 ? true : false;
-                }
+                //    _columnSize = $"col-xs-{12 / columns}";
+
+                //    if (_hasLine)
+                //        _marketLine = GetMarketLine(_mainMarketName, Market.Line);
+                //}
 
                 _init = false;
             }
@@ -174,18 +162,6 @@ namespace Backoffice.Web.Components.Common
             return result;
         }
 
-        public void HandleCloseMatchClick()
-        {
-            ModalParameters parameters = new ModalParameters();
-            parameters.Add("ModalDialogClass", "modal-dialog-centered modal-lg");
-            parameters.Add("FixtureName", _fixtureName);
-            parameters.Add("ProviderFixtureId", _providerFixtureId);
-
-            ModalOptions options = new ModalOptions();
-
-            ModalService.Open<CloseMatchModal>("Close Match", parameters, options);
-        }
-
         public void Dispose()
         {
         }
@@ -194,11 +170,47 @@ namespace Backoffice.Web.Components.Common
 
         #region Utilities
 
+        private string GetClientMargin(decimal clientCodeMargin, List<MonitoringFixtureSelectionModel> selections)
+        {
+            if (clientCodeMargin > 0)
+            {
+                var newMargin = ((int)((clientCodeMargin * 100) + 100)).ToString();
+
+                var newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
+
+                if (newActiveSelections.Count == 1)
+                    newActiveSelections = selections.Where(c => c.IsActive == true).ToList();
+
+                var computedMargin = "";
+                try
+                {
+                    computedMargin = $"{(Math.Round(newActiveSelections.Sum(s => 100 / Convert.ToDecimal(s.DecimalOdds))) - 100) + 100}";
+                }
+                catch (Exception ex)
+                {
+
+                }
+                if (newMargin != computedMargin)
+                {
+                    newMargin = $"{newMargin} ({computedMargin})";
+                }
+                return newMargin;
+            }
+
+            var activeSelections = selections.Where(c => c.IsActive == true && Convert.ToDecimal(c.DecimalOdds) > 0m).ToList();
+
+            if (activeSelections.Count == 1)
+                activeSelections = selections.Where(c => Convert.ToDecimal(Convert.ToDecimal(c.DecimalOdds)) > 0m).ToList();
+
+            var margin = (Math.Round(activeSelections.Sum(s => 100 / Convert.ToDecimal(s.DecimalOdds))) - 100) / 100;
+
+            return ((int)((margin * 100) + 100)).ToString();
+        }
         private bool ValidateParameters()
         {
             var clientReference = string.Join(',', Clients.Select(s => s.ClientCode).OrderBy(c => c).Select(s => s.Trim()).ToList());
 
-            return (_init || _unixTime != Market.UnixTime || _clientReference != clientReference) && Market != null;
+            return (_init || _unixTime != UnixTime || _clientReference != clientReference || _isBetStop != IsBetStop) && Markets != null ;
         }
 
         private string GetClientOdds(SelectionModel selection, string clientCode)

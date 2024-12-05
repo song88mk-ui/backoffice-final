@@ -1,17 +1,13 @@
 ﻿using Backoffice.Shared.Enums;
+using Backoffice.Web.Models.OddsEngine.Monitoring;
 using Microsoft.AspNetCore.Components;
 
-using static Backoffice.Shared.Models.Response.MarketFixtureResponse;
-
-namespace Backoffice.Web.Components.Common
+namespace Backoffice.Web.Components.OddsEngine.Monitoring
 {
-    public partial class SelectionRow : IDisposable
+    public partial class MonitoringSelectionRow : IDisposable
     {
         #region Properties
-        [Parameter] public SelectionModel Selection { get; set; }
-        [Parameter] public string CurrentClientCode { get; set; }
-        [Parameter] public bool HasClientConfig { get; set; }
-        [Parameter] public string ColumnSize { get; set; }
+        [Parameter] public MonitoringFixtureSelectionModel Selection { get; set; }
         [Parameter] public bool IsBetStop { get; set; }
         [Parameter] public int CurrentMarketStatus { get; set; }
 
@@ -86,16 +82,6 @@ namespace Backoffice.Web.Components.Common
                 || _currentMarketStatus != CurrentMarketStatus
                 || _unixTime != Selection.UnixTime;
 
-        private string GetClientOdds()
-        {
-            if (Selection.ClientOdds != null && Selection.ClientOdds.Any(c => c.ClientCode == CurrentClientCode))
-            {
-                return Selection.ClientOdds.Where(c => c.ClientCode == CurrentClientCode && c.SelectionTemplateId == Selection.SelectionTemplateId).FirstOrDefault().Odds.ToString("0.00");
-            }
-
-            return Selection.DecimalOdds;
-        }
-
         private string GetColor()
         {
             _fading = true;
@@ -119,9 +105,7 @@ namespace Backoffice.Web.Components.Common
             }
             else
             {
-                if (CurrentClientCode == null)
-                {
-                    if (!string.IsNullOrEmpty(_odds))
+                    if (!string.IsNullOrEmpty(_odds) && Selection.DecimalOdds != "-.-")
                     {
                         if (Convert.ToDecimal(_odds) > Convert.ToDecimal(Selection.DecimalOdds))
                         {
@@ -134,35 +118,9 @@ namespace Backoffice.Web.Components.Common
                         }
                     }
 
-                    //_odds = Selection.DecimalOdds;
-                }
-                else
-                {
-                    if (Selection.ClientOdds != null)
-                    {
-                        var clientOdds = Selection.ClientOdds.Where(c => c.ClientCode == CurrentClientCode && c.SelectionTemplateId == Selection.SelectionTemplateId).FirstOrDefault();
-                        if (clientOdds != null)
-                        {
-                            if(!string.IsNullOrEmpty(_odds))
-                            {
-                                if (Convert.ToDecimal(_odds) > clientOdds.Odds)
-                                {
-                                    color = "odds-bg-danger-active";
-                                }
-
-                                if (Convert.ToDecimal(_odds) < clientOdds.Odds)
-                                {
-                                    color = "odds-bg-success-active";
-                                }
-                            }
-                        }
-
-                        //_odds = clientOdds?.Odds.ToString("0.00") ?? "-.-";
-                    }
-                }
             }
 
-            _odds = GetClientOdds();
+            _odds = Selection.DecimalOdds;
             return color;
         }
 

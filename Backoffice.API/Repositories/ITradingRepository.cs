@@ -71,8 +71,9 @@ namespace Backoffice.API.Repositories
         #endregion
 
         #region Fixtures
-        Task<BaseResponse<MarketFixtureResponse>> GetFixturesByMarket(int fixtureTypeId, int sportId, int segmentId, int leagueId, string region, string langCode = "");
-        Task<BaseResponse<MarketFixtureResponse>> GetMarketFixtures(int fixtureTypeId, int sportId, int segmentId, int leagueId, string marketTemplateId, string region, string langCode = "");
+        Task<BaseResponse<MarketFixtureResponseV2>> GetFixturesByMarket(int fixtureTypeId, int sportId, int segmentId, int leagueId, string region, string langCode = "");
+        Task<BaseResponse<MarketFixtureResponseV2>> GetMarketFixtures(int fixtureTypeId, int sportId, int segmentId, int leagueId, string marketTemplateId, string region, string langCode = "");
+        Task<BaseResponse<MarketFixtureResponseV2>> GetMostEvenLineMarketFixtures(int fixtureTypeId, int sportId, int segmentId, int leagueId, string marketTemplateId, string region, string langCode = "");
         Task<BaseResponse<FixtureOddsHistoryResponse>> GetFixtureMarketSelections(int fixtureTypeId, string providerFixtureId, string providerMarketId, string providerSelectionId, string region);
         Task<BaseResponse<MarketFixtureDetailResponse>> GetFixtureMarketDetails(string providerFixtureId, string region, string langCode = "");
         #endregion

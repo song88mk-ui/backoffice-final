@@ -1,4 +1,4 @@
-﻿<tr>
+﻿﻿<tr>
     <td class="td-start-date">
         @if (_fixtureStatusId == 1)
         {
@@ -32,17 +32,6 @@
         </div>
     </td>
 
-    @if (IsMonitoringPage)
-    {
-        <AuthorizeView Policy="sbc-monitoring-match-canedit">
-            <Authorized Context="ActivateAll">
-                <td class="td-close-match">
-                    <button type="button" class="btn btn-dark close-match-btn mx-4" @onclick="HandleCloseMatchClick">@_translationState.GetValue("Close Match")</button>
-                </td>
-            </Authorized>
-        </AuthorizeView>
-    }
-
     <!-- BR CTRL -->
     <td class="td-master">
         <div class="d-flex justify-content-left">
@@ -53,7 +42,7 @@
                 {
                     var selectionKey = $"br-{selection.ProviderSelectionId}";
 
-                    <SelectionRow @key="selectionKey" Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop" CurrentMarketStatus="@_marketStatusId" HasClientConfig="true" />
+                    <MonitoringDetailsSelectionRow @key="selectionKey" Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop" CurrentMarketStatus="@_marketStatusId" HasClientConfig="true" />
 
                     if (_hasLine && displayLine)
                     {
@@ -104,7 +93,7 @@
                         {
                             @*var selectionKey = $"{client.ClientCode.ToLower()}-{selection.ProviderSelectionId}";*@
 
-                            <SelectionRow @key="selection.ProviderSelectionId" CurrentClientCode="@client.ClientCode"
+                            <MonitoringDetailsSelectionRow @key="selection.ProviderSelectionId" CurrentClientCode="@client.ClientCode"
                                           Selection="selection" ColumnSize="@_columnSize" IsBetStop="_isBetStop"
                                           CurrentMarketStatus="@GetMarketStatusId(client, _clientCode, _marketStatusId)"
                                           HasClientConfig="hasClientConfig" />

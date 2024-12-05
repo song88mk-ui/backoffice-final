@@ -1,0 +1,29 @@
+﻿
+<td class="td-master">
+    <div class="d-flex justify-content-left">
+        @if (_selections.Any())
+        {
+            var displayLine = true;
+            foreach (var selection in _selections)
+            {
+                <MonitoringSelectionRow
+                                        Selection="selection" IsBetStop="_isBetStop"
+                                        CurrentMarketStatus="@_marketStatusId"/>
+
+                if (Market.HasLine && displayLine)
+                {
+                    displayLine = false;
+                    <div class="market-line">
+                        <div class="margin-value me-2 py-1">
+                            <span class="d-block text-center">@_marketLine</span>
+                        </div>
+                    </div>
+                }
+            }
+
+            <div class="py-1 px-1">
+                <span class="text-nowrap">@_clientMargin</span>
+            </div>
+        }
+    </div>
+</td>

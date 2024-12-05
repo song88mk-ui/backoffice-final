@@ -3,5 +3,5 @@
 **/bin
 **/obj
 **/*.csproj.user
-**/Logs
 **/PublishProfiles
+**/Logs

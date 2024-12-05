@@ -1,6 +1,7 @@
 using Backoffice.Shared.IncomingSbEngineMessages;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
+using Backoffice.WebSocket.Service.Repositories;
 using Backoffice.WebSocket.Service.Services;
 using Backoffice.WebSocket.Service.Telemetry;
 using MessagePack;
@@ -32,7 +33,7 @@ namespace Backoffice.WebSocket.Service
     {
         private readonly ILogger<Worker> _logger;
         private readonly IMessageBroker _messageBroker;
-        private readonly ISportsbookService _sportsbookService;
+        private readonly ISportsbookRepository _sportsbookRepository;
         private readonly HubConnection _hubConnection;
 
         private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
@@ -51,10 +52,10 @@ namespace Backoffice.WebSocket.Service
         private readonly BlockingCollection<IncomingBetStopGlobalMessage> _messagesOnBetStopGlobal = new BlockingCollection<IncomingBetStopGlobalMessage>();
         private readonly BlockingCollection<NotificationsDetailsModel> _messagesNotification = new BlockingCollection<NotificationsDetailsModel>();
 
-        public Worker(ILogger<Worker> logger, IConfiguration configuration, IMessageBroker messageBroker, ISportsbookService sportsbookService, Instrumentation instrumentation)
+        public Worker(ILogger<Worker> logger, IConfiguration configuration, IMessageBroker messageBroker, ISportsbookRepository sportsbookService, Instrumentation instrumentation)
         {
             _logger = logger;
-            _sportsbookService = sportsbookService;
+            _sportsbookRepository = sportsbookService;
 
             _hubConnection = new HubConnectionBuilder()
                                 .WithUrl(configuration["Custom:WebSocketAPI"], options =>
@@ -86,7 +87,7 @@ namespace Backoffice.WebSocket.Service
         {
             try
             {
-                await _sportsbookService.ProcessMarketTemplatePlayerProps();
+                await _sportsbookRepository.ProcessMarketTemplatePlayerProps();
 
                 _threadOnMonitoringOddsChange = new Thread(ThreadMonitoringOnOddsChange);
                 _threadOnMonitoringDetailsOddsChange = new Thread(ThreadMonitoringDetailsOnOddsChange);
@@ -161,7 +162,7 @@ namespace Backoffice.WebSocket.Service
             while (true)
             {
                 var message = _messagesOnMonitoringOddsChange.Take();
-                await _sportsbookService.ProcessOnMonitoringOddsChange(message, _hubConnection);
+                await _sportsbookRepository.ProcessOnMonitoringOddsChange(message, _hubConnection);
             }
         }
         private async void ThreadMonitoringDetailsOnOddsChange()
@@ -169,7 +170,7 @@ namespace Backoffice.WebSocket.Service
             while (true)
             {
                 var message = _messagesOnMonitoringDetailsOddsChange.Take();
-                await _sportsbookService.ProcessOnMonitoringDetailsOddsChange(message, _hubConnection);
+                await _sportsbookRepository.ProcessOnMonitoringDetailsOddsChange(message, _hubConnection);
             }
         }
         private async void ThreadBetStopFixture()
@@ -177,7 +178,7 @@ namespace Backoffice.WebSocket.Service
             while (true)
             {
                 var message = _messagesOnBetStopFixture.Take();
-                await _sportsbookService.ProcessOnBetStopFixture(message, _hubConnection);
+                await _sportsbookRepository.ProcessOnBetStopFixture(message, _hubConnection);
             }
         }
         private async void ThreadBetStopGlobal()
@@ -185,7 +186,7 @@ namespace Backoffice.WebSocket.Service
             while (true)
             {
                 var message = _messagesOnBetStopGlobal.Take();
-                await _sportsbookService.ProcessOnBetStopGlobal(message, _hubConnection);
+                await _sportsbookRepository.ProcessOnBetStopGlobal(message, _hubConnection);
             }
         }
         private async void ThreadNotification()
@@ -193,7 +194,7 @@ namespace Backoffice.WebSocket.Service
             while (true)
             {
                 var message = _messagesNotification.Take();
-                await _sportsbookService.ProcessNotification(message, _hubConnection);
+                await _sportsbookRepository.ProcessNotification(message, _hubConnection);
             }
         }
 
