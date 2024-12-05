@@ -1,13 +1,11 @@
 ﻿
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.HubMessages;
-using Backoffice.Shared.OutgoingEngineBookmakerMessages;
-using MessagePack.Resolvers;
 using MessagePack;
+using MessagePack.Resolvers;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Serilog;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Connections;
 
 namespace Backoffice.Web.Services
 {
@@ -138,7 +136,14 @@ namespace Backoffice.Web.Services
                 _hubConnection.On<OddsChangeMonitoringMessage>("OnMonitoringOddsChange", async message => await processOddsChangeMonitoring(message));
 
             if (processOddsChange != null)
-                _hubConnection.On<OddsChangeFixtureDetailsMessage>("OnOddsChange", async message => await processOddsChange(message));
+                _hubConnection.On<OddsChangeFixtureDetailsMessage>("OnOddsChange", async message => {
+                    Console.WriteLine(" - MessageReceived");
+                    await processOddsChange(message);
+                });
+
+            _hubConnection.On<byte>("OnOddsChange", async message => {
+                Console.WriteLine(" - MessageReceived (Byte)");
+            });
 
             _hubConnection.On<BetStopFixtureMessage>("OnBetStopFixture", async message
                 => await processOnBetStopFixture(message));

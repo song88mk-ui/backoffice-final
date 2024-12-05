@@ -63,7 +63,12 @@ namespace Backoffice.Web.Shared
 
                 _showSwitchAccess = categories != null && categories.Count > 1;
             }
-            var init = _init || _page != page;
+
+            var init = _init;
+            if (_page != null && _page != "hk/odds-engine" && !_page.Contains("hk/odds-engine/monitoring-details"))
+            {
+                init = _init || _page != page;
+            }
             var languageCode = _languageCode;
             var navMenuAccess = _navMenuAccess;
 
@@ -276,7 +281,7 @@ namespace Backoffice.Web.Shared
         }
         private async Task HandleLeagueMenuEvent(int sportId, string sportName, int segmentId, string segmentName, int leagueId, string leagueName)
         {
-            if (_selectedSport.LeagueId != leagueId)
+            if (_selectedSport.LeagueId != leagueId || _page.Contains("monitoring-details"))
             {
                 _selectedSport = new SportClickCallbackModel()
                 {

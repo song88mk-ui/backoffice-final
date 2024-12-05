@@ -342,7 +342,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (marketFixtureResponse.StatusCode == StatusCode.Success && marketFixtureResponse.Result.Fixture != null)
             {
                 Fixture = marketFixtureResponse.Result.Fixture;
-                await SubscribeToChannel($"fixturedetails:{Fixture.FixtureId}");
+                await SubscribeToChannel($"fixturedetails:{Fixture.ProviderFixtureId}");
                 SportId = Fixture.SportId;
                 _pageHeaderModel = new()
                 {
@@ -521,8 +521,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                                     {
                                         ClientCode = client.ClCo,
                                         Odds = clientSelection?.DecOd ?? -99,
-                                        SelectionTemplateId = newSelection.SeTeId,
-                                        SelectionId = newSelection.SeId
+                                        SelectionTemplateId = newSelection.SeTeId,  
+                                        SelectionId = newSelection.SeId,
                                     });
                                 }
 

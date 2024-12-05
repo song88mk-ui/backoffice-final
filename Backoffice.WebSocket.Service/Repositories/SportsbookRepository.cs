@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
 namespace Backoffice.WebSocket.Service.Repositories
 {
@@ -64,7 +65,7 @@ namespace Backoffice.WebSocket.Service.Repositories
                 {
                     Gr = GetGroupForMonitoringMarkets(fixture),
                     Pa = fixture
-                };
+                };  
 
                 await PublishToWebSocket(HUB_PUBLISH_MONITORING_ODDSCHANGE, hubConnection, payload);
             }
@@ -89,6 +90,10 @@ namespace Backoffice.WebSocket.Service.Repositories
                     Pa = fixture
                 };
 
+                if(message.ProviderFixtureId == "56128617")
+                {
+
+                }
                 await PublishToWebSocket(HUB_PUBLISH_ODDSCHANGE, hubConnection, payload);
             }
             catch (Exception ex)
@@ -625,7 +630,7 @@ namespace Backoffice.WebSocket.Service.Repositories
 
         private List<string> GetGroupForMonitoringDetailsMarkets(OddsChangeFixtureDetailsMessage message) => new List<string>
             {
-                $"fixturedetails:{message.FiId}"
+                $"fixturedetails:{message.PrFiId}"
             };
 
         private List<string> GetGroupForBetStopFixture(IncomingBetStopFixtureMessage message)
