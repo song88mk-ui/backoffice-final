@@ -17,11 +17,6 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class Monitoring : IDisposable
     {
         #region Properties
-
-        [Inject] public IConfiguration Configuration { get; set; }
-        [Inject] public ICommonService CommonService { get; set; }
-        [Inject] public NavigationManager NavigationManager { get; set; }
-
         [CascadingParameter(Name = "SelectedSport")] public SportClickCallbackModel SelectedSport { get; set; }
 
         [Parameter] public int SportId { get; set; }
@@ -68,7 +63,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     IsCurrentPage = true
                 }
             };
-            _slugs = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Split("/").ToList();
+            _slugs = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "").Split("/").ToList();
 
             await _hubService.RegisterMessageHandlers(
                 ProcessBetStopFixture,

@@ -20,13 +20,13 @@ table thead th {
     text-align: center;
 }
 
-table thead th:first-child {
-    border-top-left-radius: 3px;
-}
+    table thead th:first-child {
+        border-top-left-radius: 3px;
+    }
 
-table thead th:last-child {
-    border-top-right-radius: 3px;
-}
+    table thead th:last-child {
+        border-top-right-radius: 3px;
+    }
 
 .table-head th {
     border-width: 1px 0;
@@ -56,11 +56,6 @@ table thead th:last-child {
     white-space: nowrap;
 }
 
-﻿.fixture-details {
-    color: #212529;
-    white-space: nowrap;
-}
-
 
 .td-start-date {
     width: 100px;
@@ -69,6 +64,11 @@ table thead th:last-child {
 .td-fixture-name {
     width: 320px;
     min-width: 250px;
+}
+
+.td-fixture-name .fixture-details {
+    color: #212529;
+    white-space: nowrap;
 }
 
 .td-close-match {
