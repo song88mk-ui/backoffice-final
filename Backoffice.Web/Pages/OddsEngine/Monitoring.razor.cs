@@ -79,7 +79,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = ValidateParameters();
             if (_shouldRender)
             {
-                var isSportChanged = _sportId != (SelectedSport?.SportId ?? 0) || _leagueId != (SelectedSport?.LeagueId ?? 0) || _languageCode != _translationState.ActiveLanguageCode;
+                var isReloadFixtureMarkets = ((SelectedSport?.SportId ?? _sportId) == _sportId && (LeagueId == 0 && LeagueId != _leagueId)) || _languageCode != _translationState.ActiveLanguageCode;
 
                 if (SelectedSport != null)
                 {
@@ -97,7 +97,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     ShowLanguageDropDown = false
                 };
 
-                if (!_init && isSportChanged && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
+                if (!_init && isReloadFixtureMarkets && _monitoringCallbackModel != null && !string.IsNullOrEmpty(_monitoringCallbackModel.SelectedMarketTemplateId))
                 {
                     await OnInitializeEvent(_monitoringCallbackModel);
                 }
@@ -119,7 +119,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _modalService.Open<CloseMatchModal>("Close Match", parameters, options);
         }
-        private bool ValidateParameters() => _init || ((SelectedSport?.SportId ?? 0) > 0 && _slugs != null && _slugs.Count >= 2);
+        private bool ValidateParameters() => _init || ((SelectedSport?.LeagueId ?? _leagueId) != _leagueId || (LeagueId != 0 && LeagueId != _leagueId));
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
         {
@@ -587,7 +587,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
 
             _shouldRender = true;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
 
         private async Task ProcessBetStopFixture(BetStopFixtureMessage message)
