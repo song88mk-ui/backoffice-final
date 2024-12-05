@@ -44,7 +44,6 @@ namespace Backoffice.Shared.IncomingSbEngineMessages
         public int SortOrder { get; set; }
         public string ClientCodes { get; set; }
         public string CorrelationId { get; set; }
-        public bool IsSuspended { get; set; }
         public bool? IsBoosted { get; set; }
         //public List<SportTranslation> SportTranslations { get; set; }
         //public List<SegmentTranslation> SegmentTranslations { get; set; }
@@ -96,6 +95,7 @@ namespace Backoffice.Shared.IncomingSbEngineMessages
         public string SelectionTemplateId { get; set; }
         public string MarketSpecifier { get; set; }
         public long SelectionId { get; set; }
+        public string ProviderSelectionId { get; set; }
         public decimal Odds { get; set; }
         public double Probability { get; set; }
         public double WonProbability { get; set; }

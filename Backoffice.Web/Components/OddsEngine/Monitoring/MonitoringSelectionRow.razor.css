@@ -4,48 +4,6 @@
     width: 50px;
 }
 
-/*.odds-bg-disabled, odds-bg-disabled-active {
-    cursor: unset;
-    border-radius: 0px;
-    width: 70px;
-    height: 34px;
-    line-height: 22px;
-    text-align: center;
-    padding: 4px 4px;
-    font-size: 14px;
-    display: inline-block;
-    border: 2px #E2E2E2 solid;
-}*/
-
-/*.odds-bg-inactive {
-    border-radius: 0px;
-    width: 70px;
-    height: 34px;
-    line-height: 22px;
-    text-align: center;
-    padding: 4px 4px;
-    font-size: 14px;
-    display: inline-block;
-    border: 2px solid #eb3422 !important;
-    cursor: default;
-    background: #e2e2e2;
-    color: #9f9f9f;
-    cursor: not-allowed;
-}*/
-
-/*.odds-bg-betstop {
-    border-radius: 0px;
-    width: 70px;
-    height: 34px;
-    line-height: 22px;
-    text-align: center;
-    padding: 4px 4px;
-    font-size: 14px;
-    display: inline-block;
-    border: 2px #e2e2e2 solid;
-    cursor: not-allowed;
-}*/
-
 .odds-bg-disabled, odds-bg-disabled-active {
     border: 2px #E2E2E2 solid;
 }

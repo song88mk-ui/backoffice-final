@@ -156,6 +156,22 @@ namespace Backoffice.API.Controllers.Trading
         #endregion
 
         #region Fixtures
+        [HttpGet("fixtures/{fixtureTypeId}/sports/{sportId}/segments/{segmentId}/leagues/{leagueId}/markets/{marketTemplateId}/most-even-line")]
+        public async Task<IActionResult> GetMostEvenLineFixturesByMarket(int fixtureTypeId, int sportId, int segmentId, int leagueId, string marketTemplateId)
+        {
+            var region = HttpContext.Request.Headers.ContainsKey("x-region") ? HttpContext.Request.Headers["x-region"].ToString() : string.Empty;
+            var langCode = HttpContext.Request.Headers.ContainsKey("x-language-code") ? HttpContext.Request.Headers["x-language-code"].ToString() : string.Empty;
+
+            var result = await _tradingRepository.GetMostEvenLineMarketFixtures(fixtureTypeId, sportId, segmentId, leagueId, marketTemplateId, region, langCode);
+
+            switch (result.StatusCode)
+            {
+                case Shared.Enums.StatusCode.Success:
+                    return Ok(result);
+                default:
+                    return BadRequest(result);
+            }
+        }
         [HttpGet("fixtures/market/{fixtureTypeId}/{sportId}/{segmentId}/{leagueId}")]
         public async Task<IActionResult> GetFixturesByMarket(int fixtureTypeId, int sportId, int segmentId, int leagueId)
         {

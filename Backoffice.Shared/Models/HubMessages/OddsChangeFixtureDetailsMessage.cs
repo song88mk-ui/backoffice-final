@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Policy;
-using System.Text;
 
 namespace Backoffice.Shared.Models.HubMessages
 {
-    public class OddsChangeFixtureMessage
+    public class OddsChangeFixtureDetailsMessage
     {
         public int SpId { get; set; }
         public string SpNa { get; set; }
@@ -28,9 +26,9 @@ namespace Backoffice.Shared.Models.HubMessages
         public int SoOr { get; set; }
         public int FiTyId { get; set; }
         public long UnTi { get; set; }
-        public List<OddsChangeMarket> Ma { get; set; } = new List<OddsChangeMarket>();
+        public List<OddsChangeFixtureDetailsMarket> Ma { get; set; } = new List<OddsChangeFixtureDetailsMarket>();
     }
-    public class OddsChangeMarket
+    public class OddsChangeFixtureDetailsMarket
     {
         public string MaTeId { get; set; }
         public string MaId { get; set; }
@@ -45,29 +43,28 @@ namespace Backoffice.Shared.Models.HubMessages
         public Dictionary<string, decimal> ClCoMaLi { get; set; }
         public int SoOr { get; set; }
         public long UnTi { get; set; }
-        public List<OddsChangeClientSelections> ClSe { get; set; } = new List<OddsChangeClientSelections>();
-        public List<OddsChangeSelection> Se { get; set; } = new List<OddsChangeSelection>();
+        public List<OddsChangeFixtureDetailsClientSelections> ClSe { get; set; } = new List<OddsChangeFixtureDetailsClientSelections>();
+        public List<OddsChangeFixtureDetailsSelection> Se { get; set; } = new List<OddsChangeFixtureDetailsSelection>();
     }
-    public class OddsChangeClientSelections
+    public class OddsChangeFixtureDetailsClientSelections
     {
         public string ClCo { get; set; }
         public string ClMa { get; set; }
 
-        public List<OddsChangeSelection> Se { get; set; } = new List<OddsChangeSelection>();
+        public List<OddsChangeFixtureDetailsSelection> Se { get; set; } = new List<OddsChangeFixtureDetailsSelection>();
     }
-    public class OddsChangeSelection
+    public class OddsChangeFixtureDetailsSelection
     {
         public string PrSeId { get; set; }
         public long SeId { get; set; }
         public string SeTeId { get; set; }
         public string SeNa { get; set; }
-        //public string SelectionSpecifier { get; set; }
         public decimal DecOd { get; set; }
         public bool IsAc { get; set; }
         public int SoOr { get; set; }
         public long UnTi { get; set; }
     }
-    public class OddsChangeClientOdds
+    public class OddsChangeFixtureDetailsClientOdds
     {
         public string ClCo { get; set; }
         public string ClCoMa { get; set; }
