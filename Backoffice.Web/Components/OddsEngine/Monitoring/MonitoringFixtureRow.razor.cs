@@ -69,7 +69,6 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                     .OrderBy(c => Clients.FindIndex(client => client.ClientCode == c.ClientCode))
                     .ToList();
 
-
                 //if (_mainMarketName != Market.MarketName)
                 //{
                 //    _mainMarketName = Market.MarketName;

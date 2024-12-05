@@ -21,7 +21,7 @@
                                     displayLine = false;
                             <div class="market-line">
                                 <div class="margin-value me-2 py-1">
-                                    <span class="d-block text-center">@_ctrlMarket.Market.Line</span>
+                                    <span class="d-block text-center">@GetMarketLine(_ctrlMarket.Market.MarketName, _ctrlMarket.Market.Line)</span>
                                 </div>
                             </div>
                                 }
@@ -73,7 +73,7 @@
                                             displayLine = false;
                                     <div class="market-line">
                                         <div class="margin-value me-2 py-1">
-                                            <span class="d-block text-center">@client.Market.Line</span>
+                                            <span class="d-block text-center">@GetMarketLine(client.Market.MarketName, client.Market.Line)</span>
                                         </div>
                                     </div>
                                         }
