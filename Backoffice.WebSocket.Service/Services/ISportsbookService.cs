@@ -11,5 +11,6 @@ namespace Backoffice.WebSocket.Service.Services
     public interface ISportsbookService
     {
         Task<BaseResponse<List<MarketTemplatePlayerPropsResponse>>> GetMarketTemplatePlayerProps();
+        Task<BaseResponse<NoMarginClientsResponse>> GetAsianclientCodes();
     }
 }

@@ -64,7 +64,7 @@ namespace Backoffice.WebSocket.Service.Repositories
                 {
                     Gr = GetGroupForMonitoringMarkets(fixture),
                     Pa = fixture
-                };  
+                };
 
                 await PublishToWebSocket(HUB_PUBLISH_MONITORING_ODDSCHANGE, hubConnection, payload);
             }
@@ -185,6 +185,8 @@ namespace Backoffice.WebSocket.Service.Repositories
                     var topMarketTemplateIds = new HashSet<string>(topMarkets.Select(tm => tm.MainMarketTemplateId));
 
                     var tempMarkets = new List<OddsChangeMonitoringMarket>();
+                    var clientWithouMargins = await GetAsianClientsWithoutMargin();
+
                     foreach (var market in message.Markets.Where(c => topMarketTemplateIds.Contains(c.MarketTemplateId)))
                     {
                         var clients = new List<ClientMarginModel>()
@@ -199,7 +201,6 @@ namespace Backoffice.WebSocket.Service.Repositories
 
                                 return new ClientMarginModel() { ClientCode = clientMargin.FirstOrDefault(), Margin = Convert.ToDecimal(clientMargin.LastOrDefault()) };
                             }));
-
                         var providerMarketId = $"{market.ProviderFixtureId}:{market.MarketTemplateId}:{market.MarketSpecifier}";
                         tempMarkets.AddRange(clients.Select(client => new OddsChangeMonitoringMarket()
                         {
@@ -214,7 +215,7 @@ namespace Backoffice.WebSocket.Service.Repositories
                             MaSp = market.MarketSpecifier,
                             ClCo = client.ClientCode,
                             ClCoMa = client.Margin,
-                            Se = GetMonitoringClientOdds(market.Selections, client.Margin.ToString(), market.MarketTemplateId, marketTemplateGroup)
+                            Se = GetMonitoringClientOdds(market.Selections, clientWithouMargins.ClientCodes.Contains(client.ClientCode) && clientWithouMargins.MarketTemplateIds.Contains(market.MarketTemplateId) ? "-999" : client.Margin.ToString(), market.MarketTemplateId, marketTemplateGroup)
                         }));
                     }
 
@@ -872,6 +873,24 @@ namespace Backoffice.WebSocket.Service.Repositories
             }
 
             return result;
+        }
+        private async Task<NoMarginClientsResponse> GetAsianClientsWithoutMargin()
+        {
+            var key = "acnm";
+
+            var cache = _memCache.GetCache<NoMarginClientsResponse>(key);
+
+            if (cache != null)
+                return cache;
+
+            var response = await _sportsbookService.GetAsianclientCodes();
+
+            if (response.StatusCode != StatusCode.Success)
+                return new NoMarginClientsResponse();
+
+            _memCache.AddOrUpdateCache<NoMarginClientsResponse>(key, response.Result, 24);
+
+            return response.Result;
         }
         public List<MainMarketTemplateResponse> GetTopMarketTemplates(int sportId)
         {
