@@ -71,11 +71,11 @@ namespace Backoffice.Web.Shared
             }
             var languageCode = _languageCode;
             var navMenuAccess = _navMenuAccess;
+            _page = page;
 
             if (init || _navMenuAccess != NavMenuParameter?.NavMenuAccess || languageCode != _translationState.ActiveLanguageCode)
             {
                 var cts = new CancellationTokenSource();
-                _page = page;
                 _languageCode = _translationState.ActiveLanguageCode;
                 _navMenuAccess = NavMenuParameter?.NavMenuAccess;
 
