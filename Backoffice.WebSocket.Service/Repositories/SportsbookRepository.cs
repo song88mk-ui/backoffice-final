@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
 namespace Backoffice.WebSocket.Service.Repositories
 {
@@ -90,10 +89,6 @@ namespace Backoffice.WebSocket.Service.Repositories
                     Pa = fixture
                 };
 
-                if(message.ProviderFixtureId == "56128617")
-                {
-
-                }
                 await PublishToWebSocket(HUB_PUBLISH_ODDSCHANGE, hubConnection, payload);
             }
             catch (Exception ex)
@@ -609,11 +604,6 @@ namespace Backoffice.WebSocket.Service.Repositories
         {
             try
             {
-                if (hubConnection.State != HubConnectionState.Connected)
-                {
-                    await hubConnection.StartAsync();
-                }
-
                 await hubConnection.SendAsync(method, payload);
             }
             catch (Exception ex)

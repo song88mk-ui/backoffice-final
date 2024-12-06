@@ -89,10 +89,10 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
             SpanAttributes["data-title"] = string.Empty;
 
-            if (IsBetStop || CurrentMarketStatus != (int)MarketStatus.Active)
+            if (IsBetStop || CurrentMarketStatus != (int)MarketStatus.Active || !Selection.IsActive)
             {
                 _fading = false;
-                if (CurrentMarketStatus == (int)MarketStatus.Inactive)
+                if (CurrentMarketStatus == (int)MarketStatus.Inactive || !Selection.IsActive)
                 {
                     SpanAttributes["data-title"] = MarketStatus.Inactive.ToString();
                     color = "odds-bg-inactive";

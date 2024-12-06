@@ -2,7 +2,6 @@ using Backoffice.Shared.IncomingSbEngineMessages;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Utilities;
 using Backoffice.WebSocket.Service.Repositories;
-using Backoffice.WebSocket.Service.Services;
 using Backoffice.WebSocket.Service.Telemetry;
 using MessagePack;
 using MessagePack.Resolvers;
@@ -81,6 +80,12 @@ namespace Backoffice.WebSocket.Service
         {
             await _hubConnection.DisposeAsync();
 
+            _messagesOnMonitoringOddsChange.CompleteAdding();
+            _messagesOnMonitoringDetailsOddsChange.CompleteAdding();
+            _messagesOnBetStopFixture.CompleteAdding();
+            _messagesOnBetStopGlobal.CompleteAdding();
+            _messagesNotification.CompleteAdding();
+
             _messageBroker.Dispose();
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -91,10 +96,14 @@ namespace Backoffice.WebSocket.Service
 
                 _threadOnMonitoringOddsChange = new Thread(ThreadMonitoringOnOddsChange);
                 _threadOnMonitoringDetailsOddsChange = new Thread(ThreadMonitoringDetailsOnOddsChange);
+                _threadOnBetStopFixture = new Thread(ThreadBetStopFixture);
+                _threadOnBetStopGlobal = new Thread(ThreadBetStopGlobal);
                 _threadNotification = new Thread(ThreadNotification);
 
                 _threadOnMonitoringOddsChange.Start();
                 _threadOnMonitoringDetailsOddsChange.Start();
+                _threadOnBetStopFixture.Start();
+                _threadOnBetStopGlobal.Start();
                 _threadNotification.Start();
 
                 await _hubConnection.StartAsync();
@@ -208,7 +217,7 @@ namespace Backoffice.WebSocket.Service
                     return new[] { Encoding.UTF8.GetString(bytes) };
                 }
             }
-            catch (Exception) {}
+            catch (Exception) { }
             return Enumerable.Empty<string>();
         }
     }
