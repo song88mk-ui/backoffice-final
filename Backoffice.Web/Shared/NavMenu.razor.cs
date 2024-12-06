@@ -66,13 +66,19 @@ namespace Backoffice.Web.Shared
             }
 
             var init = _init;
-            //if (_page != null && _page != "hk/odds-engine" && !_page.Contains("hk/odds-engine/monitoring-details"))
-            //{
-            //    init = _init || _page != page;
-            //}
+            if (_page != null && (_page != "hk/odds-engine" || !_page.Contains("hk/odds-engine/monitoring-details")) && !_isLeagueChange)
+            {
+                init = _init || _page != page;
+            }
             var languageCode = _languageCode;
             var navMenuAccess = _navMenuAccess;
-            _page = page;
+            if (_page != page)
+            {
+                _page = page;
+
+                if (_monitoringUrls.Contains(_page))
+                    _isLeagueChange = false;
+            }
 
             if (init || _navMenuAccess != NavMenuParameter?.NavMenuAccess || languageCode != _translationState.ActiveLanguageCode)
             {
@@ -280,12 +286,16 @@ namespace Backoffice.Web.Shared
                 SegmentName = segmentName
             };
         }
+        private bool _isLeagueChange = false;
         private async Task HandleLeagueMenuEvent(int sportId, string sportName, int segmentId, string segmentName, int leagueId, string leagueName)
         {
             var isPageChanged = !_monitoringUrls.Contains(_page) || _page.Contains("monitoring-details");
 
             if (_selectedSport.LeagueId != leagueId || isPageChanged)
             {
+                if (isPageChanged)
+                    _isLeagueChange = true;
+
                 _selectedSport = new SportClickCallbackModel()
                 {
                     SportId = sportId,
