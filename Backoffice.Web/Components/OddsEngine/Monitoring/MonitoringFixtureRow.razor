@@ -11,7 +11,7 @@
                         @if (_ctrlMarket.Market.Selections.Any())
                         {
                             var displayLine = true;
-                            foreach (var selection in _ctrlMarket.Market.Selections)
+                            foreach (var selection in _ctrlMarket.Market.Selections.OrderBy(c => c.SortOrder))
                             {
                         <MonitoringSelectionRow Selection="selection" IsBetStop="_isBetStop"
                                                 CurrentMarketStatus="@_ctrlMarket.Market.MarketStatusId" />
@@ -63,7 +63,7 @@
                                 @if (client.Market.Selections.Any())
                                 {
                                     var displayLine = true;
-                                    foreach (var selection in client.Market.Selections)
+                                    foreach (var selection in client.Market.Selections.OrderBy(c => c.SortOrder))
                                     {
                                 <MonitoringSelectionRow Selection="selection" IsBetStop="_isBetStop"
                                                         CurrentMarketStatus="@client.Market.MarketStatusId" />
