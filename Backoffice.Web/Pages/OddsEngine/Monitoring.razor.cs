@@ -586,6 +586,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     _fixtureMarkets = _fixtureMarkets.OrderByDescending(o => o.FixtureStatusId).ThenBy(o => o.FixtureStartDate).ThenBy(o => o.FixtureName).ToList();
             }
 
+            _fixtureMarkets.RemoveAll(c => c == null);
             _shouldRender = true;
             await InvokeAsync(StateHasChanged);
         }

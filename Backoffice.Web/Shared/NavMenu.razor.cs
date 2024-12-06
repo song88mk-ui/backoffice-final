@@ -39,6 +39,7 @@ namespace Backoffice.Web.Shared
 
         private string[] _permissionCategories = new string[] { nameof(PermissionCategory.Admin), nameof(PermissionCategory.SBC) };
         private string[] _access = new string[] { ((int)Access.View).ToString(), ((int)Access.Edit).ToString() };
+        private readonly List<string> _monitoringUrls = new List<string>() { "hk/odds-engine", "hk/odds-engine/monitoring" };
 
         private string _page;
 
@@ -65,10 +66,10 @@ namespace Backoffice.Web.Shared
             }
 
             var init = _init;
-            if (_page != null && _page != "hk/odds-engine" && !_page.Contains("hk/odds-engine/monitoring-details"))
-            {
-                init = _init || _page != page;
-            }
+            //if (_page != null && _page != "hk/odds-engine" && !_page.Contains("hk/odds-engine/monitoring-details"))
+            //{
+            //    init = _init || _page != page;
+            //}
             var languageCode = _languageCode;
             var navMenuAccess = _navMenuAccess;
             _page = page;
@@ -281,7 +282,9 @@ namespace Backoffice.Web.Shared
         }
         private async Task HandleLeagueMenuEvent(int sportId, string sportName, int segmentId, string segmentName, int leagueId, string leagueName)
         {
-            if (_selectedSport.LeagueId != leagueId || _page.Contains("monitoring-details"))
+            var isPageChanged = !_monitoringUrls.Contains(_page) || _page.Contains("monitoring-details");
+
+            if (_selectedSport.LeagueId != leagueId || isPageChanged)
             {
                 _selectedSport = new SportClickCallbackModel()
                 {

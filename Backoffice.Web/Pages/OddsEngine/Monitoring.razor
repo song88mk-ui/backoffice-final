@@ -70,54 +70,57 @@
                             {
                                 if (_fixtureMarkets != null && _fixtureMarkets.Any())
                                 {
-                                    <Virtualize Items="_fixtureMarkets" Context="fixture" OverscanCount="20">
-                                        <MonitoringFixtureRow @key="fixture" IsBetStop="fixture.IsBetStopGlobal || (fixture.BetStop.Count > 0 && fixture.BetStop.FirstOrDefault() == 1)" UnixTime="fixture.UnixTime" Markets="fixture.ClientMarkets" Clients="_clients">
-                                            <FixtureHeaderContent>
-                                                <td class="td-start-date">
-                                                    @if (fixture.FixtureStatusId == 1)
-                                                    {
-                                                        <span class="m-1">@fixture.CurrentPeriod</span>
-                                                        @if (!string.IsNullOrEmpty(fixture.CurrentMinute) && int.TryParse(fixture.CurrentMinute, out var currentMinute) && currentMinute > 0)
-                                                        {
-                                                            <span class="fw-bold">@currentMinute</span>
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        <span>
-                                                            @fixture.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)
-                                                            <br />
-                                                            <strong>@fixture.FixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
-                                                        </span>
-                                                    }
-                                                </td>
-                                                <td class="td-fixture-name">
-                                                    <div class="d-flex justify-content-between px-2">
-                                                        <a href="@($"hk/odds-engine/monitoring-details/{fixture.ProviderFixtureId}")"
-                                                           class="fixture-details text-decoration-none">
-                                                            <span class="fw-bold">@fixture.HomeName?.ToUpper()</span>
-                                                            <br />
-                                                            <span>@fixture.AwayName?.ToUpper()</span>
-                                                        </a>
+                                    <Virtualize Items="_fixtureMarkets" Context="fixture" OverscanCount="10">
+                                        @if (fixture != null)
+                                        {
+                                            <MonitoringFixtureRow @key="fixture" IsBetStop="fixture.IsBetStopGlobal || (fixture.BetStop?.Count > 0 && fixture.BetStop?.FirstOrDefault() == 1)" UnixTime="fixture.UnixTime" Markets="fixture.ClientMarkets" Clients="_clients">
+                                                <FixtureHeaderContent>
+                                                    <td class="td-start-date">
                                                         @if (fixture.FixtureStatusId == 1)
                                                         {
-                                                            <span class="score-info py-2 px-2">@fixture.Score</span>
+                                                            <span class="m-1">@fixture.CurrentPeriod</span>
+                                                            @if (!string.IsNullOrEmpty(fixture.CurrentMinute) && int.TryParse(fixture.CurrentMinute, out var currentMinute) && currentMinute > 0)
+                                                            {
+                                                                <span class="fw-bold">@currentMinute</span>
+                                                            }
                                                         }
-                                                    </div>
-                                                </td>
-                                                <AuthorizeView Policy="sbc-monitoring-match-canedit">
-                                                    <Authorized Context="authorizedContext">
-                                                        <td class="td-close-match">
-                                                            <button type="button"
-                                                                    class="btn btn-dark close-match-btn mx-4"
-                                                                    @onclick="fixture.CloseMatchClick">
-                                                                @_translationState.GetValue("Close Match")
-                                                            </button>
-                                                        </td>
-                                                    </Authorized>
-                                                </AuthorizeView>
-                                            </FixtureHeaderContent>
-                                        </MonitoringFixtureRow>
+                                                        else
+                                                        {
+                                                            <span>
+                                                                @fixture.FixtureStartDate.ToLocalTime().ToString("dd/MM/yy", CultureInfo.InvariantCulture)
+                                                                <br />
+                                                                <strong>@fixture.FixtureStartDate.ToLocalTime().ToString("HH:mm")</strong>
+                                                            </span>
+                                                        }
+                                                    </td>
+                                                    <td class="td-fixture-name">
+                                                        <div class="d-flex justify-content-between px-2">
+                                                            <a href="@($"hk/odds-engine/monitoring-details/{fixture.ProviderFixtureId}")"
+                                                               class="fixture-details text-decoration-none">
+                                                                <span class="fw-bold">@fixture.HomeName?.ToUpper()</span>
+                                                                <br />
+                                                                <span>@fixture.AwayName?.ToUpper()</span>
+                                                            </a>
+                                                            @if (fixture.FixtureStatusId == 1)
+                                                            {
+                                                                <span class="score-info py-2 px-2">@fixture.Score</span>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                    <AuthorizeView Policy="sbc-monitoring-match-canedit">
+                                                        <Authorized Context="authorizedContext">
+                                                            <td class="td-close-match">
+                                                                <button type="button"
+                                                                        class="btn btn-dark close-match-btn mx-4"
+                                                                        @onclick="fixture.CloseMatchClick">
+                                                                    @_translationState.GetValue("Close Match")
+                                                                </button>
+                                                            </td>
+                                                        </Authorized>
+                                                    </AuthorizeView>
+                                                </FixtureHeaderContent>
+                                            </MonitoringFixtureRow>
+                                        }
                                     </Virtualize>
 
                                 }
