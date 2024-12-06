@@ -215,7 +215,7 @@ namespace Backoffice.WebSocket.Service.Repositories
                             MaSp = market.MarketSpecifier,
                             ClCo = client.ClientCode,
                             ClCoMa = client.Margin,
-                            Se = GetMonitoringClientOdds(market.Selections, clientWithouMargins.ClientCodes.Contains(client.ClientCode) && clientWithouMargins.MarketTemplateIds.Contains(market.MarketTemplateId) ? "-999" : client.Margin.ToString(), market.MarketTemplateId, marketTemplateGroup)
+                            Se = GetMonitoringClientOdds(market.Selections, clientWithouMargins.ClientCodes.Contains(client.ClientCode) && clientWithouMargins.MarketTemplateIds.Contains(market.MarketTemplateId) && message.SportId == 1 ? "-999" : client.Margin.ToString(), market.MarketTemplateId, marketTemplateGroup)
                         }));
                     }
 
