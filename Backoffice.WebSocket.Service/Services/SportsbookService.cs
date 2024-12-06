@@ -1,20 +1,11 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.IncomingSbEngineMessages;
 using Backoffice.Shared.Models;
-using Backoffice.Shared.Models.HubMessages;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.OutgoingWebSocketMessages;
-using Backoffice.Shared.Utilities;
-using Backoffice.WebSocket.Service.Repositories;
-using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
 using System.Net;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -36,7 +27,7 @@ namespace Backoffice.WebSocket.Service.Services
             
             _sportsbookHttpClient = new HttpClient()
             {
-                BaseAddress = new Uri(configuration["API:Sportsbook:Uri"]),
+                BaseAddress = new Uri(configuration["API:PlatformSportsbook:Uri"]),
                 Timeout = TimeSpan.FromSeconds(5)
             };
         }
