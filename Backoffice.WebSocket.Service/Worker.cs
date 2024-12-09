@@ -72,6 +72,7 @@ namespace Backoffice.WebSocket.Service
                                 })
                                 .WithAutomaticReconnect()
                                 .Build();
+
             _messageBroker = messageBroker;
             _activitySource = instrumentation.ActivitySource;
             _receivedMessagesCounter = instrumentation.ReceivedMessagesCounter;
@@ -93,6 +94,7 @@ namespace Backoffice.WebSocket.Service
             try
             {
                 await _sportsbookRepository.ProcessMarketTemplatePlayerProps();
+                await _sportsbookRepository.ProcessClientsWithoutMargin();
 
                 _threadOnMonitoringOddsChange = new Thread(ThreadMonitoringOnOddsChange);
                 _threadOnMonitoringDetailsOddsChange = new Thread(ThreadMonitoringDetailsOnOddsChange);

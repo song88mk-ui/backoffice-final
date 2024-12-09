@@ -41,10 +41,22 @@ namespace Backoffice.WebSocket.Service.Repositories
         {
             try
             {
-                var result = await _sportsbookService.GetMarketTemplatePlayerProps();
-
                 var key = $"mtpp";
 
+                var result = await _sportsbookService.GetMarketTemplatePlayerProps();
+                _memCache.AddOrUpdateCache(key, result.Result, DateTimeOffset.UtcNow.AddYears(1));
+            }
+            catch (Exception)
+            {
+            }
+        }
+        public async Task ProcessClientsWithoutMargin()
+        {
+            try
+            {
+                var key = "acnm";
+
+                var result = await _sportsbookService.GetAsianclientCodes();
                 _memCache.AddOrUpdateCache(key, result.Result, DateTimeOffset.UtcNow.AddYears(1));
             }
             catch (Exception)
@@ -185,7 +197,7 @@ namespace Backoffice.WebSocket.Service.Repositories
                     var topMarketTemplateIds = new HashSet<string>(topMarkets.Select(tm => tm.MainMarketTemplateId));
 
                     var tempMarkets = new List<OddsChangeMonitoringMarket>();
-                    var clientWithouMargins = await GetAsianClientsWithoutMargin();
+                    var clientWithouMargins = GetAsianClientsWithoutMargin();
 
                     foreach (var market in message.Markets.Where(c => topMarketTemplateIds.Contains(c.MarketTemplateId)))
                     {
@@ -588,6 +600,7 @@ namespace Backoffice.WebSocket.Service.Repositories
         }
 
         private List<MarketTemplatePlayerPropsResponse> GetMarketTemplatePlayerProps() => _memCache.GetCache<List<MarketTemplatePlayerPropsResponse>>($"mtpp") ?? new List<MarketTemplatePlayerPropsResponse>();
+        private NoMarginClientsResponse GetAsianClientsWithoutMargin() => _memCache.GetCache<NoMarginClientsResponse>($"acnm") ?? new NoMarginClientsResponse();
 
         private static decimal GetMasterOddsWithAddedMargin(decimal odds)
         {
@@ -873,24 +886,6 @@ namespace Backoffice.WebSocket.Service.Repositories
             }
 
             return result;
-        }
-        private async Task<NoMarginClientsResponse> GetAsianClientsWithoutMargin()
-        {
-            var key = "acnm";
-
-            var cache = _memCache.GetCache<NoMarginClientsResponse>(key);
-
-            if (cache != null)
-                return cache;
-
-            var response = await _sportsbookService.GetAsianclientCodes();
-
-            if (response.StatusCode != StatusCode.Success)
-                return new NoMarginClientsResponse();
-
-            _memCache.AddOrUpdateCache<NoMarginClientsResponse>(key, response.Result, 24);
-
-            return response.Result;
         }
         public List<MainMarketTemplateResponse> GetTopMarketTemplates(int sportId)
         {
