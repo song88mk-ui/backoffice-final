@@ -18,7 +18,7 @@ namespace Backoffice.WebSocket.Service.Repositories
 {
     public class SportsbookRepository : ISportsbookRepository
     {
-        private readonly ILogger<SportsbookService> _logger;
+        private readonly ILogger<SportsbookRepository> _logger;
         private readonly ISportsbookService _sportsbookService;
         private readonly IMemCache _memCache;
 
@@ -29,7 +29,7 @@ namespace Backoffice.WebSocket.Service.Repositories
         private const string HUB_PUBLISH_ODDSCHANGE = "PublishOddsChange";
         private const string HUB_PUBLISH_BETSTOPFIXTURE = "PublishBetStopFixture";
 
-        public SportsbookRepository(ILogger<SportsbookService> logger, IConfiguration configuration, IMemCache memCache, ISportsbookService sportsbookService)
+        public SportsbookRepository(ILogger<SportsbookRepository> logger, IConfiguration configuration, IMemCache memCache, ISportsbookService sportsbookService)
         {
             _logger = logger;
             _sportsbookService = sportsbookService;

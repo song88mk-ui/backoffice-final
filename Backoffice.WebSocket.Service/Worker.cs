@@ -95,7 +95,7 @@ namespace Backoffice.WebSocket.Service
             {
                 await _sportsbookRepository.ProcessMarketTemplatePlayerProps();
                 await _sportsbookRepository.ProcessClientsWithoutMargin();
-
+x
                 _threadOnMonitoringOddsChange = new Thread(ThreadMonitoringOnOddsChange);
                 _threadOnMonitoringDetailsOddsChange = new Thread(ThreadMonitoringDetailsOnOddsChange);
                 _threadOnBetStopFixture = new Thread(ThreadBetStopFixture);
