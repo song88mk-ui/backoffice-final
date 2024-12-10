@@ -5,6 +5,7 @@ using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -76,8 +77,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     ).ToList()
                 };
 
-                // Task - Migrate to api call
-                //MessageBroker.Publish(JsonSerializer.Serialize(message), "OnCopyClientSettings2", "r.oe.web.config.oncopyclientsettings2", Guid.NewGuid().ToString());
+                await _tradingService.Publish(new MessageRequest
+                {
+                    CorrelationId = Guid.NewGuid().ToString(),
+                    MessageType = "OnCopyClientSettings2",
+                    RoutingKey = "r.oe.web.config.oncopyclientsettings2",
+                    Payload = JsonSerializer.Serialize(message)
+                });
 
                 alert = new AlertModel()
                 {
