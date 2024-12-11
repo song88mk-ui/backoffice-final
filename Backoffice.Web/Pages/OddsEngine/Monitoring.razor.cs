@@ -42,6 +42,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private AlertModel _alertModel = new();
         private int _colCtr = 3;
         private bool _fixtureMarketPreLoader;
+        private long _selectedSportsUnix;
 
         private MonitoringCallbackModel _monitoringCallbackModel = new();
 
@@ -119,7 +120,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _modalService.Open<CloseMatchModal>("Close Match", parameters, options);
         }
-        private bool ValidateParameters() => _init || ((SelectedSport?.LeagueId ?? _leagueId) != _leagueId || (LeagueId != 0 && LeagueId != _leagueId));
+        private bool ValidateParameters() => _init || ((SelectedSport?.LeagueId ?? _leagueId) != _leagueId || (LeagueId != 0 && LeagueId != _leagueId)) || _languageCode != _translationState.ActiveLanguageCode || _selectedSportsUnix != SelectedSport?.UnixTime;
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
         {
