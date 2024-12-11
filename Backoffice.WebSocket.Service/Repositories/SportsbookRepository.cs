@@ -22,9 +22,6 @@ namespace Backoffice.WebSocket.Service.Repositories
         private readonly ISportsbookService _sportsbookService;
         private readonly IMemCache _memCache;
 
-        private readonly List<string> _asianClientCodes = new List<string>();
-        private readonly List<string> _marketTemplateIds = new List<string> { "16", "18", "66", "68" };
-
         private const string HUB_PUBLISH_MONITORING_ODDSCHANGE = "PublishMonitoringOddsChange";
         private const string HUB_PUBLISH_ODDSCHANGE = "PublishOddsChange";
         private const string HUB_PUBLISH_BETSTOPFIXTURE = "PublishBetStopFixture";
@@ -34,8 +31,6 @@ namespace Backoffice.WebSocket.Service.Repositories
             _logger = logger;
             _sportsbookService = sportsbookService;
             _memCache = memCache;
-
-            _asianClientCodes = configuration["Custom:AsianClientCodes"].ToString().Split(',').ToList();
         }
         public async Task ProcessMarketTemplatePlayerProps()
         {
@@ -408,6 +403,8 @@ namespace Backoffice.WebSocket.Service.Repositories
 
             var clients = clientMarketConfig.Split('|').Select(s => new Tuple<string, decimal>(s.Split(':').First(), Convert.ToDecimal(s.Split(':').Last()))).ToList();
 
+            var clientWithouMargins = GetAsianClientsWithoutMargin();
+
             var result = new List<OddsChangeFixtureDetailsClientOdds>();
             var isBinary = selections.Count > 2 ? false : true;
 
@@ -417,7 +414,7 @@ namespace Backoffice.WebSocket.Service.Repositories
             {
                 foreach (var selection in selections)
                 {
-                    if (sportId == 1 && _marketTemplateIds.Contains(marketTemplateId) && _asianClientCodes.Contains(client.Item1, StringComparer.OrdinalIgnoreCase))
+                    if (sportId == 1 && clientWithouMargins.MarketTemplateIds.Contains(marketTemplateId) && clientWithouMargins.ClientCodes.Contains(client.Item1, StringComparer.OrdinalIgnoreCase))
                     {
                         result.Add(new OddsChangeFixtureDetailsClientOdds()
                         {
