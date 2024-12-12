@@ -36,12 +36,12 @@ namespace Backoffice.API.Repositories
         {
             try
             {
-                var key = $"sp-{langCode}-{fixtureTypeId}";
+                //var key = $"sp-{langCode}-{fixtureTypeId}";
 
-                var cache = _memCache.GetCache<BaseResponse<SportsTreeResponse>>(key);
+                //var cache = _memCache.GetCache<BaseResponse<SportsTreeResponse>>(key);
 
-                if (cache != null && cache.StatusCode == StatusCode.Success)
-                    return cache;
+                //if (cache != null && cache.StatusCode == StatusCode.Success)
+                //    return cache;
 
                 var result = new BaseResponse<SportsTreeResponse>();
 
@@ -61,7 +61,7 @@ namespace Backoffice.API.Repositories
                         };
                 }
 
-                _memCache.AddOrUpdateCache(key, result, 24);
+                //_memCache.AddOrUpdateCache(key, result, 24);
                 return result;
             }
             catch (Exception ex)
