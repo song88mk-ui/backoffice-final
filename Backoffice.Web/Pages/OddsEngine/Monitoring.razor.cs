@@ -10,6 +10,7 @@ using Backoffice.Web.States;
 using Backoffice.Web.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Collections.Concurrent;
 using static Backoffice.Shared.Models.Response.FastOddsFixturesResponse;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -46,7 +47,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private MonitoringCallbackModel _monitoringCallbackModel = new();
 
-        private List<string> _channels = new List<string>();
+        private readonly ConcurrentBag<string> _channels = new ConcurrentBag<string>();
         #endregion
 
         #region Methods
@@ -215,10 +216,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (_channels.Contains(key))
                 return;
 
-            foreach (var channel in _channels)
-            {
-                await _hubService.UnSubscribeToChannel(channel);
-            }
+            await Task.WhenAll(_channels.Select(channel => _hubService.UnSubscribeToChannel(channel)));
 
             _channels.Clear();
 
@@ -230,7 +228,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             var response = await _backofficeService.GetMostEvenLineMarketFixtures(request, _languageCode);
             var marketFixtures = response.Result;
 
-            if (marketFixtures == null || marketFixtures.Fixtures.Count == 0)
+            if ((marketFixtures?.Fixtures?.Count ?? 0) == 0)
                 return new();
 
             var result = new List<MonitoringFixtureModel>();
