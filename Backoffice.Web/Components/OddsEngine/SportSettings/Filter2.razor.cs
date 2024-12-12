@@ -8,10 +8,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 {
     public partial class Filter2
     {
-        [Inject] public ITradingService TradingService { get; set; }
-
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
         //[Parameter] public bool Render { get; set; }
         [Parameter] public bool IsUpdate { get; set; }
         [Parameter] public bool IsPreload { get; set; }
@@ -39,11 +35,11 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 return;
 
             //_init = true;
-            var clientResponse = await TradingService.GetClientList();
+            var clientResponse = await _tradingService.GetClientList();
 
             if (clientResponse.StatusCode == StatusCode.Success)
             {
-                clientResponse.Result = clientResponse.Result.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                clientResponse.Result = clientResponse.Result.Where(c => _userState.TradingClients.Any(tc => tc.ClientCode.Equals(c.ClientCode, StringComparison.OrdinalIgnoreCase))).ToList();
 
                 _clients = clientResponse.Result.Select(s => new SelectListItemModel<string>
                 {
@@ -51,10 +47,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                     Name = s.ClientName,
                 }).OrderBy(x => x.Name).ToList();
 
-                _selectedClientCode = _clients.FirstOrDefault().Value;
+                _selectedClientCode = _clients.FirstOrDefault()?.Value;
                 await OnClientChangedCallback.InvokeAsync(_selectedClientCode);
-
-                TradingService.Region = "HK";
 
             }
         }

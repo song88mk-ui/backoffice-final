@@ -13,10 +13,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class SportSettings : IDisposable
     {
-        [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IJSRuntime JSRuntime { get; set; }
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public NavigationManager NavigationManager { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
 
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
@@ -67,8 +63,8 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _isPreload = true;
 
-            _segmentLookupTask = Task.Run(() => TradingService.GetSegmentLookup(0, _languageCode));
-            _leagueLookupTask = Task.Run(() => TradingService.GetLeagueLookup(0, 0, _languageCode));
+            _segmentLookupTask = Task.Run(() => _tradingService.GetSegmentLookup(0, _languageCode));
+            _leagueLookupTask = Task.Run(() => _tradingService.GetLeagueLookup(0, 0, _languageCode));
 
             await Task.CompletedTask;
             _isUpdate = false;
@@ -85,7 +81,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (firstRender)
             {
-                registration = NavigationManager.RegisterLocationChangingHandler(OnLocationChanging);
+                registration = _navigationManager.RegisterLocationChangingHandler(OnLocationChanging);
             }
         }
         private async ValueTask OnLocationChanging(LocationChangingContext context)
@@ -99,9 +95,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                     parameters.Add("DialogStyle", "max-width: 600px;");
 
                     var options = new ModalOptions();
-                    ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
+                    _modalService.Open<ConfirmationModal>("Confirmation", parameters, options);
 
-                    _targetLocation = context.TargetLocation.Replace(NavigationManager.BaseUri, "");
+                    _targetLocation = context.TargetLocation.Replace(_navigationManager.BaseUri, "");
                     context.PreventNavigation();
                 }
             }
@@ -115,7 +111,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 parameters.Add("DialogStyle", "max-width: 600px;");
 
                 var options = new ModalOptions();
-                ModalService.Open<ConfirmationModal>("Confirmation", parameters, options);
+                _modalService.Open<ConfirmationModal>("Confirmation", parameters, options);
             }
         }
         public async Task OnClientChangedEvent(string clientCode)
@@ -133,7 +129,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isPreload = true;
             if (!_sportLookupSettings.Any())
             {
-                var sportLookupResponse = await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
+                var sportLookupResponse = await _tradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString());
 
                 await Task.WhenAll(_leagueLookupTask, _segmentLookupTask);
                 var leagueLookupResponse = _leagueLookupTask.Result.Result;
@@ -193,7 +189,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 case EditSportSettingsPage.SegmentAndLeagues:
                     _isUpdate = true;
                     _hasChanges = false;
-                    var sportsOrder = await JSRuntime.InvokeAsync<List<SortOrderModel>>("getCurrentSortOrder", "#sportstreeEditable .sport-container");
+                    var sportsOrder = await _jsRuntime.InvokeAsync<List<SortOrderModel>>("getCurrentSortOrder", "#sportstreeEditable .sport-container");
 
                     _editedSportSettings = _sportSettings
                         .Join(sportsOrder,
@@ -285,7 +281,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
 
-            ModalService.Open<CopyModal>($"Copy Sports Settings", parameters, options);
+            _modalService.Open<CopyModal>($"Copy Sports Settings", parameters, options);
         }
         public async Task OnViewLogsClickEvent()
         {
@@ -299,7 +295,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
 
-            ModalService.Open<ViewLogsModal>("View Logs", parameters, options);
+            _modalService.Open<ViewLogsModal>("View Logs", parameters, options);
         }
         public async void OnConfirmationModalSaveClicked(object userAction)
         {
@@ -325,7 +321,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     if (!string.IsNullOrEmpty(_targetLocation))
                     {
                         _allowedLeave = true;
-                        NavigationManager.NavigateTo(_targetLocation);
+                        _navigationManager.NavigateTo(_targetLocation);
                     }
                     break;
                 default:
@@ -344,7 +340,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (!string.IsNullOrEmpty(_targetLocation))
                 {
                     _allowedLeave = true;
-                    NavigationManager.NavigateTo(_targetLocation);
+                    _navigationManager.NavigateTo(_targetLocation);
                 }
             }
         }
@@ -359,17 +355,17 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (!_isPreload)
                 _isPreload = true;
 
-            var sportsOrderResponse = await TradingService.GetClientSportOrderList(new ClientSportOrderListRequest
+            var sportsOrderResponse = await _tradingService.GetClientSportOrderList(new ClientSportOrderListRequest
             {
                 ClientCode = _clientCode
             });
 
-            var segmentOrderResponse = await TradingService.GetClientSegmentOrderList(new ClientSegmentOrderListRequest
+            var segmentOrderResponse = await _tradingService.GetClientSegmentOrderList(new ClientSegmentOrderListRequest
             {
                 ClientCode = _clientCode
             });
 
-            var leagueOrderResponse = await TradingService.GetClientLeagueOrderList(new ClientLeagueOrderListRequest
+            var leagueOrderResponse = await _tradingService.GetClientLeagueOrderList(new ClientLeagueOrderListRequest
             {
                 ClientCode = _clientCode
             });
@@ -559,7 +555,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private async Task SaveSportsSetting()
         {
             _isPreload = true;
-            var response = await TradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
+            var response = await _tradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
             {
                 ClientCode = _clientCode,
                 UserId = UserModel.Id,
