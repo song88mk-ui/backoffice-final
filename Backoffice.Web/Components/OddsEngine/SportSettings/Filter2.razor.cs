@@ -1,14 +1,11 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Diagnostics;
 
 namespace Backoffice.Web.Components.OddsEngine.SportSettings
 {
     public partial class Filter2
     {
-        //[Parameter] public bool Render { get; set; }
         [Parameter] public bool IsUpdate { get; set; }
         [Parameter] public bool IsPreload { get; set; }
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
@@ -26,15 +23,11 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         private int _counter;
         private LanguageCode _languageCode;
 
-        //private bool _init;
-        //private bool _shouldRender;
-
         protected override async Task OnInitializedAsync()
         {
             if (PreRenderService.IsPreRendering)
                 return;
 
-            //_init = true;
             var clientResponse = await _tradingService.GetClientList();
 
             if (clientResponse.StatusCode == StatusCode.Success)
@@ -49,11 +42,9 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
                 _selectedClientCode = _clients.FirstOrDefault()?.Value;
                 await OnClientChangedCallback.InvokeAsync(_selectedClientCode);
-
             }
         }
 
-        //protected override bool ShouldRender() => _shouldRender;
 
         public async void OnClientChangedEvent(ChangeEventArgs e)
         {
@@ -70,15 +61,13 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             //}
         }
 
-        public async Task OnUpdateClick()
+        public async Task HandleUpdateClick()
         {
             _editSportSettingsPage = EditSportSettingsPage.Sport;
 
             await OnUpdateClickCallback.InvokeAsync(_editSportSettingsPage);
-
-            //_shouldRender = true;
         }
-        public async Task OnCopyClickEvent()
+        public async Task HandleCopyClick()
         {
             if (IsPreload)
                 return;
@@ -88,7 +77,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             await OnCopyClickCallback.InvokeAsync();
         }
-        public async Task OnCancelClick()
+        public async Task HandleCancelClick()
         {
             if (_editSportSettingsPage == EditSportSettingsPage.SegmentAndLeagues)
             {
@@ -101,7 +90,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             }
         }
 
-        public async Task OnSaveChangesClick()
+        public async Task HandleSaveChangesClick()
         {
             if (_editSportSettingsPage == EditSportSettingsPage.Sport)
             {

@@ -467,47 +467,41 @@ window.loadEventListener = (reference) => {
     netReference = reference;
 }
 window.enableSportSortOrder = () => {
+    const $sportsTree = $('#sportstreeEditable');
+    const $allSports = $('#allSportsEditable');
+
     $('.connect-list').multisortable({
-        stop: function (event, ui) {
-            var data = [];
-            var index = 1;
+        stop: function () {
+            const updateSortOrder = (parentSelector) => {
+                const result = [];
+                let index = 1;
 
-            $('#sportstreeEditable .sport-container').each(function () {
-                data.push({
-                    rowId: $(this).attr('data-id'),
-                    sortOrder: index
+                $(parentSelector + ' .sport-container').each(function () {
+                    result.push({
+                        rowId: this.dataset.id, // Use native `dataset` for performance
+                        sortOrder: index++
+                    });
                 });
 
-                index++;
-            });
-
-            var allData = [];
-            index = 1;
-
-            $('#allSportsEditable .sport-container').each(function () {
-                allData.push({
-                    rowId: $(this).attr('data-id'),
-                    sortOrder: index
-                });
-
-                index++;
-            });
-
-            //console.log(data);
-
-            // call C# method here
-            netReference.invokeMethodAsync('UpdateSportSetting', data, allData)
+                return result;
+            };
+            
+            const treeData = updateSortOrder('#sportstreeEditable');
+            const allSportsData = updateSortOrder('#allSportsEditable');
+            
+            netReference.invokeMethodAsync('UpdateSportSetting', treeData, allSportsData);
         },
     });
-
-    $('#sportstreeEditable, #allSportsEditable').sortable({
+    
+    $sportsTree.add($allSports).sortable({
         handle: '.drag-container',
         connectWith: '.connect-list',
         placeholder: 'py-3 mb-2 border border-2 border-info rounded',
         scroll: true,
         tolerance: 'pointer'
-    })
-}
+    });
+};
+
 
 window.enableSortOrder2 = (id, childId, sportId, segmentId) => {
     $(id).sortable({

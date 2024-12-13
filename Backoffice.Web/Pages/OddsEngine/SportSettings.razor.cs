@@ -4,7 +4,6 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.OddsEngine.SportSettings;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
@@ -29,7 +28,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string _targetLocation;
         private string _pageUrl = "/hk/odds-engine/sport-settings";
 
-        //private bool _renderFilter = true;
+        private bool _processing;
+        private bool _init = true;
         private bool _isPreload;
         private bool _isUpdate;
         private bool _hasChanges;
@@ -71,11 +71,12 @@ namespace Backoffice.Web.Pages.OddsEngine
         }
         protected override async Task OnParametersSetAsync()
         {
-            if(_languageCode != _translationState.ActiveLanguageCode)
+            if (_init && !string.IsNullOrEmpty(_clientCode) && _languageCode != _translationState.ActiveLanguageCode)
             {
                 _languageCode = _translationState.ActiveLanguageCode;
                 await GetSports();
             }
+            _init = false;
         }
         protected override void OnAfterRender(bool firstRender)
         {
@@ -84,6 +85,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 registration = _navigationManager.RegisterLocationChangingHandler(OnLocationChanging);
             }
         }
+
         private async ValueTask OnLocationChanging(LocationChangingContext context)
         {
             if (!_allowedLeave)
@@ -102,7 +104,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             }
         }
-        private async Task OnCancelClickedEvent()
+
+        private async Task HandleCancelClick()
         {
             if (_currentEditPage != EditSportSettingsPage.SegmentAndLeagues)
             {
@@ -114,17 +117,15 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _modalService.Open<ConfirmationModal>("Confirmation", parameters, options);
             }
         }
-        public async Task OnClientChangedEvent(string clientCode)
+        public async Task HandleClientChange(string clientCode)
         {
             _clientCode = clientCode;
             _currentEditPage = EditSportSettingsPage.Main;
-            //_renderFilter = false;
             _isUpdate = false;
 
             await GetSports();
         }
-
-        public async Task OnUpdateClickEvent(EditSportSettingsPage editSportSettingsPage)
+        public async Task HandleUpdateClick(EditSportSettingsPage editSportSettingsPage)
         {
             _isPreload = true;
             if (!_sportLookupSettings.Any())
@@ -238,7 +239,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 _isPreload = false;
             _currentEditPage = editSportSettingsPage;
         }
-        public async Task OnCopyClickEvent()
+        public async Task HandleCopyClick()
         {
             var parameters = new ModalParameters();
 
@@ -283,7 +284,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _modalService.Open<CopyModal>($"Copy Sports Settings", parameters, options);
         }
-        public async Task OnViewLogsClickEvent()
+        public async Task HdleViewLogsClick()
         {
             var parameters = new ModalParameters();
 
@@ -297,7 +298,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _modalService.Open<ViewLogsModal>("View Logs", parameters, options);
         }
-        public async void OnConfirmationModalSaveClicked(object userAction)
+        public async void HandleConfirmationModalSaveClick(object userAction)
         {
             if (userAction == null)
                 return;
@@ -328,8 +329,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                     break;
             }
         }
-
-        public async void OnModalCancelClicked(object userAction)
+        public async void HandleModalCancelClick(object userAction)
         {
             _allowedLeave = false;
             if (userAction == null)
@@ -345,121 +345,110 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
+
         private async Task GetSports()
         {
-            _sportSettings = new List<SportSettingSport>();
-
-            if (string.IsNullOrEmpty(_clientCode))
+            if (_processing)
                 return;
 
-            if (!_isPreload)
-                _isPreload = true;
-
-            var sportsOrderResponse = await _tradingService.GetClientSportOrderList(new ClientSportOrderListRequest
+            try
             {
-                ClientCode = _clientCode
-            });
+                _sportSettings = new List<SportSettingSport>();
 
-            var segmentOrderResponse = await _tradingService.GetClientSegmentOrderList(new ClientSegmentOrderListRequest
-            {
-                ClientCode = _clientCode
-            });
+                if (string.IsNullOrEmpty(_clientCode))
+                    return;
 
-            var leagueOrderResponse = await _tradingService.GetClientLeagueOrderList(new ClientLeagueOrderListRequest
-            {
-                ClientCode = _clientCode
-            });
+                if (!_isPreload)
+                    _isPreload = true;
 
-            await Task.WhenAll(_leagueLookupTask, _segmentLookupTask);
-            var leagueLookupResponse = _leagueLookupTask.Result.Result;
-            var segmentLookupResponse = _segmentLookupTask.Result.Result;
+                var sportsOrderTask = _tradingService.GetClientSportOrderList(new ClientSportOrderListRequest
+                {
+                    ClientCode = _clientCode
+                });
 
-            if (sportsOrderResponse.StatusCode == StatusCode.Success && segmentOrderResponse.StatusCode == StatusCode.Success && leagueOrderResponse.StatusCode == StatusCode.Success)
-            {
-                var leagues = leagueLookupResponse.LeagueLookup.GroupJoin(leagueOrderResponse.Result,
-                        le => new { le.SportId, le.SegmentId, le.LeagueId },
-                        so => new { so.SportId, so.SegmentId, so.LeagueId },
-                        (le, so) => new { Lookup = le, LookupOrder = so })
+                var segmentOrderTask = _tradingService.GetClientSegmentOrderList(new ClientSegmentOrderListRequest
+                {
+                    ClientCode = _clientCode
+                });
+
+                var leagueOrderTask = _tradingService.GetClientLeagueOrderList(new ClientLeagueOrderListRequest
+                {
+                    ClientCode = _clientCode
+                });
+
+                await Task.WhenAll(sportsOrderTask, segmentOrderTask, leagueOrderTask, _leagueLookupTask, _segmentLookupTask);
+                var leagueLookupResponse = _leagueLookupTask.Result.Result;
+                var segmentLookupResponse = _segmentLookupTask.Result.Result;
+                var sportsOrderResponse = sportsOrderTask.Result;
+                var segmentOrderResponse = segmentOrderTask.Result;
+                var leagueOrderResponse = leagueOrderTask.Result;
+
+                if (sportsOrderResponse.StatusCode == StatusCode.Success && segmentOrderResponse.StatusCode == StatusCode.Success && leagueOrderResponse.StatusCode == StatusCode.Success)
+                {
+                    var leagues = leagueLookupResponse.LeagueLookup.GroupJoin(leagueOrderResponse.Result,
+                            le => new { le.SportId, le.SegmentId, le.LeagueId },
+                            so => new { so.SportId, so.SegmentId, so.LeagueId },
+                            (le, so) => new { Lookup = le, LookupOrder = so })
+                            .SelectMany(
+                            temp => temp.LookupOrder.DefaultIfEmpty(),
+                            (temp, s) => new SportSettingLeague
+                            {
+                                SportId = temp.Lookup.SportId,
+                                SegmentId = temp.Lookup.SegmentId,
+                                LeagueId = temp.Lookup.LeagueId,
+                                LeagueName = temp.Lookup.LeagueName.TrimEnd(),
+                                IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
+                                SortOrder = temp.LookupOrder.FirstOrDefault()?.SortOrder ?? 1000
+                            })
+                            .OrderBy(o => o.SortOrder)
+                            .ToList();
+
+                    var segments = segmentLookupResponse.SegmentLookup.GroupJoin(segmentOrderResponse.Result,
+                        seg => new { seg.SportId, seg.SegmentId },
+                        lp => new { lp.SportId, lp.SegmentId },
+                        (seg, lp) => new { Lookup = seg, LookupOrder = lp })
                         .SelectMany(
                         temp => temp.LookupOrder.DefaultIfEmpty(),
-                        (temp, s) => new SportSettingLeague
+                        (temp, s) => new SportSettingSegment
                         {
                             SportId = temp.Lookup.SportId,
                             SegmentId = temp.Lookup.SegmentId,
-                            LeagueId = temp.Lookup.LeagueId,
-                            LeagueName = temp.Lookup.LeagueName.TrimEnd(),
+                            SegmentName = temp.Lookup.SegmentName.TrimEnd(),
                             IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
-                            SortOrder = temp.LookupOrder.FirstOrDefault()?.SortOrder ?? 1000
+                            SortOrder = temp.LookupOrder.FirstOrDefault()?.SortOrder ?? 1000,
+                            IsOpen = false,
+                            Leagues = leagues.Where(c => c.SportId == temp.Lookup.SportId && c.SegmentId == temp.Lookup.SegmentId).ToList()
                         })
                         .OrderBy(o => o.SortOrder)
                         .ToList();
 
-                var segments = segmentLookupResponse.SegmentLookup.GroupJoin(segmentOrderResponse.Result,
-                    seg => new { seg.SportId, seg.SegmentId },
-                    lp => new { lp.SportId, lp.SegmentId },
-                    (seg, lp) => new { Lookup = seg, LookupOrder = lp })
-                    .SelectMany(
-                    temp => temp.LookupOrder.DefaultIfEmpty(),
-                    (temp, s) => new SportSettingSegment
-                    {
-                        SportId = temp.Lookup.SportId,
-                        SegmentId = temp.Lookup.SegmentId,
-                        SegmentName = temp.Lookup.SegmentName.TrimEnd(),
-                        IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
-                        SortOrder = temp.LookupOrder.FirstOrDefault()?.SortOrder ?? 1000,
-                        IsOpen = false,
-                        Leagues = leagues.Where(c => c.SportId == temp.Lookup.SportId && c.SegmentId == temp.Lookup.SegmentId).ToList()
-                    })
-                    .OrderBy(o => o.SortOrder)
-                    .ToList();
+                    _sportSettings = sportsOrderResponse.Result
+                        .Where(s => s.IsActive)
+                        .GroupJoin(segments,
+                        sport => sport.SportId,
+                        segment => segment.SportId,
+                        (sport, segment) => new { sport, segment })
+                        .Select(s => new SportSettingSport
+                        {
+                            SportId = s.sport.SportId,
+                            SportName = s.sport.SportName.TrimEnd(),
+                            SortOrder = s.sport.SortOrder,
+                            IsActive = s.sport.IsActive,
+                            IsOpen = false,
+                            Segments = s.segment.ToList()
+                        })
+                        .OrderBy(o => o.SortOrder)
+                        .ToList();
+                }
 
-                //var segmentSettings = segmentOrderResponse.Result
-                //    .GroupJoin(leagueOrderResponse.Result,
-                //    segment => new { SpId = segment.SportId, SegId = segment.SegmentId },
-                //    league => new { SpId = league.SportId, SegId = league.SegmentId },
-                //    (segment, league) => new SportSettingSegment
-                //    {
-                //        SportId = segment.SportId,
-                //        SegmentId = segment.SegmentId,
-                //        SegmentName = segment.SegmentName,
-                //        SortOrder = segment.SortOrder,
-                //        IsActive = true,
-                //        Leagues = league.Select(s => new SportSettingLeague
-                //        {
-                //            SportId = s.SportId,
-                //            SegmentId = s.SegmentId,
-                //            LeagueId = s.LeagueId,
-                //            LeagueName = s.LeagueName,
-                //            SortOrder = s.SortOrder,
-                //            IsActive = true
-                //        }).ToList()
-                //    }).ToList();
-
-
-                _sportSettings = sportsOrderResponse.Result
-                    .Where(s => s.IsActive)
-                    .GroupJoin(segments,
-                    sport => sport.SportId,
-                    segment => segment.SportId,
-                    (sport, segment) => new { sport, segment })
-                    .Select(s => new SportSettingSport
-                    {
-                        SportId = s.sport.SportId,
-                        SportName = s.sport.SportName.TrimEnd(),
-                        SortOrder = s.sport.SortOrder,
-                        IsActive = s.sport.IsActive,
-                        IsOpen = false,
-                        Segments = s.segment.ToList()
-                    })
-                    .OrderBy(o => o.SortOrder)
-                    .ToList();
+                _isPreload = false;
+                StateHasChanged();
             }
-
-            _isPreload = false;
-            StateHasChanged();
-            //_renderFilter = true;
+            finally
+            {
+                _processing = true;
+            }
         }
-
         private List<SportsSortOrder> GetSportSortOrder(List<SportSettingSport> sportSettings)
         {
             var result = sportSettings.Select((s, sIndex) => new SportsSortOrder
@@ -494,7 +483,6 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             return result;
         }
-
         private List<SportSettingSport> GetVirtualSports()
         {
             // 1001,1002,1003,1005,1021,1055,1058
