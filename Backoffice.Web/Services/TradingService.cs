@@ -358,7 +358,7 @@ namespace Backoffice.Web.Services
         {
             try
             {
-                var query = !(string.IsNullOrEmpty(userId) || string.IsNullOrWhiteSpace(userId)) ? "?userId=" + userId : "";
+                var query = !(string.IsNullOrEmpty(userId) || string.IsNullOrWhiteSpace(userId)) ? $"?userId={userId}" : "";
                 var response = await GetHttpClient().PostAsync($"api/trading/priceboost/settings{query}", new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)

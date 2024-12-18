@@ -157,24 +157,27 @@ namespace Backoffice.WebSocket.Service.Repositories
 
         public async Task ProcessNotification(NotificationsDetailsModel message, HubConnection hubConnection)
         {
-
             var date = DateTime.UtcNow.ToString();
-            var payload = new NotificationsModel
+            var payload = new OutgoingNotificationMessage
             {
-                Id = message.Id,
-                Timestamp = date,
-                Page = message.Page,
-                Details = message.Details,
-                PageRedirect = message.PageRedirect,
-                IsRead = false,
-                UserId = message.UserId?.ToString(),
-                DateText = date,
-                ClaimsType = message.ClaimType,
-                ClientCode = message.ClientCode,
+                Gr = null,
+                UsId = message.UserId?.ToString(),
+                Pa = new NotificationsModel
+                {
+                    Id = message.Id,
+                    Timestamp = date,
+                    Page = message.Page,
+                    Details = message.Details,
+                    PageRedirect = message.PageRedirect,
+                    IsRead = false,
+                    UserId = message.UserId?.ToString(),
+                    DateText = date,
+                    ClaimsType = message.ClaimType,
+                    ClientCode = message.ClientCode,
+                }
             };
 
-
-            await PublishToWebSocket("Notification", hubConnection, payload);
+            await PublishToWebSocket("PublishNotification", hubConnection, payload);
         }
 
         private async Task<OddsChangeMonitoringMessage> ConvertToMonitoringOddsChangeFixture(IncomingOddsChangeMessage message)

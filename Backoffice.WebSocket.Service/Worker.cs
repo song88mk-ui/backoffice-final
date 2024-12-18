@@ -157,6 +157,7 @@ namespace Backoffice.WebSocket.Service
                             break;
                         case "OnNewNotification":
                             var notificationsModel = JsonSerializer.Deserialize<NotificationsDetailsModel>(payload);
+                            _messagesNotification.Add(notificationsModel);
                             break;
                     }
                 }

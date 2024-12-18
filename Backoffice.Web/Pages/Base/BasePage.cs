@@ -8,10 +8,6 @@ namespace Backoffice.Web.Pages.Base
     {
         public PageHeaderModel PageHeaderModel { get; set; }
 
-        public async Task RefreshPage()
-        {
-            // add custom code here or any validations that you need
-            await InvokeAsync(StateHasChanged);
-        }
+        public async Task RefreshPage() => await InvokeAsync(StateHasChanged);
     }
 }

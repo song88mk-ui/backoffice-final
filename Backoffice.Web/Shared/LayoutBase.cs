@@ -55,38 +55,16 @@ namespace Backoffice.Web.Shared
             { "SBC.OE.PriceBoost.Manage", "/manage-boost" },
             { "SBC.OE.PriceBoost.Settings", "/boosted-settings" }
         };
-        private HubConnection _hubConnection;
         private CancellationTokenSource _cts;
 
         #endregion
 
         #region Methods
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                try
-                {
-                    //await Subscribe();
-
-                    await HubService.OnNotificationReceived(async (NotificationsModel message) =>
-                    {
-                        await ProcessNotification(message);
-                    });
-                }
-                catch (Exception ex)
-                {
-                    ToasterService.AddToast(Toast.NewToast("Render Error", ex.Message));
-                }
-            }
-        }
-
         protected async void InitializeState()
         {
             try
             {
-
                 _cts?.Cancel();
                 _cts = new CancellationTokenSource();
 
@@ -143,6 +121,7 @@ namespace Backoffice.Web.Shared
                     UserModel.RoleId = roleId;
                     UserModel.RoleName = role;
                     UserModel.ConnectionId = HubService.ConnectionId;
+                    await HubService.ConnectAsync(UserModel.Id, ProcessNotification);
                 }
 
                 NavMenus = new NavMenuModel();
@@ -274,53 +253,6 @@ namespace Backoffice.Web.Shared
         #endregion
 
         #region Private Methods
-
-        private async Task Subscribe()
-        {
-            try
-            {
-                var request = HttpContextAccessor.HttpContext?.Request;
-
-                _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(new Uri(Configuration["API:HubAPI"]))
-                .Build();
-
-                _hubConnection.On<NotificationsModel>("Notification", async message =>
-                {
-                    await ProcessNotification(message);
-                });
-
-                _hubConnection.Closed += async (error) =>
-                {
-                    await Task.Delay(new Random().Next(0, 5) * 1000);
-                    await _hubConnection.StartAsync();
-                };
-
-                await _hubConnection.StartAsync().ContinueWith(task =>
-                {
-                    if (task.IsFaulted)
-                    {
-                        ToasterService.AddToast(Toast.NewToast
-                                ("Error Connecting to hub", "Fault in connecting."));
-                    }
-                    else if (task.IsCompletedSuccessfully)
-                    {
-                        UserModel.ConnectionId = _hubConnection?.ConnectionId?.ToString() ?? string.Empty;
-                    }
-                });
-
-                //await _hubConnection.InvokeAsync("AddToGroup", "HK");
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Hubconnection URI - {NavigationManager.BaseUri}");
-                ToasterService.AddToast(Toast.NewToast
-                        ("Error Connecting to hub", ex.Message));
-                Log.Error(ex.Message);
-                if (ex.StackTrace != null)
-                    Log.Error(ex.StackTrace.ToString());
-            }
-        }
         private async Task ProcessNotification(NotificationsModel message)
         {
             if (message != null)

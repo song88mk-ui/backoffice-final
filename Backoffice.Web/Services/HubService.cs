@@ -15,13 +15,27 @@ namespace Backoffice.Web.Services
 
         private HubConnection _hubConnection;
         private List<string> _channels = new List<string>();
+        private string _hubUri;
+        private bool _isConnecting;
 
         public HubService(IConfiguration configuration)
         {
+            _hubUri = configuration["API:HubAPI"] ?? throw new ArgumentNullException("API:HubAPI configuration is missing.");
+        }
+
+        public async Task ConnectAsync(string userId, Func<NotificationsModel, Task>? processNotification = null)
+        {
             try
             {
+                if (_isConnecting)
+                    return;
+
+                if (_hubConnection != null && (_hubConnection.State == HubConnectionState.Connected || _hubConnection.State == HubConnectionState.Connecting))
+                    return;
+
+                _isConnecting = true;
                 _hubConnection = new HubConnectionBuilder()
-                                .WithUrl(configuration["API:HubAPI"], options =>
+                                .WithUrl($"{_hubUri}?userId={userId}", options =>
                                 {
                                     options.Transports = HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling;
                                 })
@@ -39,9 +53,11 @@ namespace Backoffice.Web.Services
 
                 _hubConnection.ServerTimeout = TimeSpan.FromSeconds(30);
                 _hubConnection.KeepAliveInterval = TimeSpan.FromSeconds(10);
+
                 _hubConnection.Closed += async (error) =>
                 {
                     Log.Error($"HubConnection Closed: {error?.Message} - {error?.StackTrace}");
+                    await ConnectAsync(userId);
                 };
 
                 _hubConnection.Reconnecting += (error) =>
@@ -52,6 +68,8 @@ namespace Backoffice.Web.Services
 
                 _hubConnection.Reconnected += async (connectionId) =>
                 {
+                    ConnectionId = connectionId;
+
                     var tempChannel = new List<string>(_channels);
                     _channels.Clear();
 
@@ -61,41 +79,33 @@ namespace Backoffice.Web.Services
                     }
 
                     await SubscribeToChannel("onbetstopglobal");
-                    Log.Information($"HubConnection Reconnected with Connection ID: {connectionId}");
                 };
 
-                _hubConnection.StartAsync().ContinueWith(async task =>
-                {
-                    if (task.IsFaulted)
-                    {
-                        Log.Error($"HubConnection failed to connect: {task?.Exception?.Message} - {task?.Exception?.StackTrace}");
-                    }
-                    else if (task.IsCompletedSuccessfully)
-                    {
-                        var connectionId = _hubConnection.ConnectionId?.ToString();
-                        Log.Information($"HubConnection Connected with Connection ID: {connectionId}");
+                await _hubConnection.StartAsync();
+                ConnectionId = _hubConnection.ConnectionId;
+                await SubscribeToChannel("onbetstopglobal");
 
-                        await SubscribeToChannel("onbetstopglobal");
-                    }
-                });
+                if (processNotification != null)
+                    await OnNotificationReceived(processNotification);
             }
             catch (Exception ex)
             {
                 Log.Error($"{ex.Message} - {ex.StackTrace}");
             }
+            _isConnecting = false;
         }
-
         public async Task OnNotificationReceived(Func<NotificationsModel, Task> processNotification)
         {
-            if (_hubConnection.State != HubConnectionState.Connected)
+            if (_hubConnection == null || _hubConnection.State != HubConnectionState.Connected)
                 return;
 
-            _hubConnection.On("Notification", async (NotificationsModel message) => await processNotification(message));
+            _hubConnection.On("OnNotification", async (NotificationsModel message) => await processNotification(message));
+            await Task.CompletedTask;
         }
 
         public async Task SubscribeToChannel(string key)
         {
-            if (_hubConnection.State != HubConnectionState.Connected)
+            if (_hubConnection == null || _hubConnection.State != HubConnectionState.Connected)
             {
                 _channels.Add(key);
                 return;
@@ -113,7 +123,7 @@ namespace Backoffice.Web.Services
 
         public async Task UnSubscribeToChannel(string key)
         {
-            if (_hubConnection.State != HubConnectionState.Connected)
+            if (_hubConnection == null || _hubConnection.State != HubConnectionState.Connected)
             {
                 _channels.Remove(key);
                 return;
@@ -136,12 +146,14 @@ namespace Backoffice.Web.Services
                 _hubConnection.On<OddsChangeMonitoringMessage>("OnMonitoringOddsChange", async message => await processOddsChangeMonitoring(message));
 
             if (processOddsChange != null)
-                _hubConnection.On<OddsChangeFixtureDetailsMessage>("OnOddsChange", async message => {
+                _hubConnection.On<OddsChangeFixtureDetailsMessage>("OnOddsChange", async message =>
+                {
                     Console.WriteLine(" - MessageReceived");
                     await processOddsChange(message);
                 });
 
-            _hubConnection.On<byte>("OnOddsChange", async message => {
+            _hubConnection.On<byte>("OnOddsChange", async message =>
+            {
                 Console.WriteLine(" - MessageReceived (Byte)");
             });
 
@@ -150,13 +162,18 @@ namespace Backoffice.Web.Services
 
             _hubConnection.On<BetStopGlobalMessage>("OnBetStopGlobal", async message
                 => await processOnBetStopGlobal(message));
+
+            await Task.CompletedTask;
         }
         public async ValueTask DisposeAsync()
         {
-            await _hubConnection.StopAsync();
-            await _hubConnection.DisposeAsync();
+            if(_hubConnection != null)
+            {
+                await _hubConnection.StopAsync();
+                await _hubConnection.DisposeAsync();
 
-            Log.Warning("HubConnection Disposed");
+                Log.Warning("HubConnection Disposed");
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Backoffice.Shared.Models.HubMessages;
+﻿using Backoffice.Shared.Models;
+using Backoffice.Shared.Models.HubMessages;
 using Backoffice.Shared.OutgoingEngineBookmakerMessages;
 
 namespace Backoffice.WebSocket.API.Events
@@ -9,5 +10,6 @@ namespace Backoffice.WebSocket.API.Events
         Task OnMonitoringOddsChange(OddsChangeMonitoringMessage message);
         Task OnBetStopFixture(BetStopFixtureMessage message);
         Task OnBetStopGlobal(BetStopGlobalMessage message);
+        Task OnNotification(NotificationsModel message);
     }
 }

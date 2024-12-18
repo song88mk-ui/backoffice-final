@@ -43,8 +43,6 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             }
 
             _searchForm = new SearchFormModel();
-            //await SearchFormChanged.InvokeAsync(_searchForm);
-            await OnInitializeCallback.InvokeAsync();
         }
         public async Task OnInputSearchEvent()
         {

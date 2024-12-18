@@ -19,8 +19,6 @@ namespace Backoffice.Web.Pages.OddsEngine
         [Parameter] public string Region { get; set; } = "hk";
         [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
-
-        //protected SearchFormModel SearchForm { get; set; } = new SearchFormModel();
         #endregion
         private AlertModel _alertModel;
 
@@ -30,6 +28,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string _tHeadClass;
         private string _searchText;
         protected List<BoostedSettingsModel> _clientsView;
+
+        private bool _init = true;
 
         #region Methods
 
@@ -66,6 +66,14 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            if (_init)
+                await GetContent();
+
+            _init = false;
         }
 
         public async Task OnSaveSettingClickEvent(object item)
