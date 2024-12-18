@@ -57,10 +57,7 @@ namespace Backoffice.WebSocket.Service
             _sportsbookRepository = sportsbookService;
 
             _hubConnection = new HubConnectionBuilder()
-                                .WithUrl(configuration["Custom:WebSocketAPI"], options =>
-                                {
-                                    options.Transports = HttpTransportType.WebSockets;
-                                })
+                                .WithUrl(configuration["Custom:WebSocketAPI"], options => options.Transports = HttpTransportType.WebSockets)
                                 .AddMessagePackProtocol(options =>
                                 {
                                     StaticCompositeResolver.Instance.Register(
