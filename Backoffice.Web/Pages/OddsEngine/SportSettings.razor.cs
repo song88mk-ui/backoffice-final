@@ -446,7 +446,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
             finally
             {
-                _processing = true;
+                _processing = false;
             }
         }
         private List<SportsSortOrder> GetSportSortOrder(List<SportSettingSport> sportSettings)
