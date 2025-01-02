@@ -1,13 +1,13 @@
 ﻿<div class="modal-body">
     <div class="row">
         <div class="col-md-12">
-            @if (IsPreLoader)
+            @if (_isPreloader)
             {
                 <Preloader />
             }
             else
             {
-                if (ClientSportOrderAudit != null && ClientSportOrderAudit.Any())
+                if (_clientSportOrderAudit != null && _clientSportOrderAudit.Any())
                 {
                     <table class="table table-bordered table-hover">
                         <thead>
@@ -20,11 +20,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <Virtualize Items="ClientSportOrderAudit" Context="model">
+                            <Virtualize Items="_clientSportOrderAudit" Context="model">
                                 <tr>
                                     <td>
-                                        @model.TimeStamp.ToLocalTime().ToString("MM/dd/yyyy") <br>
-                                        @model.TimeStamp.ToLocalTime().ToString("hh:mm:ss tt")
+                                        @model.Timestamp.ToLocalTime().ToString("MM/dd/yyyy") <br>
+                                        @model.Timestamp.ToLocalTime().ToString("hh:mm:ss tt")
                                     </td>
                                     <td>@model.ClientName</td>
                                     <td>
@@ -33,10 +33,11 @@
                                     <td>
                                         <span>@((MarkupString)model.ChangesTo)</span>
                                     </td>
-                                    <td>@model.UserName</td>
+                                    <td>@model.UpdatedBy</td>
                                 </tr>
                             </Virtualize>
                         </tbody>
+                        <Pagination MetaData="_metaData" Spread="3" SelectPageEvent="SelectedPage" PaginationColspan="5" />
                     </table>
                 }
                 else

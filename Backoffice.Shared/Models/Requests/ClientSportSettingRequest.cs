@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -52,5 +53,12 @@ namespace Backoffice.Shared.Models.Requests
     {
         public bool Checked { get; set; }
         public object Param1 { get; set; }
+    }
+    public class SortOrderChange
+    {
+        public string ChangeType { get; set; }
+        public int SportId { get; set; }
+        public int? SegmentId { get; set; }
+        public int? LeagueId { get; set; }
     }
 }

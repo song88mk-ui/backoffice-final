@@ -4,9 +4,11 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.OddsEngine.SportSettings;
 using Backoffice.Web.Models;
+using Backoffice.Web.Models.OddsEngine.SportSetting;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
@@ -386,41 +388,65 @@ namespace Backoffice.Web.Pages.OddsEngine
                 if (sportsOrderResponse.StatusCode == StatusCode.Success && segmentOrderResponse.StatusCode == StatusCode.Success && leagueOrderResponse.StatusCode == StatusCode.Success)
                 {
                     var leagues = leagueLookupResponse.LeagueLookup.GroupJoin(leagueOrderResponse.Result,
-                            le => new { le.SportId, le.SegmentId, le.LeagueId },
-                            so => new { so.SportId, so.SegmentId, so.LeagueId },
-                            (le, so) => new { Lookup = le, LookupOrder = so })
-                            .SelectMany(
-                            temp => temp.LookupOrder.DefaultIfEmpty(),
-                            (temp, s) => new SportSettingLeague
-                            {
-                                SportId = temp.Lookup.SportId,
-                                SegmentId = temp.Lookup.SegmentId,
-                                LeagueId = temp.Lookup.LeagueId,
-                                LeagueName = temp.Lookup.LeagueName.TrimEnd(),
-                                IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
-                                SortOrder = temp.LookupOrder.FirstOrDefault()?.SortOrder ?? 1000
-                            })
-                            .OrderBy(o => o.SortOrder)
-                            .ToList();
+                    le => new { le.SportId, le.SegmentId, le.LeagueId },
+                    so => new { so.SportId, so.SegmentId, so.LeagueId },
+                    (le, so) => new { Lookup = le, LookupOrder = so })
+                    .SelectMany(
+                    temp => temp.LookupOrder.DefaultIfEmpty(),
+                    (temp, s) => new
+                    {
+                        temp.Lookup,
+                        temp.LookupOrder,
+                        temp.LookupOrder.FirstOrDefault()?.SortOrder
+                    })
+                    .GroupBy(x => new { x.Lookup.SportId, x.Lookup.SegmentId })
+                    .SelectMany(group =>
+                    {
+                        var maxSortOrder = group.Max(x => x.SortOrder ?? 0);
+
+                        return group.Select((x, index) => new SportSettingLeague
+                        {
+                            SportId = x.Lookup.SportId,
+                            SegmentId = x.Lookup.SegmentId,
+                            LeagueId = x.Lookup.LeagueId,
+                            LeagueName = x.Lookup.LeagueName.TrimEnd(),
+                            IsActive = x.LookupOrder.FirstOrDefault() != null,
+                            SortOrder = x.LookupOrder.FirstOrDefault()?.SortOrder ?? (++maxSortOrder),
+                        });
+                    })
+                    .OrderBy(o => o.SortOrder)
+                    .ToList();
 
                     var segments = segmentLookupResponse.SegmentLookup.GroupJoin(segmentOrderResponse.Result,
-                        seg => new { seg.SportId, seg.SegmentId },
-                        lp => new { lp.SportId, lp.SegmentId },
-                        (seg, lp) => new { Lookup = seg, LookupOrder = lp })
-                        .SelectMany(
-                        temp => temp.LookupOrder.DefaultIfEmpty(),
-                        (temp, s) => new SportSettingSegment
+                    seg => new { seg.SportId, seg.SegmentId },
+                    lp => new { lp.SportId, lp.SegmentId },
+                    (seg, lp) => new { Lookup = seg, LookupOrder = lp })
+                    .SelectMany(
+                    temp => temp.LookupOrder.DefaultIfEmpty(),
+                    (temp, s) => new
+                    {
+                        temp.Lookup,
+                        temp.LookupOrder,
+                        temp.LookupOrder.FirstOrDefault()?.SortOrder
+                    })
+                    .GroupBy(x => new { x.Lookup.SportId })
+                    .SelectMany(group =>
+                    {
+                        var maxSortOrder = group.Max(x => x.SortOrder ?? 0);
+
+                        return group.Select((x, index) => new SportSettingSegment
                         {
-                            SportId = temp.Lookup.SportId,
-                            SegmentId = temp.Lookup.SegmentId,
-                            SegmentName = temp.Lookup.SegmentName.TrimEnd(),
-                            IsActive = temp.LookupOrder.FirstOrDefault() != null ? true : false,
-                            SortOrder = temp.LookupOrder.FirstOrDefault()?.SortOrder ?? 1000,
+                            SportId = x.Lookup.SportId,
+                            SegmentId = x.Lookup.SegmentId,
+                            SegmentName = x.Lookup.SegmentName.TrimEnd(),
+                            IsActive = x.LookupOrder.FirstOrDefault() != null,
+                            SortOrder = x.LookupOrder.FirstOrDefault()?.SortOrder ?? (++maxSortOrder),
                             IsOpen = false,
-                            Leagues = leagues.Where(c => c.SportId == temp.Lookup.SportId && c.SegmentId == temp.Lookup.SegmentId).ToList()
-                        })
-                        .OrderBy(o => o.SortOrder)
-                        .ToList();
+                            Leagues = leagues.Where(c => c.SportId == x.Lookup.SportId && c.SegmentId == x.Lookup.SegmentId).ToList()
+                        });
+                    })
+                    .OrderBy(o => o.SortOrder)
+                    .ToList();
 
                     _sportSettings = sportsOrderResponse.Result
                         .Where(s => s.IsActive)
@@ -543,22 +569,32 @@ namespace Backoffice.Web.Pages.OddsEngine
         private async Task SaveSportsSetting()
         {
             _isPreload = true;
-            var response = await _tradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
-            {
-                ClientCode = _clientCode,
-                UserId = UserModel.Id,
-                UserName = UserModel.UserName,
-                TimeStamp = DateTime.UtcNow,
-                SportsSortOrder = GetSportSortOrder(_editedSportSettings),
-            });
+            var newSportOrder = GetSportSortOrder(_editedSportSettings);
 
-            if (response.StatusCode == StatusCode.Success)
+            var changes = GetSortOrderChanges(_sportSettings, newSportOrder);
+
+            if (changes.Any())
             {
-                _alertModel = new AlertModel()
+                var activityLog = GetActivityLogModel(changes, _sportSettings, newSportOrder);
+
+                var response = await _tradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
                 {
-                    Status = AlertStatus.Success,
-                    Message = "Success! Your changes have been saved.",
-                };
+                    ClientCode = _clientCode,
+                    UserId = UserModel.Id,
+                    UserName = UserModel.UserName,
+                    TimeStamp = DateTime.UtcNow,
+                    SportsSortOrder = newSportOrder
+                });
+
+                if (response.StatusCode == StatusCode.Success)
+                {
+                    await _backofficeService.AddActivityLog(activityLog);
+                    _alertModel = new AlertModel()
+                    {
+                        Status = AlertStatus.Success,
+                        Message = "Success! Your changes have been saved.",
+                    };
+                }
             }
 
             //_renderFilter = false;
@@ -566,7 +602,180 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             await GetSports();
         }
+        public List<SortOrderChange> GetSortOrderChanges(List<SportSettingSport> currentRequest, List<SportsSortOrder> newRequest)
+        {
+            var changes = new List<SortOrderChange>();
 
+            if (currentRequest == null || newRequest == null)
+                return changes;
+
+            foreach (var newSport in newRequest)
+            {
+                var currentSport = currentRequest.FirstOrDefault(s => s.SportId == newSport.SportId);
+                if (currentSport == null || currentSport.SortOrder != newSport.SortOrder || currentSport.IsActive != newSport.IsActive)
+                {
+                    changes.Add(new SortOrderChange
+                    {
+                        ChangeType = "Sport",
+                        SportId = newSport.SportId
+                    });
+                }
+
+                foreach (var newSegment in newSport.SegmentsSortOrder)
+                {
+                    var currentSegment = currentSport?.Segments.FirstOrDefault(s => s.SegmentId == newSegment.SegmentId);
+                    if (currentSegment == null || currentSegment.SortOrder != newSegment.SortOrder || currentSegment.IsActive != newSegment.IsActive)
+                    {
+                        changes.Add(new SortOrderChange
+                        {
+                            ChangeType = "Segment",
+                            SportId = newSport.SportId,
+                            SegmentId = newSegment.SegmentId
+                        });
+                    }
+
+                    foreach (var newLeague in newSegment.LeagueSortOrder)
+                    {
+                        var currentLeague = currentSegment?.Leagues.FirstOrDefault(l => l.LeagueId == newLeague.LeagueId);
+                        if (currentLeague == null || currentLeague.SortOrder != newLeague.SortOrder || currentLeague.IsActive != newLeague.IsActive)
+                        {
+                            changes.Add(new SortOrderChange
+                            {
+                                ChangeType = "League",
+                                SportId = newSport.SportId,
+                                SegmentId = newSegment.SegmentId,
+                                LeagueId = newLeague.LeagueId
+                            });
+                        }
+                    }
+                }
+            }
+
+            return changes;
+        }
+        public ActivityLogModel GetActivityLogModel(List<SortOrderChange> changes, List<SportSettingSport> currentSportOrder, List<SportsSortOrder> newSportOrder)
+        {
+            var payloadFrom = new SportSettingSortOrderAudit();
+            var payloadTo = new SportSettingSortOrderAudit();
+
+            if (changes.Any(c => c.ChangeType == "Sport"))
+            {
+                payloadFrom.Sports = _sportSettings.Select(s => new SportSortOrderAudit
+                {
+                    SportId = s.SportId,
+                    SportName = s.SportName,
+                    SortOrder = s.SortOrder
+                }).ToList();
+
+                payloadTo.Sports = newSportOrder.Select(s => new SportSortOrderAudit
+                {
+                    SportId = s.SportId,
+                    SportName = s.SportName,
+                    SortOrder = s.SortOrder
+                }).ToList();
+            }
+
+            var segmentChanges = changes.Where(c => c.ChangeType == "Segment").Select(s => s.SportId).Distinct().ToHashSet();
+            if (segmentChanges.Any())
+            {
+                payloadFrom.Segments = _sportSettings
+                    .Where(c => segmentChanges.Contains(c.SportId))
+                    .Select(sport => new SegmentSortOrderAuditSport
+                    {
+                        SportId = sport.SportId,
+                        SportName = sport.SportName,
+                        Segments = sport.Segments.Select(segment => new SegmentSortOrderAuditSegment
+                        {
+                            SegmentId = segment.SegmentId,
+                            SegmentName = segment.SegmentName.TrimEnd(),
+                            SortOrder = segment.SortOrder
+                        }).ToList()
+                    }).ToList();
+
+                payloadTo.Segments = newSportOrder
+                    .Where(c => segmentChanges.Contains(c.SportId))
+                    .Select(sport => new SegmentSortOrderAuditSport
+                    {
+                        SportId = sport.SportId,
+                        SportName = sport.SportName,
+                        Segments = sport.SegmentsSortOrder.Select(segment => new SegmentSortOrderAuditSegment
+                        {
+                            SegmentId = segment.SegmentId,
+                            SegmentName = segment.SegmentName.TrimEnd(),
+                            SortOrder = segment.SortOrder
+                        }).ToList()
+                    }).ToList();
+            }
+
+            var leagueChanges = changes
+                .Where(c => c.ChangeType == "League")
+                .Select(s => new { s.SportId, s.SegmentId })
+                .Distinct()
+                .GroupBy(x => x.SportId)
+                .Select(g => new
+                {
+                    SportId = g.Key,
+                    SegmentIds = g.Select(x => x.SegmentId).ToList()
+                })
+                .ToList();
+
+            if (leagueChanges.Any())
+            {
+                payloadFrom.Leagues = _sportSettings
+                    .Where(sport => leagueChanges.Any(lc => lc.SportId == sport.SportId))
+                    .Select(sport => new LeagueSortOrderAuditSport
+                    {
+                        SportId = sport.SportId,
+                        SportName = sport.SportName,
+                        Segments = sport.Segments
+                            .Where(segment => leagueChanges.First(lc => lc.SportId == sport.SportId).SegmentIds.Contains(segment.SegmentId))
+                            .Select(segment => new LeagueSortOrderAuditSegment
+                            {
+                                SegmentId = segment.SegmentId,
+                                SegmentName = segment.SegmentName,
+                                Leagues = segment.Leagues.Select(league => new LeagueSortOrderAuditLeague
+                                {
+                                    LeagueId = league.LeagueId,
+                                    LeagueName = league.LeagueName.TrimEnd(),
+                                    SortOrder = league.SortOrder
+                                }).ToList()
+                            }).ToList()
+                    }).ToList();
+
+                payloadTo.Leagues = newSportOrder
+                    .Where(sport => leagueChanges.Any(lc => lc.SportId == sport.SportId))
+                    .Select(sport => new LeagueSortOrderAuditSport
+                    {
+                        SportId = sport.SportId,
+                        SportName = sport.SportName,
+                        Segments = sport.SegmentsSortOrder
+                            .Where(segment => leagueChanges.First(lc => lc.SportId == sport.SportId).SegmentIds.Contains(segment.SegmentId))
+                            .Select(segment => new LeagueSortOrderAuditSegment
+                            {
+                                SegmentId = segment.SegmentId,
+                                SegmentName = segment.SegmentName,
+                                Leagues = segment.LeagueSortOrder.Select(league => new LeagueSortOrderAuditLeague
+                                {
+                                    LeagueId = league.LeagueId,
+                                    LeagueName = league.LeagueName.TrimEnd(),
+                                    SortOrder = league.SortOrder
+                                }).ToList()
+                            }).ToList()
+                    }).ToList();
+            }
+
+            return new ActivityLogModel
+            {
+                Page = SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace('_', '.'),
+                Activity = Activity.Update.ToString(),
+                Payload = $"{_clientCode}",
+                From = JsonSerializer.Serialize(payloadFrom),
+                To = JsonSerializer.Serialize(payloadTo),
+                UserId = UserModel.Id,
+                UserName = UserModel.UserName,
+                TimeStamp = DateTime.Now
+            };
+        }
         public void Dispose() => registration?.Dispose();
     }
 }

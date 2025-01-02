@@ -41,7 +41,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             {
                 if (sportId == x.SportId)
                     x.IsOpen = true;
-                else 
+                else
                     x.IsOpen = false;
             });
         }

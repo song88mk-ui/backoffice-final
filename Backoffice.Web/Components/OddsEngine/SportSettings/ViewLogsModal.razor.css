@@ -7,7 +7,10 @@
     background-color: #F5F5F5;
 }
 
-tbody tr td:nth-child(2n+1) {
+/*tbody tr td:nth-child(2n+1) {
+    text-align: center;
+}*/
+tbody tr td {
     text-align: center;
 }
 
