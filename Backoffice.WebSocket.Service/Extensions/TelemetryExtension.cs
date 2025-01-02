@@ -15,7 +15,6 @@ namespace Backoffice.WebSocket.Service.Extensions
         {
             Action<ResourceBuilder> resource = r => r.AddService(
                     serviceName: "Backoffice.WebSocket.Service",
-                    serviceNamespace: configuration["Telemetry:Environment"] ?? "dev",
                     serviceVersion: "latest",
                     serviceInstanceId: Environment.MachineName);
 
@@ -31,11 +30,7 @@ namespace Backoffice.WebSocket.Service.Extensions
                         tracing
                         .AddSource(Instrumentation.ActivitySourceName)
                         .SetSampler(new AlwaysOnSampler())
-                        .AddOtlpExporter(o =>
-                        {
-                            o.Protocol = OtlpExportProtocol.HttpProtobuf;
-                            o.Endpoint = new Uri(configuration["Telemetry:Collector"]+"/v1/traces");
-                        });
+                        .AddOtlpExporter();
                     })
                     .WithMetrics(metrics =>
                     {
@@ -43,11 +38,7 @@ namespace Backoffice.WebSocket.Service.Extensions
                         .AddMeter(Instrumentation.MeterName)
                         .AddRuntimeInstrumentation()
                         .AddProcessInstrumentation()
-                        .AddOtlpExporter(o =>
-                        {
-                            o.Protocol = OtlpExportProtocol.HttpProtobuf;
-                            o.Endpoint = new Uri(configuration["Telemetry:Collector"]+"/v1/metrics");
-                        });
+                        .AddOtlpExporter();
                     });
             }
 
