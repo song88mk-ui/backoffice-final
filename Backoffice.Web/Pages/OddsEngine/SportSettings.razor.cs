@@ -188,6 +188,8 @@ namespace Backoffice.Web.Pages.OddsEngine
             {
                 case EditSportSettingsPage.Sport:
                     _isUpdate = true;
+                    _editedSportSettings = new List<SportSettingSport>();
+                    _editedSportSettings.AddRange(_sportSettings);
                     break;
                 case EditSportSettingsPage.SegmentAndLeagues:
                     _isUpdate = true;
@@ -619,6 +621,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                         ChangeType = "Sport",
                         SportId = newSport.SportId
                     });
+
+                    if (currentSport == null)
+                        continue;
                 }
 
                 foreach (var newSegment in newSport.SegmentsSortOrder)
@@ -632,6 +637,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                             SportId = newSport.SportId,
                             SegmentId = newSegment.SegmentId
                         });
+
+                        if (currentSegment == null)
+                            continue;
                     }
 
                     foreach (var newLeague in newSegment.LeagueSortOrder)
@@ -645,6 +653,52 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 SportId = newSport.SportId,
                                 SegmentId = newSegment.SegmentId,
                                 LeagueId = newLeague.LeagueId
+                            });
+                        }
+                    }
+                }
+            }
+
+            foreach (var currentSport in currentRequest)
+            {
+                if (!newRequest.Any(s => s.SportId == currentSport.SportId))
+                {
+                    changes.Add(new SortOrderChange
+                    {
+                        ChangeType = "Sport",
+                        SportId = currentSport.SportId
+                    });
+
+                    continue;
+                }
+
+                foreach (var currentSegment in currentSport.Segments)
+                {
+                    if (!newRequest.Any(ns => ns.SportId == currentSport.SportId && ns.SegmentsSortOrder.Any(nss => nss.SegmentId == currentSegment.SegmentId)))
+                    {
+                        changes.Add(new SortOrderChange
+                        {
+                            ChangeType = "Segment",
+                            SportId = currentSport.SportId,
+                            SegmentId = currentSegment.SegmentId
+                        });
+
+                        continue;
+                    }
+
+                    foreach (var currentLeague in currentSegment.Leagues)
+                    {
+                        if (!newRequest.Any(ns => ns.SportId == currentSport.SportId &&
+                                                  ns.SegmentsSortOrder.Any(nss => nss.SegmentId == currentSegment.SegmentId &&
+                                                  nss.LeagueSortOrder.Any(nl => nl.LeagueId == currentLeague.LeagueId)))
+                        )
+                        {
+                            changes.Add(new SortOrderChange
+                            {
+                                ChangeType = "League",
+                                SportId = currentSport.SportId,
+                                SegmentId = currentSegment.SegmentId,
+                                LeagueId = currentLeague.LeagueId
                             });
                         }
                     }
