@@ -27,7 +27,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             var payload = new OnGetOeConfigTemplateMessage()
             {
-                ConnectionId = ModalParameters.TryGet<string>("ConnectionId"),
+                ConnectionId = _userState.ConnectionId,
                 UserId = ModalParameters.TryGet<string>("UserId"),
                 ConfigTemplateId = ModalParameters.TryGet<long>("ConfigTemplateId").ToString(),
                 Filename = Path.GetFileNameWithoutExtension(_filename),

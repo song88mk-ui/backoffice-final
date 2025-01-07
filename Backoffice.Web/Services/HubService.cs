@@ -74,6 +74,7 @@ namespace Backoffice.Web.Services
                 _hubConnection.Reconnected += async (connectionId) =>
                 {
                     ConnectionId = connectionId;
+                    _userState.ConnectionId = connectionId;
 
                     var tempChannel = new List<string>(_channels);
                     _channels.Clear();
@@ -88,6 +89,7 @@ namespace Backoffice.Web.Services
 
                 await _hubConnection.StartAsync();
                 ConnectionId = _hubConnection.ConnectionId;
+                _userState.ConnectionId = _hubConnection.ConnectionId;
                 await SubscribeToChannel("onbetstopglobal");
 
                 if (processNotification != null)
