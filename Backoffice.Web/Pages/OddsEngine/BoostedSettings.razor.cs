@@ -14,10 +14,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
 
-        [Inject] public ITradingService TradingService { get; set; }
-        [Inject] IModalService ModalService { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         #endregion
         private AlertModel _alertModel;
@@ -46,7 +43,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 ShowLanguageDropDown = false
             };
 
-            TradingService.Region = Region.ToUpper();
+            _tradingService.Region = Region.ToUpper();
             _alertModel = new();
 
             _breadcrumbs = new List<BreadcrumbModel>()
@@ -98,9 +95,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
                 _searchText = search ?? string.Empty;
 
-                var result = await TradingService.GetBoostedSettings(new BoostedSettingsRequest()
+                var result = await _tradingService.GetBoostedSettings(new BoostedSettingsRequest()
                 {
-                    ClientCodes = UserModel.ClientCodes.Any() ? UserModel.ClientCodes.ToList() : new List<string>(),
+                    ClientCodes = _userState.ClientCodes.Any() ? _userState.ClientCodes.ToList() : new List<string>(),
                     Search = _searchText
                 });
                 _clientsView = result.Result;
@@ -123,7 +120,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 parameters.Add("Region", Region);
 
                 var options = new ModalOptions();
-                ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
+                _modalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
             }
             catch (Exception ex)
             {
@@ -142,7 +139,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 parameters.Add("Region", Region);
                 var options = new ModalOptions();
 
-                ModalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);
+                _modalService.Open<ViewAllLogsModal>($"View Logs", parameters, options);
             }
             catch (Exception ex)
             {

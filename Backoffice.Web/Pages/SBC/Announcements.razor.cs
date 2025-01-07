@@ -3,10 +3,10 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.SBC.Announcements;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Linq;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -18,7 +18,6 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter(Name = "AuthenticateAccessEvent")] private EventCallback AuthenticateAccess { get; set; }
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public MetaData MetaData { get; set; }
 
@@ -105,8 +104,8 @@ namespace Backoffice.Web.Pages.SBC
                 parameters.Add("ModalDialogClass", "modal-l");
                 parameters.Add("Announcement", new Models.Announcements
                 {
-                    StartDate = DateTime.UtcNow,
-                    EndDate = DateTime.UtcNow,
+                    StartDate = DateTimeHelper.Now(_userState.TimeZoneOffset),
+                    EndDate = DateTimeHelper.Now(_userState.TimeZoneOffset),
                     LanguageCode = LanguageCode.EN,
                     IsActive = true
                 });
@@ -307,12 +306,12 @@ namespace Backoffice.Web.Pages.SBC
 
         private void SetItemAction()
         {
-            var isInternalUser = UserModel.Claims.Any(c => c.Type.Contains("Admin.") && c.Value != "0") && UserModel.Claims.Any(c => c.Type.Contains("SBC.") && c.Value != "0");
+            var isInternalUser = _userState.Claims.Any(c => c.Type.Contains("Admin.") && c.Value != "0") && _userState.Claims.Any(c => c.Type.Contains("SBC.") && c.Value != "0");
             foreach (var item in _model.Announcements)
             {
                 item.EditAction = _ => OnEditClickEvent(item);
                 item.DeleteAction = _ => OnDeleteClickEvent(item);
-                item.DisabledClass = isInternalUser == false && !item.Clients.Any(c => UserModel.ClientCodes.Contains(c.ClientCode)) ? "disabled-action" : "";
+                item.DisabledClass = isInternalUser == false && !item.Clients.Any(c => _userState.ClientCodes.Contains(c.ClientCode)) ? "disabled-action" : "";
             }
         }
 

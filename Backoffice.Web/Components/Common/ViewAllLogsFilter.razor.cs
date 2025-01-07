@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
@@ -16,7 +17,6 @@ public partial class ViewAllLogsFilter : IDisposable
     [Parameter] public EventCallback<PriceBoostLogFilterModel> OnFilterChangedEventCallback { get; set; }
     [Parameter] public PriceBoostLogFilterModel FilterModel { get; set; } = new PriceBoostLogFilterModel();
     [Parameter] public EventCallback<PriceBoostLogFilterModel> FilterModelChanged { get; set; }
-    [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
     public Dictionary<SportsbookClientPermission, string> Pages { get; set; }
     #endregion
 
@@ -39,8 +39,8 @@ public partial class ViewAllLogsFilter : IDisposable
             Leagues = new LeagueLookupResponse(),
             LeagueId = 0,
             SearchText = string.Empty,
-            DateFrom = DateTime.Now.AddDays(-7).Date,
-            DateTo = DateTime.Now.Date
+            DateFrom = DateTimeHelper.Now(_userState.TimeZoneOffset).AddDays(-7).Date,
+            DateTo = DateTimeHelper.Now(_userState.TimeZoneOffset).Date
         };
         await OnFilterChangedEventCallback.InvokeAsync(FilterModel);
     }
@@ -56,8 +56,8 @@ public partial class ViewAllLogsFilter : IDisposable
     }
     public async Task OnDateRangeChangedEvent(DateRange range)
     {
-        FilterModel.DateFrom = DateTime.Parse(range.Start.ToString()).Date.Add(new TimeSpan(0, 0, 0));
-        FilterModel.DateTo = DateTime.Parse(range.End.ToString()).Date.Add(new TimeSpan(23, 59, 59));
+        FilterModel.DateFrom = Convert.ToDateTime(range.End);
+        FilterModel.DateTo = Convert.ToDateTime(range.End);
 
         await OnFilterChangedEventCallback.InvokeAsync(FilterModel);
         await InvokeAsync(StateHasChanged);
@@ -117,7 +117,7 @@ public partial class ViewAllLogsFilter : IDisposable
         {
             foreach (var client in response.Result)
             {
-                if (UserModel.ClientCodes.Contains(client.ClientCode, StringComparer.OrdinalIgnoreCase))
+                if (_userState.ClientCodes.Contains(client.ClientCode, StringComparer.OrdinalIgnoreCase))
                 {
                     KeyValuePair<string, string> Client = new KeyValuePair<string, string>(client.ClientCode, client.ClientName);
 

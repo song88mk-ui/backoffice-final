@@ -17,11 +17,6 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
 
-        [Inject] public IJSRuntime JSRuntime { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
-
-        
-
         [Parameter] public string Region { get; set; } = "hk";
 
         public IJSStreamReference? DataReference { get; set; }
@@ -54,7 +49,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Title = "Market Sort Order",
                 ShowLanguageDropDown = false
             };
-            TradingService.Region = Region.ToUpper();
+            _tradingService.Region = Region.ToUpper();
 
             _tableClass = "market-sort-order-table";
             _selectClass = "market-group-select";
@@ -86,19 +81,19 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (_initSortingAndSelect)
             {
-                await JSRuntime.InvokeVoidAsync("initSort", $".{_tableClass}", ".drag-handle");
-                await JSRuntime.InvokeVoidAsync("disableSort", $".{_tableClass}");
+                await _jsRuntime.InvokeVoidAsync("initSort", $".{_tableClass}", ".drag-handle");
+                await _jsRuntime.InvokeVoidAsync("disableSort", $".{_tableClass}");
 
-                await JSRuntime.InvokeVoidAsync("initSelect2", $".{_selectClass}", "OnMarketGroupChangedEvent");
-                await JSRuntime.InvokeVoidAsync("disableSelect2", $".{_selectClass}");
+                await _jsRuntime.InvokeVoidAsync("initSelect2", $".{_selectClass}", "OnMarketGroupChangedEvent");
+                await _jsRuntime.InvokeVoidAsync("disableSelect2", $".{_selectClass}");
 
                 _initSortingAndSelect = false;
             }
 
             if (_isMarketGroupClicked)
             {
-                await JSRuntime.InvokeVoidAsync("initSort", $".{_tableClass}", ".drag-handle");
-                await JSRuntime.InvokeVoidAsync("initSelect2", $".{_selectClass}", "OnMarketGroupChangedEvent");
+                await _jsRuntime.InvokeVoidAsync("initSort", $".{_tableClass}", ".drag-handle");
+                await _jsRuntime.InvokeVoidAsync("initSelect2", $".{_selectClass}", "OnMarketGroupChangedEvent");
 
                 if (_isUpdate)
                 {
@@ -178,7 +173,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }).ToList()
             };
 
-            var response = await TradingService.AddOrUpdateClientMarketTemplatesOrder(request);
+            var response = await _tradingService.AddOrUpdateClientMarketTemplatesOrder(request);
 
             _isPreLoader = false;
             if (response.StatusCode == StatusCode.Success)
@@ -301,19 +296,19 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task EnableSortingAndSelect2()
         {
-            await JSRuntime.InvokeVoidAsync("enableSort", $".{_tableClass}");
-            await JSRuntime.InvokeVoidAsync("enableSelect2", $".{_selectClass}");
+            await _jsRuntime.InvokeVoidAsync("enableSort", $".{_tableClass}");
+            await _jsRuntime.InvokeVoidAsync("enableSelect2", $".{_selectClass}");
         }
         private async Task DisableSortingAndSelect2()
         {
-            await JSRuntime.InvokeVoidAsync("disableSort", $".{_tableClass}");
-            await JSRuntime.InvokeVoidAsync("disableSelect2", $".{_selectClass}");
+            await _jsRuntime.InvokeVoidAsync("disableSort", $".{_tableClass}");
+            await _jsRuntime.InvokeVoidAsync("disableSelect2", $".{_selectClass}");
         }
         private async Task<List<SortOrderModel>> GetMarketTemplates()
         {
             var marketTemplates = new List<SortOrderModel>();
 
-            DataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getSortOrder", $".{_tableClass}");
+            DataReference = await _jsRuntime.InvokeAsync<IJSStreamReference>("getSortOrder", $".{_tableClass}");
 
             using (var stream = await DataReference.OpenReadStreamAsync(maxAllowedSize: 10_000_000))
             {
@@ -346,9 +341,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (!string.IsNullOrEmpty(_filterModel.SelectedClientCode) && _filterModel.SelectedClientCode != "NA" && _filterModel.SelectedSportId != 0)
             {
-                var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId, _translationState.ActiveLanguageCode)).Result;
+                var marketTemplateResponse = (await _tradingService.GetClientMarketTemplates(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId, _translationState.ActiveLanguageCode)).Result;
 
-                var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
+                var marketTemplateGroupResponse = (await _tradingService.GetClientMarketTemplateGroups(_filterModel.SelectedClientCode, _filterModel.SelectedSportId, _filterModel.SelectedFixtureStatusId)).Result;
 
                 _clientMarketTemplateGroupsRef = marketTemplateGroupResponse?.ClientMarketTemplateGroups
                     .Select(s => new ClientMarketTemplateGroup

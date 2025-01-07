@@ -12,7 +12,6 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class ConfigAssigned : IDisposable
     {
         #region Properties
-        [Inject] private IJSRuntime JSRuntime { get; set; }
 
         [Parameter] public ConfigState State { get; set; }
         [Parameter] public ConfigContentFilterModel FilterModel { get; set; }
@@ -119,7 +118,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (_isSelectedLeagueShowing)
             {
-                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+                await _jsRuntime.InvokeVoidAsync("showSelectedLeagueCount");
                 _isSelectedLeagueShowing = false;
             }
 
@@ -132,7 +131,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             if (_isSelectedLeagueShowing)
             {
-                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+                await _jsRuntime.InvokeVoidAsync("showSelectedLeagueCount");
                 _isSelectedLeagueShowing = false;
             }
 
@@ -161,7 +160,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             await HandledPageSelect(1);
             if (_isSelectedLeagueShowing)
             {
-                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+                await _jsRuntime.InvokeVoidAsync("showSelectedLeagueCount");
                 _isSelectedLeagueShowing = false;
             }
 
@@ -199,13 +198,13 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (_selectedConfigClients.Count > 0 && !_isSelectedLeagueShowing)
             {
                 _isSelectedLeagueShowing = true;
-                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+                await _jsRuntime.InvokeVoidAsync("showSelectedLeagueCount");
             }
 
             if (_selectedConfigClients.Count == 0)
             {
                 _isSelectedLeagueShowing = false;
-                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+                await _jsRuntime.InvokeVoidAsync("showSelectedLeagueCount");
             }
 
             _shouldRender = true;
@@ -224,7 +223,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (_isSelectedLeagueShowing && _selectedConfigClients.Count == 0)
             {
-                await JSRuntime.InvokeVoidAsync("showSelectedLeagueCount");
+                await _jsRuntime.InvokeVoidAsync("showSelectedLeagueCount");
                 _isSelectedLeagueShowing = false;
             }
 

@@ -19,9 +19,6 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        
-
         public MarketSettlementFilterModel FilterModel { get; set; } = new MarketSettlementFilterModel();
         public List<MessageSettlementModel> MessageSettlementModel { get; set; }
         public MetaData MetaData { get; set; }
@@ -104,16 +101,14 @@ namespace Backoffice.Web.Pages.Administration
         {
             IsPreLoader = true;
 
-            var request = new ActivityLogRequest()
+            var logs = await BackofficeService.GetActivityLogs(new ActivityLogRequest()
             {
                 Page = AdminPermission.Admin_Settlements_MessageSettlement.ToString().Replace("_", "."),
                 Payload = BuildPayload(),
                 MetaData = MetaData,
-                DateFrom = FilterModel.FromDate.Date.Add(new TimeSpan(0, 0, 0)).ToUniversalTime(),
-                DateTo = FilterModel.ToDate.Date.Add(new TimeSpan(23, 59, 59)).ToUniversalTime()
-            };
-
-            var logs = await BackofficeService.GetActivityLogs(request);
+                DateFrom = FilterModel.FromDate,
+                DateTo = FilterModel.ToDate
+            });
 
             var result = new List<MessageSettlementModel>();
 

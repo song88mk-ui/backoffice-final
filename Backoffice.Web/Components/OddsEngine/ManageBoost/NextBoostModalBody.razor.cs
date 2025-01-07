@@ -22,7 +22,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] UserModel UserModel { get; set; }
 
         public AddPriceBoostFilterModel AddPriceBoostFilterModel { get; set; }
 
@@ -233,9 +232,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                             Activity = Activity.Create.ToString(),
                             From = "-",
                             To = JsonSerializer.Serialize(priceBoostLogModel),
-                            UserId = UserModel.Id,
-                            UserName = UserModel.UserName,
-                            TimeStamp = DateTime.UtcNow
+                            UserId = _userState.Id,
+                            UserName = _userState.Name
                         };
 
                         activityLogList.ActivityLogs.Add(onActivityLogMessage);

@@ -19,7 +19,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private IJSRuntime JSRuntime { get; set; }
         [Inject] private IExcelService ExcelService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
         public EventCallback OnExportMarginCallback { get; set; }
@@ -226,7 +225,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             var payload = new OnExportConfigMarginMessage()
             {
-                UserId = UserModel.Id,
+                UserId = _userState.Id,
                 ClientCode = SelectedClient,
                 SportIds = string.Join(",", SelectedSportsSet)
             };
@@ -318,7 +317,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             if (clients != null)
             {
-                clients = UserModel.ClientCodes.Any() ? clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+                clients = _userState.ClientCodes.Any() ? clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
             }
 
             return clients?.Select(x => new SelectListItemModel<string>()

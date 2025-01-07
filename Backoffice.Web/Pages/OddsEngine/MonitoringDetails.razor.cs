@@ -17,15 +17,6 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
 
-        [Inject] public ICommonService CommonService { get; set; }
-        [Inject] public IConfiguration Configuration { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public NavigationManager NavigationManager { get; set; }
-
-
-
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public string Id { get; set; }
 
@@ -73,7 +64,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isPreLoader = true;
             _clients = new();
             _pageHeaderModel = new();
-            TradingService.Region = Region.ToUpper();
+            _tradingService.Region = Region.ToUpper();
             Breadcrumbs = new List<BreadcrumbModel>();
             Fixture = new MarketFixtureResponse.FixtureModel();
             FixtureMarkets = new List<FixtureMarketModel>();
@@ -102,7 +93,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"Hubconnection URI - {NavigationManager.BaseUri}");
+                    Log.Error($"Hubconnection URI - {_navigationManager.BaseUri}");
                     Console.WriteLine(ex.Message);
 
                     Log.Error(ex.Message);
@@ -167,7 +158,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-            ModalService.Open<CloseMarketsModal>("Close Markets", parameters, options);
+            _modalService.Open<CloseMarketsModal>("Close Markets", parameters, options);
         }
         private MarketModel? GetNearestLineToTwo(List<MarketModel> markets)
         {
@@ -337,7 +328,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool ValidateParameters() => _init || _languageCode != _translationState.ActiveLanguageCode || Id != _id;
         private async Task PrepareMonitoringDetails()
         {
-            var marketFixtureResponse = await BackofficeService.GetMarketFixtureDetails(Id, _languageCode);
+            var marketFixtureResponse = await _backofficeService.GetMarketFixtureDetails(Id, _languageCode);
 
             if (marketFixtureResponse.StatusCode == StatusCode.Success && marketFixtureResponse.Result.Fixture != null)
             {
@@ -528,7 +519,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
                                 if (newSelection.IsAc)
                                 {
-                                    currentSelection.DecimalOdds = CommonService.GetFinalOdds(newSelection.DecOd).ToString("0.00");
+                                    currentSelection.DecimalOdds = _commonService.GetFinalOdds(newSelection.DecOd).ToString("0.00");
                                     currentSelection.IsActive = newSelection.IsAc;
                                     currentSelection.UnixTime = newSelection.UnTi;
                                     currentSelection.ClientOdds = clientOdds;
@@ -569,7 +560,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 SelectionId = newSelection.SeId.ToString(),
                                 ProviderSelectionId = $"{Fixture.ProviderFixtureId}:{newMarket.MaTeId}:{newSelection.SeTeId}:{newMarket.MaSp}",
                                 //OldDecimalOdds = CommonService.GetFinalOdds(s.DecimalOdds).ToString("0.00"),
-                                DecimalOdds = CommonService.GetFinalOdds(newSelection.DecOd).ToString("0.00"),
+                                DecimalOdds = _commonService.GetFinalOdds(newSelection.DecOd).ToString("0.00"),
                                 IsActive = newSelection.IsAc,
                                 SelectionName = newSelection.SeNa,
                                 SelectionTemplateId = newSelection.SeTeId,

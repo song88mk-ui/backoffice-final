@@ -5,7 +5,6 @@
     <ChildContent>
         @if (!PreRenderService.IsPreRendering)
         {
-            <CascadingValue Value="UserModel" Name="UserModel">
                 @if (NavigationManager.Uri.Contains("/admin"))
                 {
                     <PageTitle>Backoffice - Administration</PageTitle>
@@ -34,7 +33,6 @@
                         </main>
                     </div>
                 }
-            </CascadingValue>
             <ToastComponent />
             <ToastComponent2 />
         }

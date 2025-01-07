@@ -17,8 +17,6 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
         public MetaData MetaData { get; set; }
         public ClientParlayBonusModel ClientParlayBonusModel { get; set; }
         public List<ParlayBonusConfig> TempConfig { get; set; }
@@ -280,9 +278,9 @@ namespace Backoffice.Web.Pages.SBC
             var clients = (await BackofficeService.GetClients()).Result;
             if (clients != null)
             {
-                if (UserModel.ClientCodes.Any())
+                if (_userState.ClientCodes.Any())
                 {
-                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                    clients.Clients = clients.Clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                 }
 
                 Clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemModel<Client>

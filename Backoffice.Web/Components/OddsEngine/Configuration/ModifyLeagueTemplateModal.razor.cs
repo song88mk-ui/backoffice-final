@@ -14,11 +14,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
 
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackofficeService { get; set; }
-        [Inject] private ITradingService TradingService { get; set; }
-
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
 
@@ -117,7 +112,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task HandleCancelClick()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         public async Task HandleSaveClick()
@@ -151,7 +146,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     state = ConfigState.Assigned;
                 }
 
-                var response = await BackofficeService.SetLeagueState(state, new ConfigSetLeagueStateRequest()
+                var response = await _backofficeService.SetLeagueState(state, new ConfigSetLeagueStateRequest()
                 {
                     PrematchTemplateId = _prematchSelectedItem?.Value ?? -1,
                     LiveTemplateId = _liveSelectedItem?.Value ?? -1,
@@ -219,8 +214,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         data.SegmentId = league.SegmentId;
                         data.LeagueId = league.LeagueId;
                         data.ClientId = Guid.Parse(league.ClientId);
-                        data.UserId = UserModel.Id;
-                        data.UserName = UserModel.UserName;
+                        data.UserId = _userState.Id;
+                        data.UserName = _userState.Name;
 
                         data.MarketConfig = marketConfig.Select(s => new MarketConfigModel
                         {
@@ -240,7 +235,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                             }
                         };
 
-                        var result = await TradingService.AddOrUpdateConfig(data);
+                        var result = await _tradingService.AddOrUpdateConfig(data);
                         if (result.StatusCode == StatusCode.Success)
                         {
 
@@ -254,7 +249,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 IsActive = state == ConfigState.Assigned ? data.MarketConfig.Any(m => m.IsActive) : false
                             };
 
-                            await TradingService.Publish(new MessageRequest()
+                            await _tradingService.Publish(new MessageRequest()
                             {
                                 CorrelationId = Guid.NewGuid().ToString(),
                                 MessageType = "OnLeagueConfig",
@@ -272,7 +267,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 Markets = marketConfig
                             };
 
-                            await TradingService.Publish(new MessageRequest()
+                            await _tradingService.Publish(new MessageRequest()
                             {
                                 CorrelationId = Guid.NewGuid().ToString(),
                                 MessageType = "OnMarketConfig",
@@ -330,12 +325,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 From = from,
                                 To = to,
                                 Activity = Activity.Update.ToString(),
-                                UserId = UserModel.Id,
-                                UserName = UserModel.UserName,
-                                TimeStamp = DateTime.UtcNow
+                                UserId = _userState.Id,
+                                UserName = _userState.Name
                             };
 
-                            await BackofficeService.AddActivityLog(activityLog);
+                            await _backofficeService.AddActivityLog(activityLog);
                         }
                     });
                     Parallel.ForEach(distinctLiveTemplates, async (item) =>
@@ -372,12 +366,11 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 From = from,
                                 To = to,
                                 Activity = Activity.Update.ToString(),
-                                UserId = UserModel.Id,
-                                UserName = UserModel.UserName,
-                                TimeStamp = DateTime.UtcNow
+                                UserId = _userState.Id,
+                                UserName = _userState.Name
                             };
 
-                            await BackofficeService.AddActivityLog(activityLog);
+                            await _backofficeService.AddActivityLog(activityLog);
                         }
                     });
 
@@ -407,7 +400,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             {
                 IsPreLoader = false;
             }
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         public async Task HandleShowAllClick()
@@ -426,7 +419,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private async Task<List<SelectListItemModel<long>>> GetTemplates(int sportId, int scopeId)
         {
             IsPreLoader = true;
-            var response = await BackofficeService.GetConfigTemplate(string.Empty, sportId, scopeId);
+            var response = await _backofficeService.GetConfigTemplate(string.Empty, sportId, scopeId);
 
             IsPreLoader = false;
             if (response.StatusCode == StatusCode.Success && response.Result.ConfigTemplates.Count > 0)
@@ -451,7 +444,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         private async Task<ConfigTemplateMarginModel> GetConfigTemplateMargin(long configTemplateId)
         {
-            var response = await BackofficeService.GetConfigTemplateMargin(configTemplateId);
+            var response = await _backofficeService.GetConfigTemplateMargin(configTemplateId);
 
             if (response.StatusCode == StatusCode.Success)
                 return response.Result;

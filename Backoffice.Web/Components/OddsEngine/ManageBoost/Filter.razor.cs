@@ -16,8 +16,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
         [Parameter] public EventCallback OnInitCallback { get; set; }
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback<int> OnSportChangedCallback { get; set; }
@@ -177,7 +175,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 return new();
             }
 
-            clientList = UserModel.ClientCodes.Any() ? clientList.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+            clientList = _userState.ClientCodes.Any() ? clientList.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
 
             var result = clientList?.Select(s => new SelectListItemModel<string>
             {

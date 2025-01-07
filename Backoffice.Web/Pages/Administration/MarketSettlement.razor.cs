@@ -1,6 +1,7 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -19,7 +20,7 @@ namespace Backoffice.Web.Pages.Administration
 
         
 
-        public MarketSettlementModalFilterModel ModalFilter { get; set; } = new MarketSettlementModalFilterModel();
+        public MarketSettlementModalFilterModel ModalFilterModel { get; set; } = new MarketSettlementModalFilterModel();
         public List<ManualMarketSettlementAuditModel> ManualMarketSettlements { get; set; }
         public MetaData MetaData { get; set; }
 
@@ -53,10 +54,10 @@ namespace Backoffice.Web.Pages.Administration
             };
 
             ManualMarketSettlements = new List<ManualMarketSettlementAuditModel>();
-            ModalFilter = new MarketSettlementModalFilterModel()
+            ModalFilterModel = new MarketSettlementModalFilterModel()
             {
-                FromDate = DateTime.Now.Date.AddDays(-1),
-                ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
+                FromDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(-1),
+                ToDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(1).AddTicks(-1),
             };
 
             await PageState.AuthenticateAccessEvent.InvokeAsync();
@@ -66,20 +67,20 @@ namespace Backoffice.Web.Pages.Administration
         {
             IsPreLoader = true;
 
-            var fromDate = Convert.ToDateTime(ModalFilter.FromDate.ToString("yyyy-MM-dd 00:00:00"));
-            var toDate = Convert.ToDateTime(ModalFilter.ToDate.ToString("yyyy-MM-dd 23:59:59"));
-            var filterSportsId = ModalFilter.SportId == 0 ? "%" : ModalFilter.SportId.ToString();
-            var filterSegmentId = ModalFilter.SegmentId == 0 ? "%%" : ModalFilter.SegmentId.ToString();
-            var filterLeagueId = ModalFilter.LeagueId == 0 ? "%%" : ModalFilter.LeagueId.ToString();
-            var filterFixtureId = string.IsNullOrEmpty(ModalFilter.FixtureId) ? "%" : ModalFilter.FixtureId;
+            var fromDate = Convert.ToDateTime(ModalFilterModel.FromDate);
+            var toDate = Convert.ToDateTime(ModalFilterModel.ToDate);
+            var filterSportsId = ModalFilterModel.SportId == 0 ? "%" : ModalFilterModel.SportId.ToString();
+            var filterSegmentId = ModalFilterModel.SegmentId == 0 ? "%%" : ModalFilterModel.SegmentId.ToString();
+            var filterLeagueId = ModalFilterModel.LeagueId == 0 ? "%%" : ModalFilterModel.LeagueId.ToString();
+            var filterFixtureId = string.IsNullOrEmpty(ModalFilterModel.FixtureId) ? "%" : ModalFilterModel.FixtureId;
 
             var response = (await BackofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
                 Payload = $"{filterSportsId}.{filterSegmentId}.{filterLeagueId}.{filterFixtureId}",
                 MetaData = MetaData,
-                DateFrom = fromDate.Date.Add(new TimeSpan(0, 0, 0)).ToUniversalTime(),
-                DateTo = toDate.Date.Add(new TimeSpan(23, 59, 59)).ToUniversalTime()
+                DateFrom = fromDate.Date,
+                DateTo = toDate.Date
             })).Result;
 
             List<ManualMarketSettlementAuditModel> result = new List<ManualMarketSettlementAuditModel>();
@@ -93,13 +94,13 @@ namespace Backoffice.Web.Pages.Administration
                 }
             }
 
-            var marketIds = string.IsNullOrEmpty(ModalFilter.MarketId) ? new List<long>() : ModalFilter.MarketId.Split(",").Select(s => Convert.ToInt64(s)).ToList();
-            var selectionIds = string.IsNullOrEmpty(ModalFilter.SelectionId) ? new List<long>() : ModalFilter.SelectionId.Split(",").Select(s => Convert.ToInt64(s)).ToList();
+            var marketIds = string.IsNullOrEmpty(ModalFilterModel.MarketId) ? new List<long>() : ModalFilterModel.MarketId.Split(",").Select(s => Convert.ToInt64(s)).ToList();
+            var selectionIds = string.IsNullOrEmpty(ModalFilterModel.SelectionId) ? new List<long>() : ModalFilterModel.SelectionId.Split(",").Select(s => Convert.ToInt64(s)).ToList();
 
-            ManualMarketSettlements = result.Where(x => (ModalFilter.ToStatus == 0 || x.ToStatusId == ModalFilter.ToStatus)
-                                        && (string.IsNullOrEmpty(ModalFilter.MarketId) || x.MarketId.ToString() == ModalFilter.MarketId)
-                                        && (string.IsNullOrEmpty(ModalFilter.SelectionId) || x.SelectionId.ToString() == ModalFilter.SelectionId)
-                                        && (string.IsNullOrEmpty(ModalFilter.SettledBy) || x.ManualSettledBy.ToUpper().Contains(ModalFilter.SettledBy.ToUpper()))).ToList();
+            ManualMarketSettlements = result.Where(x => (ModalFilterModel.ToStatus == 0 || x.ToStatusId == ModalFilterModel.ToStatus)
+                                        && (string.IsNullOrEmpty(ModalFilterModel.MarketId) || x.MarketId.ToString() == ModalFilterModel.MarketId)
+                                        && (string.IsNullOrEmpty(ModalFilterModel.SelectionId) || x.SelectionId.ToString() == ModalFilterModel.SelectionId)
+                                        && (string.IsNullOrEmpty(ModalFilterModel.SettledBy) || x.ManualSettledBy.ToUpper().Contains(ModalFilterModel.SettledBy.ToUpper()))).ToList();
 
             IsPreLoader = false;
         }
@@ -121,7 +122,7 @@ namespace Backoffice.Web.Pages.Administration
 
         public void Dispose()
         {
-            ModalFilter = null;
+            ModalFilterModel = null;
             ManualMarketSettlements = null;
             MetaData = null;
 

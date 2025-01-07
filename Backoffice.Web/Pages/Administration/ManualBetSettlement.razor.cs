@@ -18,9 +18,6 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] private IBackofficeService BackofficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        
-
         public List<ActivityLogModel> ActivityLogs { get; set; }
         public List<AlertModel> Alerts { get; set; }
 
@@ -114,7 +111,7 @@ namespace Backoffice.Web.Pages.Administration
             var payload = new OnGetManualBetSettlementHistoryMessage()
             {
                 ManualBetSettlementCallbackModel = CallbackModel,
-                ConnectionId = UserModel.ConnectionId
+                ConnectionId = _userState.ConnectionId
             };
 
             // Task - Migrate to api call

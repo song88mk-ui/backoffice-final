@@ -1,7 +1,5 @@
-﻿using Backoffice.Shared.Enums;
-using Backoffice.Shared.Models;
+﻿using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
-using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.SBC.TopLeagues;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
@@ -18,9 +16,6 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
-
-        [CascadingParameter(Name = "UserModel")] protected UserModel UserModel { get; set; }
-        
 
         public bool IsPreLoader { get; set; } = true;
 

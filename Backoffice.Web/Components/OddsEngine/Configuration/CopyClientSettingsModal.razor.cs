@@ -8,10 +8,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class CopyClientSettingsModal : IDisposable
     {
         #region Properties
-        [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
         private EventCallback<AlertModel> OnCopyClientSettingsCallback { get; set; }
@@ -70,7 +67,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnCancelModalClickEvent()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         public async Task OnApplyModalClickEvent()
@@ -83,7 +80,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             parameters.Add("OnCopyClientSettingsCallback", OnCopyClientSettingsCallback);
 
             var options = new ModalOptions();
-            ModalService.Open<ConfirmCopyClientSettingsModal>($"Copy Client Settings", parameters);
+            _modalService.Open<ConfirmCopyClientSettingsModal>($"Copy Client Settings", parameters);
         }
         public void Dispose()
         {
@@ -95,10 +92,10 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         private async Task<List<ClientInformationModel>> LoadClients()
         {
             var clients = new List<ClientInformationModel>();
-            clients = (await TradingService.GetClientList()).Result;
+            clients = (await _tradingService.GetClientList()).Result;
             if (clients != null)
             {
-                clients = UserModel.ClientCodes.Any() ? clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+                clients = _userState.ClientCodes.Any() ? clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
             }
 
             return clients?.ToList() ?? new List<ClientInformationModel>();

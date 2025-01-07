@@ -12,7 +12,6 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public EventCallback<string> OnMarketChangedCallback { get; set; }
         [Parameter] public EventCallback OnCloseMarketCallback { get; set; }
         [Parameter] public EventCallback<List<SelectListItemWithCheckboxModel<string>>> OnFilterClientCallback { get; set; }
@@ -44,8 +43,8 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
             if (clients != null)
             {
-                _clientFilter = UserModel.ClientCodes.Any() ?
-                    clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()))
+                _clientFilter = _userState.ClientCodes.Any() ?
+                    clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper()))
                         .Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList() : new();
 
                 _clientFilter.Insert(0, new SelectListItemWithCheckboxModel<string>

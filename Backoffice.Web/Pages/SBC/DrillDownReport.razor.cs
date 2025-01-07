@@ -4,8 +4,6 @@ using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using System.Drawing;
 
 namespace Backoffice.Web.Pages.SBC
 {
@@ -15,9 +13,6 @@ namespace Backoffice.Web.Pages.SBC
 
         [Inject] public ITableauService TableauService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
-
-        
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public string IFrameSrc { get; set; }
 
@@ -47,7 +42,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             var reportRoles = (await AuthenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
             {
-                RoleId = UserModel.RoleId,
+                RoleId = _userState.RoleId,
                 ClaimType = SportsbookClientPermission.SBC_Reports_DrillDownReport.ToString().Replace("_", ".")
             })).Result ?? new ReportRolesUrlResponse();
 

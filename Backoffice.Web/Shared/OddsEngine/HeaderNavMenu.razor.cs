@@ -1,20 +1,11 @@
 ﻿using Backoffice.Shared.Enums;
-using Backoffice.Web.Models;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
-using Newtonsoft.Json.Bson;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Shared.OddsEngine
 {
     public partial class HeaderNavMenu : IDisposable
     {
-        #region Properties
-
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
-        #endregion
-
         #region Fields
 
         private OeNavMenu _menu;
@@ -34,7 +25,7 @@ namespace Backoffice.Web.Shared.OddsEngine
 
         protected override async Task OnInitializedAsync()
         {
-            //_navigationManager.LocationChanged += HandleLocationChanged;
+            _navigationManager.LocationChanged += HandleLocationChanged;
             _translationState.PropertyChanged += async (s, e) =>
             {
                 _shouldRender = true;
@@ -49,7 +40,7 @@ namespace Backoffice.Web.Shared.OddsEngine
 
             if (_shouldRender)
             {
-                _userClaims = UserModel.Claims;
+                _userClaims = new List<Claim>(_userState.Claims);
 
                 var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
 
@@ -57,7 +48,7 @@ namespace Backoffice.Web.Shared.OddsEngine
                 ActivateMenu(page);
             }
 
-            if (UserModel.Claims.Any())
+            if (_userState.Claims.Any())
                 _init = false;
         }
 
@@ -135,7 +126,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         {
             var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
 
-            return _init || _activePage != page || _userClaims.SequenceEqual(UserModel.Claims);
+            return _init || _activePage != page || _userClaims.SequenceEqual(_userState.Claims);
         }
 
         public void Dispose()
@@ -155,8 +146,10 @@ namespace Backoffice.Web.Shared.OddsEngine
 
         private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
         {
-            //var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
-            //ActivateMenu(page);
+            var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
+            ActivateMenu(page);
+            _shouldRender = true;
+            StateHasChanged();
         }
         private void HandleLanguageCHanged()
         {

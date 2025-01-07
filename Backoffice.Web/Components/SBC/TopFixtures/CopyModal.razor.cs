@@ -18,7 +18,6 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public List<ClientIdSelectedModel> ClientIdSelectedModel { get; set; }
         public ClientTopFixtureModel.OrderedClientTopFixture TopFixture { get; set; }
@@ -37,7 +36,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 var clients = (await BackofficeService.GetClients()).Result;
                 if (clients != null)
                 {
-                    clients.Clients = UserModel.ClientCodes.Any() ? clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != TopFixture.ClientIdRef).ToList() : new List<Client>();
+                    clients.Clients = _userState.ClientCodes.Any() ? clients.Clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != TopFixture.ClientIdRef).ToList() : new List<Client>();
 
                     ClientIdSelectedModel = clients.Clients.Select(s => new ClientIdSelectedModel
                     {

@@ -1,7 +1,6 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Web.ActionFilter;
 using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.Shared;
@@ -10,9 +9,7 @@ using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
-using Serilog;
-using System.Security.Policy;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.JSInterop;
 
 namespace Backoffice.Web.Shared
 {
@@ -25,6 +22,7 @@ namespace Backoffice.Web.Shared
         [Inject] public IConfiguration Configuration { get; set; }
         [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
@@ -34,7 +32,6 @@ namespace Backoffice.Web.Shared
         [Inject] public UserState UserState { get; set; }
         [Inject] public HubService HubService { get; set; }
 
-        public UserModel UserModel { get; set; } = new UserModel();
         public NavMenuModel NavMenus { get; set; } = new NavMenuModel();
         public NavMenuParameter NavMenuParameter { get; set; }
         public bool IsPreloader { get; set; }
@@ -76,7 +73,11 @@ namespace Backoffice.Web.Shared
                     return;
                 }
 
+                var timeZoneOffset = await JSRuntime.InvokeAsync<int>("getClientTimeZoneOffset");
+                UserState.TimeZoneOffset = TimeSpan.FromMinutes(timeZoneOffset);
+
                 var ctsToken = _cts.Token;
+
                 var clientResult = await BackofficeService.GetClientsV2(ctsToken);
 
                 if (ctsToken.IsCancellationRequested || clientResult.StatusCode != StatusCode.Success)
@@ -88,42 +89,13 @@ namespace Backoffice.Web.Shared
                     return;
                 }
 
-                var userClaims = UserState.ClaimsPrincipal.Claims.ToList();
-
-                var clients = clientResult.Result.Clients;
-                var userClientCodes = new List<string>();
-
-                if (userClaims != null)
+                if (UserState?.ClaimsPrincipal?.Claims != null && UserState.ClaimsPrincipal.Claims.Any())
                 {
-                    var otherPermissions = new List<string>() { "CLIENTCODES", "USERID", "TOKENNAME", "MAINUSERID" };
-
-                    var roleId = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLEID")?.Value ?? string.Empty;
-                    var role = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLENAME")?.Value ?? string.Empty;
-                    var isSuperAdmin = !string.IsNullOrEmpty(role) && role.ToUpper().Equals("SUPER ADMIN") ? true : false;
-
-                    if (clients.Any())
-                    {
-                        if (isSuperAdmin)
-                            userClientCodes = clients.Select(c => c.ClientCode).ToList();
-                        else
-                        {
-                            userClientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>();
-                            clients = clients.Where(c => userClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
-                        }
-                    }
+                    var clients = clientResult.Result.Clients;
                     UserState.SetSportsbookClients(clients);
 
-                    UserModel.Id = userClaims.Where(x => x.Type.ToUpper() == "USERID").FirstOrDefault()?.Value ?? "";
-                    UserModel.UserName = userClaims.Where(x => x.Type.ToUpper() == "TOKENNAME").FirstOrDefault()?.Value ?? "";
-                    UserModel.MainUserId = userClaims.Where(x => x.Type.ToUpper() == "MAINUSERID").FirstOrDefault()?.Value ?? "";
-                    UserModel.Claims = userClaims.Where(x => !otherPermissions.Contains(x.Type.ToUpper())).ToList();
-                    UserModel.ClientCodes = userClientCodes;
-                    UserModel.RoleId = roleId;
-                    UserModel.RoleName = role;
-                    UserModel.ConnectionId = HubService.ConnectionId;
-                    await HubService.ConnectAsync(UserModel.Id, ProcessNotification);
+                    await HubService.ConnectAsync(ProcessNotification);
                 }
-
                 NavMenus = new NavMenuModel();
 
                 var navMenuAccess = PermissionCategory.SBC;
@@ -138,12 +110,9 @@ namespace Backoffice.Web.Shared
                 }
 
                 var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
-                if (userClaims != null)
+                if (UserState?.Claims != null)
                 {
                     var permissionSubCategory = permissions.Permissions.Where(p => p.CategoryId == (int)navMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.')).Select(s => s.SubCategoryName).Distinct();
-                    //// Task: Temporary Hide Settlement
-                    //var permissionSubCategory = permissions.Permissions.Where(p => p.CategoryId == (int)NavMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.')
-                    //&& p.SubCategoryName.ToUpper() != "Settlements".ToUpper()).Select(s => s.SubCategoryName).Distinct();
 
                     foreach (var category in permissionSubCategory)
                     {
@@ -151,10 +120,10 @@ namespace Backoffice.Web.Shared
 
                         if (subMenus.Count() == 1)
                         {
-                            var claim = userClaims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
+                            var claim = UserState?.Claims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
                             if (claim != null && claim.Value != "0")
                             {
-                                if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel.MainUserId))
+                                if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserState.MainUserId))
                                     continue;
 
                                 if (!string.IsNullOrEmpty(subMenus[0].GroupName) && subMenus[0].ClaimType.Contains(SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".")))
@@ -182,15 +151,15 @@ namespace Backoffice.Web.Shared
 
                             foreach (var subMenu in subMenus)
                             {
-                                var claim = userClaims.FirstOrDefault(c => c.Type == subMenu.ClaimType);
+                                var claim = UserState?.Claims.FirstOrDefault(c => c.Type == subMenu.ClaimType);
                                 if (claim != null && claim.Value != "0")
                                 {
-                                    if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserModel.MainUserId))
+                                    if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserState.MainUserId))
                                         continue;
 
                                     if (claim.Type == SportsbookClientPermission.SBC_OE.ToString().Replace("_", "."))
                                     {
-                                        var sbsFirstClaim = userClaims.FirstOrDefault(x => x.Type.ToUpper().Contains($"{SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".").ToUpper()}."))?.Type.ToString() ?? string.Empty;
+                                        var sbsFirstClaim = UserState?.Claims.FirstOrDefault(x => x.Type.ToUpper().Contains($"{SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".").ToUpper()}."))?.Type.ToString() ?? string.Empty;
 
                                         var permission = PermissionMap.TryGetValue(sbsFirstClaim, out string permissionMapResult) ? permissionMapResult : string.Empty;
                                         var menu2 = new MenuModel
@@ -242,7 +211,7 @@ namespace Backoffice.Web.Shared
                     var regions = new List<string>() { "HK", "SA" };
                     PageState.Region = regions.Contains(splitVal.Trim().ToUpper()) ? splitVal.Trim().ToUpper() : string.Empty;
                 }
-                StateHasChanged();
+                await InvokeAsync(StateHasChanged);
             }
             catch (Exception ex)
             {
@@ -257,7 +226,7 @@ namespace Backoffice.Web.Shared
         {
             if (message != null)
             {
-                if (!string.IsNullOrEmpty(message.UserId) && message.UserId != UserModel.Id)
+                if (!string.IsNullOrEmpty(message.UserId) && message.UserId != UserState.Id)
                     return;
 
                 ToasterService.AddToast(Toast.NewToast

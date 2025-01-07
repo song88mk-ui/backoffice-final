@@ -3,6 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.OutgoingEngineMessages;
 using Backoffice.Shared.Utilities;
+using Backoffice.Web.Extensions;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -16,9 +17,6 @@ namespace Backoffice.Web.Pages.Administration
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] private ToastService? ToasterService { get; set; }
-
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        
 
         public CancelBetHistoryCallbackModel CallbackModel { get; set; }
         public CancelBetHistoryModel CancelBets { get; set; }
@@ -73,7 +71,7 @@ namespace Backoffice.Web.Pages.Administration
 
             var request = new OnGetCancelBetHistoryMessage
             {
-                ConnectionId = UserModel.ConnectionId,
+                ConnectionId = _userState.ConnectionId,
                 Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                 Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
                 DateFrom = model.DateFrom,
@@ -111,16 +109,13 @@ namespace Backoffice.Web.Pages.Administration
         private async Task<CancelBetHistoryModel> GetActivityLogList(CancelBetHistoryCallbackModel model)
         {
             var cancelBets = new CancelBetHistoryModel();
-            var request = new ActivityLogRequest
+
+            var response = await BackofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
                 Payload = $"%{model.CancelledBy}%.%{model.BetReferenceId}%.%.%{model.MemberName}%.%{model.ClientName}%",
-                DateFrom = model.DateFrom.Date.Add(new TimeSpan(0, 0, 0)).ToUniversalTime(),
-                DateTo = model.DateTo.Date.Add(new TimeSpan(23, 59, 59)).ToUniversalTime(),
                 MetaData = MetaData
-            };
-
-            var response = await BackofficeService.GetActivityLogs(request);
+            });
 
             if (response.StatusCode == StatusCode.Success)
             {

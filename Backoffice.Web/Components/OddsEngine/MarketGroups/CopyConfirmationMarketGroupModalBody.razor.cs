@@ -13,13 +13,8 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
     {
         #region Properties
 
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public MarketGroupModel MarketGroupModel { get; set; }
 
@@ -52,7 +47,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         public async Task OnCancelClickEvent()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         protected async Task OnCopyMarketGroup()
@@ -70,7 +65,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 CopyToFixtureStatusId = CopyToFixtureStatusId
             };
 
-            var response = (await TradingService.CopyClientMarketTemplateGroup(request));
+            var response = (await _tradingService.CopyClientMarketTemplateGroup(request));
 
             if (response.StatusCode == StatusCode.Success)
             {
@@ -100,22 +95,22 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 }
 
                 //activity log
-                await BackofficeService.AddActivityLog(new ActivityLogModel
+                await _backofficeService.AddActivityLog(new ActivityLogModel
                 {
                     Page = SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", "."),
                     Payload = $"{CopyToClientCode}.{CopyToSportId}.{CopyToFixtureStatusId}.0",
                     Activity = Activity.Copy.ToString(),
                     From = JsonSerializer.Serialize(fromData),
                     To = JsonSerializer.Serialize(toData),
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName
+                    UserId = _userState.Id,
+                    UserName = _userState.Name
                 });
 
                 await InvokeAsync(StateHasChanged);
             }
 
             IsPreLoader = false;
-            ModalService.Cancel();
+            _modalService.Cancel();
             await Modal.OnSaveClickCallback.InvokeAsync(true);
         }
 

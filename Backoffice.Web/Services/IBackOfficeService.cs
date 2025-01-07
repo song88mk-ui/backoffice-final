@@ -18,7 +18,7 @@ namespace Backoffice.Web.Services
         Task<BaseResponse<ActivityLogResponse>> GetPriceboostActivityLogs(PriceboostActivityLogRequest request, string region);
         Task<BaseResponse<ActivityLogResponse>> GetManualBetSettlementActivityLogs(ManualBetSettlementActivityLogRequest request);
         Task<BaseResponse<ClientModel>> GetClients();
-        Task<BaseResponse<ClientModel>> GetClientsV2(CancellationToken cancellationToken);
+        Task<BaseResponse<ClientModel>> GetClientsV2(CancellationToken cancellationToken = default);
         Task<BaseResponse<ClientListResponse>> GetClientList(GetClientListRequest request);
         Task<BaseResponse<bool>> AddOrUpdateClient(ClientListResponse.Client request);
         Task<BaseResponse<BetSettingResponse>> GetBetSetting(BetSettingRequest request);

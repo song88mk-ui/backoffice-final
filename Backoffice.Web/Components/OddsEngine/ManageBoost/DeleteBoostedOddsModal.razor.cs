@@ -19,7 +19,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public PriceBoostConfigModel PriceBoost { get; set; }
         public bool IsPreLoader { get; set; }
@@ -51,8 +50,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             PriceBoost.BoostedOdds = 0;
             PriceBoost.BoostedOddsStr = "0";
             PriceBoost.TimeStamp = DateTime.UtcNow;
-            PriceBoost.UserId = UserModel.Id;
-            PriceBoost.UserName = UserModel.UserName;
+            PriceBoost.UserId = _userState.Id;
+            PriceBoost.UserName = _userState.Name;
 
             var result = await TradingService.AddOrUpdatePriceBoost(new List<PriceBoostConfigModel>() { PriceBoost });
 
@@ -107,9 +106,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     Activity = Activity.Delete.ToString(),
                     From = JsonSerializer.Serialize(priceBoostLogModelFrom),
                     To = "-",
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName,
-                    TimeStamp = DateTime.UtcNow
+                    UserId = _userState.Id,
+                    UserName = _userState.Name
                 });
             }
 

@@ -15,7 +15,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         [Inject] public ITradingService TradingService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
 
         public string ToClientName { get; set; }
@@ -46,8 +45,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             var request = new ClientSportSettingRequest
             {
                 ClientCode = ModalParameters.TryGet<string>("ToClientCode"),
-                UserId = UserModel.Id,
-                UserName = UserModel.UserName,
+                UserId = _userState.Id,
+                UserName = _userState.Name,
                 TimeStamp = DateTime.UtcNow,
                 SportsSortOrder = ModalParameters.TryGet<List<SportsSortOrder>>("Sports")
             };

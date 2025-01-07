@@ -15,7 +15,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IBackofficeService BackofficeService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }        
 
         private EventCallback<AlertModel> OnCopyClientSettingsCallback { get; set; }
@@ -63,7 +62,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                 var message = new OnCopyClientSettingsMessage
                 {
-                    UserId = UserModel.Id,
+                    UserId = _userState.Id,
                     FromClientCode = SelectedFromClient.Key,
                     ToClientCode = ToClient.ClientCode,
                     ToRemoveConfig = response.Result.ToBeRemoved.Select(s => new ClientLeagueConfig 

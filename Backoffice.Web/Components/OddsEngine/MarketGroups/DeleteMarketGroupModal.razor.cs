@@ -14,13 +14,8 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
     {
         #region Properties
 
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public ClientMarketTemplateGroupDTO MarketTemplateGroup { get; set; }
         public ClientMarketTemplateGroupDTO OldMarketTemplateGroup { get; set; }
@@ -35,7 +30,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         protected override async Task OnInitializedAsync()
         {
-            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            _tradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             IsPreLoader = false;
             MarketTemplateGroup = new ClientMarketTemplateGroupDTO();
             MarketGroupModel = ModalParameters.TryGet<MarketGroupModel>("MarketGroupModel");
@@ -53,7 +48,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         public async Task OnCancelModalClick()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         public async Task OnDeleteModalClick()
@@ -75,7 +70,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 return;
             }
 
-            var marketTemplateGroupResponse = await TradingService.DeleteClientMarketTemplateGroup(new ClientDeleteMarketTemplateGroupRequest
+            var marketTemplateGroupResponse = await _tradingService.DeleteClientMarketTemplateGroup(new ClientDeleteMarketTemplateGroupRequest
             {
                 ClientId = MarketGroupModel.ClientId,
                 SportId = MarketGroupModel.SportId,
@@ -92,18 +87,18 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 };
 
                 //activity log
-                await BackofficeService.AddActivityLog(new ActivityLogModel
+                await _backofficeService.AddActivityLog(new ActivityLogModel
                 {
                     Page = SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", "."),
                     Payload = $"{MarketGroupModel.ClientCode}.{MarketGroupModel.SportId}.{MarketGroupModel.FixtureStatusId}",
                     Activity = Activity.Delete.ToString(),
                     From = JsonSerializer.Serialize(OldMarketTemplateGroup),
                     To = "-",
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName
+                    UserId = _userState.Id,
+                    UserName = _userState.Name
                 });
 
-                ModalService.Cancel();
+                _modalService.Cancel();
                 await Modal.OnSaveClickCallback.InvokeAsync($"{MarketTemplateGroup.MarketTemplateGroupId}");
             }
             else
@@ -116,7 +111,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
             }
 
             IsPreLoader = false;
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         public void Dispose()

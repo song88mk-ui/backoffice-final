@@ -2,18 +2,11 @@
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Models;
-using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Pages.SBC
 {
     public partial class Dashboard : IDisposable
     {
-        #region Properties
-
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-
-        #endregion
-
         #region Fields
 
         private string _iFrameSrc;
@@ -39,9 +32,9 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnParametersSetAsync()
         {
-            if (_roleId != UserModel.RoleId)
+            if (_roleId != _userState.RoleId)
             {
-                _roleId = UserModel.RoleId;
+                _roleId = _userState.RoleId;
                 await Initialize();
             }
         }

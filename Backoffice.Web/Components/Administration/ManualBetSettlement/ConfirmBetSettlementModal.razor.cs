@@ -18,7 +18,6 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
         [Inject] private IBackofficeService BackofficeService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private CustomModal Modal { get; set; }
 
         private ManualBetDetailsModel ManualBetDetailsModel { get; set; }
@@ -66,9 +65,9 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
                     Payload = "",
                     From = "-",
                     To = JsonSerializer.Serialize(bet),
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName,
-                    TimeStamp = DateTime.Now
+                    UserId = _userState.Id,
+                    UserName = _userState.Name,
+                    TimeStamp = DateTime.UtcNow
                 };
 
                 ActivityLogs.OnActivityLogMessages.Add(ActivityLog);

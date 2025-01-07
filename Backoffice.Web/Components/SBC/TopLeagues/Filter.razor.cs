@@ -10,12 +10,11 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         #region Properties
         [Inject] public IBackofficeService BackofficeService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<TopLeaguesFilterModel> OnFilterCallback { get; set; }
 
         protected SearchFormModel SearchForm { get; set; }
-        public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
+        public List<SelectListItemWithCheckboxModel<string>>? Clients { get; set; }
         public string SelectedSportId { get; set; }
         public List<SelectListItemModel<string>> Sports { get; set; }
         public TopLeaguesFilterModel TopLeaguesFilterModel { get; set; }
@@ -24,13 +23,14 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         public string SelectedClientName { get; set; }
 
         //private TopLeaguesFilterModel DefaultFilter { get; set; }
+
+        private bool _init = true;
         #endregion
 
         #region Methods
 
         protected override async Task OnInitializedAsync()
         {
-            Clients = new List<SelectListItemWithCheckboxModel<string>>();
             Sports = new List<SelectListItemModel<string>>();
             TopLeaguesFilterModel = new TopLeaguesFilterModel();
             //DefaultFilter = new TopLeaguesFilterModel();
@@ -41,42 +41,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 IsReset = false
             };
 
-            var clients = (await BackofficeService.GetClients()).Result;
-
-            if (clients != null && clients.Clients.Any())
-            {
-                clients.Clients = UserModel.ClientCodes.Any() ? clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
-
-                TopLeaguesFilterModel.Clients = clients.Clients
-                    .Select(s => new TopLeaguesFilterModel.Client
-                    {
-                        ClientId = s.ClientId,
-                        ClientCode = s.ClientCode,
-                        ClientName = s.ClientName,
-                        Region = s.Region
-                    }).ToList();
-
-                Clients = TopLeaguesFilterModel.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
-                {
-                    Value = s.ClientId.ToString(),
-                    Name = s.ClientName,
-                    IsChecked = true
-                }).ToList();
-
-                Clients.Insert(0, new SelectListItemWithCheckboxModel<string>
-                {
-                    Value = "all",
-                    Name = "All Clients",
-                    IsChecked = true
-                });
-
-                var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
-
-                SelectedClientCount = selectedClients.Count;
-                SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
-
-                TopLeaguesFilterModel.ClientIds = string.Join(",", selectedClients);
-            }
+            SetClients();
 
             var sports = (await BackofficeService.GetSportsAsync()).Result;
 
@@ -111,16 +76,20 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
                 TopLeaguesFilterModel.SportName = sport.Name;
             }
 
-            //DefaultFilter = new TopLeaguesFilterModel()
-            //{
-            //    SportId = TopLeaguesFilterModel.SportId,
-            //    SportName = TopLeaguesFilterModel.SportName,
-            //    ClientIds = TopLeaguesFilterModel.ClientIds
-            //};
-
             await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
         }
 
+        protected override async Task OnParametersSetAsync()
+        {
+            if (!_init && !TopLeaguesFilterModel.Clients.Any())
+            {
+                SetClients();
+
+                await OnInitCallback.InvokeAsync(TopLeaguesFilterModel);
+            }
+
+            _init = false;
+        }
         public async void OnSportsChangedEvent(ChangeEventArgs e)
         {
             SelectedSportId = e.Value.ToString();
@@ -159,6 +128,47 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
             GC.SuppressFinalize(this);
         }
 
+        #endregion
+
+        #region Utilities
+        private void SetClients()
+        {
+            if (_userState.SportsbookClients != null && _userState.SportsbookClients.Any())
+            {
+                var clients = _userState.ClientCodes.Any() ? _userState.SportsbookClients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
+
+                TopLeaguesFilterModel.Clients = clients
+                    .Select(s => new TopLeaguesFilterModel.Client
+                    {
+                        ClientId = s.ClientId,
+                        ClientCode = s.ClientCode,
+                        ClientName = s.ClientName,
+                        Region = s.Region
+                    }).ToList();
+
+                Clients = new List<SelectListItemWithCheckboxModel<string>>();
+                Clients = TopLeaguesFilterModel.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
+                {
+                    Value = s.ClientId.ToString(),
+                    Name = s.ClientName,
+                    IsChecked = true
+                }).ToList();
+
+                Clients.Insert(0, new SelectListItemWithCheckboxModel<string>
+                {
+                    Value = "all",
+                    Name = "All Clients",
+                    IsChecked = true
+                });
+
+                var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
+
+                SelectedClientCount = selectedClients.Count;
+                SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked)?.Name ?? "";
+
+                TopLeaguesFilterModel.ClientIds = string.Join(",", selectedClients);
+            }
+        }
         #endregion
     }
 }

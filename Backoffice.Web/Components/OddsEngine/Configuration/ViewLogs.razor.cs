@@ -2,10 +2,10 @@
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.Utilities;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
-using System.Drawing;
 using System.Text;
 using System.Text.Json;
 
@@ -16,7 +16,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         #region Properties
         [Inject] private ITradingService TradingService { get; set; }
         [Inject] private IModalService ModalService { get; set; }
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         private ConfigLogsFilterModel ConfigLogsFilterModel { get; set; }
         private MetaData MetaData { get; set; } = new MetaData();
@@ -39,9 +38,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 MarketTemplateIds = null,
                 Scope = string.Empty,
                 MarketId = string.Empty,
-                FromDate = DateTime.Now,
-                ToDate = DateTime.Now,
-                Filter = string.Empty,
+                FromDate = DateTimeHelper.Now(_userState.TimeZoneOffset),
+                ToDate = DateTimeHelper.Now(_userState.TimeZoneOffset),
+                Filter = string.Empty
             };
 
             TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();

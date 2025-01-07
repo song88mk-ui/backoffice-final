@@ -7,7 +7,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class ExportTemplateModal : IDisposable
     {
         #region Properties
-        [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         #endregion
 
@@ -32,7 +31,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 UserId = ModalParameters.TryGet<string>("UserId"),
                 ConfigTemplateId = ModalParameters.TryGet<long>("ConfigTemplateId").ToString(),
                 Filename = Path.GetFileNameWithoutExtension(_filename),
-                AccessToken = HttpContextAccessor.HttpContext?.Session.GetString("UserToken") ?? string.Empty
+                AccessToken = _userState.AccessToken ?? string.Empty
             };
 
             // Task - Migrate to api call

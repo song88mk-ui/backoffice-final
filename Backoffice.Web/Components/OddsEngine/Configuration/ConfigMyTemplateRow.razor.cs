@@ -7,7 +7,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class ConfigMyTemplateRow
     {
         [Inject] private NavigationManager NavigationManager { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public ConfigMyTemplateModel ConfigTemplate { get; set; }
         [Parameter] public EventCallback<ModalParameters> ModalClickedCallback { get; set; }
@@ -24,8 +23,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             parameters.Add("ModalClass", "modal-show");
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");                                                                                                                                                                                                                                          
             parameters.Add("Region", _region);
-            parameters.Add("ConnectionId", UserModel.ConnectionId);
-            parameters.Add("UserId", UserModel.Id);
+            parameters.Add("ConnectionId", _userState.ConnectionId);
+            parameters.Add("UserId", _userState.Id);
             parameters.Add("ConfigTemplateId", ConfigTemplate.Id);
             parameters.Add("ConfigTemplateName", ConfigTemplate.Name);
 

@@ -19,7 +19,6 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public AddMessageSettlementModel AddMessageSettlementModel { get; set; }
 
@@ -129,8 +128,8 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
                                 InitialBetSelectionStatusId = item.InitialBetSelectionStatusId,
                                 MarketTemplateId = item.MarketTemplateId
                             }),
-                            UserId = UserModel.Id,
-                            UserName = UserModel.UserName,
+                            UserId = _userState.Id,
+                            UserName = _userState.Name,
                             TimeStamp = DateTime.UtcNow
                         };
 
@@ -181,8 +180,8 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
                                     InitialBetSelectionStatusId = item.InitialBetSelectionStatusId,
                                     MarketTemplateId = item.MarketTemplateId
                                 }),
-                                UserId = UserModel.Id,
-                                UserName = UserModel.UserName,
+                                UserId = _userState.Id,
+                                UserName = _userState.Name,
                                 TimeStamp = DateTime.UtcNow
                             };
 

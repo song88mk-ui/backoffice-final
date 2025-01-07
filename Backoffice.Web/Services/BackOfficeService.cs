@@ -2,11 +2,9 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
-using Backoffice.Shared.OutgoingEngineMessages;
-using Backoffice.Shared.Utilities;
 using Backoffice.Web.Extensions;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.States;
 using Microsoft.JSInterop;
 using Serilog;
@@ -14,7 +12,6 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using static Backoffice.Shared.Models.Response.FastOddsSportsResponse;
 
 namespace Backoffice.Web.Services
 {
@@ -170,6 +167,17 @@ namespace Backoffice.Web.Services
         {
             try
             {
+                if (request != null)
+                {
+                    if (request.DateFrom == DateTime.MinValue)
+                        request.DateFrom = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(-1);
+                    if (request.DateTo == DateTime.MinValue)
+                        request.DateTo = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(1).AddTicks(-1);
+
+                    request.DateFrom = request.DateFrom.ToUniversalTime();
+                    request.DateTo = request.DateTo.ToUniversalTime();
+                }
+
                 var response = await _httpClient.PostAsync($"api/config/activitylog/list", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)

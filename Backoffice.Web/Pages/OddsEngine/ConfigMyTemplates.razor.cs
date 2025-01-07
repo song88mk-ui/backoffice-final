@@ -4,8 +4,6 @@ using Backoffice.Web.Components.OddsEngine.Configuration;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Config;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using System.Diagnostics;
 using System.Globalization;
 
 namespace Backoffice.Web.Pages.OddsEngine
@@ -13,10 +11,6 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class ConfigMyTemplates : IDisposable
     {
         #region Properties
-        [Inject] private IJSRuntime JSRuntime { get; set; }
-
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
         [Parameter] public ConfigContentFilterModel FilterModel { get; set; }
         [Parameter] public EventCallback OnStateHasChange { get; set; }
         [Parameter] public string QueryMessage { get; set; }
