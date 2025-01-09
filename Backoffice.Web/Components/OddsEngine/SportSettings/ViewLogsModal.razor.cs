@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.SportSetting;
 using Backoffice.Web.Services;
@@ -62,20 +63,13 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         {
             _isPreloader = true;
             _clientSportOrderAudit = new List<SportSettingsActivityLog>();
-            var testP = new ActivityLogRequest
-            {
-                Page = SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace("_", "."),
-                //Payload = $"{_clientCode}",
-                MetaData = _metaData,
-                DateFrom = DateTime.UtcNow.AddDays(-30)
-            };
 
             var response = await _backofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace("_", "."),
                 //Payload = $"{_clientCode}",
                 MetaData = _metaData,
-                DateFrom = DateTime.UtcNow.AddDays(-30)
+                DateFrom = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(-30)
             });
 
             if (response.StatusCode == StatusCode.Success)

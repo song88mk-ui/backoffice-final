@@ -2,9 +2,8 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
-using Backoffice.Web.Pages.SBC;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 using System.Globalization;
@@ -17,12 +16,7 @@ namespace Backoffice.Web.Components.Common
     public partial class ViewAllLogsModal : IDisposable
     {
         #region Properties
-        [Inject] IModalService ModalService { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         private bool _isPreLoader;
         public SportsbookClientPermission CurrentPage { get; set; }
@@ -38,7 +32,7 @@ namespace Backoffice.Web.Components.Common
         protected override async Task OnInitializedAsync()
         {
             _isPreLoader = true;
-            _userClients = UserModel.ClientCodes.Any() ? UserModel.ClientCodes : new List<string>();
+            _userClients = _userState.ClientCodes.Any() ? _userState.ClientCodes : new List<string>();
             WithAdministrationPagesAccess = false;
             _boostedSettingsActivityLogs = new List<ActivityLogModel>();
 
@@ -53,8 +47,8 @@ namespace Backoffice.Web.Components.Common
                 SegmentId = 0,
                 Leagues = null,
                 LeagueId = 0,
-                DateFrom = DateTime.Now.AddDays(-7),
-                DateTo = DateTime.Now,
+                DateFrom = DateTimeHelper.Now(_userState.TimeZoneOffset).AddDays(-7),
+                DateTo = DateTimeHelper.Now(_userState.TimeZoneOffset),
                 SearchText = string.Empty
             };
 
@@ -70,7 +64,7 @@ namespace Backoffice.Web.Components.Common
         }
         protected override async Task OnParametersSetAsync()
         {
-            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            _tradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             CurrentPage = ModalParameters.TryGet<SportsbookClientPermission>("SelectedPage");
         }
         #region Methods
@@ -83,13 +77,13 @@ namespace Backoffice.Web.Components.Common
                 _metaData.PageSize = int.MaxValue;
             }
 
-            var response = await BackofficeService.GetPriceboostActivityLogs(new PriceboostActivityLogRequest
+            var response = await _backofficeService.GetPriceboostActivityLogs(new PriceboostActivityLogRequest
             {
                 Page = CurrentPage.ToString().Replace("_", "."),
                 Payload = payload,
                 MetaData = _metaData,
-                DateFrom = _priceBoostLogFilterModel.DateFrom.Date.Add(new TimeSpan(0, 0, 0)),
-                DateTo = _priceBoostLogFilterModel.DateTo.Date.Add(new TimeSpan(23, 59, 59)),
+                DateFrom = _priceBoostLogFilterModel.DateFrom.Date.AddDays(-1),
+                DateTo = _priceBoostLogFilterModel.DateTo.Date.AddDays(1).AddTicks(-1),
                 UserClients = _userClients
             }, _region);
 
@@ -161,7 +155,7 @@ namespace Backoffice.Web.Components.Common
         }
         private async Task<List<KeyValuePair<string, string>>> GetClients()
         {
-            var response = await TradingService.GetClientList();
+            var response = await _tradingService.GetClientList();
 
             List<KeyValuePair<string, string>> Clients = new List<KeyValuePair<string, string>>();
 
@@ -299,7 +293,7 @@ namespace Backoffice.Web.Components.Common
         }
         public async Task OnCancelModalClick()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
         public void Dispose()
         {
@@ -367,17 +361,17 @@ namespace Backoffice.Web.Components.Common
 
         private async Task<SportsLookupResponse> GetSports()
         {
-            return (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString().ToUpper())).Result;
+            return (await _tradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString().ToUpper())).Result;
         }
 
         private async Task<SegmentLookupResponse> GetSegments(int sportId)
         {
-            return sportId != 0 ? (await TradingService.GetSegmentLookup(sportId)).Result : null;
+            return sportId != 0 ? (await _tradingService.GetSegmentLookup(sportId)).Result : null;
         }
 
         private async Task<LeagueLookupResponse> GetLeagues(int sportId, int segmentId)
         {
-            return sportId != 0 && segmentId != 0 ? (await TradingService.GetLeagueLookup(sportId, segmentId)).Result : null;
+            return sportId != 0 && segmentId != 0 ? (await _tradingService.GetLeagueLookup(sportId, segmentId)).Result : null;
         }
 
         private string EvaluateBoostedSettingsActivity(string changeData)

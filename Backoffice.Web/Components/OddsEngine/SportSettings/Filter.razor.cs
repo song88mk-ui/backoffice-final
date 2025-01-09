@@ -12,8 +12,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
         [Inject] public ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback OnUpdateClickCallback { get; set; }
         [Parameter] public EventCallback OnCancelClickCallback { get; set; }
@@ -40,7 +38,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             if (clientResponse.StatusCode == StatusCode.Success)
             {
-                clientResponse.Result = UserModel.ClientCodes.Any() ? clientResponse.Result.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+                clientResponse.Result = _userState.ClientCodes.Any() ? clientResponse.Result.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
 
                 Clients = clientResponse.Result.Select(s => new SelectListItemModel<string>
                 {

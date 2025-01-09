@@ -13,9 +13,6 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public ITableauService TableauService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-        
-
         public string IFrameSrc { get; set; }
 
         #endregion
@@ -42,7 +39,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             var reportRoles = (await AuthenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
             {
-                RoleId = UserModel.RoleId,
+                RoleId = _userState.RoleId,
                 ClaimType = AdminPermission.Admin_Dashboard.ToString().Replace("_", ".")
             })).Result ?? new ReportRolesUrlResponse();
 

@@ -8,7 +8,6 @@
 
 <AuthorizeView Policy="sbc-priceboost-settings">
     <Authorized>
-        <CascadingValue Name="Region" Value="@Region">
             <div class="col-md-12">
                 <Breadcrumb Breadcrumbs="_breadcrumbs" />
             </div>
@@ -69,7 +68,6 @@
                 </div>
             </div>
             <CustomModal OnSaveClickCallback="OnSaveSettingClickEvent" />
-        </CascadingValue>
     </Authorized>
     <NotAuthorized>
         <RedirectToPage FromPage="@SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace('_', '.')" />

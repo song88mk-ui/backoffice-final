@@ -11,8 +11,6 @@ namespace Backoffice.Web.Pages.Administration
 {
     public partial class MaintenanceV2
     {
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-
         private string _title = "Maintenance";
         private PageHeaderModel _pageHeaderModel;
         private string _maintenanceModeAllClientsCss;

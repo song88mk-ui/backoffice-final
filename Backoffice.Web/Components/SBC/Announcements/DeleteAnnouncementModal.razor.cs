@@ -18,7 +18,6 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
 
         #endregion
@@ -84,8 +83,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     Activity = Activity.Delete.ToString(),
                     From = JsonSerializer.Serialize(oldData),
                     To = "-",
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName
+                    UserId = _userState.Id,
+                    UserName = _userState.Name
                 });
 
                 ModalService.Cancel();

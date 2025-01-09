@@ -12,10 +12,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
     {
         #region Properties
 
-        [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IModalService ModalService { get; set; }
-
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
 
         public List<ClientInformationModel> ClientInformations { get; set; }
@@ -39,7 +35,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         protected override async Task OnInitializedAsync()
         {
             IsPreLoader = true;
-            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            _tradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             AlertModel = new AlertModel();
             Clients = new List<SelectListItemModel<string>>();
             Sports = new List<SelectListItemModel<int>>();
@@ -53,14 +49,14 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 try
                 {
                     CopyToClientCode = ModalParameters.TryGet<string>("ClientCode");
-                    if (UserModel.ClientCodes.Any())
+                    if (_userState.ClientCodes.Any())
                     {
-                        ClientInformations = (await TradingService.GetClientList()).Result;
+                        ClientInformations = (await _tradingService.GetClientList()).Result;
 
-                        var roleName = UserModel.RoleName;
+                        var roleName = _userState.RoleName;
                         if (roleName != "Super Admin")
                         {
-                            var clientCodes = UserModel.ClientCodes;
+                            var clientCodes = _userState.ClientCodes;
                             ClientInformations = ClientInformations.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
                         }
                         Clients = ClientInformations.Where(x => x.ClientCode != CopyToClientCode).Select(s => new SelectListItemModel<string>
@@ -83,7 +79,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     CopyToClientName = client.ClientName;
                     SelectedClientCode = Clients.FirstOrDefault().Value;
 
-                    var sports = (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
+                    var sports = (await _tradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
 
                     if (sports != null)
                     {
@@ -145,7 +141,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         public async Task OnModalCancelEvent()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         public async void OnModalCopyEvent()
@@ -162,7 +158,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 return;
             }
 
-            var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId)).Result;
+            var marketTemplateGroupResponse = (await _tradingService.GetClientMarketTemplateGroups(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId)).Result;
 
             var copyFromMarketGroupModel = new MarketGroupModel()
             {
@@ -190,7 +186,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
             IsPreLoader = false;
             var options = new ModalOptions();
-            ModalService.Open<CopyConfirmationMarketGroupModalBody>("Copy Market Group", parameters, options);
+            _modalService.Open<CopyConfirmationMarketGroupModalBody>("Copy Market Group", parameters, options);
         }
 
         public void Dispose()

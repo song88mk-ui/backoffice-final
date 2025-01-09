@@ -3,6 +3,7 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Web.Components.Common;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
@@ -21,7 +22,6 @@ namespace Backoffice.Web.Components.SBC.Announcements
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IModalService ModalService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
 
@@ -54,6 +54,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
         private List<SelectListItemWithCheckboxModel<string>> _clients;
         private LanguageOptionsModel _languages;
         private Dictionary<LanguageCode, string> _announcementMessages;
+        private DateTime _startDate;
+        private DateTime _endDate;
 
         #endregion
 
@@ -62,6 +64,9 @@ namespace Backoffice.Web.Components.SBC.Announcements
         protected override async Task OnInitializedAsync()
         {
             _isPreload = false;
+
+            _startDate = DateTimeHelper.Now(_userState.TimeZoneOffset).AddDays(-1);
+            _endDate = DateTimeHelper.Now(_userState.TimeZoneOffset).AddDays(1).AddTicks(-1);
 
             _alerts = new List<AnnouncementsAlertModel>();
             _announcement = ModalParameters.TryGet<Models.Announcements>("Announcement");
@@ -137,13 +142,13 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         public async Task OnRangeSelectStartDate(DateRange range)
         {
-            _announcement.StartDate = range.Start.LocalDateTime;
+            _announcement.StartDate = range.Start.UtcDateTime;
             _shouldRender = true;
         }
 
         public async Task OnRangeSelectEndDate(DateRange range)
         {
-            _announcement.EndDate = range.Start.LocalDateTime;
+            _announcement.EndDate = range.Start.UtcDateTime;
         }
 
         public async Task OnCancelClickEvent()
@@ -250,8 +255,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
                 var token = _cts.Token;
 
-                var userId = UserModel.Id;
-                var userRoleId = UserModel.RoleId;
+                var userId = _userState.Id;
+                var userRoleId = _userState.RoleId;
 
                 var request = new AddOrUpdateAnnouncementRequest
                 {
@@ -268,9 +273,9 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
                 if(_isEdit)
                 {
-                    var isInternalUser = UserModel.Claims.Any(c => c.Type.Contains("Admin.") && c.Value != "0") && UserModel.Claims.Any(c => c.Type.Contains("SBC.") && c.Value != "0");
+                    var isInternalUser = _userState.Claims.Any(c => c.Type.Contains("Admin.") && c.Value != "0") && _userState.Claims.Any(c => c.Type.Contains("SBC.") && c.Value != "0");
 
-                    if (isInternalUser == false && _announcement.UserRoleId != UserModel.RoleId)
+                    if (isInternalUser == false && _announcement.UserRoleId != _userState.RoleId)
                     {
                         var toRemoveClientCodes = _announcement.Clients.Select(s => s.ClientCode).ToList();
                         if (toRemoveClientCodes != null && toRemoveClientCodes.Any())

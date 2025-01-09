@@ -12,7 +12,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     public partial class EditConfigTemplateFilter : IDisposable
     {
         #region Properties
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [Parameter] public EventCallback<EditConfigTemplateFilterModel> EditConfigTemplateFilterCallback { get; set; }
         [Parameter] public long ConfigTemplateId { get; set; }
 

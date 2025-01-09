@@ -12,10 +12,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
     {
         #region Properties
 
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
 
         public MarketGroupModel MarketGroupModel { get; set; }
@@ -39,7 +35,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 TotalPages = 0,
             };
 
-            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            _tradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             MarketGroupModel = ModalParameters.TryGet<MarketGroupModel>("MarketGroupModel");
 
             await GetContent();
@@ -47,7 +43,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         public async Task OnCloseModalClickEvent()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         protected async Task SelectedPage(int page)
@@ -70,7 +66,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             IsPreLoader = true;
 
-            var response = (await BackofficeService.GetActivityLogs(new ActivityLogRequest
+            var response = (await _backofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", "."),
                 Payload = $"{MarketGroupModel.ClientCode}.{MarketGroupModel.SportId}.{MarketGroupModel.FixtureStatusId}",

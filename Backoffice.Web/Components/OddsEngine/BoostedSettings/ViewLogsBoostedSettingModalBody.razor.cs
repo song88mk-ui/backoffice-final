@@ -1,12 +1,14 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Newtonsoft.Json;
+using System;
 using System.Globalization;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -48,8 +50,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             };
             SearchForm = new SearchFormModel();
 
-            StartDate = DateTime.Now.AddDays(-1).Date;
-            EndDate = DateTime.Now.Date;
+            StartDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(-1);
+            EndDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(1).AddTicks(-1);
 
             var client = ModalParameters?.TryGet<BoostedSettingsModel>("Client");
 
@@ -85,7 +87,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         public async Task GetContent()
         {
             IsPreLoader = true;
-
+                
             ActivityLogs = new List<ActivityLogModel>();
 
             var response = await BackofficeService.GetActivityLogs(new ActivityLogRequest
@@ -93,8 +95,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                 Page = SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace("_", "."),
                 Payload = $"{ClientCode}",
                 MetaData = MetaData,
-                DateFrom = StartDate.Date.Add(new TimeSpan(0, 0, 0)).ToUniversalTime(),
-                DateTo = EndDate.Date.Add(new TimeSpan(23, 59, 59)).ToUniversalTime()
+                DateFrom = StartDate.Date,
+                DateTo = EndDate.Date
             });
 
             if (response.Result != null)
@@ -136,8 +138,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
         public async Task OnRangeSelect(DateRange range)
         {
-            StartDate = Convert.ToDateTime(range.Start.ToString("yyyy-MM-dd 00:00:00"));
-            EndDate = Convert.ToDateTime(range.End.ToString("yyyy-MM-dd 23:59:59"));
+            StartDate = Convert.ToDateTime(range.Start);
+            EndDate = Convert.ToDateTime(range.End);
 
             await GetContent();
         }

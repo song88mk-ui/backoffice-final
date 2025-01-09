@@ -30,6 +30,10 @@ window.initSort = (className, handler) => {
     });
 }
 
+window.getClientTimeZoneOffset = () => {
+    return (new Date().getTimezoneOffset()) * -1;
+}
+
 // disable table sorting
 window.disableSort = (className) => {
     var tableClass = className + ' > tbody';

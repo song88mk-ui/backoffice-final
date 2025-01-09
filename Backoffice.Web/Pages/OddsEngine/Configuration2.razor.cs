@@ -13,13 +13,10 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class Configuration2 : IDisposable
     {
         #region Properties
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IJSRuntime JSRuntime { get; set; }
 
         [Parameter]
         [SupplyParameterFromQuery(Name = "M")]
         public string? QueryMessage { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
 
         #endregion
@@ -115,7 +112,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("OnCopyClientSettingsCallback", EventCallback.Factory.Create(this, (AlertModel alert) => HandleCopyClientSettingsAlert(alert)));
 
             var options = new ModalOptions();
-            ModalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
+            _modalService.Open<CopyClientSettingsModal>($"Copy Client Settings", parameters);
         }
 
         public void HandleCopyClientSettingsAlert(AlertModel alert)

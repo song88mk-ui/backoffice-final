@@ -18,7 +18,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         [Parameter] public EventCallback<bool> CreateTemplateCallback { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         private List<SelectListItemModel<int>> _sports;
         private List<SelectListItemModel<int>> _scopes;
@@ -101,9 +100,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     From = "-",
                     To = JsonSerializer.Serialize(payload),
                     Activity = Activity.Create.ToString(),
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName,
-                    TimeStamp = DateTime.UtcNow
+                    UserId = _userState.Id,
+                    UserName = _userState.Name
                 });
 
                 isSuccess = true;

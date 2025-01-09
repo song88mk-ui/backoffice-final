@@ -18,7 +18,6 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
         //[Inject] private IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
 
         public List<AlertModel> Alerts { get; set; }
 

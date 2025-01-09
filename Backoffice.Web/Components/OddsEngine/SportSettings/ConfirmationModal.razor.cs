@@ -8,8 +8,6 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 {
     public partial class ConfirmationModal : IDisposable
     {
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-        [Inject] IModalService ModalService { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
 
@@ -37,12 +35,12 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
         private async void OnYesBtnClicked()
         {
             await Modal.OnSaveClickCallback.InvokeAsync(_userAction);
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
         private async void OnCacnelClicked()
         {
             await Modal.OnCancelClickCallback.InvokeAsync(_userAction);
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
         public void Dispose()
         {

@@ -5,6 +5,7 @@ using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Backoffice.Web.Helpers;
 
 namespace Backoffice.Web.Components.OddsEngine.Configuration
 {
@@ -17,7 +18,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         [Parameter] public EventCallback<ConfigLogsFilterModel> ConfigLogsFilterModelChanged { get; set; }
         [Parameter] public EventCallback GetContentCallback { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         private bool IsFilterButtonDisabled { get; set; }
         #endregion
         #region Methods
@@ -43,8 +43,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 Scopes = GetScopes(),
                 Scope = string.Empty,
                 MarketId = string.Empty,
-                FromDate = DateTime.Now,
-                ToDate = DateTime.Now,
+                FromDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.Add(new TimeSpan(0,0,0)),
+                ToDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(1).AddTicks(-1),
                 Filter = string.Empty,
             };
 
@@ -127,8 +127,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnDateRangeChangedEvent(DateRange range)
         {
-            ConfigLogsFilterModel.FromDate = DateTime.Parse(range.Start.ToString()).Date.Add(new TimeSpan(0, 0, 0));
-            ConfigLogsFilterModel.ToDate = DateTime.Parse(range.End.ToString()).Date.Add(new TimeSpan(23, 59, 59));
+            ConfigLogsFilterModel.FromDate = Convert.ToDateTime(range.Start);
+            ConfigLogsFilterModel.ToDate = Convert.ToDateTime(range.End);
 
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
             await GetContentCallback.InvokeAsync();
@@ -146,7 +146,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 new SelectListItemModel<int> {  Value = 1, Name = "Outrights" }
             };
 
-        private async Task<List<SelectListItemModel<Guid>>> GetClients() => (await TradingService.GetClientList()).Result.Where(x => UserModel.ClientCodes.Contains(x.ClientCode)).Select(c => new SelectListItemModel<Guid>()
+        private async Task<List<SelectListItemModel<Guid>>> GetClients() => (await TradingService.GetClientList()).Result.Where(x => _userState.ClientCodes.Contains(x.ClientCode)).Select(c => new SelectListItemModel<Guid>()
         {
             Value = c.ClientId,
             Name = c.ClientName

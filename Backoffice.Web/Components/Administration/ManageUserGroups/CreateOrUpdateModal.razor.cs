@@ -24,7 +24,6 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public UserGroupResponse UserGroup { get; set; }
         public UserGroupResponse OldUserGroup { get; set; }
@@ -177,8 +176,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                         Activity = !IsEdit ? Activity.Create.ToString() : Activity.Update.ToString(),
                         From = !IsEdit ? "-" : JsonSerializer.Serialize(OldUserGroup),
                         To = JsonSerializer.Serialize(UserGroup),
-                        UserId = UserModel.Id,
-                        UserName = UserModel.UserName
+                        UserId = _userState.Id,
+                        UserName = _userState.Name
                     });
 
                     ModalService.Cancel();

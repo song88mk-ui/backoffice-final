@@ -9,9 +9,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
     {
         #region Properties
 
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
-
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
 
         public List<ClientMarketTemplateModel> ClientMarketTemplates { get; set; }
@@ -30,13 +27,13 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
         {
             IsPreLoader = true;
 
-            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            _tradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             ClientCode = ModalParameters.TryGet<string>("ClientCode");
             SportId = ModalParameters.TryGet<int>("SportId");
             FixtureStatusId = ModalParameters.TryGet<int>("FixtureStatusId");
             MarketTemplateGroupName = ModalParameters.TryGet<string>("MarketTemplateGroupName");
 
-            var result = (await TradingService.GetClientMarketTemplates(ClientCode, SportId, FixtureStatusId, _translationState.ActiveLanguageCode)).Result;
+            var result = (await _tradingService.GetClientMarketTemplates(ClientCode, SportId, FixtureStatusId, _translationState.ActiveLanguageCode)).Result;
 
             ClientMarketTemplates = result != null ? result.MarketTemplates : new List<ClientMarketTemplateModel>();
 
@@ -47,7 +44,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         public async Task OnModalCancel()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         public void Dispose()

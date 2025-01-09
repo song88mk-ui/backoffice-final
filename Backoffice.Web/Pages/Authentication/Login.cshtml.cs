@@ -19,7 +19,7 @@ namespace Backoffice.Web.Pages.Authentication
         #region Properties
 
         [TempData] public string ErrorMessage { get; set; }
-        [BindProperty] public LogInModel UserModel { get; set; } = new LogInModel();
+        [BindProperty] public LogInModel LogInModel { get; set; } = new LogInModel();
         [BindProperty] public bool IsSaveCookie { get; set; }
 
         public bool IsValidLogin { get; set; }
@@ -63,11 +63,11 @@ namespace Backoffice.Web.Pages.Authentication
         {
             var selectedLangCode = Request.Cookies["c-langCode"]?.ToString() ?? "EN";
 
-            if (Translations == null || (!string.IsNullOrEmpty(selectedLangCode) && UserModel.LanguageCode != selectedLangCode))
+            if (Translations == null || (!string.IsNullOrEmpty(selectedLangCode) && LogInModel.LanguageCode != selectedLangCode))
             {
                 if (Enum.TryParse(selectedLangCode, out LanguageCode langCode))
                 {
-                    UserModel.LanguageCode = selectedLangCode;
+                    LogInModel.LanguageCode = selectedLangCode;
 
                     Translations = await _translationService.GetTranslationsAsync(langCode);
 
@@ -127,7 +127,7 @@ namespace Backoffice.Web.Pages.Authentication
                             }
 
                             TempData["HasError"] = true;
-                            TempData["LogError"] = $"<script>console.log(\"{authenticate.StatusCode.ToString()} - {authenticate.Message} -\n{JsonSerializer.Serialize(UserModel).Replace("\"", "")}\")</script>";
+                            TempData["LogError"] = $"<script>console.log(\"{authenticate.StatusCode.ToString()} - {authenticate.Message} -\n{JsonSerializer.Serialize(LogInModel).Replace("\"", "")}\")</script>";
 
                             if (!string.IsNullOrEmpty(authenticate.Message) && !authenticate.Message.Contains("Incorrect password"))
                             {
@@ -189,7 +189,7 @@ namespace Backoffice.Web.Pages.Authentication
             {
                 var policies = new List<string>();
                 TempData["HasError"] = false;
-                var result = await _authenticationService.Login(UserModel);
+                var result = await _authenticationService.Login(LogInModel);
 
                 if (result.Result.Item1)
                 {
@@ -224,7 +224,7 @@ namespace Backoffice.Web.Pages.Authentication
                 }
 
                 TempData["HasError"] = true;
-                TempData["LogError"] = $"<script>console.log(\"{result.StatusCode.ToString()} - {result.Message} -\n{JsonSerializer.Serialize(UserModel).Replace("\"", "")}\")</script>";
+                TempData["LogError"] = $"<script>console.log(\"{result.StatusCode.ToString()} - {result.Message} -\n{JsonSerializer.Serialize(LogInModel).Replace("\"", "")}\")</script>";
 
                 if (!string.IsNullOrEmpty(result.Message) && !result.Message.Contains("Incorrect password"))
                 {
@@ -298,11 +298,11 @@ namespace Backoffice.Web.Pages.Authentication
             var langCodeCookie = Request.Cookies["c-langCode"]?.ToString() ?? "EN";
             var selectedLangCode = !string.IsNullOrEmpty(languageCode) ? languageCode : langCodeCookie;
 
-            if (Translations == null || (!string.IsNullOrEmpty(selectedLangCode) && UserModel.LanguageCode != selectedLangCode))
+            if (Translations == null || (!string.IsNullOrEmpty(selectedLangCode) && LogInModel.LanguageCode != selectedLangCode))
             {
                 if (Enum.TryParse(selectedLangCode, out LanguageCode langCode))
                 {
-                    UserModel.LanguageCode = selectedLangCode;
+                    LogInModel.LanguageCode = selectedLangCode;
 
                     Translations = await _translationService.GetTranslationsAsync(langCode);
 

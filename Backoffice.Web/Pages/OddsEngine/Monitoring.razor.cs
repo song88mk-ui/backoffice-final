@@ -33,6 +33,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private List<MonitoringFixtureModel>? _fixtureMarkets;
         private List<BreadcrumbModel> _breadcrumbs;
         private List<string>? _slugs;
+        private string _userId;
 
         private bool _isPreloader = true;
         private LanguageCode _languageCode;
@@ -67,12 +68,6 @@ namespace Backoffice.Web.Pages.OddsEngine
             };
             _slugs = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "").Split("/").ToList();
 
-            await _hubService.RegisterMessageHandlers(
-                ProcessBetStopFixture,
-                ProcessBetStopGlobal,
-                processOddsChangeMonitoring: ProcessOddsChange
-            );
-
             await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
@@ -81,6 +76,17 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = ValidateParameters();
             if (_shouldRender)
             {
+                if (_userId != _userState.Id)
+                {
+                    _userId = _userState.Id;
+
+                    await _hubService.RegisterMessageHandlers(
+                        ProcessBetStopFixture,
+                        ProcessBetStopGlobal,
+                        processOddsChangeMonitoring: ProcessOddsChange
+                    );
+                }
+
                 var isReloadFixtureMarkets = ((SelectedSport?.SportId ?? _sportId) == _sportId && (LeagueId == 0 && LeagueId != _leagueId)) || _languageCode != _translationState.ActiveLanguageCode;
 
                 if (SelectedSport != null)
@@ -121,7 +127,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _modalService.Open<CloseMatchModal>("Close Match", parameters, options);
         }
-        private bool ValidateParameters() => _init || ((SelectedSport?.LeagueId ?? _leagueId) != _leagueId || (LeagueId != 0 && LeagueId != _leagueId)) || _languageCode != _translationState.ActiveLanguageCode || _selectedSportsUnix != SelectedSport?.UnixTime;
+        private bool ValidateParameters() => _init || ((SelectedSport?.LeagueId ?? _leagueId) != _leagueId || (LeagueId != 0 && LeagueId != _leagueId)) || _languageCode != _translationState.ActiveLanguageCode || _selectedSportsUnix != SelectedSport?.UnixTime || _userId != _userState.Id;
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
         {

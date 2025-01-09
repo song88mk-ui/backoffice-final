@@ -20,7 +20,6 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
@@ -371,7 +370,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                     DeadHeatFactor = row.DeadHeat,
                     SelectionStatus = (BetStatus)row.ToStatus,
                     Reason = row.Reason,
-                    ManualSettledBy = UserModel.UserName,
+                    ManualSettledBy = _userState.Name,
                 });
 
                 var fixture = fixtureList.Where(f => f.Item1 == row.FixtureId).FirstOrDefault();
@@ -440,15 +439,15 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                         ToStatusId = (int)item.SelectionStatus,
                         ToStatusName = item.SelectionStatus.ToString()
                     }),
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName,
-                    TimeStamp = DateTime.Now
+                    UserId = _userState.Id,
+                    UserName = _userState.Name,
+                    TimeStamp = DateTime.UtcNow
                 };
 
                 ActivityLogs.ActivityLogs.Add(ActivityLog);
             }
 
-            var response = (await TradingService.AddOrUpdateManualMarketSettlement(request, UserModel.Id)).Result;
+            var response = (await TradingService.AddOrUpdateManualMarketSettlement(request, _userState.Id)).Result;
 
             if (response.StatusCode == StatusCode.Success)
             {

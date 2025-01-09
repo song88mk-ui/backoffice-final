@@ -3,7 +3,6 @@ using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.OddsEngine.ManageBoost;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
 
@@ -13,12 +12,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
 
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private ITradingService TradingService { get; set; }
-
         [Parameter] public string Region { get; set; } = "hk";
-
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         #endregion
 
@@ -60,7 +54,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             if (_region != Region.ToUpper())
             {
                 _region = Region.ToUpper();
-                TradingService.Region = _region;
+                _tradingService.Region = _region;
                 _breadcrumbs = new()
                 {
                     new()
@@ -141,7 +135,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
 
-            ModalService.Open<EditBoostedOddsModal>($"Edit Boosted Odds", parameters, options);
+            _modalService.Open<EditBoostedOddsModal>($"Edit Boosted Odds", parameters, options);
         }
 
         public void OnViewLogClickEvent(PriceBoostConfigModel priceboost)
@@ -155,7 +149,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
 
-            ModalService.Open<ViewLogsBoostedModal>($"View Logs", parameters, options);
+            _modalService.Open<ViewLogsBoostedModal>($"View Logs", parameters, options);
         }
 
         public void OnDeleteClickEvent(PriceBoostConfigModel priceboost)
@@ -171,7 +165,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
 
-            ModalService.Open<DeleteBoostedOddsModal>($"Delete Boosted Odds", parameters, options);
+            _modalService.Open<DeleteBoostedOddsModal>($"Delete Boosted Odds", parameters, options);
         }
 
         public async Task OnInitCallback()
@@ -251,7 +245,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             var options = new ModalOptions();
 
-            ModalService.Open<AddBoostedOddsModal>($"Add Boosted Odds", parameters, options);
+            _modalService.Open<AddBoostedOddsModal>($"Add Boosted Odds", parameters, options);
         }
         public void OpacityChanged(decimal opacity)
         {
@@ -281,7 +275,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             _isPreLoader = true;
             await InvokeAsync(StateHasChanged);
 
-            var priceBoostConfigResponse = (await TradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
+            var priceBoostConfigResponse = (await _tradingService.GetPriceBoostConfig(new PriceBoostConfigRequest
             {
                 ClientCode = !string.IsNullOrEmpty(_clientCode) ? _clientCode : string.Empty,
                 SportId = _sportId > 0 ? _sportId.ToString() : string.Empty,
@@ -302,7 +296,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
                 else
                 {
-                    var query = priceBoostConfigResponse.Result.AsQueryable().Where(c => UserModel.ClientCodes.Contains(c.ClientCode));
+                    var query = priceBoostConfigResponse.Result.AsQueryable().Where(c => _userState.ClientCodes.Contains(c.ClientCode));
 
                     if (!string.IsNullOrEmpty(_search))
                     {

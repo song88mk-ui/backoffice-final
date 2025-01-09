@@ -14,7 +14,6 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         [Inject] public IModalService ModalService { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public string FromClientCode { get; set; }
         public int FromSportId { get; set; }
@@ -41,7 +40,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
             if (clientResponse.StatusCode == StatusCode.Success)
             {
-                clientResponse.Result = UserModel.ClientCodes.Any() ? clientResponse.Result.Where(c => UserModel.ClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
+                clientResponse.Result = _userState.ClientCodes.Any() ? clientResponse.Result.Where(c => _userState.ClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
 
                 ClientInformations = clientResponse.Result;
 
@@ -93,7 +92,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             parameters.Add("SportId", FromSportId);
             parameters.Add("FixtureStatusId", FromFixtureStatusId);
 
-            parameters.Add("UserId", UserModel.Id);
+            parameters.Add("UserId", _userState.Id);
 
             parameters.Add("DialogStyle", "max-width: 600px;");
 

@@ -2,13 +2,12 @@
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
-using Backoffice.Shared.Utilities;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
 using Serilog;
-using System.Text.Json;
 using FixtureModel = Backoffice.Shared.Models.Response.MarketFixtureResponse.FixtureModel;
 
 namespace Backoffice.Web.Components.Administration.MarketSettlement
@@ -19,7 +18,6 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public ITradingService TradingService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [CascadingParameter] public ModalParameters ModalParameters { get; set; }
 
         [Parameter] public MarketSettlementModalFilterModel FilterModel { get; set; }
@@ -50,29 +48,9 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
         {
             ShowFilter = false;
 
-            Sports = new List<SelectListItemModel<int>>();
-            Segments = new List<SelectListItemModel<int>>();
-            Leagues = new List<SelectListItemModel<int>>();
-            Fixtures = new List<SelectListItemModel<string>>();
-            Markets = new List<SelectListItemModel<string>>();
-            Selections = new List<SelectListItemModel<string>>();
-            Statuses = new List<SelectListItemModel<int>>();
+            _marketFixtureResponse = new MarketFixtureResponse();
+            _marketFixtureOutrightResponse = new MarketFixtureResponse();
 
-            FilterModel = new MarketSettlementModalFilterModel()
-            {
-                FromDate = DateTime.Now.Date.AddDays(-1),
-                ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
-            };
-
-            _marketFixtureResponse = new MarketFixtureResponse()
-            {
-                Fixtures = new List<FixtureModel>(),
-            };
-
-            _marketFixtureOutrightResponse = new MarketFixtureResponse()
-            {
-                Fixtures = new List<FixtureModel>(),
-            };
             await Initialize();
         }
 
@@ -195,8 +173,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
         public void OnRangeSelect(DateRange range)
         {
-            FilterModel.FromDate = Convert.ToDateTime(range.Start.ToString("yyyy-MM-dd 00:00:00"));
-            FilterModel.ToDate = Convert.ToDateTime(range.End.ToString("yyyy-MM-dd 23:59:59"));
+            FilterModel.FromDate = Convert.ToDateTime(range.Start);
+            FilterModel.ToDate = Convert.ToDateTime(range.End);
         }
 
         public async Task OnExportClickEvent()
@@ -216,8 +194,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 ManualSettledBy = FilterModel.SettledBy,
                 FromDate = FilterModel.FromDate,
                 ToDate = FilterModel.ToDate,
-                UserId = UserModel.Id,
-                ConnectionId = UserModel.ConnectionId
+                UserId = _userState.Id,
+                ConnectionId = _userState.ConnectionId
             };
 
             // Task - Migrate to api call
@@ -254,8 +232,8 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
 
                 FilterModel = new MarketSettlementModalFilterModel()
                 {
-                    FromDate = DateTime.Now.Date.AddDays(-1),
-                    ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
+                    FromDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(-1),
+                    ToDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(1).AddTicks(-1),
                 };
 
                 var sports = await GetSports();

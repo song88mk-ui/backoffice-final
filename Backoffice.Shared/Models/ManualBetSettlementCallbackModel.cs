@@ -22,8 +22,8 @@ namespace Backoffice.Shared.Models
         public List<SettlementBetStatus> FromBetStatuses { get; set; }
         public List<SettlementBetStatus> ToBetStatuses { get; set; }
 
-        public DateTime DateFrom { get; set; } = DateTime.Now.AddDays(-7).Date;
-        public DateTime DateTo { get; set; } = DateTime.Now.Date;
+        public DateTime DateFrom { get; set; } = DateTime.UtcNow.AddDays(-7).Date;
+        public DateTime DateTo { get; set; } = DateTime.UtcNow.Date;
 
         public string BetId { get; set; } = "";
         public string MemberName { get; set; } = "";

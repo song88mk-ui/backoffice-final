@@ -23,7 +23,6 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public UserGroupResponse UserGroup { get; set; }
         public List<AlertModel> Alerts { get; set; }
@@ -86,8 +85,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                         Activity = Activity.Delete.ToString(),
                         From = JsonSerializer.Serialize(UserGroup),
                         To = "-",
-                        UserId = UserModel.Id,
-                        UserName = UserModel.UserName,
+                        UserId = _userState.Id,
+                        UserName = _userState.Name
                     });
 
                     ModalService.Cancel();

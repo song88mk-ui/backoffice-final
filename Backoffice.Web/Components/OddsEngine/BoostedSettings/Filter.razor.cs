@@ -11,8 +11,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
     {
         #region Properties
 
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public NavigationManager NavigationManager { get; set; }
+
         //[Parameter] public EventCallback<SearchFormModel> SearchFormChanged { get; set; }
         [Parameter] public EventCallback<string> OnInitializeCallback { get; set; }
         [Parameter] public EventCallback OnViewAllLogsCallback { get; set; }
@@ -29,7 +28,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
         protected override async Task OnInitializedAsync()
         {
-            var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+            var page = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "");
 
             if (page.Contains("manage") || page == string.Empty)
             {

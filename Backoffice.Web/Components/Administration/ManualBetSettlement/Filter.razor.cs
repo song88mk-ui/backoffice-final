@@ -21,8 +21,6 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
         [Parameter] public bool IsExportDisabled { get; set; }
         [Parameter] public EventCallback<bool> IsExportDisabledChanged { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
         public List<SelectListItemWithCheckboxModel<string>> Clients { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Sports { get; set; }
         public List<SelectListItemWithCheckboxModel<string>> Currencies { get; set; }
@@ -216,8 +214,8 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
         public async Task OnDateRangeChangedEvent(DateRange range)
         {
-            CallbackModel.DateFrom = DateTime.Parse(range.Start.ToString()).Date.Add(new TimeSpan(0, 0, 0));
-            CallbackModel.DateTo = DateTime.Parse(range.End.ToString()).Date.Add(new TimeSpan(23, 59, 59));
+            CallbackModel.DateFrom = Convert.ToDateTime(range.Start);
+            CallbackModel.DateTo = Convert.ToDateTime(range.End);
 
             await OnInitCallback.InvokeAsync(CallbackModel);
         }
@@ -255,8 +253,8 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
             if (clients != null && clients.Clients.Any())
             {
-                if (UserModel.ClientCodes.Any())
-                    clients.Clients = clients.Clients.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                if(_userState.ClientCodes.Any())
+                    clients.Clients = clients.Clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
                 Clients = clients.Clients.Select(s => new SelectListItemWithCheckboxModel<string>
                 {

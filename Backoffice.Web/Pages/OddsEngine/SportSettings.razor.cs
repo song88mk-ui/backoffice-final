@@ -16,8 +16,6 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         [Parameter] public string Region { get; set; } = "hk";
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
         private List<BreadcrumbModel> _breadcrumbs = new List<BreadcrumbModel>();
         private List<SportSettingSport> _sportSettings = new List<SportSettingSport>();
         private List<SportSettingSport> _sportLookupSettings = new List<SportSettingSport>();
@@ -582,8 +580,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var response = await _tradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
                 {
                     ClientCode = _clientCode,
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName,
+                    UserId = _userState.Id,
+                    UserName = _userState.Name,
                     TimeStamp = DateTime.UtcNow,
                     SportsSortOrder = newSportOrder
                 });
@@ -825,9 +823,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Payload = $"{_clientCode}",
                 From = JsonSerializer.Serialize(payloadFrom),
                 To = JsonSerializer.Serialize(payloadTo),
-                UserId = UserModel.Id,
-                UserName = UserModel.UserName,
-                TimeStamp = DateTime.Now
+                UserId = _userState.Id,
+                UserName = _userState.Name
             };
         }
         public void Dispose() => registration?.Dispose();

@@ -16,8 +16,6 @@ namespace Backoffice.Web.Pages.Administration
         [Inject] public IModalService ModalService { get; set; }
         [Inject] public IBackofficeService BackofficeService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        
 
         private CancelBetReferenceModel BetRefenceModel;
         private List<CancelBetAlertModel> Alerts;
@@ -164,12 +162,12 @@ namespace Backoffice.Web.Pages.Administration
                                     message.ActivityLogs.Add(new()
                                     {
                                         Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
-                                        Payload = $"{UserModel.UserName}.{data.BetId}.{selection.BetSelectionId}.{betData.UserId}.{betData.ClientName}",
+                                        Payload = $"{_userState.Name}.{data.BetId}.{selection.BetSelectionId}.{betData.UserId}.{betData.ClientName}",
                                         Activity = Activity.CancelBet.ToString(),
                                         From = JsonSerializer.Serialize(betData),
                                         To = JsonSerializer.Serialize(selection),
-                                        UserId = UserModel.Id,
-                                        UserName = UserModel.UserName,
+                                        UserId = _userState.Id,
+                                        UserName = _userState.Name,
                                     });
                                 }
                             }

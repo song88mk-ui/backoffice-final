@@ -6,7 +6,7 @@ namespace Backoffice.Web.Shared
 {
     public partial class MainLayout
     {
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
             if (PreRenderService.IsPreRendering)
                 return;

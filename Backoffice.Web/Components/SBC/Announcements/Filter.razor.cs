@@ -13,8 +13,6 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         [Inject] public IBackofficeService BackofficeService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-
         [Parameter] public EventCallback<AnnouncementsFilterModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<AnnouncementsFilterModel> OnFilterCallback { get; set; }
 

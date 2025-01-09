@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Shared.Models.Response;
 using Backoffice.Shared.OutgoingEngineMessages;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
@@ -23,8 +24,6 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
         [Parameter] public EventCallback<MarketSettlementFilterModel> FilterModelChanged { get; set; }
         [Parameter] public MarketSettlementFilterModel FilterModel { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
         public List<SelectListItemModel<int>> Sports { get; set; }
         public List<SelectListItemModel<int>> Segments { get; set; }
         public List<SelectListItemModel<int>> Leagues { get; set; }
@@ -44,28 +43,9 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
         protected override async Task OnInitializedAsync()
         {
             ShowFilter = false;
-            Sports = new List<SelectListItemModel<int>>();
-            Segments = new List<SelectListItemModel<int>>();
-            Leagues = new List<SelectListItemModel<int>>();
-            Fixtures = new List<SelectListItemModel<string>>();
-            Markets = new List<SelectListItemModel<string>>();
-            Selections = new List<SelectListItemModel<string>>();
 
-            FilterModel = new MarketSettlementFilterModel()
-            {
-                FromDate = DateTime.Now.Date.AddDays(-1),
-                ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
-            };
-
-            MarketFixtures = new MarketFixtureResponse()
-            {
-                Fixtures = new List<FixtureModel>(),
-            };
-
-            MarketFixtureOutrights = new MarketFixtureResponse()
-            {
-                Fixtures = new List<FixtureModel>(),
-            };
+            MarketFixtures = new MarketFixtureResponse();
+            MarketFixtureOutrights = new MarketFixtureResponse();
 
             await FilterModelChanged.InvokeAsync(FilterModel);
             await Initialize();
@@ -88,8 +68,8 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
         public void OnRangeSelect(DateRange range)
         {
-            FilterModel.FromDate = Convert.ToDateTime(range.Start.ToString("yyyy-MM-dd 00:00:00"));
-            FilterModel.ToDate = Convert.ToDateTime(range.End.ToString("yyyy-MM-dd 23:59:59"));
+            FilterModel.FromDate = Convert.ToDateTime(range.Start);
+            FilterModel.ToDate = Convert.ToDateTime(range.End);
         }
 
         public async Task OnSportChangedEvent(ChangeEventArgs e)
@@ -212,8 +192,8 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
             var payload = new OnGetMessageSettlementHistoryMessage()
             {
-                UserId = UserModel.Id,
-                ConnectionId = UserModel.ConnectionId,
+                UserId = _userState.Id,
+                ConnectionId = _userState.ConnectionId,
                 SportId = FilterModel.SportId,
                 SegmentId = FilterModel.SegmentId,
                 LeagueId = FilterModel.LeagueId,
@@ -244,9 +224,6 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
         {
             try
             {
-                var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-
                 Sports = new List<SelectListItemModel<int>>();
                 Segments = new List<SelectListItemModel<int>>();
                 Leagues = new List<SelectListItemModel<int>>();
@@ -257,8 +234,8 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
                 FilterModel = new MarketSettlementFilterModel()
                 {
-                    FromDate = DateTime.Now.Date.AddDays(-1),
-                    ToDate = DateTime.Now.Date.AddDays(1).AddTicks(-1),
+                    FromDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(-1),
+                    ToDate = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(1).AddTicks(-1),
                 };
 
                 var sports = await GetSports();

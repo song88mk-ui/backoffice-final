@@ -1,4 +1,5 @@
 ﻿using Backoffice.Shared.Models;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
@@ -19,8 +20,8 @@ namespace Backoffice.Web.Components.Administration.CancelBetHistory
         {
             FilterModel = new CancelBetHistoryCallbackModel
             {
-                DateFrom = DateTime.Now.Date,
-                DateTo = DateTime.Now,
+                DateFrom = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(-1),
+                DateTo = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(1).AddTicks(-1),
             };
 
             await OnInitCallback.InvokeAsync(FilterModel);
@@ -43,8 +44,8 @@ namespace Backoffice.Web.Components.Administration.CancelBetHistory
 
         public async Task OnDateRangeChangedEvent(DateRange range)
         {
-            FilterModel.DateFrom = DateTime.Parse(range.Start.ToString()).Date.Add(new TimeSpan(0, 0, 0));
-            FilterModel.DateTo = DateTime.Parse(range.End.ToString()).Date.Add(new TimeSpan(23, 59, 59));
+            FilterModel.DateFrom = Convert.ToDateTime(range.Start);
+            FilterModel.DateTo = Convert.ToDateTime(range.End);
 
             await OnInitCallback.InvokeAsync(FilterModel);
         }

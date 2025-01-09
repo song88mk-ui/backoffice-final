@@ -12,12 +12,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
     {
         #region Properties
 
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
-
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         public ElementReference SaveButton { get; set; }
 
@@ -42,9 +38,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         {
             try
             {
-                Client = new BoostedSettingsModel();
-                Client = ModalParameters?.TryGet<BoostedSettingsModel>("Client");
-                TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
+                Client = ModalParameters?.TryGet<BoostedSettingsModel>("Client") ?? new BoostedSettingsModel();
+                _tradingService.Region = ModalParameters?.TryGet<string>("Region").ToUpper() ?? "HK";
                 ClientId = Client.ClientId;
                 ClientCode = Client.ClientCode;
                 ClientName = Client.ClientName;
@@ -60,7 +55,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         }
         public async Task OnCancelClickEvent()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
         public async Task OnSaveClickEvent()
         {
@@ -71,13 +66,13 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
             if (Cap != CapEdit)
             {
-                var result = await TradingService.AddOrUpdateBoostedSetting(new BoostedSettingsModel()
+                var result = await _tradingService.AddOrUpdateBoostedSetting(new BoostedSettingsModel()
                 {
                     ClientId = this.ClientId,
                     ClientCode = this.ClientCode,
                     ClientName = this.ClientName,
                     Cap = this.CapEdit != 0 ? this.CapEdit / 100 : 0
-                }, UserModel.Id);
+                }, _userState.Id);
 
                 if (result.StatusCode != StatusCode.Success)
                 {
@@ -93,7 +88,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
             if (isClosing)
             {
                 await Modal.OnSaveClickCallback.InvokeAsync(true);
-                ModalService.Cancel();
+                _modalService.Cancel();
             }
         }
         public void Dispose()

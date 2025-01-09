@@ -16,14 +16,6 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
 
-        [Inject] IModalService ModalService { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-        [Inject] public IJSRuntime JSRuntime { get; set; }
-
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-        
-
         [Parameter] public string Region { get; set; } = "hk";
 
         public IJSStreamReference? DataReference { get; set; }
@@ -50,7 +42,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         {
             PageState.Page = this;
 
-            TradingService.Region = Region.ToUpper();
+            _tradingService.Region = Region.ToUpper();
             _pageHeaderModel = new()
             {
                 Title = "Market Groups",
@@ -93,15 +85,15 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-            ModalService.Open<AddOrEditMarketGroupModal>($"Add Market Group", parameters, options);
+            _modalService.Open<AddOrEditMarketGroupModal>($"Add Market Group", parameters, options);
         }
 
         public async Task OnUpdateClickedEvent()
         {
             MarketGroupModel.IsUpdate = true;
 
-            await JSRuntime.InvokeVoidAsync("initSort", $".{TableClass}", ".drag-handle");
-            await JSRuntime.InvokeVoidAsync("enableSort", $".{TableClass}");
+            await _jsRuntime.InvokeVoidAsync("initSort", $".{TableClass}", ".drag-handle");
+            await _jsRuntime.InvokeVoidAsync("enableSort", $".{TableClass}");
         }
 
         public async Task OnEditClickedEvent(int marketTemplateGroupId)
@@ -120,7 +112,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-            ModalService.Open<AddOrEditMarketGroupModal>($"Edit Market Group", parameters, options);
+            _modalService.Open<AddOrEditMarketGroupModal>($"Edit Market Group", parameters, options);
         }
 
         public async Task OnDeleteClickedEvent(ClientMarketTemplateGroupDTO marketTemplateGroup)
@@ -136,7 +128,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-            ModalService.Open<DeleteMarketGroupModal>($"Delete Market Group", parameters, options);
+            _modalService.Open<DeleteMarketGroupModal>($"Delete Market Group", parameters, options);
         }
 
         public async Task OnCancelUpdateClickedEvent()
@@ -146,7 +138,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             IsPreLoader = true;
             StateHasChanged();
 
-            await JSRuntime.InvokeVoidAsync("disableSort", $".{TableClass}");
+            await _jsRuntime.InvokeVoidAsync("disableSort", $".{TableClass}");
 
             MarketGroupModel.MarketTemplateGroups = new List<ClientMarketTemplateGroupDTO>();
             MarketGroupModel.MarketTemplateGroups.AddRange(MarketGroupModel.OldMarketTemplateGroups);
@@ -165,7 +157,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-            ModalService.Open<CopyMarketGroupModal>($"Edit Market Group", parameters, options);
+            _modalService.Open<CopyMarketGroupModal>($"Edit Market Group", parameters, options);
         }
 
         public async Task OnViewLogsClickedEvent()
@@ -178,7 +170,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-            ModalService.Open<MarketGroupViewLogsModal>($"View Logs", parameters, options);
+            _modalService.Open<MarketGroupViewLogsModal>($"View Logs", parameters, options);
         }
 
         public async Task OnViewClickedEvent(string MarketTemplateGroupName, string marketTemplateIds)
@@ -194,7 +186,7 @@ namespace Backoffice.Web.Pages.OddsEngine
             parameters.Add("Region", Region);
 
             var options = new ModalOptions();
-            ModalService.Open<ViewMarketGroupModal>($"View Market Group", parameters, options);
+            _modalService.Open<ViewMarketGroupModal>($"View Market Group", parameters, options);
         }
 
         protected async Task CheckboxSelectAllClickedEvent(CheckBoxModel model)
@@ -286,20 +278,20 @@ namespace Backoffice.Web.Pages.OddsEngine
                     MarketTemplateGroups = marketTemplateGroups
                 };
 
-                var response = await TradingService.AddOrUpdateClientMarketTemplateGroup(request);
+                var response = await _tradingService.AddOrUpdateClientMarketTemplateGroup(request);
 
                 if (response.StatusCode == StatusCode.Success)
                 {
                     //activity log
-                    await BackofficeService.AddActivityLog(new ActivityLogModel
+                    await _backofficeService.AddActivityLog(new ActivityLogModel
                     {
                         Page = SportsbookClientPermission.SBC_OE_MarketSetting_Group.ToString().Replace("_", "."),
                         Payload = $"{MarketGroupModel.ClientCode}.{MarketGroupModel.SportId}.{MarketGroupModel.FixtureStatusId}.0",
                         Activity = Activity.Update.ToString(),
                         From = JsonSerializer.Serialize(MarketGroupModel.OldMarketTemplateGroups),
                         To = JsonSerializer.Serialize(marketTemplateGroups),
-                        UserId = UserModel.Id,
-                        UserName = UserModel.UserName
+                        UserId = _userState.Id,
+                        UserName = _userState.Name
                     });
 
                     // re-assign the updated data on market sort order properties
@@ -338,7 +330,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (!string.IsNullOrEmpty(MarketGroupModel.ClientCode) && MarketGroupModel.SportId != 0)
             {
-                var marketTemplateGroupResponse = (await TradingService.GetClientMarketTemplateGroups(MarketGroupModel.ClientCode, MarketGroupModel.SportId, MarketGroupModel.FixtureStatusId)).Result;
+                var marketTemplateGroupResponse = (await _tradingService.GetClientMarketTemplateGroups(MarketGroupModel.ClientCode, MarketGroupModel.SportId, MarketGroupModel.FixtureStatusId)).Result;
 
                 MarketGroupModel.MarketTemplateGroups = marketTemplateGroupResponse.ClientMarketTemplateGroups
                     .Select(s => new ClientMarketTemplateGroupDTO
@@ -384,7 +376,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         private async Task<List<ClientMarketTemplateGroupDTO>> GetMarketGroupSortOrderUpdate()
         {
-            DataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getSortOrder", $".{TableClass}");
+            DataReference = await _jsRuntime.InvokeAsync<IJSStreamReference>("getSortOrder", $".{TableClass}");
 
             var selectionTemplate
                 = new List<SortOrderModel>();

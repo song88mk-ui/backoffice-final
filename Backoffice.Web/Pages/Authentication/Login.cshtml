@@ -69,8 +69,8 @@
                                         <div class="dropdown">
                                             <button class="btn btn-secondary @(Model.LanguageCodes.Any() ? "dropdown-toggle" : "") d-flex align-items-center font-white" type="button" id="dropdownLanguage" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <span class="d-flex">
-                                                    <i class="@($"ico-flag flag-{Model.UserModel.LanguageCode.ToLower()}") me-2" aria-hidden="true"></i>
-                                                    <span>@Model.UserModel.LanguageCode.ToString()</span>
+                                                    <i class="@($"ico-flag flag-{Model.LogInModel.LanguageCode.ToLower()}") me-2" aria-hidden="true"></i>
+                                                    <span>@Model.LogInModel.LanguageCode.ToString()</span>
                                                 </span>
                                             </button>
                                             <ul class="dropdown-menu" aria-labelledby="dropdownLanguage">
@@ -91,7 +91,7 @@
                         </div>
 
                         <form aspmethod="post" asp-page-handler="Login">
-                            @Html.HiddenFor(m => m.UserModel.LanguageCode)
+                            @Html.HiddenFor(m => m.LogInModel.LanguageCode)
                             @Html.HiddenFor(m => m.Translations)
                             <div class="login-header">
                                 <div class="logo">
@@ -109,11 +109,11 @@
                                     <label class="form-label">
                                         @Model.Translations.GetValue("Username")
                                     </label>
-                                    @Html.TextBoxFor(m => m.UserModel.Username, new { @class = "form-control p-3", @placeholder = Model.Translations.GetValue("Enter your username"), @id = "username", @autocomplete = "off", @onchange = "" })
+                                    @Html.TextBoxFor(m => m.LogInModel.Username, new { @class = "form-control p-3", @placeholder = Model.Translations.GetValue("Enter your username"), @id = "username", @autocomplete = "off", @onchange = "" })
                                     @* @Html.ValidationMessageFor(m => m.UserModel.Username) *@
-                                    @if (ViewData.ModelState.ContainsKey("UserModel.Username"))
+                                    @if (ViewData.ModelState.ContainsKey("LogInModel.Username"))
                                     {
-                                        var modelState = ViewData.ModelState["UserModel.Username"];
+                                        var modelState = ViewData.ModelState["LogInModel.Username"];
                                         if (modelState != null && modelState.Errors.Count > 0)
                                         {
                                             <div class="text-danger">
@@ -127,16 +127,16 @@
                                         @Model.Translations.GetValue("Password")
                                     </label>
                                     <div class="input-group">
-                                        @Html.TextBoxFor(m => m.UserModel.Password, new { @type = "password", @class = "form-control p-3 pe-5", @placeholder = Model.Translations.GetValue("Enter your password"), id = "password", autocomplete = "off" })
+                                        @Html.TextBoxFor(m => m.LogInModel.Password, new { @type = "password", @class = "form-control p-3 pe-5", @placeholder = Model.Translations.GetValue("Enter your password"), id = "password", autocomplete = "off" })
                                         <button type="button" class="d-flex align-items-center position-absolute end-0 h-100 bg-transparent border-0 password-eye" onclick="password_show_hide();">
                                             <i class="fa fa-eye-slash text-center eye-icon" id="show_eye"></i>
                                             <i class="fa fa-eye d-none text-center eye-icon" id="hide_eye"></i>
                                         </button>
                                     </div>
                                     @* @Html.ValidationMessageFor(m => m.UserModel.Password) *@
-                                    @if (ViewData.ModelState.ContainsKey("UserModel.Password"))
+                                    @if (ViewData.ModelState.ContainsKey("LogInModel.Password"))
                                     {
-                                        var modelState = ViewData.ModelState["UserModel.Password"];
+                                        var modelState = ViewData.ModelState["LogInModel.Password"];
                                         if (modelState != null && modelState.Errors.Count > 0)
                                         {
                                             <div class="text-danger">

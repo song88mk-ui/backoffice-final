@@ -36,9 +36,13 @@ namespace Backoffice.Web.Shared
             if (_shouldRender)
             {
                 _activeLanguageCode = _translationState.ActiveLanguageCode;
-                _title = PageHeaderModel.Title;
-                _iconClass = PageHeaderModel.IconClass;
-                _showLanguageDropdown = PageHeaderModel.ShowLanguageDropDown;
+
+                if(PageHeaderModel != null)
+                {
+                    _title = PageHeaderModel.Title;
+                    _iconClass = PageHeaderModel.IconClass;
+                    _showLanguageDropdown = PageHeaderModel.ShowLanguageDropDown;
+                }
             }
 
             _init = false;

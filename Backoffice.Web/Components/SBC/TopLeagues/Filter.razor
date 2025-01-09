@@ -3,32 +3,35 @@
 <div class="content-filter mx-3">
     <div class="d-flex flex-row justify-content-between">
         <div class="select-container d-flex">
-            <div class="me-4 w-50">
-                <label class="form-label d-block">@_translationState.GetValue("Client")</label>
-                <div class="dropdown">
-                    <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        @if (Clients.Any())
-                        {
-                            if (Clients.Count - 1 == SelectedClientCount)
+            @if (Clients != null)
+            {
+                <div class="me-4 w-50">
+                    <label class="form-label d-block">@_translationState.GetValue("Client")</label>
+                    <div class="dropdown">
+                        <button class="btn form-select dropdown-toggle" type="button" id="client-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            @if (Clients.Any(c => !c.Value.Equals("ALL", StringComparison.OrdinalIgnoreCase)))
                             {
-                                <span>@_translationState.GetValue("All Clients") (@SelectedClientCount)</span>
+                                if (Clients.Count - 1 == SelectedClientCount)
+                                {
+                                    <span>@_translationState.GetValue("All Clients") (@SelectedClientCount)</span>
+                                }
+                                else
+                                {
+                                    <span>@(SelectedClientCount == 1 ? SelectedClientName : $"{_translationState.GetValue("Clients")} ({SelectedClientCount})")</span>
+                                }
                             }
                             else
                             {
-                                <span>@(SelectedClientCount == 1 ? SelectedClientName : $"{_translationState.GetValue("Clients")} ({SelectedClientCount})")</span>
+                                <span>@_translationState.GetValue("No Clients Available")</span>
                             }
-                        }
-                        else
+                        </button>
+                        @if (Clients.Any(c => !c.Value.Equals("ALL", StringComparison.OrdinalIgnoreCase)))
                         {
-                            <span>@_translationState.GetValue("No Clients Available")</span>
+                            <SelectWithCheckbox Items="Clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="client-dropdown" />
                         }
-                    </button>
-                    @if (Clients.Any())
-                    {
-                        <SelectWithCheckbox Items="Clients" OnCheckboxCallback="OnClientCheckboxClickEvent" AriaLabel="client-dropdown" />
-                    }
+                    </div>
                 </div>
-            </div>
+            }
             <div class="me-4 w-50">
                 <label class="form-label d-block">@_translationState.GetValue("Sports")</label>
                 <select class="form-select d-block" @onchange="OnSportsChangedEvent">

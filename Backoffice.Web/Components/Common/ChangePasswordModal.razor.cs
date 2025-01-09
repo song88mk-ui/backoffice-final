@@ -13,8 +13,6 @@ namespace Backoffice.Web.Components.Common
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IAuthenticationService AuthenticationService { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-
         public List<AlertModel> Alerts { get; set; }
 
         public string NewPassword = string.Empty;
@@ -41,7 +39,7 @@ namespace Backoffice.Web.Components.Common
 
             if (isValidInput)
             {
-                var response = await AuthenticationService.UpdateUserPassword(UserModel.Id, new Backoffice.Shared.Models.Requests.UserRegisterRequest() 
+                var response = await AuthenticationService.UpdateUserPassword(_userState.Id, new Backoffice.Shared.Models.Requests.UserRegisterRequest() 
                 {
                     Password = NewPassword
                 });

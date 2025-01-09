@@ -11,7 +11,6 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
     {
         #region Properties
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
         [Parameter] public EventCallback<MonitoringCallbackModel> OnInitCallback { get; set; }
         [Parameter] public EventCallback<List<SelectListItemWithCheckboxModel<string>>> OnFilterClientCallback { get; set; }
         [Parameter] public int SportId { get; set; }
@@ -46,10 +45,13 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         private string _clientReference;
         protected override async Task OnParametersSetAsync()
         {
-            var tempClientReference = string.Join(',', UserModel.ClientCodes.OrderBy(c => c).Select(s => s.Trim()).ToList());
+            var tempClientReference = string.Join(',', _userState.ClientCodes.OrderBy(c => c).Select(s => s.Trim()).ToList());
 
-            if (_userState.TradingClients != null && !_clientListReference.Any())
-                _clientListReference = _userState.TradingClients;
+            if (_userState.TradingClients != null && _userState.TradingClients.Any() && !_clientListReference.Any())
+            {
+                _clientListReference = new List<ClientInformationModel>(_userState.TradingClients);
+                _init = true;
+            }
 
             if (_init || _clientReference != tempClientReference)
             {
@@ -58,8 +60,8 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                 _clientReference = tempClientReference;
                 if (_clientListReference != null)
                 {
-                    _clientFilter = UserModel.ClientCodes.Any()
-                        ? _clientListReference.Where(c => UserModel.ClientCodes.Contains(c.ClientCode.ToUpper())).Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList()
+                    _clientFilter = _userState.ClientCodes.Any()
+                        ? _clientListReference.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList()
                         : new();
 
                     if (_clientFilter.Any())

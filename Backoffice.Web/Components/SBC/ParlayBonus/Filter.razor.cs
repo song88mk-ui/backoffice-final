@@ -12,8 +12,6 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
         [Parameter] public ClientParlayBonusModel ClientParlayBonusResponse { get; set; }
         [Parameter] public EventCallback<bool> OnUpdateClickCallback { get; set; }
         [Parameter] public EventCallback OnAddClickCallback { get; set; }

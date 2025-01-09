@@ -2,6 +2,7 @@
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Common;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
@@ -19,7 +20,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         [Inject] private IModalService ModalService { get; set; }
         [Inject] private IBackofficeService BackofficeService { get; set; }
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
 
@@ -69,8 +69,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 {
                     SelectedSportId = Sports.FirstOrDefault()?.Value.ToString() ?? "-1",
                     SelectedScopeId = Scopes.FirstOrDefault()?.Value.ToString() ?? "0",
-                    DateFrom = DateTime.Now,
-                    DateTo = DateTime.Now,
+                    DateFrom = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(-1),
+                    DateTo = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(1).AddTicks(-1),
                     SearchText = ""
                 };
             }
@@ -229,8 +229,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         }
         public async Task OnDatePickerClickEvent(DateRange range)
         {
-            FilterModel.DateFrom = Convert.ToDateTime(range.Start.ToString("yyyy-MM-dd 00:00:00"));
-            FilterModel.DateTo = Convert.ToDateTime(range.End.ToString("yyyy-MM-dd 23:59:59"));
+            FilterModel.DateFrom = Convert.ToDateTime(range.Start);
+            FilterModel.DateTo = Convert.ToDateTime(range.End);
 
             await SelectPage(1);
         }
@@ -263,8 +263,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                 Payload = BuildPayload(filterModel),
                 MetaData = MetaData,
-                DateFrom = filterModel.DateFrom.Date.Add(new TimeSpan(0, 0, 0)).ToUniversalTime(),
-                DateTo = filterModel.DateFrom.Date.Add(new TimeSpan(23, 59, 59)).ToUniversalTime(),
+                DateFrom = filterModel.DateFrom.Date,
+                DateTo = filterModel.DateFrom.Date,
                 SearchText = filterModel.SearchText
             });
 

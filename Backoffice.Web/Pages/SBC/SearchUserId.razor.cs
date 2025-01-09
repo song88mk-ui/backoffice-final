@@ -14,9 +14,6 @@ namespace Backoffice.Web.Pages.SBC
         [Inject] public ITableauService TableauService { get; set; }
         [Inject] public IAuthenticationService AuthenticationService { get; set; }
 
-        
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
-
         public string IFrameSrc { get; set; }
 
         #endregion
@@ -43,7 +40,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             var reportRoles = (await AuthenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
             {
-                RoleId = UserModel.RoleId,
+                RoleId = _userState.RoleId,
                 ClaimType = SportsbookClientPermission.SBC_Reports_SearchUserId.ToString().Replace("_", ".")
             })).Result ?? new ReportRolesUrlResponse();
 

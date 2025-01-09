@@ -4,18 +4,14 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Models.OddsEngine.Monitoring;
 using Backoffice.Web.Models.Shared;
 using Microsoft.AspNetCore.Components;
-using RabbitMQ.Client.MessagePatterns;
 using System.Collections.Immutable;
 using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Backoffice.Web.Shared
 {
     public partial class NavMenu : IDisposable
     {
         #region Properties
-
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
 
         [Parameter] public NavMenuParameter NavMenuParameter { get; set; }
         [Parameter] public EventCallback<SportClickCallbackModel> OnSportClickCallback { get; set; }
@@ -55,11 +51,11 @@ namespace Backoffice.Web.Shared
         {
             var page = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "");
 
-            if (!_userClaims.SequenceEqual(UserModel.Claims))
+            if (!_userClaims.SequenceEqual(_userState.Claims))
             {
-                _userClaims = new List<Claim>(UserModel.Claims);
+                _userClaims = new List<Claim>(_userState.Claims);
 
-                var categories = UserModel.Claims?.Where(c => _access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
+                var categories = _userState.Claims?.Where(c => _access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
                 categories = categories?.Where(c => _permissionCategories.Contains(c)).ToList();
 
                 _showSwitchAccess = categories != null && categories.Count > 1;

@@ -21,7 +21,6 @@ namespace Backoffice.Web.Components.Administration.ManageUser
         [Inject] public IBackofficeService BackofficeService { get; set; }
         [Inject] public IJSRuntime JSRuntime { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 

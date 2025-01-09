@@ -15,10 +15,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     public partial class ConfigEditTemplate : IDisposable
     {
         #region Properties
-        [Inject] public IJSRuntime JSRuntime { get; set; }
-        [Inject] public NavigationManager NavigationManager { get; set; }
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [Parameter] public string Region { get; set; } = "hk";
         [Parameter] public long ConfigTemplateId { get; set; }
         [Parameter] public string Action { get; set; }
@@ -83,7 +80,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             if (_activity == null)
             {
-                NavigationManager.NavigateTo("/notfound");
+                _navigationManager.NavigateTo("/notfound");
                 return;
             }
 
@@ -221,9 +218,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                             Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                             From = JsonSerializer.Serialize(oldConfigTemplate),
                             To = JsonSerializer.Serialize(payload),
-                            UserId = UserModel.Id,
-                            UserName = UserModel.UserName,
-                            TimeStamp = DateTime.UtcNow
+                            UserId = _userState.Id,
+                            UserName = _userState.Name
                         };
 
                         if (_activity == Activity.Copy)
@@ -401,9 +397,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldConfigMarginsLogs),
                                 To = JsonSerializer.Serialize(newConfigMarginsLogs),
                                 Activity = Activity.Update.ToString(),
-                                UserId = UserModel.Id,
-                                UserName = UserModel.UserName,
-                                TimeStamp = DateTime.UtcNow
+                                UserId = _userState.Id,
+                                UserName = _userState.Name
                             });
 
                         if (statusHasChange)
@@ -414,9 +409,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldMarketState),
                                 To = JsonSerializer.Serialize(newMarketState),
                                 Activity = Activity.Update.ToString(),
-                                UserId = UserModel.Id,
-                                UserName = UserModel.UserName,
-                                TimeStamp = DateTime.UtcNow
+                                UserId = _userState.Id,
+                                UserName = _userState.Name
                             });
 
                         isNavigate = true;
@@ -424,7 +418,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
 
                 if (isNavigate)
-                    NavigationManager.NavigateTo($"hk/odds-engine/config-templates?message=Successfully updated");
+                    _navigationManager.NavigateTo($"hk/odds-engine/config-templates?message=Successfully updated");
             }
             catch (Exception ex)
             { }
@@ -437,7 +431,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         public async Task OnCancelMarginTemplate()
         {
-            NavigationManager.NavigateTo($"hk/odds-engine/config-templates");
+            _navigationManager.NavigateTo($"hk/odds-engine/config-templates");
         }
         public async Task OnTemplateNameClicked()
         {

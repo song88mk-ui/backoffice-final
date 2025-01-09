@@ -297,9 +297,9 @@ namespace Backoffice.API.Repositories
                 var metaData = request.MetaData;
 
                 if (request.DateFrom == DateTime.MinValue)
-                    request.DateFrom = DateTime.Now.Date.Add(new TimeSpan(0, 0, 0)).ToUniversalTime();
+                    request.DateFrom = DateTime.UtcNow.Date.Add(new TimeSpan(0, 0, 0));
                 if (request.DateTo == DateTime.MinValue)
-                    request.DateTo = DateTime.Now.Date.Add(new TimeSpan(23, 59, 59)).ToUniversalTime();
+                    request.DateTo = DateTime.UtcNow.Date.Add(new TimeSpan(23, 59, 59));
 
                 var fromUTC = request.DateFrom.ToString("yyyy-MM-dd HH:mm:ss");
                 var toUTC = request.DateTo.ToString("yyyy-MM-dd HH:mm:ss");

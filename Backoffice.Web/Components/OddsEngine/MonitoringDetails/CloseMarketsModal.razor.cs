@@ -13,9 +13,6 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
     public partial class CloseMarketsModal : IDisposable
     {
         #region Properties
-        [Inject] public IBackofficeService BackofficeService { get; set; }
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public IJSRuntime JSRuntime { get; set; }
 
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 
@@ -57,7 +54,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             }
 
             // 99 = all fixture types
-            var marketTemplateGroupResponse = (await BackofficeService.GetMarketTemplateGroups(99));
+            var marketTemplateGroupResponse = (await _backofficeService.GetMarketTemplateGroups(99));
 
             if (marketTemplateGroupResponse.StatusCode == StatusCode.Success)
             {
@@ -120,7 +117,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
             }
 
 
-            await JSRuntime.InvokeVoidAsync("scrollIntoElement", $"#lbl-{groupId}");
+            await _jsRuntime.InvokeVoidAsync("scrollIntoElement", $"#lbl-{groupId}");
         }
 
         public async Task OnMarketChecked(string marketTemplateId)
@@ -134,7 +131,7 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
         public async Task OnCancelClickEvent()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
         public async Task OnSaveClickEvent()
         {

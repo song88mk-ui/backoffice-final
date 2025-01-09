@@ -10,8 +10,6 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
     {
         #region Properties
 
-        [Inject] IModalService ModalService { get; set; }
-
         [Parameter] public BoostedSettingsModel BoostedSettings { get; set; }
         [Parameter] public Guid ClientId { get; set; }
 
@@ -32,7 +30,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                 parameters.Add("ModalDialogClass", "modal-dialog-centered");
 
                 var options = new ModalOptions();
-                ModalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
+                _modalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
             }
             catch (Exception ex)
             {
@@ -52,7 +50,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                 parameters.Add("DialogStyle", "max-width: 80%; overflow-y: initial !important");
 
                 var options = new ModalOptions();
-                ModalService.Open<ViewLogsBoostedSettingModalBody>($"View Logs for {{{client.ClientName}}}", parameters, options);
+                _modalService.Open<ViewLogsBoostedSettingModalBody>($"View Logs for {{{client.ClientName}}}", parameters, options);
             }
             catch (Exception ex)
             {

@@ -13,14 +13,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
     {
         #region Properties
 
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private ITradingService TradingService { get; set; }
-        [Inject] private IBackofficeService BackofficeService { get; set; }
-
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
-        [CascadingParameter(Name = "UserModel")] public UserModel UserModel { get; set; }
-
 
         #endregion
 
@@ -40,7 +34,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             
             _priceBoostConfigModel = ModalParameters.TryGet<PriceBoostConfigModel>("PriceBoostConfigModel");
             
-            TradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
+            _tradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             _isPreloader = false;
         }
 
@@ -102,7 +96,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         public async Task OnCancelModalClick()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
 
         }
 
@@ -124,13 +118,13 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 }
             }
 
-            _priceBoostConfigModel.UserId = UserModel.Id;
-            _priceBoostConfigModel.UserName = UserModel.UserName;
+            _priceBoostConfigModel.UserId = _userState.Id;
+            _priceBoostConfigModel.UserName = _userState.Name;
 
             string currentPriceBoostString = ModalParameters.TryGet<string>("PriceBoostConfigModelSerialized");
             var region = ModalParameters.TryGet<string>("Region") ?? string.Empty;
 
-            var result = await TradingService.AddOrUpdatePriceBoost(new List<PriceBoostConfigModel>() { _priceBoostConfigModel });
+            var result = await _tradingService.AddOrUpdatePriceBoost(new List<PriceBoostConfigModel>() { _priceBoostConfigModel });
             if (result.StatusCode == StatusCode.Success)
             {
                 //remove existing from mongodb
@@ -173,7 +167,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                             ClientBoostedSelectionNameTranslations = clientBoostedSelectionNameTranslations
                         };
 
-                        await TradingService.Publish(new MessageRequest()
+                        await _tradingService.Publish(new MessageRequest()
                         {
                             CorrelationId = Guid.NewGuid().ToString(),
                             MessageType = "OnPriceBoost",
@@ -218,7 +212,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     ClientBoostedSelectionNameTranslations = clientBoostedSelectionNameTranslations2
                 };
 
-                await TradingService.Publish(new MessageRequest()
+                await _tradingService.Publish(new MessageRequest()
                 {
                     CorrelationId = Guid.NewGuid().ToString(),
                     MessageType = "OnPriceBoost",
@@ -262,16 +256,15 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     Translations = _priceBoostConfigModel.BoostedSelectionTranslations
                 };
 
-                var updateLogResponse = await BackofficeService.AddActivityLog(new ActivityLogModel()
+                var updateLogResponse = await _backofficeService.AddActivityLog(new ActivityLogModel()
                 {
                     Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace('_', '.'),
                     Payload = $"{_priceBoostConfigModel.ClientCode}.{_priceBoostConfigModel.SportId}.{_priceBoostConfigModel.SegmentId}.{_priceBoostConfigModel.LeagueId}",
                     Activity = Activity.Update.ToString(),
                     From = JsonSerializer.Serialize(priceBoostLogModelFrom),
                     To = JsonSerializer.Serialize(priceBoostLogModelTo),
-                    UserId = UserModel.Id,
-                    UserName = UserModel.UserName,
-                    TimeStamp = DateTime.UtcNow
+                    UserId = _userState.Id,
+                    UserName = _userState.Name
                 });
             }
 
@@ -279,7 +272,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
             await Modal.OnSaveClickCallback.InvokeAsync("updated");
 
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         public void Dispose()

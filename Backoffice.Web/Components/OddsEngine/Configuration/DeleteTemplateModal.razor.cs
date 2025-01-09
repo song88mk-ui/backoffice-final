@@ -12,7 +12,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
 
-        [CascadingParameter(Name = "UserModel")] private UserModel UserModel { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
 

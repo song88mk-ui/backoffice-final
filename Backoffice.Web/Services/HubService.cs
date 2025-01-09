@@ -1,6 +1,7 @@
 ﻿
 using Backoffice.Shared.Models;
 using Backoffice.Shared.Models.HubMessages;
+using Backoffice.Web.States;
 using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Http.Connections;
@@ -17,13 +18,15 @@ namespace Backoffice.Web.Services
         private List<string> _channels = new List<string>();
         private string _hubUri;
         private bool _isConnecting;
+        private UserState _userState;
 
-        public HubService(IConfiguration configuration)
+        public HubService(IConfiguration configuration, UserState userState)
         {
             _hubUri = configuration["API:HubAPI"] ?? throw new ArgumentNullException("API:HubAPI configuration is missing.");
+            _userState = userState;
         }
 
-        public async Task ConnectAsync(string userId, Func<NotificationsModel, Task>? processNotification = null)
+        public async Task ConnectAsync(Func<NotificationsModel, Task>? processNotification = null)
         {
             try
             {
@@ -34,6 +37,8 @@ namespace Backoffice.Web.Services
                     return;
 
                 _isConnecting = true;
+
+                var userId = _userState.Id;
                 _hubConnection = new HubConnectionBuilder()
                                 .WithUrl($"{_hubUri}?userId={userId}", options =>
                                 {
@@ -57,7 +62,7 @@ namespace Backoffice.Web.Services
                 _hubConnection.Closed += async (error) =>
                 {
                     Log.Error($"HubConnection Closed: {error?.Message} - {error?.StackTrace}");
-                    await ConnectAsync(userId);
+                    await ConnectAsync();
                 };
 
                 _hubConnection.Reconnecting += (error) =>
@@ -69,6 +74,7 @@ namespace Backoffice.Web.Services
                 _hubConnection.Reconnected += async (connectionId) =>
                 {
                     ConnectionId = connectionId;
+                    _userState.ConnectionId = connectionId;
 
                     var tempChannel = new List<string>(_channels);
                     _channels.Clear();
@@ -83,6 +89,7 @@ namespace Backoffice.Web.Services
 
                 await _hubConnection.StartAsync();
                 ConnectionId = _hubConnection.ConnectionId;
+                _userState.ConnectionId = _hubConnection.ConnectionId;
                 await SubscribeToChannel("onbetstopglobal");
 
                 if (processNotification != null)
@@ -142,6 +149,8 @@ namespace Backoffice.Web.Services
 
         public async Task RegisterMessageHandlers(Func<BetStopFixtureMessage, Task> processOnBetStopFixture, Func<BetStopGlobalMessage, Task> processOnBetStopGlobal, Func<OddsChangeMonitoringMessage, Task> processOddsChangeMonitoring = null, Func<OddsChangeFixtureDetailsMessage, Task> processOddsChange = null)
         {
+            if(_hubConnection == null) return;
+
             if (processOddsChangeMonitoring != null)
                 _hubConnection.On<OddsChangeMonitoringMessage>("OnMonitoringOddsChange", async message => await processOddsChangeMonitoring(message));
 
