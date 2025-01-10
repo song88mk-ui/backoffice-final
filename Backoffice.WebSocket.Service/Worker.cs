@@ -88,6 +88,7 @@ namespace Backoffice.WebSocket.Service
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("Service is starting");
             try
             {
                 await _sportsbookRepository.ProcessMarketTemplatePlayerProps();
