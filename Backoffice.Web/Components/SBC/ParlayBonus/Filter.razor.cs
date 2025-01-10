@@ -52,6 +52,7 @@ namespace Backoffice.Web.Components.SBC.ParlayBonus
         {
             OriginalMinOdds = ClientParlayBonusResponse.ParlayBonusMinOdds;
             IsEdit = !IsEdit;
+            IsSaveDisabled = false;
 
             IsFormValid = ClientParlayBonusResponse.ParlayBonusMinOdds < 1.20m ? true : false;
 
