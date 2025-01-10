@@ -234,6 +234,8 @@ namespace Backoffice.Web.Pages.SBC
         {
             var configCasted = (Models.ParlayBonusConfig)config;
 
+            IsEdit = true;
+
             ClientParlayBonusModel.ParlayBonusConfig.Remove(configCasted);
 
             MetaData.TotalCount = ClientParlayBonusModel.ParlayBonusConfig.Count;
