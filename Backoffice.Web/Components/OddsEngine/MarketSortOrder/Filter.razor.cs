@@ -23,7 +23,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
         [Parameter] public bool IsUpdate { get; set; }
         [Parameter] public EventCallback<bool> IsPreLoaderChanged { get; set; }
         [Parameter] public bool IsPreLoader { get; set; }
-        [Parameter] public string Region { get; set; }
+        [Parameter] public string Region { get; set; } = "HK";
 
         public List<SelectListItemModel<string>> Clients { get; set; }
         public List<SelectListItemModel<int>> Sports { get; set; }

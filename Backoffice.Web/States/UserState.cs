@@ -20,7 +20,18 @@ namespace Backoffice.Web.States
         public string RoleName => RoleName;
         public ClaimsPrincipal? ClaimsPrincipal => _principal;
         public List<string> ClientCodes => _clientCodes ?? new List<string>();
-        public List<ClientInformationModel> TradingClients => _tradingClients ?? new List<ClientInformationModel>();
+        public List<ClientInformationModel> TradingClients
+        {
+            get => _tradingClients ?? new List<ClientInformationModel>();
+            private set
+            {
+                if (_tradingClients != value)
+                {
+                    _tradingClients = value;
+                    OnPropertyChanged(); // Notify that TradingClients has changed
+                }
+            }
+        }
         public List<Claim> Claims => _claims;
         public List<Client> SportsbookClients => _sportsbookClients ?? new List<Client>();
         public bool IsAuthenticated => !string.IsNullOrEmpty(AccessToken);
@@ -94,8 +105,7 @@ namespace Backoffice.Web.States
         }
         public void SetTradingClients(List<ClientInformationModel> clients)
         {
-            _tradingClients = new List<ClientInformationModel>(clients);
-            OnPropertyChanged();
+            TradingClients = new List<ClientInformationModel>(clients);
         }
         public void SetSportsbookClients(List<Client> clients)
         {

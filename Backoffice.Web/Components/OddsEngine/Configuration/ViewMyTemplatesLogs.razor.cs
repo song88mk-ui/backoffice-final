@@ -229,8 +229,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         }
         public async Task OnDatePickerClickEvent(DateRange range)
         {
-            FilterModel.DateFrom = Convert.ToDateTime(range.Start);
-            FilterModel.DateTo = Convert.ToDateTime(range.End);
+            FilterModel.DateFrom = range.Start.DateTime;
+            FilterModel.DateTo = range.End.DateTime;
 
             await SelectPage(1);
         }

@@ -14,7 +14,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class SportSettings : IDisposable
     {
-        [Parameter] public string Region { get; set; } = "hk";
+        [Parameter] public string Region { get; set; } = "HK";
 
         private List<BreadcrumbModel> _breadcrumbs = new List<BreadcrumbModel>();
         private List<SportSettingSport> _sportSettings = new List<SportSettingSport>();

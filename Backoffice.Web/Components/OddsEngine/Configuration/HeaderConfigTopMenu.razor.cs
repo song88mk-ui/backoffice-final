@@ -15,7 +15,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         //[Parameter] public Pages.OddsEngine.Configuration ConfigurationRef { get; set; }
 
-        [Parameter] public string Region { get; set; }
+        [Parameter] public string Region { get; set; } = "HK";
         #endregion
 
         #region Fields

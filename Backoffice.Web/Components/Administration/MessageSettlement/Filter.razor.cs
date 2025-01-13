@@ -68,8 +68,8 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
         public void OnRangeSelect(DateRange range)
         {
-            FilterModel.FromDate = Convert.ToDateTime(range.Start);
-            FilterModel.ToDate = Convert.ToDateTime(range.End);
+            FilterModel.FromDate = range.Start.DateTime;
+            FilterModel.ToDate = range.End.DateTime;
         }
 
         public async Task OnSportChangedEvent(ChangeEventArgs e)

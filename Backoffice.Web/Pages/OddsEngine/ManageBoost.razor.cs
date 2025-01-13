@@ -12,7 +12,7 @@ namespace Backoffice.Web.Pages.OddsEngine
     {
         #region Properties
 
-        [Parameter] public string Region { get; set; } = "hk";
+        [Parameter] public string Region { get; set; } = "HK";
 
         #endregion
 

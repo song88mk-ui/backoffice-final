@@ -28,6 +28,7 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
         private LanguageCode _languageCode;
         private bool _init = true;
 
+        private string _clientReference;
         private List<ClientInformationModel> _clientListReference = new List<ClientInformationModel>();
         #endregion
 
@@ -42,7 +43,6 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
             _tradingService.Region = _region.ToUpper();
         }
 
-        private string _clientReference;
         protected override async Task OnParametersSetAsync()
         {
             var tempClientReference = string.Join(',', _userState.ClientCodes.OrderBy(c => c).Select(s => s.Trim()).ToList());

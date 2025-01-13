@@ -214,8 +214,8 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
         public async Task OnDateRangeChangedEvent(DateRange range)
         {
-            CallbackModel.DateFrom = Convert.ToDateTime(range.Start);
-            CallbackModel.DateTo = Convert.ToDateTime(range.End);
+            CallbackModel.DateFrom = range.Start.DateTime;
+            CallbackModel.DateTo = range.End.DateTime;
 
             await OnInitCallback.InvokeAsync(CallbackModel);
         }

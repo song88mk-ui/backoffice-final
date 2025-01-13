@@ -13,23 +13,20 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
     {
         #region Properties
 
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private ITradingService TradingService { get; set; }
-
         [Parameter] public EventCallback OnInitCallback { get; set; }
         [Parameter] public EventCallback<string> OnClientChangedCallback { get; set; }
         [Parameter] public EventCallback<int> OnSportChangedCallback { get; set; }
         [Parameter] public EventCallback<int> OnSegmentChangedCallback { get; set; }
         [Parameter] public EventCallback<int> OnLeagueChangedCallback { get; set; }
         [Parameter] public EventCallback<string> OnInputSearchCallback { get; set; }
-        [Parameter] public string Region { get; set; }
+        [Parameter] public string Region { get; set; } = "HK";
         public string SelectedClientCode { get; set; }
         public int SelectedSportId { get; set; }
         public int SelectedSegmentId { get; set; }
         public int SelectedLeagueId { get; set; }
         public SearchFormModel SearchForm { get; set; }
 
-        private string _region;
+        private string _region = string.Empty;
         private List<SelectListItemModel<string>> _clients;
         private List<SelectListItemModel<int>> _sports;
         private List<SelectListItemModel<int>> _segments;
@@ -61,11 +58,6 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         }
         protected override async Task OnParametersSetAsync()
         {
-            if (_region != Region.ToUpper())
-            {
-                _region = Region.ToUpper();
-                TradingService.Region = _region;
-            }
             if (_languageCode != _translationState.ActiveLanguageCode)
             {
                 _languageCode = _translationState.ActiveLanguageCode;
@@ -91,7 +83,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             //parameters.Add("PriceBoostFilterModel", PriceboostFilterModel);            
 
             var options = new ModalOptions();
-            ModalService.Open<AddBoostedOddsModal>($"Add Boosted Odds", parameters, options);
+            _modalService.Open<AddBoostedOddsModal>($"Add Boosted Odds", parameters, options);
         }
 
         public async Task OnViewAllLogs()
@@ -106,7 +98,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             parameters.Add("Region", _region);
 
             var options = new ModalOptions();
-            ModalService.Open<ViewAllLogsModal>("View Logs", parameters, options);
+            _modalService.Open<ViewAllLogsModal>("View Logs", parameters, options);
         }
 
         public async Task OnClientChangedEvent(ChangeEventArgs e)
@@ -167,7 +159,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #region Utilities
         private async Task<List<SelectListItemModel<string>>> LoadClients()
         {
-            var response = await TradingService.GetClientList();
+            var response = await _tradingService.GetClientList();
 
             var clientList = response.Result;
             if (clientList == null)
@@ -197,7 +189,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         private async Task<List<SelectListItemModel<int>>> LoadSports()
         {
-            var response = await TradingService.GetSportLookup(_languageCode.ToString());
+            var response = await _tradingService.GetSportLookup(_languageCode.ToString());
 
             var sportsLookup = response.Result;
             if (sportsLookup == null)
@@ -220,7 +212,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         private async Task<List<SelectListItemModel<int>>> LoadSegments(int sportId)
         {
-            var response = await TradingService.GetSegmentLookup(sportId, _languageCode);
+            var response = await _tradingService.GetSegmentLookup(sportId, _languageCode);
 
             var segmentsLookup = response.Result;
             if (segmentsLookup == null)
@@ -243,7 +235,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         private async Task<List<SelectListItemModel<int>>> LoadLeagues(int sportId, int segmentId)
         {
-            var response = await TradingService.GetLeagueLookup(sportId, segmentId, _languageCode);
+            var response = await _tradingService.GetLeagueLookup(sportId, segmentId, _languageCode);
 
             var leaguesLookup = response.Result;
             if (leaguesLookup == null)
