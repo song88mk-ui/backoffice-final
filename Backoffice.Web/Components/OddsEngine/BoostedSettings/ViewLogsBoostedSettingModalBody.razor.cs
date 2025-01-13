@@ -6,11 +6,8 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Newtonsoft.Json;
-using System;
 using System.Globalization;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 {
@@ -138,8 +135,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
 
         public async Task OnRangeSelect(DateRange range)
         {
-            StartDate = Convert.ToDateTime(range.Start);
-            EndDate = Convert.ToDateTime(range.End);
+            StartDate = range.Start.DateTime;
+            EndDate = range.End.DateTime;
 
             await GetContent();
         }

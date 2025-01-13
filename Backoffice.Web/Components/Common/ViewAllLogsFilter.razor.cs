@@ -12,7 +12,6 @@ namespace Backoffice.Web.Components.Common;
 public partial class ViewAllLogsFilter : IDisposable
 {
     #region Properties
-    [Inject] public ITradingService TradingService { get; set; }
     [Parameter] public SportsbookClientPermission SelectedPage { get; set; }
     [Parameter] public EventCallback<PriceBoostLogFilterModel> OnFilterChangedEventCallback { get; set; }
     [Parameter] public PriceBoostLogFilterModel FilterModel { get; set; } = new PriceBoostLogFilterModel();
@@ -23,9 +22,8 @@ public partial class ViewAllLogsFilter : IDisposable
     #region Methods
     protected override async Task OnInitializedAsync()
     {
-        Pages = new Dictionary<SportsbookClientPermission, string>() { { SportsbookClientPermission.SBC_OE_PriceBoost_Manage, "Manage Boost" }, { SportsbookClientPermission.SBC_OE_PriceBoost_Settings, "Boosted Setting" } };
+        Pages = new Dictionary<SportsbookClientPermission, string>() { { SportsbookClientPermission.SBC_OE_PriceBoost_Manage, "Manage Boost" }, { SportsbookClientPermission.SBC_OE_PriceBoost_Settings, "Boosted Settings" } };
 
-        TradingService.Region = "";
         var client = await GetClients();
         FilterModel = new PriceBoostLogFilterModel()
         {
@@ -56,8 +54,8 @@ public partial class ViewAllLogsFilter : IDisposable
     }
     public async Task OnDateRangeChangedEvent(DateRange range)
     {
-        FilterModel.DateFrom = Convert.ToDateTime(range.End);
-        FilterModel.DateTo = Convert.ToDateTime(range.End);
+        FilterModel.DateFrom = range.Start.DateTime;
+        FilterModel.DateTo = range.End.DateTime;
 
         await OnFilterChangedEventCallback.InvokeAsync(FilterModel);
         await InvokeAsync(StateHasChanged);
@@ -109,7 +107,7 @@ public partial class ViewAllLogsFilter : IDisposable
     #region Utilities
     private async Task<List<KeyValuePair<string, string>>> GetClients()
     {
-        var response = await TradingService.GetClientList();
+        var response = await _tradingService.GetClientList();
 
         List<KeyValuePair<string, string>> Clients = new List<KeyValuePair<string, string>>();
 
