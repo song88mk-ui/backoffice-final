@@ -99,7 +99,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     Translations = PriceBoost.BoostedSelectionTranslations
                 };
 
-                var deleteLogResponse = await BackofficeService.AddActivityLog(new ActivityLogModel()
+                var activityLogResponse = await BackofficeService.AddActivityLog(new ActivityLogModel()
                 {
                     Page = SportsbookClientPermission.SBC_OE_PriceBoost_Manage.ToString().Replace('_', '.'),
                     Payload = $"{PriceBoost.ClientCode}.{PriceBoost.SportId}.{PriceBoost.SegmentId}.{PriceBoost.LeagueId}",

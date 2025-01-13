@@ -4,17 +4,17 @@ using Backoffice.Shared.Models.Requests;
 using Backoffice.Web.Components.Common;
 using Backoffice.Web.Components.OddsEngine.BoostedSettings;
 using Backoffice.Web.Models;
-using Backoffice.Web.Services;
+using Backoffice.Web.States;
 using Microsoft.AspNetCore.Components;
 using Serilog;
+using System.ComponentModel;
 
 namespace Backoffice.Web.Pages.OddsEngine
 {
     public partial class BoostedSettings : IDisposable
     {
         #region Properties
-
-        [Parameter] public string Region { get; set; } = "hk";
+        [Parameter] public string Region { get; set; } = "HK";
 
         #endregion
         private AlertModel _alertModel;
@@ -25,6 +25,8 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string _tHeadClass;
         private string _searchText;
         protected List<BoostedSettingsModel> _clientsView;
+        private List<ClientInformationModel>? _clientListReference = null;
+        private CancellationTokenSource _cts;
 
         private bool _init = true;
 
@@ -62,12 +64,21 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
             };
 
+            _userState.PropertyChanged += UserStatePropertyChanged;
             await PageState.AuthenticateAccessEvent.InvokeAsync();
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            if (_init)
+            if (_userState.TradingClients != null && _userState.TradingClients.Any() && !_clientListReference.Any())
+            {
+                _clientListReference = new List<ClientInformationModel>(_userState.TradingClients);
+                _init = true;
+            }
+
+            var shouldRender = ValidateParameter();
+
+            if (shouldRender)
                 await GetContent();
 
             _init = false;
@@ -95,13 +106,24 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
                 _searchText = search ?? string.Empty;
 
+                var clientCodes = _clientListReference.Select(s => s.ClientCode).ToList();
+
+                _cts?.Cancel();
+                _cts = new CancellationTokenSource();
+
+                var token = _cts.Token;
                 var result = await _tradingService.GetBoostedSettings(new BoostedSettingsRequest()
                 {
-                    ClientCodes = _userState.ClientCodes.Any() ? _userState.ClientCodes.ToList() : new List<string>(),
+                    ClientCodes = clientCodes.Any() ? clientCodes : new List<string>(),
                     Search = _searchText
-                });
-                _clientsView = result.Result;
-                _isPreLoader = false;
+                }, token);
+
+
+                if (!token.IsCancellationRequested)
+                {
+                    _clientsView = result.Result;
+                    _isPreLoader = false;
+                }
             }
             catch (Exception ex)
             {
@@ -117,7 +139,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var parameters = new ModalParameters();
 
                 parameters.Add("Client", client);
-                parameters.Add("Region", Region);
+                parameters.Add("Region", "hk");
 
                 var options = new ModalOptions();
                 _modalService.Open<CreateOrUpdateBoostedSettings>("Edit % Cap of Current Odds from Boosted Odds", parameters, options);
@@ -149,6 +171,16 @@ namespace Backoffice.Web.Pages.OddsEngine
             }
         }
 
+        private bool ValidateParameter() => _clientListReference != null && _init;
+        private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (_userState.TradingClients != null && _userState.TradingClients.Any() && !_clientListReference.Any())
+            {
+                _clientListReference = new List<ClientInformationModel>(_userState.TradingClients);
+
+                await GetContent();
+            }
+        }
         private void OpacityChanged(decimal opacity)
         {
             _alertModel = new();

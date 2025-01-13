@@ -1,8 +1,5 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
-using Backoffice.Web.Components.Common;
-using Backoffice.Web.Models;
-using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
@@ -12,7 +9,6 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         #region Properties
 
 
-        //[Parameter] public EventCallback<SearchFormModel> SearchFormChanged { get; set; }
         [Parameter] public EventCallback<string> OnInitializeCallback { get; set; }
         [Parameter] public EventCallback OnViewAllLogsCallback { get; set; }
 
@@ -45,7 +41,6 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
         }
         public async Task OnInputSearchEvent()
         {
-            //await SearchFormChanged.InvokeAsync(SearchForm);
             await OnInitializeCallback.InvokeAsync(_searchForm.SearchText);
         }
 

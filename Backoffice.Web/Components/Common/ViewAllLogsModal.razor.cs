@@ -27,6 +27,7 @@ namespace Backoffice.Web.Components.Common
         public List<ActivityLogModel> _boostedSettingsActivityLogs { get; set; }
         public bool WithAdministrationPagesAccess { get; set; }
         private string _region = string.Empty;
+        private bool _init = true;
         #endregion
 
         protected override async Task OnInitializedAsync()
@@ -60,13 +61,18 @@ namespace Backoffice.Web.Components.Common
                 TotalPages = 0,
             };
 
-            await GetContent();
         }
         protected override async Task OnParametersSetAsync()
         {
             _tradingService.Region = ModalParameters.TryGet<string>("Region").ToUpper();
             CurrentPage = ModalParameters.TryGet<SportsbookClientPermission>("SelectedPage");
+
+            if (_init)
+            {
+                await GetContent();
+            }
         }
+        private bool ValidateParameter() => _init;
         #region Methods
         public async Task GetContent()
         {
@@ -120,7 +126,7 @@ namespace Backoffice.Web.Components.Common
                         }
                         break;
                     case SportsbookClientPermission.SBC_OE_PriceBoost_Settings:
-                        foreach (var activityLog in activityLogs.ActivityLogs.Where(x => _userClients.Contains(payload)))
+                        foreach (var activityLog in activityLogs.ActivityLogs.Where(c => _userClients.Contains(c.Payload)))
                         {
                             var activity = "Increased Cap %";
 
