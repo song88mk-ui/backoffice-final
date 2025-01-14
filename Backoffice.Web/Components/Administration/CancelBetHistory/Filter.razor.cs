@@ -44,8 +44,9 @@ namespace Backoffice.Web.Components.Administration.CancelBetHistory
 
         public async Task OnDateRangeChangedEvent(DateRange range)
         {
-            FilterModel.DateFrom = range.Start.DateTime;
-            FilterModel.DateTo = range.End.DateTime;
+            var clientDateRange = DateTimeHelper.ConvertToClientTimeZone(range, _userState.TimeZoneOffset);
+            FilterModel.DateFrom = clientDateRange.Start.DateTime;
+            FilterModel.DateTo = clientDateRange.End.DateTime;
 
             await OnInitCallback.InvokeAsync(FilterModel);
         }

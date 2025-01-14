@@ -127,8 +127,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
         public async Task OnDateRangeChangedEvent(DateRange range)
         {
-            ConfigLogsFilterModel.FromDate = range.Start.DateTime;
-            ConfigLogsFilterModel.ToDate = range.End.DateTime;
+            var clientDateRange = DateTimeHelper.ConvertToClientTimeZone(range, _userState.TimeZoneOffset);
+            ConfigLogsFilterModel.FromDate= clientDateRange.Start.DateTime;
+            ConfigLogsFilterModel.ToDate = clientDateRange.End.DateTime;
 
             await ConfigLogsFilterModelChanged.InvokeAsync(ConfigLogsFilterModel);
             await GetContentCallback.InvokeAsync();

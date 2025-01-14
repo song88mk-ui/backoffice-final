@@ -68,8 +68,9 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
         public void OnRangeSelect(DateRange range)
         {
-            FilterModel.FromDate = range.Start.DateTime;
-            FilterModel.ToDate = range.End.DateTime;
+            var clientDateRange = DateTimeHelper.ConvertToClientTimeZone(range, _userState.TimeZoneOffset);
+            FilterModel.FromDate = clientDateRange.Start.DateTime;
+            FilterModel.ToDate = clientDateRange.End.DateTime;
         }
 
         public async Task OnSportChangedEvent(ChangeEventArgs e)

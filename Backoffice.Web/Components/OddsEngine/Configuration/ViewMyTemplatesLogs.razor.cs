@@ -9,6 +9,7 @@ using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using System.Drawing;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -18,8 +19,6 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
     {
         #region Properties
 
-        [Inject] private IModalService ModalService { get; set; }
-        [Inject] private IBackofficeService BackofficeService { get; set; }
         [CascadingParameter] private ModalParameters ModalParameters { get; set; }
         [CascadingParameter] public CustomModal Modal { get; set; }
 
@@ -229,8 +228,9 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         }
         public async Task OnDatePickerClickEvent(DateRange range)
         {
-            FilterModel.DateFrom = range.Start.DateTime;
-            FilterModel.DateTo = range.End.DateTime;
+            var clientDateRange = DateTimeHelper.ConvertToClientTimeZone(range, _userState.TimeZoneOffset);
+            FilterModel.DateFrom = clientDateRange.Start.DateTime;
+            FilterModel.DateTo = clientDateRange.End.DateTime;
 
             await SelectPage(1);
         }
@@ -240,7 +240,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
         }
         public async Task OnCloseClickEvent()
         {
-            ModalService.Cancel();
+            _modalService.Cancel();
         }
 
         public void Dispose()
@@ -258,13 +258,13 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 StateHasChanged();
             }
             ActivitLogs = new List<ActivityLogModel>();
-            var response = await BackofficeService.GetActivityLogs(new ActivityLogRequest
+            var response = await _backofficeService.GetActivityLogs(new ActivityLogRequest
             {
                 Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                 Payload = BuildPayload(filterModel),
                 MetaData = MetaData,
-                DateFrom = filterModel.DateFrom.Date,
-                DateTo = filterModel.DateFrom.Date,
+                DateFrom = filterModel.DateFrom,
+                DateTo = filterModel.DateTo,
                 SearchText = filterModel.SearchText
             });
 

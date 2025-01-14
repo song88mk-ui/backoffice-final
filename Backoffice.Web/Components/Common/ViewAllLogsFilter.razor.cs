@@ -54,8 +54,9 @@ public partial class ViewAllLogsFilter : IDisposable
     }
     public async Task OnDateRangeChangedEvent(DateRange range)
     {
-        FilterModel.DateFrom = range.Start.DateTime;
-        FilterModel.DateTo = range.End.DateTime;
+        var clientDateRange = DateTimeHelper.ConvertToClientTimeZone(range, _userState.TimeZoneOffset);
+        FilterModel.DateFrom = clientDateRange.Start.DateTime;
+        FilterModel.DateTo = clientDateRange.End.DateTime;
 
         await OnFilterChangedEventCallback.InvokeAsync(FilterModel);
         await InvokeAsync(StateHasChanged);

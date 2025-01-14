@@ -1,9 +1,11 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Shared.Models;
+using Backoffice.Web.Helpers;
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using BlazorDateRangePicker;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using System.Security.Claims;
 
 namespace Backoffice.Web.Components.Administration.ManualBetSettlement
@@ -214,8 +216,9 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
         public async Task OnDateRangeChangedEvent(DateRange range)
         {
-            CallbackModel.DateFrom = range.Start.DateTime;
-            CallbackModel.DateTo = range.End.DateTime;
+            var clientDateRange = DateTimeHelper.ConvertToClientTimeZone(range, _userState.TimeZoneOffset);
+            CallbackModel.DateFrom = clientDateRange.Start.DateTime;
+            CallbackModel.DateTo = clientDateRange.End.DateTime;
 
             await OnInitCallback.InvokeAsync(CallbackModel);
         }
