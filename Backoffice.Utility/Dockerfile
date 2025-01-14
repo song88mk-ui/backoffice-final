@@ -6,7 +6,7 @@ ADD Backoffice.Utility Backoffice.Utility
 
 WORKDIR /source/Backoffice.Utility
 
-RUN dotnet restore
+RUN dotnet restore --verbosity normal
 
 RUN dotnet build --configuration Release
 

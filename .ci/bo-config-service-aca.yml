@@ -25,7 +25,7 @@ variables:
 
 stages:
   - stage: build
-    displayName: Docker Build
+    displayName: Build
     jobs:
       - job: docker_build
         displayName: Build App via Docker
@@ -63,10 +63,10 @@ stages:
 
   - stage: stage_staging_release
     dependsOn: build
-    displayName: Staging - Deploy ACA
+    displayName: Staging - Deploy
     jobs:
-      - deployment: Deployment
-        displayName: Deploy to ACA
+      - deployment: staging_deployment_stage
+        displayName: Staging::deployment.ACA
         pool:
           vmImage: "ubuntu-latest"
         environment:
@@ -118,12 +118,12 @@ stages:
 
   - stage: stage_production_release
     dependsOn: stage_staging_release
-    displayName: Production - Deploy ACA
+    displayName: Production - Deploy
     variables:
       - group: PRODUCTION_TRIGGER_STAGE1 # requires approval
     jobs:
-      - deployment: Deployment
-        displayName: Deploy to ACA
+      - deployment: production_deployment_stage
+        displayName: Production::deployment.aca
         pool:
           vmImage: "ubuntu-latest"
         environment:

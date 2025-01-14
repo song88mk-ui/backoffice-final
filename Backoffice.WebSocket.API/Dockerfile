@@ -7,7 +7,7 @@ ADD Backoffice.Shared Backoffice.Shared
 
 WORKDIR /source/Backoffice.WebSocket.API
 
-RUN dotnet restore
+RUN dotnet restore --verbosity normal
 
 RUN dotnet build --configuration Release
 

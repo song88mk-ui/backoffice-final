@@ -6,7 +6,7 @@ ADD Backoffice.Config.Service Backoffice.Config.Service
 
 WORKDIR /source/Backoffice.Config.Service
 
-RUN dotnet restore
+RUN dotnet restore --verbosity normal
 
 RUN dotnet build --configuration Release
 
