@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Backoffice.Web.Components.Common;
 using System.Drawing;
 using Backoffice.Web.States;
+using System.ComponentModel;
 
 namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 {
@@ -32,6 +33,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         private List<SelectListItemModel<int>> _segments;
         private List<SelectListItemModel<int>> _leagues;
         private LanguageCode _languageCode;
+        private List<ClientInformationModel>? _clientListReference = null;
         #endregion
 
         #region Methods
@@ -55,6 +57,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             SelectedLeagueId = 0;
 
             await OnInitCallback.InvokeAsync();
+            _userState.PropertyChanged += UserStatePropertyChanged;
         }
         protected override async Task OnParametersSetAsync()
         {
@@ -157,6 +160,18 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #endregion
 
         #region Utilities
+        private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (_userState.TradingClients != null && _userState.TradingClients.Any() && !_clientListReference.Any())
+            {
+                _clientListReference = new List<ClientInformationModel>(_userState.TradingClients);
+
+                _clients = await LoadClients();
+                SelectedClientCode = _clients.FirstOrDefault().Value;
+
+                await OnClientChangedCallback.InvokeAsync(SelectedClientCode);
+            }
+        }
         private async Task<List<SelectListItemModel<string>>> LoadClients()
         {
             var response = await _tradingService.GetClientList();
