@@ -1,8 +1,9 @@
-﻿<div class="modal-body">
-    @if (IsPreloader)
-    {
-        <Preloader InlineCss="@PreloaderInlineCss" />
-    }
+﻿@if (IsPreloader)
+{
+    <Preloader InlineCss="@PreloaderInlineCss" />
+}
+<div class="modal-body">
+
     <div class="d-flex flex-row">
         <div>
             <input type="radio" class="btn-check" name="matchTabOptions" id="matchType" checked @onclick="@(e => OnMatchTypeChanged(FixtureType.Match))" />

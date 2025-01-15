@@ -29,7 +29,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
         #region Fields
 
-        public const string PreloaderInlineCss = "top:50%;transform:unset!important";
+        public const string PreloaderInlineCss = "transform: unset !important;position: absolute;display: flex;justify-content: center;align-items: center;z-index: 1000;top: 0;left: 0;right: 0;bottom: 0;background-color: rgba(0, 0, 0, 0.3);";
 
         #endregion
 
