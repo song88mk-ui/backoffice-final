@@ -25,7 +25,7 @@ namespace Backoffice.Web.Pages.OddsEngine
         private string _tHeadClass;
         private string _searchText;
         protected List<BoostedSettingsModel> _clientsView;
-        private List<ClientInformationModel>? _clientListReference = null;
+        private List<ClientInformationModel> _clientListReference = new List<ClientInformationModel>();
         private CancellationTokenSource _cts;
 
         private bool _init = true;

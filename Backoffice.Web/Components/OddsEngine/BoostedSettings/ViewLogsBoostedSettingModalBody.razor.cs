@@ -93,8 +93,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                 Page = SportsbookClientPermission.SBC_OE_PriceBoost_Settings.ToString().Replace("_", "."),
                 Payload = $"{ClientCode}",
                 MetaData = MetaData,
-                DateFrom = StartDate.Date,
-                DateTo = EndDate.Date
+                DateFrom = StartDate,
+                DateTo = EndDate
             });
 
             if (response.Result != null)

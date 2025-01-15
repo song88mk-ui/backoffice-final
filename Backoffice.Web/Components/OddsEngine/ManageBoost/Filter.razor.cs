@@ -33,7 +33,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         private List<SelectListItemModel<int>> _segments;
         private List<SelectListItemModel<int>> _leagues;
         private LanguageCode _languageCode;
-        private List<ClientInformationModel>? _clientListReference = null;
+        private List<ClientInformationModel> _clientListReference = new List<ClientInformationModel>();
         #endregion
 
         #region Methods

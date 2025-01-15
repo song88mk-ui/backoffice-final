@@ -69,7 +69,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 Page = SportsbookClientPermission.SBC_OE_SportsSettings.ToString().Replace("_", "."),
                 //Payload = $"{_clientCode}",
                 MetaData = _metaData,
-                DateFrom = DateTimeHelper.Now(_userState.TimeZoneOffset).Date.AddDays(-30)
+                DateFrom = DateTimeHelper.Now(_userState.TimeZoneOffset).AddDays(-30)
             });
 
             if (response.StatusCode == StatusCode.Success)

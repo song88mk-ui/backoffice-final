@@ -69,7 +69,7 @@
                 <option value="">@_translationState.GetValue("Select Market")</option>
                 @foreach (var item in Model.Markets)
                 {
-                    <option value="@item.Value" selected="@(item.Value == Model.MarketName)">@_translationState.GetValue(item.Name)</option>
+                    <option value="@item.Value" selected="@(item.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}")">@_translationState.GetValue(item.Name)</option>
                 }
             </select>
         </div>
@@ -79,7 +79,7 @@
                 <option value="">@_translationState.GetValue("Select Selection")</option>
                 @foreach (var item in Model.Selections)
                 {
-                    <option value="@item.Value" selected="@(item.Value == Model.SelectionName)">@_translationState.GetValue(item.Name)</option>
+                    <option value="@item.Value" selected="@(item.Value == $"{Model.SelectionTemplateId}|{Model.SelectionSpecifier}")">@_translationState.GetValue(item.Name)</option>
                 }
             </select>
         </div>

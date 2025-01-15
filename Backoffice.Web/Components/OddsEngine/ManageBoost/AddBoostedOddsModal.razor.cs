@@ -209,8 +209,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             {
                 Model.MarketTemplateId = Model.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
                 Model.MarketSpecifier = Model.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-                Model.MarketName = string.IsNullOrEmpty(Model.MarketTemplateId) ? "" : Model.Markets.Where(s => s.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}").FirstOrDefault().Name;
-                Model.MarketName = GetMarketName(Model.MarketName, Model.MarketSpecifier);
+                var marketName = string.IsNullOrEmpty(Model.MarketTemplateId) ? "" : Model.Markets.Where(s => s.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}").FirstOrDefault().Name;
+                Model.MarketName = GetMarketName(marketName, Model.MarketSpecifier);
             }
 
             Model.Selections = await GetSelections(Model.ProviderFixtureId, Model.MarketTemplateId, Model.MarketSpecifier);
@@ -236,24 +236,36 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
 
                 Model.Leagues = new List<SelectListItemModel<int>>();
 
-                Model.Leagues = await GetLeagues(Model.SportId, Model.SegmentId);
-                Model.LeagueId = Model.Leagues.FirstOrDefault()?.Value ?? 0;
-                Model.LeagueName = Model.Leagues.Where(s => s.Value == Model.LeagueId).FirstOrDefault().Name;
+                Model.Leagues = await GetLeagues(Model.SportId, Model.SegmentId) ?? new List<SelectListItemModel<int>>();
+                if (Model.Leagues.Any())
+                {
+                    Model.LeagueId = Model.Leagues.FirstOrDefault()?.Value ?? 0;
+                    Model.LeagueName = Model.Leagues.Where(s => s.Value == Model.LeagueId).FirstOrDefault()?.Name;
+                }
 
-                Model.Fixtures = await GetFixtures(Model.SportId, Model.SegmentId, Model.LeagueId);
-                Model.ProviderFixtureId = Model.Fixtures.FirstOrDefault()?.Value ?? string.Empty;
-                Model.FixtureName = string.IsNullOrEmpty(Model.ProviderFixtureId) ? "" : Model.Fixtures.Where(s => s.Value == Model.ProviderFixtureId).FirstOrDefault().Name;
+                Model.Fixtures = await GetFixtures(Model.SportId, Model.SegmentId, Model.LeagueId) ?? new List<SelectListItemModel<string>>();
+                if (Model.Fixtures.Any())
+                {
+                    Model.ProviderFixtureId = Model.Fixtures.FirstOrDefault()?.Value ?? string.Empty;
+                    Model.FixtureName = string.IsNullOrEmpty(Model.ProviderFixtureId) ? "" : Model.Fixtures.Where(s => s.Value == Model.ProviderFixtureId).FirstOrDefault().Name;
+                }
 
-                Model.Markets = await GetMarkets(Model.ProviderFixtureId);
-                Model.MarketTemplateId = Model.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
-                Model.MarketSpecifier = Model.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-                Model.MarketName = string.IsNullOrEmpty(Model.MarketTemplateId) ? "" : Model.Markets.Where(s => s.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}").FirstOrDefault().Name;
-                Model.MarketName = GetMarketName(Model.MarketName, Model.MarketSpecifier);
+                Model.Markets = await GetMarkets(Model.ProviderFixtureId) ?? new List<SelectListItemModel<string>>();
+                if (Model.Markets.Any())
+                {
+                    Model.MarketTemplateId = Model.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
+                    Model.MarketSpecifier = Model.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
+                    var marketName = string.IsNullOrEmpty(Model.MarketTemplateId) ? "" : Model.Markets.Where(s => s.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}").FirstOrDefault().Name;
+                    Model.MarketName = GetMarketName(marketName, Model.MarketSpecifier);
+                }
 
-                Model.Selections = await GetSelections(Model.ProviderFixtureId, Model.MarketTemplateId, Model.MarketSpecifier);
-                Model.SelectionTemplateId = Model.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
-                Model.SelectionSpecifier = Model.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-                Model.SelectionName = string.IsNullOrEmpty(Model.SelectionTemplateId) ? "" : Model.Selections.Where(s => s.Value == $"{Model.SelectionTemplateId}|{Model.SelectionSpecifier}").FirstOrDefault().Name;
+                Model.Selections = await GetSelections(Model.ProviderFixtureId, Model.MarketTemplateId, Model.MarketSpecifier) ?? new List<SelectListItemModel<string>>();
+                if (Model.Selections.Any())
+                {
+                    Model.SelectionTemplateId = Model.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
+                    Model.SelectionSpecifier = Model.Selections.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
+                    Model.SelectionName = string.IsNullOrEmpty(Model.SelectionTemplateId) ? "" : Model.Selections.Where(s => s.Value == $"{Model.SelectionTemplateId}|{Model.SelectionSpecifier}").FirstOrDefault().Name;
+                }
             }
             else
             {
@@ -283,8 +295,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 Model.Markets = await GetMarkets(Model.ProviderFixtureId);
                 Model.MarketTemplateId = Model.Markets.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;
                 Model.MarketSpecifier = Model.Markets.FirstOrDefault()?.Value.Split('|')[1] ?? string.Empty;
-                Model.MarketName = string.IsNullOrEmpty(Model.MarketTemplateId) ? "" : Model.Markets.Where(s => s.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}").FirstOrDefault().Name;
-                Model.MarketName = GetMarketName(Model.MarketName, Model.MarketSpecifier);
+                var marketName = string.IsNullOrEmpty(Model.MarketTemplateId) ? "" : Model.Markets.Where(s => s.Value == $"{Model.MarketTemplateId}|{Model.MarketSpecifier}").FirstOrDefault().Name;
+                Model.MarketName = GetMarketName(marketName, Model.MarketSpecifier);
 
                 Model.Selections = await GetSelections(Model.ProviderFixtureId, Model.MarketTemplateId, Model.MarketSpecifier);
                 Model.SelectionTemplateId = Model.Selections.FirstOrDefault()?.Value.Split('|')[0] ?? string.Empty;

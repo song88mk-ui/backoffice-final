@@ -67,8 +67,6 @@ namespace Backoffice.Web.Pages.Administration
         {
             IsPreLoader = true;
 
-            var fromDate = Convert.ToDateTime(ModalFilterModel.FromDate);
-            var toDate = Convert.ToDateTime(ModalFilterModel.ToDate);
             var filterSportsId = ModalFilterModel.SportId == 0 ? "%" : ModalFilterModel.SportId.ToString();
             var filterSegmentId = ModalFilterModel.SegmentId == 0 ? "%%" : ModalFilterModel.SegmentId.ToString();
             var filterLeagueId = ModalFilterModel.LeagueId == 0 ? "%%" : ModalFilterModel.LeagueId.ToString();
@@ -79,8 +77,8 @@ namespace Backoffice.Web.Pages.Administration
                 Page = AdminPermission.Admin_Settlements_MarketSettlement.ToString().Replace("_", "."),
                 Payload = $"{filterSportsId}.{filterSegmentId}.{filterLeagueId}.{filterFixtureId}",
                 MetaData = MetaData,
-                DateFrom = fromDate.Date,
-                DateTo = toDate.Date
+                DateFrom = ModalFilterModel.FromDate,
+                DateTo = ModalFilterModel.ToDate
             })).Result;
 
             List<ManualMarketSettlementAuditModel> result = new List<ManualMarketSettlementAuditModel>();
