@@ -218,8 +218,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                             Page = SportsbookClientPermission.SBC_OE_Config.ToString().Replace("_", "."),
                             From = JsonSerializer.Serialize(oldConfigTemplate),
                             To = JsonSerializer.Serialize(payload),
-                            UserId = _userState.Id,
-                            UserName = _userState.Name
+                            UserId = _userState.Model.Id,
+                            UserName = _userState.Model.Name
                         };
 
                         if (_activity == Activity.Copy)
@@ -397,8 +397,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldConfigMarginsLogs),
                                 To = JsonSerializer.Serialize(newConfigMarginsLogs),
                                 Activity = Activity.Update.ToString(),
-                                UserId = _userState.Id,
-                                UserName = _userState.Name
+                                UserId = _userState.Model.Id,
+                                UserName = _userState.Model.Name
                             });
 
                         if (statusHasChange)
@@ -409,8 +409,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                                 From = _activity == Activity.Copy ? "-" : JsonSerializer.Serialize(oldMarketState),
                                 To = JsonSerializer.Serialize(newMarketState),
                                 Activity = Activity.Update.ToString(),
-                                UserId = _userState.Id,
-                                UserName = _userState.Name
+                                UserId = _userState.Model.Id,
+                                UserName = _userState.Model.Name
                             });
 
                         isNavigate = true;

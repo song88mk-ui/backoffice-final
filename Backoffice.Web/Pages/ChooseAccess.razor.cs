@@ -41,8 +41,8 @@ namespace Backoffice.Web.Pages
             //var authState = await ((AuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
             //var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
-            if(UserState.ClaimsPrincipal != null)
-                UserClaims.AddRange(UserState.ClaimsPrincipal?.Claims.Where(c => validClaimValues.Contains(c.Value)).ToList());
+            if(_userState.Model.ClaimsPrincipal != null)
+                UserClaims.AddRange(_userState.Model.ClaimsPrincipal?.Claims.Where(c => validClaimValues.Contains(c.Value)).ToList());
         }
         //protected override async Task OnAfterRenderAsync(bool firstRender)
         //{

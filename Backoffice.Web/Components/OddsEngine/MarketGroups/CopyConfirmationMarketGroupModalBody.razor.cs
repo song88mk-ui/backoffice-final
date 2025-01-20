@@ -102,8 +102,8 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     Activity = Activity.Copy.ToString(),
                     From = JsonSerializer.Serialize(fromData),
                     To = JsonSerializer.Serialize(toData),
-                    UserId = _userState.Id,
-                    UserName = _userState.Name
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name
                 });
 
                 await InvokeAsync(StateHasChanged);

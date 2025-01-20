@@ -36,7 +36,7 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 var clients = (await BackofficeService.GetClients()).Result;
                 if (clients != null)
                 {
-                    clients.Clients = _userState.ClientCodes.Any() ? clients.Clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != TopFixture.ClientIdRef).ToList() : new List<Client>();
+                    clients.Clients = _userState.Model.ClientCodes.Any() ? clients.Clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != TopFixture.ClientIdRef).ToList() : new List<Client>();
 
                     ClientIdSelectedModel = clients.Clients.Select(s => new ClientIdSelectedModel
                     {

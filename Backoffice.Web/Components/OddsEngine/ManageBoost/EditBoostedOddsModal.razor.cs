@@ -118,8 +118,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 }
             }
 
-            _priceBoostConfigModel.UserId = _userState.Id;
-            _priceBoostConfigModel.UserName = _userState.Name;
+            _priceBoostConfigModel.UserId = _userState.Model.Id;
+            _priceBoostConfigModel.UserName = _userState.Model.Name;
 
             string currentPriceBoostString = ModalParameters.TryGet<string>("PriceBoostConfigModelSerialized");
             var region = ModalParameters.TryGet<string>("Region") ?? string.Empty;
@@ -263,8 +263,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     Activity = Activity.Update.ToString(),
                     From = JsonSerializer.Serialize(priceBoostLogModelFrom),
                     To = JsonSerializer.Serialize(priceBoostLogModelTo),
-                    UserId = _userState.Id,
-                    UserName = _userState.Name
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name
                 });
             }
 

@@ -162,12 +162,12 @@ namespace Backoffice.Web.Pages.Administration
                                     message.ActivityLogs.Add(new()
                                     {
                                         Page = AdminPermission.Admin_CancelBets.ToString().Replace("_", "."),
-                                        Payload = $"{_userState.Name}.{data.BetId}.{selection.BetSelectionId}.{betData.UserId}.{betData.ClientName}",
+                                        Payload = $"{_userState.Model.Name}.{data.BetId}.{selection.BetSelectionId}.{betData.UserId}.{betData.ClientName}",
                                         Activity = Activity.CancelBet.ToString(),
                                         From = JsonSerializer.Serialize(betData),
                                         To = JsonSerializer.Serialize(selection),
-                                        UserId = _userState.Id,
-                                        UserName = _userState.Name,
+                                        UserId = _userState.Model.Id,
+                                        UserName = _userState.Model.Name,
                                     });
                                 }
                             }

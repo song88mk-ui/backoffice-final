@@ -225,7 +225,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             var payload = new OnExportConfigMarginMessage()
             {
-                UserId = _userState.Id,
+                UserId = _userState.Model.Id,
                 ClientCode = SelectedClient,
                 SportIds = string.Join(",", SelectedSportsSet)
             };
@@ -317,7 +317,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
             if (clients != null)
             {
-                clients = _userState.ClientCodes.Any() ? clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+                clients = _userState.Model.ClientCodes.Any() ? clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
             }
 
             return clients?.Select(x => new SelectListItemModel<string>()

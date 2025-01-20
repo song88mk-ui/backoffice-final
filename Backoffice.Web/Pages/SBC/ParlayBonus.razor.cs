@@ -280,9 +280,9 @@ namespace Backoffice.Web.Pages.SBC
             var clients = (await BackofficeService.GetClients()).Result;
             if (clients != null)
             {
-                if (_userState.ClientCodes.Any())
+                if (_userState.Model.ClientCodes.Any())
                 {
-                    clients.Clients = clients.Clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                    clients.Clients = clients.Clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
                 }
 
                 Clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemModel<Client>

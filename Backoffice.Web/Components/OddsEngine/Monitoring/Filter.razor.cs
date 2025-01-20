@@ -45,11 +45,11 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
 
         protected override async Task OnParametersSetAsync()
         {
-            var tempClientReference = string.Join(',', _userState.ClientCodes.OrderBy(c => c).Select(s => s.Trim()).ToList());
+            var tempClientReference = string.Join(',', _userState.Model.ClientCodes.OrderBy(c => c).Select(s => s.Trim()).ToList());
 
-            if (_userState.TradingClients != null && _userState.TradingClients.Any() && !_clientListReference.Any())
+            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
             {
-                _clientListReference = new List<ClientInformationModel>(_userState.TradingClients);
+                _clientListReference = new List<ClientInformationModel>(_userState.Model.TradingClients);
                 _init = true;
             }
 
@@ -60,8 +60,8 @@ namespace Backoffice.Web.Components.OddsEngine.Monitoring
                 _clientReference = tempClientReference;
                 if (_clientListReference != null)
                 {
-                    _clientFilter = _userState.ClientCodes.Any()
-                        ? _clientListReference.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList()
+                    _clientFilter = _userState.Model.ClientCodes.Any()
+                        ? _clientListReference.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList()
                         : new();
 
                     if (_clientFilter.Any())

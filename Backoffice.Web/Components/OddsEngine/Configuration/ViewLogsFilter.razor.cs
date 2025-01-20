@@ -147,7 +147,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 new SelectListItemModel<int> {  Value = 1, Name = "Outrights" }
             };
 
-        private async Task<List<SelectListItemModel<Guid>>> GetClients() => (await TradingService.GetClientList()).Result.Where(x => _userState.ClientCodes.Contains(x.ClientCode)).Select(c => new SelectListItemModel<Guid>()
+        private async Task<List<SelectListItemModel<Guid>>> GetClients() => (await TradingService.GetClientList()).Result.Where(x => _userState.Model.ClientCodes.Contains(x.ClientCode)).Select(c => new SelectListItemModel<Guid>()
         {
             Value = c.ClientId,
             Name = c.ClientName

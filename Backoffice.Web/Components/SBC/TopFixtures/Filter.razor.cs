@@ -2,6 +2,7 @@
 using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
+using System.ComponentModel;
 
 namespace Backoffice.Web.Components.SBC.TopFixtures
 {
@@ -34,13 +35,11 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
                 SearchText = string.Empty
             };
 
-            var clients = (await BackofficeService.GetClients()).Result;
-
-            if (clients != null && clients.Clients.Any())
+            if (_userState.Model.ClientCodes != null && _userState.Model.ClientCodes.Any())
             {
-                clients.Clients = _userState.ClientCodes.Any() ? clients.Clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
-
-                Clients = clients.Clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
+                var clients = _userState.Model.SportsbookClients;
+                
+                Clients = clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
                 {
                     IsChecked = true,
                     Value = s.ClientId.ToString(),
@@ -58,20 +57,22 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
 
                 SelectedClientCount = selectedClients.Count;
                 SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+
+                CallbackModel = new TopFixtureCallbackModel
+                {
+                    SearchText = string.Empty,
+                    Clients = Clients.Where(c => c.Value != "all" && c.IsChecked)
+                        .Select(s => new TopFixtureCallbackModel.Client
+                        {
+                            ClientId = long.Parse(s.Value),
+                            ClientName = s.Name
+                        }).ToList()
+                };
+
+                await OnInitCallback.InvokeAsync(CallbackModel);
             }
 
-            CallbackModel = new TopFixtureCallbackModel
-            {
-                SearchText = string.Empty,
-                Clients = Clients.Where(c => c.Value != "all" && c.IsChecked)
-                    .Select(s => new TopFixtureCallbackModel.Client
-                    {
-                        ClientId = long.Parse(s.Value),
-                        ClientName = s.Name
-                    }).ToList()
-            };
-
-            await OnInitCallback.InvokeAsync(CallbackModel);
+            _userState.PropertyChanged += UserStatePropertyChanged;
         }
 
         public async Task OnClientCheckboxClickEvent(Dictionary<string, string> items)
@@ -105,6 +106,48 @@ namespace Backoffice.Web.Components.SBC.TopFixtures
             GC.SuppressFinalize(this);
         }
 
+        #endregion
+
+        #region Utilities
+        private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (_userState.Model.ClientCodes != null && _userState.Model.ClientCodes.Any())
+            {
+                var clients = _userState.Model.SportsbookClients;
+
+                Clients = clients.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = s.ClientId.ToString(),
+                    Name = s.ClientName
+                }).ToList();
+
+                Clients.Insert(0, new SelectListItemWithCheckboxModel<string>
+                {
+                    IsChecked = true,
+                    Value = "all",
+                    Name = "All Clients"
+                });
+
+                var selectedClients = Clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
+
+                SelectedClientCount = selectedClients.Count;
+                SelectedClientName = SelectedClientCount > 0 ? string.Empty : Clients.FirstOrDefault(c => c.Value != "all" && c.IsChecked).Name;
+
+                CallbackModel = new TopFixtureCallbackModel
+                {
+                    SearchText = string.Empty,
+                    Clients = Clients.Where(c => c.Value != "all" && c.IsChecked)
+                        .Select(s => new TopFixtureCallbackModel.Client
+                        {
+                            ClientId = long.Parse(s.Value),
+                            ClientName = s.Name
+                        }).ToList()
+                };
+
+                await OnInitCallback.InvokeAsync(CallbackModel);
+            }
+        }
         #endregion
     }
 }

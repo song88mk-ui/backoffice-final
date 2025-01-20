@@ -51,11 +51,11 @@ namespace Backoffice.Web.Shared
         {
             var page = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "");
 
-            if (!_userClaims.SequenceEqual(_userState.Claims))
+            if (!_userClaims.SequenceEqual(_userState.Model.Claims))
             {
-                _userClaims = new List<Claim>(_userState.Claims);
+                _userClaims = new List<Claim>(_userState.Model.Claims);
 
-                var categories = _userState.Claims?.Where(c => _access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
+                var categories = _userState.Model.Claims?.Where(c => _access.Contains(c.Value)).Select(s => s.Type.Split(".")[0]).Distinct().ToList();
                 categories = categories?.Where(c => _permissionCategories.Contains(c)).ToList();
 
                 _showSwitchAccess = categories != null && categories.Count > 1;

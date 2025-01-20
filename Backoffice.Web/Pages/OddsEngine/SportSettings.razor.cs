@@ -580,8 +580,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 var response = await _tradingService.AddOrUpdateClientSportSettings(new ClientSportSettingRequest
                 {
                     ClientCode = _clientCode,
-                    UserId = _userState.Id,
-                    UserName = _userState.Name,
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name,
                     TimeStamp = DateTime.UtcNow,
                     SportsSortOrder = newSportOrder
                 });
@@ -823,8 +823,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                 Payload = $"{_clientCode}",
                 From = JsonSerializer.Serialize(payloadFrom),
                 To = JsonSerializer.Serialize(payloadTo),
-                UserId = _userState.Id,
-                UserName = _userState.Name
+                UserId = _userState.Model.Id,
+                UserName = _userState.Model.Name
             };
         }
         public void Dispose() => registration?.Dispose();

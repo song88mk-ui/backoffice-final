@@ -100,8 +100,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                     From = "-",
                     To = JsonSerializer.Serialize(payload),
                     Activity = Activity.Create.ToString(),
-                    UserId = _userState.Id,
-                    UserName = _userState.Name
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name
                 });
 
                 isSuccess = true;

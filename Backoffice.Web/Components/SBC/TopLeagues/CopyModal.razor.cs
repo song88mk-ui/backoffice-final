@@ -63,7 +63,7 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
 
             if (clients != null)
             {
-                clients.Clients = _userState.ClientCodes.Any() ? clients.Clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != CopyTopLeaguesModel.CopyFromClientId).ToList() : new List<Client>();
+                clients.Clients = _userState.Model.ClientCodes.Any() ? clients.Clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper()) && c.ClientId != CopyTopLeaguesModel.CopyFromClientId).ToList() : new List<Client>();
 
                 CopyTopLeaguesModel.ClientIdSelectedModel = clients.Clients.Select(s => new ClientIdSelectedModel
                 {

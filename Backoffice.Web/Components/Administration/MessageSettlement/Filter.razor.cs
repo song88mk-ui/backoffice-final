@@ -193,7 +193,7 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
 
             var payload = new OnGetMessageSettlementHistoryMessage()
             {
-                UserId = _userState.Id,
+                UserId = _userState.Model.Id,
                 ConnectionId = _userState.ConnectionId,
                 SportId = FilterModel.SportId,
                 SegmentId = FilterModel.SegmentId,

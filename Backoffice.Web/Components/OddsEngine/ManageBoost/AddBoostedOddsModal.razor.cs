@@ -114,8 +114,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     MarketTemplateId = Model.MarketTemplateId,
                     SelectionTemplateId = Model.SelectionTemplateId,
                     SelectionSpecifier = Model.SelectionSpecifier,
-                    UserId = _userState.Id,
-                    UserName = _userState.Name,
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name,
                     TimeStamp = DateTime.UtcNow,
                     MarketSpecifier = Model.MarketSpecifier
                 };
@@ -544,7 +544,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         {
             var clients = (await TradingService.GetClientList()).Result;
 
-            clients = _userState.ClientCodes.Any() ? clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
+            clients = _userState.Model.ClientCodes.Any() ? clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
 
             if (!string.IsNullOrEmpty(Model.ClientCode))
                 clients = clients.Where(c => c.ClientCode == Model.ClientCode).ToList();

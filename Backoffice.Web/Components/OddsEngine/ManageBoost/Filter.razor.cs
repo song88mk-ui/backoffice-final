@@ -162,9 +162,9 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
         #region Utilities
         private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (_userState.TradingClients != null && _userState.TradingClients.Any() && !_clientListReference.Any())
+            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
             {
-                _clientListReference = new List<ClientInformationModel>(_userState.TradingClients);
+                _clientListReference = new List<ClientInformationModel>(_userState.Model.TradingClients);
 
                 _clients = await LoadClients();
                 SelectedClientCode = _clients.FirstOrDefault().Value;
@@ -182,7 +182,7 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                 return new();
             }
 
-            clientList = _userState.ClientCodes.Any() ? clientList.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+            clientList = _userState.Model.ClientCodes.Any() ? clientList.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
 
             var result = clientList?.Select(s => new SelectListItemModel<string>
             {

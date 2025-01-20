@@ -255,8 +255,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
                 var token = _cts.Token;
 
-                var userId = _userState.Id;
-                var userRoleId = _userState.RoleId;
+                var userId = _userState.Model.Id;
+                var userRoleId = _userState.Model.RoleId;
 
                 var request = new AddOrUpdateAnnouncementRequest
                 {
@@ -273,9 +273,9 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
                 if(_isEdit)
                 {
-                    var isInternalUser = _userState.Claims.Any(c => c.Type.Contains("Admin.") && c.Value != "0") && _userState.Claims.Any(c => c.Type.Contains("SBC.") && c.Value != "0");
+                    var isInternalUser = _userState.Model.Claims.Any(c => c.Type.Contains("Admin.") && c.Value != "0") && _userState.Model.Claims.Any(c => c.Type.Contains("SBC.") && c.Value != "0");
 
-                    if (isInternalUser == false && _announcement.UserRoleId != _userState.RoleId)
+                    if (isInternalUser == false && _announcement.UserRoleId != _userState.Model.RoleId)
                     {
                         var toRemoveClientCodes = _announcement.Clients.Select(s => s.ClientCode).ToList();
                         if (toRemoveClientCodes != null && toRemoveClientCodes.Any())

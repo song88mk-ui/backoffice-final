@@ -128,8 +128,8 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
                                 InitialBetSelectionStatusId = item.InitialBetSelectionStatusId,
                                 MarketTemplateId = item.MarketTemplateId
                             }),
-                            UserId = _userState.Id,
-                            UserName = _userState.Name,
+                            UserId = _userState.Model.Id,
+                            UserName = _userState.Model.Name,
                             TimeStamp = DateTime.UtcNow
                         };
 
@@ -180,8 +180,8 @@ namespace Backoffice.Web.Components.Administration.MessageSettlement
                                     InitialBetSelectionStatusId = item.InitialBetSelectionStatusId,
                                     MarketTemplateId = item.MarketTemplateId
                                 }),
-                                UserId = _userState.Id,
-                                UserName = _userState.Name,
+                                UserId = _userState.Model.Id,
+                                UserName = _userState.Model.Name,
                                 TimeStamp = DateTime.UtcNow
                             };
 

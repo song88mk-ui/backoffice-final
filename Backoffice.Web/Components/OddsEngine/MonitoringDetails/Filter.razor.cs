@@ -43,8 +43,8 @@ namespace Backoffice.Web.Components.OddsEngine.MonitoringDetails
 
             if (clients != null)
             {
-                _clientFilter = _userState.ClientCodes.Any() ?
-                    clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper()))
+                _clientFilter = _userState.Model.ClientCodes.Any() ?
+                    clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper()))
                         .Select(c => new SelectListItemWithCheckboxModel<string> { Value = c.ClientCode, Name = c.ClientName, IsChecked = true }).ToList() : new();
 
                 _clientFilter.Insert(0, new SelectListItemWithCheckboxModel<string>

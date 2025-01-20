@@ -296,7 +296,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }
                 else
                 {
-                    var query = priceBoostConfigResponse.Result.AsQueryable().Where(c => _userState.ClientCodes.Contains(c.ClientCode));
+                    var query = priceBoostConfigResponse.Result.AsQueryable().Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode));
 
                     if (!string.IsNullOrEmpty(_search))
                     {

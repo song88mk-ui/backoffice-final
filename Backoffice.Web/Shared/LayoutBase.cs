@@ -67,7 +67,7 @@ namespace Backoffice.Web.Shared
 
                 TranslationState.PropertyChanged += async (s, e) => await InvokeAsync(StateHasChanged);
 
-                if (!UserState.IsAuthenticated)
+                if (!UserState.Model.IsAuthenticated)
                 {
                     NavigationManager.NavigateTo("login", true);
                     return;
@@ -89,7 +89,7 @@ namespace Backoffice.Web.Shared
                     return;
                 }
 
-                if (UserState?.ClaimsPrincipal?.Claims != null && UserState.ClaimsPrincipal.Claims.Any())
+                if (UserState?.Model.ClaimsPrincipal?.Claims != null && UserState.Model.ClaimsPrincipal.Claims.Any())
                 {
                     var clients = clientResult.Result.Clients;
                     UserState.SetSportsbookClients(clients);
@@ -110,7 +110,7 @@ namespace Backoffice.Web.Shared
                 }
 
                 var page = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
-                if (UserState?.Claims != null)
+                if (UserState?.Model.Claims != null)
                 {
                     var permissionSubCategory = permissions.Permissions.Where(p => p.CategoryId == (int)navMenuAccess && p.ClaimType != SportsbookClientPermission.SBC_Clients_Access.ToString().Replace('_', '.')).Select(s => s.SubCategoryName).Distinct();
 
@@ -120,10 +120,10 @@ namespace Backoffice.Web.Shared
 
                         if (subMenus.Count() == 1)
                         {
-                            var claim = UserState?.Claims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
+                            var claim = UserState?.Model.Claims.FirstOrDefault(c => c.Type == subMenus[0].ClaimType);
                             if (claim != null && claim.Value != "0")
                             {
-                                if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserState.MainUserId))
+                                if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserState.Model.MainUserId))
                                     continue;
 
                                 if (!string.IsNullOrEmpty(subMenus[0].GroupName) && subMenus[0].ClaimType.Contains(SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".")))
@@ -151,15 +151,15 @@ namespace Backoffice.Web.Shared
 
                             foreach (var subMenu in subMenus)
                             {
-                                var claim = UserState?.Claims.FirstOrDefault(c => c.Type == subMenu.ClaimType);
+                                var claim = UserState?.Model.Claims.FirstOrDefault(c => c.Type == subMenu.ClaimType);
                                 if (claim != null && claim.Value != "0")
                                 {
-                                    if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserState.MainUserId))
+                                    if (claim.Type == SportsbookClientPermission.SBC_SubUsers.ToString().Replace("_", ".") && !string.IsNullOrWhiteSpace(UserState?.Model.MainUserId))
                                         continue;
 
                                     if (claim.Type == SportsbookClientPermission.SBC_OE.ToString().Replace("_", "."))
                                     {
-                                        var sbsFirstClaim = UserState?.Claims.FirstOrDefault(x => x.Type.ToUpper().Contains($"{SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".").ToUpper()}."))?.Type.ToString() ?? string.Empty;
+                                        var sbsFirstClaim = UserState?.Model.Claims.FirstOrDefault(x => x.Type.ToUpper().Contains($"{SportsbookClientPermission.SBC_OE.ToString().Replace("_", ".").ToUpper()}."))?.Type.ToString() ?? string.Empty;
 
                                         var permission = PermissionMap.TryGetValue(sbsFirstClaim, out string permissionMapResult) ? permissionMapResult : string.Empty;
                                         var menu2 = new MenuModel
@@ -226,7 +226,7 @@ namespace Backoffice.Web.Shared
         {
             if (message != null)
             {
-                if (!string.IsNullOrEmpty(message.UserId) && message.UserId != UserState.Id)
+                if (!string.IsNullOrEmpty(message.UserId) && message.UserId != UserState.Model.Id)
                     return;
 
                 ToasterService.AddToast(Toast.NewToast

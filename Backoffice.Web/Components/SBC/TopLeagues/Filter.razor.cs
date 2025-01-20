@@ -133,9 +133,9 @@ namespace Backoffice.Web.Components.SBC.TopLeagues
         #region Utilities
         private void SetClients()
         {
-            if (_userState.SportsbookClients != null && _userState.SportsbookClients.Any())
+            if (_userState.Model.SportsbookClients != null && _userState.Model.SportsbookClients.Any())
             {
-                var clients = _userState.ClientCodes.Any() ? _userState.SportsbookClients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
+                var clients = _userState.Model.ClientCodes.Any() ? _userState.Model.SportsbookClients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<Client>();
 
                 TopLeaguesFilterModel.Clients = clients
                     .Select(s => new TopLeaguesFilterModel.Client

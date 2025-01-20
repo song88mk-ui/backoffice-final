@@ -4,6 +4,7 @@ using Backoffice.Web.Models;
 using Backoffice.Web.Services;
 using Backoffice.Web.Utilities;
 using Microsoft.AspNetCore.Components;
+using System.ComponentModel;
 
 namespace Backoffice.Web.Components.SBC.Announcements
 {
@@ -53,6 +54,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
             _filterModel.LanguageCode = _languageCodes.FirstOrDefault()?.Value ?? string.Empty;
             _filterModel.Search = string.Empty;
 
+            _userState.PropertyChanged += UserStatePropertyChanged;
         }
 
         protected override async Task OnParametersSetAsync()
@@ -65,8 +67,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
             {
                 _languageCode = _translationState.ActiveLanguageCode;
 
-                if (_userState.SportsbookClients != null && _clientListReference != _userState.SportsbookClients)
-                    _clientListReference = _userState.SportsbookClients;
+                if (_userState.Model.SportsbookClients != null && _clientListReference != _userState.Model.SportsbookClients)
+                    _clientListReference = _userState.Model.SportsbookClients;
 
                 if (_clientListReference != null && _clientListReference.Any())
                 {
@@ -130,7 +132,7 @@ namespace Backoffice.Web.Components.SBC.Announcements
 
         private bool ValidateParameters()
         {
-            return _init || _clientListReference != _userState.SportsbookClients || _languageCode != _translationState.ActiveLanguageCode;
+            return _init || _clientListReference != _userState.Model.SportsbookClients || _languageCode != _translationState.ActiveLanguageCode;
         }
 
         public void Dispose()
@@ -138,6 +140,39 @@ namespace Backoffice.Web.Components.SBC.Announcements
             GC.SuppressFinalize(this);
         }
 
+        #endregion
+
+        #region Utilities
+        private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (_userState.Model.SportsbookClients != null && _clientListReference != _userState.Model.SportsbookClients)
+                _clientListReference = _userState.Model.SportsbookClients;
+
+            if (_clientListReference != null && _clientListReference.Any())
+            {
+                _clients = _clientListReference.OrderBy(x => x.ClientName).Select(s => new SelectListItemWithCheckboxModel<string>
+                {
+                    Value = s.ClientCode,
+                    Name = s.ClientName,
+                    IsChecked = true
+                }).ToList();
+
+                var selectedClients = _clients.Where(c => c.Value != "all" && c.IsChecked).Select(s => s.Value).ToList();
+
+                _filterModel.Clients = _clients;
+                _filterModel.ClientCodes = string.Join(",", selectedClients);
+            }
+            else
+            {
+                _clients = new List<SelectListItemWithCheckboxModel<string>>();
+                _filterModel.ClientCodes = null;
+            }
+
+            _shouldRender = true;
+            StateHasChanged();
+
+            await OnInitCallback.InvokeAsync(_filterModel);
+        }
         #endregion
     }
 }

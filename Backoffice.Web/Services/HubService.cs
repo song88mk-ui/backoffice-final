@@ -38,7 +38,7 @@ namespace Backoffice.Web.Services
 
                 _isConnecting = true;
 
-                var userId = _userState.Id;
+                var userId = _userState.Model.Id;
                 _hubConnection = new HubConnectionBuilder()
                                 .WithUrl($"{_hubUri}?userId={userId}", options =>
                                 {

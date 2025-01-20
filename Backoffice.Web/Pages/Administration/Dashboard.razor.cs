@@ -39,7 +39,7 @@ namespace Backoffice.Web.Pages.Administration
         {
             var reportRoles = (await AuthenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
             {
-                RoleId = _userState.RoleId,
+                RoleId = _userState.Model.RoleId,
                 ClaimType = AdminPermission.Admin_Dashboard.ToString().Replace("_", ".")
             })).Result ?? new ReportRolesUrlResponse();
 

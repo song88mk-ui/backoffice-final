@@ -24,7 +24,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             parameters.Add("ModalDialogClass", "modal-md modal-dialog-centered");                                                                                                                                                                                                                                          
             parameters.Add("Region", _region);
             parameters.Add("ConnectionId", _userState.ConnectionId);
-            parameters.Add("UserId", _userState.Id);
+            parameters.Add("UserId", _userState.Model.Id);
             parameters.Add("ConfigTemplateId", ConfigTemplate.Id);
             parameters.Add("ConfigTemplateName", ConfigTemplate.Name);
 

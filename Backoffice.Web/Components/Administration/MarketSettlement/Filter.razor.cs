@@ -195,7 +195,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                 ManualSettledBy = FilterModel.SettledBy,
                 FromDate = FilterModel.FromDate,
                 ToDate = FilterModel.ToDate,
-                UserId = _userState.Id,
+                UserId = _userState.Model.Id,
                 ConnectionId = _userState.ConnectionId
             };
 

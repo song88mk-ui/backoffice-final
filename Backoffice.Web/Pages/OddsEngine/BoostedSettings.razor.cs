@@ -70,9 +70,9 @@ namespace Backoffice.Web.Pages.OddsEngine
 
         protected override async Task OnParametersSetAsync()
         {
-            if (_userState.TradingClients != null && _userState.TradingClients.Any() && !_clientListReference.Any())
+            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
             {
-                _clientListReference = new List<ClientInformationModel>(_userState.TradingClients);
+                _clientListReference = new List<ClientInformationModel>(_userState.Model.TradingClients);
                 _init = true;
             }
 
@@ -174,9 +174,9 @@ namespace Backoffice.Web.Pages.OddsEngine
         private bool ValidateParameter() => _clientListReference != null && _init;
         private async void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (_userState.TradingClients != null && _userState.TradingClients.Any() && !_clientListReference.Any())
+            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any() && !_clientListReference.Any())
             {
-                _clientListReference = new List<ClientInformationModel>(_userState.TradingClients);
+                _clientListReference = new List<ClientInformationModel>(_userState.Model.TradingClients);
 
                 await GetContent();
             }

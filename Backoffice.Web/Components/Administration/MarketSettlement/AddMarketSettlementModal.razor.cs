@@ -370,7 +370,7 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                     DeadHeatFactor = row.DeadHeat,
                     SelectionStatus = (BetStatus)row.ToStatus,
                     Reason = row.Reason,
-                    ManualSettledBy = _userState.Name,
+                    ManualSettledBy = _userState.Model.Name,
                 });
 
                 var fixture = fixtureList.Where(f => f.Item1 == row.FixtureId).FirstOrDefault();
@@ -439,15 +439,15 @@ namespace Backoffice.Web.Components.Administration.MarketSettlement
                         ToStatusId = (int)item.SelectionStatus,
                         ToStatusName = item.SelectionStatus.ToString()
                     }),
-                    UserId = _userState.Id,
-                    UserName = _userState.Name,
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name,
                     TimeStamp = DateTime.UtcNow
                 };
 
                 ActivityLogs.ActivityLogs.Add(ActivityLog);
             }
 
-            var response = (await TradingService.AddOrUpdateManualMarketSettlement(request, _userState.Id)).Result;
+            var response = (await TradingService.AddOrUpdateManualMarketSettlement(request, _userState.Model.Id)).Result;
 
             if (response.StatusCode == StatusCode.Success)
             {

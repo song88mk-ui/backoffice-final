@@ -214,8 +214,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                         data.SegmentId = league.SegmentId;
                         data.LeagueId = league.LeagueId;
                         data.ClientId = Guid.Parse(league.ClientId);
-                        data.UserId = _userState.Id;
-                        data.UserName = _userState.Name;
+                        data.UserId = _userState.Model.Id;
+                        data.UserName = _userState.Model.Name;
 
                         data.MarketConfig = marketConfig.Select(s => new MarketConfigModel
                         {
@@ -325,8 +325,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 From = from,
                                 To = to,
                                 Activity = Activity.Update.ToString(),
-                                UserId = _userState.Id,
-                                UserName = _userState.Name
+                                UserId = _userState.Model.Id,
+                                UserName = _userState.Model.Name
                             };
 
                             await _backofficeService.AddActivityLog(activityLog);
@@ -366,8 +366,8 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                                 From = from,
                                 To = to,
                                 Activity = Activity.Update.ToString(),
-                                UserId = _userState.Id,
-                                UserName = _userState.Name
+                                UserId = _userState.Model.Id,
+                                UserName = _userState.Model.Name
                             };
 
                             await _backofficeService.AddActivityLog(activityLog);

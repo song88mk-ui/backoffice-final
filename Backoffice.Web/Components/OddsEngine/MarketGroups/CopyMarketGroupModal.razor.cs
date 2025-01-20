@@ -49,14 +49,14 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                 try
                 {
                     CopyToClientCode = ModalParameters.TryGet<string>("ClientCode");
-                    if (_userState.ClientCodes.Any())
+                    if (_userState.Model.ClientCodes.Any())
                     {
                         ClientInformations = (await _tradingService.GetClientList()).Result;
 
-                        var roleName = _userState.RoleName;
+                        var roleName = _userState.Model.RoleName;
                         if (roleName != "Super Admin")
                         {
-                            var clientCodes = _userState.ClientCodes;
+                            var clientCodes = _userState.Model.ClientCodes;
                             ClientInformations = ClientInformations.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
                         }
                         Clients = ClientInformations.Where(x => x.ClientCode != CopyToClientCode).Select(s => new SelectListItemModel<string>

@@ -116,7 +116,7 @@ public partial class ViewAllLogsFilter : IDisposable
         {
             foreach (var client in response.Result)
             {
-                if (_userState.ClientCodes.Contains(client.ClientCode, StringComparer.OrdinalIgnoreCase))
+                if (_userState.Model.ClientCodes.Contains(client.ClientCode, StringComparer.OrdinalIgnoreCase))
                 {
                     KeyValuePair<string, string> Client = new KeyValuePair<string, string>(client.ClientCode, client.ClientName);
 

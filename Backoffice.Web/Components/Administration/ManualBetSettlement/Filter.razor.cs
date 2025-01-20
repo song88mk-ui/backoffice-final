@@ -256,8 +256,8 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
 
             if (clients != null && clients.Clients.Any())
             {
-                if(_userState.ClientCodes.Any())
-                    clients.Clients = clients.Clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
+                if(_userState.Model.ClientCodes.Any())
+                    clients.Clients = clients.Clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList();
 
                 Clients = clients.Clients.Select(s => new SelectListItemWithCheckboxModel<string>
                 {

@@ -42,7 +42,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             var reportRoles = (await AuthenticationService.GetReportRolesUrl(new ReportRolesUrlRequest
             {
-                RoleId = _userState.RoleId,
+                RoleId = _userState.Model.RoleId,
                 ClaimType = SportsbookClientPermission.SBC_Reports_DrillDownReport.ToString().Replace("_", ".")
             })).Result ?? new ReportRolesUrlResponse();
 

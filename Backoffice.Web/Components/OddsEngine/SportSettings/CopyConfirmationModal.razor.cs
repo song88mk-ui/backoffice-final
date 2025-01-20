@@ -45,8 +45,8 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
             var request = new ClientSportSettingRequest
             {
                 ClientCode = ModalParameters.TryGet<string>("ToClientCode"),
-                UserId = _userState.Id,
-                UserName = _userState.Name,
+                UserId = _userState.Model.Id,
+                UserName = _userState.Model.Name,
                 TimeStamp = DateTime.UtcNow,
                 SportsSortOrder = ModalParameters.TryGet<List<SportsSortOrder>>("Sports")
             };

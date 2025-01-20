@@ -40,7 +40,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
 
             if (clientResponse.StatusCode == StatusCode.Success)
             {
-                clientResponse.Result = _userState.ClientCodes.Any() ? clientResponse.Result.Where(c => _userState.ClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
+                clientResponse.Result = _userState.Model.ClientCodes.Any() ? clientResponse.Result.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode)).ToList() : new List<ClientInformationModel>();
 
                 ClientInformations = clientResponse.Result;
 
@@ -92,7 +92,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketSortOrder
             parameters.Add("SportId", FromSportId);
             parameters.Add("FixtureStatusId", FromFixtureStatusId);
 
-            parameters.Add("UserId", _userState.Id);
+            parameters.Add("UserId", _userState.Model.Id);
 
             parameters.Add("DialogStyle", "max-width: 600px;");
 

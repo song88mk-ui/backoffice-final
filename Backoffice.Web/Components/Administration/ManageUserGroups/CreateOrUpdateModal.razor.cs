@@ -176,8 +176,8 @@ namespace Backoffice.Web.Components.Administration.ManageUserGroups
                         Activity = !IsEdit ? Activity.Create.ToString() : Activity.Update.ToString(),
                         From = !IsEdit ? "-" : JsonSerializer.Serialize(OldUserGroup),
                         To = JsonSerializer.Serialize(UserGroup),
-                        UserId = _userState.Id,
-                        UserName = _userState.Name
+                        UserId = _userState.Model.Id,
+                        UserName = _userState.Model.Name
                     });
 
                     ModalService.Cancel();

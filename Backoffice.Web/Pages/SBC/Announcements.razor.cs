@@ -306,12 +306,12 @@ namespace Backoffice.Web.Pages.SBC
 
         private void SetItemAction()
         {
-            var isInternalUser = _userState.Claims.Any(c => c.Type.Contains("Admin.") && c.Value != "0") && _userState.Claims.Any(c => c.Type.Contains("SBC.") && c.Value != "0");
+            var isInternalUser = _userState.Model.Claims.Any(c => c.Type.Contains("Admin.") && c.Value != "0") && _userState.Model.Claims.Any(c => c.Type.Contains("SBC.") && c.Value != "0");
             foreach (var item in _model.Announcements)
             {
                 item.EditAction = _ => OnEditClickEvent(item);
                 item.DeleteAction = _ => OnDeleteClickEvent(item);
-                item.DisabledClass = isInternalUser == false && !item.Clients.Any(c => _userState.ClientCodes.Contains(c.ClientCode)) ? "disabled-action" : "";
+                item.DisabledClass = isInternalUser == false && !item.Clients.Any(c => _userState.Model.ClientCodes.Contains(c.ClientCode)) ? "disabled-action" : "";
             }
         }
 

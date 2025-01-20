@@ -62,7 +62,7 @@ namespace Backoffice.Web.Services
 
         private void ConfigureHttpClientHeaders()
         {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.AccessToken);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.Model.AccessToken);
 
             RemoveHeader("x-page");
             RemoveHeader("x-language-code");
@@ -893,7 +893,7 @@ namespace Backoffice.Web.Services
                     }
                     else
                     {
-                        Log.Error($"[api/trading/sports/{fixtureTypeId}] - {_userState.AccessToken} - {response.ReasonPhrase}");
+                        Log.Error($"[api/trading/sports/{fixtureTypeId}] - {_userState.Model.AccessToken} - {response.ReasonPhrase}");
 
                         return new BaseResponse<SportsTreeResponse>
                         {
@@ -1085,7 +1085,7 @@ namespace Backoffice.Web.Services
                     {
 
                         var content = await response.Content.ReadAsStringAsync();
-                        Log.Error($"[api/trading/client] - {_userState.AccessToken} - {response.ReasonPhrase}");
+                        Log.Error($"[api/trading/client] - {_userState.Model.AccessToken} - {response.ReasonPhrase}");
                         return JsonSerializer.Deserialize<BaseResponse<List<MainMarketTemplateResponse>>>
                         (
                             content,
@@ -1094,7 +1094,7 @@ namespace Backoffice.Web.Services
                     }
                     else
                     {
-                        Log.Error($"[api/trading/client] - {_userState.AccessToken} - {response.ReasonPhrase}");
+                        Log.Error($"[api/trading/client] - {_userState.Model.AccessToken} - {response.ReasonPhrase}");
 
                         return new BaseResponse<List<MainMarketTemplateResponse>>
                         {

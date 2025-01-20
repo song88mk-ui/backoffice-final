@@ -38,7 +38,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
 
             if (clientResponse.StatusCode == StatusCode.Success)
             {
-                clientResponse.Result = _userState.ClientCodes.Any() ? clientResponse.Result.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+                clientResponse.Result = _userState.Model.ClientCodes.Any() ? clientResponse.Result.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
 
                 Clients = clientResponse.Result.Select(s => new SelectListItemModel<string>
                 {

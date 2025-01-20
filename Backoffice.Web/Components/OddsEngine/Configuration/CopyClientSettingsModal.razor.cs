@@ -95,7 +95,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
             clients = (await _tradingService.GetClientList()).Result;
             if (clients != null)
             {
-                clients = _userState.ClientCodes.Any() ? clients.Where(c => _userState.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
+                clients = _userState.Model.ClientCodes.Any() ? clients.Where(c => _userState.Model.ClientCodes.Contains(c.ClientCode.ToUpper())).ToList() : new List<ClientInformationModel>();
             }
 
             return clients?.ToList() ?? new List<ClientInformationModel>();

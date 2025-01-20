@@ -94,8 +94,8 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
                     Activity = isAdd ? Activity.Create.ToString() : Activity.Update.ToString(),
                     From = isAdd ? "-" : JsonSerializer.Serialize(oldClientMarketTemplateGroup),
                     To = JsonSerializer.Serialize(clientMarketTemplateGroup),
-                    UserId = _userState.Id,
-                    UserName = _userState.Name
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name
                 });
 
                 _modalService.Cancel();

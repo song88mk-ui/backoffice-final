@@ -31,7 +31,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
                 UserId = ModalParameters.TryGet<string>("UserId"),
                 ConfigTemplateId = ModalParameters.TryGet<long>("ConfigTemplateId").ToString(),
                 Filename = Path.GetFileNameWithoutExtension(_filename),
-                AccessToken = _userState.AccessToken ?? string.Empty
+                AccessToken = _userState.Model.AccessToken ?? string.Empty
             };
 
             // Task - Migrate to api call

@@ -50,8 +50,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
             PriceBoost.BoostedOdds = 0;
             PriceBoost.BoostedOddsStr = "0";
             PriceBoost.TimeStamp = DateTime.UtcNow;
-            PriceBoost.UserId = _userState.Id;
-            PriceBoost.UserName = _userState.Name;
+            PriceBoost.UserId = _userState.Model.Id;
+            PriceBoost.UserName = _userState.Model.Name;
 
             var result = await TradingService.AddOrUpdatePriceBoost(new List<PriceBoostConfigModel>() { PriceBoost });
 
@@ -106,8 +106,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                     Activity = Activity.Delete.ToString(),
                     From = JsonSerializer.Serialize(priceBoostLogModelFrom),
                     To = "-",
-                    UserId = _userState.Id,
-                    UserName = _userState.Name
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name
                 });
             }
 

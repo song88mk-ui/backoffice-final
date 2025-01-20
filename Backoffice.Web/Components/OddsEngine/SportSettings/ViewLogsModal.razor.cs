@@ -79,7 +79,7 @@ namespace Backoffice.Web.Components.OddsEngine.SportSettings
                 _clientSportOrderAudit = activityLogs.Select(s => new SportSettingsActivityLog()
                 {
                     Timestamp = s.TimeStamp,
-                    ClientName = _userState.TradingClients.FirstOrDefault(c => c.ClientCode.Equals(s.Payload, StringComparison.OrdinalIgnoreCase))?.ClientName ?? s.Payload,
+                    ClientName = _userState.Model.TradingClients.FirstOrDefault(c => c.ClientCode.Equals(s.Payload, StringComparison.OrdinalIgnoreCase))?.ClientName ?? s.Payload,
                     ChangesFrom = PrepareLogPayload(JsonSerializer.Deserialize<SportSettingSortOrderAudit>(s.From)),
                     ChangesTo = PrepareLogPayload(JsonSerializer.Deserialize<SportSettingSortOrderAudit>(s.To)),
                     UpdatedBy = s.UserName

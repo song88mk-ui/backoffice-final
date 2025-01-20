@@ -65,8 +65,8 @@ namespace Backoffice.Web.Components.Administration.ManualBetSettlement
                     Payload = "",
                     From = "-",
                     To = JsonSerializer.Serialize(bet),
-                    UserId = _userState.Id,
-                    UserName = _userState.Name,
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name,
                     TimeStamp = DateTime.UtcNow
                 };
 

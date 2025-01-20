@@ -76,9 +76,9 @@ namespace Backoffice.Web.Pages.OddsEngine
             _shouldRender = ValidateParameters();
             if (_shouldRender)
             {
-                if (_userId != _userState.Id)
+                if (_userId != _userState.Model.Id)
                 {
-                    _userId = _userState.Id;
+                    _userId = _userState.Model.Id;
 
                     await _hubService.RegisterMessageHandlers(
                         ProcessBetStopFixture,
@@ -127,7 +127,7 @@ namespace Backoffice.Web.Pages.OddsEngine
 
             _modalService.Open<CloseMatchModal>("Close Match", parameters, options);
         }
-        private bool ValidateParameters() => _init || ((SelectedSport?.LeagueId ?? _leagueId) != _leagueId || (LeagueId != 0 && LeagueId != _leagueId)) || _languageCode != _translationState.ActiveLanguageCode || _selectedSportsUnix != SelectedSport?.UnixTime || _userId != _userState.Id;
+        private bool ValidateParameters() => _init || ((SelectedSport?.LeagueId ?? _leagueId) != _leagueId || (LeagueId != 0 && LeagueId != _leagueId)) || _languageCode != _translationState.ActiveLanguageCode || _selectedSportsUnix != SelectedSport?.UnixTime || _userId != _userState.Model.Id;
 
         private async Task OnInitializeEvent(MonitoringCallbackModel model)
         {
@@ -165,7 +165,7 @@ namespace Backoffice.Web.Pages.OddsEngine
                 }).ToList();
                 _colCtr = 3 + _clients.Count();
 
-                if (_userState.ClaimsPrincipal?.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_Monitoring_MatchType.ToString().Replace("_", ".")}" && x.Value == "1") ?? false)
+                if (_userState.Model.ClaimsPrincipal?.Claims?.Any(x => x.Type == $"{SportsbookClientPermission.SBC_OE_Monitoring_MatchType.ToString().Replace("_", ".")}" && x.Value == "1") ?? false)
                     _colCtr++;
 
             }

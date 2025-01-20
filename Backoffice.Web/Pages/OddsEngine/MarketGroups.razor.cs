@@ -290,8 +290,8 @@ namespace Backoffice.Web.Pages.OddsEngine
                         Activity = Activity.Update.ToString(),
                         From = JsonSerializer.Serialize(MarketGroupModel.OldMarketTemplateGroups),
                         To = JsonSerializer.Serialize(marketTemplateGroups),
-                        UserId = _userState.Id,
-                        UserName = _userState.Name
+                        UserId = _userState.Model.Id,
+                        UserName = _userState.Model.Name
                     });
 
                     // re-assign the updated data on market sort order properties

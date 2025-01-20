@@ -39,7 +39,7 @@ namespace Backoffice.Web.Components.Common
 
             if (isValidInput)
             {
-                var response = await AuthenticationService.UpdateUserPassword(_userState.Id, new Backoffice.Shared.Models.Requests.UserRegisterRequest() 
+                var response = await AuthenticationService.UpdateUserPassword(_userState.Model.Id, new Backoffice.Shared.Models.Requests.UserRegisterRequest() 
                 {
                     Password = NewPassword
                 });

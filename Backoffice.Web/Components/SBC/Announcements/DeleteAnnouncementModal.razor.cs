@@ -83,8 +83,8 @@ namespace Backoffice.Web.Components.SBC.Announcements
                     Activity = Activity.Delete.ToString(),
                     From = JsonSerializer.Serialize(oldData),
                     To = "-",
-                    UserId = _userState.Id,
-                    UserName = _userState.Name
+                    UserId = _userState.Model.Id,
+                    UserName = _userState.Model.Name
                 });
 
                 ModalService.Cancel();

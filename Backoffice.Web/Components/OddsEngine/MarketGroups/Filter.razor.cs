@@ -1,17 +1,16 @@
 ﻿using Backoffice.Shared.Enums;
 using Backoffice.Web.Models;
+using Backoffice.Web.Pages.SBC;
 using Backoffice.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Serilog;
+using System.ComponentModel;
 
 namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 {
     public partial class Filter : IDisposable
     {
         #region Properties
-
-        [Inject] public IModalService ModalService { get; set; }
-        [Inject] public ITradingService TradingService { get; set; }
 
         [Parameter] public EventCallback OnAddCallback { get; set; }
         [Parameter] public EventCallback OnUpdateCallback { get; set; }
@@ -37,26 +36,21 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         protected override async Task OnInitializedAsync()
         {
+            _userState.PropertyChanged += UserStatePropertyChanged;
+
             Clients = new List<SelectListItemModel<string>>();
             Sports = new List<SelectListItemModel<int>>();
             FixtureStatuses = new List<SelectListItemModel<int>>();
             MarketGroupModel = new MarketGroupModel();
+
             try
             {
                 MarketGroupModel.IsUpdate = false;
-                TradingService.Region = Region.ToUpper();
+                _tradingService.Region = Region.ToUpper();
 
-                if (_userState.ClientCodes.Any())
+                if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
                 {
-                    var clients = (await TradingService.GetClientList()).Result;
-
-                    var roleName = _userState.RoleName;
-                    if (roleName != "Super Admin")
-                    {
-                        var clientCodes = _userState.ClientCodes;
-                        clients = clients.Where(c => clientCodes.Contains(c.ClientCode)).ToList();
-                    }
-                    Clients = clients.Select(s => new SelectListItemModel<string>
+                    Clients = _userState.Model.TradingClients.Select(s => new SelectListItemModel<string>
                     {
                         Value = s.ClientCode,
                         Name = s.ClientName
@@ -73,7 +67,7 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
                 SelectedClientCode = Clients.FirstOrDefault().Value;
 
-                var sports = (await TradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
+                var sports = (await _tradingService.GetSportLookup(_translationState.ActiveLanguageCode.ToString())).Result;
 
                 if (sports != null)
                 {
@@ -182,11 +176,34 @@ namespace Backoffice.Web.Components.OddsEngine.MarketGroups
 
         #region Utilities
 
+        private void UserStatePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            Clients = new List<SelectListItemModel<string>>();
+
+            if (_userState.Model.TradingClients != null && _userState.Model.TradingClients.Any())
+            {
+                Clients = _userState.Model.TradingClients.Select(s => new SelectListItemModel<string>
+                {
+                    Value = s.ClientCode,
+                    Name = s.ClientName
+                }).ToList();
+            }
+            else
+            {
+                Clients.Add(new SelectListItemModel<string>
+                {
+                    Value = "",
+                    Name = _translationState.GetValue("No Clients Available")
+                });
+            }
+
+            SelectedClientCode = Clients.FirstOrDefault().Value;
+        }
         private async Task PrepareMarketGroupModel()
         {
             if (!string.IsNullOrEmpty(SelectedClientCode) && SelectedSportId != 0)
             {
-                var marketTemplateResponse = (await TradingService.GetClientMarketTemplates(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId, _translationState.ActiveLanguageCode)).Result;
+                var marketTemplateResponse = (await _tradingService.GetClientMarketTemplates(SelectedClientCode, SelectedSportId, SelectedFixtureStatusId, _translationState.ActiveLanguageCode)).Result;
 
                 if(marketTemplateResponse != null)
                 {

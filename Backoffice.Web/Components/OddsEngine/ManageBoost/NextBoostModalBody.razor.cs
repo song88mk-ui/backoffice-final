@@ -232,8 +232,8 @@ namespace Backoffice.Web.Components.OddsEngine.ManageBoost
                             Activity = Activity.Create.ToString(),
                             From = "-",
                             To = JsonSerializer.Serialize(priceBoostLogModel),
-                            UserId = _userState.Id,
-                            UserName = _userState.Name
+                            UserId = _userState.Model.Id,
+                            UserName = _userState.Model.Name
                         };
 
                         activityLogList.ActivityLogs.Add(onActivityLogMessage);

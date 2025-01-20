@@ -33,7 +33,7 @@ namespace Backoffice.Web.Services
 
         private HttpClient GetHttpClient()
         {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.AccessToken);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userState.Model.AccessToken);
 
             if (_client.DefaultRequestHeaders.Contains("x-region"))
             {
@@ -259,7 +259,7 @@ namespace Backoffice.Web.Services
                     }
                     else
                     {
-                        Log.Error($"[api/trading/client] - {_userState.AccessToken} - {response.ReasonPhrase}");
+                        Log.Error($"[api/trading/client] - {_userState.Model.AccessToken} - {response.ReasonPhrase}");
 
                         return new BaseResponse<List<ClientInformationModel>>
                         {

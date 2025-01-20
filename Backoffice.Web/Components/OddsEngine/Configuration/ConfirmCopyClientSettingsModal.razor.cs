@@ -62,7 +62,7 @@ namespace Backoffice.Web.Components.OddsEngine.Configuration
 
                 var message = new OnCopyClientSettingsMessage
                 {
-                    UserId = _userState.Id,
+                    UserId = _userState.Model.Id,
                     FromClientCode = SelectedFromClient.Key,
                     ToClientCode = ToClient.ClientCode,
                     ToRemoveConfig = response.Result.ToBeRemoved.Select(s => new ClientLeagueConfig 

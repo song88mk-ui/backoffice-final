@@ -40,7 +40,7 @@ namespace Backoffice.Web.Shared.OddsEngine
 
             if (_shouldRender)
             {
-                _userClaims = new List<Claim>(_userState.Claims);
+                _userClaims = new List<Claim>(_userState.Model.Claims);
 
                 var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
 
@@ -48,7 +48,7 @@ namespace Backoffice.Web.Shared.OddsEngine
                 ActivateMenu(page);
             }
 
-            if (_userState.Claims.Any())
+            if (_userState.Model.Claims.Any())
                 _init = false;
         }
 
@@ -126,7 +126,7 @@ namespace Backoffice.Web.Shared.OddsEngine
         {
             var page = _navigationManager?.Uri.Replace(_navigationManager.BaseUri, "");
 
-            return _init || _activePage != page || _userClaims.SequenceEqual(_userState.Claims);
+            return _init || _activePage != page || _userClaims.SequenceEqual(_userState.Model.Claims);
         }
 
         public void Dispose()

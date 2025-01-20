@@ -32,9 +32,9 @@ namespace Backoffice.Web.Pages.SBC
 
         protected override async Task OnParametersSetAsync()
         {
-            if (_roleId != _userState.RoleId)
+            if (_roleId != _userState.Model.RoleId)
             {
-                _roleId = _userState.RoleId;
+                _roleId = _userState.Model.RoleId;
                 await Initialize();
             }
         }

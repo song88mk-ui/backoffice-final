@@ -69,8 +69,8 @@ namespace Backoffice.Web.Pages.SBC
 
             if (model.IsFirstTime)
             {
-                SubUserClaims.MainUserId = _userState.Id;
-                SubUserClaims.MainUserName = _userState.Name;
+                SubUserClaims.MainUserId = _userState.Model.Id;
+                SubUserClaims.MainUserName = _userState.Model.Name;
                 SubUserClaims.SubUserClaims = new List<PermissionModel>();
 
                 PermissionResponse = await GetPermissionList();
@@ -158,7 +158,7 @@ namespace Backoffice.Web.Pages.SBC
         {
             var request = new SubAccountListRequest
             {
-                MainUserId = _userState.Id,
+                MainUserId = _userState.Model.Id,
                 SearchText = searchText,
                 Page = page,
                 PageSize = 25
@@ -206,12 +206,12 @@ namespace Backoffice.Web.Pages.SBC
             var subUserClaims = new List<PermissionModel>();
 
             bool hasDashboard = false;
-            foreach (var permission in PermissionResponse.Permissions.Where(x => _userState.Claims?.Any(um => um.Type == x.ClaimType) ?? false))
+            foreach (var permission in PermissionResponse.Permissions.Where(x => _userState.Model.Claims?.Any(um => um.Type == x.ClaimType) ?? false))
             {
                 if (permission.IsSubUser)
                 {
                     var availability = 0;
-                    int.TryParse(_userState.Claims?.Where(x => x.Type == permission.ClaimType).FirstOrDefault()?.Value, out availability);
+                    int.TryParse(_userState.Model.Claims?.Where(x => x.Type == permission.ClaimType).FirstOrDefault()?.Value, out availability);
 
                     var subUserClaim = new PermissionModel
                     {
@@ -237,7 +237,7 @@ namespace Backoffice.Web.Pages.SBC
                     }
                     else
                     {
-                        var claim = _userState.Claims?.FirstOrDefault(c => c.Type == permission.ClaimType);
+                        var claim = _userState.Model.Claims?.FirstOrDefault(c => c.Type == permission.ClaimType);
                         if (claim != null && Convert.ToInt32(claim.Value) > 0)
                         {
                             subUserClaim.ClaimValue = claim.Value;
@@ -286,7 +286,7 @@ namespace Backoffice.Web.Pages.SBC
 
         private string GetClaimsList(List<ClaimModel> claims)
         {
-            var userClaims = _userState.Claims?.Where(x => claims.Any(c => c.ClaimType == x.Type && x.Value == c.ClaimValue)).Select(x => x.Type).ToList();
+            var userClaims = _userState.Model.Claims?.Where(x => claims.Any(c => c.ClaimType == x.Type && x.Value == c.ClaimValue)).Select(x => x.Type).ToList();
 
 
             return string.Join(", ", PermissionResponse.Permissions.Where(x => userClaims != null && userClaims.Contains(x.ClaimType)).Select(x => x.Name).ToList());

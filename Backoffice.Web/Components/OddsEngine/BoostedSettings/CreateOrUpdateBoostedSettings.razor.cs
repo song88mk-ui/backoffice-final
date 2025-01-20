@@ -73,7 +73,7 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                     Cap = CapEdit != 0 ? CapEdit / 100 : 0
                 };
 
-                var result = await _tradingService.AddOrUpdateBoostedSetting(payload, _userState.Id);  
+                var result = await _tradingService.AddOrUpdateBoostedSetting(payload, _userState.Model.Id);  
 
                 if (result.StatusCode == StatusCode.Success)
                 {
@@ -90,8 +90,8 @@ namespace Backoffice.Web.Components.OddsEngine.BoostedSettings
                             Cap = Cap / 100
                         }),
                         To = JsonSerializer.Serialize(payload),
-                        UserId = _userState.Id,
-                        UserName = _userState.Name
+                        UserId = _userState.Model.Id,
+                        UserName = _userState.Model.Name
                     });
                 }
                 else
