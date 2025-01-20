@@ -302,9 +302,9 @@ namespace Backoffice.Web.Pages.OddsEngine
                     {
                         var search = _search.ToLower();
 
-                        query = query.Where(c => c.ClientName.ToLower().Contains(_search) || c.SportName.ToLower().Contains(_search)
-                        || c.SegmentName.ToLower().Contains(_search) || c.LeagueName.ToLower().Contains(_search)
-                        || c.SelectionName.ToLower().Contains(_search));
+                        query = query.Where(c => c.ClientName.ToLower().Contains(search) || c.SportName.ToLower().Contains(search)
+                        || c.SegmentName.ToLower().Contains(search) || c.LeagueName.ToLower().Contains(search)
+                        || c.SelectionName.ToLower().Contains(search));
                     }
 
                     _priceBoostList = query.ToList();
