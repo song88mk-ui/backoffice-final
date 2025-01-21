@@ -37,43 +37,33 @@ namespace Backoffice.Web.States
 
         public async void SetAccessToken(string accessToken)
         {
-            var userModel = new UserModel();
-
+            base.Model = new UserModel();
             var parsedToken = JwtParser.ParseClaimsFromJwt(accessToken);
             var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(parsedToken, "jwtAuthType"));
             var userClaims = claimsPrincipal.Claims.ToList();
+            _isSuperAdmin = false;
 
             if (userClaims != null && userClaims.Any())
             {
                 var otherPermissions = new List<string>() { "CLIENTCODES", "USERID", "TOKENNAME", "MAINUSERID" };
 
-                userModel.Id = userClaims.Where(x => x.Type.ToUpper() == "USERID").FirstOrDefault()?.Value ?? "";
-                userModel.Name = userClaims.Where(x => x.Type.ToUpper() == "TOKENNAME").FirstOrDefault()?.Value ?? "";
-                userModel.MainUserId = userClaims.Where(x => x.Type.ToUpper() == "MAINUSERID").FirstOrDefault()?.Value ?? "";
-                userModel.RoleId = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLEID")?.Value ?? string.Empty;
-                userModel.RoleName = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLENAME")?.Value ?? string.Empty;
-                userModel.ClientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>();
-                _isSuperAdmin = !string.IsNullOrEmpty(userModel.RoleName) && userModel.RoleName.ToUpper().Equals("SUPER ADMIN") ? true : false;
+                base.Model = new UserModel()
+                {
+                    Id = userClaims.Where(x => x.Type.ToUpper() == "USERID").FirstOrDefault()?.Value ?? "",
+                    Name = userClaims.Where(x => x.Type.ToUpper() == "TOKENNAME").FirstOrDefault()?.Value ?? "",
+                    MainUserId = userClaims.Where(x => x.Type.ToUpper() == "MAINUSERID").FirstOrDefault()?.Value ?? "",
+                    RoleId = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLEID")?.Value ?? string.Empty,
+                    RoleName = userClaims.FirstOrDefault(c => c.Type.ToUpper() == "ROLENAME")?.Value ?? string.Empty,
+                    ClientCodes = userClaims.Where(x => x.Type.ToUpper() == "CLIENTCODES").FirstOrDefault()?.Value.Split(',').ToList() ?? new List<string>(),
+                    Claims = userClaims.Where(x => !otherPermissions.Contains(x.Type.ToUpper())).ToList(),
+                    AccessToken = accessToken,
+                    IsAuthenticated = !string.IsNullOrEmpty(accessToken),
+                    ClaimsPrincipal = claimsPrincipal
+                };
 
-                userModel.Claims = userClaims.Where(x => !otherPermissions.Contains(x.Type.ToUpper())).ToList();
-            }
-            else
-            {
-                _isSuperAdmin = false;
+                _isSuperAdmin = !string.IsNullOrEmpty(base.Model.RoleName) && base.Model.RoleName.ToUpper().Equals("SUPER ADMIN") ? true : false;
             }
 
-            base.Model = new UserModel()
-            {
-                Id = userModel.Id,
-                Name = userModel.Name,
-                MainUserId = userModel.MainUserId,
-                AccessToken = accessToken,
-                RoleId = userModel.RoleId,
-                RoleName = userModel.RoleName,
-                IsAuthenticated = !string.IsNullOrEmpty(accessToken),
-                Claims = new List<Claim>(userModel.Claims),
-                ClaimsPrincipal = claimsPrincipal
-            };
         }
         public void SetTradingClients(List<ClientInformationModel> clients)
         {
